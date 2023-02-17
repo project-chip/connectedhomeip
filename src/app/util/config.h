@@ -154,17 +154,6 @@
 #define EMBER_ADDRESS_TABLE_SIZE (EMBER_AF_PLUGIN_ADDRESS_TABLE_SIZE + EMBER_AF_PLUGIN_ADDRESS_TABLE_TRUST_CENTER_CACHE_SIZE)
 #endif
 
-#ifndef EMBER_AF_DEFAULT_APS_OPTIONS
-// BUGZID 12261: Concentrators use MTORRs for route discovery and should not
-// enable route discovery in the APS options.
-#ifdef EMBER_AF_PLUGIN_CONCENTRATOR
-#define EMBER_AF_DEFAULT_APS_OPTIONS (EMBER_APS_OPTION_RETRY | EMBER_APS_OPTION_ENABLE_ADDRESS_DISCOVERY)
-#else
-#define EMBER_AF_DEFAULT_APS_OPTIONS                                                                                               \
-    (EMBER_APS_OPTION_RETRY | EMBER_APS_OPTION_ENABLE_ROUTE_DISCOVERY | EMBER_APS_OPTION_ENABLE_ADDRESS_DISCOVERY)
-#endif
-#endif
-
 // *******************************************************************
 // // Default values for required defines
 // //

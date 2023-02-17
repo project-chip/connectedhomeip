@@ -501,53 +501,6 @@ EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t de
  */
 void emberAfSetCommandEndpoints(chip::EndpointId sourceEndpoint, chip::EndpointId destinationEndpoint);
 
-/**
- * @brief Use this function to find devices in the network with endpoints
- *   matching a given cluster ID in their descriptors.
- *   Target may either be a specific device, or the broadcast
- *   address EMBER_RX_ON_WHEN_IDLE_BROADCAST_ADDRESS.
- *
- * With this function a service discovery is initiated and received
- * responses are returned by executing the callback function passed in.
- * For unicast discoveries, the callback will be executed only once.
- * Either the target will return a result or a timeout will occur.
- * For broadcast discoveries, the callback may be called multiple times
- * and after a period of time the discovery will be finished with a final
- * call to the callback.
- *
- * @param target The destination node ID for the discovery; either a specific
- *  node's ID or EMBER_RX_ON_WHEN_IDLE_BROADCAST_ADDRESS.
- * @param clusterId The cluster being discovered.
- * @param serverCluster EMBER_AF_SERVER_CLUSTER_DISCOVERY (true) if discovering
- *  servers for the target cluster; EMBER_AF_CLIENT_CLUSTER_DISCOVERY (false)
- *  if discovering clients for that cluster.
- * @param callback Function pointer for the callback function triggered when
- *  a match is discovered.  (For broadcast discoveries, this is called once per
- *  matching node, even if a node has multiple matching endpoints.)
- */
-EmberStatus emberAfFindDevicesByCluster(EmberNodeId target, chip::ClusterId clusterId, bool serverCluster,
-                                        EmberAfServiceDiscoveryCallback * callback);
-
-#if !defined(DOXYGEN_SHOULD_SKIP_THIS)
-/**
- * @brief Use this macro to retrieve the current command. This
- * macro may only be used within the command parsing context. For instance
- * Any of the command handling callbacks may use this macro. If this macro
- * is used outside the command context, the returned EmberAfClusterCommand pointer
- * will be null.
- */
-#define emberAfCurrentCommand() (emAfCurrentCommand)
-extern EmberAfClusterCommand * emAfCurrentCommand;
-#endif
-
-/**
- * @brief returns the current endpoint that is being served.
- *
- * The purpose of this macro is mostly to access endpoint that
- * is being served in the command callbacks.
- */
-#define emberAfCurrentEndpoint() (emberAfCurrentCommand()->apsFrame->destinationEndpoint)
-
 /** @} END Messaging */
 
 /** @name ZCL macros */
@@ -594,12 +547,6 @@ extern EmberAfClusterCommand * emAfCurrentCommand;
 #define EMBER_TEST_ASSERT(x)
 #endif
 #endif
-
-/**
- * @brief API for parsing a cluster-specific message.  Implemented by
- * generated code.
- */
-EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
 
 /**
  * Returns the pointer to the data version storage for the given endpoint and

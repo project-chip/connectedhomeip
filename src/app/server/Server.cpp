@@ -240,7 +240,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
     // This initializes clusters, so should come after lower level initialization.
-    InitDataModelHandler(&mExchangeMgr);
+    InitDataModelHandler();
 
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&mExchangeMgr);

@@ -23,7 +23,6 @@
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
-#include <app/util/ember-compatibility-functions.h>
 #include <app/util/generic-callbacks.h>
 
 // TODO: figure out a clear path for compile-time codegen
@@ -52,14 +51,6 @@ const EmberAfClusterName zclClusterNames[] = {
     { kInvalidClusterId, nullptr }, // terminator
 };
 
-// A pointer to the current command being processed
-// This struct is allocated inside ember-compatibility-functions.cpp.
-// The pointer below is set to NULL when not processing a command.
-EmberAfClusterCommand * emAfCurrentCommand;
-
-// A pointer to the global exchange manager
-chip::Messaging::ExchangeManager * emAfExchangeMgr = nullptr;
-
 // DEPRECATED.
 uint8_t emberAfIncomingZclSequenceNumber = 0xFF;
 
@@ -67,7 +58,6 @@ uint8_t emberAfIncomingZclSequenceNumber = 0xFF;
 // not responses.
 uint8_t emberAfSequenceNumber = 0xFF;
 
-static uint8_t /*enum EmberAfRetryOverride*/ emberAfApsRetryOverride                      = EMBER_AF_RETRY_OVERRIDE_NONE;
 static uint8_t /*enum EmberAfDisableDefaultResponse*/ emAfDisableDefaultResponse          = EMBER_AF_DISABLE_DEFAULT_RESPONSE_NONE;
 static uint8_t /*enum EmberAfDisableDefaultResponse*/ emAfSavedDisableDefaultResponseVale = EMBER_AF_DISABLE_DEFAULT_RESPONSE_NONE;
 
@@ -131,14 +121,12 @@ EmberAfDifferenceType emberAfGetDifference(uint8_t * pData, EmberAfDifferenceTyp
 // ****************************************
 // Initialize Clusters
 // ****************************************
-void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
+void emberAfInit()
 {
     uint8_t i;
 #ifdef EMBER_AF_ENABLE_STATISTICS
     afNumPktsSent = 0;
 #endif
-
-    emAfExchangeMgr = exchangeMgr;
 
     for (i = 0; i < EMBER_SUPPORTED_NETWORKS; i++)
     {
@@ -220,23 +208,6 @@ uint16_t emberAfFindClusterNameIndex(ClusterId cluster)
     return 0xFFFF;
 }
 
-// This function makes the assumption that
-// emberAfCurrentCommand will either be NULL
-// when invalid, or will have a valid mfgCode
-// when called.
-// If it is invalid, we just return the
-// EMBER_AF_NULL_MANUFACTURER_CODE, which we tend to use
-// for references to the standard library.
-uint16_t emberAfGetMfgCodeFromCurrentCommand()
-{
-    if (emberAfCurrentCommand() != nullptr)
-    {
-        return emberAfCurrentCommand()->mfgCode;
-    }
-
-    return EMBER_AF_NULL_MANUFACTURER_CODE;
-}
-
 // the caller to the library can set a flag to say do not respond to the
 // next ZCL message passed in to the library. Passing true means disable
 // the reply for the next ZCL message. Setting to false re-enables the
@@ -251,36 +222,6 @@ void emberAfSetNoReplyForNextMessage(bool set)
     else
     {
         emberAfResponseType = static_cast<uint8_t>(emberAfResponseType & ~ZCL_UTIL_RESP_NONE);
-    }
-}
-
-void emberAfSetRetryOverride(EmberAfRetryOverride value)
-{
-    emberAfApsRetryOverride = value;
-}
-
-EmberAfRetryOverride emberAfGetRetryOverride()
-{
-    return (EmberAfRetryOverride) emberAfApsRetryOverride;
-}
-
-void emAfApplyRetryOverride(EmberApsOption * options)
-{
-    if (options == nullptr)
-    {
-        return;
-    }
-    if (emberAfApsRetryOverride == EMBER_AF_RETRY_OVERRIDE_SET)
-    {
-        *options |= EMBER_APS_OPTION_RETRY;
-    }
-    else if (emberAfApsRetryOverride == EMBER_AF_RETRY_OVERRIDE_UNSET)
-    {
-        *options = static_cast<EmberApsOption>(*options & ~EMBER_APS_OPTION_RETRY);
-    }
-    else
-    {
-        // MISRA requires ..else if.. to have terminating else.
     }
 }
 
@@ -469,16 +410,6 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
     return 0;
 }
 
-#if 0
-// Moving to time-util.c
-int8_t emberAfCompareDates(EmberAfDate* date1, EmberAfDate* date2)
-{
-  uint32_t val1 = emberAfEncodeDate(date1);
-  uint32_t val2 = emberAfEncodeDate(date2);
-  return (val1 == val2) ? 0 : ((val1 < val2) ? -1 : 1);
-}
-#endif
-
 // Zigbee spec says types between signed 8 bit and signed 64 bit
 bool emberAfIsTypeSigned(EmberAfAttributeType dataType)
 {
@@ -529,9 +460,4 @@ bool emberAfIsKnownVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId 
     }
 
     return !metadata->IsAutomaticallyPersisted() && !metadata->IsExternal();
-}
-
-chip::Messaging::ExchangeManager * chip::ExchangeManager()
-{
-    return emAfExchangeMgr;
 }
