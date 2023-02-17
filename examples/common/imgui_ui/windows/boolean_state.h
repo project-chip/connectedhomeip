@@ -34,7 +34,7 @@ namespace Windows {
 class BooleanState : public Window
 {
 public:
-    BooleanState(chip::EndpointId endpointId, const char *title) : mEndpointId(endpointId), mTitle(title) {}
+    BooleanState(chip::EndpointId endpointId, const char * title) : mEndpointId(endpointId), mTitle(title) {}
 
     void UpdateState() override;
     void Render() override;
