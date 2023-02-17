@@ -54,6 +54,7 @@ using chip::app::Clusters::DoorLock::UserStatusEnum;
 using chip::app::Clusters::DoorLock::UserTypeEnum;
 using chip::app::DataModel::List;
 using chip::app::DataModel::Nullable;
+using chip::app::DataModel::NullNullable;
 
 using CredentialStruct  = chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type;
 using LockOpCredentials = CredentialStruct;
@@ -95,7 +96,9 @@ public:
      *
      * @return true on success, false on failure.
      */
-    bool SetLockState(chip::EndpointId endpointId, DlLockState newLockState, OperationSourceEnum opSource);
+    bool SetLockState(chip::EndpointId endpointId, DlLockState newLockState, OperationSourceEnum opSource,
+                      const Nullable<uint16_t> & userIndex                        = NullNullable,
+                      const Nullable<List<const LockOpCredentials>> & credentials = NullNullable);
 
     /**
      * Updates the LockState attribute with new value.
@@ -408,7 +411,7 @@ private:
     void SendLockOperationEvent(chip::EndpointId endpointId, LockOperationTypeEnum opType, OperationSourceEnum opSource,
                                 OperationErrorEnum opErr, const Nullable<uint16_t> & userId,
                                 const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
-                                LockOpCredentials * credList, size_t credListSize, bool opSuccess = true);
+                                const Nullable<List<const LockOpCredentials>> & credentials = NullNullable, bool opSuccess = true);
 
     /**
      * @brief Schedule auto relocking with a given timeout

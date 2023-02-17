@@ -107,7 +107,8 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
     return SetAttribute(endpointId, Attributes::LockState::Id, Attributes::LockState::Set, newLockState);
 }
 
-bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState, OperationSourceEnum opSource)
+bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState, OperationSourceEnum opSource,
+                                  const Nullable<uint16_t> & userIndex, const Nullable<List<const LockOpCredentials>> & credentials)
 {
     bool success = SetLockState(endpointId, newLockState);
 
@@ -122,8 +123,8 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
     // Send LockOperation event
     auto opType = (DlLockState::kLocked == newLockState) ? LockOperationTypeEnum::kLock : LockOperationTypeEnum::kUnlock;
 
-    SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kUnspecified, Nullable<uint16_t>(),
-                           Nullable<chip::FabricIndex>(), Nullable<chip::NodeId>(), nullptr, 0, success);
+    SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kUnspecified, userIndex, Nullable<chip::FabricIndex>(),
+                           Nullable<chip::NodeId>(), credentials, success);
 
     // Schedule auto-relocking
     if (success && LockOperationTypeEnum::kUnlock == opType)
@@ -3356,46 +3357,31 @@ exit:
 
     // Send LockOperation/LockOperationError event.  The credential index in
     // foundCred will be filled in if we actually have a value to fill in.
+    Nullable<List<const LockOpCredentials>> credentials{};
     LockOpCredentials foundCred[] = { { CredentialTypeEnum::kPin, UINT16_MAX } };
-    LockOpCredentials * credList  = nullptr;
-    size_t credListSize           = 0;
 
     // appclusters.pdf 5.3.5.3, 5.3.5.4:
     // The list of credentials used in performing the lock operation. This SHALL be null if no credentials were involved.
     if (pinCode.HasValue() && pinCredIdx.HasValue())
     {
         foundCred[0].credentialIndex = pinCredIdx.Value();
-        credList                     = foundCred;
-        credListSize                 = 1;
+        credentials.SetNonNull(foundCred);
     }
 
     SendLockOperationEvent(endpoint, opType, OperationSourceEnum::kRemote, reason, pinUserIdx,
                            Nullable<chip::FabricIndex>(getFabricIndex(commandObj)), Nullable<chip::NodeId>(getNodeId(commandObj)),
-                           credList, credListSize, success);
+                           credentials, success);
     return success;
 }
 
 void DoorLockServer::SendLockOperationEvent(chip::EndpointId endpointId, LockOperationTypeEnum opType, OperationSourceEnum opSource,
                                             OperationErrorEnum opErr, const Nullable<uint16_t> & userId,
                                             const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
-                                            LockOpCredentials * credList, size_t credListSize, bool opSuccess)
+                                            const Nullable<List<const LockOpCredentials>> & credentials, bool opSuccess)
 {
-    Nullable<List<const Structs::CredentialStruct::Type>> credentials{};
-
-    // appclusters.pdf 5.3.5.3, 5.3.5.4:
-    // The list of credentials used in performing the lock operation. This SHALL be null if no credentials were involved.
-    if (nullptr == credList || 0 == credListSize)
-    {
-        credentials.SetNull();
-    }
-    else
-    {
-        credentials.SetNonNull(List<const Structs::CredentialStruct::Type>(credList, credListSize));
-    }
 
     // TODO: if [USR] feature is not supported then credentials should be omitted (Optional.HasValue()==false)?
     // Spec just says that it should be NULL if no PIN were provided.
-
     if (opSuccess)
     {
         Events::LockOperation::Type event{ opType, opSource, userId, fabricIdx, nodeId, MakeOptional(credentials) };

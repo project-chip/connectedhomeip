@@ -20,15 +20,16 @@
 #include <cstring>
 
 using chip::to_underlying;
+using chip::app::DataModel::MakeNullable;
 
-bool LockEndpoint::Lock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
+bool LockEndpoint::Lock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
 {
-    return setLockState(DlLockState::kLocked, pin, err);
+    return setLockState(DlLockState::kLocked, pin, err, opSource);
 }
 
-bool LockEndpoint::Unlock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
+bool LockEndpoint::Unlock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource)
 {
-    return setLockState(DlLockState::kUnlocked, pin, err);
+    return setLockState(DlLockState::kUnlocked, pin, err, opSource);
 }
 
 bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const
@@ -376,7 +377,8 @@ DlStatus LockEndpoint::SetSchedule(uint8_t holidayIndex, DlScheduleStatus status
     return DlStatus::kSuccess;
 }
 
-bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err)
+bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err,
+                                OperationSourceEnum opSource)
 {
     // Assume pin is required until told otherwise
     bool requirePin = true;
@@ -457,8 +459,11 @@ bool LockEndpoint::setLockState(DlLockState lockState, const Optional<chip::Byte
         "Lock App: specified PIN code was found in the database, setting door lock state to \"%s\" [endpointId=%d,userIndex=%u]",
         lockStateToString(lockState), mEndpointId, userIndex);
 
-    mLockState = lockState;
-    DoorLockServer::Instance().SetLockState(mEndpointId, mLockState);
+    mLockState                         = lockState;
+    LockOpCredentials userCredential[] = { { CredentialTypeEnum::kPin, uint16_t(credentialIndex) } };
+    auto userCredentials               = MakeNullable<List<const LockOpCredentials>>(userCredential);
+    DoorLockServer::Instance().SetLockState(mEndpointId, mLockState, opSource, MakeNullable(static_cast<uint16_t>(userIndex + 1)),
+                                            userCredentials);
 
     return true;
 }
