@@ -65,14 +65,8 @@ struct ExtensionFieldsSet
 
         ReturnErrorOnFailure(reader.Next(TagEFS()));
         ReturnErrorOnFailure(reader.Get(buffer));
-        if (buffer.size() > kMaxFieldsPerCluster)
-        {
-            this->mUsedBytes = kMaxFieldsPerCluster;
-        }
-        else
-        {
-            this->mUsedBytes = static_cast<uint8_t>(buffer.size());
-        }
+        VerifyOrReturnError(buffer.size() <= kMaxFieldsPerCluster, CHIP_ERROR_BUFFER_TOO_SMALL);
+        this->mUsedBytes = static_cast<uint8_t>(buffer.size());
         memcpy(this->mBytesBuffer, buffer.data(), this->mUsedBytes);
 
         return reader.ExitContainer(container);
@@ -85,7 +79,7 @@ struct ExtensionFieldsSet
         this->mUsedBytes = 0;
     }
 
-    bool is_empty() const { return (this->mUsedBytes == 0); }
+    bool IsEmpty() const { return (this->mUsedBytes == 0); }
 
     bool operator==(const ExtensionFieldsSet & other)
     {
@@ -120,12 +114,12 @@ public:
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override;
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override;
     void Clear() override;
-    bool is_empty() const override;
+    bool IsEmpty() const override;
 
     // implementation
-    CHIP_ERROR insertField(ExtensionFieldsSet & field);
-    CHIP_ERROR getFieldAtPosition(ExtensionFieldsSet & field, uint8_t position);
-    CHIP_ERROR removeFieldAtPosition(uint8_t position);
+    CHIP_ERROR InsertFieldSet(ExtensionFieldsSet & field);
+    CHIP_ERROR GetFieldSetAtPosition(ExtensionFieldsSet & field, uint8_t position);
+    CHIP_ERROR RemoveFieldAtPosition(uint8_t position);
 
     bool operator==(const ExtensionFieldsSetsImpl & other)
     {

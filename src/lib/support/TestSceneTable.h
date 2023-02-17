@@ -151,14 +151,14 @@ CHIP_ERROR TestSceneData(SceneTableImpl * provider, FabricIndex fabric_index)
     err = provider->registerHandler(levelControlEFS1.mID, &test_level_control_from_cluster_callback,
                                     &test_level_control_to_cluster_callback);
     LogErrorOnFailure(err);
-    err = provider->EFSValuesFromCluster(scene1.mStorageData.mExtentsionFieldsSets);
+    err = provider->EFSValuesFromCluster(scene1.mStorageData.mExtensionFieldsSets);
     LogErrorOnFailure(err);
 
     // Tests
     err = scene_store_test(provider, fabric_index, scene1);
     LogErrorOnFailure(err);
 
-    err = provider->EFSValuesToCluster(scene1.mStorageData.mExtentsionFieldsSets);
+    err = provider->EFSValuesToCluster(scene1.mStorageData.mExtensionFieldsSets);
     LogErrorOnFailure(err);
 
     err = scene_store_test(provider, fabric_index, scene2);

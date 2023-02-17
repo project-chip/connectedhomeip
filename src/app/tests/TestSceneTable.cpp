@@ -168,15 +168,15 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
     ResetSceneTable(sceneTable);
 
     // Test SceneHandlers
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->registerHandler(onOffEFS1.mID, &oo_from_cluster_cb1, &oo_to_cluster_cb1));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->registerHandler(lvCtrEFS1.mID, &lc_from_cluster_cb1, &lc_to_cluster_cb1));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->registerHandler(coCtrEFS2.mID, &cc_from_cluster_cb1, &cc_to_cluster_cb1));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RegisterHandler(onOffEFS1.mID, &oo_from_cluster_cb1, &oo_to_cluster_cb1));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RegisterHandler(lvCtrEFS1.mID, &lc_from_cluster_cb1, &lc_to_cluster_cb1));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RegisterHandler(coCtrEFS2.mID, &cc_from_cluster_cb1, &cc_to_cluster_cb1));
 
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene1.mStorageData.mExtentsionFieldsSets));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene2.mStorageData.mExtentsionFieldsSets));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene3.mStorageData.mExtentsionFieldsSets));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene4.mStorageData.mExtentsionFieldsSets));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene5.mStorageData.mExtentsionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene1.mStorageData.mExtensionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene2.mStorageData.mExtensionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene3.mStorageData.mExtensionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene4.mStorageData.mExtensionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene5.mStorageData.mExtensionFieldsSets));
 
     SceneTableEntry scene;
 
@@ -199,23 +199,23 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
     // Get test
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId1, scene));
     NL_TEST_ASSERT(aSuite, scene == scene1);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.mStorageData.mExtentsionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.mStorageData.mExtensionFieldsSets));
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId2, scene));
     NL_TEST_ASSERT(aSuite, scene == scene2);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.mStorageData.mExtentsionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.mStorageData.mExtensionFieldsSets));
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId3, scene));
     NL_TEST_ASSERT(aSuite, scene == scene3);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.mStorageData.mExtentsionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.mStorageData.mExtensionFieldsSets));
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId4, scene));
     NL_TEST_ASSERT(aSuite, scene == scene4);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.mStorageData.mExtentsionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.mStorageData.mExtensionFieldsSets));
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId5, scene));
     NL_TEST_ASSERT(aSuite, scene == scene5);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.mStorageData.mExtentsionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.mStorageData.mExtensionFieldsSets));
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId6, scene));
     NL_TEST_ASSERT(aSuite, scene == scene6);
@@ -231,16 +231,16 @@ void TestOverwriteScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, sceneTable);
 
     // Test SceneHandlers overwrite
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->registerHandler(onOffEFS2.mID, &oo_from_cluster_cb2, &oo_to_cluster_cb2));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->registerHandler(lvCtrEFS2.mID, &lc_from_cluster_cb2, &lc_to_cluster_cb2));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->registerHandler(coCtrEFS2.mID, &cc_from_cluster_cb2, &cc_to_cluster_cb2));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RegisterHandler(onOffEFS2.mID, &oo_from_cluster_cb2, &oo_to_cluster_cb2));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RegisterHandler(lvCtrEFS2.mID, &lc_from_cluster_cb2, &lc_to_cluster_cb2));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RegisterHandler(coCtrEFS2.mID, &cc_from_cluster_cb2, &cc_to_cluster_cb2));
 
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene10.mStorageData.mExtentsionFieldsSets));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene11.mStorageData.mExtentsionFieldsSets));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene12.mStorageData.mExtentsionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene10.mStorageData.mExtensionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene11.mStorageData.mExtensionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesFromCluster(scene12.mStorageData.mExtensionFieldsSets));
 
     // Verfies the overwrite hasn't changed the handlers number
-    NL_TEST_ASSERT(aSuite, sceneTable->getHandlerNum() == 3);
+    NL_TEST_ASSERT(aSuite, sceneTable->GetHandlerNum() == 3);
 
     SceneTableEntry scene;
     // Overwriting the first entry
@@ -253,15 +253,15 @@ void TestOverwriteScenes(nlTestSuite * aSuite, void * aContext)
     // Scene 10 has the same sceneId as scene 1, Get->sceneId1 should thus return scene 10, etc.
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId1, scene));
     NL_TEST_ASSERT(aSuite, scene == scene10);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.mStorageData.mExtentsionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.mStorageData.mExtensionFieldsSets));
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId5, scene));
     NL_TEST_ASSERT(aSuite, scene == scene11);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.mStorageData.mExtentsionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.mStorageData.mExtensionFieldsSets));
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId8, scene));
     NL_TEST_ASSERT(aSuite, scene == scene12);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.mStorageData.mExtentsionFieldsSets));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->EFSValuesToCluster(scene.mStorageData.mExtensionFieldsSets));
 }
 
 void TestIterateScenes(nlTestSuite * aSuite, void * aContext)
