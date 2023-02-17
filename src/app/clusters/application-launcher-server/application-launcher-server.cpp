@@ -39,8 +39,6 @@
 #include <app/util/attribute-storage.h>
 #include <platform/CHIPDeviceConfig.h>
 
-#include <app/util/config.h>
-
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ApplicationLauncher;

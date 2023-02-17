@@ -34,8 +34,6 @@
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
 
-#include <app/util/config.h>
-
 #include <list>
 
 using namespace chip;

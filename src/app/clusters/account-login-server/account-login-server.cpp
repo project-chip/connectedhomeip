@@ -35,8 +35,6 @@
 #include <app/app-platform/ContentAppPlatform.h>
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-#include <app/util/config.h>
-
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AccountLogin;
