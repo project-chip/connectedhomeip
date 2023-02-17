@@ -65,9 +65,18 @@ ImVec4 HueSaturationToColor(float hueDegrees, float saturationPercent)
 
 void Light::UpdateState()
 {
+    if (mTargetLightIsOn.HasValue()) {
+        OnOff::Attributes::OnOff::Set(mEndpointId, mTargetLightIsOn.Value());
+        mTargetLightIsOn.ClearValue();
+    }
     OnOff::Attributes::OnOff::Get(mEndpointId, &mLightIsOn);
 
     // Level Control
+    if (mTargetLevel.HasValue()) {
+        LevelControl::Attributes::CurrentLevel::Set(mEndpointId, mTargetLevel.Value());
+        mTargetLevel.ClearValue();
+    }
+
     LevelControl::Attributes::CurrentLevel::Get(mEndpointId, mCurrentLevel);
     LevelControl::Attributes::MinLevel::Get(mEndpointId, &mMinLevel);
     LevelControl::Attributes::MaxLevel::Get(mEndpointId, &mMaxLevel);
@@ -88,15 +97,14 @@ void Light::Render()
     ImGui::Begin("Light state");
     ImGui::Text("Light on endpoint %d", mEndpointId);
 
-    ImGui::Text("On-Off:");
     ImGui::Indent();
-    if (mLightIsOn)
     {
-        ImGui::Text("Light is ON");
-    }
-    else
-    {
-        ImGui::Text("Light is OFF");
+        bool uiValue = mLightIsOn;
+        ImGui::Checkbox("Light is ON", &uiValue);
+        if (uiValue != mLightIsOn)
+        {
+            mTargetLightIsOn.SetValue(uiValue); // schedule future update
+        }
     }
 
     // bright yellow vs dark yellow on/off view
@@ -115,8 +123,12 @@ void Light::Render()
     }
     else
     {
-        int levelValue = mCurrentLevel.Value();
-        ImGui::SliderInt("Current Level", &levelValue, mMinLevel, mMaxLevel);
+        int uiValue = mCurrentLevel.Value();
+        ImGui::SliderInt("Current Level", &uiValue, mMinLevel, mMaxLevel);
+        if (uiValue != mCurrentLevel.Value())
+        {
+            mTargetLevel.SetValue(uiValue); // schedule future update
+        }
     }
     ImGui::Unindent();
 
