@@ -43,12 +43,7 @@ using chip::Protocols::InteractionModel::Status;
  * Attributes Definition
  *********************************************************/
 
-namespace {
-
-OnOffEffect * firstEffect = nullptr;
-
-} // namespace
-
+static OnOffEffect * firstEffect = nullptr;
 OnOffServer OnOffServer::instance;
 
 /**********************************************************
