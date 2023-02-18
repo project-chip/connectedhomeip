@@ -121,9 +121,9 @@ class TestPythonController(CHIPVirtualHome):
                 self.get_device_pretty_id(device_id)))
             self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), [
                 "Received command for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001",
-                "Toggle on/off from 0 to 1",
+                "Toggle ep1 on/off from state 0 to 1",
                 "Received command for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0000",
-                "Toggle on/off from 1 to 0",
+                "Toggle ep1 on/off from state 1 to 0",
                 "No command 0x0000_0001 in Cluster 0x0000_0006 on Endpoint 0xe9"]),
                 "Datamodel test failed: cannot find matching string from device {}".format(device_id))
 
