@@ -68,7 +68,7 @@ class Efr32App(Enum):
         elif self == Efr32App.WINDOW_COVERING:
             return 'window_app.flashbundle.txt'
         elif self == Efr32App.THERMOSTAT:
-            return 'thermostat.flashbundle.txt'
+            return 'thermostat_app.flashbundle.txt'
         elif self == Efr32App.UNIT_TEST:
             return 'efr32_device_tests.flashbundle.txt'
         else:
