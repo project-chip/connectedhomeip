@@ -25,7 +25,6 @@
 #include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
 
-
 using chip::app::Clusters::OnOff::OnOffFeature;
 
 /**********************************************************

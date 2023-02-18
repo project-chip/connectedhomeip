@@ -23,8 +23,8 @@
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 #include <app/util/config.h>
-#include <protocols/interaction_model/StatusCode.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 /**********************************************************
  * Defines and Macros
