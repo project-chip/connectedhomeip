@@ -76,6 +76,28 @@
 
     XCTAssertNil(payload);
     XCTAssertNotNil(error);
+
+    // Use the fact that this is actually a Matter error to test our
+    // NSSecureCoding implementation.
+    XCTAssertNotNil(error.userInfo);
+    XCTAssertNotNil(error.userInfo[@"underlyingError"]);
+
+    XCTAssertTrue([[error description] containsString:@"MTRSetupPayload.mm"]);
+    XCTAssertTrue([[error description] containsString:@"0x0000002F"]);
+
+    NSError * encodingError;
+    NSData * encoded = [NSKeyedArchiver archivedDataWithRootObject:error requiringSecureCoding:YES error:&encodingError];
+    XCTAssertNotNil(encoded);
+    XCTAssertNil(encodingError);
+
+    NSSet * classes = [NSSet setWithObjects:[NSError class], NSClassFromString(@"MTRErrorHolder"), nil];
+    NSError * decodingError;
+    NSError * decoded = [NSKeyedUnarchiver unarchivedObjectOfClasses:classes fromData:encoded error:&decodingError];
+    XCTAssertNotNil(decoded);
+    XCTAssertNil(decodingError);
+
+    XCTAssertFalse([[decoded description] containsString:@"MTRSetupPayload.mm"]);
+    XCTAssertTrue([[error description] containsString:@"0x0000002F"]);
 }
 
 - (void)testOnboardingPayloadParser_NFC_NoError

@@ -30,7 +30,7 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
 // Class for holding on to a CHIP_ERROR that we can use as the value
 // in a dictionary.
-@interface MTRErrorHolder : NSObject
+@interface MTRErrorHolder : NSObject <NSSecureCoding>
 @property (nonatomic, readonly) CHIP_ERROR error;
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -297,6 +297,44 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
     _error = error;
     return self;
+}
+
+#pragma mark - NSSecureCoding
+
+static NSString * const MTRErrorHolderCodingKeyErrorNumber = @"MTREH.ck.errorNumber";
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    // We don't try to save our file/line info, because that's pointing to our
+    // process memory, so there is no really good way to decode it on the other
+    // side without leaking the filename string.
+    [coder encodeObject:@(self.error.AsInteger()) forKey:MTRErrorHolderCodingKeyErrorNumber];
+}
+
+- (instancetype _Nullable)initWithCoder:(NSCoder *)decoder
+{
+    using namespace chip;
+
+    NSNumber * errorNumber = [decoder decodeObjectOfClass:[NSNumber class] forKey:MTRErrorHolderCodingKeyErrorNumber];
+    if (decoder == nil) {
+        return nil;
+    }
+
+    // Use unsignedLongLongValue so we are not making assumptions about the size
+    // of ChipError::StorageType
+    auto error = static_cast<ChipError::StorageType>(errorNumber.unsignedLongLongValue);
+
+    return [self initWithError:ChipError(error)];
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<MTRErrorHolder>[error: %s]", self.error.AsString()];
 }
 
 @end
