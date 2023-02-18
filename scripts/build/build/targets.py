@@ -192,6 +192,7 @@ def BuildEfr32Target():
     target.AppendFixedTargets([
         TargetPart('brd4161a', board=Efr32Board.BRD4161A),
         TargetPart('brd4187c', board=Efr32Board.BRD4187C),
+        TargetPart('brd4186c', board=Efr32Board.BRD4186C),
         TargetPart('brd4163a', board=Efr32Board.BRD4163A),
         TargetPart('brd4164a', board=Efr32Board.BRD4164A),
         TargetPart('brd4166a', board=Efr32Board.BRD4166A),
