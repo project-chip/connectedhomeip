@@ -55,7 +55,6 @@ static constexpr AttributeId Id = 0x0000FFFD;
 } // namespace Attributes
 } // namespace Globals
 
-
 namespace Identify {
 namespace Attributes {
 
@@ -5319,7 +5318,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace FaultInjection
-
 
 } // namespace Clusters
 } // namespace app

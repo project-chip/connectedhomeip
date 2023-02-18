@@ -355,7 +355,6 @@ static constexpr EventId Id = 0x00000002;
 } // namespace Events
 } // namespace UnitTesting
 
-
 } // namespace Clusters
 } // namespace app
 } // namespace chip
