@@ -88,13 +88,13 @@ jobs:
           ./scripts/run_in_build_env.sh \
              "./scripts/build/build_examples.py \
                 --enable-flashbundle \
-                --target efr32-brd4187c-window-covering \
-                --target efr32-brd4187c-switch \
-                --target efr32-brd4187c-switch-sed \
+                --target efr32-brd4187c-window-covering-additional_data_advertising \
+                --target efr32-brd4187c-switch-openthread_mtd-shell \
+                --target efr32-brd4187c-switch-sed-low-power-use_ot_coap_lib \
                 --target efr32-brd4187c-unit-test \
-                --target efr32-brd4187c-light \
+                --target efr32-brd4187c-light-use_ot_lib \
                 --target efr32-brd4187c-light-rpc \
-                --target efr32-brd4187c-lock-rpc \
+                --target efr32-brd4187c-lock-rpc-shell-enable_heap_monitoring \
                 build \
                 --copy-artifacts-to out/artifacts \
              "
@@ -102,11 +102,11 @@ jobs:
         run: |
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
              efr32 BRD4187C lighting-app \
-             out/efr32-brd4187c-light/chip-efr32-lighting-example.out \
+             out/efr32-brd4187c-light-rpc/chip-efr32-lighting-example.out \
              /tmp/bloat_reports/
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py  \
              efr32 BRD4187C window-app \
-             out/efr32-brd4187c-window-covering/chip-efr32-window-example.out \
+             out/efr32-brd4187c-window-covering-additional_data_advertising/chip-efr32-window-example.out \
              /tmp/bloat_reports/
       - name: Clean out build output
         run: rm -rf ./out
