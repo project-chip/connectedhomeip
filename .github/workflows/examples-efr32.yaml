@@ -102,11 +102,11 @@ jobs:
         run: |
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
              efr32 BRD4187C lighting-app \
-             out/efr32-brd4187c-light/chip-efr32-lighting-example.out \
+             out/efr32-brd4187c-light-rpc/chip-efr32-lighting-example.out \
              /tmp/bloat_reports/
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py  \
              efr32 BRD4187C window-app \
-             out/efr32-brd4187c-window-covering/chip-efr32-window-example.out \
+             out/efr32-brd4187c-window-covering-additional_data_advertising/chip-efr32-window-example.out \
              /tmp/bloat_reports/
       - name: Clean out build output
         run: rm -rf ./out
