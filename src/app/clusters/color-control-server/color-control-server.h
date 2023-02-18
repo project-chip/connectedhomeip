@@ -256,8 +256,7 @@ private:
     Color16uTransitionState colorTempTransitionStates[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
-    EmberEventControl
-        eventControls[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
+    EmberEventControl eventControls[EMBER_AF_COLOR_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 };
 
 /**********************************************************

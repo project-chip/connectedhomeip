@@ -3391,7 +3391,9 @@ void DoorLockServer::SendLockOperationEvent(chip::EndpointId endpointId, LockOpe
 
 void DoorLockServer::ScheduleAutoRelock(chip::EndpointId endpointId, uint32_t timeoutSec)
 {
-    uint32_t timeoutMs = timeoutSec * MILLISECOND_TICKS_PER_SECOND;
+    uint32_t timeoutMs =
+        (DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC >= timeoutSec) ? timeoutSec * MILLISECOND_TICKS_PER_SECOND : DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC;
+
     CHIP_ERROR err =
         DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(timeoutMs), DoorLockOnAutoRelockCallback,
                                               reinterpret_cast<void *>(static_cast<uintptr_t>(endpointId)));
