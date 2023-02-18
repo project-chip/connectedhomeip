@@ -3402,7 +3402,8 @@ void DoorLockServer::ScheduleAutoRelock(chip::EndpointId endpointId, uint32_t ti
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to schedule autorelock: timeout=%" PRIu32 ", status=%" CHIP_ERROR_FORMAT, timeoutSec, err.Format());
+        ChipLogError(Zcl, "Failed to schedule autorelock: timeout=%" PRIu32 ", status=%" CHIP_ERROR_FORMAT, timeoutSec,
+                     err.Format());
     }
 }
 
