@@ -24,9 +24,7 @@ extern "C" {
 #include "semphr.h"
 #include "sl_mx25_flash_shutdown_usart_config.h"
 #include "sl_spidrv_exp_config.h"
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
 #include "sl_wfx_host_api.h"
-#endif /* EFR32MG24 && WF200_WIFI */
 
 #define LCD_BIT_RATE 1100000
 #define EXP_HDR_BIT_RATE 16000000
