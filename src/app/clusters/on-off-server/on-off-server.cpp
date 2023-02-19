@@ -20,7 +20,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/data-model/Nullable.h>
 #include <app/reporting/reporting.h>
-#include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
 #include <app/util/error-mapping.h>
@@ -73,18 +72,10 @@ void OnOffServer::scheduleTimerCallbackMs(EmberEventControl * control, uint32_t 
     {
         ChipLogError(Zcl, "OnOff Server failed to schedule event: %" CHIP_ERROR_FORMAT, err.Format());
     }
-    else
-    {
-        control->status = EMBER_EVENT_MS_TIME;
-    }
 }
 
 void OnOffServer::cancelEndpointTimerCallback(EmberEventControl * control)
 {
-    if (control->status != EMBER_EVENT_INACTIVE)
-    {
-        control->status = EMBER_EVENT_INACTIVE;
-    }
     DeviceLayer::SystemLayer().CancelTimer(timerCallback, control);
 }
 
