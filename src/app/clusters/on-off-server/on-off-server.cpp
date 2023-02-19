@@ -110,8 +110,6 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
     EmberAfStatus status;
     bool currentValue, newValue;
 
-    emberAfOnOffClusterPrintln("On/Off set value: %x %x", endpoint, static_cast<uint8_t>(command));
-
     // read current on/off value
     status = Attributes::OnOff::Get(endpoint, &currentValue);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -123,14 +121,14 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
     // if the value is already what we want to set it to then do nothing
     if ((!currentValue && command == Commands::Off::Id) || (currentValue && command == Commands::On::Id))
     {
-        emberAfOnOffClusterPrintln("On/off already set to new value");
+        emberAfOnOffClusterPrintln("Endpoint %x On/off already set to new value", endpoint);
         return EMBER_ZCL_STATUS_SUCCESS;
     }
 
     // we either got a toggle, or an on when off, or an off when on,
     // so we need to swap the value
     newValue = !currentValue;
-    emberAfOnOffClusterPrintln("Toggle on/off from %x to %x", currentValue, newValue);
+    emberAfOnOffClusterPrintln("Toggle ep%x on/off from state %x to %x", endpoint, currentValue, newValue);
 
     // the sequence of updating on/off attribute and kick off level change effect should
     // be depend on whether we are turning on or off. If we are turning on the light, we
@@ -193,12 +191,6 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
     }
     else // Set Off
     {
-        if (SupportsLightingApplications(endpoint))
-        {
-            emberAfOnOffClusterPrintln("Off Command - OnTime :  0");
-            Attributes::OnTime::Set(endpoint, 0); // Reset onTime
-        }
-
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         // If initiatedByLevelChange is false, then we assume that the level change
         // ZCL stuff has not happened and we do it here
@@ -207,8 +199,8 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
             emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
         }
         else
-        {
 #endif
+        {
             // write the new on/off value
             status = Attributes::OnOff::Set(endpoint, newValue);
             if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -216,9 +208,13 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, chip::Comman
                 emberAfOnOffClusterPrintln("ERR: writing on/off %x", status);
                 return status;
             }
-#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
+
+            if (SupportsLightingApplications(endpoint))
+            {
+                emberAfOnOffClusterPrintln("Off completed. reset OnTime to  0");
+                Attributes::OnTime::Set(endpoint, 0); // Reset onTime
+            }
         }
-#endif
     }
 
 #ifdef EMBER_AF_PLUGIN_SCENES
@@ -383,7 +379,6 @@ bool OnOffServer::offWithEffectCommand(app::CommandHandler * commandObj, const a
 #endif // EMBER_AF_PLUGIN_SCENES
 
             OnOff::Attributes::GlobalSceneControl::Set(endpoint, false);
-            Attributes::OnTime::Set(endpoint, 0);
         }
 
         // Only apply effect if OnOff is on
