@@ -7,125 +7,59 @@ orphan: true
 ## Overview
 
 This tool can generate an OTA image in the `|OTA standard header|TLV1|...|TLVn|`
-format. The payload contains data in standard TLV format (not Matter TLV format.
+format. The payload contains data in standard TLV format (not Matter TLV format).
 During OTA transfer, these TLV can span across multiple BDX blocks, thus the
 `OTAImageProcessorImpl` instance should take this into account.
 
-Each TLV will be processed by its associated processor, pre-registered in
-`OTAImageProcessorImpl` and identified by the TLV tag. If a processor cannot be
-found for current decoded tag, the OTA transfer will be canceled.
-
-An application is able to define its own processors, thus enabling extending the
-default OTA functionality. The application can also opt to disable the default
-processors (application, bootloader and factory data) by setting
-`chip_enable_ota_default_processors=0`.
+## Supported platforms
+-    K32W0 - [K32W OTA README](../../../../src/platform/nxp/k32w/common/K32W_OTA_README.md)
 
 ## Usage
-
-Example (factory data + app + SSBL update):
+This is a wrapper over standard `ota_image_tool.py`, so the options for `create` are also available here:
 ```
-python3 ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 50000 -vs "1.0" -da sha256 -fd --cert_declaration $FACTORY_DATA_DEST/Chip-Test-CD-$VID-$PID.der --dac_cert $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Cert.der --dac_key $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Key.der --pai_cert $FACTORY_DATA_DEST/Chip-PAI-NXP-$VID-$PID-Cert.der -app ~/binaries/ota_update/chip-k32w0x-light-example-50000.bin --app-version 50000 --app-version-str "50000_test" --app-build-date "$DATE" --bootloader-input-file ~/binaries/ota_update/new_ssbl.bin --bl-version 50000 --bl-version-str "50000_ssbl_test" --bl-build-date "$DATE" --bl-load-addr 0 ~/binaries/ota_update/chip-k32w0x-light-example-50000.bin $FACTORY_DATA_DEST/chip-k32w0x-light-example-50000.ota
+python3 ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 50000 -vs "1.0" -da sha256
 ```
+followed by **custom options*-    and a positional argument (should be last) that specifies the output file. Please see the `create_ota_images.sh` for some reference commands.
 
-Example (only factory data update):
-
+The list of **custom options**:
 ```
-python3 ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 50000 -vs "1.0" -da sha256 -fd --cert_declaration $FACTORY_DATA_DEST/Chip-Test-CD-$VID-$PID.der --dac_cert $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Cert.der --dac_key $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Key.der --pai_cert $FACTORY_DATA_DEST/Chip-PAI-NXP-$VID-$PID-Cert.der $FACTORY_DATA_DEST/chip-k32w0x-light-example-50000.ota
+# Application options
+--app-input-file   --> Path to the application binary.
+--app-version      --> Application version. It's part of the descriptor and
+                       can be different than the OTA image header version: -vn.
+--app-version-str  --> Application version string. Same as above.
+--app-build-date   --> Application build date. Same as above.
+
+# SSBL options
+--bl-input-file    --> Path to the SSBL binary.
+--bl-version       --> SSBL version.
+--bl-version-str   --> SSBL version string.
+--bl-build-date    --> SSBL build date.
+
+# Factory data options
+--factory-data     --> If set, enables the generation of factory data.
+--cert_declaration --> Certification Declaration.
+--dac_cert         --> DAC certificate.
+--dac_key          --> DAC private key.
+--pai_cert         --> PAI certificate.
+
+# Custom TLVs options
+--json             --> Path to a JSON file following ota_payload.schema
 ```
+Please note that the options above are separated into four categories: application, bootloader, factory data and custom TLVs (`--json` option). If no descriptor options are specified for app/SSBL, the script will use the default values (`50000`, `"50000-default"`, `"2023-01-01"`). The descriptor feature is optional, TLV processors having the option to register a callback for descriptor processing.
 
-## Default processors
-
-The default processors for K32W0 are already implemented in:
--   `OTAFirmwareProcessor` for application/SSBL update.
--   `OTAFactoryDataProcessor` for factory data update.
-
-## Implementing custom processors
-
-A custom processor should implement the interface defined by the
-`OTATlvProcessor` abstract interface (simplified version; see `OTATlvHeader.h`
-for full version):
-
-```
-class OTATlvProcessor
-{
-public:
-    virtual CHIP_ERROR Init() = 0;
-    virtual CHIP_ERROR Clear() = 0;
-    virtual CHIP_ERROR ApplyAction() = 0;
-    virtual CHIP_ERROR AbortAction() = 0;
-    virtual CHIP_ERROR ExitAction();
-
-    CHIP_ERROR Process(ByteSpan & block);
-protected:
-    virtual CHIP_ERROR ProcessInternal(ByteSpan & block) = 0;
-};
-
-```
-`ExitAction` is optional and should be implemented by the processors that want to execute an action
-after all data has been transferred, but before `HandleApply` is called. This is useful in the context
-of multiple TLVs transferred in a single OTA process.
-
-Note that `ProcessInternal` should return:
-
--   `CHIP_NO_ERROR` if block was processed successfully.
--   `CHIP_ERROR_BUFFER_TOO_SMALL` if current block doesn't contain all necessary
-    data. This can happen when a TLV value field has a header, but it is split
-    across two blocks.
--   `CHIP_OTA_FETCH_ALREADY_SCHEDULED` if block was processed successfully and
-    the fetching is already scheduled by the processor. This happens in the
-    default application processor, because the next data fetching is scheduled
-    through a callback (called when enough external flash was erased).
-
-`Process` is the public API that is used inside `OTAImageProcessorImpl` for data
-processing. This is a wrapper over `ProcessInternal`, which can return
-`CHIP_OTA_CHANGE_PROCESSOR` to notify a new processor should be selected for the
-remaining data.
-
-Furthermore, a processor can use an instance of `OTADataAccumulator` to to
-accumulate data until a given threshold. This is useful when a custom payload
-contains metadata that need parsing: accumulate data until the threshold is
-reached or return `CHIP_ERROR_BUFFER_TOO_SMALL` to signal
-`OTAImageProcessorImpl` more data is needed.
-
-```
-/**
- * This class can be used to accumulate data until a given threshold.
- * Should be used by OTATlvProcessor derived classes if they need
- * metadata accumulation (e.g. for custom header decoding).
- */
-class OTADataAccumulator
-{
-public:
-    void Init(uint32_t threshold);
-    void Clear();
-    CHIP_ERROR Accumulate(ByteSpan & block);
-
-    inline uint8_t* data() { return mBuffer.Get(); }
-
-private:
-    uint32_t mThreshold;
-    uint32_t mBufferOffset;
-    Platform::ScopedMemoryBuffer<uint8_t> mBuffer;
-};
-```
-
-### Custom payload
+## Custom payload
 When defining a custom processor, a user is able to also specify the custom format of the TLV by creating a JSON file based on the `ota_payload.schema`.
-The tool offers support for describing multiple TLVs in the same JSON file. Please see the `examples/ota_payload_example.json` for a basic example.
+The tool offers support for describing multiple TLVs in the same JSON file. Please see the `examples/ota_max_entries_example.json` for a multi-app + SSBL example.
 Option `--json` must be used to specify the path to the JSON file.
 
-## Factory data update
+## Examples
+A set of examples can be found in `./examples`. Please run `create_ota_image.sh` to generate the examples:
+-    Application image with default descriptor
+-    Application image with specified descriptor
+-    Factory data image
+-    SSBL image
+-    Application + SSBL + factory data image
+-    Maximum number of entries image, using `ota_max_entries_example.json`. The examples uses 8 SSBL binaries because they have a small size and fit in external flash.
 
-`DAC`, `PAI` and `CD` can be updated at a later time by creating a factory data
-update OTA image. If the `PAA` changes, make sure to generate the new
-certificates using the new `PAA` (which is only used by the controller, e.g.
-`chip-tool`). Please see the
-[manufacturing flow guide](../../../../docs/guides/nxp_manufacturing_flow.md)
-for generating new certificates.
-
-Example of OTA image generation with factory data and application update (using
-env variables set in the prerequisites of manufacturing flow):
-
-```
-python3 ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 50000 -vs "1.0" -da sha256 -fd --cert_declaration $FACTORY_DATA_DEST/Chip-Test-CD-$VID-$PID.der --dac_cert $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Cert.der --dac_key $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Key.der --pai_cert $FACTORY_DATA_DEST/Chip-PAI-NXP-$VID-$PID-Cert.der -app $FACTORY_DATA_DEST/chip-k32w0x-light-example-50000.bin --app-version 50000 --app-version-str "50000_test" --app-build-date "$DATE" $FACTORY_DATA_DEST/chip-k32w0x-light-example-50000.bin $FACTORY_DATA_DEST/chip-k32w0x-light-example-50000.ota
-```
+The binaries from `./examples/binaries` should only be used only as an example. The user should provide their own binaries when generating the OTA image.

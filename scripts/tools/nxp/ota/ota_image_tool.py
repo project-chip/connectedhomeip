@@ -95,28 +95,53 @@ def generate_factory_data(args: object):
 
     write_to_temp(OTA_FACTORY_TLV_TEMP, payload)
 
+    return [OTA_FACTORY_TLV_TEMP]
+
+def generate_descriptor(version: int, versionStr: str, buildDate: str):
+    """
+    Generate descriptor as bytearray for app/SSBL payload.
+    """
+    v = version if version is not None else 50000
+    vs = versionStr if versionStr is not None else "50000-default"
+    bd = buildDate if buildDate is not None else "2023-01-01"
+
+    logging.info(f"\t-version: {v}")
+    logging.info(f"\t-version str: {vs}")
+    logging.info(f"\t-build date: {bd}")
+
+    v = v.to_bytes(4, "little")
+    vs = bytearray(vs, "ascii") + bytearray(64 - len(vs))
+    bd = bytearray(bd, "ascii") + bytearray(64 - len(bd))
+
+    return v + vs + bd
 
 def generate_app(args: object):
-    version = args.app_version.to_bytes(4, "little")
-    versionStr = bytearray(args.app_version_str, "ascii") + bytearray(64 - len(args.app_version_str))
-    buildDate = bytearray(args.app_build_date, "ascii") + bytearray(64 - len(args.app_build_date))
-    descriptor = version + versionStr + buildDate
+    """
+    Generate app payload with descriptor. If a certain option is not specified, use the default values.
+    """
+    logging.info("App descriptor information:")
+
+    descriptor = generate_descriptor(args.app_version, args.app_version_str, args.app_build_date)
     file_size = os.path.getsize(args.app_input_file)
     payload = generate_header(TAG.APPLICATION, len(descriptor) + file_size) + descriptor
 
     write_to_temp(OTA_APP_TLV_TEMP, payload)
 
+    return [OTA_APP_TLV_TEMP, args.app_input_file]
 
 def generate_bootloader(args: object):
-    version = args.bl_version.to_bytes(4, "little")
-    versionStr = bytearray(args.bl_version_str, "ascii") + bytearray(64 - len(args.bl_version_str))
-    buildDate = bytearray(args.bl_build_date, "ascii") + bytearray(64 - len(args.bl_build_date))
-    loadAddr = args.bl_load_addr.to_bytes(4, "little")
-    descriptor = version + versionStr + buildDate + loadAddr
-    file_size = os.path.getsize(args.bootloader_input_file)
-    payload = generate_header(TAG.APPLICATION, len(descriptor) + file_size) + descriptor
+    """
+    Generate SSBL payload with descriptor. If a certain option is not specified, use the default values.
+    """
+    logging.info("SSBL descriptor information:")
+
+    descriptor = generate_descriptor(args.bl_version, args.bl_version_str, args.bl_build_date)
+    file_size = os.path.getsize(args.bl_input_file)
+    payload = generate_header(TAG.BOOTLOADER, len(descriptor) + file_size) + descriptor
 
     write_to_temp(OTA_BOOTLOADER_TLV_TEMP, payload)
+
+    return [OTA_BOOTLOADER_TLV_TEMP, args.bl_input_file]
 
 def validate_json(data: str):
     with open(os.path.join(os.path.dirname(__file__), 'ota_payload.schema'), 'r') as fd:
@@ -154,6 +179,7 @@ def generate_custom_tlvs(data):
 
         input_files += [temp_output, entry["path"]]
         iteration += 1
+        descriptor = bytearray()
 
     return input_files
 
@@ -168,6 +194,7 @@ def show_payload(args: object):
 
 def create_image(args: object):
     ota_image_tool.validate_header_attributes(args)
+
     input_files = list()
 
     if args.json:
@@ -177,15 +204,20 @@ def create_image(args: object):
         input_files += generate_custom_tlvs(data)
 
     if args.factory_data:
-        generate_factory_data(args)
-        input_files += [OTA_FACTORY_TLV_TEMP]
+        input_files += generate_factory_data(args)
 
-    if args.app_input_file is not None:
-        generate_app(args)
-        input_files += [OTA_APP_TLV_TEMP, args.app_input_file]
+    if args.bl_input_file:
+        input_files += generate_bootloader(args)
+
+    if args.app_input_file:
+        input_files += generate_app(args)
+
+    if len(input_files) == 0:
+        print("Please specify an input option.")
+        sys.exit(1)
 
     logging.info("Input files used:")
-    [logging.info(f"- {_file}") for _file in input_files]
+    [logging.info(f"\t- {_file}") for _file in input_files]
 
     args.input_files = input_files
     ota_image_tool.generate_image(args)
@@ -225,14 +257,11 @@ def main():
                                help='Minimum software version that can be updated to this image')
     create_parser.add_argument('-ma', '--max-version', type=any_base_int,
                                help='Maximum software version that can be updated to this image')
-    create_parser.add_argument(
-        '-rn', '--release-notes', help='Release note URL')
-    create_parser.add_argument('input_files', nargs='*',
-                               help='Path to input image payload file')
-    create_parser.add_argument('output_file', help='Path to output image file')
+    create_parser.add_argument('-rn', '--release-notes',
+                               help='Release note URL')
 
-    create_parser.add_argument('-app', '--app-input-file',
-                               help='Path to input application image payload file')
+    create_parser.add_argument('-app', "--app-input-file",
+                               help='Path to application input file')
     create_parser.add_argument('--app-version', type=any_base_int,
                                help='Application Software version (numeric)')
     create_parser.add_argument('--app-version-str', type=str,
@@ -240,7 +269,7 @@ def main():
     create_parser.add_argument('--app-build-date', type=str,
                                help='Application build date (string)')
 
-    create_parser.add_argument('-bl', '--bootloader-input-file',
+    create_parser.add_argument('-bl', '--bl-input-file',
                                help='Path to input bootloader image payload file')
     create_parser.add_argument('--bl-version', type=any_base_int,
                                help='Bootloader Software version (numeric)')
@@ -248,8 +277,6 @@ def main():
                                help='Bootloader Software version (string)')
     create_parser.add_argument('--bl-build-date', type=str,
                                help='Bootloader build date (string)')
-    create_parser.add_argument('--bl-load-addr', type=any_base_int,
-                               help='Bootloader load address (numeric)')
 
     # Factory data specific arguments. Will be used to generate the TLV payload.
     create_parser.add_argument('-fd', '--factory-data', action='store_true',
@@ -265,8 +292,12 @@ def main():
     create_parser.add_argument("--pai_cert", type=PaiCert,
                                help="[path] Path to PAI certificate in DER format")
 
-    # Path to input JSON file which describe custom TLVs
+    # Path to input JSON file which describes custom TLVs.
     create_parser.add_argument('--json', help="[path] Path to the JSON describing custom TLVs")
+
+    create_parser.add_argument('-i', '--input_files', default=list(),
+                               help='Path to input image payload file')
+    create_parser.add_argument('output_file', help='Path to output image file')
 
     show_parser = subcommands.add_parser('show', help='Show OTA image info')
     show_parser.add_argument('image_file', help='Path to OTA image file')
