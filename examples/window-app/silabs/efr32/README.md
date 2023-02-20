@@ -194,7 +194,8 @@ combination with JLinkRTTClient as follows:
     For MG12 use:
 
           $ JLinkExe -device EFR32MG12PXXXF1024 -if JTAG -speed 4000 -autoconnect 1
-          
+
+
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
           $ JLinkRTTClient
