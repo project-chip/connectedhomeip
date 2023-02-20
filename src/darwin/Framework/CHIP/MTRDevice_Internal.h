@@ -51,4 +51,11 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 // Returns min or max, if it is below or above, respectively.
 NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max);
 
+#pragma mark - Utility for time conversion
+NSTimeInterval MTRTimeIntervalForEventTimestampValue(uint64_t timeValue);
+
+#pragma mark - Utility for event priority conversion
+BOOL MTRPriorityLevelIsValid(chip::app::PriorityLevel priorityLevel);
+MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel);
+
 NS_ASSUME_NONNULL_END

@@ -24,12 +24,12 @@
 
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #ifndef DOOR_LOCK_SERVER_ENDPOINT
 #define DOOR_LOCK_SERVER_ENDPOINT 1
@@ -54,8 +54,10 @@ using chip::app::Clusters::DoorLock::UserStatusEnum;
 using chip::app::Clusters::DoorLock::UserTypeEnum;
 using chip::app::DataModel::List;
 using chip::app::DataModel::Nullable;
+using chip::app::DataModel::NullNullable;
 
-using LockOpCredentials = chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type;
+using CredentialStruct  = chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type;
+using LockOpCredentials = CredentialStruct;
 
 typedef bool (*RemoteLockOpHandler)(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
                                     OperationErrorEnum & err);
@@ -94,7 +96,9 @@ public:
      *
      * @return true on success, false on failure.
      */
-    bool SetLockState(chip::EndpointId endpointId, DlLockState newLockState, OperationSourceEnum opSource);
+    bool SetLockState(chip::EndpointId endpointId, DlLockState newLockState, OperationSourceEnum opSource,
+                      const Nullable<uint16_t> & userIndex                        = NullNullable,
+                      const Nullable<List<const LockOpCredentials>> & credentials = NullNullable);
 
     /**
      * Updates the LockState attribute with new value.
@@ -219,10 +223,11 @@ private:
                              uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
                              const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
                              const Nullable<CredentialRuleEnum> & credentialRule);
-    EmberAfStatus clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId, chip::NodeId sourceNodeId,
-                            uint16_t userIndex, bool sendUserChangeEvent);
-    EmberAfStatus clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId, chip::NodeId sourceNodeId,
-                            uint16_t userIndex, const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent);
+    chip::Protocols::InteractionModel::Status clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId,
+                                                        chip::NodeId sourceNodeId, uint16_t userIndex, bool sendUserChangeEvent);
+    chip::Protocols::InteractionModel::Status clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId,
+                                                        chip::NodeId sourceNodeId, uint16_t userIndex,
+                                                        const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent);
 
     bool clearFabricFromUsers(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
@@ -252,11 +257,13 @@ private:
                               const EmberAfPluginDoorLockCredentialInfo & existingCredential, const chip::ByteSpan & credentialData,
                               uint16_t userIndex, const Nullable<UserStatusEnum> & userStatus, Nullable<UserTypeEnum> userType);
 
-    EmberAfStatus clearCredential(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId,
-                                  CredentialTypeEnum credentialType, uint16_t credentialIndex, bool sendUserChangeEvent);
-    EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId);
-    EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId,
-                                   CredentialTypeEnum credentialType);
+    chip::Protocols::InteractionModel::Status clearCredential(chip::EndpointId endpointId, chip::FabricIndex modifier,
+                                                              chip::NodeId sourceNodeId, CredentialTypeEnum credentialType,
+                                                              uint16_t credentialIndex, bool sendUserChangeEvent);
+    chip::Protocols::InteractionModel::Status clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier,
+                                                               chip::NodeId sourceNodeId);
+    chip::Protocols::InteractionModel::Status clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier,
+                                                               chip::NodeId sourceNodeId, CredentialTypeEnum credentialType);
 
     bool clearFabricFromCredentials(chip::EndpointId endpointId, CredentialTypeEnum credentialType,
                                     chip::FabricIndex fabricToRemove);
@@ -404,7 +411,7 @@ private:
     void SendLockOperationEvent(chip::EndpointId endpointId, LockOperationTypeEnum opType, OperationSourceEnum opSource,
                                 OperationErrorEnum opErr, const Nullable<uint16_t> & userId,
                                 const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
-                                LockOpCredentials * credList, size_t credListSize, bool opSuccess = true);
+                                const Nullable<List<const LockOpCredentials>> & credentials = NullNullable, bool opSuccess = true);
 
     /**
      * @brief Schedule auto relocking with a given timeout

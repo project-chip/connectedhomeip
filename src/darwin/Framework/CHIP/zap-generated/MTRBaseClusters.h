@@ -20130,24 +20130,64 @@ typedef NS_OPTIONS(uint8_t, MTRNetworkCommissioningWiFiSecurity) {
     = 0x10,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTRDiagnosticLogsIntent) {
+    MTRDiagnosticLogsIntentEndUserSupport MTR_NEWLY_AVAILABLE = 0x00,
+    MTRDiagnosticLogsIntentNetworkDiag MTR_NEWLY_AVAILABLE = 0x01,
+    MTRDiagnosticLogsIntentCrashLogs MTR_NEWLY_AVAILABLE = 0x02,
+} MTR_NEWLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRDiagnosticLogsLogsIntent) {
-    MTRDiagnosticLogsLogsIntentEndUserSupport API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDiagnosticLogsLogsIntentNetworkDiag API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDiagnosticLogsLogsIntentCrashLogs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRDiagnosticLogsLogsIntentEndUserSupport API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsIntentEndUserSupport")
+    = 0x00,
+    MTRDiagnosticLogsLogsIntentNetworkDiag API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsIntentNetworkDiag")
+    = 0x01,
+    MTRDiagnosticLogsLogsIntentCrashLogs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsIntentCrashLogs")
+    = 0x02,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsIntent");
+
+typedef NS_ENUM(uint8_t, MTRDiagnosticLogsStatus) {
+    MTRDiagnosticLogsStatusSuccess MTR_NEWLY_AVAILABLE = 0x00,
+    MTRDiagnosticLogsStatusExhausted MTR_NEWLY_AVAILABLE = 0x01,
+    MTRDiagnosticLogsStatusNoLogs MTR_NEWLY_AVAILABLE = 0x02,
+    MTRDiagnosticLogsStatusBusy MTR_NEWLY_AVAILABLE = 0x03,
+    MTRDiagnosticLogsStatusDenied MTR_NEWLY_AVAILABLE = 0x04,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDiagnosticLogsLogsStatus) {
-    MTRDiagnosticLogsLogsStatusSuccess API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDiagnosticLogsLogsStatusExhausted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRDiagnosticLogsLogsStatusNoLogs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-    MTRDiagnosticLogsLogsStatusBusy API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x03,
-    MTRDiagnosticLogsLogsStatusDenied API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRDiagnosticLogsLogsStatusSuccess API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatusSuccess")
+    = 0x00,
+    MTRDiagnosticLogsLogsStatusExhausted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatusExhausted")
+    = 0x01,
+    MTRDiagnosticLogsLogsStatusNoLogs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatusNoLogs")
+    = 0x02,
+    MTRDiagnosticLogsLogsStatusBusy API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatusBusy")
+    = 0x03,
+    MTRDiagnosticLogsLogsStatusDenied API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatusDenied")
+    = 0x04,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatus");
+
+typedef NS_ENUM(uint8_t, MTRDiagnosticLogsTransferProtocol) {
+    MTRDiagnosticLogsTransferProtocolResponsePayload MTR_NEWLY_AVAILABLE = 0x00,
+    MTRDiagnosticLogsTransferProtocolBDX MTR_NEWLY_AVAILABLE = 0x01,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDiagnosticLogsLogsTransferProtocol) {
-    MTRDiagnosticLogsLogsTransferProtocolResponsePayload API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRDiagnosticLogsLogsTransferProtocolBDX API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRDiagnosticLogsLogsTransferProtocolResponsePayload API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsTransferProtocolResponsePayload")
+    = 0x00,
+    MTRDiagnosticLogsLogsTransferProtocolBDX API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsTransferProtocolBDX")
+    = 0x01,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsTransferProtocol");
 
 typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsBootReason) {
     MTRGeneralDiagnosticsBootReasonUnspecified API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,
@@ -20370,6 +20410,21 @@ typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsAssociationFailureCause) {
     = 0x03,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsConnectionStatus) {
+    MTRWiFiNetworkDiagnosticsConnectionStatusConnected MTR_NEWLY_AVAILABLE = 0x00,
+    MTRWiFiNetworkDiagnosticsConnectionStatusNotConnected MTR_NEWLY_AVAILABLE = 0x01,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsWiFiConnectionStatus) {
+    MTRWiFiNetworkDiagnosticsWiFiConnectionStatusConnected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsConnectionStatusConnected")
+    = 0x00,
+    MTRWiFiNetworkDiagnosticsWiFiConnectionStatusNotConnected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsConnectionStatusNotConnected")
+    = 0x01,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsConnectionStatus");
+
 typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsSecurityType) {
     MTRWiFiNetworkDiagnosticsSecurityTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTRWiFiNetworkDiagnosticsSecurityTypeNone API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
@@ -20379,38 +20434,54 @@ typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsSecurityType) {
     MTRWiFiNetworkDiagnosticsSecurityTypeWPA3 API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x05,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
-typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsWiFiConnectionStatus) {
-    MTRWiFiNetworkDiagnosticsWiFiConnectionStatusConnected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRWiFiNetworkDiagnosticsWiFiConnectionStatusNotConnected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    = 0x01,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsWiFiVersion) {
+    MTRWiFiNetworkDiagnosticsWiFiVersionA MTR_NEWLY_AVAILABLE = 0x00,
+    MTRWiFiNetworkDiagnosticsWiFiVersionB MTR_NEWLY_AVAILABLE = 0x01,
+    MTRWiFiNetworkDiagnosticsWiFiVersionG MTR_NEWLY_AVAILABLE = 0x02,
+    MTRWiFiNetworkDiagnosticsWiFiVersionN MTR_NEWLY_AVAILABLE = 0x03,
+    MTRWiFiNetworkDiagnosticsWiFiVersionAc MTR_NEWLY_AVAILABLE = 0x04,
+    MTRWiFiNetworkDiagnosticsWiFiVersionAx MTR_NEWLY_AVAILABLE = 0x05,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsWiFiVersionType) {
-    MTRWiFiNetworkDiagnosticsWiFiVersionTypeA API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,
-    MTRWiFiNetworkDiagnosticsWiFiVersionType80211a API_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionTypeA",
-        ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeA API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionA")
     = 0x00,
-    MTRWiFiNetworkDiagnosticsWiFiVersionTypeB API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x01,
-    MTRWiFiNetworkDiagnosticsWiFiVersionType80211b API_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionTypeB",
-        ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    MTRWiFiNetworkDiagnosticsWiFiVersionType80211a API_DEPRECATED(
+        "Please use MTRWiFiNetworkDiagnosticsWiFiVersionA", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x00,
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeB API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionB")
     = 0x01,
-    MTRWiFiNetworkDiagnosticsWiFiVersionTypeG API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x02,
-    MTRWiFiNetworkDiagnosticsWiFiVersionType80211g API_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionTypeG",
-        ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    MTRWiFiNetworkDiagnosticsWiFiVersionType80211b API_DEPRECATED(
+        "Please use MTRWiFiNetworkDiagnosticsWiFiVersionB", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x01,
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeG API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionG")
     = 0x02,
-    MTRWiFiNetworkDiagnosticsWiFiVersionTypeN API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x03,
-    MTRWiFiNetworkDiagnosticsWiFiVersionType80211n API_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionTypeN",
-        ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    MTRWiFiNetworkDiagnosticsWiFiVersionType80211g API_DEPRECATED(
+        "Please use MTRWiFiNetworkDiagnosticsWiFiVersionG", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x02,
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeN API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionN")
     = 0x03,
-    MTRWiFiNetworkDiagnosticsWiFiVersionTypeAc API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x04,
-    MTRWiFiNetworkDiagnosticsWiFiVersionType80211ac API_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionTypeAc",
+    MTRWiFiNetworkDiagnosticsWiFiVersionType80211n API_DEPRECATED(
+        "Please use MTRWiFiNetworkDiagnosticsWiFiVersionN", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x03,
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeAc API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionAc")
+    = 0x04,
+    MTRWiFiNetworkDiagnosticsWiFiVersionType80211ac API_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionAc",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x04,
-    MTRWiFiNetworkDiagnosticsWiFiVersionTypeAx API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x05,
-    MTRWiFiNetworkDiagnosticsWiFiVersionType80211ax API_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionTypeAx",
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeAx API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionAx")
+    = 0x05,
+    MTRWiFiNetworkDiagnosticsWiFiVersionType80211ax API_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionAx",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x05,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+    MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersion");
 
 typedef NS_OPTIONS(uint32_t, MTRWiFiNetworkDiagnosticsFeature) {
     MTRWiFiNetworkDiagnosticsFeaturePacketCounts API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x1,
@@ -20874,6 +20945,7 @@ typedef NS_ENUM(uint8_t, MTRDoorLockLockDataType) {
     MTRDoorLockLockDataTypePIN API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x06,
     MTRDoorLockLockDataTypeRFID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x07,
     MTRDoorLockLockDataTypeFingerprint API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x08,
+    MTRDoorLockLockDataTypeFingerVein MTR_NEWLY_AVAILABLE = 0x09,
 } API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 typedef NS_ENUM(uint8_t, MTRDoorLockDlLockDataType) {
@@ -21655,6 +21727,23 @@ typedef NS_OPTIONS(uint32_t, MTRPressureMeasurementPressureFeature) {
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x1,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+typedef NS_ENUM(uint8_t, MTROccupancySensingOccupancySensorType) {
+    MTROccupancySensingOccupancySensorTypePIR MTR_NEWLY_AVAILABLE = 0x00,
+    MTROccupancySensingOccupancySensorTypeUltrasonic MTR_NEWLY_AVAILABLE = 0x01,
+    MTROccupancySensingOccupancySensorTypePIRAndUltrasonic MTR_NEWLY_AVAILABLE = 0x02,
+    MTROccupancySensingOccupancySensorTypePhysicalContact MTR_NEWLY_AVAILABLE = 0x03,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint8_t, MTROccupancySensingOccupancyBitmap) {
+    MTROccupancySensingOccupancyBitmapOccupied MTR_NEWLY_AVAILABLE = 0x1,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint8_t, MTROccupancySensingOccupancySensorTypeBitmap) {
+    MTROccupancySensingOccupancySensorTypeBitmapPIR MTR_NEWLY_AVAILABLE = 0x1,
+    MTROccupancySensingOccupancySensorTypeBitmapUltrasonic MTR_NEWLY_AVAILABLE = 0x2,
+    MTROccupancySensingOccupancySensorTypeBitmapPhysicalContact MTR_NEWLY_AVAILABLE = 0x4,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRChannelStatus) {
     MTRChannelStatusSuccess API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,

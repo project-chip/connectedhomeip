@@ -264,7 +264,7 @@ static void CauseReadClientFailure(
     return self;
 }
 
-+ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
++ (MTRBaseDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     // Indirect through the controller to give it a chance to create an
     // MTRBaseDeviceOverXPC instead of just an MTRBaseDevice.
@@ -1870,7 +1870,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                      (uint32_t) _cluster.unsignedLongValue];
 }
 
-+ (instancetype)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
++ (MTRClusterPath *)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
 {
     ConcreteClusterPath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
         static_cast<chip::ClusterId>([clusterID unsignedLongValue]));
@@ -1919,9 +1919,9 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                      (uint32_t) _attribute.unsignedLongValue];
 }
 
-+ (instancetype)attributePathWithEndpointID:(NSNumber *)endpointID
-                                  clusterID:(NSNumber *)clusterID
-                                attributeID:(NSNumber *)attributeID
++ (MTRAttributePath *)attributePathWithEndpointID:(NSNumber *)endpointID
+                                        clusterID:(NSNumber *)clusterID
+                                      attributeID:(NSNumber *)attributeID
 {
     ConcreteDataAttributePath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
         static_cast<chip::ClusterId>([clusterID unsignedLongValue]),
@@ -1979,7 +1979,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                   (uint32_t) self.cluster.unsignedLongValue, (uint32_t) _event.unsignedLongValue];
 }
 
-+ (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID
++ (MTREventPath *)eventPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID
 {
     ConcreteEventPath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
         static_cast<chip::ClusterId>([clusterID unsignedLongValue]), static_cast<chip::EventId>([eventID unsignedLongValue]));
@@ -2009,7 +2009,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
     return self;
 }
 
-+ (instancetype)commandPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID commandID:(NSNumber *)commandID
++ (MTRCommandPath *)commandPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID commandID:(NSNumber *)commandID
 {
     ConcreteCommandPath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
         static_cast<chip::ClusterId>([clusterID unsignedLongValue]), static_cast<chip::CommandId>([commandID unsignedLongValue]));
@@ -2042,23 +2042,47 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 }
 @end
 
+@interface MTREventReport () {
+    NSNumber * _timestampValue;
+}
+@end
+
 @implementation MTREventReport
-- (instancetype)initWithPath:(const ConcreteEventPath &)path
+- (instancetype)initWithPath:(const chip::app::ConcreteEventPath &)path
                  eventNumber:(NSNumber *)eventNumber
-                    priority:(NSNumber *)priority
-                   timestamp:(NSNumber *)timestamp
+                    priority:(PriorityLevel)priority
+                   timestamp:(const Timestamp &)timestamp
                        value:(id _Nullable)value
                        error:(NSError * _Nullable)error
 {
     if (self = [super init]) {
         _path = [[MTREventPath alloc] initWithPath:path];
         _eventNumber = eventNumber;
-        _priority = priority;
-        _timestamp = timestamp;
+        if (!MTRPriorityLevelIsValid(priority)) {
+            return nil;
+        }
+        _priority = @(MTREventPriorityForValidPriorityLevel(priority));
+        _timestampValue = @(timestamp.mValue);
+        if (timestamp.IsSystem()) {
+            _eventTimeType = MTREventTimeTypeSystemUpTime;
+            _systemUpTime = MTRTimeIntervalForEventTimestampValue(timestamp.mValue);
+        } else if (timestamp.IsEpoch()) {
+            _eventTimeType = MTREventTimeTypeTimestampDate;
+            _timestampDate = [NSDate dateWithTimeIntervalSince1970:MTRTimeIntervalForEventTimestampValue(timestamp.mValue)];
+        } else {
+            return nil;
+        }
         _value = value;
         _error = error;
     }
     return self;
+}
+@end
+
+@implementation MTREventReport (Deprecated)
+- (NSNumber *)timestamp
+{
+    return _timestampValue;
 }
 @end
 
@@ -2093,8 +2117,8 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
 
     [mEventReports addObject:[[MTREventReport alloc] initWithPath:aEventHeader.mPath
                                                       eventNumber:@(aEventHeader.mEventNumber)
-                                                         priority:@((uint8_t) aEventHeader.mPriorityLevel)
-                                                        timestamp:@(aEventHeader.mTimestamp.mValue)
+                                                         priority:aEventHeader.mPriorityLevel
+                                                        timestamp:aEventHeader.mTimestamp
                                                             value:value
                                                             error:error]];
 }

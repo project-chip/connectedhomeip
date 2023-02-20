@@ -16,13 +16,13 @@
 import enum
 import logging
 import re
+from typing import List, Set, Union
 
-from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Idl, Field, Attribute, Cluster, ClusterSide
 from matter_idl import matter_idl_types
-from matter_idl.generators.types import (ParseDataType, BasicString, BasicInteger, FundamentalType,
-                                         IdlType, IdlEnumType, IdlBitmapType, TypeLookupContext)
-from typing import Union, List, Set
+from matter_idl.generators import CodeGenerator, GeneratorStorage
+from matter_idl.generators.types import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
+                                         ParseDataType, TypeLookupContext)
+from matter_idl.matter_idl_types import Attribute, Cluster, ClusterSide, Field, Idl
 
 
 def camel_to_const(s):
@@ -135,7 +135,7 @@ class BridgeGenerator(CodeGenerator):
     Generation of bridge cpp code for matter.
     """
 
-    def __init__(self, storage: GeneratorStorage, idl: Idl):
+    def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
         """
         Inintialization is specific for cpp generation and will add
         filters as required by the cpp .jinja templates to function.

@@ -32,7 +32,7 @@
 #include <setup_payload/SetupPayload.h>
 #endif // QR_CODE_ENABLED
 
-extern "C" void sl_button_on_change();
+extern "C" void sl_button_on_change(uint8_t btn, uint8_t btnAction);
 
 #ifdef SL_WIFI
 #include "wfx_host_events.h"
@@ -217,7 +217,7 @@ CHIP_ERROR WindowAppImpl::Init()
     char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan QRCode(qrCodeBuffer);
 
-    if (EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(QRCode) == CHIP_NO_ERROR)
+    if (SIWx917::SIWx917DeviceDataProvider::GetDeviceDataProvider().GetSetupPayload(QRCode) == CHIP_NO_ERROR)
     {
         PrintQrCodeURL(QRCode);
     }
@@ -528,16 +528,17 @@ void WindowAppImpl::OnMainLoop()
 //------------------------------------------------------------------------------
 WindowAppImpl::Button::Button(WindowApp::Button::Id id, const char * name) : WindowApp::Button(id, name) {}
 
-void WindowAppImpl::OnButtonChange(const sl_button_t * handle)
+void WindowAppImpl::OnButtonChange(uint8_t Btn, uint8_t btnAction)
 {
-    WindowApp::Button * btn = static_cast<Button *>((handle == &sl_button_btn0) ? sInstance.mButtonUp : sInstance.mButtonDown);
+    WindowApp::Button * btn = static_cast<Button *>((Btn == SIWx917_BTN0) ? sInstance.mButtonUp : sInstance.mButtonDown);
     btn->Press();
+    // since sl_button_on_change is being called only with button press, calling Release() without condition
+    btn->Release();
 }
 
 // Silabs button callback from button event ISR
-void sl_button_on_change()
+void sl_button_on_change(uint8_t btn, uint8_t btnAction)
 {
-    const sl_button_t * handle = &sl_button_btn0;
-    WindowAppImpl * app        = static_cast<WindowAppImpl *>(&WindowAppImpl::sInstance);
-    app->OnButtonChange(handle);
+    WindowAppImpl * app = static_cast<WindowAppImpl *>(&WindowAppImpl::sInstance);
+    app->OnButtonChange(btn, btnAction);
 }

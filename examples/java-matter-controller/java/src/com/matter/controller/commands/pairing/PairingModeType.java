@@ -22,6 +22,7 @@ public enum PairingModeType {
   NONE,
   CODE,
   CODE_PASE_ONLY,
+  ADDRESS_PASE_ONLY,
   BLE,
   SOFT_AP,
   ALREADY_DISCOVERED,

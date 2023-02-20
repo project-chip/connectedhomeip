@@ -16,19 +16,10 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import com.google.chip.chiptool.ChipClient
-import com.google.chip.chiptool.R
+import com.google.chip.chiptool.databinding.AddressCommissioningFragmentBinding
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
 import com.google.chip.chiptool.util.FragmentUtil
-import kotlinx.android.synthetic.main.address_commissioning_fragment.addressEditText
-import kotlinx.android.synthetic.main.address_commissioning_fragment.commissionBtn
-import kotlinx.android.synthetic.main.address_commissioning_fragment.discoverBtn
-import kotlinx.android.synthetic.main.address_commissioning_fragment.discoverListSpinner
-import kotlinx.android.synthetic.main.address_commissioning_fragment.discriminatorEditText
-import kotlinx.android.synthetic.main.address_commissioning_fragment.pincodeEditText
-import kotlinx.android.synthetic.main.address_commissioning_fragment.wifiConnectBtn
-import kotlinx.android.synthetic.main.address_commissioning_fragment.wifiScanBtn
-import kotlinx.android.synthetic.main.address_commissioning_fragment.wifiScanListSpinner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -40,22 +31,25 @@ class AddressCommissioningFragment : Fragment() {
   private val wifiApList = ArrayList<String>()
   private var wifiApSsid = String()
   private val scope = CoroutineScope(Dispatchers.Main + Job())
+  private var _binding: AddressCommissioningFragmentBinding? = null
+  private val binding get() = _binding!!
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View? {
-    return inflater.inflate(R.layout.address_commissioning_fragment, container, false)
+  ): View {
+    _binding = AddressCommissioningFragmentBinding.inflate(inflater, container, false)
+    return binding.root
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    commissionBtn.setOnClickListener {
-      val address = addressEditText.text.toString()
-      val discriminator = discriminatorEditText.text.toString()
-      val pincode = pincodeEditText.text.toString()
+    binding.commissionBtn.setOnClickListener {
+      val address = binding.addressEditText.text.toString()
+      val discriminator = binding.discriminatorEditText.text.toString()
+      val pincode = binding.pincodeEditText.text.toString()
 
       if (address.isEmpty() || discriminator.isEmpty() || pincode.isEmpty()) {
         Log.e(TAG, "Address, discriminator, or pincode was empty: $address $discriminator $pincode")
@@ -71,19 +65,19 @@ class AddressCommissioningFragment : Fragment() {
       )
     }
 
-    discoverBtn.setOnClickListener { _ ->
-      discoverBtn.isEnabled = false
+    binding.discoverBtn.setOnClickListener { _ ->
+      binding.discoverBtn.isEnabled = false
       val deviceController = ChipClient.getDeviceController(requireContext())
       deviceController.discoverCommissionableNodes()
       scope.launch {
         delay(7000)
         updateSpinner()
-        discoverBtn.isEnabled = true
+        binding.discoverBtn.isEnabled = true
       }
     }
 
-    wifiConnectBtn.setOnClickListener { _ ->
-      wifiConnectBtn.isEnabled = false
+    binding.wifiConnectBtn.setOnClickListener { _ ->
+      binding.wifiConnectBtn.isEnabled = false
       val context = getActivity()
       val wifiManager = context?.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
@@ -104,13 +98,13 @@ class AddressCommissioningFragment : Fragment() {
           Log.d(TAG, "Enable network ${config.SSID} succeeded")
         } else {
           Log.d(TAG, "Enable network ${config.SSID} failed")
-          wifiConnectBtn.isEnabled = true
+          binding.wifiConnectBtn.isEnabled = true
         }
       }
     }
 
-    wifiScanBtn.setOnClickListener { _ ->
-      wifiScanBtn.isEnabled = false
+    binding.wifiScanBtn.setOnClickListener { _ ->
+      binding.wifiScanBtn.isEnabled = false
       val context = getActivity()
       val wifiManager = context?.getSystemService(Context.WIFI_SERVICE) as WifiManager
       val wifiScanReceiver = object : BroadcastReceiver() {
@@ -124,7 +118,7 @@ class AddressCommissioningFragment : Fragment() {
           } else {
             Log.d(TAG, "Scan failed")
           }
-          wifiScanBtn.isEnabled = true
+          binding.wifiScanBtn.isEnabled = true
         }
       }
 
@@ -142,6 +136,11 @@ class AddressCommissioningFragment : Fragment() {
     }
   }
 
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
+
   private fun updateWifiScanListSpinner(scanResults : MutableList<ScanResult>) {
     wifiApList.clear()
     for (result in scanResults) {
@@ -149,9 +148,9 @@ class AddressCommissioningFragment : Fragment() {
         wifiApList.add("${result.SSID}, ${result.BSSID}, ${result.level}")
     }
     requireActivity().runOnUiThread {
-      wifiScanListSpinner.adapter =
+      binding.wifiScanListSpinner.adapter =
         ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, wifiApList)
-      wifiScanListSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+      binding.wifiScanListSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
         override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
           wifiApSsid = wifiApList[position].split(",")[0].trim()
           Log.d(TAG, "ready to connect to $wifiApSsid")
@@ -168,14 +167,15 @@ class AddressCommissioningFragment : Fragment() {
       ipAddressList.add("${device.ipAddress}, ${device.discriminator}")
     }
     requireActivity().runOnUiThread {
-      discoverListSpinner.adapter =
+      binding.discoverListSpinner.adapter =
         ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, ipAddressList)
-      discoverListSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+      binding.discoverListSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
         override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
           val address = ipAddressList[position].split(",")[0].trim()
           val discriminator = ipAddressList[position].split(",")[1].trim()
-          addressEditText.setText(address)
-          discriminatorEditText.setText(discriminator)
+
+          binding.addressEditText.setText(address)
+          binding.discriminatorEditText.setText(discriminator)
         }
 
         override fun onNothingSelected(parent: AdapterView<*>) {}

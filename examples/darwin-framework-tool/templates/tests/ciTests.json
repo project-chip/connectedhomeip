@@ -3,6 +3,7 @@
     "disable": [
         "TestClientMonitoringCluster",
         "Test_TC_SC_4_2",
+        "Test_TC_SC_5_2",
         "TestClusterComplexTypes",
         "TestEvents",
         "TestDiscovery",
@@ -29,6 +30,7 @@
         "Test_TC_ACL_2_7",
         "Test_TC_ACL_2_8",
         "Test_TC_ACL_2_9",
-        "Test_TC_ACL_2_10"
+        "Test_TC_ACL_2_10",
+        "DL_LockUnlock"
     ]
 }

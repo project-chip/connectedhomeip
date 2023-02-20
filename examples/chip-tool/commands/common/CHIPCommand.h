@@ -29,6 +29,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
+#include <crypto/RawKeySessionKeystore.h>
 
 #pragma once
 
@@ -139,6 +140,7 @@ protected:
 #endif // CONFIG_USE_LOCAL_STORAGE
     chip::PersistentStorageOperationalKeystore mOperationalKeystore;
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
+    chip::Crypto::RawKeySessionKeystore mSessionKeystore;
 
     static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
     CredentialIssuerCommands * mCredIssuerCmds;

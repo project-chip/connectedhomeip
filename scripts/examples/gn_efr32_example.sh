@@ -209,7 +209,7 @@ else
 
     if [ "$USE_GIT_SHA_FOR_VERSION" == true ]; then
         {
-            ShortCommitSha=$(git describe --always --dirty)
+            ShortCommitSha=$(git describe --always --dirty --exclude '*')
             branchName=$(git rev-parse --abbrev-ref HEAD)
             optArgs+="sl_matter_version_str=\"v1.0-$branchName-$ShortCommitSha\" "
         } &>/dev/null

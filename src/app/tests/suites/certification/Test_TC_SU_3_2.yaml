@@ -31,7 +31,7 @@ tests:
           field can be set to either True or False in the QueryImage Command.
           DUT responds with the QueryImageResponse to the OTA-R/TH."
       verification: |
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -45,16 +45,14 @@ tests:
 
 
 
-          [1651265462659] [21768:35233106] CHIP: [SWU] QueryImageResponse:
-          [1651265462659] [21768:35233106] CHIP: [SWU]   status: 0
-          [1651265462659] [21768:35233106] CHIP: [SWU]   delayedActionTime: 0 seconds
-          [1651265462659] [21768:35233106] CHIP: [SWU]   imageURI: bdx://0000000000000001/test.ota
-          [1651265462659] [21768:35233106] CHIP: [SWU]   softwareVersion: 2
-          [1651265462659] [21768:35233106] CHIP: [SWU]   softwareVersionString: 2.0
-          [1651265462659] [21768:35233106] CHIP: [SWU]   updateToken: 32
-          [1651265462659] [21768:35233106] CHIP: [SWU]   userConsentNeeded: 0
-          [1651265462659] [21768:35233106] CHIP: [SWU]   metadataForRequestor: 0
-          [1651265462659] [21768:35233106] CHIP: [SWU] Update available from version 1 to 2
+          [1673337981.104652][28428:28428] CHIP:SWU: QueryImageResponse:
+          [1673337981.104695][28428:28428] CHIP:SWU:   status: 0
+          [1673337981.104735][28428:28428] CHIP:SWU:   imageURI: bdx://000000000000007B/ota-requestor-app.ota
+          [1673337981.104776][28428:28428] CHIP:SWU:   softwareVersion: 2
+          [1673337981.104816][28428:28428] CHIP:SWU:   softwareVersionString: 2.0
+          [1673337981.104856][28428:28428] CHIP:SWU:   updateToken: 32
+          [1673337981.104896][28428:28428] CHIP:SWU:   userConsentNeeded: 0
+          [1673337981.104948][28428:28428] CHIP:SWU: Update available from version 1 to 2
       disabled: true
 
     - label:
@@ -64,17 +62,15 @@ tests:
       verification: |
           ./chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -q updateNotAvailable
 
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
           Verify on the OTA Requestor logs receives QueryImageResponse with the Status as Not Available
 
-          [1645819644181] [21592:21187907] CHIP: [SWU] QueryImageResponse:
-          [1645819644181] [21592:21187907] CHIP: [SWU]   status: 2
-          [1645819644181] [21592:21187907] CHIP: [SWU]   delayedActionTime: 120 seconds
-          [1645819644181] [21592:21187907] CHIP: [SWU]   userConsentNeeded: 0
-          [1645819644181] [21592:21187907] CHIP: [SWU]   metadataForRequestor: 0
+          [1673423580.333750][2898:2898] CHIP:SWU: QueryImageResponse:
+          [1673423580.333776][2898:2898] CHIP:SWU:   status: 2
+          [1673423580.333803][2898:2898] CHIP:SWU:   userConsentNeeded: 0
       disabled: true
 
     - label:
@@ -82,68 +78,66 @@ tests:
           field should list BDX. DUT responds with the QueryImageResponse to the
           OTA-R/TH."
       verification: |
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
           Verify on the OTA Requestor logs receives QueryImageResponse
 
-          [1651265462659] [21768:35233106] CHIP: [SWU] QueryImageResponse:
-          [1651265462659] [21768:35233106] CHIP: [SWU]   status: 0
-          [1651265462659] [21768:35233106] CHIP: [SWU]   delayedActionTime: 0 seconds
-          [1651265462659] [21768:35233106] CHIP: [SWU]   imageURI: bdx://0000000000000001/test.ota
-          [1651265462659] [21768:35233106] CHIP: [SWU]   softwareVersion: 2
-          [1651265462659] [21768:35233106] CHIP: [SWU]   softwareVersionString: 2.0
-          [1651265462659] [21768:35233106] CHIP: [SWU]   updateToken: 32
-          [1651265462659] [21768:35233106] CHIP: [SWU]   userConsentNeeded: 0
-          [1651265462659] [21768:35233106] CHIP: [SWU]   metadataForRequestor: 0
-          [1651265462659] [21768:35233106] CHIP: [SWU] Update available from version 1 to 2
+          [1673417165.348812][2114:2114] CHIP:SWU: QueryImageResponse:
+          [1673417165.348861][2114:2114] CHIP:SWU:   status: 0
+          [1673417165.348908][2114:2114] CHIP:SWU:   imageURI: bdx://000000000000007B/ota-requestor-app.ota
+          [1673417165.348957][2114:2114] CHIP:SWU:   softwareVersion: 2
+          [1673417165.349003][2114:2114] CHIP:SWU:   softwareVersionString: 2.0
+          [1673417165.349050][2114:2114] CHIP:SWU:   updateToken: 32
+          [1673417165.349096][2114:2114] CHIP:SWU:   userConsentNeeded: 0
+          [1673417165.349155][2114:2114] CHIP:SWU: Update available from version 1 to 2
+
 
           Verify all the image URI field requirements.
       disabled: true
 
     - label:
           "OTA-R/TH sends a QueryImage Command to the DUT. ProtocolSupported
-          field should list https. DUT responds with a QueryImageResponse to the
-          OTA-R/TH."
+          field should list 'https'. DUT responds with a QueryImageResponse to
+          the OTA-R/TH."
       verification: |
           Out of scope for V1.0
       disabled: true
 
     - label:
           "OTA-R/TH sends a QueryImage Command to the DUT. DUT responds with the
-          QueryImageResponse with QueryStatus set to Busy, DelayedActionTime set
-          to 3 minutes. On the subsequent QueryImage command, DUT sends a
+          QueryImageResponse with QueryStatus set to 'Busy', DelayedActionTime
+          set to 3 minutes. On the subsequent QueryImage command, DUT sends a
           QueryImageResponse back to OTA-R/TH. QueryStatus is set to
-          UpdateAvailable."
+          'UpdateAvailable'."
       PICS: OTAP.S.M.DelayedActionTime
       verification: |
           ./chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -q busy -t 180
 
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
           Verify on the OTA Requestor logs receives QueryImageResponse with Status as busy and DelayedActionTime as 3 minutes
 
-          [1651265271074] [21764:35230537] CHIP: [SWU] QueryImageResponse:
-          [1651265271074] [21764:35230537] CHIP: [SWU]   status: 1
-          [1651265271074] [21764:35230537] CHIP: [SWU]   delayedActionTime: 180 seconds
-          [1651265271074] [21764:35230537] CHIP: [SWU]   userConsentNeeded: 0
-          [1651265271074] [21764:35230537] CHIP: [SWU]   metadataForRequestor: 0
+          [1673425035.586964][3055:3055] CHIP:SWU: QueryImageResponse:
+          [1673425035.586994][3055:3055] CHIP:SWU:   status: 1
+          [1673425035.587022][3055:3055] CHIP:SWU:   delayedActionTime: 180 seconds
+          [1673425035.587052][3055:3055] CHIP:SWU:   userConsentNeeded: 0
+          [1673425035.587083][3055:3055] CHIP:SWU: Scheduling a retry
+
 
           Verify that the OTA-R/TH starts the download from the DUT after the second QueryImageResponse with UpdateAvailable status.
 
-          [1651265462659] [21768:35233106] CHIP: [SWU] QueryImageResponse:
-          [1651265462659] [21768:35233106] CHIP: [SWU]   status: 0
-          [1651265462659] [21768:35233106] CHIP: [SWU]   delayedActionTime: 0 seconds
-          [1651265462659] [21768:35233106] CHIP: [SWU]   imageURI: bdx://0000000000000001/test.ota
-          [1651265462659] [21768:35233106] CHIP: [SWU]   softwareVersion: 2
-          [1651265462659] [21768:35233106] CHIP: [SWU]   softwareVersionString: 2.0
-          [1651265462659] [21768:35233106] CHIP: [SWU]   updateToken: 32
-          [1651265462659] [21768:35233106] CHIP: [SWU]   userConsentNeeded: 0
-          [1651265462659] [21768:35233106] CHIP: [SWU]   metadataForRequestor: 0
-          [1651265462659] [21768:35233106] CHIP: [SWU] Update available from version 1 to 2
+          [1673425215.698563][3055:3055] CHIP:SWU: QueryImageResponse:
+          [1673425215.698602][3055:3055] CHIP:SWU:   status: 0
+          [1673425215.698633][3055:3055] CHIP:SWU:   imageURI: bdx://000000000000007B/ota-requestor-app.ota
+          [1673425215.698664][3055:3055] CHIP:SWU:   softwareVersion: 2
+          [1673425215.698695][3055:3055] CHIP:SWU:   softwareVersionString: 2.0
+          [1673425215.698731][3055:3055] CHIP:SWU:   updateToken: 32
+          [1673425215.698760][3055:3055] CHIP:SWU:   userConsentNeeded: 0
+          [1673425215.698801][3055:3055] CHIP:SWU: Update available from version 1 to 2
 
           Verify that the Image downloaded by the OTA-R/TH is valid and is the same image that was supposed to be downloaded.
       disabled: true

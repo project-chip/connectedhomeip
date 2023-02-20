@@ -508,6 +508,36 @@ server cluster A = 1 { /* Test comment */ }
         ])
         self.assertEqual(actual, expected)
 
+    def test_emits_events(self):
+        actual = parseText("""
+            endpoint 1 {
+                server cluster Example {}
+            }
+            endpoint 2 {
+              server cluster Example {
+                emits event FooBar;
+                emits event SomeNewEvent;
+              }
+              server cluster AnotherExample {
+                emits event StartUp;
+                emits event ShutDown;
+              }
+            }
+        """)
+
+        expected = Idl(endpoints=[
+            Endpoint(number=1, server_clusters=[
+                     ServerClusterInstantiation(name="Example")]),
+            Endpoint(number=2, server_clusters=[
+                ServerClusterInstantiation(name="Example", events_emitted={
+                                           "FooBar", "SomeNewEvent"}),
+                ServerClusterInstantiation(name="AnotherExample", events_emitted={
+                    "StartUp", "ShutDown"}),
+            ])
+        ])
+
+        self.assertEqual(actual, expected)
+
 
 if __name__ == '__main__':
     unittest.main()

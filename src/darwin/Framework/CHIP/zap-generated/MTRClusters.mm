@@ -2346,8 +2346,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 }
                 request.effectIdentifier = static_cast<std::remove_reference_t<decltype(request.effectIdentifier)>>(
                     params.effectIdentifier.unsignedCharValue);
-                request.effectVariant
-                    = static_cast<std::remove_reference_t<decltype(request.effectVariant)>>(params.effectVariant.unsignedCharValue);
+                request.effectVariant = params.effectVariant.unsignedCharValue;
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
                     self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
@@ -8643,7 +8642,10 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 request.intent = static_cast<std::remove_reference_t<decltype(request.intent)>>(params.intent.unsignedCharValue);
                 request.requestedProtocol = static_cast<std::remove_reference_t<decltype(request.requestedProtocol)>>(
                     params.requestedProtocol.unsignedCharValue);
-                request.transferFileDesignator = [self asByteSpan:params.transferFileDesignator];
+                if (params.transferFileDesignator != nil) {
+                    auto & definedValue_0 = request.transferFileDesignator.Emplace();
+                    definedValue_0 = [self asCharSpan:params.transferFileDesignator];
+                }
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
                     self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);

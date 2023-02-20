@@ -178,6 +178,15 @@ tests:
                         EpochStartTime2: 2220002,
                     }
 
+    - label:
+          "TH reads GroupKeyMap Attribute from the GroupKeyManagement cluster"
+      cluster: "Group Key Management"
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      response:
+          value: [{ FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 }]
+
     - label: "TH reads GroupTable attribute"
       cluster: "Group Key Management"
       endpoint: 0

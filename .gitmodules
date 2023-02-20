@@ -289,3 +289,7 @@
 	path = third_party/libwebsockets/repo
 	url = https://github.com/warmcat/libwebsockets
 	platforms = linux,darwin,tizen
+[submodule "third_party/imgui/repo"]
+	path = third_party/imgui/repo
+	url = https://github.com/ocornut/imgui
+	platforms = linux

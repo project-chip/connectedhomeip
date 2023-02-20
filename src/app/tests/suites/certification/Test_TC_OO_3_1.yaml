@@ -80,7 +80,7 @@ tests:
 
           ./chip-tool onoff read global-scene-control 1 1
 
-          verify the " global-scene-control response" on the TH (all-cluster-app) log:
+          Verify TH receives global-scene-control attribute response on the TH(all-clusters-app) Log:
 
           [...]
           ReportDataMessage =
@@ -112,7 +112,7 @@ tests:
 
           ./chip-tool onoff read on-time 1 1
 
-          verify the " on-time response" on the TH (all-cluster-app) log:
+          Verify TH receives on-time attribute response on the TH(all-clusters-app) Log:
 
           [...]
           [ReportDataMessage =
@@ -145,7 +145,7 @@ tests:
 
           ./chip-tool onoff read off-wait-time 1 1
 
-          verify the " off-wait-time response" on the TH (all-cluster-app) log:
+          Verify TH receives off-wait-time attribute response on the TH(all-clusters-app) Log:
 
           [...]
           ReportDataMessage =
@@ -178,7 +178,7 @@ tests:
 
           ./chip-tool onoff read start-up-on-off 1 1
 
-          verify the " start-up-on-off response" on the TH (all-cluster-app) log:
+          Verify TH recieves  " start-up-on-off response" on the TH (all-cluster-app) log:
 
           [...]
           ReportDataMessage =
@@ -226,7 +226,7 @@ tests:
 
           ./chip-tool onoff write on-time 1 1 1
 
-          verify the WriteResponseMessage of " on-time" on the TH (all-cluster-app) log:
+          Verify the WriteResponseMessage of " on-time" on the TH (all-cluster-app) log:
 
           [1666941297.380594][9718:9718] CHIP:DMG: WriteResponseMessage =
           [1666941297.380596][9718:9718] CHIP:DMG: {
@@ -255,7 +255,7 @@ tests:
 
           ./chip-tool onoff write off-wait-time 22 1 1
 
-          verify the WriteResponseMessage of " off-wait-time" on the TH (all-cluster-app) log:
+          Verify the WriteResponseMessage of " off-wait-time" on the TH (all-cluster-app) log:
           [1666941329.582813][9718:9718] CHIP:DMG: WriteResponseMessage =
           [1666941329.582820][9718:9718] CHIP:DMG: {
           [1666941329.582828][9718:9718] CHIP:DMG:         AttributeStatusIBs =
@@ -285,7 +285,7 @@ tests:
 
           ./chip-tool onoff write start-up-on-off 2 1 1
 
-          verify the WriteResponseMessage of " start-up-on-off " on the TH (all-cluster-app) log:
+          Verify the WriteResponseMessage of " start-up-on-off " on the TH (all-cluster-app) log:
 
           [1666941347.639597][9718:9718] CHIP:DMG: WriteResponseMessage =
           [1666941347.639609][9718:9718] CHIP:DMG: {
@@ -322,7 +322,7 @@ tests:
 
           ./chip-tool onoff read attribute-list 1 1
 
-          verify the " attribute-list response" on the TH (all-cluster-minimal-app) log:
+          Verify the " attribute-list response" on the TH (all-cluster-minimal-app) log:
 
           [1666943616.274425][12769:12769] CHIP:DMG:
           [1666943616.274453][12769:12769] CHIP:DMG: ReportDataMessage =
@@ -465,7 +465,7 @@ tests:
 
           ./chip-tool onoff read feature-map  1 1
 
-          verify the "  feature-map response" on the TH (all-cluster-minimal-app) log:
+          Verify the "  feature-map response" on the TH (all-cluster-minimal-app) log:
 
           [1666943673.928358][12769:12769] CHIP:DMG: ReportDataMessage =
           [1666943673.928360][12769:12769] CHIP:DMG: {
@@ -497,7 +497,7 @@ tests:
 
           ./chip-tool onoff read on-off 1 1
 
-          verify the " on-off response" on the TH (all-cluster-minimal-app) log:
+          Verify the " on-off response" on the TH (all-cluster-minimal-app) log:
 
           [1666943688.655282][12769:12769] CHIP:DMG: ReportDataMessage =
           [1666943688.655285][12769:12769] CHIP:DMG: {

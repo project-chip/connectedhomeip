@@ -213,7 +213,7 @@ tests:
           "read NeighborTableList attribute from DUT and Verify that the
           NeighborTable List size is Zero or greater and verify each node types"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read neighbor-table-list 54 0
+          ./chip-tool threadnetworkdiagnostics read neighbor-table 54 0
 
           Verify "NeighborTableList value is  Zero or greater  " on the TH(Chip-tool) Log:
           if the attribute has an entries verify the each node mentioned in the test plan.
@@ -250,10 +250,10 @@ tests:
                 value: "y"
 
     - label:
-          "Read RouteTableList attribute from DUT and Verify that the
-          RouteTableList List size is Zero or greater and verify each node types"
+          "Read RouteTable attribute from DUT and Verify that the RouteTableList
+          List size is Zero or greater and verify each node types"
       verification: |
-          ./chip-tool threadnetworkdiagnostics read route-table-list 54 0
+          ./chip-tool threadnetworkdiagnostics read route-table 54 0
 
           Verify "RouteTableList value is  Zero or greater  " on the TH(Chip-tool) Log:
           if the attribute has an entries verify the each node mentioned in the test plan.

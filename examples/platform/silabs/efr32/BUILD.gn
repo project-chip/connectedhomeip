@@ -41,7 +41,13 @@ declare_args() {
 
   #default Wifi Password
   chip_default_wifi_psk = ""
+
+  # Use default handler to negotiate subscription max interval
+  chip_config_use_icd_subscription_callbacks = enable_sleepy_device
 }
+
+# Use persitent subscriptions for IC devices
+chip_persist_subscriptions = enable_sleepy_device
 
 silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
@@ -236,7 +242,10 @@ config("silabs-wifi-config") {
 source_set("efr32-common") {
   deps = []
   public_deps = []
-  public_configs = [ ":efr32-common-config" ]
+  public_configs = [
+    ":efr32-common-config",
+    "${efr32_sdk_build_root}:silabs_config",
+  ]
 
   include_dirs = [ "." ]
 
@@ -316,6 +325,10 @@ source_set("efr32-common") {
   # Factory Data Provider
   if (use_efr32_factory_data_provider) {
     public_deps += [ ":efr32-factory-data-provider" ]
+  }
+
+  if (chip_config_use_icd_subscription_callbacks) {
+    public_deps += [ ":efr32-ICD-subscription-callback" ]
   }
 
   public_deps += [

@@ -23,8 +23,16 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
+
+#if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
+#include <imgui_ui/ui.h>
+#include <imgui_ui/windows/light.h>
+#include <imgui_ui/windows/qrcode.h>
+
+#endif
 
 using namespace chip;
 using namespace chip::app;
@@ -81,7 +89,17 @@ int main(int argc, char * argv[])
     }
 
     LightingMgr().Init();
+
+#if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
+    example::Ui::ImguiUi ui;
+
+    ui.AddWindow(std::make_unique<example::Ui::Windows::QRCode>());
+    ui.AddWindow(std::make_unique<example::Ui::Windows::Light>(chip::EndpointId(1)));
+
+    ChipLinuxAppMainLoop(&ui);
+#else
     ChipLinuxAppMainLoop();
+#endif
 
     return 0;
 }

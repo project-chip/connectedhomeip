@@ -4892,7 +4892,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "SecurityType",
+              "type": "SecurityTypeEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -4908,7 +4908,7 @@
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "WiFiVersionType",
+              "type": "WiFiVersionEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -10283,22 +10283,6 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ],
-          "events": [
-            {
-              "name": "StateChanged",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "ActionFailed",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            }
           ]
         },
         {
@@ -11939,15 +11923,6 @@
               "maxInterval": 65344,
               "reportableChange": 0
             }
-          ],
-          "events": [
-            {
-              "name": "SwitchLatched",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            }
           ]
         },
         {
@@ -12265,15 +12240,6 @@
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
-            }
-          ],
-          "events": [
-            {
-              "name": "StateChange",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
             }
           ]
         },
@@ -24986,6 +24952,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 61442
     }
-  ],
-  "log": []
+  ]
 }

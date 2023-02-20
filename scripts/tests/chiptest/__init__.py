@@ -131,6 +131,8 @@ def _GetInDevelopmentTests() -> Set[str]:
        Goal is for this set to become empty.
     """
     return {
+        # Needs group support in repl / The test is incorrect - see https://github.com/CHIP-Specifications/chip-test-plans/issues/2431 for details.
+        "Test_TC_SC_5_2.yaml",
         "TestGroupMessaging.yaml",     # Needs group support in repl
     }
 

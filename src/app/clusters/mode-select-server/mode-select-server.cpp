@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -28,6 +27,7 @@
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <app/util/error-mapping.h>
 #include <app/util/odd-sized-integers.h>
 #include <app/util/util.h>
@@ -40,6 +40,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeSelect;
 using namespace chip::Protocols;
+using chip::Protocols::InteractionModel::Status;
 
 using BootReasonType = GeneralDiagnostics::BootReasonEnum;
 
@@ -99,18 +100,18 @@ bool emberAfModeSelectClusterChangeToModeCallback(CommandHandler * commandHandle
     uint8_t newMode       = commandData.newMode;
     // Check that the newMode matches one of the supported options
     const ModeSelect::Structs::ModeOptionStruct::Type * modeOptionPtr;
-    EmberAfStatus checkSupportedModeStatus =
+    Status checkSupportedModeStatus =
         ModeSelect::getSupportedModesManager()->getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
-    if (EMBER_ZCL_STATUS_SUCCESS != checkSupportedModeStatus)
+    if (Status::Success != checkSupportedModeStatus)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: Failed to find the option with mode %u", newMode);
-        emberAfSendImmediateDefaultResponse(checkSupportedModeStatus);
-        return false;
+        commandHandler->AddStatus(commandPath, checkSupportedModeStatus);
+        return true;
     }
     ModeSelect::Attributes::CurrentMode::Set(endpointId, newMode);
 
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelect: ChangeToMode successful");
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandHandler->AddStatus(commandPath, Status::Success);
     return true;
 }
 
@@ -262,12 +263,5 @@ static InteractionModel::Status verifyModeValue(const EndpointId endpointId, con
         return InteractionModel::Status::Success;
     }
     const ModeSelect::Structs::ModeOptionStruct::Type * modeOptionPtr;
-    EmberAfStatus checkSupportedModeStatus =
-        ModeSelect::getSupportedModesManager()->getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
-    if (EMBER_ZCL_STATUS_SUCCESS != checkSupportedModeStatus)
-    {
-        const InteractionModel::Status returnStatus = ToInteractionModelStatus(checkSupportedModeStatus);
-        return returnStatus;
-    }
-    return InteractionModel::Status::Success;
+    return ModeSelect::getSupportedModesManager()->getModeOptionByMode(endpointId, newMode, &modeOptionPtr);
 }

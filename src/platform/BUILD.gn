@@ -191,8 +191,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET=Tizen",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
-      defines -=
-          [ "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}" ]
     } else if (chip_device_platform == "nrfconnect") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_NRFCONNECT=1",

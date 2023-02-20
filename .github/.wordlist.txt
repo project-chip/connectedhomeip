@@ -1164,6 +1164,8 @@ saveAs
 sbin
 scalability
 scalable
+schema
+schemas
 scm
 sco
 scp

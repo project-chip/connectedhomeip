@@ -43,17 +43,6 @@
 #define ZA_END_DEVICE 3
 #define ZA_SLEEPY_END_DEVICE 4
 
-// A subtle distniction:
-//   EMBER_AF_MANUFACTURER_CODE is the MFG code set by AppBuilder
-//     for use in the App Framework (AF).  If not set by AppBuilder we default
-//     it to 0x0000. The customer should be setting this value.
-//   EMBER_COMPANY_MANUFACTURER_CODE is the Ember Corporation's Manufacturer
-//     ID allocated by the Zigbee alliance.  This shall not change.
-#define EMBER_COMPANY_MANUFACTURER_CODE 0x1002
-#ifndef EMBER_AF_MANUFACTURER_CODE
-#define EMBER_AF_MANUFACTURER_CODE 0x0000
-#endif
-
 // This file determines the security profile used, and from that various
 // other security parameters.
 // #include "app/framework/security/security-config.h"
@@ -163,17 +152,6 @@
 // a single configuration for the whole table.
 #ifndef EMBER_ADDRESS_TABLE_SIZE
 #define EMBER_ADDRESS_TABLE_SIZE (EMBER_AF_PLUGIN_ADDRESS_TABLE_SIZE + EMBER_AF_PLUGIN_ADDRESS_TABLE_TRUST_CENTER_CACHE_SIZE)
-#endif
-
-#ifndef EMBER_AF_DEFAULT_APS_OPTIONS
-// BUGZID 12261: Concentrators use MTORRs for route discovery and should not
-// enable route discovery in the APS options.
-#ifdef EMBER_AF_PLUGIN_CONCENTRATOR
-#define EMBER_AF_DEFAULT_APS_OPTIONS (EMBER_APS_OPTION_RETRY | EMBER_APS_OPTION_ENABLE_ADDRESS_DISCOVERY)
-#else
-#define EMBER_AF_DEFAULT_APS_OPTIONS                                                                                               \
-    (EMBER_APS_OPTION_RETRY | EMBER_APS_OPTION_ENABLE_ROUTE_DISCOVERY | EMBER_APS_OPTION_ENABLE_ADDRESS_DISCOVERY)
-#endif
 #endif
 
 // *******************************************************************

@@ -70,8 +70,10 @@ __LOG_LEVELS__ = {
 @click.option(
     '--generator',
     default='JAVA',
-    type=click.Choice(GENERATORS.keys(), case_sensitive=False),
-    help='What code generator to run')
+    help='What code generator to run.  The choices are: '+'|'.join(GENERATORS.keys())+'. ' +
+         'When using custom, provide the plugin path using `--generator custom:<path_to_plugin>:<plugin_module_name>` syntax. ' +
+    'For example, `--generator custom:./my_plugin:my_plugin_module` will load `./my_plugin/my_plugin_module/__init.py__` ' +
+         'that defines a subclass of CodeGenerator named CustomGenerator.')
 @click.option(
     '--output-dir',
     type=click.Path(exists=False),
@@ -110,16 +112,28 @@ def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs,
             datefmt='%Y-%m-%d %H:%M:%S'
         )
 
-    logging.info("Parsing idl from %s" % idl_path)
-    idl_tree = CreateParser().parse(open(idl_path, "rt").read())
-
     if name_only:
         storage = ListGeneratedFilesStorage()
     else:
         storage = FileSystemGeneratorStorage(output_dir)
 
+    logging.info("Parsing idl from %s" % idl_path)
+    idl_tree = CreateParser().parse(open(idl_path, "rt").read())
+
+    plugin_module = None
+    if generator.startswith('custom'):
+        # check that the plugin path is provided
+        if ':' not in generator:
+            logging.fatal("Custom generator plugin path not provided. Use --generator custom:<path_to_plugin>")
+            sys.exit(1)
+        custom_params = generator.split(':')
+        (generator, plugin_path, plugin_module) = custom_params
+        logging.info("Using CustomGenerator at plugin path %s.%s" % (plugin_path, plugin_module))
+        sys.path.append(plugin_path)
+        generator = 'CUSTOM'
+
     logging.info("Running code generator %s" % generator)
-    generator = CodeGenerator.FromString(generator).Create(storage, idl=idl_tree)
+    generator = CodeGenerator.FromString(generator).Create(storage, idl=idl_tree, plugin_module=plugin_module)
     generator.render(dry_run)
 
     if expected_outputs:

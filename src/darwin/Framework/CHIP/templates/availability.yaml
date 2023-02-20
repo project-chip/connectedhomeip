@@ -1855,7 +1855,6 @@
               RetrieveLogsRequest:
                   - intent
                   - requestedProtocol
-                  - transferFileDesignator
               RetrieveLogsResponse:
                   - status
                   - content
@@ -3101,8 +3100,14 @@
               - RoutingRole
               - ThreadConnectionStatus
           WiFiNetworkDiagnostics:
-              - AssociationFailureCause
-              - SecurityType
+              # AssociationFailureCauseEnum was originally just named
+              # AssociationFailureCause, but we generate the same API for both
+              # of those names, so the name can just change here.
+              - AssociationFailureCauseEnum
+              # SecurityTypeEnum was originally just named SecurityType, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              - SecurityTypeEnum
               - WiFiConnectionStatus
               - WiFiVersionType
           EthernetNetworkDiagnostics:
@@ -3481,12 +3486,18 @@
                   - Connected
                   - NotConnected
           WiFiNetworkDiagnostics:
-              AssociationFailureCause:
+              # AssociationFailureCauseEnum was originally just named
+              # AssociationFailureCause, but we generate the same API for both
+              # of those names, so the name can just change here.
+              AssociationFailureCauseEnum:
                   - Unknown
                   - AssociationFailed
                   - AuthenticationFailed
                   - SsidNotFound
-              SecurityType:
+              # SecurityTypeEnum was originally just named SecurityType, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              SecurityTypeEnum:
                   - Unspecified
                   - None
                   - WEP
@@ -6001,7 +6012,7 @@
               - DlOperationSource
               - DlUserStatus
               - DlUserType
-              # The enums after this come from the silabs types-silabs.xml, not the
+              # The enums after this come from the draft/types/door-lock.xml, not the
               # door lock cluster XML
               #
               # DoorLockUserStatus is not marked deprecated here because the
@@ -6503,7 +6514,7 @@
                   HeatSetpointPresent: HeatSetpointFieldPresent
                   CoolSetpointPresent: CoolSetpointFieldPresent
 
-- release: "Future"
+- release: "First after major API revamp"
   versions: "future"
   introduced:
       global attributes:
@@ -6565,6 +6576,7 @@
               - EventList
           TimeSynchronization:
               - EventList
+              - DSTOffset
           BridgedDeviceBasicInformation:
               - EventList
           Switch:
@@ -6651,3 +6663,118 @@
               - EventList
           FaultInjection:
               - EventList
+      command fields:
+          DiagnosticLogs:
+              RetrieveLogsRequest:
+                  # Not really usable in earlier releases: wrong type.
+                  - transferFileDesignator
+      structs:
+          TimeSynchronization:
+              - DSTOffsetStruct
+              - TimeZoneStruct
+      struct fields:
+          TimeSynchronization:
+              DSTOffsetStruct:
+                  - offset
+                  - validStarting
+                  - validUntil
+              TimeZoneStruct:
+                  - offset
+                  - validAt
+                  - name
+      enums:
+          DiagnosticLogs:
+              - IntentEnum
+              - StatusEnum
+              - TransferProtocolEnum
+          OccupancySensing:
+              - OccupancySensorTypeEnum
+          WiFiNetworkDiagnostics:
+              - ConnectionStatusEnum
+              - WiFiVersionEnum
+      enum values:
+          DoorLock:
+              LockDataTypeEnum:
+                  - FingerVein
+          DiagnosticLogs:
+              IntentEnum:
+                  - EndUserSupport
+                  - NetworkDiag
+                  - CrashLogs
+              StatusEnum:
+                  - Success
+                  - Exhausted
+                  - NoLogs
+                  - Busy
+                  - Denied
+              TransferProtocolEnum:
+                  - ResponsePayload
+                  - BDX
+          OccupancySensing:
+              OccupancySensorTypeEnum:
+                  - PIR
+                  - Ultrasonic
+                  - PIRAndUltrasonic
+                  - PhysicalContact
+          WiFiNetworkDiagnostics:
+              ConnectionStatusEnum:
+                  - Connected
+                  - NotConnected
+              WiFiVersionEnum:
+                  - A
+                  - B
+                  - G
+                  - N
+                  - Ac
+                  - Ax
+      bitmaps:
+          OccupancySensing:
+              - OccupancyBitmap
+              - OccupancySensorTypeBitmap
+      bitmap values:
+          OccupancySensing:
+              OccupancyBitmap:
+                  - Occupied
+              OccupancySensorTypeBitmap:
+                  - PIR
+                  - Ultrasonic
+                  - PhysicalContact
+  deprecated:
+      attributes:
+          TimeSynchronization:
+              - DstOffset
+      structs:
+          TimeSynchronization:
+              - DstOffsetType
+              - TimeZoneType
+      enums:
+          DiagnosticLogs:
+              - LogsIntent
+              - LogsStatus
+              - LogsTransferProtocol
+          WiFiNetworkDiagnostics:
+              - WiFiConnectionStatus
+              - WiFiVersionType
+  removed:
+      enum values:
+          DoorLock:
+              DlLockDataType:
+                  # This value never existed for this enum name so, don't start
+                  # exposing it.  It's exposed for LockDataTypeEnum
+                  - FingerVein
+  renames:
+      attributes:
+          TimeSynchronization:
+              DSTOffset: DstOffset
+      structs:
+          TimeSynchronization:
+              DSTOffsetStruct: DstOffsetType
+              TimeZoneStruct: TimeZoneType
+      enums:
+          DiagnosticLogs:
+              IntentEnum: LogsIntent
+              StatusEnum: LogsStatus
+              TransferProtocolEnum: LogsTransferProtocol
+          WiFiNetworkDiagnostics:
+              ConnectionStatusEnum: WiFiConnectionStatus
+              WiFiVersionEnum: WiFiVersionType

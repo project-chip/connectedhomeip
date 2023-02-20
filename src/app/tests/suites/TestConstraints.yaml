@@ -265,3 +265,81 @@ tests:
       attribute: "char_string"
       arguments:
           value: ""
+
+    # Tests for hasValue attribute
+
+    - label: "Read attribute NULLABLE_INT8U Default Value"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          value: 0
+
+    - label: "Write attribute NULLABLE_INT8U with a value"
+      command: "writeAttribute"
+      attribute: "nullable_int8u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_INT8U with a value"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          constraints:
+              hasValue: true
+
+    - label: "Write attribute NULLABLE_INT8U without a value"
+      command: "writeAttribute"
+      attribute: "nullable_int8u"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_INT8U with a value"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          constraints:
+              hasValue: false
+
+    - label: "Write attribute NULLABLE_INT8U back to Default Value"
+      command: "writeAttribute"
+      attribute: "nullable_int8u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_OCTET_STRING Default Value"
+      command: "readAttribute"
+      attribute: "nullable_octet_string"
+      response:
+          value: ""
+
+    - label: "Write attribute NULLABLE_OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "nullable_octet_string"
+      arguments:
+          value: "TestValue"
+
+    - label: "Read attribute NULLABLE_OCTET_STRING"
+      command: "readAttribute"
+      attribute: "nullable_octet_string"
+      response:
+          constraints:
+              hasValue: true
+
+    - label: "Write attribute NULLABLE_OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "nullable_octet_string"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_OCTET_STRING"
+      command: "readAttribute"
+      attribute: "nullable_octet_string"
+      response:
+          constraints:
+              hasValue: false
+
+    - label: "Write attribute NULLABLE_OCTET_STRING back to Default Value"
+      command: "writeAttribute"
+      attribute: "nullable_octet_string"
+      arguments:
+          value: ""

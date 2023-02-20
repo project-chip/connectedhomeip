@@ -1783,7 +1783,7 @@ void CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback::CallbackFn(
     VerifyOrReturn(javaCallbackRef != nullptr);
 
     err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess",
-                                                  "(Ljava/lang/Integer;[BLjava/lang/Long;Ljava/lang/Long;)V", &javaMethod);
+                                                  "(Ljava/lang/Integer;[BLjava/util/Optional;Ljava/util/Optional;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject Status;
@@ -1797,15 +1797,35 @@ void CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback::CallbackFn(
                             reinterpret_cast<const jbyte *>(dataResponse.logContent.data()));
     LogContent = LogContentByteArray;
     jobject UTCTimeStamp;
-    std::string UTCTimeStampClassName     = "java/lang/Long";
-    std::string UTCTimeStampCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(UTCTimeStampClassName.c_str(), UTCTimeStampCtorSignature.c_str(),
-                                                                   dataResponse.UTCTimeStamp, UTCTimeStamp);
+    if (!dataResponse.UTCTimeStamp.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, UTCTimeStamp);
+    }
+    else
+    {
+        jobject UTCTimeStampInsideOptional;
+        std::string UTCTimeStampInsideOptionalClassName     = "java/lang/Long";
+        std::string UTCTimeStampInsideOptionalCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
+            UTCTimeStampInsideOptionalClassName.c_str(), UTCTimeStampInsideOptionalCtorSignature.c_str(),
+            dataResponse.UTCTimeStamp.Value(), UTCTimeStampInsideOptional);
+        chip::JniReferences::GetInstance().CreateOptional(UTCTimeStampInsideOptional, UTCTimeStamp);
+    }
     jobject TimeSinceBoot;
-    std::string TimeSinceBootClassName     = "java/lang/Long";
-    std::string TimeSinceBootCtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(
-        TimeSinceBootClassName.c_str(), TimeSinceBootCtorSignature.c_str(), dataResponse.timeSinceBoot, TimeSinceBoot);
+    if (!dataResponse.timeSinceBoot.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, TimeSinceBoot);
+    }
+    else
+    {
+        jobject TimeSinceBootInsideOptional;
+        std::string TimeSinceBootInsideOptionalClassName     = "java/lang/Long";
+        std::string TimeSinceBootInsideOptionalCtorSignature = "(J)V";
+        chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
+            TimeSinceBootInsideOptionalClassName.c_str(), TimeSinceBootInsideOptionalCtorSignature.c_str(),
+            dataResponse.timeSinceBoot.Value(), TimeSinceBootInsideOptional);
+        chip::JniReferences::GetInstance().CreateOptional(TimeSinceBootInsideOptional, TimeSinceBoot);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, LogContent, UTCTimeStamp, TimeSinceBoot);
 }

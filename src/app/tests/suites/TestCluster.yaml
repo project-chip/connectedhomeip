@@ -995,16 +995,16 @@ tests:
     - label: "Read attribute UNSUPPORTED"
       command: "readAttribute"
       attribute: "unsupported"
-      optional: true
       response:
-          value: 0
+          error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Writeattribute UNSUPPORTED"
       command: "writeAttribute"
       attribute: "unsupported"
-      optional: true
       arguments:
           value: 0
+      response:
+          error: UNSUPPORTED_ATTRIBUTE
 
     - label: "Send Test Command to unsupported endpoint"
       command: "Test"

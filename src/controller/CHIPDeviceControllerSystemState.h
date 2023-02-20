@@ -33,6 +33,7 @@
 #include <app/CASESessionManager.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
+#include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPConfig.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
@@ -81,6 +82,7 @@ struct DeviceControllerSystemStateParams
     Ble::BleLayer * bleLayer = nullptr;
 #endif
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
+    Crypto::SessionKeystore * sessionKeystore          = nullptr;
 
     // Params that will be deallocated via Platform::Delete in
     // DeviceControllerSystemState::Shutdown.
@@ -126,7 +128,8 @@ public:
         mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable), mCASEServer(params.caseServer),
         mCASESessionManager(params.caseSessionManager), mSessionSetupPool(params.sessionSetupPool),
         mCASEClientPool(params.caseClientPool), mGroupDataProvider(params.groupDataProvider),
-        mFabricTableDelegate(params.fabricTableDelegate), mSessionResumptionStorage(std::move(params.sessionResumptionStorage))
+        mSessionKeystore(params.sessionKeystore), mFabricTableDelegate(params.fabricTableDelegate),
+        mSessionResumptionStorage(std::move(params.sessionResumptionStorage))
     {
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
@@ -165,7 +168,7 @@ public:
         return mSystemLayer != nullptr && mUDPEndPointManager != nullptr && mTransportMgr != nullptr && mSessionMgr != nullptr &&
             mUnsolicitedStatusHandler != nullptr && mExchangeMgr != nullptr && mMessageCounterManager != nullptr &&
             mFabrics != nullptr && mCASESessionManager != nullptr && mSessionSetupPool != nullptr && mCASEClientPool != nullptr &&
-            mGroupDataProvider != nullptr;
+            mGroupDataProvider != nullptr && mSessionKeystore != nullptr;
     };
 
     System::Layer * SystemLayer() const { return mSystemLayer; };
@@ -181,6 +184,7 @@ public:
 #endif
     CASESessionManager * CASESessionMgr() const { return mCASESessionManager; }
     Credentials::GroupDataProvider * GetGroupDataProvider() const { return mGroupDataProvider; }
+    Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
     void SetTempFabricTable(FabricTable * tempFabricTable) { mTempFabricTable = tempFabricTable; }
 
 private:
@@ -203,6 +207,7 @@ private:
     SessionSetupPool * mSessionSetupPool                                           = nullptr;
     CASEClientPool * mCASEClientPool                                               = nullptr;
     Credentials::GroupDataProvider * mGroupDataProvider                            = nullptr;
+    Crypto::SessionKeystore * mSessionKeystore                                     = nullptr;
     FabricTable::Delegate * mFabricTableDelegate                                   = nullptr;
     Platform::UniquePtr<SimpleSessionResumptionStorage> mSessionResumptionStorage;
 

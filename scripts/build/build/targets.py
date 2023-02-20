@@ -148,6 +148,7 @@ def BuildHostTarget():
     target.AppendModifier('clang', use_clang=True)
     target.AppendModifier('test', extra_tests=True)
     target.AppendModifier('rpc', enable_rpcs=True)
+    target.AppendModifier('with-ui', imgui_ui=True)
 
     return target
 
