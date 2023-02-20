@@ -315,7 +315,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
     wext_get_enc_ext("wlan0", &_security, &setting.key_idx, setting.password);
     if (wext_get_auth_type("wlan0", &_auth_type) < 0)
     {
-        securityType = 0;
+        securityType = SecurityTypeEnum::kUnspecified;
     }
     else
     {
@@ -342,7 +342,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
                 securityType = SecurityTypeEnum::kWpa3;
             break;
         default:
-            securityType = SecurityTypeEnum::Unspecified;
+            securityType = SecurityTypeEnum::kUnspecified;
             break;
         }
     }
