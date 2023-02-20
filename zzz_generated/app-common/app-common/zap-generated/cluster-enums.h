@@ -1205,8 +1205,8 @@ enum class NodeOperationalCertStatusEnum : uint8_t
 
 namespace GroupKeyManagement {
 
-// Enum for GroupKeySecurityPolicy
-enum class GroupKeySecurityPolicy : uint8_t
+// Enum for GroupKeySecurityPolicyEnum
+enum class GroupKeySecurityPolicyEnum : uint8_t
 {
     kTrustFirst   = 0x00,
     kCacheAndSync = 0x01,

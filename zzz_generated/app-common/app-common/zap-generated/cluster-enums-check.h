@@ -1033,9 +1033,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalCredentials:
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::GroupKeySecurityPolicy val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::GroupKeySecurityPolicyEnum val)
 {
-    using EnumType = GroupKeyManagement::GroupKeySecurityPolicy;
+    using EnumType = GroupKeyManagement::GroupKeySecurityPolicyEnum;
     switch (val)
     {
     case EnumType::kTrustFirst:

@@ -12991,7 +12991,7 @@ class GroupKeyManagement(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class GroupKeySecurityPolicy(MatterIntEnum):
+        class GroupKeySecurityPolicyEnum(MatterIntEnum):
             kTrustFirst = 0x00
             kCacheAndSync = 0x01
             # All received enum values that are not listed above will be mapped
@@ -13042,7 +13042,7 @@ class GroupKeyManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="groupKeySetID", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="groupKeySecurityPolicy", Tag=1, Type=GroupKeyManagement.Enums.GroupKeySecurityPolicy),
+                            ClusterObjectFieldDescriptor(Label="groupKeySecurityPolicy", Tag=1, Type=GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum),
                             ClusterObjectFieldDescriptor(Label="epochKey0", Tag=2, Type=typing.Union[Nullable, bytes]),
                             ClusterObjectFieldDescriptor(Label="epochStartTime0", Tag=3, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="epochKey1", Tag=4, Type=typing.Union[Nullable, bytes]),
@@ -13052,7 +13052,7 @@ class GroupKeyManagement(Cluster):
                     ])
 
             groupKeySetID: 'uint' = 0
-            groupKeySecurityPolicy: 'GroupKeyManagement.Enums.GroupKeySecurityPolicy' = 0
+            groupKeySecurityPolicy: 'GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum' = 0
             epochKey0: 'typing.Union[Nullable, bytes]' = NullValue
             epochStartTime0: 'typing.Union[Nullable, uint]' = NullValue
             epochKey1: 'typing.Union[Nullable, bytes]' = NullValue
