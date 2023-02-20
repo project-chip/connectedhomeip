@@ -44,6 +44,14 @@ void emberAf{{asUpperCamelCase label}}ClusterInitCallback(chip::EndpointId endpo
  */
 void emberAf{{asUpperCamelCase label}}ClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief {{label}} Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void Matter{{asUpperCamelCase label}}ClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief {{label}} Cluster Client Init
  *
  * Client Init

@@ -162,7 +162,6 @@ template("chip_data_model") {
       "${_app_root}/util/ClientMonitoringRegistrationTable.cpp",
       "${_app_root}/util/ClientMonitoringRegistrationTable.h",
       "${_app_root}/util/DataModelHandler.cpp",
-      "${_app_root}/util/af-event.cpp",
       "${_app_root}/util/attribute-size-util.cpp",
       "${_app_root}/util/attribute-storage.cpp",
       "${_app_root}/util/attribute-table.cpp",

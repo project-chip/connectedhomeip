@@ -23,6 +23,7 @@
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 #include <app/util/config.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 /**********************************************************
@@ -182,6 +183,8 @@ public:
     void updateTempCommand(chip::EndpointId endpoint);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
+    void cancelEndpointTimerCallback(chip::EndpointId endpoint);
+
 private:
     /**********************************************************
      * Functions Definitions
@@ -196,6 +199,11 @@ private:
     void computePwmFromTemp(chip::EndpointId endpoint);
     void computePwmFromXy(chip::EndpointId endpoint);
     bool computeNewColor16uValue(Color16uTransitionState * p);
+
+    // Matter timer scheduling glue logic
+    static void timerCallback(chip::System::Layer *, void * callbackContext);
+    void scheduleTimerCallbackMs(EmberEventControl * control, uint32_t delayMs);
+    void cancelEndpointTimerCallback(EmberEventControl * control);
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
     ColorHueTransitionState * getColorHueTransitionState(chip::EndpointId endpoint);

@@ -1563,9 +1563,11 @@
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayOnOffServer[] = {                                                             \
         (EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback,                                                     \
+        (EmberAfGenericClusterFunction) MatterOnOffClusterServerShutdownCallback,                                                  \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayLevelControlServer[] = {                                                      \
         (EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback,                                              \
+        (EmberAfGenericClusterFunction) MatterLevelControlClusterServerShutdownCallback,                                           \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayModeSelectServer[] = {                                                        \
         (EmberAfGenericClusterFunction) emberAfModeSelectClusterServerInitCallback,                                                \
@@ -1573,10 +1575,14 @@
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayDoorLockServer[] = {                                                          \
         (EmberAfGenericClusterFunction) MatterDoorLockClusterServerAttributeChangedCallback,                                       \
+        (EmberAfGenericClusterFunction) MatterDoorLockClusterServerShutdownCallback,                                               \
         (EmberAfGenericClusterFunction) MatterDoorLockClusterServerPreAttributeChangedCallback,                                    \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayWindowCoveringServer[] = {                                                    \
         (EmberAfGenericClusterFunction) MatterWindowCoveringClusterServerAttributeChangedCallback,                                 \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayBarrierControlServer[] = {                                                    \
+        (EmberAfGenericClusterFunction) MatterBarrierControlClusterServerShutdownCallback,                                         \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayPumpConfigurationAndControlServer[] = {                                       \
         (EmberAfGenericClusterFunction) emberAfPumpConfigurationAndControlClusterServerInitCallback,                               \
@@ -1596,6 +1602,7 @@
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayColorControlServer[] = {                                                      \
         (EmberAfGenericClusterFunction) emberAfColorControlClusterServerInitCallback,                                              \
+        (EmberAfGenericClusterFunction) MatterColorControlClusterServerShutdownCallback,                                           \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayOccupancySensingServer[] = {                                                  \
         (EmberAfGenericClusterFunction) emberAfOccupancySensingClusterServerInitCallback,                                          \
@@ -2355,7 +2362,7 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(247), \
       .attributeCount = 7, \
       .clusterSize = 13, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
       .functions = chipFuncArrayOnOffServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 109 ) ,\
       .generatedCommandList = nullptr ,\
@@ -2381,7 +2388,7 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(258), \
       .attributeCount = 16, \
       .clusterSize = 27, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
       .functions = chipFuncArrayLevelControlServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 116 ) ,\
       .generatedCommandList = nullptr ,\
@@ -2524,7 +2531,7 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(324), \
       .attributeCount = 33, \
       .clusterSize = 55, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayDoorLockServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 127 ) ,\
       .generatedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 142 ) ,\
@@ -2550,8 +2557,8 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(381), \
       .attributeCount = 6, \
       .clusterSize = 11, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
+      .functions = chipFuncArrayBarrierControlServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 156 ) ,\
       .generatedCommandList = nullptr ,\
       .eventList = nullptr, \
@@ -2615,7 +2622,7 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(446), \
       .attributeCount = 54, \
       .clusterSize = 345, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
       .functions = chipFuncArrayColorControlServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 161 ) ,\
       .generatedCommandList = nullptr ,\
@@ -2901,7 +2908,7 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(682), \
       .attributeCount = 7, \
       .clusterSize = 13, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
       .functions = chipFuncArrayOnOffServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 237 ) ,\
       .generatedCommandList = nullptr ,\

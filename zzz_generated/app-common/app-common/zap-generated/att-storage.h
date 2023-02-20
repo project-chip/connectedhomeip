@@ -30,8 +30,8 @@
 #define CLUSTER_MASK_DEFAULT_RESPONSE_FUNCTION (0x04)
 // Does this cluster have message sent function?
 #define CLUSTER_MASK_MESSAGE_SENT_FUNCTION (0x08)
-// Does this cluster have manufacturer specific attribute changed function?
-#define CLUSTER_MASK_MANUFACTURER_SPECIFIC_ATTRIBUTE_CHANGED_FUNCTION (0x10)
+// Does this cluster have shutdown function?
+#define CLUSTER_MASK_SHUTDOWN_FUNCTION (0x10)
 // Does this cluster have pre-attribute changed function?
 #define CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION (0x20)
 // Cluster is a server
