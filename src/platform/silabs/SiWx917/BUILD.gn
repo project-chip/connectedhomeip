@@ -72,9 +72,7 @@ static_library("SiWx917") {
 
   # Add platform crypto implementation
   if (chip_crypto == "platform") {
-    sources += [
-      "CHIPCryptoPALTinyCrypt.cpp",
-    ]
+    sources += [ "CHIPCryptoPALTinyCrypt.cpp" ]
     public_deps += [
       "${chip_root}/src/crypto",
       "${mbedtls_root}:mbedtls",
