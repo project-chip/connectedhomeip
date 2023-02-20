@@ -21,9 +21,9 @@
 
 #ifdef SIWX917_USE_COMISSIONABLE_DATA
 
-uint32_t discriminatorValue = 3455;
-uint64_t passcode           = 20202121;
-uint32_t spake2Interation   = 100;
+uint32_t discriminatorValue = 3840;
+uint64_t passcode           = 20202021;
+uint32_t spake2Interation   = 1000;
 char spake2Salt[]           = "U1BBS0UyUCBLZXkgU2FsdA==";
 char spake2Verifier[]       = "uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/"
                         "SRPFNRODm3wH/MBiehuFc6FJ/NH6Rmzw==";

@@ -42,8 +42,8 @@ void SIWx917DeviceDataProvider::setupPayload(uint8_t * outBuf)
     payload.version = 0;
     payload.discriminator.SetLongValue(discriminatorValue);
     payload.setUpPINCode = passcode;
-    payload.rendezvousInformation.SetValue((chip::RendezvousInformationFlags) rendezvousFlag);
-    payload.commissioningFlow = (chip::CommissioningFlow) commissionableFlow;
+    payload.rendezvousInformation.SetValue(static_cast<RendezvousInformationFlags>(rendezvousFlag));
+    payload.commissioningFlow = static_cast<CommissioningFlow>(commissionableFlow);
     payload.vendorID          = vendorId;
     payload.productID         = productId;
 
