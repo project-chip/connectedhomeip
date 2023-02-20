@@ -46,25 +46,6 @@ enum
 };
 
 /**
- * @brief Either marks an event as inactive or specifies the units for the
- * event execution time.
- */
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberEventUnits
-#else
-typedef uint8_t EmberEventUnits;
-enum
-#endif
-{
-    /** The event is not scheduled to run. */
-    EMBER_EVENT_INACTIVE = 0,
-    /** The execution time is in approximate milliseconds.  */
-    EMBER_EVENT_MS_TIME,
-    /** The event is scheduled to run at the earliest opportunity. */
-    EMBER_EVENT_ZERO_DELAY
-};
-
-/**
  * @brief Size of EUI64 (an IEEE address) in bytes (8).
  */
 #define EUI64_SIZE 8
@@ -201,14 +182,10 @@ typedef void (*TimerCallback)(chip::EndpointId);
 
 /** @brief The control structure for events.
  *
- * It holds the event status (one of the @e EMBER_EVENT_ values)
- * and the callback and it's parameters
+ * It holds the callback and its parameters.
  */
 typedef struct
 {
-    /** The event's status, either inactive or the units for timeToExecute. */
-    EmberEventUnits status;
-
     /* Callback information */
     TimerCallback callback;
     chip::EndpointId endpoint;

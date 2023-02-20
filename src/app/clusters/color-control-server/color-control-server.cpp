@@ -19,7 +19,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
@@ -49,18 +48,10 @@ void ColorControlServer::scheduleTimerCallbackMs(EmberEventControl * control, ui
     {
         ChipLogError(Zcl, "Color Control Server failed to schedule event: %" CHIP_ERROR_FORMAT, err.Format());
     }
-    else
-    {
-        control->status = EMBER_EVENT_MS_TIME;
-    }
 }
 
 void ColorControlServer::cancelEndpointTimerCallback(EmberEventControl * control)
 {
-    if (control->status != EMBER_EVENT_INACTIVE)
-    {
-        control->status = EMBER_EVENT_INACTIVE;
-    }
     DeviceLayer::SystemLayer().CancelTimer(timerCallback, control);
 }
 
