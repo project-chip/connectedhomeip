@@ -40,12 +40,6 @@ using namespace chip;
 //------------------------------------------------------------------------------
 // Globals
 
-#ifdef EMBER_AF_ENABLE_STATISTICS
-// a variable containing the number of messages send from the utilities
-// since emberAfInit was called.
-uint32_t afNumPktsSent;
-#endif
-
 const EmberAfClusterName zclClusterNames[] = {
     CLUSTER_IDS_TO_NAMES            // defined in print-cluster.h
     { kInvalidClusterId, nullptr }, // terminator
@@ -123,18 +117,7 @@ EmberAfDifferenceType emberAfGetDifference(uint8_t * pData, EmberAfDifferenceTyp
 // ****************************************
 void emberAfInit()
 {
-    uint8_t i;
-#ifdef EMBER_AF_ENABLE_STATISTICS
-    afNumPktsSent = 0;
-#endif
-
-    for (i = 0; i < EMBER_SUPPORTED_NETWORKS; i++)
-    {
-        // FIXME: Do we need to support more than one network?
-        // emberAfPushNetworkIndex(i);
-        emberAfInitializeAttributes(EMBER_BROADCAST_ENDPOINT);
-        // emberAfPopNetworkIndex();
-    }
+    emberAfInitializeAttributes(EMBER_BROADCAST_ENDPOINT);
 
     MATTER_PLUGINS_INIT
 
