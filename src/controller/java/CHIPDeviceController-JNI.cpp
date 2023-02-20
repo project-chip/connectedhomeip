@@ -303,6 +303,16 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
                                                         &getSkipCommissioningComplete);
     SuccessOrExit(err);
 
+    jmethodID getCountryCode;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getCountryCode", "()Ljava/util/Optional;",
+                                                        &getCountryCode);
+    SuccessOrExit(err);
+
+    jmethodID getRegulatoryLocation;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getRegulatoryLocation", "()Ljava/util/Optional;",
+                                                        &getRegulatoryLocation);
+    SuccessOrExit(err);
+
     jmethodID getKeypairDelegate;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getKeypairDelegate",
                                                         "()Lchip/devicecontroller/KeypairDelegate;", &getKeypairDelegate);
@@ -345,6 +355,8 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         bool attemptNetworkScanThread      = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanThread);
         bool skipCommissioningComplete     = env->CallBooleanMethod(controllerParams, getSkipCommissioningComplete);
         uint64_t adminSubject              = env->CallLongMethod(controllerParams, getAdminSubject);
+        jobject countryCodeOptional        = env->CallObjectMethod(controllerParams, getCountryCode);
+        jobject regulatoryLocationOptional = env->CallObjectMethod(controllerParams, getRegulatoryLocation);
 
 #ifdef JAVA_MATTER_CONTROLLER_TEST
         std::unique_ptr<chip::Controller::ExampleOperationalCredentialsIssuer> opCredsIssuer(
@@ -377,6 +389,54 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
             // if there is a valid adminSubject in the ControllerParams, then remember it
             CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
             commissioningParams.SetAdminSubject(adminSubject);
+            err = wrapper->UpdateCommissioningParameters(commissioningParams);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+                SuccessOrExit(err);
+            }
+        }
+
+        jobject countryCode;
+        err = chip::JniReferences::GetInstance().GetOptionalValue(countryCodeOptional, countryCode);
+        SuccessOrExit(err);
+
+        if (countryCode != nullptr)
+        {
+            jstring countryCodeStr = static_cast<jstring>(countryCode);
+            JniUtfString countryCodeJniString(env, countryCodeStr);
+
+            VerifyOrExit(countryCodeJniString.size() == 2, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+            chip::Controller::CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
+            commissioningParams.SetCountryCode(countryCodeJniString.charSpan());
+
+            // The wrapper internally has reserved storage for the country code and will copy the value.
+            err = wrapper->UpdateCommissioningParameters(commissioningParams);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+                SuccessOrExit(err);
+            }
+        }
+
+        jobject regulatoryLocation;
+        err = chip::JniReferences::GetInstance().GetOptionalValue(regulatoryLocationOptional, regulatoryLocation);
+        SuccessOrExit(err);
+
+        if (regulatoryLocation != nullptr)
+        {
+            using namespace app::Clusters::GeneralCommissioning;
+
+            jint regulatoryLocationJint = chip::JniReferences::GetInstance().IntegerToPrimitive(regulatoryLocation);
+            VerifyOrExit(chip::CanCastTo<RegulatoryLocationType>(regulatoryLocationJint), err = CHIP_ERROR_INVALID_ARGUMENT);
+
+            RegulatoryLocationType regulatoryLocationType = static_cast<RegulatoryLocationType>(regulatoryLocationJint);
+            VerifyOrExit(regulatoryLocationType >= RegulatoryLocationType::kIndoor, err = CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrExit(regulatoryLocationType <= RegulatoryLocationType::kIndoorOutdoor, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+            chip::Controller::CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
+            commissioningParams.SetDeviceRegulatoryLocation(regulatoryLocationType);
             err = wrapper->UpdateCommissioningParameters(commissioningParams);
             if (err != CHIP_NO_ERROR)
             {
