@@ -114,7 +114,7 @@ class WildcardFragment : Fragment() {
     return stringBuilder.toString()
   }
 
-  private suspend fun subscribe(type: Int, minInterval: Int, maxInterval: Int, keepSubscriptions: Boolean, isFabricFiltered: Boolean) {
+  private suspend fun subscribe(type: Int, minInterval: Int, maxInterval: Int, keepSubscriptions: Boolean, isFabricFiltered: Boolean, eventMin: Long?) {
     val subscriptionEstablishedCallback =
       SubscriptionEstablishedCallback { Log.i(TAG, "Subscription to device established") }
 
@@ -152,11 +152,12 @@ class WildcardFragment : Fragment() {
                                       minInterval,
                                       maxInterval,
                                       keepSubscriptions,
-                                      isFabricFiltered)
+                                      isFabricFiltered,
+                                      eventMin)
     }
   }
 
-  private suspend fun read(type: Int, isFabricFiltered: Boolean) {
+  private suspend fun read(type: Int, isFabricFiltered: Boolean, eventMin: Long?) {
     val endpointId = getChipPathIdForText(binding.endpointIdEd.text.toString())
     val clusterId = getChipPathIdForText(binding.clusterIdEd.text.toString())
     val attributeId = getChipPathIdForText(binding.attributeIdEd.text.toString())
@@ -177,20 +178,27 @@ class WildcardFragment : Fragment() {
                           addressUpdateFragment.deviceId),
                           null,
                           listOf(eventPath),
-                          isFabricFiltered)
+                          isFabricFiltered,
+                          eventMin)
     }
   }
 
   private fun showReadDialog(type: Int) {
     val dialogView = requireActivity().layoutInflater.inflate(R.layout.read_dialog, null)
+    val eventMinEd = dialogView.findViewById<EditText>(R.id.eventMinEd)
+    eventMinEd.visibility = if (type == EVENT) { View.VISIBLE } else { View.GONE }
     val dialog = AlertDialog.Builder(requireContext()).apply {
       setView(dialogView)
     }.create()
 
-    val isFabricFilteredEd = dialogView.findViewById<EditText>(R.id.isFabricFilteredSp)
+    val isFabricFilteredEd = dialogView.findViewById<Spinner>(R.id.isFabricFilteredSp)
     dialogView.findViewById<Button>(R.id.readBtn).setOnClickListener {
       scope.launch {
-        read(type, isFabricFilteredEd.text.toString().toBoolean())
+        var eventMin : Long? = null
+        if (type == EVENT && eventMinEd.text.isNotBlank()) {
+          eventMin = eventMinEd.text.toString().toULong().toLong()
+        }
+        read(type, isFabricFilteredEd.selectedItem.toString().toBoolean(), eventMin)
         requireActivity().runOnUiThread { dialog.dismiss() }
       }
     }
@@ -199,6 +207,8 @@ class WildcardFragment : Fragment() {
 
   private fun showSubscribeDialog(type: Int) {
     val dialogView = requireActivity().layoutInflater.inflate(R.layout.subscribe_dialog, null)
+    val eventMinEd = dialogView.findViewById<EditText>(R.id.eventMinEd)
+    eventMinEd.visibility = if (type == EVENT) { View.VISIBLE } else { View.GONE }
     val dialog = AlertDialog.Builder(requireContext()).apply {
       setView(dialogView)
     }.create()
@@ -210,12 +220,17 @@ class WildcardFragment : Fragment() {
     dialogView.findViewById<Button>(R.id.subscribeBtn).setOnClickListener {
       scope.launch {
         if(minIntervalEd.text.isNotBlank() && maxIntervalEd.text.isNotBlank()) {
+          var eventMin : Long? = null
+          if (type == EVENT && eventMinEd.text.isNotBlank()) {
+            eventMin = eventMinEd.text.toString().toULong().toLong()
+          }
           subscribe(
-            type,
-            minIntervalEd.text.toString().toInt(),
-            maxIntervalEd.text.toString().toInt(),
-            keepSubscriptionsSp.selectedItem.toString().toBoolean(),
-            isFabricFilteredSp.selectedItem.toString().toBoolean()
+                  type,
+                  minIntervalEd.text.toString().toInt(),
+                  maxIntervalEd.text.toString().toInt(),
+                  keepSubscriptionsSp.selectedItem.toString().toBoolean(),
+                  isFabricFilteredSp.selectedItem.toString().toBoolean(),
+                  eventMin
           )
         } else {
           Log.e(TAG, "minInterval or maxInterval is empty!" )

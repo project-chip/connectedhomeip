@@ -1190,7 +1190,7 @@ exit:
 
 JNI_METHOD(void, subscribe)
 (JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
- jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered)
+ jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered, jobject eventMin)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1220,6 +1220,11 @@ JNI_METHOD(void, subscribe)
     params.mKeepSubscriptions           = (keepSubscriptions != JNI_FALSE);
     params.mIsFabricFiltered            = (isFabricFiltered != JNI_FALSE);
 
+    if (eventMin != nullptr)
+    {
+        params.mEventNumber.SetValue(static_cast<chip::EventNumber>(JniReferences::GetInstance().LongToPrimitive(eventMin)));
+    }
+
     auto callback = reinterpret_cast<ReportCallback *>(callbackHandle);
 
     app::ReadClient * readClient = Platform::New<app::ReadClient>(
@@ -1241,7 +1246,7 @@ JNI_METHOD(void, subscribe)
 
 JNI_METHOD(void, read)
 (JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
- jboolean isFabricFiltered)
+ jboolean isFabricFiltered, jobject eventMin)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1270,6 +1275,11 @@ JNI_METHOD(void, read)
     params.mEventPathParamsListSize     = eventPathParamsList.size();
 
     params.mIsFabricFiltered = (isFabricFiltered != JNI_FALSE);
+
+    if (eventMin != nullptr)
+    {
+        params.mEventNumber.SetValue(static_cast<chip::EventNumber>(JniReferences::GetInstance().LongToPrimitive(eventMin)));
+    }
 
     auto callback = reinterpret_cast<ReportCallback *>(callbackHandle);
 
