@@ -20946,6 +20946,7 @@ typedef NS_ENUM(uint8_t, MTRDoorLockLockDataType) {
     MTRDoorLockLockDataTypeRFID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x07,
     MTRDoorLockLockDataTypeFingerprint API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x08,
     MTRDoorLockLockDataTypeFingerVein MTR_NEWLY_AVAILABLE = 0x09,
+    MTRDoorLockLockDataTypeFace MTR_NEWLY_AVAILABLE = 0x0A,
 } API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 typedef NS_ENUM(uint8_t, MTRDoorLockDlLockDataType) {

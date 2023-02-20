@@ -522,6 +522,7 @@ limitations under the License.
         <item value="7" name="RFID" />
         <item value="8" name="Fingerprint" />
         <item value="9" name="FingerVein" />
+        <item value="10" name="Face" />
     </enum>
 
     <enum name="LockOperationTypeEnum" type="ENUM8">
