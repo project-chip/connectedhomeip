@@ -736,7 +736,7 @@ class TC_RR_1_1(MatterBaseTest):
         asserts.assert_less_equal(
             set_id, 0xFFFF, "Invalid Key Set ID. This may be a limitation of the test harness, not the device under test.")
         return Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(groupKeySetID=set_id,
-                                                                     groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicy.kTrustFirst,
+                                                                     groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
                                                                      epochKey0=self.random_string(16).encode(),
                                                                      epochStartTime0=(set_id * 4),
                                                                      epochKey1=self.random_string(16).encode(),
