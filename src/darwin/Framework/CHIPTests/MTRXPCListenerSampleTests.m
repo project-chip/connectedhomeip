@@ -81,9 +81,43 @@ static MTRDeviceController * sController = nil;
 
 - (instancetype)init
 {
+    // Classes that are used by MTRDevice responses.  In particular, needs to
+    // include NSError.
+    //
+    // TODO: should this include NSOrderedSet, NSSet, NSDate, NSNull, even
+    // though we don't use them?  Should we have public API for some sort for
+    // this set?
+    __auto_type * allowedClasses = [NSSet setWithArray:@[
+        [NSString class], [NSNumber class], [NSData class], [NSArray class], [NSDictionary class], [NSError class]
+    ]];
     if ([super init]) {
         _serviceInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRDeviceControllerServerProtocol)];
         _clientInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRDeviceControllerClientProtocol)];
+        [_serviceInterface setClasses:allowedClasses
+                          forSelector:@selector(readAttributeWithController:
+                                                                     nodeId:endpointId:clusterId:attributeId:params:completion:)
+                        argumentIndex:0
+                              ofReply:YES];
+        [_serviceInterface setClasses:allowedClasses
+                          forSelector:@selector
+                          (writeAttributeWithController:nodeId:endpointId:clusterId:attributeId:value:timedWriteTimeout:completion:)
+                        argumentIndex:0
+                              ofReply:YES];
+        [_serviceInterface setClasses:allowedClasses
+                          forSelector:@selector
+                          (invokeCommandWithController:nodeId:endpointId:clusterId:commandId:fields:timedInvokeTimeout:completion:)
+                        argumentIndex:0
+                              ofReply:YES];
+
+        [_serviceInterface setClasses:allowedClasses
+                          forSelector:@selector(readAttributeCacheWithController:
+                                                                          nodeId:endpointId:clusterId:attributeId:completion:)
+                        argumentIndex:0
+                              ofReply:YES];
+        [_clientInterface setClasses:allowedClasses
+                         forSelector:@selector(handleReportWithController:nodeId:values:error:)
+                       argumentIndex:2
+                             ofReply:NO];
         _servers = [NSMutableDictionary dictionary];
         _clusterStateCacheDictionary = [NSMutableDictionary dictionary];
         _xpcListener = [NSXPCListener anonymousListener];
@@ -789,11 +823,25 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               completion:^(id _Nullable values, NSError * _Nullable error) {
                                   NSLog(@"read attribute: DeviceType values: %@, error: %@", values, error);
 
-                                  XCTAssertNil(values);
-                                  // Error is copied over XPC and hence cannot use MTRErrorTestUtils utility which checks against
-                                  // a local domain string object.
-                                  XCTAssertTrue([error.domain isEqualToString:MTRInteractionErrorDomain]);
-                                  XCTAssertEqual(error.code, EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER);
+                                  XCTAssertNil(error);
+                                  XCTAssertNotNil(values);
+
+                                  {
+                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+                                      NSArray * resultArray = values;
+                                      XCTAssertEqual([resultArray count], 1);
+                                      NSDictionary * result = resultArray[0];
+
+                                      MTRAttributePath * path = result[@"attributePath"];
+                                      XCTAssertEqual(path.endpoint.unsignedIntegerValue, 0);
+                                      XCTAssertEqual(path.cluster.unsignedIntegerValue, 10000);
+                                      XCTAssertEqual(path.attribute.unsignedIntegerValue, 0);
+                                      XCTAssertNotNil(result[@"error"]);
+                                      XCTAssertNil(result[@"data"]);
+                                      XCTAssertTrue([result[@"error"] isKindOfClass:[NSError class]]);
+                                      XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:result[@"error"]],
+                                          EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER);
+                                  }
 
                                   [expectation fulfill];
                               }];
@@ -814,23 +862,21 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     NSDictionary * writeValue = [NSDictionary
         dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type", [NSNumber numberWithUnsignedInteger:200], @"value", nil];
-    [device writeAttributeWithEndpointID:@1
-                               clusterID:@8
-                             attributeID:@10000
-                                   value:writeValue
-                       timedWriteTimeout:nil
-                                   queue:queue
-                              completion:^(id _Nullable values, NSError * _Nullable error) {
-                                  NSLog(@"write attribute: Brightness values: %@, error: %@", values, error);
+    [device
+        writeAttributeWithEndpointID:@1
+                           clusterID:@8
+                         attributeID:@10000
+                               value:writeValue
+                   timedWriteTimeout:nil
+                               queue:queue
+                          completion:^(id _Nullable values, NSError * _Nullable error) {
+                              NSLog(@"write attribute: Brightness values: %@, error: %@", values, error);
 
-                                  XCTAssertNil(values);
-                                  // Error is copied over XPC and hence cannot use MTRErrorTestUtils utility which checks
-                                  // against a local domain string object.
-                                  XCTAssertTrue([error.domain isEqualToString:MTRInteractionErrorDomain]);
-                                  XCTAssertEqual(error.code, EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE);
+                              XCTAssertNil(values);
+                              XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE);
 
-                                  [expectation fulfill];
-                              }];
+                              [expectation fulfill];
+                          }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -867,9 +913,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                NSLog(@"invoke command: MoveToLevelWithOnOff values: %@, error: %@", values, error);
 
                XCTAssertNil(values);
-        // Error is copied over XPC and hence cannot use MTRErrorTestUtils utility which checks against a local domain string object.
-        XCTAssertTrue([error.domain isEqualToString:MTRInteractionErrorDomain]);
-        XCTAssertEqual(error.code, EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+               XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
 
         [expectation fulfill];
     }];
@@ -892,10 +936,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         // Because our subscription has no existent paths, it gets an
         // InvalidAction response, which is EMBER_ZCL_STATUS_MALFORMED_COMMAND.
         XCTAssertNil(values);
-        // Error is copied over XPC and hence cannot use MTRErrorTestUtils utility which checks against a local domain string
-        // object.
-        XCTAssertTrue([error.domain isEqualToString:MTRInteractionErrorDomain]);
-        XCTAssertEqual(error.code, EMBER_ZCL_STATUS_MALFORMED_COMMAND);
+        XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_MALFORMED_COMMAND);
         [errorReportExpectation fulfill];
     };
 

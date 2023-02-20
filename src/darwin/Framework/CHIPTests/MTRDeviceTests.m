@@ -263,6 +263,7 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
                               completion:^(id _Nullable values, NSError * _Nullable error) {
                                   NSLog(@"read attribute: DeviceType values: %@, error: %@", values, error);
 
+                                  XCTAssertNil(error);
                                   XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                   {
@@ -272,6 +273,8 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
                                           MTRAttributePath * path = result[@"attributePath"];
                                           XCTAssertEqual([path.cluster unsignedIntegerValue], 29);
                                           XCTAssertEqual([path.attribute unsignedIntegerValue], 0);
+                                          XCTAssertNotNil(result[@"data"]);
+                                          XCTAssertNil(result[@"error"]);
                                           XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
                                           XCTAssertTrue([result[@"data"][@"type"] isEqualToString:@"Array"]);
                                       }
@@ -573,20 +576,36 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    [device
-        readAttributesWithEndpointID:@0
-                           clusterID:@10000
-                         attributeID:@0
-                              params:nil
-                               queue:queue
-                          completion:^(id _Nullable values, NSError * _Nullable error) {
-                              NSLog(@"read attribute: DeviceType values: %@, error: %@", values, error);
+    [device readAttributesWithEndpointID:@0
+                               clusterID:@10000
+                             attributeID:@0
+                                  params:nil
+                                   queue:queue
+                              completion:^(id _Nullable values, NSError * _Nullable error) {
+                                  NSLog(@"read attribute: DeviceType values: %@, error: %@", values, error);
 
-                              XCTAssertNil(values);
-                              XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER);
+                                  XCTAssertNil(error);
+                                  XCTAssertNotNil(values);
 
-                              [expectation fulfill];
-                          }];
+                                  {
+                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
+                                      NSArray * resultArray = values;
+                                      XCTAssertEqual([resultArray count], 1);
+                                      NSDictionary * result = resultArray[0];
+
+                                      MTRAttributePath * path = result[@"attributePath"];
+                                      XCTAssertEqual(path.endpoint.unsignedIntegerValue, 0);
+                                      XCTAssertEqual(path.cluster.unsignedIntegerValue, 10000);
+                                      XCTAssertEqual(path.attribute.unsignedIntegerValue, 0);
+                                      XCTAssertNotNil(result[@"error"]);
+                                      XCTAssertNil(result[@"data"]);
+                                      XCTAssertTrue([result[@"error"] isKindOfClass:[NSError class]]);
+                                      XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:result[@"error"]],
+                                          EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER);
+                                  }
+
+                                  [expectation fulfill];
+                              }];
 
     [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:kTimeoutInSeconds];
 }
@@ -736,6 +755,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               completion:^(id _Nullable values, NSError * _Nullable error) {
                                   NSLog(@"read attribute: DeviceType values: %@, error: %@", values, error);
 
+                                  XCTAssertNil(error);
                                   XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                   {
@@ -745,6 +765,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                           MTRAttributePath * path = result[@"attributePath"];
                                           XCTAssertEqual([path.cluster unsignedIntegerValue], 29);
                                           XCTAssertEqual([path.endpoint unsignedIntegerValue], 1);
+                                          XCTAssertNotNil(result[@"data"]);
+                                          XCTAssertNil(result[@"error"]);
                                           XCTAssertTrue([result[@"data"] isKindOfClass:[NSDictionary class]]);
                                       }
                                       XCTAssertTrue([resultArray count] > 0);
@@ -930,6 +952,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                               XCTAssertEqual([path.endpoint unsignedShortValue], 1);
                               XCTAssertEqual([path.cluster unsignedLongValue], 6);
                               XCTAssertEqual([path.attribute unsignedLongValue], 0);
+                              XCTAssertNotNil(values[0][@"data"]);
                               XCTAssertNil(values[0][@"error"]);
                               XCTAssertTrue([values[0][@"data"][@"type"] isEqualToString:@"Boolean"]);
                               XCTAssertEqual([values[0][@"data"][@"value"] boolValue], NO);
@@ -954,6 +977,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                   XCTAssertEqual([path.cluster unsignedLongValue], 6);
                                   XCTAssertEqual([path.attribute unsignedLongValue], 0);
                                   XCTAssertNil(value[@"error"]);
+                                  XCTAssertNotNil(value[@"data"]);
                               }
                               [cacheExpectation fulfill];
                           }];
@@ -975,6 +999,8 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                   MTRAttributePath * path = value[@"attributePath"];
                                   XCTAssertEqual([path.endpoint unsignedShortValue], 1);
                                   XCTAssertEqual([path.attribute unsignedLongValue], 0);
+                                  XCTAssertNil(value[@"error"]);
+                                  XCTAssertNotNil(value[@"data"]);
                               }
                               [cacheExpectation fulfill];
                           }];
@@ -997,6 +1023,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                   XCTAssertEqual([path.endpoint unsignedShortValue], 1);
                                   XCTAssertEqual([path.cluster unsignedLongValue], 6);
                                   XCTAssertNil(value[@"error"]);
+                                  XCTAssertNotNil(value[@"data"]);
                               }
                               [cacheExpectation fulfill];
                           }];
