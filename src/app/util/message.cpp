@@ -31,27 +31,12 @@ using namespace chip;
 // only result in a single call to emberIncomingMsgHandler. If the device
 // receives multiple ZCL messages, the stack will queue these and hand
 // these to the application via emberIncomingMsgHandler one at a time.
-Messaging::ExchangeContext * emberAfResponseDestination;
 uint8_t appResponseData[EMBER_AF_RESPONSE_BUFFER_LEN];
 uint16_t appResponseLength;
-
-// Used for empty string
-static uint16_t zeroLenByte     = 0;
-static uint8_t * zeroLenBytePtr = (uint8_t *) &zeroLenByte;
 
 //------------------------------------------------------------------------------
 // Utilities for adding bytes to the response buffer: appResponseData. These
 // functions take care of incrementing appResponseLength.
-
-void emberAfClearResponseData()
-{
-    emberAfResponseType = ZCL_UTIL_RESP_NORMAL;
-    // To prevent accidentally sending to someone else,
-    // set the destination to ourselves.
-    emberAfResponseDestination = nullptr /* emberAfGetNodeId() */;
-    memset(appResponseData, 0, EMBER_AF_RESPONSE_BUFFER_LEN);
-    appResponseLength = 0;
-}
 
 uint8_t * emberAfPutInt8uInResp(uint8_t value)
 {
@@ -80,35 +65,6 @@ uint16_t * emberAfPutInt16uInResp(uint16_t value)
     return nullptr;
 }
 
-uint32_t * emberAfPutInt32uInResp(uint32_t value)
-{
-    uint8_t * a = emberAfPutInt8uInResp(EMBER_BYTE_0(value));
-    uint8_t * b = emberAfPutInt8uInResp(EMBER_BYTE_1(value));
-    uint8_t * c = emberAfPutInt8uInResp(EMBER_BYTE_2(value));
-    uint8_t * d = emberAfPutInt8uInResp(EMBER_BYTE_3(value));
-
-    if (a && b && c && d)
-    {
-        return (uint32_t *) a;
-    }
-
-    return nullptr;
-}
-
-uint32_t * emberAfPutInt24uInResp(uint32_t value)
-{
-    uint8_t * a = emberAfPutInt8uInResp(EMBER_BYTE_0(value));
-    uint8_t * b = emberAfPutInt8uInResp(EMBER_BYTE_1(value));
-    uint8_t * c = emberAfPutInt8uInResp(EMBER_BYTE_2(value));
-
-    if (a && b && c)
-    {
-        return (uint32_t *) a;
-    }
-
-    return nullptr;
-}
-
 uint8_t * emberAfPutBlockInResp(const uint8_t * data, uint16_t length)
 {
     if ((appResponseLength + length) < EMBER_AF_RESPONSE_BUFFER_LEN)
@@ -130,11 +86,6 @@ uint8_t * emberAfPutStringInResp(const uint8_t * buffer)
 void emberAfPutInt16sInResp(int16_t value)
 {
     emberAfPutInt16uInResp(static_cast<uint16_t>(value));
-}
-
-void emberAfPutStatusInResp(EmberAfStatus value)
-{
-    emberAfPutInt8uInResp(to_underlying(value));
 }
 
 // ------------------------------------
@@ -162,64 +113,9 @@ uint64_t emberAfGetInt(const uint8_t * message, uint16_t currentIndex, uint16_t 
     return result;
 }
 
-uint64_t emberAfGetInt64u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen)
-{
-    return emberAfGetInt(message, currentIndex, msgLen, 8);
-}
-
-uint32_t emberAfGetInt32u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen)
-{
-    return static_cast<uint32_t>(emberAfGetInt(message, currentIndex, msgLen, 4));
-}
-
-uint32_t emberAfGetInt24u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen)
-{
-    return static_cast<uint32_t>(emberAfGetInt(message, currentIndex, msgLen, 3));
-}
-
 uint16_t emberAfGetInt16u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen)
 {
     return static_cast<uint16_t>(emberAfGetInt(message, currentIndex, msgLen, 2));
-}
-
-uint8_t * emberAfGetString(uint8_t * message, uint16_t currentIndex, uint16_t msgLen)
-{
-    // Strings must contain at least one byte for the length.
-    if (msgLen <= currentIndex)
-    {
-        emberAfDebugPrintln("GetString: %p", "buffer too short");
-        return zeroLenBytePtr;
-    }
-
-    // Starting from the current index, there must be enough bytes in the message
-    // for the string and the length byte.
-    if (msgLen < currentIndex + emberAfStringLength(&message[currentIndex]) + 1)
-    {
-        emberAfDebugPrintln("GetString: %p", "len byte wrong");
-        return zeroLenBytePtr;
-    }
-
-    return &message[currentIndex];
-}
-
-uint8_t * emberAfGetLongString(uint8_t * message, uint16_t currentIndex, uint16_t msgLen)
-{
-    // Long strings must contain at least two bytes for the length.
-    if (msgLen <= currentIndex + 1)
-    {
-        emberAfDebugPrintln("GetLongString: %p", "buffer too short");
-        return zeroLenBytePtr;
-    }
-
-    // Starting from the current index, there must be enough bytes in the message
-    // for the string and the length bytes.
-    if (msgLen < currentIndex + emberAfLongStringLength(&message[currentIndex]) + 2)
-    {
-        emberAfDebugPrintln("GetLongString: %p", "len bytes wrong");
-        return zeroLenBytePtr;
-    }
-
-    return &message[currentIndex];
 }
 
 uint8_t emberAfStringLength(const uint8_t * buffer)

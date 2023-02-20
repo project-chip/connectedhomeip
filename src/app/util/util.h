@@ -19,17 +19,6 @@
 
 #include <inttypes.h>
 
-// User asserts can override SLAB_ASSERT and should be defined as follows:
-// void userAssert (int file, int line);                   // declaration
-// #define USER_ASSERT(file, line) userAssert(file, line)  // definition
-
-// This controls the type of response. Normally The library sends an automatic
-// response (if appropriate) on the same PAN. The reply can be disabled by
-// calling emberAfSetNoReplyForNextMessage.
-#define ZCL_UTIL_RESP_NORMAL 0
-#define ZCL_UTIL_RESP_NONE 1
-#define ZCL_UTIL_RESP_INTERPAN 2
-
 // Cluster name structure
 typedef struct
 {
@@ -41,33 +30,10 @@ extern const EmberAfClusterName zclClusterNames[];
 
 #include <app/util/af.h>
 
-// Override Disable Default Response flag in the ZCL Frame Control
-typedef enum
-{
-    EMBER_AF_DISABLE_DEFAULT_RESPONSE_NONE      = 0, // no override
-    EMBER_AF_DISABLE_DEFAULT_RESPONSE_ONE_SHOT  = 1, // next message only
-    EMBER_AF_DISABLE_DEFAULT_RESPONSE_PERMANENT = 2  // until cancelled
-} EmberAfDisableDefaultResponse;
-
-// The default value for the Disable Default Response flag in ZCL Frame Control
-// is 0 (i.e. default responses are generated). The app can disable default
-// reponses either for the next message only or for all messages until another
-// call to this function.
-void emberAfSetDisableDefaultResponse(EmberAfDisableDefaultResponse value);
-
-// Return the current status
-EmberAfDisableDefaultResponse emberAfGetDisableDefaultResponse(void);
-
-// This function applies the curent override value to the ZCL Frame Control.
-// It is called internally by the framework in the final stages of filling the
-// message buffer.
-void emAfApplyDisableDefaultResponse(uint8_t * frame_control);
-
 // EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH is defined in config.h
 #define EMBER_AF_RESPONSE_BUFFER_LEN EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH
 
 void emberAfInit();
-void emberAfTick(void);
 uint16_t emberAfFindClusterNameIndex(chip::ClusterId cluster);
 void emberAfStackDown(void);
 
@@ -93,56 +59,11 @@ EmberAfDifferenceType emberAfGetDifference(uint8_t * pData, EmberAfDifferenceTyp
  */
 uint64_t emberAfGetInt(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen, uint8_t bytes);
 
-void emberAfClearResponseData(void);
 uint8_t * emberAfPutInt8uInResp(uint8_t value);
 uint16_t * emberAfPutInt16uInResp(uint16_t value);
-uint32_t * emberAfPutInt32uInResp(uint32_t value);
-uint32_t * emberAfPutInt24uInResp(uint32_t value);
 uint8_t * emberAfPutBlockInResp(const uint8_t * data, uint16_t length);
 uint8_t * emberAfPutStringInResp(const uint8_t * buffer);
 void emberAfPutInt16sInResp(int16_t value);
-void emberAfPutStatusInResp(EmberAfStatus value);
-
-bool emberAfIsThisMyEui64(EmberEUI64 eui64);
-
-#ifdef EZSP_HOST
-// the EM260 host application is expected to provide these functions if using
-// a cluster that needs it.
-EmberNodeId emberGetSender(void);
-EmberStatus emberGetSenderEui64(EmberEUI64 senderEui64);
-#endif // EZSP_HOST
-
-// DEPRECATED.
-extern uint8_t emberAfIncomingZclSequenceNumber;
-
-// the caller to the library can set a flag to say do not respond to the
-// next ZCL message passed in to the library. Passing true means disable
-// the reply for the next ZCL message. Setting to false re-enables the
-// reply (in the case where the app disables it and then doesnt send a
-// message that gets parsed).
-void emberAfSetNoReplyForNextMessage(bool set);
-
-#define isThisDataTypeSentLittleEndianOTA(dataType) (!(emberAfIsThisDataTypeAStringType(dataType)))
-
-extern uint8_t emberAfResponseType;
-
-uint16_t emberAfStrnlen(const uint8_t * string, uint16_t maxLength);
-
-/* @brief Append characters to a ZCL string.
- *
- * Appending characters to an existing ZCL string. If it is an invalid string
- * (length byte equals 0xFF), no characters will be appended.
- *
- * @param zclString - pointer to the zcl string
- * @param zclStringMaxLen - length of zcl string (does not include zcl length byte)
- * @param src - pointer to plain text characters
- * @param srcLen - length of plain text characters
- *
- * @return number of characters appended
- *
- */
-uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, const uint8_t * appendingChars,
-                                uint8_t appendingCharsLen);
 
 bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
