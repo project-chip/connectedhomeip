@@ -264,7 +264,7 @@ static void CauseReadClientFailure(
     return self;
 }
 
-+ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
++ (MTRBaseDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     // Indirect through the controller to give it a chance to create an
     // MTRBaseDeviceOverXPC instead of just an MTRBaseDevice.
@@ -1870,7 +1870,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                      (uint32_t) _cluster.unsignedLongValue];
 }
 
-+ (instancetype)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
++ (MTRClusterPath *)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
 {
     ConcreteClusterPath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
         static_cast<chip::ClusterId>([clusterID unsignedLongValue]));
@@ -1919,9 +1919,9 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                      (uint32_t) _attribute.unsignedLongValue];
 }
 
-+ (instancetype)attributePathWithEndpointID:(NSNumber *)endpointID
-                                  clusterID:(NSNumber *)clusterID
-                                attributeID:(NSNumber *)attributeID
++ (MTRAttributePath *)attributePathWithEndpointID:(NSNumber *)endpointID
+                                        clusterID:(NSNumber *)clusterID
+                                      attributeID:(NSNumber *)attributeID
 {
     ConcreteDataAttributePath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
         static_cast<chip::ClusterId>([clusterID unsignedLongValue]),
@@ -1979,7 +1979,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                   (uint32_t) self.cluster.unsignedLongValue, (uint32_t) _event.unsignedLongValue];
 }
 
-+ (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID
++ (MTREventPath *)eventPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID
 {
     ConcreteEventPath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
         static_cast<chip::ClusterId>([clusterID unsignedLongValue]), static_cast<chip::EventId>([eventID unsignedLongValue]));
@@ -2009,7 +2009,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
     return self;
 }
 
-+ (instancetype)commandPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID commandID:(NSNumber *)commandID
++ (MTRCommandPath *)commandPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID commandID:(NSNumber *)commandID
 {
     ConcreteCommandPath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
         static_cast<chip::ClusterId>([clusterID unsignedLongValue]), static_cast<chip::CommandId>([commandID unsignedLongValue]));

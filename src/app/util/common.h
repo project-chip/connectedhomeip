@@ -26,7 +26,6 @@
 #include <messaging/ExchangeContext.h>
 
 // the variables used to setup and send responses to cluster messages
-extern EmberApsFrame emberAfResponseApsFrame;
 extern uint8_t appResponseData[EMBER_AF_RESPONSE_BUFFER_LEN];
 extern uint16_t appResponseLength;
 extern chip::Messaging::ExchangeContext * emberAfResponseDestination;

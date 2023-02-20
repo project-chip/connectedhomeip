@@ -131,6 +131,7 @@
     <string name="basic_cluster_serial_number_text">SerialNumber</string>
     <string name="basic_cluster_local_config_disabled_text">LocalConfigDisabled</string>
     <string name="basic_cluster_reachable_text">Reachable</string>
+    <string name="basic_cluster_unique_id_text">UniqueID</string>
     <string name="basic_cluster_cluster_revision_text">ClusterRevision</string>
 
     <string name="read_dialog_title_text">Read</string>

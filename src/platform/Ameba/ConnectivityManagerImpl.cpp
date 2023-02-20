@@ -583,7 +583,7 @@ void ConnectivityManagerImpl::OnStationConnected()
     if (delegate)
     {
         delegate->OnConnectionStatusChanged(
-            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kConnected));
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kConnected));
     }
 
     UpdateInternetConnectivityState();
@@ -599,7 +599,7 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
     uint16_t reason                    = NetworkCommissioning::AmebaWiFiDriver::GetInstance().GetLastDisconnectReason();
     uint8_t associationFailureCause =
-        chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kUnknown);
+        chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
 
     if (delegate)
     {
@@ -608,17 +608,17 @@ void ConnectivityManagerImpl::OnStationDisconnected()
         case RTW_NO_ERROR:
         case RTW_NONE_NETWORK:
             associationFailureCause =
-                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kSsidNotFound);
+                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kSsidNotFound);
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
             break;
         case RTW_CONNECT_FAIL:
             associationFailureCause =
-                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAssociationFailed);
+                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAssociationFailed);
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
             break;
         case RTW_WRONG_PASSWORD:
-            associationFailureCause =
-                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAuthenticationFailed);
+            associationFailureCause = chip::to_underlying(
+                chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAuthenticationFailed);
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
             break;
 #if defined(CONFIG_PLATFORM_8710C)
@@ -634,7 +634,7 @@ void ConnectivityManagerImpl::OnStationDisconnected()
         }
         delegate->OnDisconnectionDetected(reason);
         delegate->OnConnectionStatusChanged(
-            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kNotConnected));
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kNotConnected));
     }
 
     UpdateInternetConnectivityState();

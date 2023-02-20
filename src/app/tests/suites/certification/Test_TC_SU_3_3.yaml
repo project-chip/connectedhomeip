@@ -27,10 +27,10 @@ config:
 tests:
     - label:
           "OTA-R/TH sends a QueryImage Command to the DUT. Protocol supported
-          should only list BDX DUT responds with the QueryImageResponse to the
-          OTA-R/TH."
+          should only list 'BDX'. DUT responds with the QueryImageResponse to
+          the OTA-R/TH."
       verification: |
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -96,7 +96,8 @@ tests:
           [1651269360125] [23256:35291938] CHIP: [BDX] Transfer timed out
 
           Relaunch the OTA Requestor App and initiate another query
-          chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           Verify that a new transfer of software image is started from DUT when sending another QueryImage request
       disabled: true
@@ -111,8 +112,7 @@ tests:
           Out of scope for V1.0
       disabled: true
 
-    - label:
-          "IF Perform the OTA Update from DUT using vendor specific mechanism."
+    - label: "Perform the OTA Update from DUT using vendor specific mechanism."
       PICS: MCORE.OTA.VendorSpecific
       verification: |
           Use vendor specific steps to initiate OTA Update and verify that the software image is transferred from the DUT

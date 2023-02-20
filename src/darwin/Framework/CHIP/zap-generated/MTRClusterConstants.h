@@ -2907,7 +2907,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
         watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x00000005,
     MTRClusterTimeSynchronizationAttributeDstOffsetID API_DEPRECATED(
-        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeDstOffsetID", ios(16.1, 16.4), macos(13.0, 13.3),
+        "Please use MTRAttributeIDTypeClusterTimeSynchronizationAttributeDSTOffsetID", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x00000006,
     MTRClusterTimeSynchronizationAttributeLocalTimeID API_DEPRECATED(
@@ -2960,8 +2960,10 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = 0x00000004,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000005,
+    MTRAttributeIDTypeClusterTimeSynchronizationAttributeDSTOffsetID MTR_NEWLY_AVAILABLE = 0x00000006,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeDstOffsetID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-    = 0x00000006,
+        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeTimeSynchronizationAttributeDSTOffsetID")
+    = MTRAttributeIDTypeClusterTimeSynchronizationAttributeDSTOffsetID,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeLocalTimeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000007,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneDatabaseID API_AVAILABLE(

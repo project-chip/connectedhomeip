@@ -49,13 +49,9 @@ executable("chip-lighting-app") {
 
   if (chip_examples_enable_imgui_ui) {
     deps += [
-      "${chip_root}/examples/common/QRCode",
-      "${chip_root}/third_party/imgui",
-    ]
-
-    sources += [
-      "ui.cpp",
-      "ui.h",
+      "${chip_root}/examples/common/imgui_ui",
+      "${chip_root}/examples/common/imgui_ui/windows:light",
+      "${chip_root}/examples/common/imgui_ui/windows:qrcode",
     ]
   }
 

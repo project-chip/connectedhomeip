@@ -28,6 +28,7 @@ struct PairWithCodeCommand
 {
     chip::NodeId nodeId;
     chip::CharSpan payload;
+    Optional<bool> discoverOnce;
 
     CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
     {
@@ -35,6 +36,7 @@ struct PairWithCodeCommand
         ReturnErrorOnFailure(writer.StartContainer(tag, chip::TLV::kTLVType_Structure, outer));
         ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(0), nodeId));
         ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(1), payload));
+        ReturnErrorOnFailure(chip::app::DataModel::Encode(writer, chip::TLV::ContextTag(2), discoverOnce));
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
     }
@@ -56,6 +58,9 @@ struct PairWithCodeCommand
                 break;
             case 1:
                 ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, payload));
+                break;
+            case 2:
+                ReturnErrorOnFailure(chip::app::DataModel::Decode(reader, discoverOnce));
                 break;
             default:
                 break;

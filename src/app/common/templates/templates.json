@@ -32,11 +32,6 @@
     ],
     "templates": [
         {
-            "path": "../../zap-templates/templates/app/af-structs.zapt",
-            "name": "ZCL af-structs header",
-            "output": "af-structs.h"
-        },
-        {
             "path": "../../zap-templates/templates/app/att-storage.zapt",
             "name": "ZCL att-storage header",
             "output": "att-storage.h"

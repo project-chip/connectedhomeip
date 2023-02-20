@@ -549,7 +549,7 @@
 #define ZAP_GENERATED_COMMANDS_INDEX(index) (&generatedCommands[index])
 
 // clang-format off
-#define GENERATED_EVENT_COUNT 18
+#define GENERATED_EVENT_COUNT 15
 #define GENERATED_EVENTS { \
   /* Endpoint: 0, Cluster: Access Control (server) */ \
   /* EventList (index=0) */ \
@@ -571,15 +571,8 @@
   0x00000001, /* RadioFaultChange */ \
   0x00000002, /* NetworkFaultChange */ \
   0x00000003, /* BootReason */ \
-  /* Endpoint: 0, Cluster: Software Diagnostics (server) */ \
-  /* EventList (index=12) */ \
-  0x00000000, /* SoftwareFault */ \
-  /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */ \
-  /* EventList (index=13) */ \
-  0x00000000, /* ConnectionStatus */ \
-  0x00000001, /* NetworkFaultChange */ \
   /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */ \
-  /* EventList (index=15) */ \
+  /* EventList (index=12) */ \
   0x00000000, /* Disconnection */ \
   0x00000001, /* AssociationFailure */ \
   0x00000002, /* ConnectionStatus */ \
@@ -963,8 +956,8 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 39 ) ,\
       .generatedCommandList = nullptr ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 12 ), \
-      .eventCount = 1, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */ \
@@ -976,8 +969,8 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 41 ) ,\
       .generatedCommandList = nullptr ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 13 ), \
-      .eventCount = 2, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
     },\
   { \
       /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */ \
@@ -989,7 +982,7 @@
       .functions = NULL, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 43 ) ,\
       .generatedCommandList = nullptr ,\
-      .eventList = ZAP_GENERATED_EVENTS_INDEX( 15 ), \
+      .eventList = ZAP_GENERATED_EVENTS_INDEX( 12 ), \
       .eventCount = 3, \
     },\
   { \

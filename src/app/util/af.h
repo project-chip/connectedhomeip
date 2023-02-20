@@ -106,11 +106,6 @@ bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId)
 EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                     uint8_t * dataPtr, EmberAfAttributeType dataType);
 
-// For now, just define emberAfWriteServerAttribute to emberAfWriteAttribute, to
-// minimize code churn.
-// TODO: Remove this define.
-#define emberAfWriteServerAttribute emberAfWriteAttribute
-
 /**
  * @brief Read the attribute value, performing all the checks.
  *
@@ -122,11 +117,6 @@ EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId c
  */
 EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                    uint8_t * dataPtr, uint16_t readLength);
-
-// For now, just define emberAfReadServerAttribute to emberAfReadAttribute, to
-// minimize code churn.
-// TODO: Remove this define.
-#define emberAfReadServerAttribute emberAfReadAttribute
 
 /**
  * @brief this function returns the size of the ZCL data in bytes.
@@ -365,12 +355,6 @@ void emberAfGetEui64(EmberEUI64 returnEui64);
  */
 EmberNodeId emberAfGetNodeId(void);
 
-/**
- * @brief Returns the current network state.  This call caches the results
- *   on the host to prevent frequent EZSP transactions.
- */
-EmberNetworkStatus emberAfNetworkState(void);
-
 /** @} END Miscellaneous */
 
 /** @name Sleep Control */
@@ -513,87 +497,9 @@ EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t de
 // @{
 
 /**
- * @brief Sends a default response to a cluster command.
- *
- * This function is used to prepare and send a default response to a cluster
- * command.
- *
- * @param cmd The cluster command to which to respond.
- * @param status Status code for the default response command.
- * @return An ::EmberStatus value that indicates the success or failure of
- * sending the response.
- */
-EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberAfStatus status);
-
-/**
- * @brief Sends a default response to a cluster command using the
- * current command.
- *
- * This function is used to prepare and send a default response to a cluster
- * command.
- *
- * @param status Status code for the default response command.
- * @return An ::EmberStatus value that indicates the success or failure of
- * sending the response.
- */
-EmberStatus emberAfSendImmediateDefaultResponse(EmberAfStatus status);
-
-/**
- * @brief Access to client API APS frame.
- */
-EmberApsFrame * emberAfGetCommandApsFrame(void);
-
-/**
  * @brief Set the source and destination endpoints in the client API APS frame.
  */
 void emberAfSetCommandEndpoints(chip::EndpointId sourceEndpoint, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief Use this function to find devices in the network with endpoints
- *   matching a given cluster ID in their descriptors.
- *   Target may either be a specific device, or the broadcast
- *   address EMBER_RX_ON_WHEN_IDLE_BROADCAST_ADDRESS.
- *
- * With this function a service discovery is initiated and received
- * responses are returned by executing the callback function passed in.
- * For unicast discoveries, the callback will be executed only once.
- * Either the target will return a result or a timeout will occur.
- * For broadcast discoveries, the callback may be called multiple times
- * and after a period of time the discovery will be finished with a final
- * call to the callback.
- *
- * @param target The destination node ID for the discovery; either a specific
- *  node's ID or EMBER_RX_ON_WHEN_IDLE_BROADCAST_ADDRESS.
- * @param clusterId The cluster being discovered.
- * @param serverCluster EMBER_AF_SERVER_CLUSTER_DISCOVERY (true) if discovering
- *  servers for the target cluster; EMBER_AF_CLIENT_CLUSTER_DISCOVERY (false)
- *  if discovering clients for that cluster.
- * @param callback Function pointer for the callback function triggered when
- *  a match is discovered.  (For broadcast discoveries, this is called once per
- *  matching node, even if a node has multiple matching endpoints.)
- */
-EmberStatus emberAfFindDevicesByCluster(EmberNodeId target, chip::ClusterId clusterId, bool serverCluster,
-                                        EmberAfServiceDiscoveryCallback * callback);
-
-#if !defined(DOXYGEN_SHOULD_SKIP_THIS)
-/**
- * @brief Use this macro to retrieve the current command. This
- * macro may only be used within the command parsing context. For instance
- * Any of the command handling callbacks may use this macro. If this macro
- * is used outside the command context, the returned EmberAfClusterCommand pointer
- * will be null.
- */
-#define emberAfCurrentCommand() (emAfCurrentCommand)
-extern EmberAfClusterCommand * emAfCurrentCommand;
-#endif
-
-/**
- * @brief returns the current endpoint that is being served.
- *
- * The purpose of this macro is mostly to access endpoint that
- * is being served in the command callbacks.
- */
-#define emberAfCurrentEndpoint() (emberAfCurrentCommand()->apsFrame->destinationEndpoint)
 
 /** @} END Messaging */
 
@@ -641,12 +547,6 @@ extern EmberAfClusterCommand * emAfCurrentCommand;
 #define EMBER_TEST_ASSERT(x)
 #endif
 #endif
-
-/**
- * @brief API for parsing a cluster-specific message.  Implemented by
- * generated code.
- */
-EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
 
 /**
  * Returns the pointer to the data version storage for the given endpoint and

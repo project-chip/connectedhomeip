@@ -1280,6 +1280,23 @@ server cluster FlowMeasurement = 1028 {
 }
 
 client cluster OccupancySensing = 1030 {
+  enum OccupancySensorTypeEnum : ENUM8 {
+    kPir = 0;
+    kUltrasonic = 1;
+    kPIRAndUltrasonic = 2;
+    kPhysicalContact = 3;
+  }
+
+  bitmap OccupancyBitmap : BITMAP8 {
+    kOccupied = 0x1;
+  }
+
+  bitmap OccupancySensorTypeBitmap : BITMAP8 {
+    kPir = 0x1;
+    kUltrasonic = 0x2;
+    kPhysicalContact = 0x4;
+  }
+
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1305,6 +1322,8 @@ endpoint 0 {
   }
 
   server cluster AccessControl {
+    emits event AccessControlEntryChanged;
+    emits event AccessControlExtensionChanged;
     callback attribute acl;
     callback attribute extension;
     callback attribute subjectsPerAccessControlEntry default = 4;
@@ -1318,6 +1337,9 @@ endpoint 0 {
   }
 
   server cluster BasicInformation {
+    emits event StartUp;
+    emits event ShutDown;
+    emits event Leave;
     callback attribute dataModelRevision default = 10;
     callback attribute vendorName;
     callback attribute vendorID;
@@ -1343,6 +1365,9 @@ endpoint 0 {
   }
 
   server cluster OtaSoftwareUpdateRequestor {
+    emits event StateTransition;
+    emits event VersionApplied;
+    emits event DownloadError;
     callback attribute defaultOTAProviders;
     ram      attribute updatePossible default = 1;
     ram      attribute updateState;
@@ -1384,6 +1409,10 @@ endpoint 0 {
   }
 
   server cluster GeneralDiagnostics {
+    emits event HardwareFaultChange;
+    emits event RadioFaultChange;
+    emits event NetworkFaultChange;
+    emits event BootReason;
     callback attribute networkInterfaces;
     callback attribute rebootCount;
     callback attribute testEventTriggersEnabled;

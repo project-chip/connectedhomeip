@@ -494,6 +494,39 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
     return CHIP_NO_ERROR;
 }
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("Offset", indent + 1, value.offset);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Offset'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ValidStarting", indent + 1, value.validStarting);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ValidStarting'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ValidUntil", indent + 1, value.validUntil);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ValidUntil'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType & value)
 {
@@ -559,38 +592,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'A'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("Offset", indent + 1, value.offset);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Offset'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ValidStarting", indent + 1, value.validStarting);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ValidStarting'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("ValidUntil", indent + 1, value.validUntil);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ValidUntil'");
             return err;
         }
     }
@@ -2313,7 +2314,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::DecodableType & value)
+                                     const chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -6193,12 +6194,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("BSSID", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::SecurityType::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SecurityType", 1, value);
         }
         case WiFiNetworkDiagnostics::Attributes::WiFiVersion::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("WiFiVersion", 1, value);
         }
@@ -8633,17 +8634,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case OccupancySensing::Attributes::Occupancy::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Occupancy", 1, value);
         }
         case OccupancySensing::Attributes::OccupancySensorType::Id: {
-            uint8_t value;
+            chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OccupancySensorType", 1, value);
         }
         case OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OccupancySensorTypeBitmap", 1, value);
         }

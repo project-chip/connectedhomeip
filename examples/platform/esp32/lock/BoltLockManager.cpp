@@ -430,9 +430,12 @@ bool BoltLockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, c
 
     for (size_t i = 0; i < totalCredentials; ++i)
     {
-        mCredentials[userIndex][i]                 = credentials[i];
-        mCredentials[userIndex][i].CredentialType  = 1;
-        mCredentials[userIndex][i].CredentialIndex = i + 1;
+        mCredentials[userIndex][i] = credentials[i];
+        // TODO: Why are we modifying the passed-in credentials?
+        // https://github.com/project-chip/connectedhomeip/issues/25083
+        // For now, preserve pre-existing behavior, which set credentialType to 1.
+        mCredentials[userIndex][i].credentialType  = CredentialTypeEnum::kPin;
+        mCredentials[userIndex][i].credentialIndex = i + 1;
     }
 
     userInStorage.credentials = chip::Span<const CredentialStruct>(mCredentials[userIndex], totalCredentials);

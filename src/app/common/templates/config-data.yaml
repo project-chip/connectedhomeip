@@ -1,8 +1,3 @@
-LegacyStructs:
-    # List of structs for which we output a legacy definition in af-structs.h
-    # Ideally this list should become empty.
-    - CredentialStruct
-
 WeakEnums:
     # Allow-list of enums that we generate as enums, not enum classes.
     # The goal is to drive this down to 0.
@@ -23,21 +18,24 @@ WeakEnums:
     - IdentifyEffectVariant
     - IdentifyIdentifyType
     - InterfaceTypeEnum
-    - KeypadLockout
     - LevelControlOptions
     - MoveMode
     - NetworkFaultEnum
-    - OnOffDelayedAllOffEffectVariant
-    - OnOffDyingLightEffectVariant
-    - OnOffEffectIdentifier
     - PHYRateEnum
     - RadioFaultEnum
     - RoutingRole
     - SaturationMoveMode
     - SaturationStepMode
-    - SecurityType
     - StepMode
-    - TemperatureDisplayMode
+
+DefineBitmaps:
+    # Allow-list of bitmaps that we generates as #define as well as enum classes.
+    # The goal is to drive this down to 0.
+    - BarrierControlCapabilities
+    - BarrierControlSafetyStatus
+    - ColorLoopUpdateFlags
+    - LevelControlFeature
+    - PowerSourceFeature
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
@@ -73,3 +71,5 @@ ClustersWithPreAttributeChangeFunctions:
     - Mode Select
     - Fan Control
     - Thermostat
+
+ClustersWithShutdownFunctions: []

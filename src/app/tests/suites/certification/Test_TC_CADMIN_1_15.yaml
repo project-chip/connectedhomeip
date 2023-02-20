@@ -28,6 +28,9 @@ config:
         type: node_id
         defaultValue: 0xC00FEE
     endpoint: 0
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
     discriminator:
         type: int16u
         defaultValue: 3840
@@ -86,6 +89,14 @@ tests:
               - name: "Salt"
                 value: "SPAKE2P Key Salt"
 
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
@@ -126,6 +137,14 @@ tests:
                 value: 1000
               - name: "Salt"
                 value: "SPAKE2P Key Salt"
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     - label: "TH_CR3 Commissions with DUT_CE"
       PICS: CADMIN.S
@@ -278,6 +297,14 @@ tests:
                 value: 1000
               - name: "Salt"
                 value: "SPAKE2P Key Salt"
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"

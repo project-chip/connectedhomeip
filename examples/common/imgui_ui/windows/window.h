@@ -1,6 +1,6 @@
 /*
+ *
  *    Copyright (c) 2023 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,15 +14,34 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 namespace example {
 namespace Ui {
 
-void Start();
+/**
+ * Represents a generic UI window for a ImGUI application.
+ *
+ * Provides callbacks of loading state, updating state and rendering the
+ * actual UI.
+ *
+ * UI rendering is expected to be done using imgui.
+ */
+class Window
+{
+public:
+    virtual ~Window() = default;
 
-void Stop();
+    // State updates will run in the chip main loop
+
+    virtual void LoadInitialState() {}
+    virtual void UpdateState() {}
+
+    // Render the UI
+    // MUST use Imgui rendering, generally within a Begin/End block to
+    // create a window.
+    virtual void Render() = 0;
+};
 
 } // namespace Ui
 } // namespace example

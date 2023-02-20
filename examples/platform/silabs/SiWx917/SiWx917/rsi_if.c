@@ -69,7 +69,7 @@ bool hasNotifiedIPV4 = false;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 bool hasNotifiedWifiConnectivity = false;
 
-extern rsi_semaphore_handle_t sl_ble_init_sem;
+extern rsi_semaphore_handle_t sl_rs_ble_init_sem;
 /*
  * This file implements the interface to the RSI SAPIs
  */
@@ -340,7 +340,7 @@ static int32_t wfx_rsi_init(void)
     }
 #endif
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
-    rsi_semaphore_post(&sl_ble_init_sem);
+    rsi_semaphore_post(&sl_rs_ble_init_sem);
     WFX_RSI_LOG("%s: RSI: OK", __func__);
     return RSI_SUCCESS;
 }
@@ -497,12 +497,6 @@ void wfx_rsi_task(void * arg)
     wfx_started_notify();
 
     WFX_RSI_LOG("%s: starting event wait", __func__);
-#ifdef CHIP_ONNETWORK_PAIRING
-    memcpy(&wfx_rsi.sec.ssid[0], TOSTRING(CHIP_WIFI_SSID), sizeof(TOSTRING(CHIP_WIFI_SSID)));
-    memcpy(&wfx_rsi.sec.passkey[0], TOSTRING(CHIP_WIFI_PSK), sizeof(TOSTRING(CHIP_WIFI_PSK)));
-    xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
-#endif
-
     for (;;)
     {
         /*
@@ -858,12 +852,12 @@ void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retry
          */
         if (retryJoin < MAX_JOIN_RETRIES_COUNT)
         {
-            SILABS_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
+            WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(WLAN_RETRY_TIMER_MS));
             vTaskDelay(pdMS_TO_TICKS(WLAN_RETRY_TIMER_MS));
         }
         else
         {
-            SILABS_LOG("Connect failed after max %d tries", retryJoin);
+            WFX_RSI_LOG("Connect failed after max %d tries", retryJoin);
         }
     }
     else
@@ -877,7 +871,7 @@ void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retry
         {
             retryInterval = WLAN_MAX_RETRY_TIMER_MS;
         }
-        SILABS_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(retryInterval));
+        WFX_RSI_LOG("%s: Next attempt after %d Seconds", __func__, CONVERT_MS_TO_SEC(retryInterval));
         vTaskDelay(pdMS_TO_TICKS(retryInterval));
         retryInterval += retryInterval;
     }

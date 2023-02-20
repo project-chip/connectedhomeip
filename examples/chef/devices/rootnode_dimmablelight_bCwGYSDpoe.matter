@@ -783,13 +783,13 @@ server cluster NetworkCommissioning = 49 {
 }
 
 server cluster DiagnosticLogs = 50 {
-  enum LogsIntent : ENUM8 {
+  enum IntentEnum : ENUM8 {
     kEndUserSupport = 0;
     kNetworkDiag = 1;
     kCrashLogs = 2;
   }
 
-  enum LogsStatus : ENUM8 {
+  enum StatusEnum : ENUM8 {
     kSuccess = 0;
     kExhausted = 1;
     kNoLogs = 2;
@@ -797,7 +797,7 @@ server cluster DiagnosticLogs = 50 {
     kDenied = 4;
   }
 
-  enum LogsTransferProtocol : ENUM8 {
+  enum TransferProtocolEnum : ENUM8 {
     kResponsePayload = 0;
     kBdx = 1;
   }
@@ -810,9 +810,9 @@ server cluster DiagnosticLogs = 50 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct RetrieveLogsRequestRequest {
-    LogsIntent intent = 0;
-    LogsTransferProtocol requestedProtocol = 1;
-    OCTET_STRING<32> transferFileDesignator = 2;
+    IntentEnum intent = 0;
+    TransferProtocolEnum requestedProtocol = 1;
+    optional CHAR_STRING<32> transferFileDesignator = 2;
   }
 
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
@@ -1244,9 +1244,26 @@ server cluster FixedLabel = 64 {
 }
 
 client cluster OccupancySensing = 1030 {
-  readonly attribute bitmap8 occupancy = 0;
-  readonly attribute enum8 occupancySensorType = 1;
-  readonly attribute bitmap8 occupancySensorTypeBitmap = 2;
+  enum OccupancySensorTypeEnum : ENUM8 {
+    kPir = 0;
+    kUltrasonic = 1;
+    kPIRAndUltrasonic = 2;
+    kPhysicalContact = 3;
+  }
+
+  bitmap OccupancyBitmap : BITMAP8 {
+    kOccupied = 0x1;
+  }
+
+  bitmap OccupancySensorTypeBitmap : BITMAP8 {
+    kPir = 0x1;
+    kUltrasonic = 0x2;
+    kPhysicalContact = 0x4;
+  }
+
+  readonly attribute OccupancyBitmap occupancy = 0;
+  readonly attribute OccupancySensorTypeEnum occupancySensorType = 1;
+  readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

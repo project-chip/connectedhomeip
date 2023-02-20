@@ -1822,9 +1822,9 @@ namespace TimeZone {
 static constexpr AttributeId Id = 0x00000005;
 } // namespace TimeZone
 
-namespace DstOffset {
+namespace DSTOffset {
 static constexpr AttributeId Id = 0x00000006;
-} // namespace DstOffset
+} // namespace DSTOffset
 
 namespace LocalTime {
 static constexpr AttributeId Id = 0x00000007;

@@ -19,6 +19,7 @@
 
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 
 #include <platform/CHIPDeviceLayer.h>
 

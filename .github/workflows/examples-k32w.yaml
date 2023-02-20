@@ -17,6 +17,7 @@ name: Build example - K32W with SE051
 on:
     push:
     pull_request:
+    merge_group:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -78,7 +79,7 @@ jobs:
                       .environment/pigweed-venv/*.log
 
             - name: Build examples
-              timeout-minutes: 50
+              timeout-minutes: 70
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \

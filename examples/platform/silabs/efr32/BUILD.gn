@@ -46,6 +46,9 @@ declare_args() {
   chip_config_use_icd_subscription_callbacks = enable_sleepy_device
 }
 
+# Use persitent subscriptions for IC devices
+chip_persist_subscriptions = enable_sleepy_device
+
 silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 import("${silabs_common_plat_dir}/efr32/args.gni")

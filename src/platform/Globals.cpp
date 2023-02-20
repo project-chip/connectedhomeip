@@ -26,9 +26,9 @@ namespace DeviceLayer {
 
 chip::System::LayerImpl * gMockedSystemLayer = nullptr;
 
-void SetSystemLayerForTesting(System::LayerImpl * layer)
+void SetSystemLayerForTesting(System::Layer * layer)
 {
-    gMockedSystemLayer = layer;
+    gMockedSystemLayer = static_cast<System::LayerImpl *>(layer);
 }
 
 chip::System::LayerImpl & SystemLayerImpl()

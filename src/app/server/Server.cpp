@@ -43,6 +43,7 @@
 #include <platform/DeviceControlServer.h>
 #include <platform/DeviceInfoProvider.h>
 #include <platform/KeyValueStoreManager.h>
+#include <platform/LockTracker.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <setup_payload/SetupPayload.h>
@@ -68,15 +69,6 @@ using chip::Transport::PeerAddress;
 using chip::Transport::UdpListenParameters;
 
 namespace {
-
-void StopEventLoop(intptr_t arg)
-{
-    CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Stopping event loop: %" CHIP_ERROR_FORMAT, err.Format());
-    }
-}
 
 class DeviceTypeResolver : public chip::Access::AccessControl::DeviceTypeResolver
 {
@@ -105,6 +97,9 @@ static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BU
 CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 {
     ChipLogProgress(AppServer, "Server initializing...");
+    assertChipStackLockedByCurrentThread();
+
+    mInitTimestamp = System::SystemClock().GetMonotonicMicroseconds64();
 
     CASESessionManagerConfig caseSessionManagerConfig;
     DeviceLayer::DeviceInfoProvider * deviceInfoprovider = nullptr;
@@ -119,6 +114,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     VerifyOrExit(initParams.accessDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.aclStorage != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.groupDataProvider != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(initParams.sessionKeystore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.operationalKeystore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(initParams.opCertStore != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -201,7 +197,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif
     SuccessOrExit(err);
 
-    err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, mDeviceStorage, &GetFabricTable());
+    err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, mDeviceStorage, &GetFabricTable(),
+                         *initParams.sessionKeystore);
     SuccessOrExit(err);
 
     err = mFabricDelegate.Init(this);
@@ -243,7 +240,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
     // This initializes clusters, so should come after lower level initialization.
-    InitDataModelHandler(&mExchangeMgr);
+    InitDataModelHandler();
 
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&mExchangeMgr);
@@ -376,7 +373,7 @@ void Server::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event)
 {
     switch (event.Type)
     {
-    case DeviceEventType::kDnssdPlatformInitialized:
+    case DeviceEventType::kDnssdInitialized:
         // Platform DNS-SD implementation uses kPlatformDnssdInitialized event to signal that it's ready.
         if (!mIsDnssdReady)
         {
@@ -400,6 +397,8 @@ void Server::CheckServerReadyEvent()
     // are ready, and emit the 'server ready' event if so.
     if (mIsDnssdReady)
     {
+        ChipLogError(AppServer, "Server initialization complete");
+
         ChipDeviceEvent event = { .Type = DeviceEventType::kServerReady };
         PlatformMgr().PostEventOrDie(&event);
     }
@@ -443,10 +442,9 @@ void Server::RejoinExistingMulticastGroups()
     }
 }
 
-void Server::DispatchShutDownAndStopEventLoop()
+void Server::GenerateShutDownEvent()
 {
     PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().HandleServerShuttingDown(); });
-    PlatformMgr().ScheduleWork(StopEventLoop);
 }
 
 void Server::ScheduleFactoryReset()
@@ -461,6 +459,7 @@ void Server::ScheduleFactoryReset()
 
 void Server::Shutdown()
 {
+    assertChipStackLockedByCurrentThread();
     PlatformMgr().RemoveEventHandler(OnPlatformEventWrapper, 0);
     mCASEServer.Shutdown();
     mCASESessionManager.Shutdown();
@@ -530,5 +529,19 @@ void Server::ResumeSubscriptions()
     }
 }
 #endif
+
+KvsPersistentStorageDelegate CommonCaseDeviceServerInitParams::sKvsPersistenStorageDelegate;
+PersistentStorageOperationalKeystore CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
+Credentials::PersistentStorageOpCertStore CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
+Credentials::GroupDataProviderImpl CommonCaseDeviceServerInitParams::sGroupDataProvider;
+IgnoreCertificateValidityPolicy CommonCaseDeviceServerInitParams::sDefaultCertValidityPolicy;
+#if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
+SimpleSessionResumptionStorage CommonCaseDeviceServerInitParams::sSessionResumptionStorage;
+#endif
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+app::SimpleSubscriptionResumptionStorage CommonCaseDeviceServerInitParams::sSubscriptionResumptionStorage;
+#endif
+app::DefaultAclStorage CommonCaseDeviceServerInitParams::sAclStorage;
+Crypto::DefaultSessionKeystore CommonCaseDeviceServerInitParams::sSessionKeystore;
 
 } // namespace chip

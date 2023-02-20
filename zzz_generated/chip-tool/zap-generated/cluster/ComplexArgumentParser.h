@@ -85,6 +85,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Struc
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request);
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::Type & request,
                         Json::Value & value);
 
@@ -97,10 +101,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::UnitTesting::St
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::UnitTesting::Structs::DoubleNestedStructList::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::TimeSynchronization::Structs::DstOffsetType::Type & request);
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::Actions::Structs::EndpointListStruct::Type & request,
                         Json::Value & value);
 
@@ -248,10 +248,10 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::SoftwareDiagnos
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::Type & request);
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::Type & request);
+static void Finalize(chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type & request);
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type & request,
                         Json::Value & value);

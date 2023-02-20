@@ -19,7 +19,6 @@
 #include "DeviceCallbacks.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>

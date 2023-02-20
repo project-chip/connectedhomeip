@@ -171,5 +171,5 @@ extern "C" void vApplicationIdleHook(void)
     // FreeRTOS Idle callback
 
     // Check CHIP Config nvm3 and repack flash if necessary.
-    Internal::SILABSConfig::RepackNvm3Flash();
+    Internal::SilabsConfig::RepackNvm3Flash();
 }

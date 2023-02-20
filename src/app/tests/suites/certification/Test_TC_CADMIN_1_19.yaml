@@ -88,7 +88,7 @@ tests:
           to reach an index value of SupportedFabrics on DUT_CE"
       PICS: CADMIN.S.C00.Rsp
       verification: |
-          Repeat step 3 until  CommissionedFabrics=SupportedFabrics  (Supported fabrics value obtained in the step 1)
+          Repeat step 3 until  CommissionedFabrics=SupportedFabrics  (Supported fabrics value obtained in the precondition)
 
           Use the following command to verify the currentcommissioned fabric (Output number may vary depends on the number successful commissioning )
 

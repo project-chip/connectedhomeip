@@ -78,7 +78,8 @@
 }
 
 // This class method is for unit testing
-+ (instancetype)connectionWithWorkQueue:(dispatch_queue_t)workQueue connectBlock:(NSXPCConnection * (^)(void) )connectBlock
++ (MTRDeviceControllerXPCConnection *)connectionWithWorkQueue:(dispatch_queue_t)workQueue
+                                                 connectBlock:(NSXPCConnection * (^)(void) )connectBlock
 {
     return [[MTRDeviceControllerXPCConnection alloc] initWithWorkQueue:workQueue connectBlock:connectBlock];
 }
