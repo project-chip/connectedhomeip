@@ -21,75 +21,48 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Base64.h>
 #include <platform/silabs/SilabsConfig.h>
+#include <setup_payload/Base38Decode.h>
 #include <setup_payload/Base38Encode.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace SIWx917 {
 #include <string>
-using namespace std;
-
 // using namespace chip::Credentials;
 using namespace chip::DeviceLayer::Internal;
 
 #ifdef SIWX917_USE_COMISSIONABLE_DATA
-uint8_t SIWx917DeviceDataProvider::WriteBits(uint8_t * bits, uint8_t offset, uint64_t input, uint8_t numberOfBits,
-                                             uint8_t totalPayloadInBits)
+void SIWx917DeviceDataProvider::setupPayload(uint8_t * outBuf)
 {
-    if ((offset + numberOfBits) > totalPayloadInBits)
+    SetupPayload payload;
+    std::string result;
+    ChipError err   = CHIP_NO_ERROR;
+    payload.version = 0;
+    payload.discriminator.SetLongValue(discriminatorValue);
+    payload.setUpPINCode = passcode;
+    payload.rendezvousInformation.SetValue((chip::RendezvousInformationFlags) rendezvousFlag);
+    payload.commissioningFlow = (chip::CommissioningFlow) commissionableFlow;
+    payload.vendorID          = vendorId;
+    payload.productID         = productId;
+
+    QRCodeSetupPayloadGenerator generator(payload);
+    err = generator.payloadBase38Representation(result);
+    if (err != CHIP_NO_ERROR)
     {
-        return -1;
+        SILABS_LOG("Failed to get the payload: %d", err);
     }
-    uint8_t index = offset;
-    offset += numberOfBits;
-    while (input != 0)
+    SILABS_LOG("Payload value in string format : %s", result.c_str());
+    std::vector<uint8_t> result1;
+    // skipping the MT: from the payload during decoding
+    err = base38Decode(result.substr(3), result1);
+    if (err == CHIP_NO_ERROR)
     {
-        if (input & 1)
+        for (uint8_t i = 0; i < result1.size(); i++)
         {
-            bits[int(index / 8)] |= (1 << (index % 8));
+            outBuf[i] = result1.at(i);
         }
-        index++;
-        input >>= 1;
-    }
-    return offset;
-}
-
-// Generation of the payload using the details provided in the DeviceConfig.h
-void SIWx917DeviceDataProvider::generateQrCodeBitSet(uint8_t * payload)
-{
-    uint8_t kVersionFieldLengthInBits              = 3;
-    uint8_t kVendorIDFieldLengthInBits             = 16;
-    uint8_t kProductIDFieldLengthInBits            = 16;
-    uint8_t kCommissioningFlowFieldLengthInBits    = 2;
-    uint8_t kRendezvousInfoFieldLengthInBits       = 8;
-    uint8_t kPayloadDiscriminatorFieldLengthInBits = 12;
-    uint8_t kSetupPINCodeFieldLengthInBits         = 27;
-    uint8_t kPaddingFieldLengthInBits              = 4;
-
-    uint8_t kTotalPayloadDataSizeInBits =
-        (kVersionFieldLengthInBits + kVendorIDFieldLengthInBits + kProductIDFieldLengthInBits +
-         kCommissioningFlowFieldLengthInBits + kRendezvousInfoFieldLengthInBits + kPayloadDiscriminatorFieldLengthInBits +
-         kSetupPINCodeFieldLengthInBits + kPaddingFieldLengthInBits);
-    uint8_t offset = 0;
-    uint8_t * fillBits;
-    fillBits = (uint8_t *) malloc(sizeof(uint8_t) * 11);
-    memset(fillBits, 0, sizeof(fillBits) * 11);
-
-    offset = WriteBits(fillBits, offset, 0, kVersionFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    offset = WriteBits(fillBits, offset, (uint64_t) vendorId, kVendorIDFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    offset = WriteBits(fillBits, offset, (uint64_t) productId, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    offset = WriteBits(fillBits, offset, (uint64_t) commissionableFlow, kCommissioningFlowFieldLengthInBits,
-                       kTotalPayloadDataSizeInBits);
-    offset = WriteBits(fillBits, offset, (uint64_t) rendezvousFlag, kRendezvousInfoFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    offset = WriteBits(fillBits, offset, (uint64_t) discriminatorValue, kPayloadDiscriminatorFieldLengthInBits,
-                       kTotalPayloadDataSizeInBits);
-    offset = WriteBits(fillBits, offset, (uint64_t) passcode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    offset = WriteBits(fillBits, offset, 0, kPaddingFieldLengthInBits, kTotalPayloadDataSizeInBits);
-
-    for (uint8_t i = 0; i < kTotalPayloadDataSizeInBits / 8; i++)
-    {
-        payload[i] = fillBits[i];
     }
 }
 
@@ -112,9 +85,9 @@ CHIP_ERROR SIWx917DeviceDataProvider::FlashFactoryData()
             return err;
         }
     }
-    uint8_t payload[11];
-    generateQrCodeBitSet(payload);
-    err = SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_SetupPayloadBitSet, payload, 11);
+    uint8_t payload[kTotalPayloadDataSizeInBytes];
+    setupPayload(payload);
+    err = SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_SetupPayloadBitSet, payload, kTotalPayloadDataSizeInBytes);
     if (err != CHIP_NO_ERROR)
     {
         return err;
@@ -191,14 +164,6 @@ CHIP_ERROR SIWx917DeviceDataProvider::FlashFactoryData()
             return err;
         }
     }
-    if (commissionableFlow != 0)
-    {
-        err = SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_ProductName, commissionableFlow);
-        if (err != CHIP_NO_ERROR)
-        {
-            return err;
-        }
-    }
 }
 #endif
 
@@ -224,7 +189,6 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetSetupDiscriminator(uint16_t & setupDisc
 CHIP_ERROR SIWx917DeviceDataProvider::GetSpake2pIterationCount(uint32_t & iterationCount)
 {
     CHIP_ERROR err = SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_Spake2pIterationCount, iterationCount);
-
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT) && CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -244,7 +208,6 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
     size_t saltB64Len                       = 0;
 
     err = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_Spake2pSalt, saltB64, sizeof(saltB64), saltB64Len);
-
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -278,7 +241,6 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetSpake2pVerifier(MutableByteSpan & verif
 
     err = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_Spake2pVerifier, verifierB64, sizeof(verifierB64),
                                            verifierB64Len);
-
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -305,10 +267,8 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetSetupPayload(MutableCharSpan & payloadB
     CHIP_ERROR err                                      = CHIP_NO_ERROR;
     uint8_t payloadBitSet[kTotalPayloadDataSizeInBytes] = { 0 };
     size_t bitSetLen                                    = 0;
-
     err = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_SetupPayloadBitSet, payloadBitSet, kTotalPayloadDataSizeInBytes,
                                            bitSetLen);
-
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -352,7 +312,6 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetVendorId(uint16_t & vendorId)
     uint32_t vendorId32 = 0;
 
     err = SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_VendorId, vendorId32);
-
 #if defined(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID) && CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -378,7 +337,6 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetProductId(uint16_t & productId)
     uint32_t productId32 = 0;
 
     err = SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_ProductId, productId32);
-
 #if defined(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID) && CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {

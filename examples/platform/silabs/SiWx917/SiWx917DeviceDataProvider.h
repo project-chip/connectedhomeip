@@ -39,8 +39,7 @@ public:
 
     static SIWx917DeviceDataProvider & GetDeviceDataProvider();
     CHIP_ERROR GetSetupPayload(MutableCharSpan & payloadBuf);
-    uint8_t WriteBits(uint8_t * bits, uint8_t offset, uint64_t input, uint8_t numberOfBits, uint8_t totalPayloadInBits);
-    void generateQrCodeBitSet(uint8_t * payload);
+    void setupPayload(uint8_t * outBuf);
     CHIP_ERROR FlashFactoryData();
     // ===== Members functions that implement the CommissionableDataProvider
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
