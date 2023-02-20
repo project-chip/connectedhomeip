@@ -73,7 +73,6 @@ static_library("SiWx917") {
   # Add platform crypto implementation
   if (chip_crypto == "platform") {
     sources += [
-      "CHIPCryptoPAL.h",
       "CHIPCryptoPALTinyCrypt.cpp",
     ]
     public_deps += [
