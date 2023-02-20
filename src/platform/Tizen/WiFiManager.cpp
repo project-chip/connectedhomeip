@@ -273,12 +273,11 @@ void WiFiManager::_ConnectedCb(wifi_manager_error_e wifiErr, void * userData)
 {
     auto loop = reinterpret_cast<GMainLoop *>(userData);
 
-    if (wifiErr == WIFI_MANAGER_ERROR_NONE)
+    if (wifiErr == WIFI_MANAGER_ERROR_NONE || wifiErr == WIFI_MANAGER_ERROR_ALREADY_EXISTS)
     {
         ChipLogProgress(DeviceLayer, "WiFi is connected");
         if (sInstance.mpConnectCallback != nullptr)
         {
-
             chip::DeviceLayer::PlatformMgr().LockChipStack();
             sInstance.mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
             sInstance.mpConnectCallback = nullptr;
