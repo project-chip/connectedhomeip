@@ -1,6 +1,6 @@
-# Matter Telink Lighting Example Application
+# Matter Telink Window Example Application
 
-The Telink Lighting Example demonstrates how to remotely control a
+The Telink Window Example demonstrates how to remotely control a
 window shutter device. It uses buttons to test changing cover position and
 device states and LEDs to show the state of these changes. You can use this example as
 a reference for creating your own application.
@@ -60,10 +60,11 @@ The following buttons are available on **tlsr9518adk80d** board:
 
 | Name     | Function               | Description                                                                                            |
 | :------- | :--------------------- | :----------------------------------------------------------------------------------------------------- |
-| Button 1 | Factory reset          | Perform factory reset to forget currently commissioned Thread network and back to uncommissioned state |
-| Button 2 | Lighting control       | Manually triggers the lighting state                                                                   |
-| Button 3 | Thread start           | Commission thread with static credentials and enables the Thread on device                             |
-| Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE                           |
+| Button 1 | Factory reset          | Tripple press performs factory reset to forget currently commissioned Thread network and back to uncommissioned state |
+| Button 2 | Open and ToggleMoveType control       | Manually triggers the Open state by one press and double press triggers the Lift-Tilt move type                                                           |
+| Button 3 | Thread start           | Commission thread with static credentials and enables the Thread on device       |
+| Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE     |
+| Button 5 | Close control       | Manually triggers the Close state by one press                                      |
 
 ### LEDs
 
@@ -92,30 +93,6 @@ be used to specify the the effect. It is able to be in following effects:
 | Blinks (1000 ms on/1000 ms off) | Channel Change (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE) |
 | Blinks (950 ms on/50 ms off)    | Finish (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT)          |
 | LED off                         | Stop (EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT)              |
-
-#### Indicate current state of lightbulb
-
-By default, only **Blue** LED is used to show current state of lightbulb (only
-for lightning-app).
-
-To enable RGB functionality in Your application set this config:
-
-In Matter examples/lighting-app/telink/include/**AppConfig.h**, set the define
-`USE_RGB_PWM`:
-
-```bash
-    define USE_RGB_PWM 1
-```
-
-To get current state of lightbulb in RGB mode, connect 3-color LED module to
-following pins:
-
-| Name  |         Pin         |
-| :---: | :-----------------: |
-|  Red  | PE2 (pin 8 of J34)  |
-| Green | PE0 (pin 5 of J34)  |
-| Blue  | PB4 (pin 20 of J34) |
-|  GND  | GND (pin 24 of J50) |
 
 ### CHIP tool commands
 

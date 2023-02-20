@@ -18,7 +18,7 @@
 
 #pragma once
 
-// ---- Lighting Example App Config ----
+// ---- Window App Example Config ----
 
 // Buttons config
 #define BUTTON_PORT DEVICE_DT_GET(DT_NODELABEL(gpioc))
@@ -33,12 +33,5 @@
 #define SYSTEM_STATE_LED 7
 #define LIFT_STATE_LED 6
 #define TILT_STATE_LED 5 // NOTE: configured as PWM
-// Lighting LED config
-#define USE_RGB_PWM 0
 
-#define LIGHTING_PWM_SPEC_RGB_BLUE PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0))
-#if USE_RGB_PWM
-#define LIGHTING_PWM_SPEC_RGB_GREEN PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1))
-#define LIGHTING_PWM_SPEC_RGB_RED PWM_DT_SPEC_GET(DT_ALIAS(pwm_led2))
-#endif
 #define LIGHTING_PWM_SPEC_IDENTIFY_GREEN PWM_DT_SPEC_GET(DT_ALIAS(pwm_led3))

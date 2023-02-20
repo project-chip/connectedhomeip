@@ -17,132 +17,62 @@
  */
 
 #include "AppTask.h"
-#include "ColorFormat.h"
 #include "PWMDevice.h"
+#include "WindowCovering.h"
+#include <AppConfig.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/clusters/window-covering-server/window-covering-server.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
-using namespace chip;
-//
-using namespace ::chip::app;
-//
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::OnOff;
+using namespace ::chip;
+using namespace ::chip::app::Clusters::WindowCovering;
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-    static HsvColor_t hsv;
-    static XyColor_t xy;
-    ClusterId clusterId     = attributePath.mClusterId;
-    AttributeId attributeId = attributePath.mAttributeId;
-
-    if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
+    switch (attributePath.mClusterId)
     {
-        ChipLogDetail(Zcl, "Cluster OnOff: attribute OnOff set to %u", *value);
-        GetAppTask().SetInitiateAction(*value ? PWMDevice::ON_ACTION : PWMDevice::OFF_ACTION,
-                                       static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
-    }
-    else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id)
-    {
-        if (GetAppTask().GetPWMDevice().IsTurnedOn())
-        {
-            ChipLogDetail(Zcl, "Cluster LevelControl: attribute CurrentLevel set to %u", *value);
-            GetAppTask().SetInitiateAction(PWMDevice::LEVEL_ACTION, static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
-        }
-        else
-        {
-            ChipLogDetail(Zcl, "LED is off. Try to use move-to-level-with-on-off instead of move-to-level");
-        }
-    }
-    else if (clusterId == ColorControl::Id)
-    {
-        /* Ignore several attributes that are currently not processed */
-        if ((attributeId == ColorControl::Attributes::RemainingTime::Id) ||
-            (attributeId == ColorControl::Attributes::EnhancedColorMode::Id) ||
-            (attributeId == ColorControl::Attributes::ColorMode::Id))
-        {
-            return;
-        }
-
-        /* XY color space */
-        if (attributeId == ColorControl::Attributes::CurrentX::Id || attributeId == ColorControl::Attributes::CurrentY::Id)
-        {
-            if (attributeId == ColorControl::Attributes::CurrentX::Id)
-            {
-                xy.x = *reinterpret_cast<uint16_t *>(value);
-            }
-            else if (attributeId == ColorControl::Attributes::CurrentY::Id)
-            {
-                xy.y = *reinterpret_cast<uint16_t *>(value);
-            }
-
-            ChipLogDetail(Zcl, "New XY color: %u|%u", xy.x, xy.y);
-            GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_XY, static_cast<int32_t>(AppEvent::kEventType_Lighting),
-                                           (uint8_t *) &xy);
-        }
-        /* HSV color space */
-        else if (attributeId == ColorControl::Attributes::CurrentHue::Id ||
-                 attributeId == ColorControl::Attributes::CurrentSaturation::Id ||
-                 attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id)
-        {
-            if (attributeId == ColorControl::Attributes::EnhancedCurrentHue::Id)
-            {
-                hsv.h = (uint8_t)(((*reinterpret_cast<uint16_t *>(value)) & 0xFF00) >> 8);
-                hsv.s = (uint8_t)((*reinterpret_cast<uint16_t *>(value)) & 0xFF);
-            }
-            else if (attributeId == ColorControl::Attributes::CurrentHue::Id)
-            {
-                hsv.h = *value;
-            }
-            else if (attributeId == ColorControl::Attributes::CurrentSaturation::Id)
-            {
-                hsv.s = *value;
-            }
-            ChipLogDetail(Zcl, "New HSV color: hue = %u| saturation = %u", hsv.h, hsv.s);
-            GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_HSV, static_cast<int32_t>(AppEvent::kEventType_Lighting),
-                                           (uint8_t *) &hsv);
-        }
-        /* Temperature Mireds color space */
-        else if (attributeId == ColorControl::Attributes::ColorTemperatureMireds::Id)
-        {
-            ChipLogDetail(Zcl, "New Temperature Mireds color = %u", *(uint16_t *) value);
-            GetAppTask().SetInitiateAction(PWMDevice::COLOR_ACTION_CT, static_cast<int32_t>(AppEvent::kEventType_Lighting), value);
-        }
-        else
-        {
-            ChipLogDetail(Zcl, "Ignore ColorControl attribute (%u) that is not currently processed!", attributeId);
-        }
+    case app::Clusters::Identify::Id:
+        ChipLogProgress(Zcl, "Identify cluster ID: " ChipLogFormatMEI " Type: %u Value: %u, length: %u",
+                        ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
+        break;
+    case app::Clusters::WindowCovering::Id:
+        ChipLogProgress(Zcl, "Window covering cluster ID: " ChipLogFormatMEI " Type: %u Value: %u, length: %u",
+                        ChipLogValueMEI(attributePath.mAttributeId), type, *value, size);
+        break;
+    default:
+        break;
     }
 }
 
-/** @brief OnOff Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-void emberAfOnOffClusterInitCallback(EndpointId endpoint)
+/* Forwards all attributes changes */
+void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
 {
-    EmberAfStatus status;
-    bool storedValue;
-
-    // Read storedValue on/off value
-    status = OnOff::Attributes::OnOff::Get(1, &storedValue);
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
+    if (attributePath.mEndpointId == WindowCovering::Endpoint())
     {
-        // Set actual state to stored before reboot
-        GetAppTask().GetPWMDevice().Set(storedValue);
+        switch (attributePath.mAttributeId)
+        {
+        case Attributes::TargetPositionLiftPercent100ths::Id:
+            WindowCovering::Instance().StartMove(WindowCovering::MoveType::LIFT);
+            break;
+        case Attributes::TargetPositionTiltPercent100ths::Id:
+            WindowCovering::Instance().StartMove(WindowCovering::MoveType::TILT);
+            break;
+        case Attributes::CurrentPositionLiftPercent100ths::Id:
+            WindowCovering::Instance().PositionLEDUpdate(WindowCovering::MoveType::LIFT);
+            break;
+        case Attributes::CurrentPositionTiltPercent100ths::Id:
+            WindowCovering::Instance().PositionLEDUpdate(WindowCovering::MoveType::TILT);
+            break;
+        default:
+            WindowCovering::Instance().SchedulePostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
+            break;
+        };
     }
-
-    GetAppTask().UpdateClusterState();
 }

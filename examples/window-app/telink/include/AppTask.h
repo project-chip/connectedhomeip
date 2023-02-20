@@ -45,10 +45,8 @@ class AppTask
 public:
     CHIP_ERROR StartApp(void);
 
-    void SetInitiateAction(PWMDevice::Action_t aAction, int32_t aActor, uint8_t * value);
     void PostEvent(AppEvent * aEvent);
     void UpdateClusterState(void);
-    PWMDevice & GetPWMDevice(void) { return mPwmRgbBlueLed; }
 
     enum ButtonId_t
     {
@@ -79,6 +77,8 @@ private:
     static void UpdateStatusLED();
 #endif
     static void LightingActionButtonEventHandler(void);
+    static void OpenActionAndToggleMoveTypeButtonEventHandler(void);
+    static void CloseActionButtonEventHandler(void);
     static void FactoryResetButtonEventHandler(void);
     static void StartThreadButtonEventHandler(void);
     static void StartBleAdvButtonEventHandler(void);
@@ -86,6 +86,9 @@ private:
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     static void FactoryResetTimerTimeoutCallback(k_timer * timer);
+    static void OpenTimerTimeoutCallback(k_timer * timer);
+    static void OpenTimerEventHandler(AppEvent * aEvent);
+    static void ToggleMoveTypeHandler(AppEvent * aEvent);
 
     static void FactoryResetTimerEventHandler(AppEvent * aEvent);
     static void FactoryResetHandler(AppEvent * aEvent);
@@ -95,24 +98,17 @@ private:
     static void UpdateIdentifyStateEventHandler(AppEvent * aEvent);
 
     static void MovementTimerEventHandler(const AppEvent & event);
-    static void OpenHandler(const AppEvent & event);
-    static void CloseHandler(const AppEvent & event);
+    static void OpenHandler(AppEvent * aEvent);
+    static void CloseHandler(AppEvent * aEvent);
     void ToggleMoveType();
-    
-    static void ButtonEventHandler(ButtonId_t btnId, bool btnPressed);
+
     static void InitButtons(void);
 
     static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     static AppTask sAppTask;
-    PWMDevice mPwmRgbBlueLed;
-#if USE_RGB_PWM
-    PWMDevice mPwmRgbGreenLed;
-    PWMDevice mPwmRgbRedLed;
-#endif
     PWMDevice mPwmIdentifyLed;
 
-    // FunctionEvent mFunction{ FunctionEvent::NoneSelected };
     OperationalState mMoveType{ OperationalState::MovingUpOrOpen };
     bool mFunctionTimerActive{ false };
     bool mMovementTimerActive{ false };
