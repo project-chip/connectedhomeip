@@ -70,10 +70,18 @@ uint16_t emberEndpointCount = 0;
 // we need this data block for the defaults
 #if (defined(GENERATED_DEFAULTS) && GENERATED_DEFAULTS_COUNT)
 constexpr const uint8_t generatedDefaults[] = GENERATED_DEFAULTS;
+#define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
+    {                                                                                                                              \
+        &generatedDefaults[index]                                                                                                  \
+    }
 #endif // GENERATED_DEFAULTS
 
 #if (defined(GENERATED_MIN_MAX_DEFAULTS) && GENERATED_MIN_MAX_DEFAULT_COUNT)
 constexpr const EmberAfAttributeMinMaxValue minMaxDefaults[] = GENERATED_MIN_MAX_DEFAULTS;
+#define ZAP_MIN_MAX_DEFAULTS_INDEX(index)                                                                                          \
+    {                                                                                                                              \
+        &minMaxDefaults[index]                                                                                                     \
+    }
 #endif // GENERATED_MIN_MAX_DEFAULTS
 
 #ifdef GENERATED_FUNCTION_ARRAYS
@@ -82,14 +90,20 @@ GENERATED_FUNCTION_ARRAYS
 
 #ifdef GENERATED_COMMANDS
 constexpr const chip::CommandId generatedCommands[] = GENERATED_COMMANDS;
+#define ZAP_GENERATED_COMMANDS_INDEX(index) (&generatedCommands[index])
 #endif // GENERATED_COMMANDS
 
 #if (defined(GENERATED_EVENTS) && (GENERATED_EVENT_COUNT > 0))
 constexpr const chip::EventId generatedEvents[] = GENERATED_EVENTS;
+#define ZAP_GENERATED_EVENTS_INDEX(index) (&generatedEvents[index])
 #endif // GENERATED_EVENTS
 
-constexpr const EmberAfAttributeMetadata generatedAttributes[]      = GENERATED_ATTRIBUTES;
-constexpr const EmberAfCluster generatedClusters[]                  = GENERATED_CLUSTERS;
+constexpr const EmberAfAttributeMetadata generatedAttributes[] = GENERATED_ATTRIBUTES;
+#define ZAP_ATTRIBUTE_INDEX(index) (&generatedAttributes[index])
+
+constexpr const EmberAfCluster generatedClusters[] = GENERATED_CLUSTERS;
+#define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
+
 constexpr const EmberAfEndpointType generatedEmberAfEndpointTypes[] = GENERATED_ENDPOINT_TYPES;
 constexpr const EmberAfDeviceType fixedDeviceTypeList[]             = FIXED_DEVICE_TYPES;
 
