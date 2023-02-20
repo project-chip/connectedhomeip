@@ -89,8 +89,8 @@ jobs:
              "./scripts/build/build_examples.py \
                 --enable-flashbundle \
                 --target efr32-brd4187c-window-covering-additional_data_advertising \
-                --target efr32-brd4187c-switch-openthread_mtd-shell \
-                --target efr32-brd4187c-switch-sed-low-power-use_ot_coap_lib \
+                --target efr32-brd4187c-thermostat-openthread_mtd \
+                --target efr32-brd4187c-switch-sed-shell-use_ot_coap_lib \
                 --target efr32-brd4187c-unit-test \
                 --target efr32-brd4187c-light-use_ot_lib \
                 --target efr32-brd4187c-light-rpc \
