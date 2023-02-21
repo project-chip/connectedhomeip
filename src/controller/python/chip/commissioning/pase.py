@@ -55,7 +55,9 @@ def establish_session(devCtrl: ChipDeviceCtrl.ChipDeviceControllerBase, paramete
         selected_address = None
         for ip in device[0].addresses:
             if ipaddress.ip_address(ip).is_link_local:
-                # TODO(erjiaqing): The link local address in the discovery result does not contain a interface
+                # TODO(erjiaqing): To connect a device using link local address requires an interface identifier,
+                # however, the link local address returned from DiscoverCommissionableNodes does not have an
+                # interface identifier.
                 continue
             selected_address = ip
             break

@@ -1,7 +1,25 @@
+/*
+ *
+ *    Copyright (c) 2022 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
 #include <controller/python/chip/crypto/p256keypair.h>
 
 #include <cassert>
+#include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -14,11 +32,14 @@ pychip_P256Keypair::pychip_P256Keypair(void * aPyContext, pychip_P256Keypair_ECD
     mSignMsgFunct(aSignMsgFunct), mDeriveSecretFunct(aDeriveSecretFunct)
 {}
 
-pychip_P256Keypair::~pychip_P256Keypair() {}
+pychip_P256Keypair::~pychip_P256Keypair()
+{
+    // Just override the initialize routing to avoid calling the Initialize from the platform's code.
+}
 
 CHIP_ERROR pychip_P256Keypair::Initialize(Crypto::ECPKeyTarget key_target)
 {
-    // Just override the initialize routing of the platform implementation.
+    // Just override the initialize routing to avoid calling the Initialize from the platform's code.
     return CHIP_NO_ERROR;
 }
 
@@ -64,10 +85,9 @@ CHIP_ERROR pychip_P256Keypair::ECDH_derive_secret(const Crypto::P256PublicKey & 
     return CHIP_NO_ERROR;
 }
 
-void pychip_P256Keypair::UpdatePubkey(uint8_t * publicKey)
+void pychip_P256Keypair::UpdatePubkey(const FixedByteSpan<kP256_PublicKey_Length> & aPublicKey)
 {
-    memcpy(mPublicKey.Bytes(), publicKey, mPublicKey.Length());
-
+    mPublicKey   = aPublicKey;
     mInitialized = true;
 }
 
@@ -79,7 +99,14 @@ chip::python::pychip_P256Keypair * pychip_NewP256Keypair(void * pyObject, pychip
     return res;
 }
 
-void pychip_P256Keypair_UpdatePubkey(chip::python::pychip_P256Keypair * this_, uint8_t * aPubKey)
+PyChipError pychip_P256Keypair_UpdatePubkey(chip::python::pychip_P256Keypair * this_, uint8_t * aPubKey, size_t aPubKeyLen)
 {
-    this_->UpdatePubkey(aPubKey);
+    VerifyOrReturnError(aPubKeyLen == kP256_PublicKey_Length, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+    this_->UpdatePubkey(FixedByteSpan<Crypto::kP256_PublicKey_Length>(aPubKey));
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+void pychip_DeleteP256Keypair(chip::python::pychip_P256Keypair * this_)
+{
+    delete this_;
 }

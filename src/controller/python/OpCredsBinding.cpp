@@ -374,8 +374,9 @@ void pychip_OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::C
 }
 
 /**
- * Call of pychip_OpCreds_AllocateControllerFoCustomCommissioningFlow allows allocating a device commissioner that will perform
- * commissioning without using the auto-commissioning flow present in the Controller class
+ * Allocates a controller that does not use auto-commisioning.
+ *
+ * TODO(#25214): Need clean up API
  *
  */
 PyChipError pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(chip::Controller::DeviceCommissioner ** outDevCtrl,
@@ -385,8 +386,6 @@ PyChipError pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(chip::Co
                                                                         const uint8_t * ipk, uint32_t ipkLen,
                                                                         chip::VendorId adminVendorId, bool enableServerInteractions)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     ReturnErrorCodeIf(nocLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
     ReturnErrorCodeIf(icacLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
     ReturnErrorCodeIf(rcacLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
@@ -408,7 +407,7 @@ PyChipError pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(chip::Co
     initParams.permitMultiControllerFabrics         = true;
     initParams.hasExternallyOwnedOperationalKeypair = true;
 
-    err = Controller::DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, *devCtrl);
+    CHIP_ERROR err = Controller::DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, *devCtrl);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
 
     // Setup IPK in Group Data Provider for controller after Commissioner init which sets-up the fabric table entry
@@ -433,6 +432,7 @@ PyChipError pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(chip::Co
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
+// TODO(#25214): Need clean up API
 PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Controller::DeviceCommissioner ** outDevCtrl,
                                               FabricId fabricId, chip::NodeId nodeId, chip::VendorId adminVendorId,
                                               const char * paaTrustStorePath, bool useTestCommissioner,
