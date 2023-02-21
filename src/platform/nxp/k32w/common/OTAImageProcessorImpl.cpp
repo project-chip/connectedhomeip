@@ -133,7 +133,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessPayload(ByteSpan & block)
             ReturnErrorOnFailure(mAccumulator.Accumulate(block));
             ByteSpan tlvHeader{ mAccumulator.data(), sizeof(OTATlvHeader) };
             ReturnErrorOnFailure(SelectProcessor(tlvHeader));
-            mCurrentProcessor->Init();
+            ReturnErrorOnFailure(mCurrentProcessor->Init());
         }
 
         status = mCurrentProcessor->Process(block);
@@ -168,6 +168,7 @@ CHIP_ERROR OTAImageProcessorImpl::SelectProcessor(ByteSpan & block)
         return CHIP_OTA_PROCESSOR_NOT_REGISTERED;
     }
 
+    ChipLogDetail(SoftwareUpdate, "Selected processor with tag: %ld", pair->first);
     mCurrentProcessor = pair->second;
     mCurrentProcessor->SetLength(header.length);
     mCurrentProcessor->SetWasSelected(true);

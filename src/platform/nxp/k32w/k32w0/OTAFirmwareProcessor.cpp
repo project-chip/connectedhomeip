@@ -28,7 +28,7 @@ namespace chip {
 CHIP_ERROR OTAFirmwareProcessor::Init()
 {
     ReturnErrorCodeIf(mCallbackProcessDescriptor == nullptr, CHIP_OTA_PROCESSOR_CB_NOT_REGISTERED);
-    mAccumulator.Init(mDescriptorSize);
+    mAccumulator.Init(sizeof(Descriptor));
     ReturnErrorCodeIf(gOtaSuccess_c != OTA_ClientInit(), CHIP_OTA_PROCESSOR_CLIENT_INIT);
 
     auto offset = OTA_GetCurrentEepromAddressOffset();
@@ -37,8 +37,8 @@ CHIP_ERROR OTAFirmwareProcessor::Init()
         offset += 1;
     }
 
-    ReturnErrorCodeIf(OTA_UTILS_IMAGE_INVALID_ADDR == OTA_SetStartEepromOffset(offset), CHIP_ERROR_INTERNAL);
-    ReturnErrorCodeIf(gOtaSuccess_c != OTA_StartImage(mLength - mDescriptorSize), CHIP_ERROR_INTERNAL);
+    ReturnErrorCodeIf(OTA_UTILS_IMAGE_INVALID_ADDR == OTA_SetStartEepromOffset(offset), CHIP_OTA_PROCESSOR_EEPROM_OFFSET);
+    ReturnErrorCodeIf(gOtaSuccess_c != OTA_StartImage(mLength - sizeof(Descriptor)), CHIP_OTA_PROCESSOR_START_IMAGE);
 
     return CHIP_NO_ERROR;
 }
@@ -109,13 +109,13 @@ CHIP_ERROR OTAFirmwareProcessor::ExitAction()
 {
     if (OTA_CommitImage(NULL) != gOtaSuccess_c)
     {
-        ChipLogError(SoftwareUpdate, "Failed to commit application image.");
+        ChipLogError(SoftwareUpdate, "Failed to commit firmware image.");
         return CHIP_OTA_PROCESSOR_IMG_COMMIT;
     }
 
     if (OTA_ImageAuthenticate() != gOtaImageAuthPass_c)
     {
-        ChipLogError(SoftwareUpdate, "Failed to authenticate application image.");
+        ChipLogError(SoftwareUpdate, "Failed to authenticate firmware image.");
         return CHIP_OTA_PROCESSOR_IMG_AUTH;
     }
 

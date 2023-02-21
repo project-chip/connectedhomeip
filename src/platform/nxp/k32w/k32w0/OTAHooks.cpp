@@ -27,30 +27,33 @@
 
 #include "OtaSupport.h"
 
+#ifndef CONFIG_CHIP_K32W0_MAX_ENTRIES_TEST
+#define CONFIG_CHIP_K32W0_MAX_ENTRIES_TEST 0
+#endif
+
 extern "C" void ResetMCU(void);
 
-CHIP_ERROR AppProcessDescriptor(void* descriptor)
+CHIP_ERROR ProcessDescriptor(void* descriptor)
 {
-    auto appDescriptor = static_cast<chip::OTAFirmwareProcessor::AppDescriptor*>(descriptor);
+    auto desc = static_cast<chip::OTAFirmwareProcessor::Descriptor*>(descriptor);
+    ChipLogDetail(SoftwareUpdate, "Descriptor: %ld, %s, %s", desc->version, desc->versionString, desc->buildDate);
 
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR SsblProcessDescriptor(void* descriptor)
-{
     return CHIP_NO_ERROR;
 }
 
 extern "C" WEAK CHIP_ERROR OtaHookInit()
 {
-    static chip::OTAFirmwareProcessor sApplicationProcessor(sizeof(chip::OTAFirmwareProcessor::AppDescriptor));
-    static chip::OTAFirmwareProcessor sBootloaderProcessor(sizeof(chip::OTAFirmwareProcessor::SsblDescriptor));
-    #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+    static chip::OTAFirmwareProcessor sApplicationProcessor;
+    static chip::OTAFirmwareProcessor sBootloaderProcessor;
+#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
     static chip::OTAFactoryDataProcessor sFactoryDataProcessor;
-    #endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CONFIG_CHIP_K32W0_MAX_ENTRIES_TEST
+    static chip::OTAFirmwareProcessor processors[8];
+#endif
 
-    sApplicationProcessor.RegisterDescriptorCallback(AppProcessDescriptor);
-    sBootloaderProcessor.RegisterDescriptorCallback(SsblProcessDescriptor);
+    sApplicationProcessor.RegisterDescriptorCallback(ProcessDescriptor);
+    sBootloaderProcessor.RegisterDescriptorCallback(ProcessDescriptor);
 
     auto& imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(1, &sApplicationProcessor));
@@ -58,6 +61,13 @@ extern "C" WEAK CHIP_ERROR OtaHookInit()
 #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(3, &sFactoryDataProcessor));
 #endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CONFIG_CHIP_K32W0_MAX_ENTRIES_TEST
+    for (auto i = 0; i < 8; i++)
+    {
+        processors[i].RegisterDescriptorCallback(ProcessDescriptor);
+        ReturnErrorOnFailure(imageProcessor.RegisterProcessor(i + 4, &processors[i]));
+    }
+#endif // CONFIG_CHIP_K32W0_MAX_ENTRIES_TEST
 
     return CHIP_NO_ERROR;
 }

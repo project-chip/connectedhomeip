@@ -26,22 +26,12 @@ namespace chip {
 class OTAFirmwareProcessor : public OTATlvProcessor
 {
 public:
-    struct AppDescriptor
+    struct Descriptor
     {
         uint32_t version;
         char     versionString[kVersionStringSize];
         char     buildDate[kBuildDateSize];
     };
-
-    struct SsblDescriptor
-    {
-        uint32_t version;
-        char     versionString[kVersionStringSize];
-        char     buildDate[kBuildDateSize];
-        uint32_t loadAddress;
-    };
-
-    OTAFirmwareProcessor(uint32_t descriptorSize) : mDescriptorSize(descriptorSize) { }
 
     CHIP_ERROR Init() override;
     CHIP_ERROR Clear() override;
@@ -53,7 +43,6 @@ private:
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;
     CHIP_ERROR ProcessDescriptor(ByteSpan & block);
 
-    uint32_t mDescriptorSize = 0;
     OTADataAccumulator mAccumulator;
     bool mDescriptorProcessed = false;
 };
