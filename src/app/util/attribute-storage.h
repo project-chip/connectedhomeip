@@ -89,12 +89,6 @@ void emAfCallInits(void);
 
 #define emberAfClusterIsClient(cluster) ((bool) (((cluster)->mask & CLUSTER_MASK_CLIENT) != 0))
 #define emberAfClusterIsServer(cluster) ((bool) (((cluster)->mask & CLUSTER_MASK_SERVER) != 0))
-#define emberAfDoesClusterHaveInitFunction(cluster) ((bool) (((cluster)->mask & CLUSTER_MASK_INIT_FUNCTION) != 0))
-#define emberAfDoesClusterHaveAttributeChangedFunction(cluster)                                                                    \
-    ((bool) (((cluster)->mask & CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION) != 0))
-#define emberAfDoesClusterHaveDefaultResponseFunction(cluster)                                                                     \
-    ((bool) (((cluster)->mask & CLUSTER_MASK_DEFAULT_RESPONSE_FUNCTION) != 0))
-#define emberAfDoesClusterHaveMessageSentFunction(cluster) ((bool) (((cluster)->mask & CLUSTER_MASK_MESSAGE_SENT_FUNCTION) != 0))
 
 // Initial configuration
 void emberAfEndpointConfigure(void);
