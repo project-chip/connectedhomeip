@@ -43,13 +43,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-// Network commissioning
 namespace {
-// This file is being used by platforms other than Linux, so we need this check to disable related features since we only
-// implemented them on linux.
-constexpr EndpointId kNetworkCommissioningEndpointMain      = 0;
-constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
-
 #if CHIP_DEVICE_LAYER_TARGET_LINUX
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 DeviceLayer::NetworkCommissioning::LinuxThreadDriver sThreadDriver;
@@ -70,23 +64,20 @@ DeviceLayer::NetworkCommissioning::DarwinWiFiDriver sWiFiDriver;
 DeviceLayer::NetworkCommissioning::DarwinEthernetDriver sEthernetDriver;
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &sWiFiDriver);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sThreadDriver);
+Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0, &sThreadDriver);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetworkCommissioningEndpointSecondary, &sWiFiDriver);
-#endif
-
-Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sEthernetDriver);
+Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(0, &sEthernetDriver);
 } // namespace
+
 
 void ApplicationInit()
 {
-    (void) kNetworkCommissioningEndpointMain;
-    // Enable secondary endpoint only when we need it, this should be applied to all platforms.
-    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
-
     const bool kThreadEnabled = {
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         LinuxDeviceOptions::GetInstance().mThread
@@ -105,14 +96,10 @@ void ApplicationInit()
 
     if (kThreadEnabled && kWiFiEnabled)
     {
+        // Just use the Thread one.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         sThreadNetworkCommissioningInstance.Init();
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        sWiFiNetworkCommissioningInstance.Init();
-#endif
-        // Only enable secondary endpoint for network commissioning cluster when both WiFi and Thread are enabled.
-        emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, true);
     }
     else if (kThreadEnabled)
     {
@@ -123,10 +110,6 @@ void ApplicationInit()
     else if (kWiFiEnabled)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        // If we only enable WiFi on this device, "move" WiFi instance to main NetworkCommissioning cluster endpoint.
-        sWiFiNetworkCommissioningInstance.~Instance();
-        new (&sWiFiNetworkCommissioningInstance)
-            Clusters::NetworkCommissioning::Instance(kNetworkCommissioningEndpointMain, &sWiFiDriver);
         sWiFiNetworkCommissioningInstance.Init();
 #endif
     }
