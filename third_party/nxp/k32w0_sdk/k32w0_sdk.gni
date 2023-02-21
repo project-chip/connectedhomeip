@@ -44,6 +44,7 @@ declare_args() {
   chip_crypto_flavor = "NXP-Ultrafast-P256"
   chip_reduce_ssbl_size = false
   chip_enable_ota_default_processors = 1
+  chip_with_pdm_encryption=1
 }
 
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
@@ -126,6 +127,7 @@ template("k32w0_sdk") {
   print("FRO32k: ", use_fro_32k)
   print("low power: ", chip_with_low_power)
   print("OTA default processors: ", chip_enable_ota_default_processors)
+  print("PDM Encryption: ", chip_with_pdm_encryption)
 
   if (chip_with_low_power == 1 && chip_logging == true) {
     print(
@@ -272,7 +274,6 @@ template("k32w0_sdk") {
       "gExternalFlashIsCiphered_d=1",
       "PDM_USE_DYNAMIC_MEMORY=1",
       "PDM_SAVE_IDLE=1",
-      "PDM_ENCRYPTION=1",
       "gBootData_None_c=1",
       "PROGRAM_PAGE_SZ=256",
       "configFRTOS_MEMORY_SCHEME=4",
@@ -314,6 +315,12 @@ template("k32w0_sdk") {
       defines += [ "gClkUseFro32K=1" ]
     } else {
       defines += [ "gClkUseFro32K=0" ]
+    }
+
+    if (chip_with_pdm_encryption == 1) {
+      defines += [ "PDM_ENCRYPTION=1" ]
+    } else {
+      defines += [ "PDM_ENCRYPTION=0" ]
     }
 
     if (chip_mdns == "platform") {
