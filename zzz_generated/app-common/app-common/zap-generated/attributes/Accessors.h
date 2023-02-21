@@ -708,8 +708,9 @@ namespace PowerSource {
 namespace Attributes {
 
 namespace Status {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatus * value); // PowerSourceStatus
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatus value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::PowerSource::PowerSourceStatusEnum * value); // PowerSourceStatusEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatusEnum value);
 } // namespace Status
 
 namespace Order {
@@ -737,8 +738,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace WiredAssessedInputFrequency
 
 namespace WiredCurrentType {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentType * value); // WiredCurrentType
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentType value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::PowerSource::WiredCurrentTypeEnum * value); // WiredCurrentTypeEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum value);
 } // namespace WiredCurrentType
 
 namespace WiredAssessedCurrent {
@@ -785,8 +787,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace BatTimeRemaining
 
 namespace BatChargeLevel {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevel * value); // BatChargeLevel
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevel value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevelEnum * value); // BatChargeLevelEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevelEnum value);
 } // namespace BatChargeLevel
 
 namespace BatReplacementNeeded {
@@ -795,8 +797,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 } // namespace BatReplacementNeeded
 
 namespace BatReplaceability {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceability * value); // BatReplaceability
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceability value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::PowerSource::BatReplaceabilityEnum * value); // BatReplaceabilityEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceabilityEnum value);
 } // namespace BatReplaceability
 
 namespace BatPresent {
@@ -810,8 +813,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace BatReplacementDescription
 
 namespace BatCommonDesignation {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::PowerSource::BatCommonDesignationEnum * value); // BatCommonDesignationEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatCommonDesignationEnum value);
 } // namespace BatCommonDesignation
 
 namespace BatANSIDesignation {
@@ -825,8 +829,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace BatIECDesignation
 
 namespace BatApprovedChemistry {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::PowerSource::BatApprovedChemistryEnum * value); // BatApprovedChemistryEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatApprovedChemistryEnum value);
 } // namespace BatApprovedChemistry
 
 namespace BatCapacity {
@@ -840,8 +845,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace BatQuantity
 
 namespace BatChargeState {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeState * value); // BatChargeState
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeState value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeStateEnum * value); // BatChargeStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeStateEnum value);
 } // namespace BatChargeState
 
 namespace BatTimeToFullCharge {

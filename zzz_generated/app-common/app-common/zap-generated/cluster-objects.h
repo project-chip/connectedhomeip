@@ -6001,8 +6001,8 @@ enum class Fields
 struct Type
 {
 public:
-    DataModel::List<const BatChargeFault> current;
-    DataModel::List<const BatChargeFault> previous;
+    DataModel::List<const BatChargeFaultEnum> current;
+    DataModel::List<const BatChargeFaultEnum> previous;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -6012,8 +6012,8 @@ public:
 struct DecodableType
 {
 public:
-    DataModel::DecodableList<BatChargeFault> current;
-    DataModel::DecodableList<BatChargeFault> previous;
+    DataModel::DecodableList<BatChargeFaultEnum> current;
+    DataModel::DecodableList<BatChargeFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -6031,8 +6031,8 @@ enum class Fields
 struct Type
 {
 public:
-    DataModel::List<const BatFault> current;
-    DataModel::List<const BatFault> previous;
+    DataModel::List<const BatFaultEnum> current;
+    DataModel::List<const BatFaultEnum> previous;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -6042,8 +6042,8 @@ public:
 struct DecodableType
 {
 public:
-    DataModel::DecodableList<BatFault> current;
-    DataModel::DecodableList<BatFault> previous;
+    DataModel::DecodableList<BatFaultEnum> current;
+    DataModel::DecodableList<BatFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -6061,8 +6061,8 @@ enum class Fields
 struct Type
 {
 public:
-    DataModel::List<const WiredFault> current;
-    DataModel::List<const WiredFault> previous;
+    DataModel::List<const WiredFaultEnum> current;
+    DataModel::List<const WiredFaultEnum> previous;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -6072,8 +6072,8 @@ public:
 struct DecodableType
 {
 public:
-    DataModel::DecodableList<WiredFault> current;
-    DataModel::DecodableList<WiredFault> previous;
+    DataModel::DecodableList<WiredFaultEnum> current;
+    DataModel::DecodableList<WiredFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -6088,9 +6088,9 @@ namespace Attributes {
 namespace Status {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::PowerSource::PowerSourceStatus;
-    using DecodableType    = chip::app::Clusters::PowerSource::PowerSourceStatus;
-    using DecodableArgType = chip::app::Clusters::PowerSource::PowerSourceStatus;
+    using Type             = chip::app::Clusters::PowerSource::PowerSourceStatusEnum;
+    using DecodableType    = chip::app::Clusters::PowerSource::PowerSourceStatusEnum;
+    using DecodableArgType = chip::app::Clusters::PowerSource::PowerSourceStatusEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Status::Id; }
@@ -6149,9 +6149,9 @@ struct TypeInfo
 namespace WiredCurrentType {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::PowerSource::WiredCurrentType;
-    using DecodableType    = chip::app::Clusters::PowerSource::WiredCurrentType;
-    using DecodableArgType = chip::app::Clusters::PowerSource::WiredCurrentType;
+    using Type             = chip::app::Clusters::PowerSource::WiredCurrentTypeEnum;
+    using DecodableType    = chip::app::Clusters::PowerSource::WiredCurrentTypeEnum;
+    using DecodableArgType = chip::app::Clusters::PowerSource::WiredCurrentTypeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredCurrentType::Id; }
@@ -6209,9 +6209,9 @@ struct TypeInfo
 namespace ActiveWiredFaults {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::app::Clusters::PowerSource::WiredFault>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault> &;
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::PowerSource::WiredFaultEnum>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFaultEnum>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFaultEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveWiredFaults::Id; }
@@ -6257,9 +6257,9 @@ struct TypeInfo
 namespace BatChargeLevel {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::PowerSource::BatChargeLevel;
-    using DecodableType    = chip::app::Clusters::PowerSource::BatChargeLevel;
-    using DecodableArgType = chip::app::Clusters::PowerSource::BatChargeLevel;
+    using Type             = chip::app::Clusters::PowerSource::BatChargeLevelEnum;
+    using DecodableType    = chip::app::Clusters::PowerSource::BatChargeLevelEnum;
+    using DecodableArgType = chip::app::Clusters::PowerSource::BatChargeLevelEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatChargeLevel::Id; }
@@ -6281,9 +6281,9 @@ struct TypeInfo
 namespace BatReplaceability {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::PowerSource::BatReplaceability;
-    using DecodableType    = chip::app::Clusters::PowerSource::BatReplaceability;
-    using DecodableArgType = chip::app::Clusters::PowerSource::BatReplaceability;
+    using Type             = chip::app::Clusters::PowerSource::BatReplaceabilityEnum;
+    using DecodableType    = chip::app::Clusters::PowerSource::BatReplaceabilityEnum;
+    using DecodableArgType = chip::app::Clusters::PowerSource::BatReplaceabilityEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatReplaceability::Id; }
@@ -6305,9 +6305,9 @@ struct TypeInfo
 namespace ActiveBatFaults {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::app::Clusters::PowerSource::BatFault>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFault>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFault> &;
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::PowerSource::BatFaultEnum>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFaultEnum>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFaultEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveBatFaults::Id; }
@@ -6330,9 +6330,9 @@ struct TypeInfo
 namespace BatCommonDesignation {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::Clusters::PowerSource::BatCommonDesignationEnum;
+    using DecodableType    = chip::app::Clusters::PowerSource::BatCommonDesignationEnum;
+    using DecodableArgType = chip::app::Clusters::PowerSource::BatCommonDesignationEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatCommonDesignation::Id; }
@@ -6368,9 +6368,9 @@ struct TypeInfo
 namespace BatApprovedChemistry {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::Clusters::PowerSource::BatApprovedChemistryEnum;
+    using DecodableType    = chip::app::Clusters::PowerSource::BatApprovedChemistryEnum;
+    using DecodableArgType = chip::app::Clusters::PowerSource::BatApprovedChemistryEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatApprovedChemistry::Id; }
@@ -6404,9 +6404,9 @@ struct TypeInfo
 namespace BatChargeState {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::PowerSource::BatChargeState;
-    using DecodableType    = chip::app::Clusters::PowerSource::BatChargeState;
-    using DecodableArgType = chip::app::Clusters::PowerSource::BatChargeState;
+    using Type             = chip::app::Clusters::PowerSource::BatChargeStateEnum;
+    using DecodableType    = chip::app::Clusters::PowerSource::BatChargeStateEnum;
+    using DecodableArgType = chip::app::Clusters::PowerSource::BatChargeStateEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatChargeState::Id; }
@@ -6452,9 +6452,9 @@ struct TypeInfo
 namespace ActiveBatChargeFaults {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::app::Clusters::PowerSource::BatChargeFault>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault> &;
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::PowerSource::BatChargeFaultEnum>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFaultEnum>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFaultEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveBatChargeFaults::Id; }
@@ -6506,13 +6506,14 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Status::TypeInfo::DecodableType status = static_cast<chip::app::Clusters::PowerSource::PowerSourceStatus>(0);
-        Attributes::Order::TypeInfo::DecodableType order   = static_cast<uint8_t>(0);
+        Attributes::Status::TypeInfo::DecodableType status =
+            static_cast<chip::app::Clusters::PowerSource::PowerSourceStatusEnum>(0);
+        Attributes::Order::TypeInfo::DecodableType order = static_cast<uint8_t>(0);
         Attributes::Description::TypeInfo::DecodableType description;
         Attributes::WiredAssessedInputVoltage::TypeInfo::DecodableType wiredAssessedInputVoltage;
         Attributes::WiredAssessedInputFrequency::TypeInfo::DecodableType wiredAssessedInputFrequency;
         Attributes::WiredCurrentType::TypeInfo::DecodableType wiredCurrentType =
-            static_cast<chip::app::Clusters::PowerSource::WiredCurrentType>(0);
+            static_cast<chip::app::Clusters::PowerSource::WiredCurrentTypeEnum>(0);
         Attributes::WiredAssessedCurrent::TypeInfo::DecodableType wiredAssessedCurrent;
         Attributes::WiredNominalVoltage::TypeInfo::DecodableType wiredNominalVoltage = static_cast<uint32_t>(0);
         Attributes::WiredMaximumCurrent::TypeInfo::DecodableType wiredMaximumCurrent = static_cast<uint32_t>(0);
@@ -6522,21 +6523,23 @@ struct TypeInfo
         Attributes::BatPercentRemaining::TypeInfo::DecodableType batPercentRemaining;
         Attributes::BatTimeRemaining::TypeInfo::DecodableType batTimeRemaining;
         Attributes::BatChargeLevel::TypeInfo::DecodableType batChargeLevel =
-            static_cast<chip::app::Clusters::PowerSource::BatChargeLevel>(0);
+            static_cast<chip::app::Clusters::PowerSource::BatChargeLevelEnum>(0);
         Attributes::BatReplacementNeeded::TypeInfo::DecodableType batReplacementNeeded = static_cast<bool>(0);
         Attributes::BatReplaceability::TypeInfo::DecodableType batReplaceability =
-            static_cast<chip::app::Clusters::PowerSource::BatReplaceability>(0);
+            static_cast<chip::app::Clusters::PowerSource::BatReplaceabilityEnum>(0);
         Attributes::BatPresent::TypeInfo::DecodableType batPresent = static_cast<bool>(0);
         Attributes::ActiveBatFaults::TypeInfo::DecodableType activeBatFaults;
         Attributes::BatReplacementDescription::TypeInfo::DecodableType batReplacementDescription;
-        Attributes::BatCommonDesignation::TypeInfo::DecodableType batCommonDesignation = static_cast<uint32_t>(0);
+        Attributes::BatCommonDesignation::TypeInfo::DecodableType batCommonDesignation =
+            static_cast<chip::app::Clusters::PowerSource::BatCommonDesignationEnum>(0);
         Attributes::BatANSIDesignation::TypeInfo::DecodableType batANSIDesignation;
         Attributes::BatIECDesignation::TypeInfo::DecodableType batIECDesignation;
-        Attributes::BatApprovedChemistry::TypeInfo::DecodableType batApprovedChemistry = static_cast<uint32_t>(0);
-        Attributes::BatCapacity::TypeInfo::DecodableType batCapacity                   = static_cast<uint32_t>(0);
-        Attributes::BatQuantity::TypeInfo::DecodableType batQuantity                   = static_cast<uint8_t>(0);
+        Attributes::BatApprovedChemistry::TypeInfo::DecodableType batApprovedChemistry =
+            static_cast<chip::app::Clusters::PowerSource::BatApprovedChemistryEnum>(0);
+        Attributes::BatCapacity::TypeInfo::DecodableType batCapacity = static_cast<uint32_t>(0);
+        Attributes::BatQuantity::TypeInfo::DecodableType batQuantity = static_cast<uint8_t>(0);
         Attributes::BatChargeState::TypeInfo::DecodableType batChargeState =
-            static_cast<chip::app::Clusters::PowerSource::BatChargeState>(0);
+            static_cast<chip::app::Clusters::PowerSource::BatChargeStateEnum>(0);
         Attributes::BatTimeToFullCharge::TypeInfo::DecodableType batTimeToFullCharge;
         Attributes::BatFunctionalWhileCharging::TypeInfo::DecodableType batFunctionalWhileCharging = static_cast<bool>(0);
         Attributes::BatChargingCurrent::TypeInfo::DecodableType batChargingCurrent;
@@ -6568,8 +6571,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::List<const WiredFault> current;
-    DataModel::List<const WiredFault> previous;
+    DataModel::List<const WiredFaultEnum> current;
+    DataModel::List<const WiredFaultEnum> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6581,8 +6584,8 @@ public:
     static constexpr EventId GetEventId() { return Events::WiredFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
 
-    DataModel::DecodableList<WiredFault> current;
-    DataModel::DecodableList<WiredFault> previous;
+    DataModel::DecodableList<WiredFaultEnum> current;
+    DataModel::DecodableList<WiredFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -6604,8 +6607,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::List<const BatFault> current;
-    DataModel::List<const BatFault> previous;
+    DataModel::List<const BatFaultEnum> current;
+    DataModel::List<const BatFaultEnum> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6617,8 +6620,8 @@ public:
     static constexpr EventId GetEventId() { return Events::BatFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
 
-    DataModel::DecodableList<BatFault> current;
-    DataModel::DecodableList<BatFault> previous;
+    DataModel::DecodableList<BatFaultEnum> current;
+    DataModel::DecodableList<BatFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -6640,8 +6643,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::List<const BatChargeFault> current;
-    DataModel::List<const BatChargeFault> previous;
+    DataModel::List<const BatChargeFaultEnum> current;
+    DataModel::List<const BatChargeFaultEnum> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6653,8 +6656,8 @@ public:
     static constexpr EventId GetEventId() { return Events::BatChargeFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
 
-    DataModel::DecodableList<BatChargeFault> current;
-    DataModel::DecodableList<BatChargeFault> previous;
+    DataModel::DecodableList<BatChargeFaultEnum> current;
+    DataModel::DecodableList<BatChargeFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

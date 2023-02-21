@@ -5327,7 +5327,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case PowerSource::Attributes::Status::Id: {
-            chip::app::Clusters::PowerSource::PowerSourceStatus value;
+            chip::app::Clusters::PowerSource::PowerSourceStatusEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Status", 1, value);
         }
@@ -5352,7 +5352,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("WiredAssessedInputFrequency", 1, value);
         }
         case PowerSource::Attributes::WiredCurrentType::Id: {
-            chip::app::Clusters::PowerSource::WiredCurrentType value;
+            chip::app::Clusters::PowerSource::WiredCurrentTypeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("WiredCurrentType", 1, value);
         }
@@ -5377,7 +5377,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("WiredPresent", 1, value);
         }
         case PowerSource::Attributes::ActiveWiredFaults::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFaultEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveWiredFaults", 1, value);
         }
@@ -5397,7 +5397,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("BatTimeRemaining", 1, value);
         }
         case PowerSource::Attributes::BatChargeLevel::Id: {
-            chip::app::Clusters::PowerSource::BatChargeLevel value;
+            chip::app::Clusters::PowerSource::BatChargeLevelEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BatChargeLevel", 1, value);
         }
@@ -5407,7 +5407,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("BatReplacementNeeded", 1, value);
         }
         case PowerSource::Attributes::BatReplaceability::Id: {
-            chip::app::Clusters::PowerSource::BatReplaceability value;
+            chip::app::Clusters::PowerSource::BatReplaceabilityEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BatReplaceability", 1, value);
         }
@@ -5417,7 +5417,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("BatPresent", 1, value);
         }
         case PowerSource::Attributes::ActiveBatFaults::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFault> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFaultEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveBatFaults", 1, value);
         }
@@ -5427,7 +5427,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("BatReplacementDescription", 1, value);
         }
         case PowerSource::Attributes::BatCommonDesignation::Id: {
-            uint32_t value;
+            chip::app::Clusters::PowerSource::BatCommonDesignationEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BatCommonDesignation", 1, value);
         }
@@ -5442,7 +5442,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("BatIECDesignation", 1, value);
         }
         case PowerSource::Attributes::BatApprovedChemistry::Id: {
-            uint32_t value;
+            chip::app::Clusters::PowerSource::BatApprovedChemistryEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BatApprovedChemistry", 1, value);
         }
@@ -5457,7 +5457,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("BatQuantity", 1, value);
         }
         case PowerSource::Attributes::BatChargeState::Id: {
-            chip::app::Clusters::PowerSource::BatChargeState value;
+            chip::app::Clusters::PowerSource::BatChargeStateEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BatChargeState", 1, value);
         }
@@ -5477,7 +5477,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("BatChargingCurrent", 1, value);
         }
         case PowerSource::Attributes::ActiveBatChargeFaults::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFaultEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveBatChargeFaults", 1, value);
         }

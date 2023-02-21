@@ -914,7 +914,43 @@ server cluster PowerSourceConfiguration = 46 {
 }
 
 server cluster PowerSource = 47 {
-  enum BatChargeFault : ENUM8 {
+  enum BatApprovedChemistryEnum : ENUM16 {
+    kUnspecified = 0;
+    kAlkaline = 1;
+    kLithiumCarbonFluoride = 2;
+    kLithiumChromiumOxide = 3;
+    kLithiumCopperOxide = 4;
+    kLithiumIronDisulfide = 5;
+    kLithiumManganeseDioxide = 6;
+    kLithiumThionylChloride = 7;
+    kMagnesium = 8;
+    kMercuryOxide = 9;
+    kNickelOxyhydride = 10;
+    kSilverOxide = 11;
+    kZincAir = 12;
+    kZincCarbon = 13;
+    kZincChloride = 14;
+    kZincManganeseDioxide = 15;
+    kLeadAcid = 16;
+    kLithiumCobaltOxide = 17;
+    kLithiumIon = 18;
+    kLithiumIonPolymer = 19;
+    kLithiumIronPhosphate = 20;
+    kLithiumSulfur = 21;
+    kLithiumTitanate = 22;
+    kNickelCadmium = 23;
+    kNickelHydrogen = 24;
+    kNickelIron = 25;
+    kNickelMetalHydride = 26;
+    kNickelZinc = 27;
+    kSilverZinc = 28;
+    kSodiumIon = 29;
+    kSodiumSulfur = 30;
+    kZincBromide = 31;
+    kZincCerium = 32;
+  }
+
+  enum BatChargeFaultEnum : ENUM8 {
     kUnspecified = 0;
     kAmbientTooHot = 1;
     kAmbientTooCold = 2;
@@ -928,46 +964,130 @@ server cluster PowerSource = 47 {
     kSafetyTimeout = 10;
   }
 
-  enum BatChargeLevel : ENUM8 {
+  enum BatChargeLevelEnum : ENUM8 {
     kOk = 0;
     kWarning = 1;
     kCritical = 2;
   }
 
-  enum BatChargeState : ENUM8 {
+  enum BatChargeStateEnum : ENUM8 {
     kUnknown = 0;
     kIsCharging = 1;
     kIsAtFullCharge = 2;
     kIsNotCharging = 3;
   }
 
-  enum BatFault : ENUM8 {
-    kUnspecfied = 0;
+  enum BatCommonDesignationEnum : ENUM16 {
+    kUnspecified = 0;
+    kAaa = 1;
+    kAa = 2;
+    kC = 3;
+    kD = 4;
+    k4v5 = 5;
+    k6v0 = 6;
+    k9v0 = 7;
+    k12aa = 8;
+    kAaaa = 9;
+    kA = 10;
+    kB = 11;
+    kF = 12;
+    kN = 13;
+    kNo6 = 14;
+    kSubC = 15;
+    kA23 = 16;
+    kA27 = 17;
+    kBa5800 = 18;
+    kDuplex = 19;
+    k4sr44 = 20;
+    k523 = 21;
+    k531 = 22;
+    k15v0 = 23;
+    k22v5 = 24;
+    k30v0 = 25;
+    k45v0 = 26;
+    k67v5 = 27;
+    kJ = 28;
+    kCr123a = 29;
+    kCr2 = 30;
+    k2cr5 = 31;
+    kCrP2 = 32;
+    kCrV3 = 33;
+    kSr41 = 34;
+    kSr43 = 35;
+    kSr44 = 36;
+    kSr45 = 37;
+    kSr48 = 38;
+    kSr54 = 39;
+    kSr55 = 40;
+    kSr57 = 41;
+    kSr58 = 42;
+    kSr59 = 43;
+    kSr60 = 44;
+    kSr63 = 45;
+    kSr64 = 46;
+    kSr65 = 47;
+    kSr66 = 48;
+    kSr67 = 49;
+    kSr68 = 50;
+    kSr69 = 51;
+    kSr516 = 52;
+    kSr731 = 53;
+    kSr712 = 54;
+    kLr932 = 55;
+    kA5 = 56;
+    kA10 = 57;
+    kA13 = 58;
+    kA312 = 59;
+    kA675 = 60;
+    kAc41e = 61;
+    k10180 = 62;
+    k10280 = 63;
+    k10440 = 64;
+    k14250 = 65;
+    k14430 = 66;
+    k14500 = 67;
+    k14650 = 68;
+    k15270 = 69;
+    k16340 = 70;
+    kRcr123a = 71;
+    k17500 = 72;
+    k17670 = 73;
+    k18350 = 74;
+    k18500 = 75;
+    k18650 = 76;
+    k19670 = 77;
+    k25500 = 78;
+    k26650 = 79;
+    k32600 = 80;
+  }
+
+  enum BatFaultEnum : ENUM8 {
+    kUnspecified = 0;
     kOverTemp = 1;
     kUnderTemp = 2;
   }
 
-  enum BatReplaceability : ENUM8 {
+  enum BatReplaceabilityEnum : ENUM8 {
     kUnspecified = 0;
     kNotReplaceable = 1;
     kUserReplaceable = 2;
     kFactoryReplaceable = 3;
   }
 
-  enum PowerSourceStatus : ENUM8 {
+  enum PowerSourceStatusEnum : ENUM8 {
     kUnspecified = 0;
     kActive = 1;
     kStandby = 2;
     kUnavailable = 3;
   }
 
-  enum WiredCurrentType : ENUM8 {
+  enum WiredCurrentTypeEnum : ENUM8 {
     kAc = 0;
     kDc = 1;
   }
 
-  enum WiredFault : ENUM8 {
-    kUnspecfied = 0;
+  enum WiredFaultEnum : ENUM8 {
+    kUnspecified = 0;
     kOverVoltage = 1;
     kUnderVoltage = 2;
   }
@@ -980,26 +1100,26 @@ server cluster PowerSource = 47 {
   }
 
   info event WiredFaultChange = 0 {
-    WiredFault current[] = 0;
-    WiredFault previous[] = 1;
+    WiredFaultEnum current[] = 0;
+    WiredFaultEnum previous[] = 1;
   }
 
   info event BatFaultChange = 1 {
-    BatFault current[] = 0;
-    BatFault previous[] = 1;
+    BatFaultEnum current[] = 0;
+    BatFaultEnum previous[] = 1;
   }
 
   info event BatChargeFaultChange = 2 {
-    BatChargeFault current[] = 0;
-    BatChargeFault previous[] = 1;
+    BatChargeFaultEnum current[] = 0;
+    BatChargeFaultEnum previous[] = 1;
   }
 
-  readonly attribute PowerSourceStatus status = 0;
+  readonly attribute PowerSourceStatusEnum status = 0;
   readonly attribute int8u order = 1;
   readonly attribute char_string<60> description = 2;
-  readonly attribute BatChargeLevel batChargeLevel = 14;
+  readonly attribute BatChargeLevelEnum batChargeLevel = 14;
   readonly attribute boolean batReplacementNeeded = 15;
-  readonly attribute BatReplaceability batReplaceability = 16;
+  readonly attribute BatReplaceabilityEnum batReplaceability = 16;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
