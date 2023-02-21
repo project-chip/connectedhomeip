@@ -36,6 +36,7 @@
 #include <lib/core/TLVCircularBuffer.h>
 #include <lib/support/CHIPCounter.h>
 #include <messaging/ExchangeMgr.h>
+#include <system/SystemClock.h>
 
 #define CHIP_CONFIG_EVENT_GLOBAL_PRIORITY PriorityLevel::Debug
 
@@ -194,10 +195,15 @@ public:
      *
      * @param[in] apEventNumberCounter   A counter to use for event numbers.
      *
+     * @param[in] aMonotonicStartupTime  Time we should consider as "monotonic
+     *                                   time 0" for cases when we use
+     *                                   system-time event timestamps.
+     *
      */
     void Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
               const LogStorageResources * const apLogStorageResources,
-              MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter);
+              MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
+              System::Clock::Milliseconds64 aMonotonicStartupTime);
 
     static EventManagement & GetInstance();
 
@@ -221,12 +227,17 @@ public:
      *
      * @param[in] apEventNumberCounter   A counter to use for event numbers.
      *
+     * @param[in] aMonotonicStartupTime  Time we should consider as "monotonic
+     *                                   time 0" for cases when we use
+     *                                   system-time event timestamps.
+     *
      * @note This function must be called prior to the logging being used.
      */
-    static void CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
-                                      CircularEventBuffer * apCircularEventBuffer,
-                                      const LogStorageResources * const apLogStorageResources,
-                                      MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter);
+    static void
+    CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
+                          CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources,
+                          MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
+                          System::Clock::Milliseconds64 aMonotonicStartupTime = System::SystemClock().GetMonotonicMilliseconds64());
 
     static void DestroyEventManagement();
 
@@ -362,11 +373,7 @@ private:
 
         int mFieldsToRead = 0;
         /* PriorityLevel and DeltaTime are there if that is not first event when putting events in report*/
-#if CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS & CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
-        Timestamp mCurrentTime = Timestamp::System(System::Clock::kZero);
-#else
-        Timestamp mCurrentTime = Timestamp::Epoch(System::Clock::kZero);
-#endif
+        Timestamp mCurrentTime   = Timestamp::System(System::Clock::kZero);
         PriorityLevel mPriority  = PriorityLevel::First;
         ClusterId mClusterId     = 0;
         EndpointId mEndpointId   = 0;
@@ -513,6 +520,8 @@ private:
 
     EventNumber mLastEventNumber = 0; ///< Last event Number vended
     Timestamp mLastEventTimestamp;    ///< The timestamp of the last event in this buffer
+
+    System::Clock::Milliseconds64 mMonotonicStartupTime;
 };
 } // namespace app
 } // namespace chip
