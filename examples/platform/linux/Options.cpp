@@ -41,22 +41,22 @@ LinuxDeviceOptions gDeviceOptions;
 // Follow the code style of command line arguments in case we need to add more options in the future.
 enum
 {
-    kDeviceOption_BleDevice                             = 0x1000,
-    kDeviceOption_WiFi                                  = 0x1001,
-    kDeviceOption_Thread                                = 0x1002,
-    kDeviceOption_Version                               = 0x1003,
-    kDeviceOption_VendorID                              = 0x1004,
-    kDeviceOption_ProductID                             = 0x1005,
-    kDeviceOption_CustomFlow                            = 0x1006,
-    kDeviceOption_Capabilities                          = 0x1007,
-    kDeviceOption_Discriminator                         = 0x1008,
-    kDeviceOption_Passcode                              = 0x1009,
+    kDeviceOption_BleDevice     = 0x1000,
+    kDeviceOption_WiFi          = 0x1001,
+    kDeviceOption_Thread        = 0x1002,
+    kDeviceOption_Version       = 0x1003,
+    kDeviceOption_VendorID      = 0x1004,
+    kDeviceOption_ProductID     = 0x1005,
+    kDeviceOption_CustomFlow    = 0x1006,
+    kDeviceOption_Capabilities  = 0x1007,
+    kDeviceOption_Discriminator = 0x1008,
+    kDeviceOption_Passcode      = 0x1009,
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
-    kDeviceOption_SecuredDevicePort                     = 0x100a,
-    kDeviceOption_UnsecuredCommissionerPort             = 0x100b,
+    kDeviceOption_SecuredDevicePort         = 0x100a,
+    kDeviceOption_UnsecuredCommissionerPort = 0x100b,
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
-    kDeviceOption_SecuredCommissionerPort               = 0x100c,
+    kDeviceOption_SecuredCommissionerPort = 0x100c,
 #endif
     kDeviceOption_Command                               = 0x100d,
     kDeviceOption_PICS                                  = 0x100e,
