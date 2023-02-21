@@ -238,8 +238,9 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  *                    passed to the completion, so values will only be passed in
  *                    when the write succeeds.  In that case, values will have
  *                    the format documented in the definition of
- *                    MTRDeviceResponseHandler and just contain a single entry
- *                    with the path of the attribute that was written.
+ *                    MTRDeviceResponseHandler and will be an array with a single element
+ *                    which is a dictionary that has a MTRAttributePathKey entry in it, whose value
+ *                    is the attribute path that was successfully written to.
  */
 - (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID

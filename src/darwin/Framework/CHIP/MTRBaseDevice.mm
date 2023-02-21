@@ -955,8 +955,7 @@ private:
             // Controller::WriteAttribute guarantees that there will be exactly one call to either the success callback or the
             // failure callback, for a non-group session.
             auto onSuccessCb = [successCb, bridge](const app::ConcreteAttributePath & attribPath) {
-                auto resultArray = [[NSMutableArray alloc] init];
-                [resultArray addObject:@ { MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath] }];
+                auto resultArray = @[ @ { MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath] } ];
                 successCb(bridge, resultArray);
             };
 
