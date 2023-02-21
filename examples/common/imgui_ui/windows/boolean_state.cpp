@@ -31,6 +31,8 @@ void BooleanState::UpdateState()
 {
     if (mTargetState.HasValue())
     {
+        // TODO: if src/app/clusters/boolean-state exists, we should use its
+        //       mutation API.
         chip::app::Clusters::BooleanState::Attributes::StateValue::Set(mEndpointId, mTargetState.Value());
         mTargetState.ClearValue();
     }
