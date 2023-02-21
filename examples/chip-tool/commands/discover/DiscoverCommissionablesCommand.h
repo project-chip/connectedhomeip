@@ -25,13 +25,19 @@ class DiscoverCommissionablesCommandBase : public CHIPCommand, public chip::Cont
 public:
     DiscoverCommissionablesCommandBase(const char * name, CredentialIssuerCommands * credsIssuerConfig) :
         CHIPCommand(name, credsIssuerConfig)
-    {}
+    {
+        AddArgument("discover-once", 0, 1, &mDiscoverOnce,
+                    "Boolean indicating whether to stop discovery after the first result. Defaults to true.");
+    }
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
     /////////// CHIPCommand Interface /////////
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(30); }
+
+private:
+    chip::Optional<bool> mDiscoverOnce;
 };
 
 class DiscoverCommissionablesCommand : public DiscoverCommissionablesCommandBase
