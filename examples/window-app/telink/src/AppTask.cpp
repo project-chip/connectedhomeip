@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,15 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-// TODO
-/*
- - [DONE] find a way to ToggleMoveType with timer (as in FactoryResetHandler) instead of simultaneous two button push
- - [DONE] ZclCallbacks
- - [DONE] Update README
- - configure sCloseButton with a proper pins
- - [DONE]update GitHub CI
-*/
 
 #include "AppTask.h"
 
@@ -81,7 +72,7 @@ using namespace ::chip::DeviceLayer;
 
 namespace {
 constexpr int kFactoryResetCalcTimeout          = 3000;
-constexpr int kToggleMoveTypeTriggerTimeout     = 1500;
+constexpr int kToggleMoveTypeTriggerTimeout     = 700;
 constexpr int kFactoryResetTriggerCntr          = 3;
 constexpr int kAppEventQueueSize                = 10;
 constexpr uint8_t kButtonPushEvent              = 1;
@@ -117,7 +108,6 @@ LEDWidget sIdentifyLED;
 #endif
 
 Button sFactoryResetButton;
-Button sThreadStartButton;
 Button sBleAdvStartButton;
 Button sOpenButton;
 Button sCloseButton;
@@ -229,7 +219,7 @@ CHIP_ERROR AppTask::Init(void)
     // between the main and the CHIP threads.
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
-    err = ConnectivityMgr().SetBLEDeviceName("Telink Window");
+    err = ConnectivityMgr().SetBLEDeviceName("Telink Window Covering");
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("SetBLEDeviceName fail");
@@ -364,32 +354,6 @@ void AppTask::FactoryResetHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::StartThreadButtonEventHandler(void)
-{
-    AppEvent event;
-
-    event.Type               = AppEvent::kEventType_Button;
-    event.ButtonEvent.Action = kButtonPushEvent;
-    event.Handler            = StartThreadHandler;
-    sAppTask.PostEvent(&event);
-}
-
-void AppTask::StartThreadHandler(AppEvent * aEvent)
-{
-    LOG_INF("StartThreadHandler");
-    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
-    {
-        // Switch context from BLE to Thread
-        Internal::BLEManagerImpl sInstance;
-        sInstance.SwitchToIeee802154();
-        StartDefaultThreadNetwork();
-    }
-    else
-    {
-        LOG_INF("Device already commissioned");
-    }
-}
-
 void AppTask::StartBleAdvButtonEventHandler(void)
 {
     AppEvent event;
@@ -486,7 +450,6 @@ void AppTask::ToggleMoveType()
         WindowCovering::Instance().SetMoveType(WindowCovering::MoveType::LIFT);
         LOG_INF("Window covering move: lift");
     }
-    mMoveTypeRecentlyChanged = true;
 }
 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
@@ -651,21 +614,18 @@ void AppTask::InitButtons(void)
 {
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
     sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_1, FactoryResetButtonEventHandler);
-    // sOpenButton.Configure(BUTTON_PORT, BUTTON_PIN_X, BUTTON_PIN_X, OpenActionAndToggleMoveTypeButtonEventHandler);
-    // sCloseButton.Configure(BUTTON_PORT, BUTTON_PIN_X, BUTTON_PIN_X, CloseActionButtonEventHandler);
-    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, StartThreadButtonEventHandler);
+    sOpenButton.Configure(BUTTON_PORT, BUTTON_PIN_2, OpenActionAndToggleMoveTypeButtonEventHandler);
+    sCloseButton.Configure(BUTTON_PORT, BUTTON_PIN_3, CloseActionButtonEventHandler);
     sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, StartBleAdvButtonEventHandler);
 #else
     sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
     sOpenButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, OpenActionAndToggleMoveTypeButtonEventHandler);
-    sCloseButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, CloseActionButtonEventHandler);
-    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
-    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_4 /*to revert: 4->2*/, StartBleAdvButtonEventHandler);
+    sCloseButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, CloseActionButtonEventHandler);
+    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, StartBleAdvButtonEventHandler);
 #endif
 
     ButtonManagerInst().AddButton(sFactoryResetButton);
     ButtonManagerInst().AddButton(sOpenButton);
     ButtonManagerInst().AddButton(sCloseButton);
-    ButtonManagerInst().AddButton(sThreadStartButton);
     ButtonManagerInst().AddButton(sBleAdvStartButton);
 }

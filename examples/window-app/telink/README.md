@@ -62,11 +62,15 @@ The following buttons are available on **tlsr9518adk80d** board:
 | :------- | :-------------------------------- | :------------------------------------------------------------------------------------------------------------------- |
 | Button 1 | Factory reset                     | Triple press performs factory reset to forget currently commissioned Thread network and back to uncommissioned state |
 | Button 2 | Open and Toggle Move Type control | Manually triggers the Open state by one press and double press triggers the Lift-Tilt move type                      |
-| Button 3 | Thread start                      | Commission thread with static credentials and enables the Thread on device                                           |
-| Button 4 | Open commission window            | The button is opening commissioning window to perform commissioning over BLE                                         |
-| Button 5 | Close control                     | Manually triggers the Close state by one press                                                                       |
+| Button 3 | Open commission window            | The button is opening commissioning window to perform commissioning over BLE                                         |
+| Button 4 | Close control                     | Manually triggers the Close state by one press                                                                       |
 
 ### LEDs
+
+#### Indicate open-close position of Window Cover
+
+**Blue** LED indicates current Lift position (PWM in range of 0-254). To
+indicate the Tilt state in the same way connect external LED to pin PE0.
 
 #### Indicate current state of Thread network
 

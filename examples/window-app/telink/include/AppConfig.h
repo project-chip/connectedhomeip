@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +32,9 @@
 #define LEDS_PORT DEVICE_DT_GET(DT_NODELABEL(gpiob))
 #define SYSTEM_STATE_LED 7
 #define LIFT_STATE_LED 6
-#define TILT_STATE_LED 5 // NOTE: configured as PWM
 
 #define LIGHTING_PWM_SPEC_IDENTIFY_GREEN PWM_DT_SPEC_GET(DT_ALIAS(pwm_led3))
+#define LIGHTING_PWM_SPEC_RGB_BLUE PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0))
+
+// NOTE: pwm_led1 by default DTS is used by PE0, so get an external LED connected to that pin
+#define LIGHTING_PWM_SPEC_RGB_GREEN PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1))

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,14 +48,6 @@ public:
     void PostEvent(AppEvent * aEvent);
     void UpdateClusterState(void);
 
-    enum ButtonId_t
-    {
-        kButtonId_LightingAction = 1,
-        kButtonId_FactoryReset,
-        kButtonId_StartThread,
-        kButtonId_StartBleAdv
-    } ButtonId;
-
     static void IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect);
 
 private:
@@ -80,7 +72,6 @@ private:
     static void OpenActionAndToggleMoveTypeButtonEventHandler(void);
     static void CloseActionButtonEventHandler(void);
     static void FactoryResetButtonEventHandler(void);
-    static void StartThreadButtonEventHandler(void);
     static void StartBleAdvButtonEventHandler(void);
 
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
@@ -92,29 +83,21 @@ private:
 
     static void FactoryResetTimerEventHandler(AppEvent * aEvent);
     static void FactoryResetHandler(AppEvent * aEvent);
-    static void StartThreadHandler(AppEvent * aEvent);
     static void LightingActionEventHandler(AppEvent * aEvent);
     static void StartBleAdvHandler(AppEvent * aEvent);
     static void UpdateIdentifyStateEventHandler(AppEvent * aEvent);
 
-    static void MovementTimerEventHandler(const AppEvent & event);
     static void OpenHandler(AppEvent * aEvent);
     static void CloseHandler(AppEvent * aEvent);
-    void ToggleMoveType();
+    static void ToggleMoveType();
 
     static void InitButtons(void);
-
-    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     static AppTask sAppTask;
     PWMDevice mPwmIdentifyLed;
 
     OperationalState mMoveType{ OperationalState::MovingUpOrOpen };
-    bool mFunctionTimerActive{ false };
-    bool mMovementTimerActive{ false };
-    bool mOpenButtonIsPressed{ false };
-    bool mCloseButtonIsPressed{ false };
-    bool mMoveTypeRecentlyChanged{ false };
+
 #if CONFIG_CHIP_FACTORY_DATA
     chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::ExternalFlashFactoryData> mFactoryDataProvider;
 #endif

@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,24 +31,25 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters::WindowCovering;
 
-static const struct pwm_dt_spec sLiftPwmDevice = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0));
-static const struct pwm_dt_spec sTiltPwmDevice = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1));
+static const struct pwm_dt_spec sLiftPwmDevice = LIGHTING_PWM_SPEC_RGB_BLUE;
+static const struct pwm_dt_spec sTiltPwmDevice = LIGHTING_PWM_SPEC_RGB_GREEN;
 
 static constexpr uint32_t sMoveTimeoutMs{ 200 };
+constexpr uint8_t kDefaultMinLevel = 0;
+constexpr uint8_t kDefaultMaxLevel = 254;
 
 WindowCovering::WindowCovering()
 {
-    mLiftLED.Init(LIFT_STATE_LED);
-    mTiltLED.Init(TILT_STATE_LED);
-
-    if (mLiftIndicator.Init(&sLiftPwmDevice, 0, 255) != CHIP_NO_ERROR)
+    if (mLiftIndicator.Init(&sLiftPwmDevice, kDefaultMinLevel, kDefaultMaxLevel, kDefaultMinLevel) != CHIP_NO_ERROR)
     {
         LOG_ERR("Cannot initialize the lift indicator");
     }
-    if (mTiltIndicator.Init(&sTiltPwmDevice, 0, 255) != CHIP_NO_ERROR)
+    if (mTiltIndicator.Init(&sTiltPwmDevice, kDefaultMinLevel, kDefaultMaxLevel, kDefaultMinLevel) != CHIP_NO_ERROR)
     {
         LOG_ERR("Cannot initialize the tilt indicator");
     }
+    mLiftIndicator.InitiateAction(PWMDevice::ON_ACTION, 0, nullptr);
+    mTiltIndicator.InitiateAction(PWMDevice::ON_ACTION, 0, nullptr);
 }
 
 void WindowCovering::DriveCurrentLiftPosition(intptr_t)

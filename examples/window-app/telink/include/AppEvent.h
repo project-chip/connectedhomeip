@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,14 +30,10 @@ struct AppEvent
     enum AppEventTypes
     {
         kEventType_Button = 0,
-        kEventType_ButtonPushed,
-        kEventType_ButtonReleased,
         kEventType_Timer,
         kEventType_UpdateLedState,
         kEventType_IdentifyStart,
         kEventType_IdentifyStop,
-        kEventType_Lighting,
-        kEventType_Install,
     };
 
     uint16_t Type;
@@ -53,11 +49,6 @@ struct AppEvent
         {
             void * Context;
         } TimerEvent;
-        struct
-        {
-            uint8_t Action;
-            int32_t Actor;
-        } LightingEvent;
         struct
         {
             LEDWidget * LedWidget;
