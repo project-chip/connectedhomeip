@@ -74,12 +74,12 @@ class CHIPVirtualHome:
         if save_logs:
             try:
                 self.save_device_logs()
-            except:
+            except Exception:
                 test_ret = TestResult.SYSTEM_FAILURE
                 traceback.print_exc(file=sys.stderr)
         try:
             self.destroy_home()
-        except:
+        except requests.exceptions.RequestException:
             test_ret = TestResult.SYSTEM_FAILURE
             traceback.print_exc(file=sys.stderr)
         return test_ret

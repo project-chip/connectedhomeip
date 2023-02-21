@@ -661,7 +661,7 @@ class DeviceMgrCmd(Cmd):
             self.devCtrl.CloseSession(args.nodeid)
         except exceptions.ChipStackException as ex:
             print(str(ex))
-        except:
+        except Exception:
             self.do_help("close-session")
 
     def do_resolve(self, line):
@@ -782,7 +782,7 @@ class DeviceMgrCmd(Cmd):
             print('exception')
             print(str(ex))
             return
-        except:
+        except Exception:
             self.do_help("discover")
             return
 
@@ -1021,7 +1021,7 @@ class DeviceMgrCmd(Cmd):
         except exceptions.ChipStackException as ex:
             print(str(ex))
             return
-        except:
+        except Exception:
             self.do_help("open-commissioning-window")
             return
 
@@ -1146,7 +1146,7 @@ def main():
         else:
             try:
                 adapterId = int(options.bluetoothAdapter[3:])
-            except:
+            except ValueError:
                 print(
                     "Invalid bluetooth adapter: {}, adapter name looks like hci0, hci1 etc.")
                 sys.exit(-1)

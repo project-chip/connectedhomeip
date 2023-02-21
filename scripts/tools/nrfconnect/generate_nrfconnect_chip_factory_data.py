@@ -338,7 +338,7 @@ class FactoryDataGenerator:
             try:
                 if is_json_valid:
                     json_file.write(json_object)
-            except IOError as e:
+            except IOError:
                 log.error("Cannot save output file into directory: {}".format(self._args.output))
 
     def _add_entry(self, name: str, value: any):
@@ -372,7 +372,7 @@ class FactoryDataGenerator:
                 schema = json.loads(schema_file.read())
                 validator = jsonschema.Draft202012Validator(schema=schema)
                 validator.validate(instance=json.loads(output_json))
-        except IOError as e:
+        except IOError:
             log.error("Provided JSON schema file is wrong: {}".format(self._args.schema))
             return False
         else:

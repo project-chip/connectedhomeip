@@ -212,7 +212,7 @@ class FactoryDataWriter:
                     inputImage = self.BASE_MG24_FILE
                 else:
                     raise Exception('Invalid MCU')
-            except:
+            except Exception:
                 isDeviceConnected = False
                 print("Device not connected")
                 # When no device is connected user needs to provide the mcu family for which those credentials are to be created

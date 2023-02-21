@@ -20,7 +20,7 @@ from typing import List, Optional, Union
 try:
     from matter_idl.matter_idl_types import *
     from matter_idl.zapxml import ParseSource, ParseXmls
-except:
+except ImportError:
     import os
     import sys
 

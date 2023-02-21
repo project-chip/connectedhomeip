@@ -360,7 +360,7 @@ class BaseTestHelper:
             self.logger.error(
                 'Incorrectly succeeded in opening basic commissioning window')
             return False
-        except Exception as ex:
+        except Exception:
             pass
 
         # TODO: pipe through the commissioning window opener so we can test enhanced properly. The pake verifier is just garbage because none of of the functions to calculate
@@ -379,7 +379,7 @@ class BaseTestHelper:
             self.logger.error(
                 'Incorrectly succeeded in opening enhanced commissioning window')
             return False
-        except Exception as ex:
+        except Exception:
             pass
 
         self.logger.info("Disarming failsafe on CASE connection")
@@ -395,7 +395,7 @@ class BaseTestHelper:
         try:
             res = asyncio.run(self.devCtrl.SendCommand(
                 nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(180), timedRequestTimeoutMs=10000))
-        except Exception as ex:
+        except Exception:
             self.logger.error(
                 'Failed to open commissioning window after disarming failsafe')
             return False

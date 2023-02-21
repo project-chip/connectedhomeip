@@ -113,7 +113,7 @@ def controller(vendor_id, fabric_id, node_id):
     except exceptions.ChipStackException as ex:
         log.error("Controller initialization failed {}".format(ex))
         return None
-    except:
+    except Exception:
         log.error("Controller initialization failed")
         return None
 

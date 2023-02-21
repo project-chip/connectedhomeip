@@ -187,7 +187,7 @@ def extractGeneratedIdl(output_dir, zap_config_path):
     if not target_path.endswith(".matter"):
         # We expect "something.zap" and don't handle corner cases of
         # multiple extensions. This is to work with existing codebase only
-        raise Error("Unexpected input zap file  %s" % self.zap_config)
+        raise Exception("Unexpected input zap file  %s" % zap_config_path)
 
     shutil.move(idl_path, target_path)
 

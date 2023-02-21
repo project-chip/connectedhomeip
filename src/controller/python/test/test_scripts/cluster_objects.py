@@ -104,7 +104,7 @@ class ClusterObjectTests:
         req = Clusters.OnOff.Commands.On()
         try:
             await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=233, payload=req)
-            raise ValueError(f"Failure expected")
+            raise ValueError("Failure expected")
         except chip.interaction_model.InteractionModelError as ex:
             logger.info(f"Recevied {ex} from server.")
             return

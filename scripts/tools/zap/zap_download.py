@@ -32,7 +32,7 @@ import requests
 try:
     import coloredlogs
     _has_coloredlogs = True
-except:
+except Exception:
     _has_coloredlogs = False
 
 # Supported log levels, mapping string values required for argument

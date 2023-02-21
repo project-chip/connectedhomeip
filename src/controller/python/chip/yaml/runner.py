@@ -551,7 +551,7 @@ class WriteAttributeAction(BaseAction):
 
         args = test_step.arguments['values']
         if len(args) != 1:
-            raise UnexpectedParsingError(f'WriteAttribute is trying to write multiple values')
+            raise UnexpectedParsingError('WriteAttribute is trying to write multiple values')
         request_data_as_dict = args[0]
         try:
             # TODO this is an ugly hack
@@ -600,12 +600,11 @@ class WaitForReportAction(BaseAction):
         elif test_step.event is not None:
             queue_name = stringcase.pascalcase(test_step.event)
         else:
-            raise UnexpectedParsingError(
-                f'WaitForReport needs to wait on either attribute or event, neither were provided')
+            raise UnexpectedParsingError('WaitForReport needs to wait on either attribute or event, neither were provided')
 
         self._output_queue = context.subscription_callback_result_queue.get(queue_name, None)
         if self._output_queue is None:
-            raise UnexpectedParsingError(f'Could not find output queue')
+            raise UnexpectedParsingError('Could not find output queue')
 
     def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:

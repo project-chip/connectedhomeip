@@ -30,7 +30,7 @@ import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 # ensure matter IDL is availale for import, otherwise set relative paths
 try:
     from matter_idl import matter_idl_types
-except:
+except ImportError:
     SCRIPT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
     import sys
 

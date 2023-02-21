@@ -213,3 +213,10 @@ jobs:
               if: always()
               run: |
                   git grep -n 'emberAfWriteAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/af.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt' ':(exclude)src/app/util/attribute-table.cpp' ':(exclude)examples/common/pigweed/rpc_services/Attributes.h' ':(exclude)src/app/util/attribute-table.h' ':(exclude)src/app/util/ember-compatibility-functions.cpp' && exit 1 || exit 0
+
+            # Run python Linter (flake8) and verify python files
+            - name: Check for errors using flake8 Python linter
+              if: always()
+              ## This large number of arguments is temporary until the patch changes reported by the linter are fully merged (all fixes in PR#25193)
+              run: |
+                  flake8 --extend-ignore=E501,W391,W291,F401,F405,F403,E711,E712,F841,E265,F541,E251,E303,F821,F402,E721,E122,W191,E122,W605,E101,E202,E201,E741,F811,E302,F523,E713

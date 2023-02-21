@@ -240,7 +240,7 @@ class EncodableValue:
             elif t == FundamentalType.DOUBLE:
                 return "Double"
             else:
-                raise Error("Unknown fundamental type")
+                raise Exception("Unknown fundamental type")
         elif type(t) == BasicInteger:
             if t.byte_count >= 4:
                 return "Long"
@@ -277,7 +277,7 @@ class EncodableValue:
             elif t == FundamentalType.DOUBLE:
                 return "Ljava/lang/Double;"
             else:
-                raise Error("Unknown fundamental type")
+                raise Exception("Unknown fundamental type")
         elif type(t) == BasicInteger:
             if t.byte_count >= 4:
                 return "Ljava/lang/Long;"

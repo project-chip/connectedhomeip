@@ -142,7 +142,7 @@ class _PendingDiscoveries:
                     if self.NeedsCallback(item):
                         try:
                             item.callback(item.result)
-                        except:
+                        except Exception:
                             logging.exception("Node discovery callback failed")
                     else:
                         updatedDiscoveries.append(item)

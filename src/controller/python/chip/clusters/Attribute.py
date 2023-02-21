@@ -653,7 +653,7 @@ class AsyncReadTransaction:
             imStatus = status
             try:
                 imStatus = chip.interaction_model.Status(status)
-            except:
+            except chip.exceptions.ChipStackException:
                 pass
 
             if (imStatus != chip.interaction_model.Status.Success):
@@ -797,7 +797,7 @@ class AsyncWriteTransaction:
         try:
             imStatus = chip.interaction_model.Status(status)
             self._resultData.append(AttributeWriteResult(Path=path, Status=imStatus))
-        except:
+        except chip.exceptions.ChipStackException:
             self._resultData.append(AttributeWriteResult(Path=path, Status=status))
 
     def handleError(self, chipError: PyChipError):
@@ -991,17 +991,17 @@ def Read(future: Future, eventLoop, device, devCtrl, attributes: List[AttributeP
                 filter.EndpointId = f.EndpointId
             else:
                 raise ValueError(
-                    f"DataVersionFilter must provide EndpointId.")
+                    "DataVersionFilter must provide EndpointId.")
             if f.ClusterId is not None:
                 filter.ClusterId = f.ClusterId
             else:
                 raise ValueError(
-                    f"DataVersionFilter must provide ClusterId.")
+                    "DataVersionFilter must provide ClusterId.")
             if f.DataVersion is not None:
                 filter.DataVersion = f.DataVersion
             else:
                 raise ValueError(
-                    f"DataVersionFilter must provide DataVersion.")
+                    "DataVersionFilter must provide DataVersion.")
             filter = chip.interaction_model.DataVersionFilterIBstruct.build(
                 filter)
             readargs.append(ctypes.c_char_p(filter))

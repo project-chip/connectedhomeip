@@ -1201,7 +1201,7 @@ class ChipDeviceController():
         try:
             req = eval(
                 f"GeneratedObjects.{cluster}.Commands.{command}")(**args)
-        except:
+        except SyntaxError:
             raise UnknownCommand(cluster, command)
         try:
             res = asyncio.run(self.SendCommand(nodeid, endpoint, req))
@@ -1213,13 +1213,12 @@ class ChipDeviceController():
     def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid, blocking=True):
         self.CheckIsActive()
 
-        req = None
         clusterType = eval(f"GeneratedObjects.{cluster}")
 
         try:
             attributeType = eval(
                 f"GeneratedObjects.{cluster}.Attributes.{attribute}")
-        except:
+        except SyntaxError:
             raise UnknownAttribute(cluster, attribute)
 
         result = asyncio.run(self.ReadAttribute(
@@ -1233,7 +1232,7 @@ class ChipDeviceController():
         try:
             req = eval(
                 f"GeneratedObjects.{cluster}.Attributes.{attribute}")(value)
-        except:
+        except SyntaxError:
             raise UnknownAttribute(cluster, attribute)
 
         return asyncio.run(self.WriteAttribute(nodeid, [(endpoint, req, dataVersion)]))
@@ -1244,7 +1243,7 @@ class ChipDeviceController():
         req = None
         try:
             req = eval(f"GeneratedObjects.{cluster}.Attributes.{attribute}")
-        except:
+        except SyntaxError:
             raise UnknownAttribute(cluster, attribute)
         return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], None, False, reportInterval=(minInterval, maxInterval)))
 

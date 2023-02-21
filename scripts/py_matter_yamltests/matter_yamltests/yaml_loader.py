@@ -22,7 +22,7 @@ from .fixes import add_yaml_support_for_scientific_notation_without_dot
 
 try:
     from yaml import CSafeLoader as SafeLoader
-except:
+except ImportError:
     from yaml import SafeLoader
 
 import yaml

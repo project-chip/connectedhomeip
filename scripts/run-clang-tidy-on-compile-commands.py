@@ -168,7 +168,7 @@ class ClangTidyEntry:
                         "Tidy %s ended with code %d", self.file, proc.returncode
                     )
                 return TidyResult(self.full_path, False)
-        except:
+        except subprocess.SubprocessError:
             traceback.print_exc()
             return TidyResult(self.full_path, False)
 

@@ -116,7 +116,7 @@ class GeneratorTest:
 
                     try:
                         subprocess.check_call(["diff", actual, expected])
-                    except:
+                    except subprocess.CalledProcessError:
                         if self.context.regenerate_golden:
                             print(
                                 f"Copying updated golden image from {actual} to {expected}")

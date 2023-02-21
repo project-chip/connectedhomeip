@@ -136,7 +136,7 @@ class NetworkCommissioningTests:
         res = await self.readLastNetworkingStateAttributes(endpointId=endpointId)
         if (res.lastNetworkID != NullValue) or (res.lastNetworkingStatus != NullValue) or (res.lastConnectErrorValue != NullValue):
             raise AssertionError(
-                f"LastNetworkID, LastNetworkingStatus and LastConnectErrorValue should be Null")
+                "LastNetworkID, LastNetworkingStatus and LastConnectErrorValue should be Null")
 
         # Scan networks
         logger.info(f"Scan networks")
@@ -227,14 +227,15 @@ class NetworkCommissioningTests:
                 f"Unexpected result: first network ID should be 'TestSSID' got {networkList[0].networkID}")
         if not networkList[0].connected:
             raise AssertionError(
-                f"Unexpected result: network is not marked as connected")
+                "Unexpected result: network is not marked as connected")
 
         # Verify Last* attributes
         logger.info(f"Read Last* attributes")
         res = await self.readLastNetworkingStateAttributes(endpointId=endpointId)
         if (res.lastNetworkID == NullValue) or (res.lastNetworkingStatus == NullValue) or (res.lastConnectErrorValue != NullValue):
             raise AssertionError(
-                f"LastNetworkID, LastNetworkingStatus should not be Null, LastConnectErrorValue should be Null for a successful network provision.")
+                "LastNetworkID, LastNetworkingStatus should not be Null, "
+                "LastConnectErrorValue should be Null for a successful network provision.")
 
     async def test_thread(self, endpointId):
         logger.info(f"Get basic information of the endpoint")
@@ -257,13 +258,13 @@ class NetworkCommissioningTests:
                 Clusters.NetworkCommissioning.Commands.RemoveNetwork.command_id,
                 Clusters.NetworkCommissioning.Commands.ConnectNetwork.command_id,
                 Clusters.NetworkCommissioning.Commands.ReorderNetwork.command_id]:
-            raise AssertionError(f"Unexpected accepted command list for Thread interface")
+            raise AssertionError("Unexpected accepted command list for Thread interface")
 
         if res[endpointId][Clusters.NetworkCommissioning].generatedCommandList != [
                 Clusters.NetworkCommissioning.Commands.ScanNetworksResponse.command_id,
                 Clusters.NetworkCommissioning.Commands.NetworkConfigResponse.command_id,
                 Clusters.NetworkCommissioning.Commands.ConnectNetworkResponse.command_id]:
-            raise AssertionError(f"Unexpected generated command list for Thread interface")
+            raise AssertionError("Unexpected generated command list for Thread interface")
 
         logger.info(f"Finished getting basic information of the endpoint")
 
@@ -272,7 +273,7 @@ class NetworkCommissioningTests:
         res = await self.readLastNetworkingStateAttributes(endpointId=endpointId)
         if (res.lastNetworkID != NullValue) or (res.lastNetworkingStatus != NullValue) or (res.lastConnectErrorValue != NullValue):
             raise AssertionError(
-                f"LastNetworkID, LastNetworkingStatus and LastConnectErrorValue should be Null")
+                "LastNetworkID, LastNetworkingStatus and LastConnectErrorValue should be Null")
 
         # Scan networks
         logger.info(f"Scan networks")
@@ -398,5 +399,5 @@ class NetworkCommissioningTests:
         try:
             await self.Test()
             return True
-        except Exception as ex:
+        except Exception:
             return False

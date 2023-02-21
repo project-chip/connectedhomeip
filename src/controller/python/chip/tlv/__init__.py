@@ -649,7 +649,7 @@ class TLVReader(object):
             )
             try:
                 decoding["value"] = str(val, "utf-8")
-            except Exception as ex:
+            except Exception:
                 decoding["value"] = val
             self._bytesRead += decoding["strDataLen"]
         elif "Byte String" in decoding["type"]:

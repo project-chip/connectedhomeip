@@ -147,7 +147,7 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
                 print("========== TEST OUTPUT END   ============")
 
             logging.info("Image %s PASSED", path)
-        except:
+        except Exception:
             # make sure output is visible in stdout
             print("========== TEST OUTPUT BEGIN ============")
             print(output)

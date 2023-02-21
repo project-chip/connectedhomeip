@@ -62,7 +62,7 @@ def VoidPtrToUUIDString(ptr, len):
             + ptr[20:]
         )
         ptr = str(ptr)
-    except Exception as ex:
+    except Exception:
         print("ERROR: failed to convert void * to UUID")
         ptr = None
 

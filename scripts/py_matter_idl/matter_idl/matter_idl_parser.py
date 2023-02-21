@@ -9,7 +9,7 @@ from lark.visitors import Transformer, v_args
 
 try:
     from .matter_idl_types import *
-except:
+except ImportError:
     import os
     import sys
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
@@ -91,7 +91,7 @@ class MatterIdlTransformer(Transformer):
         """Numbers in the grammar are integers or hex numbers.
         """
         if len(tokens) != 1:
-            raise Error("Unexpected argument counts")
+            raise Exception("Unexpected argument counts")
 
         n = tokens[0].value
         if n.startswith('0x'):
@@ -117,14 +117,14 @@ class MatterIdlTransformer(Transformer):
         """An id is a string containing an identifier
         """
         if len(tokens) != 1:
-            raise Error("Unexpected argument counts")
+            raise Exception("Unexpected argument counts")
         return tokens[0].value
 
     def type(self, tokens):
         """A type is just a string for the type
         """
         if len(tokens) != 1:
-            raise Error("Unexpected argument counts")
+            raise Exception("Unexpected argument counts")
         return tokens[0].value
 
     def data_type(self, tokens):
@@ -134,7 +134,7 @@ class MatterIdlTransformer(Transformer):
         elif len(tokens) == 2:
             return DataType(name=tokens[0], max_length=tokens[1])
         else:
-            raise Error("Unexpected size for data type")
+            raise Exception("Unexpected size for data type")
 
     @v_args(inline=True)
     def constant_entry(self, id, number):

@@ -52,7 +52,7 @@ def get_ncs_recommended_revision():
     try:
         with open(os.path.join(chip_root, 'config/nrfconnect/.nrfconnect-recommended-revision'), 'r') as f:
             return f.readline().strip()
-    except:
+    except OSError:
         raise RuntimeError(
             "Encountered problem when trying to read .nrfconnect-recommended-revision file.")
 

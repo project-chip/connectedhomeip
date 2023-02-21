@@ -124,7 +124,7 @@ class CertificateAuthority:
                 f"CertificateAuthority object was previously shutdown and is no longer valid!")
 
         if (vendorId is None or fabricId is None):
-            raise ValueError(f"Invalid values for fabricId and vendorId")
+            raise ValueError("Invalid values for fabricId and vendorId")
 
         for existingAdmin in self._activeAdmins:
             if (existingAdmin.fabricId == fabricId):

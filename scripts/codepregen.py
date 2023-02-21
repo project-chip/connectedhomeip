@@ -25,7 +25,7 @@ import click
 
 try:
     from pregenerate import FindPregenerationTargets, TargetFilter
-except:
+except ImportError:
     import os
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
     from pregenerate import FindPregenerationTargets, TargetFilter
@@ -36,7 +36,7 @@ from pregenerate.types import IdlFileType
 try:
     import coloredlogs
     _has_coloredlogs = True
-except:
+except ImportError:
     _has_coloredlogs = False
 
 # Supported log levels, mapping string values required for argument

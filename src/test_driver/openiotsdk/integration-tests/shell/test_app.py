@@ -84,7 +84,7 @@ def test_command_check(device):
     except exceptions.ChipStackException as ex:
         log.error("CHIP initialization failed {}".format(ex))
         assert False
-    except:
+    except Exception:
         log.error("CHIP initialization failed")
         assert False
 

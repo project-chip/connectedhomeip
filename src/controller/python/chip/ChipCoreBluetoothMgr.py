@@ -47,7 +47,7 @@ try:
             u"/System/Library/Frameworks/IOBluetooth.framework/Versions/A/Frameworks/CoreBluetooth.framework"
         ),
     )
-except Exception as ex:
+except Exception:
     objc.loadBundle(
         "CoreBluetooth",
         globals(),
@@ -86,7 +86,7 @@ def _VoidPtrToCBUUID(ptr, len):
             + ptr[20:]
         )
         ptr = CBUUID.UUIDWithString_(ptr)
-    except Exception as ex:
+    except Exception:
         print("ERROR: failed to convert void * to CBUUID")
         ptr = None
 

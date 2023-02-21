@@ -178,7 +178,7 @@ def convert_to_data_model_type(field_value, field_type):
                 field_descriptor = next(
                     x for x in field_descriptors.Fields if x.Label.lower() ==
                     item.lower())
-            except StopIteration as exc:
+            except StopIteration:
                 raise ValidationError(
                     f'Did not find field "{item}" in {str(field_type)}') from None
 
