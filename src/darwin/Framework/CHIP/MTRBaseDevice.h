@@ -216,7 +216,7 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  * A non-nil attributeID along with a nil clusterID will only succeed if the
  * attribute ID is for a global attribute that applies to all clusters.
  *
- * completion will be called with an error if the entire read interaction fails.
+ * The completion will be called with an error if the entire read interaction fails.
  * Otherwise it will be called with values, which may be empty (e.g. if no paths
  * matched the wildcard) or may include per-path errors if particular paths
  * failed.
@@ -342,7 +342,7 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  * If all of endpointID, clusterID, eventID are nil, all events on the
  * device will be read.
  *
- * completion will be called with an error if the entire read interaction fails.
+ * The completion will be called with an error if the entire read interaction fails.
  * Otherwise it will be called with values, which may be empty (e.g. if no paths
  * matched the wildcard) or may include per-path errors if particular paths
  * failed.
