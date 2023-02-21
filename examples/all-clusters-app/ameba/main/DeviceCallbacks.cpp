@@ -128,7 +128,7 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
 void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    static bool isOTAInitialized = false;
+    bool isOTAInitialized = OTAInitializer::Instance().CheckInit();
 #endif
     if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
     {
@@ -149,7 +149,6 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
         {
             chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
                                                         InitOTARequestorHandler, nullptr);
-            isOTAInitialized = true;
         }
 #endif
     }
