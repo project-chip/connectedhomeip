@@ -6698,6 +6698,9 @@
           WiFiNetworkDiagnostics:
               - ConnectionStatusEnum
               - WiFiVersionEnum
+          PumpConfigurationAndControl:
+              - ControlModeEnum
+              - OperationModeEnum
       enum values:
           DoorLock:
               LockDataTypeEnum:
@@ -6734,10 +6737,25 @@
                   - N
                   - Ac
                   - Ax
+          PumpConfigurationAndControl:
+              ControlModeEnum:
+                  - ConstantSpeed
+                  - ConstantPressure
+                  - ProportionalPressure
+                  - ConstantFlow
+                  - ConstantTemperature
+                  - Automatic
+              OperationModeEnum:
+                  - Normal
+                  - Minimum
+                  - Maximum
+                  - Local
       bitmaps:
           OccupancySensing:
               - OccupancyBitmap
               - OccupancySensorTypeBitmap
+          PumpConfigurationAndControl:
+              - PumpStatusBitmap
       bitmap values:
           OccupancySensing:
               OccupancyBitmap:
@@ -6746,6 +6764,19 @@
                   - PIR
                   - Ultrasonic
                   - PhysicalContact
+          PumpConfigurationAndControl:
+              PumpFeature:
+                  - LocalOperation
+              PumpStatusBitmap:
+                  - DeviceFault
+                  - Supplyfault
+                  - SpeedLow
+                  - SpeedHigh
+                  - LocalOverride
+                  - Running
+                  - RemotePressure
+                  - RemoteFlow
+                  - RemoteTemperature
   deprecated:
       attributes:
           TimeSynchronization:
@@ -6762,6 +6793,16 @@
           WiFiNetworkDiagnostics:
               - WiFiConnectionStatus
               - WiFiVersionType
+          PumpConfigurationAndControl:
+              - PumpControlMode
+              - PumpOperationMode
+      bitmaps:
+          PumpConfigurationAndControl:
+              - PumpStatus
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpFeature:
+                  - Local
   removed:
       enum values:
           DoorLock:
@@ -6786,3 +6827,13 @@
           WiFiNetworkDiagnostics:
               ConnectionStatusEnum: WiFiConnectionStatus
               WiFiVersionEnum: WiFiVersionType
+          PumpConfigurationAndControl:
+              ControlModeEnum: PumpControlMode
+              OperationModeEnum: PumpOperationMode
+      bitmaps:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap: PumpStatus
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpFeature:
+                  LocalOperation: Local
