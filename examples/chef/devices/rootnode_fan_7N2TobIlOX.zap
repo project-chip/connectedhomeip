@@ -4139,7 +4139,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "SecurityType",
+              "type": "SecurityTypeEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -4155,7 +4155,7 @@
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "WiFiVersionType",
+              "type": "WiFiVersionEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -6316,6 +6316,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 43
     }
-  ],
-  "log": []
+  ]
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <app/ConcreteAttributePath.h>
+#include <app/util/config.h>
 
 #include "DataModel.h"
 

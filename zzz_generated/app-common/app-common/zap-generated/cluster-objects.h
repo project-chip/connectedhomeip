@@ -1978,8 +1978,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::OffWithEffect::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
-    OnOffEffectIdentifier effectIdentifier        = static_cast<OnOffEffectIdentifier>(0);
-    OnOffDelayedAllOffEffectVariant effectVariant = static_cast<OnOffDelayedAllOffEffectVariant>(0);
+    OnOffEffectIdentifier effectIdentifier = static_cast<OnOffEffectIdentifier>(0);
+    uint8_t effectVariant                  = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -1994,8 +1994,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::OffWithEffect::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
 
-    OnOffEffectIdentifier effectIdentifier        = static_cast<OnOffEffectIdentifier>(0);
-    OnOffDelayedAllOffEffectVariant effectVariant = static_cast<OnOffDelayedAllOffEffectVariant>(0);
+    OnOffEffectIdentifier effectIdentifier = static_cast<OnOffEffectIdentifier>(0);
+    uint8_t effectVariant                  = static_cast<uint8_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace OffWithEffect
@@ -9722,9 +9722,9 @@ struct TypeInfo
 namespace SecurityType {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType> &;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SecurityType::Id; }
@@ -9734,9 +9734,9 @@ struct TypeInfo
 namespace WiFiVersion {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType> &;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiFiVersion::Id; }
@@ -9981,8 +9981,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    AssociationFailureCause associationFailure = static_cast<AssociationFailureCause>(0);
-    uint16_t status                            = static_cast<uint16_t>(0);
+    AssociationFailureCauseEnum associationFailure = static_cast<AssociationFailureCauseEnum>(0);
+    uint16_t status                                = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -9994,8 +9994,8 @@ public:
     static constexpr EventId GetEventId() { return Events::AssociationFailure::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
-    AssociationFailureCause associationFailure = static_cast<AssociationFailureCause>(0);
-    uint16_t status                            = static_cast<uint16_t>(0);
+    AssociationFailureCauseEnum associationFailure = static_cast<AssociationFailureCauseEnum>(0);
+    uint16_t status                                = static_cast<uint16_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -10016,7 +10016,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    WiFiConnectionStatus connectionStatus = static_cast<WiFiConnectionStatus>(0);
+    ConnectionStatusEnum connectionStatus = static_cast<ConnectionStatusEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -10028,7 +10028,7 @@ public:
     static constexpr EventId GetEventId() { return Events::ConnectionStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
 
-    WiFiConnectionStatus connectionStatus = static_cast<WiFiConnectionStatus>(0);
+    ConnectionStatusEnum connectionStatus = static_cast<ConnectionStatusEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -20691,9 +20691,9 @@ namespace Attributes {
 namespace Occupancy {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Occupancy::Id; }
@@ -20703,9 +20703,9 @@ struct TypeInfo
 namespace OccupancySensorType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum;
+    using DecodableType    = chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum;
+    using DecodableArgType = chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupancySensorType::Id; }
@@ -20715,9 +20715,9 @@ struct TypeInfo
 namespace OccupancySensorTypeBitmap {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupancySensorTypeBitmap::Id; }
@@ -20877,9 +20877,12 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Occupancy::TypeInfo::DecodableType occupancy                                       = static_cast<uint8_t>(0);
-        Attributes::OccupancySensorType::TypeInfo::DecodableType occupancySensorType                   = static_cast<uint8_t>(0);
-        Attributes::OccupancySensorTypeBitmap::TypeInfo::DecodableType occupancySensorTypeBitmap       = static_cast<uint8_t>(0);
+        Attributes::Occupancy::TypeInfo::DecodableType occupancy =
+            static_cast<chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>>(0);
+        Attributes::OccupancySensorType::TypeInfo::DecodableType occupancySensorType =
+            static_cast<chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum>(0);
+        Attributes::OccupancySensorTypeBitmap::TypeInfo::DecodableType occupancySensorTypeBitmap =
+            static_cast<chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>>(0);
         Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo::DecodableType PIROccupiedToUnoccupiedDelay = static_cast<uint16_t>(0);
         Attributes::PIRUnoccupiedToOccupiedDelay::TypeInfo::DecodableType PIRUnoccupiedToOccupiedDelay = static_cast<uint16_t>(0);
         Attributes::PIRUnoccupiedToOccupiedThreshold::TypeInfo::DecodableType PIRUnoccupiedToOccupiedThreshold =

@@ -79,7 +79,7 @@ jobs:
                       .environment/pigweed-venv/*.log
 
             - name: Build examples
-              timeout-minutes: 50
+              timeout-minutes: 70
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \

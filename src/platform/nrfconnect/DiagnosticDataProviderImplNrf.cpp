@@ -50,11 +50,16 @@ CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiBssId(ByteSpan & value)
     return err;
 }
 
-CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiSecurityType(uint8_t & securityType)
+CHIP_ERROR
+DiagnosticDataProviderImplNrf::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
+    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
+
     WiFiManager::WiFiInfo info;
     CHIP_ERROR err = WiFiManager::Instance().GetWiFiInfo(info);
-    securityType   = info.mSecurityType;
+    // TODO: The values here are probably wrong.  See
+    // https://github.com/project-chip/connectedhomeip/issues/25096
+    securityType = static_cast<SecurityTypeEnum>(info.mSecurityType);
     return err;
 }
 

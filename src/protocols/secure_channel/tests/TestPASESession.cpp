@@ -119,7 +119,7 @@ public:
         NL_TEST_ASSERT(suite,
                        CHIP_NO_ERROR ==
                            mSessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &ctx.GetMessageCounterManager(),
-                                                &mStorage, &ctx.GetFabricTable()));
+                                                &mStorage, &ctx.GetFabricTable(), ctx.GetSessionKeystore()));
         // The setup here is really weird: we are using one session manager for
         // the actual messages we send (the PASE handshake, so the
         // unauthenticated sessions) and a different one for allocating the PASE

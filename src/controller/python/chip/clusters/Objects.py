@@ -1384,11 +1384,11 @@ class OnOff(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="effectIdentifier", Tag=0, Type=OnOff.Enums.OnOffEffectIdentifier),
-                            ClusterObjectFieldDescriptor(Label="effectVariant", Tag=1, Type=OnOff.Enums.OnOffDelayedAllOffEffectVariant),
+                            ClusterObjectFieldDescriptor(Label="effectVariant", Tag=1, Type=uint),
                     ])
 
             effectIdentifier: 'OnOff.Enums.OnOffEffectIdentifier' = 0
-            effectVariant: 'OnOff.Enums.OnOffDelayedAllOffEffectVariant' = 0
+            effectVariant: 'uint' = 0
 
         @dataclass
         class OnWithRecallGlobalScene(ClusterCommand):
@@ -10184,8 +10184,8 @@ class WiFiNetworkDiagnostics(Cluster):
         return ClusterObjectDescriptor(
             Fields = [
                 ClusterObjectFieldDescriptor(Label="bssid", Tag=0x00000000, Type=typing.Union[Nullable, bytes]),
-                ClusterObjectFieldDescriptor(Label="securityType", Tag=0x00000001, Type=typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.SecurityType]),
-                ClusterObjectFieldDescriptor(Label="wiFiVersion", Tag=0x00000002, Type=typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.WiFiVersionType]),
+                ClusterObjectFieldDescriptor(Label="securityType", Tag=0x00000001, Type=typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.SecurityTypeEnum]),
+                ClusterObjectFieldDescriptor(Label="wiFiVersion", Tag=0x00000002, Type=typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.WiFiVersionEnum]),
                 ClusterObjectFieldDescriptor(Label="channelNumber", Tag=0x00000003, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="rssi", Tag=0x00000004, Type=typing.Union[Nullable, int]),
                 ClusterObjectFieldDescriptor(Label="beaconLostCount", Tag=0x00000005, Type=typing.Union[None, Nullable, uint]),
@@ -10205,8 +10205,8 @@ class WiFiNetworkDiagnostics(Cluster):
             ])
 
     bssid: 'typing.Union[Nullable, bytes]' = None
-    securityType: 'typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.SecurityType]' = None
-    wiFiVersion: 'typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.WiFiVersionType]' = None
+    securityType: 'typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.SecurityTypeEnum]' = None
+    wiFiVersion: 'typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.WiFiVersionEnum]' = None
     channelNumber: 'typing.Union[Nullable, uint]' = None
     rssi: 'typing.Union[Nullable, int]' = None
     beaconLostCount: 'typing.Union[None, Nullable, uint]' = None
@@ -10225,7 +10225,7 @@ class WiFiNetworkDiagnostics(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class AssociationFailureCause(MatterIntEnum):
+        class AssociationFailureCauseEnum(MatterIntEnum):
             kUnknown = 0x00
             kAssociationFailed = 0x01
             kAuthenticationFailed = 0x02
@@ -10236,7 +10236,16 @@ class WiFiNetworkDiagnostics(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 4,
 
-        class SecurityType(MatterIntEnum):
+        class ConnectionStatusEnum(MatterIntEnum):
+            kConnected = 0x00
+            kNotConnected = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 2,
+
+        class SecurityTypeEnum(MatterIntEnum):
             kUnspecified = 0x00
             kNone = 0x01
             kWep = 0x02
@@ -10249,16 +10258,7 @@ class WiFiNetworkDiagnostics(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 6,
 
-        class WiFiConnectionStatus(MatterIntEnum):
-            kConnected = 0x00
-            kNotConnected = 0x01
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 2,
-
-        class WiFiVersionType(MatterIntEnum):
+        class WiFiVersionEnum(MatterIntEnum):
             kA = 0x00
             kB = 0x01
             kG = 0x02
@@ -10324,9 +10324,9 @@ class WiFiNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.SecurityType])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.SecurityTypeEnum])
 
-            value: 'typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.SecurityType]' = NullValue
+            value: 'typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.SecurityTypeEnum]' = NullValue
 
         @dataclass
         class WiFiVersion(ClusterAttributeDescriptor):
@@ -10340,9 +10340,9 @@ class WiFiNetworkDiagnostics(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.WiFiVersionType])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.WiFiVersionEnum])
 
-            value: 'typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.WiFiVersionType]' = NullValue
+            value: 'typing.Union[Nullable, WiFiNetworkDiagnostics.Enums.WiFiVersionEnum]' = NullValue
 
         @dataclass
         class ChannelNumber(ClusterAttributeDescriptor):
@@ -10635,11 +10635,11 @@ class WiFiNetworkDiagnostics(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="associationFailure", Tag=0, Type=WiFiNetworkDiagnostics.Enums.AssociationFailureCause),
+                            ClusterObjectFieldDescriptor(Label="associationFailure", Tag=0, Type=WiFiNetworkDiagnostics.Enums.AssociationFailureCauseEnum),
                             ClusterObjectFieldDescriptor(Label="status", Tag=1, Type=uint),
                     ])
 
-            associationFailure: 'WiFiNetworkDiagnostics.Enums.AssociationFailureCause' = 0
+            associationFailure: 'WiFiNetworkDiagnostics.Enums.AssociationFailureCauseEnum' = 0
             status: 'uint' = 0
 
         @dataclass
@@ -10656,10 +10656,10 @@ class WiFiNetworkDiagnostics(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="connectionStatus", Tag=0, Type=WiFiNetworkDiagnostics.Enums.WiFiConnectionStatus),
+                            ClusterObjectFieldDescriptor(Label="connectionStatus", Tag=0, Type=WiFiNetworkDiagnostics.Enums.ConnectionStatusEnum),
                     ])
 
-            connectionStatus: 'WiFiNetworkDiagnostics.Enums.WiFiConnectionStatus' = 0
+            connectionStatus: 'WiFiNetworkDiagnostics.Enums.ConnectionStatusEnum' = 0
 
 
 @dataclass
@@ -14749,11 +14749,12 @@ class DoorLock(Cluster):
             kRfid = 0x07
             kFingerprint = 0x08
             kFingerVein = 0x09
+            kFace = 0x0A
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 10,
+            kUnknownEnumValue = 11,
 
         class LockOperationTypeEnum(MatterIntEnum):
             kLock = 0x00
@@ -23103,7 +23104,7 @@ class OccupancySensing(Cluster):
         return ClusterObjectDescriptor(
             Fields = [
                 ClusterObjectFieldDescriptor(Label="occupancy", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="occupancySensorType", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="occupancySensorType", Tag=0x00000001, Type=OccupancySensing.Enums.OccupancySensorTypeEnum),
                 ClusterObjectFieldDescriptor(Label="occupancySensorTypeBitmap", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="PIROccupiedToUnoccupiedDelay", Tag=0x00000010, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="PIRUnoccupiedToOccupiedDelay", Tag=0x00000011, Type=typing.Optional[uint]),
@@ -23123,7 +23124,7 @@ class OccupancySensing(Cluster):
             ])
 
     occupancy: 'uint' = None
-    occupancySensorType: 'uint' = None
+    occupancySensorType: 'OccupancySensing.Enums.OccupancySensorTypeEnum' = None
     occupancySensorTypeBitmap: 'uint' = None
     PIROccupiedToUnoccupiedDelay: 'typing.Optional[uint]' = None
     PIRUnoccupiedToOccupiedDelay: 'typing.Optional[uint]' = None
@@ -23141,6 +23142,27 @@ class OccupancySensing(Cluster):
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
 
+    class Enums:
+        class OccupancySensorTypeEnum(MatterIntEnum):
+            kPir = 0x00
+            kUltrasonic = 0x01
+            kPIRAndUltrasonic = 0x02
+            kPhysicalContact = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 4,
+
+
+    class Bitmaps:
+        class OccupancyBitmap(IntFlag):
+            kOccupied = 0x1
+
+        class OccupancySensorTypeBitmap(IntFlag):
+            kPir = 0x1
+            kUltrasonic = 0x2
+            kPhysicalContact = 0x4
 
 
 
@@ -23174,9 +23196,9 @@ class OccupancySensing(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=OccupancySensing.Enums.OccupancySensorTypeEnum)
 
-            value: 'uint' = 0
+            value: 'OccupancySensing.Enums.OccupancySensorTypeEnum' = 0
 
         @dataclass
         class OccupancySensorTypeBitmap(ClusterAttributeDescriptor):

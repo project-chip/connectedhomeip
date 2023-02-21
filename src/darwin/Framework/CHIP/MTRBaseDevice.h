@@ -141,8 +141,9 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  * fabric, but attempts to actually use the MTRBaseDevice will fail
  * (asynchronously) in that case.
  */
-+ (instancetype)deviceWithNodeID:(NSNumber *)nodeID
-                      controller:(MTRDeviceController *)controller API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
++ (MTRBaseDevice *)deviceWithNodeID:(NSNumber *)nodeID
+                         controller:(MTRDeviceController *)controller
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The transport used by the current session with this device, or
@@ -377,7 +378,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, readonly, copy) NSNumber * endpoint;
 @property (nonatomic, readonly, copy) NSNumber * cluster;
 
-+ (instancetype)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
++ (MTRClusterPath *)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -390,9 +391,10 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRAttributePath : MTRClusterPath
 @property (nonatomic, readonly, copy) NSNumber * attribute;
 
-+ (instancetype)attributePathWithEndpointID:(NSNumber *)endpointID
-                                  clusterID:(NSNumber *)clusterID
-                                attributeID:(NSNumber *)attributeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
++ (MTRAttributePath *)attributePathWithEndpointID:(NSNumber *)endpointID
+                                        clusterID:(NSNumber *)clusterID
+                                      attributeID:(NSNumber *)attributeID
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 @end
 
 /**
@@ -403,9 +405,9 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTREventPath : MTRClusterPath
 @property (nonatomic, readonly, copy) NSNumber * event;
 
-+ (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID
-                              clusterID:(NSNumber *)clusterID
-                                eventID:(NSNumber *)eventID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
++ (MTREventPath *)eventPathWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                                  eventID:(NSNumber *)eventID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 @end
 
 /**
@@ -415,9 +417,9 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRCommandPath : MTRClusterPath
 @property (nonatomic, readonly, copy) NSNumber * command;
 
-+ (instancetype)commandPathWithEndpointID:(NSNumber *)endpointID
-                                clusterID:(NSNumber *)clusterID
-                                commandID:(NSNumber *)commandID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
++ (MTRCommandPath *)commandPathWithEndpointID:(NSNumber *)endpointID
+                                    clusterID:(NSNumber *)clusterID
+                                    commandID:(NSNumber *)commandID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 @end
 
 @interface MTRAttributeReport : NSObject

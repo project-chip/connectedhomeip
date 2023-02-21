@@ -30,9 +30,6 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/TypeTraits.h>
 
-// Currently we need some work to keep compatible with ember lib.
-#include <app/util/ember-compatibility-functions.h>
-
 namespace chip {
 namespace app {
 
@@ -42,8 +39,6 @@ namespace Clusters {} // namespace Clusters
 
 void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aReader, CommandHandler * apCommandObj)
 {
-    Compatibility::SetupEmberAfCommandHandler(apCommandObj, aCommandPath);
-
     switch (aCommandPath.mClusterId)
     {
     default:
@@ -51,8 +46,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
         apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCluster);
         break;
     }
-
-    Compatibility::ResetEmberAfObjects();
 }
 
 } // namespace app

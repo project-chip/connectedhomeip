@@ -103,6 +103,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.operationalKeystore      = &mOperationalKeystore;
     factoryInitParams.opCertStore              = &mOpCertStore;
     factoryInitParams.enableServerInteractions = NeedsOperationalAdvertising();
+    factoryInitParams.sessionKeystore          = &mSessionKeystore;
 
     // Init group data provider that will be used for all group keys and IPKs for the
     // chip-tool-configured fabrics. This is OK to do once since the fabric tables
@@ -110,6 +111,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     // Different commissioner implementations may want to use alternate implementations
     // of GroupDataProvider for injection through factoryInitParams.
     sGroupDataProvider.SetStorageDelegate(&mDefaultStorage);
+    sGroupDataProvider.SetSessionKeystore(factoryInitParams.sessionKeystore);
     ReturnLogErrorOnFailure(sGroupDataProvider.Init());
     chip::Credentials::SetGroupDataProvider(&sGroupDataProvider);
     factoryInitParams.groupDataProvider = &sGroupDataProvider;

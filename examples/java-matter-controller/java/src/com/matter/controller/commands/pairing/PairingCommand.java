@@ -189,10 +189,14 @@ public abstract class PairingCommand extends MatterCommand
         break;
       case CODE:
       case CODE_PASE_ONLY:
-        Only:
         addArgument("payload", mOnboardingPayload, null, false);
         addArgument("discover-once", mDiscoverOnce, null, false);
         addArgument("use-only-onnetwork-discovery", mUseOnlyOnNetworkDiscovery, null, false);
+        break;
+      case ADDRESS_PASE_ONLY:
+        addArgument("setup-pin-code", 0, 134217727, mSetupPINCode, null, false);
+        addArgument("device-remote-ip", mRemoteAddr, false);
+        addArgument("device-remote-port", (short) 0, Short.MAX_VALUE, mRemotePort, null, false);
         break;
       case BLE:
         addArgument("setup-pin-code", 0, 134217727, mSetupPINCode, null, false);
@@ -202,7 +206,6 @@ public abstract class PairingCommand extends MatterCommand
         addArgument("setup-pin-code", 0, 134217727, mSetupPINCode, null, false);
         break;
       case SOFT_AP:
-        AP:
         addArgument("setup-pin-code", 0, 134217727, mSetupPINCode, null, false);
         addArgument("discriminator", (short) 0, (short) 4096, mDiscriminator, null, false);
         addArgument("device-remote-ip", mRemoteAddr, false);

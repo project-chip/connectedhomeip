@@ -391,7 +391,7 @@ tests:
 
 
 
-          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 123456
 
           Verify "DUT receives the unlock-door response " on the TH(Lock-app) Log:
 
@@ -583,7 +583,7 @@ tests:
     - label: "DUT sends the Lock Door command to the TH with valid PINCode"
       PICS: DRLK.C.C00.Tx
       verification: |
-          ./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
+          ./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 123456
 
           Verify "DUT receives lock Door response" on the TH(Lock-app) Log:
 
@@ -991,7 +991,7 @@ tests:
     - label: "DUT sends the Unlock Door command to the TH with Invalid PINCode"
       PICS: DRLK.C.C01.Tx
       verification: |
-          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 12345678
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 12345678
 
           Verify "DUT receives Unlock Door command  response" on the TH(Lock-app) Log:
 
@@ -1211,34 +1211,34 @@ tests:
           [1667215343.626313][14571:14571] CHIP:DMG: Handing timed invoke to IM engine: handler 0xaaab1aea1e50 exchange 62569r
           [1667215343.626425][14571:14571] CHIP:DMG: InvokeRequestMessage =
           [1667215343.626536][14571:14571] CHIP:DMG: {
-          [1667215343.626597][14571:14571] CHIP:DMG: 	suppressResponse = false,
-          [1667215343.626665][14571:14571] CHIP:DMG: 	timedRequest = true,
-          [1667215343.626726][14571:14571] CHIP:DMG: 	InvokeRequests =
-          [1667215343.626813][14571:14571] CHIP:DMG: 	[
-          [1667215343.626876][14571:14571] CHIP:DMG: 		CommandDataIB =
-          [1667215343.626961][14571:14571] CHIP:DMG: 		{
-          [1667215343.627033][14571:14571] CHIP:DMG: 			CommandPathIB =
-          [1667215343.627120][14571:14571] CHIP:DMG: 			{
-          [1667215343.627210][14571:14571] CHIP:DMG: 				EndpointId = 0x1,
-          [1667215343.627297][14571:14571] CHIP:DMG: 				ClusterId = 0x101,
-          [1667215343.627381][14571:14571] CHIP:DMG: 				CommandId = 0x1a,
-          [1667215343.627460][14571:14571] CHIP:DMG: 			},
+          [1667215343.626597][14571:14571] CHIP:DMG:         suppressResponse = false,
+          [1667215343.626665][14571:14571] CHIP:DMG:         timedRequest = true,
+          [1667215343.626726][14571:14571] CHIP:DMG:         InvokeRequests =
+          [1667215343.626813][14571:14571] CHIP:DMG:         [
+          [1667215343.626876][14571:14571] CHIP:DMG:                 CommandDataIB =
+          [1667215343.626961][14571:14571] CHIP:DMG:                 {
+          [1667215343.627033][14571:14571] CHIP:DMG:                         CommandPathIB =
+          [1667215343.627120][14571:14571] CHIP:DMG:                         {
+          [1667215343.627210][14571:14571] CHIP:DMG:                                 EndpointId = 0x1,
+          [1667215343.627297][14571:14571] CHIP:DMG:                                 ClusterId = 0x101,
+          [1667215343.627381][14571:14571] CHIP:DMG:                                 CommandId = 0x1a,
+          [1667215343.627460][14571:14571] CHIP:DMG:                         },
           [1667215343.627550][14571:14571] CHIP:DMG:
-          [1667215343.627623][14571:14571] CHIP:DMG: 			CommandFields =
-          [1667215343.627709][14571:14571] CHIP:DMG: 			{
-          [1667215343.627800][14571:14571] CHIP:DMG: 				0x0 = 0,
-          [1667215343.627893][14571:14571] CHIP:DMG: 				0x1 = 3,
-          [1667215343.627983][14571:14571] CHIP:DMG: 				0x2 = "xxx" (3 chars),
-          [1667215343.628071][14571:14571] CHIP:DMG: 				0x3 = 6452,
-          [1667215343.628157][14571:14571] CHIP:DMG: 				0x4 = 1,
-          [1667215343.628242][14571:14571] CHIP:DMG: 				0x5 = 0,
-          [1667215343.628327][14571:14571] CHIP:DMG: 				0x6 = 0,
-          [1667215343.628410][14571:14571] CHIP:DMG: 			},
-          [1667215343.628493][14571:14571] CHIP:DMG: 		},
+          [1667215343.627623][14571:14571] CHIP:DMG:                         CommandFields =
+          [1667215343.627709][14571:14571] CHIP:DMG:                         {
+          [1667215343.627800][14571:14571] CHIP:DMG:                                 0x0 = 0,
+          [1667215343.627893][14571:14571] CHIP:DMG:                                 0x1 = 3,
+          [1667215343.627983][14571:14571] CHIP:DMG:                                 0x2 = "xxx" (3 chars),
+          [1667215343.628071][14571:14571] CHIP:DMG:                                 0x3 = 6452,
+          [1667215343.628157][14571:14571] CHIP:DMG:                                 0x4 = 1,
+          [1667215343.628242][14571:14571] CHIP:DMG:                                 0x5 = 0,
+          [1667215343.628327][14571:14571] CHIP:DMG:                                 0x6 = 0,
+          [1667215343.628410][14571:14571] CHIP:DMG:                         },
+          [1667215343.628493][14571:14571] CHIP:DMG:                 },
           [1667215343.628584][14571:14571] CHIP:DMG:
-          [1667215343.628646][14571:14571] CHIP:DMG: 	],
+          [1667215343.628646][14571:14571] CHIP:DMG:         ],
           [1667215343.628730][14571:14571] CHIP:DMG:
-          [1667215343.628792][14571:14571] CHIP:DMG: 	InteractionModelRevision = 1
+          [1667215343.628792][14571:14571] CHIP:DMG:         InteractionModelRevision = 1
           [1667215343.628851][14571:14571] CHIP:DMG: },
           [1667215343.629010][14571:14571] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_0101 e=1 p=a
           [1667215343.629090][14571:14571] CHIP:DMG: AccessControl: allowed
@@ -1282,28 +1282,28 @@ tests:
           [1667215343.633412][14571:14571] CHIP:DMG:
           [1667215343.633543][14571:14571] CHIP:DMG: InvokeResponseMessage =
           [1667215343.634057][14571:14571] CHIP:DMG: {
-          [1667215343.634124][14571:14571] CHIP:DMG: 	suppressResponse = false,
-          [1667215343.634188][14571:14571] CHIP:DMG: 	InvokeResponseIBs =
-          [1667215343.634413][14571:14571] CHIP:DMG: 	[
-          [1667215343.634525][14571:14571] CHIP:DMG: 		InvokeResponseIB =
-          [1667215343.634618][14571:14571] CHIP:DMG: 		{
-          [1667215343.634690][14571:14571] CHIP:DMG: 			CommandStatusIB =
-          [1667215343.634777][14571:14571] CHIP:DMG: 			{
-          [1667215343.634861][14571:14571] CHIP:DMG: 				CommandPathIB =
-          [1667215343.634947][14571:14571] CHIP:DMG: 				{
-          [1667215343.635041][14571:14571] CHIP:DMG: 					EndpointId = 0x1,
-          [1667215343.635139][14571:14571] CHIP:DMG: 					ClusterId = 0x101,
-          [1667215343.635235][14571:14571] CHIP:DMG: 					CommandId = 0x1a,
-          [1667215343.635318][14571:14571] CHIP:DMG: 				},
+          [1667215343.634124][14571:14571] CHIP:DMG:         suppressResponse = false,
+          [1667215343.634188][14571:14571] CHIP:DMG:         InvokeResponseIBs =
+          [1667215343.634413][14571:14571] CHIP:DMG:         [
+          [1667215343.634525][14571:14571] CHIP:DMG:                 InvokeResponseIB =
+          [1667215343.634618][14571:14571] CHIP:DMG:                 {
+          [1667215343.634690][14571:14571] CHIP:DMG:                         CommandStatusIB =
+          [1667215343.634777][14571:14571] CHIP:DMG:                         {
+          [1667215343.634861][14571:14571] CHIP:DMG:                                 CommandPathIB =
+          [1667215343.634947][14571:14571] CHIP:DMG:                                 {
+          [1667215343.635041][14571:14571] CHIP:DMG:                                         EndpointId = 0x1,
+          [1667215343.635139][14571:14571] CHIP:DMG:                                         ClusterId = 0x101,
+          [1667215343.635235][14571:14571] CHIP:DMG:                                         CommandId = 0x1a,
+          [1667215343.635318][14571:14571] CHIP:DMG:                                 },
           [1667215343.635420][14571:14571] CHIP:DMG:
-          [1667215343.635498][14571:14571] CHIP:DMG: 				StatusIB =
-          [1667215343.635583][14571:14571] CHIP:DMG: 				{
-          [1667215343.635678][14571:14571] CHIP:DMG: 					status = 0x00 (SUCCESS),
-          [1667215343.635761][14571:14571] CHIP:DMG: 				},
+          [1667215343.635498][14571:14571] CHIP:DMG:                                 StatusIB =
+          [1667215343.635583][14571:14571] CHIP:DMG:                                 {
+          [1667215343.635678][14571:14571] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1667215343.635761][14571:14571] CHIP:DMG:                                 },
           [1667215343.635853][14571:14571] CHIP:DMG:
-          [1667215343.635930][14571:14571] CHIP:DMG: 			},
+          [1667215343.635930][14571:14571] CHIP:DMG:                         },
           [1667215343.636023][14571:14571] CHIP:DMG:
-          [1667215343.636330][14571:14571] CHIP:DMG: 		},
+          [1667215343.636330][14571:14571] CHIP:DMG:                 },
       disabled: true
 
     - label:
@@ -1311,6 +1311,8 @@ tests:
           User command"
       PICS: DRLK.C.E04
       verification: |
+          ./chip-tool doorlock read-event lock-user-change 1 1
+
           Verify "DUT receives read-event lock-user-change response" on the TH(Lock-app) Log:
 
           [1667215381.519551][14571:14571] CHIP:EM: Handling via exchange: 17082r, Delegate: 0xaaaae921d988

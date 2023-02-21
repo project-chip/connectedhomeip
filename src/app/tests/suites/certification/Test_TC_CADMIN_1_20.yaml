@@ -108,7 +108,7 @@ tests:
           to reach an index value of SupportedFabrics on DUT_CE"
       PICS: CADMIN.S.C01.Rsp
       verification: |
-          Repeat step 3 until  CommissionedFabrics=SupportedFabrics  (Supported fabrics value obtained in the step 1)
+          Repeat step 3 until  CommissionedFabrics=SupportedFabrics  (Supported fabrics value obtained in the precondition)
 
           Use the following command to verify the currentcommissioned fabric (Output number may vary depends on the number successful commissioning )
 
@@ -126,7 +126,7 @@ tests:
 
           ./chip-tool pairing onnetwork 6 20202021 --commissioner-name 4
 
-          Verify DUT_CE responds with NOCResponse with a StatusCode of 0x05 on THn (chip-tool) log
+          Verify DUT_CE responds with NOCResponse with a StatusCode of 0x05 on TH (chip-tool) log
 
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           [1649756670.402192][10794:10799] CHIP:CTL: Device returned status 5 on receiving the NOC

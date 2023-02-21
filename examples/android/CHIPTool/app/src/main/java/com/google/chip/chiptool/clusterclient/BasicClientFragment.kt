@@ -125,6 +125,7 @@ class BasicClientFragment : Fragment() {
       getString(R.string.basic_cluster_serial_number_text) -> sendReadSerialNumberAttribute()
       getString(R.string.basic_cluster_local_config_disabled_text) -> sendReadLocalConfigDisabledAttribute()
       getString(R.string.basic_cluster_reachable_text) -> sendReadReachableAttribute()
+      getString(R.string.basic_cluster_unique_id_text) -> sendReadUniqueIDAttribute()
       getString(R.string.basic_cluster_cluster_revision_text) -> sendReadClusterRevisionAttribute()
     }
   }
@@ -148,6 +149,7 @@ class BasicClientFragment : Fragment() {
     ATTRIBUTES.add(getString(R.string.basic_cluster_serial_number_text))
     ATTRIBUTES.add(getString(R.string.basic_cluster_local_config_disabled_text))
     ATTRIBUTES.add(getString(R.string.basic_cluster_reachable_text))
+    ATTRIBUTES.add(getString(R.string.basic_cluster_unique_id_text))
     ATTRIBUTES.add(getString(R.string.basic_cluster_cluster_revision_text))
   }
 
@@ -438,6 +440,20 @@ class BasicClientFragment : Fragment() {
       override fun onError(ex: Exception) {
         showMessage("Read Reachable failure $ex")
         Log.e(TAG, "Read Reachable failure", ex)
+      }
+    })
+  }
+
+  private suspend fun sendReadUniqueIDAttribute() {
+    getBasicClusterForDevice().readUniqueIDAttribute(object : ChipClusters.CharStringAttributeCallback {
+      override fun onSuccess(value: String) {
+        Log.i(TAG,"[Read Success] UniqueID $value")
+        showMessage("[Read Success] UniqueID: $value")
+      }
+
+      override fun onError(ex: Exception) {
+        showMessage("Read UniqueID failure $ex")
+        Log.e(TAG, "Read UniqueID failure", ex)
       }
     })
   }

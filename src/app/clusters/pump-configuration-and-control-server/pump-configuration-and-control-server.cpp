@@ -24,8 +24,8 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/InteractionModelEngine.h>
-#include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 
 using namespace chip;
 using namespace chip::app;

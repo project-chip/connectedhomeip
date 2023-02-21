@@ -1,3 +1,4 @@
+#include <app/util/config.h>
 #include <static-supported-modes-manager.h>
 
 using namespace std;

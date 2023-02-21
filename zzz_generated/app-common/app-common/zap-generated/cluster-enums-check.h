@@ -101,17 +101,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::OnOffDelayedAllO
     using EnumType = OnOff::OnOffDelayedAllOffEffectVariant;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kFadeToOffIn0p8Seconds:
     case EnumType::kNoFade:
     case EnumType::k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS:
-    case EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_NO_FADE:
-    case EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_IN_12_SECONDS:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(3);
@@ -122,13 +114,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::OnOffDyingLightE
     using EnumType = OnOff::OnOffDyingLightEffectVariant;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_ON_OFF_DYING_LIGHT_EFFECT_VARIANT_20_PERCENTER_DIM_UP_IN_0P5_SECONDS_THEN_FADE_TO_OFF_IN_1_SECOND:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(1);
@@ -139,15 +125,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::OnOffEffectIdent
     using EnumType = OnOff::OnOffEffectIdentifier;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kDelayedAllOff:
     case EnumType::kDyingLight:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF:
-    case EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DYING_LIGHT:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(2);
@@ -856,9 +835,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ThreadNetworkDiagnostic
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics::AssociationFailureCause val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics::AssociationFailureCauseEnum val)
 {
-    using EnumType = WiFiNetworkDiagnostics::AssociationFailureCause;
+    using EnumType = WiFiNetworkDiagnostics::AssociationFailureCauseEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -870,36 +849,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics:
         return static_cast<EnumType>(4);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics::SecurityType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics::ConnectionStatusEnum val)
 {
-    using EnumType = WiFiNetworkDiagnostics::SecurityType;
-    switch (val)
-    {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EnumType::kUnspecified:
-    case EnumType::kNone:
-    case EnumType::kWep:
-    case EnumType::kWpa:
-    case EnumType::kWpa2:
-    case EnumType::kWpa3:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED:
-    case EMBER_ZCL_SECURITY_TYPE_NONE:
-    case EMBER_ZCL_SECURITY_TYPE_WEP:
-    case EMBER_ZCL_SECURITY_TYPE_WPA:
-    case EMBER_ZCL_SECURITY_TYPE_WPA2:
-    case EMBER_ZCL_SECURITY_TYPE_WPA3:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-        return val;
-    default:
-        return static_cast<EnumType>(6);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics::WiFiConnectionStatus val)
-{
-    using EnumType = WiFiNetworkDiagnostics::WiFiConnectionStatus;
+    using EnumType = WiFiNetworkDiagnostics::ConnectionStatusEnum;
     switch (val)
     {
     case EnumType::kConnected:
@@ -909,9 +861,25 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics:
         return static_cast<EnumType>(2);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics::WiFiVersionType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics::SecurityTypeEnum val)
 {
-    using EnumType = WiFiNetworkDiagnostics::WiFiVersionType;
+    using EnumType = WiFiNetworkDiagnostics::SecurityTypeEnum;
+    switch (val)
+    {
+    case EnumType::kUnspecified:
+    case EnumType::kNone:
+    case EnumType::kWep:
+    case EnumType::kWpa:
+    case EnumType::kWpa2:
+    case EnumType::kWpa3:
+        return val;
+    default:
+        return static_cast<EnumType>(6);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(WiFiNetworkDiagnostics::WiFiVersionEnum val)
+{
+    using EnumType = WiFiNetworkDiagnostics::WiFiVersionEnum;
     switch (val)
     {
     case EnumType::kA:
@@ -1306,9 +1274,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockDataTypeE
     case EnumType::kRfid:
     case EnumType::kFingerprint:
     case EnumType::kFingerVein:
+    case EnumType::kFace:
         return val;
     default:
-        return static_cast<EnumType>(10);
+        return static_cast<EnumType>(11);
     }
 }
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::LockOperationTypeEnum val)
@@ -1768,6 +1737,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(IlluminanceMeasurement:
         return val;
     default:
         return static_cast<EnumType>(2);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(OccupancySensing::OccupancySensorTypeEnum val)
+{
+    using EnumType = OccupancySensing::OccupancySensorTypeEnum;
+    switch (val)
+    {
+    case EnumType::kPir:
+    case EnumType::kUltrasonic:
+    case EnumType::kPIRAndUltrasonic:
+    case EnumType::kPhysicalContact:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
     }
 }
 

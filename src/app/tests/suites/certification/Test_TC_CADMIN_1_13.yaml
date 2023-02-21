@@ -34,6 +34,9 @@ config:
         type: node_id
         defaultValue: 0xC00FEE
     endpoint: 0
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
     discriminator:
         type: int16u
         defaultValue: 3840
@@ -83,6 +86,14 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
       cluster: "Administrator Commissioning"
@@ -237,6 +248,14 @@ tests:
               - name: "CommissioningTimeout"
                 value: 180
 
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
@@ -267,6 +286,14 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     - label: "TH_CR1 opens a 2nd commissioning window on DUT_CE"
       identity: "alpha"
@@ -333,6 +360,14 @@ tests:
                 value: 1000
               - name: "Salt"
                 value: "SPAKE2P Key Salt"
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
       cluster: "Administrator Commissioning"
@@ -435,6 +470,14 @@ tests:
                 value: 1000
               - name: "Salt"
                 value: "SPAKE2P Key Salt"
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     - label: "TH_CR2 opens a 2nd commissioning window on DUT_CE using ECM"
       identity: "beta"

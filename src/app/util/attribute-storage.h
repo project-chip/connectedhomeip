@@ -21,6 +21,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/util/af.h>
+#include <app/util/config.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #if !defined(EMBER_SCRIPTED_TEST)
