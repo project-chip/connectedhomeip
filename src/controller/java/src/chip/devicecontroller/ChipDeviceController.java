@@ -635,14 +635,31 @@ public class ChipDeviceController {
   public void readEventPath(
       ReportCallback callback, long devicePtr, List<ChipEventPath> eventPaths) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
-    read(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, null, eventPaths, true, null);
+    read(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        null,
+        eventPaths,
+        true,
+        null);
   }
 
   /** Read the given event path. */
   public void readEventPath(
-      ReportCallback callback, long devicePtr, List<ChipEventPath> eventPaths, @Nullable Long eventMin) {
+      ReportCallback callback,
+      long devicePtr,
+      List<ChipEventPath> eventPaths,
+      @Nullable Long eventMin) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
-    read(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, null, eventPaths, true, eventMin);
+    read(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        null,
+        eventPaths,
+        true,
+        eventMin);
   }
 
   /** Read the given attribute/event path with isFabricFiltered flag. */
