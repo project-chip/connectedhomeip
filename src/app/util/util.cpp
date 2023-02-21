@@ -20,7 +20,6 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/print-cluster.h>
-#include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
 #include <app/util/generic-callbacks.h>
@@ -40,29 +39,10 @@ using namespace chip;
 //------------------------------------------------------------------------------
 // Globals
 
-#ifdef EMBER_AF_ENABLE_STATISTICS
-// a variable containing the number of messages send from the utilities
-// since emberAfInit was called.
-uint32_t afNumPktsSent;
-#endif
-
 const EmberAfClusterName zclClusterNames[] = {
     CLUSTER_IDS_TO_NAMES            // defined in print-cluster.h
     { kInvalidClusterId, nullptr }, // terminator
 };
-
-// DEPRECATED.
-uint8_t emberAfIncomingZclSequenceNumber = 0xFF;
-
-// Sequence used for outgoing messages if they are
-// not responses.
-uint8_t emberAfSequenceNumber = 0xFF;
-
-static uint8_t /*enum EmberAfDisableDefaultResponse*/ emAfDisableDefaultResponse          = EMBER_AF_DISABLE_DEFAULT_RESPONSE_NONE;
-static uint8_t /*enum EmberAfDisableDefaultResponse*/ emAfSavedDisableDefaultResponseVale = EMBER_AF_DISABLE_DEFAULT_RESPONSE_NONE;
-
-// Holds the response type
-uint8_t emberAfResponseType = ZCL_UTIL_RESP_NORMAL;
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
@@ -123,32 +103,11 @@ EmberAfDifferenceType emberAfGetDifference(uint8_t * pData, EmberAfDifferenceTyp
 // ****************************************
 void emberAfInit()
 {
-    uint8_t i;
-#ifdef EMBER_AF_ENABLE_STATISTICS
-    afNumPktsSent = 0;
-#endif
-
-    for (i = 0; i < EMBER_SUPPORTED_NETWORKS; i++)
-    {
-        // FIXME: Do we need to support more than one network?
-        // emberAfPushNetworkIndex(i);
-        emberAfInitializeAttributes(EMBER_BROADCAST_ENDPOINT);
-        // emberAfPopNetworkIndex();
-    }
+    emberAfInitializeAttributes(EMBER_BROADCAST_ENDPOINT);
 
     MATTER_PLUGINS_INIT
 
     emAfCallInits();
-}
-
-void emberAfTick()
-{
-    // Call the AFV2-specific per-endpoint callbacks
-    // Anything that defines callbacks as void *TickCallback(void) is called in
-    // emAfInit(), which is a generated file
-#ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_CALLS
-    EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_CALLS
-#endif
 }
 
 // Cluster init functions that don't have a cluster implementation to define
@@ -206,58 +165,6 @@ uint16_t emberAfFindClusterNameIndex(ClusterId cluster)
         index++;
     }
     return 0xFFFF;
-}
-
-// the caller to the library can set a flag to say do not respond to the
-// next ZCL message passed in to the library. Passing true means disable
-// the reply for the next ZCL message. Setting to false re-enables the
-// reply (in the case where the app disables it and then doesnt send a
-// message that gets parsed).
-void emberAfSetNoReplyForNextMessage(bool set)
-{
-    if (set)
-    {
-        emberAfResponseType |= ZCL_UTIL_RESP_NONE;
-    }
-    else
-    {
-        emberAfResponseType = static_cast<uint8_t>(emberAfResponseType & ~ZCL_UTIL_RESP_NONE);
-    }
-}
-
-void emberAfSetDisableDefaultResponse(EmberAfDisableDefaultResponse value)
-{
-    emAfDisableDefaultResponse = value;
-    if (value != EMBER_AF_DISABLE_DEFAULT_RESPONSE_ONE_SHOT)
-    {
-        emAfSavedDisableDefaultResponseVale = value;
-    }
-}
-
-EmberAfDisableDefaultResponse emberAfGetDisableDefaultResponse()
-{
-    return (EmberAfDisableDefaultResponse) emAfDisableDefaultResponse;
-}
-
-void emAfApplyDisableDefaultResponse(uint8_t * frame_control)
-{
-    if (frame_control == nullptr)
-    {
-        return;
-    }
-    if (emAfDisableDefaultResponse == EMBER_AF_DISABLE_DEFAULT_RESPONSE_ONE_SHOT)
-    {
-        emAfDisableDefaultResponse = emAfSavedDisableDefaultResponseVale;
-        *frame_control |= ZCL_DISABLE_DEFAULT_RESPONSE_MASK;
-    }
-    else if (emAfDisableDefaultResponse == EMBER_AF_DISABLE_DEFAULT_RESPONSE_PERMANENT)
-    {
-        *frame_control |= ZCL_DISABLE_DEFAULT_RESPONSE_MASK;
-    }
-    else
-    {
-        // MISRA requires ..else if.. to have terminating else.
-    }
 }
 
 void emberAfCopyInt16u(uint8_t * data, uint16_t index, uint16_t x)
@@ -414,35 +321,6 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
 bool emberAfIsTypeSigned(EmberAfAttributeType dataType)
 {
     return (dataType >= ZCL_INT8S_ATTRIBUTE_TYPE && dataType <= ZCL_INT64S_ATTRIBUTE_TYPE);
-}
-
-uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, const uint8_t * appendingChars,
-                                uint8_t appendingCharsLen)
-{
-    uint8_t freeChars;
-    uint8_t curLen;
-    uint8_t charsToWrite;
-
-    if ((zclString == nullptr) || (zclStringMaxLen == 0) || (appendingChars == nullptr) || (appendingCharsLen == 0))
-    {
-        return 0;
-    }
-
-    curLen = emberAfStringLength(zclString);
-
-    if ((zclString[0] == 0xFF) || (curLen >= zclStringMaxLen))
-    {
-        return 0;
-    }
-
-    freeChars    = static_cast<uint8_t>(zclStringMaxLen - curLen);
-    charsToWrite = (freeChars > appendingCharsLen) ? appendingCharsLen : freeChars;
-
-    memcpy(&zclString[1 + curLen], // 1 is to account for zcl's length byte
-           appendingChars, charsToWrite);
-    // Cast is safe, because the sum can't be bigger than zclStringMaxLen.
-    zclString[0] = static_cast<uint8_t>(curLen + charsToWrite);
-    return charsToWrite;
 }
 
 bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)

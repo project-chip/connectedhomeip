@@ -623,6 +623,14 @@ void emberAfFaultInjectionClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfIdentifyClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Identify Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterIdentifyClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Identify Cluster Client Init
  *
  * Client Init
@@ -692,6 +700,14 @@ void emberAfIdentifyClusterClientTickCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfGroupsClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Groups Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterGroupsClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Groups Cluster Client Init
  *
@@ -763,6 +779,14 @@ void emberAfGroupsClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfScenesClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Scenes Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterScenesClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Scenes Cluster Client Init
  *
  * Client Init
@@ -832,6 +856,14 @@ void emberAfScenesClusterClientTickCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfOnOffClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief On/Off Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterOnOffClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief On/Off Cluster Client Init
  *
@@ -903,6 +935,14 @@ void emberAfOnOffClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfOnOffSwitchConfigurationClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief On/off Switch Configuration Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterOnOffSwitchConfigurationClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief On/off Switch Configuration Cluster Client Init
  *
  * Client Init
@@ -970,6 +1010,14 @@ void emberAfOnOffSwitchConfigurationClusterClientTickCallback(chip::EndpointId e
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfLevelControlClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Level Control Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterLevelControlClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Level Control Cluster Client Init
  *
@@ -1041,6 +1089,14 @@ void emberAfLevelControlClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfBinaryInputBasicClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Binary Input (Basic) Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterBinaryInputBasicClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Binary Input (Basic) Cluster Client Init
  *
  * Client Init
@@ -1111,6 +1167,14 @@ void emberAfBinaryInputBasicClusterClientTickCallback(chip::EndpointId endpoint)
  */
 void emberAfPulseWidthModulationClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Pulse Width Modulation Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterPulseWidthModulationClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Pulse Width Modulation Cluster Client Init
  *
  * Client Init
@@ -1178,6 +1242,14 @@ void emberAfPulseWidthModulationClusterClientTickCallback(chip::EndpointId endpo
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfDescriptorClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Descriptor Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterDescriptorClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Descriptor Cluster Client Init
  *
@@ -1249,6 +1321,14 @@ void emberAfDescriptorClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfBindingClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Binding Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterBindingClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Binding Cluster Client Init
  *
  * Client Init
@@ -1318,6 +1398,14 @@ void emberAfBindingClusterClientTickCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfAccessControlClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Access Control Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterAccessControlClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Access Control Cluster Client Init
  *
@@ -1389,6 +1477,14 @@ void emberAfAccessControlClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfActionsClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Actions Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterActionsClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Actions Cluster Client Init
  *
  * Client Init
@@ -1458,6 +1554,14 @@ void emberAfActionsClusterClientTickCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfBasicInformationClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Basic Information Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterBasicInformationClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Basic Information Cluster Client Init
  *
@@ -1529,6 +1633,14 @@ void emberAfBasicInformationClusterClientTickCallback(chip::EndpointId endpoint)
  */
 void emberAfOtaSoftwareUpdateProviderClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief OTA Software Update Provider Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterOtaSoftwareUpdateProviderClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief OTA Software Update Provider Cluster Client Init
  *
  * Client Init
@@ -1596,6 +1708,14 @@ void emberAfOtaSoftwareUpdateProviderClusterClientTickCallback(chip::EndpointId 
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfOtaSoftwareUpdateRequestorClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief OTA Software Update Requestor Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterOtaSoftwareUpdateRequestorClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief OTA Software Update Requestor Cluster Client Init
  *
@@ -1665,6 +1785,14 @@ void emberAfOtaSoftwareUpdateRequestorClusterClientTickCallback(chip::EndpointId
  */
 void emberAfLocalizationConfigurationClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Localization Configuration Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterLocalizationConfigurationClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Localization Configuration Cluster Client Init
  *
  * Client Init
@@ -1733,6 +1861,14 @@ void emberAfLocalizationConfigurationClusterClientTickCallback(chip::EndpointId 
  */
 void emberAfTimeFormatLocalizationClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Time Format Localization Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterTimeFormatLocalizationClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Time Format Localization Cluster Client Init
  *
  * Client Init
@@ -1800,6 +1936,14 @@ void emberAfTimeFormatLocalizationClusterClientTickCallback(chip::EndpointId end
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfUnitLocalizationClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Unit Localization Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterUnitLocalizationClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Unit Localization Cluster Client Init
  *
@@ -1871,6 +2015,14 @@ void emberAfUnitLocalizationClusterClientTickCallback(chip::EndpointId endpoint)
  */
 void emberAfPowerSourceConfigurationClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Power Source Configuration Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterPowerSourceConfigurationClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Power Source Configuration Cluster Client Init
  *
  * Client Init
@@ -1938,6 +2090,14 @@ void emberAfPowerSourceConfigurationClusterClientTickCallback(chip::EndpointId e
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfPowerSourceClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Power Source Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterPowerSourceClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Power Source Cluster Client Init
  *
@@ -2009,6 +2169,14 @@ void emberAfPowerSourceClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfGeneralCommissioningClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief General Commissioning Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterGeneralCommissioningClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief General Commissioning Cluster Client Init
  *
  * Client Init
@@ -2077,6 +2245,14 @@ void emberAfGeneralCommissioningClusterClientTickCallback(chip::EndpointId endpo
  */
 void emberAfNetworkCommissioningClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Network Commissioning Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterNetworkCommissioningClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Network Commissioning Cluster Client Init
  *
  * Client Init
@@ -2144,6 +2320,14 @@ void emberAfNetworkCommissioningClusterClientTickCallback(chip::EndpointId endpo
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfDiagnosticLogsClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Diagnostic Logs Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterDiagnosticLogsClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Diagnostic Logs Cluster Client Init
  *
@@ -2215,6 +2399,14 @@ void emberAfDiagnosticLogsClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfGeneralDiagnosticsClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief General Diagnostics Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterGeneralDiagnosticsClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief General Diagnostics Cluster Client Init
  *
  * Client Init
@@ -2282,6 +2474,14 @@ void emberAfGeneralDiagnosticsClusterClientTickCallback(chip::EndpointId endpoin
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfSoftwareDiagnosticsClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Software Diagnostics Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterSoftwareDiagnosticsClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Software Diagnostics Cluster Client Init
  *
@@ -2351,6 +2551,14 @@ void emberAfSoftwareDiagnosticsClusterClientTickCallback(chip::EndpointId endpoi
  */
 void emberAfThreadNetworkDiagnosticsClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Thread Network Diagnostics Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterThreadNetworkDiagnosticsClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Thread Network Diagnostics Cluster Client Init
  *
  * Client Init
@@ -2418,6 +2626,14 @@ void emberAfThreadNetworkDiagnosticsClusterClientTickCallback(chip::EndpointId e
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfWiFiNetworkDiagnosticsClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief WiFi Network Diagnostics Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterWiFiNetworkDiagnosticsClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief WiFi Network Diagnostics Cluster Client Init
  *
@@ -2487,6 +2703,14 @@ void emberAfWiFiNetworkDiagnosticsClusterClientTickCallback(chip::EndpointId end
  */
 void emberAfEthernetNetworkDiagnosticsClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Ethernet Network Diagnostics Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterEthernetNetworkDiagnosticsClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Ethernet Network Diagnostics Cluster Client Init
  *
  * Client Init
@@ -2554,6 +2778,14 @@ void emberAfEthernetNetworkDiagnosticsClusterClientTickCallback(chip::EndpointId
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfTimeSynchronizationClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Time Synchronization Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterTimeSynchronizationClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Time Synchronization Cluster Client Init
  *
@@ -2623,6 +2855,14 @@ void emberAfTimeSynchronizationClusterClientTickCallback(chip::EndpointId endpoi
  */
 void emberAfBridgedDeviceBasicInformationClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Bridged Device Basic Information Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterBridgedDeviceBasicInformationClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Bridged Device Basic Information Cluster Client Init
  *
  * Client Init
@@ -2691,6 +2931,14 @@ void emberAfBridgedDeviceBasicInformationClusterClientTickCallback(chip::Endpoin
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfSwitchClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Switch Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterSwitchClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Switch Cluster Client Init
  *
@@ -2762,6 +3010,14 @@ void emberAfSwitchClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfAdministratorCommissioningClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Administrator Commissioning Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterAdministratorCommissioningClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Administrator Commissioning Cluster Client Init
  *
  * Client Init
@@ -2829,6 +3085,14 @@ void emberAfAdministratorCommissioningClusterClientTickCallback(chip::EndpointId
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfOperationalCredentialsClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Operational Credentials Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterOperationalCredentialsClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Operational Credentials Cluster Client Init
  *
@@ -2898,6 +3162,14 @@ void emberAfOperationalCredentialsClusterClientTickCallback(chip::EndpointId end
  */
 void emberAfGroupKeyManagementClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Group Key Management Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterGroupKeyManagementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Group Key Management Cluster Client Init
  *
  * Client Init
@@ -2965,6 +3237,14 @@ void emberAfGroupKeyManagementClusterClientTickCallback(chip::EndpointId endpoin
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfFixedLabelClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Fixed Label Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterFixedLabelClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Fixed Label Cluster Client Init
  *
@@ -3036,6 +3316,14 @@ void emberAfFixedLabelClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfUserLabelClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief User Label Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterUserLabelClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief User Label Cluster Client Init
  *
  * Client Init
@@ -3106,6 +3394,14 @@ void emberAfUserLabelClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfProxyConfigurationClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Proxy Configuration Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterProxyConfigurationClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Proxy Configuration Cluster Client Init
  *
  * Client Init
@@ -3173,6 +3469,14 @@ void emberAfProxyConfigurationClusterClientTickCallback(chip::EndpointId endpoin
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfProxyDiscoveryClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Proxy Discovery Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterProxyDiscoveryClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Proxy Discovery Cluster Client Init
  *
@@ -3244,6 +3548,14 @@ void emberAfProxyDiscoveryClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfProxyValidClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Proxy Valid Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterProxyValidClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Proxy Valid Cluster Client Init
  *
  * Client Init
@@ -3313,6 +3625,14 @@ void emberAfProxyValidClusterClientTickCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfBooleanStateClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Boolean State Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterBooleanStateClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Boolean State Cluster Client Init
  *
@@ -3384,6 +3704,14 @@ void emberAfBooleanStateClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfModeSelectClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Mode Select Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterModeSelectClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Mode Select Cluster Client Init
  *
  * Client Init
@@ -3453,6 +3781,14 @@ void emberAfModeSelectClusterClientTickCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfDoorLockClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Door Lock Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterDoorLockClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Door Lock Cluster Client Init
  *
@@ -3524,6 +3860,14 @@ void emberAfDoorLockClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfWindowCoveringClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Window Covering Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterWindowCoveringClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Window Covering Cluster Client Init
  *
  * Client Init
@@ -3593,6 +3937,14 @@ void emberAfWindowCoveringClusterClientTickCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfBarrierControlClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Barrier Control Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterBarrierControlClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Barrier Control Cluster Client Init
  *
@@ -3664,6 +4016,14 @@ void emberAfBarrierControlClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfPumpConfigurationAndControlClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Pump Configuration and Control Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterPumpConfigurationAndControlClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Pump Configuration and Control Cluster Client Init
  *
  * Client Init
@@ -3731,6 +4091,14 @@ void emberAfPumpConfigurationAndControlClusterClientTickCallback(chip::EndpointI
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Thermostat Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterThermostatClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Thermostat Cluster Client Init
  *
@@ -3802,6 +4170,14 @@ void emberAfThermostatClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfFanControlClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Fan Control Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterFanControlClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Fan Control Cluster Client Init
  *
  * Client Init
@@ -3872,6 +4248,14 @@ void emberAfFanControlClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfThermostatUserInterfaceConfigurationClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Thermostat User Interface Configuration Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterThermostatUserInterfaceConfigurationClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Thermostat User Interface Configuration Cluster Client Init
  *
  * Client Init
@@ -3940,6 +4324,14 @@ void emberAfThermostatUserInterfaceConfigurationClusterClientTickCallback(chip::
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfColorControlClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Color Control Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterColorControlClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Color Control Cluster Client Init
  *
@@ -4011,6 +4403,14 @@ void emberAfColorControlClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfBallastConfigurationClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Ballast Configuration Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterBallastConfigurationClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Ballast Configuration Cluster Client Init
  *
  * Client Init
@@ -4078,6 +4478,14 @@ void emberAfBallastConfigurationClusterClientTickCallback(chip::EndpointId endpo
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfIlluminanceMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Illuminance Measurement Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterIlluminanceMeasurementClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Illuminance Measurement Cluster Client Init
  *
@@ -4147,6 +4555,14 @@ void emberAfIlluminanceMeasurementClusterClientTickCallback(chip::EndpointId end
  */
 void emberAfTemperatureMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Temperature Measurement Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterTemperatureMeasurementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Temperature Measurement Cluster Client Init
  *
  * Client Init
@@ -4215,6 +4631,14 @@ void emberAfTemperatureMeasurementClusterClientTickCallback(chip::EndpointId end
  */
 void emberAfPressureMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Pressure Measurement Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterPressureMeasurementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Pressure Measurement Cluster Client Init
  *
  * Client Init
@@ -4282,6 +4706,14 @@ void emberAfPressureMeasurementClusterClientTickCallback(chip::EndpointId endpoi
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfFlowMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Flow Measurement Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterFlowMeasurementClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Flow Measurement Cluster Client Init
  *
@@ -4353,6 +4785,14 @@ void emberAfFlowMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfRelativeHumidityMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Relative Humidity Measurement Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterRelativeHumidityMeasurementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Relative Humidity Measurement Cluster Client Init
  *
  * Client Init
@@ -4420,6 +4860,14 @@ void emberAfRelativeHumidityMeasurementClusterClientTickCallback(chip::EndpointI
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfOccupancySensingClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Occupancy Sensing Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterOccupancySensingClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Occupancy Sensing Cluster Client Init
  *
@@ -4491,6 +4939,14 @@ void emberAfOccupancySensingClusterClientTickCallback(chip::EndpointId endpoint)
  */
 void emberAfWakeOnLanClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Wake on LAN Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterWakeOnLanClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Wake on LAN Cluster Client Init
  *
  * Client Init
@@ -4560,6 +5016,14 @@ void emberAfWakeOnLanClusterClientTickCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfChannelClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Channel Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterChannelClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Channel Cluster Client Init
  *
@@ -4631,6 +5095,14 @@ void emberAfChannelClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfTargetNavigatorClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Target Navigator Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterTargetNavigatorClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Target Navigator Cluster Client Init
  *
  * Client Init
@@ -4700,6 +5172,14 @@ void emberAfTargetNavigatorClusterClientTickCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfMediaPlaybackClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Media Playback Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterMediaPlaybackClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Media Playback Cluster Client Init
  *
@@ -4771,6 +5251,14 @@ void emberAfMediaPlaybackClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfMediaInputClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Media Input Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterMediaInputClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Media Input Cluster Client Init
  *
  * Client Init
@@ -4840,6 +5328,14 @@ void emberAfMediaInputClusterClientTickCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfLowPowerClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Low Power Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterLowPowerClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Low Power Cluster Client Init
  *
@@ -4911,6 +5407,14 @@ void emberAfLowPowerClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfKeypadInputClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Keypad Input Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterKeypadInputClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Keypad Input Cluster Client Init
  *
  * Client Init
@@ -4980,6 +5484,14 @@ void emberAfKeypadInputClusterClientTickCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfContentLauncherClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Content Launcher Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterContentLauncherClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Content Launcher Cluster Client Init
  *
@@ -5051,6 +5563,14 @@ void emberAfContentLauncherClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfAudioOutputClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Audio Output Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterAudioOutputClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Audio Output Cluster Client Init
  *
  * Client Init
@@ -5121,6 +5641,14 @@ void emberAfAudioOutputClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfApplicationLauncherClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Application Launcher Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterApplicationLauncherClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Application Launcher Cluster Client Init
  *
  * Client Init
@@ -5188,6 +5716,14 @@ void emberAfApplicationLauncherClusterClientTickCallback(chip::EndpointId endpoi
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfApplicationBasicClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Application Basic Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterApplicationBasicClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Application Basic Cluster Client Init
  *
@@ -5259,6 +5795,14 @@ void emberAfApplicationBasicClusterClientTickCallback(chip::EndpointId endpoint)
  */
 void emberAfAccountLoginClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Account Login Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterAccountLoginClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Account Login Cluster Client Init
  *
  * Client Init
@@ -5329,6 +5873,14 @@ void emberAfAccountLoginClusterClientTickCallback(chip::EndpointId endpoint);
  */
 void emberAfElectricalMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Electrical Measurement Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterElectricalMeasurementClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Electrical Measurement Cluster Client Init
  *
  * Client Init
@@ -5396,6 +5948,14 @@ void emberAfElectricalMeasurementClusterClientTickCallback(chip::EndpointId endp
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfClientMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Client Monitoring Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterClientMonitoringClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Client Monitoring Cluster Client Init
  *
@@ -5467,6 +6027,14 @@ void emberAfClientMonitoringClusterClientTickCallback(chip::EndpointId endpoint)
  */
 void emberAfUnitTestingClusterServerInitCallback(chip::EndpointId endpoint);
 
+/** @brief Unit Testing Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterUnitTestingClusterServerShutdownCallback(chip::EndpointId endpoint);
+
 /** @brief Unit Testing Cluster Client Init
  *
  * Client Init
@@ -5536,6 +6104,14 @@ void emberAfUnitTestingClusterClientTickCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfFaultInjectionClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Fault Injection Cluster Server Shutdown
+ *
+ * Server Shutdown
+ *
+ * @param endpoint    Endpoint that is being shutdown
+ */
+void MatterFaultInjectionClusterServerShutdownCallback(chip::EndpointId endpoint);
 
 /** @brief Fault Injection Cluster Client Init
  *

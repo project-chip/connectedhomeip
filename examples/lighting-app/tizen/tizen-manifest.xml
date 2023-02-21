@@ -9,6 +9,7 @@
         <privilege>http://tizen.org/privilege/internet</privilege>
         <privilege>http://tizen.org/privilege/network.get</privilege>
         <privilege>http://tizen.org/privilege/network.set</privilege>
+        <privilege>http://tizen.org/privilege/network.profile</privilege>
     </privileges>
     <feature name="http://tizen.org/feature/network.bluetooth">true</feature>
     <feature name="http://tizen.org/feature/network.bluetooth.le">true</feature>

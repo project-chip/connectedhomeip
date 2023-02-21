@@ -96,8 +96,6 @@ CHIP_ERROR SI917MatterConfig::InitMatter(const char * appName)
 #ifdef HEAP_MONITORING
     MemMonitoring::startHeapMonitoring();
 #endif
-    SetDeviceInstanceInfoProvider(&EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider());
-    SetCommissionableDataProvider(&EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider());
 
     //==============================================
     // Init Matter Stack
@@ -114,6 +112,9 @@ CHIP_ERROR SI917MatterConfig::InitMatter(const char * appName)
         return CHIP_ERROR_INTERNAL;
     }
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
+
+    SetDeviceInstanceInfoProvider(&EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider());
+    SetCommissionableDataProvider(&EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider());
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
 

@@ -62,6 +62,13 @@ ClustersWithAttributeChangedFunctions:
     - Window Covering
     - Fan Control
 
+ClustersWithShutdownFunctions:
+    - Barrier Control
+    - On/Off
+    - Door Lock
+    - Level Control
+    - Color Control
+
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock
     - Pump Configuration and Control
@@ -71,5 +78,3 @@ ClustersWithPreAttributeChangeFunctions:
     - Mode Select
     - Fan Control
     - Thermostat
-
-ClustersWithShutdownFunctions: []

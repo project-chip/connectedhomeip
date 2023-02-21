@@ -327,11 +327,9 @@ def main() -> int:
                       action="store_true", dest="do_rpc_console")
     parser.add_option("-y", "--tty", help="Enumerated USB tty/serial interface enumerated for your physical device. E.g.: /dev/ACM0",
                       dest="tty", metavar="TTY", default=None)
-    parser.add_option("", "--use_zzz", help="Use pre generated output from the ZAP tool found in the zzz_generated folder. Used to decrease execution time of CI/CD jobs",
-                      dest="use_zzz", action="store_true")
 
     # Build CD params.
-    parser.add_option("", "--build_all", help="For use in CD only. Builds and bundles all chef examples for the specified platform. Uses --use_zzz. Chef exits after completion.",
+    parser.add_option("", "--build_all", help="For use in CD only. Builds and bundles all chef examples for the specified platform. Chef exits after completion.",
                       dest="build_all", action="store_true")
     parser.add_option("", "--dry_run", help="Display list of target builds of the --build_all command without building them.",
                       dest="dry_run", action="store_true")
@@ -342,7 +340,7 @@ def main() -> int:
     parser.add_option("-k", "--keep_going", help="For use in CD only. Continues building all sample apps in the event of an error.",
                       dest="keep_going", action="store_true")
     parser.add_option(
-        "", "--ci", help="Builds Chef examples defined in cicd_config. Uses --use_zzz. Uses specified target from -t. Chef exits after completion.", dest="ci", action="store_true")
+        "", "--ci", help="Builds Chef examples defined in cicd_config. Uses specified target from -t. Chef exits after completion.", dest="ci", action="store_true")
     parser.add_option(
         "", "--enable_ipv4", help="Enable IPv4 mDNS. Only applicable to platforms that can support IPV4 (e.g, Linux, ESP32)",
         action="store_true", default=False)
@@ -367,7 +365,7 @@ def main() -> int:
                 shell.run_cmd(
                     "export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
-            command = f"./chef.py -cbr --use_zzz -d {device_name} -t {options.build_target}"
+            command = f"./chef.py -cbr -d {device_name} -t {options.build_target}"
             flush_print(f"Building {command}", with_border=True)
             shell.run_cmd(command)
             bundle(options.build_target, device_name)
@@ -397,7 +395,7 @@ def main() -> int:
                     if options.dry_run:
                         flush_print(archive_name)
                         continue
-                    command = f"./chef.py -cbr --use_zzz -d {device_name} -t {platform} "
+                    command = f"./chef.py -cbr -d {device_name} -t {platform} "
                     command += " ".join(args)
                     flush_print(f"Building {command}", with_border=True)
                     shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
@@ -602,21 +600,6 @@ def main() -> int:
                     f"""Truncate the software version string from \"{sw_ver_string}\" to \"{truncated_sw_ver_string}\" due to 64 bytes limitation""")
                 sw_ver_string = truncated_sw_ver_string
 
-        if options.use_zzz:
-            flush_print("Using pre-generated ZAP output")
-            zzz_dir = os.path.join(_REPO_BASE_PATH,
-                                   "zzz_generated",
-                                   "chef-"+options.sample_device_type_name,
-                                   "zap-generated")
-            if not os.path.exists(zzz_dir):
-                flush_print(textwrap.dedent(f"""\
-                You have specified --use_zzz
-                for device {options.sample_device_type_name}
-                which does not exist in the cached ZAP output.
-                """))
-                exit(1)
-            shutil.rmtree(gen_dir, ignore_errors=True)
-            shutil.copytree(zzz_dir, gen_dir)
         flush_print("Building...")
 
         flush_print(
