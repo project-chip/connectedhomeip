@@ -154,7 +154,7 @@ server cluster OnOff = 6 {
 
   request struct OffWithEffectRequest {
     OnOffEffectIdentifier effectIdentifier = 0;
-    OnOffDelayedAllOffEffectVariant effectVariant = 1;
+    int8u effectVariant = 1;
   }
 
   request struct OnWithTimedOffRequest {

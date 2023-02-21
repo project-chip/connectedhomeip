@@ -25,6 +25,7 @@ class Efr32App(Enum):
     LOCK = auto()
     SWITCH = auto()
     WINDOW_COVERING = auto()
+    THERMOSTAT = auto()
     UNIT_TEST = auto()
 
     def ExampleName(self):
@@ -36,6 +37,8 @@ class Efr32App(Enum):
             return 'light-switch-app'
         elif self == Efr32App.WINDOW_COVERING:
             return 'window-app'
+        elif self == Efr32App.THERMOSTAT:
+            return 'thermostat'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -48,6 +51,8 @@ class Efr32App(Enum):
             return 'chip-efr32-light-switch-example'
         elif self == Efr32App.WINDOW_COVERING:
             return 'chip-efr32-window-example'
+        elif self == Efr32App.THERMOSTAT:
+            return 'chip-efr32-thermostat-example'
         elif self == Efr32App.UNIT_TEST:
             return 'chip-efr32-device_tests'
         else:
@@ -62,6 +67,8 @@ class Efr32App(Enum):
             return 'light_switch_app.flashbundle.txt'
         elif self == Efr32App.WINDOW_COVERING:
             return 'window_app.flashbundle.txt'
+        elif self == Efr32App.THERMOSTAT:
+            return 'thermostat_app.flashbundle.txt'
         elif self == Efr32App.UNIT_TEST:
             return 'efr32_device_tests.flashbundle.txt'
         else:
@@ -84,6 +91,7 @@ class Efr32Board(Enum):
     BRD4187A = 7
     BRD4304A = 8
     BRD4187C = 9
+    BRD4186C = 10
 
     def GnArgName(self):
         if self == Efr32Board.BRD4161A:
@@ -102,6 +110,8 @@ class Efr32Board(Enum):
             return 'BRD4187A'
         elif self == Efr32Board.BRD4304A:
             return 'BRD4304A'
+        elif self == Efr32Board.BRD4186C:
+            return 'BRD4186C'
         elif self == Efr32Board.BRD4187C:
             return 'BRD4187C'
         else:

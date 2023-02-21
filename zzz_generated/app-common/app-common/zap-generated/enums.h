@@ -156,17 +156,6 @@ enum EmberAfInterfaceTypeEnum : uint8_t
     EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD      = 4,
 };
 
-// Enum for KeypadLockout
-enum EmberAfKeypadLockout : uint8_t
-{
-    EMBER_ZCL_KEYPAD_LOCKOUT_NO_LOCKOUT          = 0,
-    EMBER_ZCL_KEYPAD_LOCKOUT_LEVEL_ONE_LOCKOUT   = 1,
-    EMBER_ZCL_KEYPAD_LOCKOUT_LEVEL_TWO_LOCKOUT   = 2,
-    EMBER_ZCL_KEYPAD_LOCKOUT_LEVEL_THREE_LOCKOUT = 3,
-    EMBER_ZCL_KEYPAD_LOCKOUT_LEVEL_FOUR_LOCKOUT  = 4,
-    EMBER_ZCL_KEYPAD_LOCKOUT_LEVELFIVE_LOCKOUT   = 5,
-};
-
 // Enum for MoveMode
 enum EmberAfMoveMode : uint8_t
 {
@@ -242,13 +231,6 @@ enum EmberAfStepMode : uint8_t
 {
     EMBER_ZCL_STEP_MODE_UP   = 0,
     EMBER_ZCL_STEP_MODE_DOWN = 1,
-};
-
-// Enum for TemperatureDisplayMode
-enum EmberAfTemperatureDisplayMode : uint8_t
-{
-    EMBER_ZCL_TEMPERATURE_DISPLAY_MODE_CELSIUS    = 0,
-    EMBER_ZCL_TEMPERATURE_DISPLAY_MODE_FAHRENHEIT = 1,
 };
 
 #define EMBER_AF_BARRIER_CONTROL_CAPABILITIES_PARTIAL_BARRIER (1)

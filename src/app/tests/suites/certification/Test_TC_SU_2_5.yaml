@@ -28,7 +28,7 @@ config:
 tests:
     - label:
           "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
-          field is set to Proceed DelayedActionTime is set to 0."
+          field is set to 'Proceed', DelayedActionTime is set to 0."
       verification: |
           Verify that the DUT starts updating its software.
           Once the update is finished verify the software version on the DUT  matches the version downloaded for the software update.
@@ -47,7 +47,7 @@ tests:
 
     - label:
           "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
-          field is set to Proceed DelayedActionTime is set to 3 minutes"
+          field is set to 'Proceed', DelayedActionTime is set to 3 minutes."
       verification: |
           Run the OTA Provider App using the command:
 
@@ -67,7 +67,8 @@ tests:
 
     - label:
           "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
-          field is set to AwaitNextAction, DelayedActionTime is set to 1 minute."
+          field is set to 'AwaitNextAction', DelayedActionTime is set to 1
+          minute."
       verification: |
           Run the OTA Provider App using the command:
 
@@ -84,9 +85,9 @@ tests:
 
     - label:
           "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
-          field is set to AwaitNextAction, DelayedActionTime is set to 3
+          field is set to 'AwaitNextAction', DelayedActionTime is set to 3
           minutes. On the subsequent ApplyUpdateRequest command, TH/OTA-P sends
-          the ApplyUpdateResponse back to DUT. Action field is set to Proceed."
+          the ApplyUpdateResponse back to DUT. Action field is set to 'Proceed'."
       verification: |
           Run the OTA Provider App using the command:
 
@@ -105,7 +106,7 @@ tests:
 
     - label:
           "OTA-P/TH sends the ApplyUpdateResponse Command to the DUT. Action
-          field is set to Discontinue."
+          field is set to 'Discontinue'."
       verification: |
           Run the OTA Provider App using the command:
           ./chip-ota-provider-app --discriminator 22 --secured-device-port 5565 --KVS /tmp/chip_kvs_provider --filepath /tmp/test.bin -a  discontinue

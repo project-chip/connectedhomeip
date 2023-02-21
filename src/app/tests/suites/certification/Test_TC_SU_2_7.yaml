@@ -34,7 +34,7 @@ tests:
 
           Trigger OTA query using command
 
-          otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -55,7 +55,7 @@ tests:
 
     - label:
           "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a
-          QueryImageResponse back to DUT. QueryStatus is set to Busy."
+          QueryImageResponse back to DUT. QueryStatus is set to 'Busy'."
       verification: |
           ./chip-tool interactive start
 
@@ -65,7 +65,7 @@ tests:
 
           Trigger OTA query using command
 
-          otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -106,7 +106,7 @@ tests:
 
           Kill OTA Provider App before issuing query using
 
-          otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -142,7 +142,7 @@ tests:
 
           Trigger OTA query using command
 
-          otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -161,7 +161,7 @@ tests:
 
           Trigger OTA query using command
 
-          otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -186,7 +186,7 @@ tests:
     - label:
           "After the OTA image is transferred, DUT sends ApplyUpdateRequest to
           the OTA-P. OTA-P/TH sends the ApplyUpdateResponse Command to the DUT.
-          Action field is set to AwaitNextAction."
+          Action field is set to 'AwaitNextAction'."
       verification: |
           ./chip-tool interactive start
 
@@ -196,7 +196,7 @@ tests:
 
           Trigger OTA query using command
 
-          otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 
@@ -236,7 +236,7 @@ tests:
           software image version is being executed on the DUT. OTA-Subscriber
           sends a read request to read the VersionApplied event from the DUT."
       verification: |
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 0xDEADBEEF 0 0 0 0x1234567890 0
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 0xDEADBEEF 0 0 0 0x1234567890 0
 
           where 0x1234567890 is OTA Requestor node ID and 0xDEADBEEF is OTA Provider node ID
 

@@ -190,15 +190,15 @@ tests:
           MinCoolSetpointLimit"
       PICS: TSTAT.S.F01 && TSTAT.S.A0017 && PICS_SKIP_SAMPLE_APP
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          ./chip-tool thermostat write occupied-cooling-setpoint 3600 1 1
-          On TH(chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87)
-          [1658386056.238286][2906:2911] CHIP:DMG: }
-          [1658386056.238356][2906:2911] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1658386056.238389][2906:2911] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
-          [1658386056.238449][2906:2911] CHIP:EM: Sending Standalone Ack for MessageCounter:41416222 on exchange 5788i
-          [1658386056.238525][2906:2911] CHIP:IN: Prepared secure message 0xffffa77ed9e8 to 0x0000000000000001 (1)  of type 0x10 and protocolId (0, 0) on exchange 5788i with MessageCounter:113884573
+          ./chip-tool thermostat write occupied-cooling-setpoint 1000 1 1
+          On TH(chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87) for the value which is below of the  MinCoolSetpointLimit
+
+          [1676028984.901635][19375:19377] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1676028984.901706][19375:19377] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+          [1676028984.901895][19375:19377] CHIP:EM: <<< [E:18153i M:141749864 (Ack:137408936)] (S) Msg TX to 1:0000000000000001 [E8D5] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1676028984.901980][19375:19377] CHIP:IN: (S) Sending msg 141749864 on secure session with LSID: 58847
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -273,14 +273,15 @@ tests:
           OccupiedCoolingSetpoint attribute when Auto is enabled"
       PICS: TSTAT.S.F05 && TSTAT.S.A0012 && PICS_SKIP_SAMPLE_APP
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+
+          Test Harness Client then attempts to write OccupiedCoolingSetpoint to both of the limits of LowerLimit(1600) & MaxCoolSetpointLimit(3200) and confirms that the device does accept the value. See also Note 5.
 
           ./chip-tool thermostat write occupied-cooling-setpoint 1600 1 1
           On TH(chip-tool) verify that  DUT sends a success response
-
-          [1658386056.238356][2906:2911] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1658386056.238389][2906:2911] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
-          [1658386056.238449][2906:2911] CHIP:EM: Sending Standalone Ack for MessageCounter:41416222 on exchange 5788i
+          [1676029009.026653][19381:19383] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1676029009.026688][19381:19383] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+          [1676029009.026776][19381:19383] CHIP:EM: <<< [E:29492i M:142792974 (Ack:241003612)] (S) Msg TX to 1:0000000000000001 [E8D5] --- Type 0000:10
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -351,16 +352,13 @@ tests:
           MinHeatSetpointLimit"
       PICS: TSTAT.S.F00 && TSTAT.S.A0015 && PICS_SKIP_SAMPLE_APP
       verification: |
-          Optional Attribute -
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          ./chip-tool thermostat write  occupied-heating-setpoint 5000 1 1
-
+           ./chip-tool thermostat write  occupied-heating-setpoint 500 1 1
           On TH(chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87)
-          [1658388388.725344][3134:3139] CHIP:DMG:         InteractionModelRevision = 1
-          [1658388388.725388][3134:3139] CHIP:DMG: }
-          [1658388388.725505][3134:3139] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1658388388.725558][3134:3139] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
-          [1658388388.725618][3134:3139] CHIP:EM: Sending Standalone Ack for MessageCounter:199663269 on exchange 29439i
+          [1676029113.651245][19392:19394] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1676029113.651285][19392:19394] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+          [1676029113.651397][19392:19394] CHIP:EM: <<< [E:43315i M:59735604 (Ack:107613834)] (S) Msg TX to 1:0000000000000001 [E8D5] --- Type 0000:10
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -429,22 +427,12 @@ tests:
       PICS:
           TSTAT.S.F05 && TSTAT.S.A0011 && TSTAT.S.A0012 && PICS_SKIP_SAMPLE_APP
       verification: |
-          ./chip-tool thermostat write occupied-heating-setpoint 2200 1 1
-          On TH(chip-tool) verify that  DUT sends a success response
-          [1661755950.285710][3540:3545] CHIP:DMG:                         StatusIB =
-          [1661755950.285739][3540:3545] CHIP:DMG:                         {
-          [1661755950.285769][3540:3545] CHIP:DMG:                                 status = 0x87 (CONSTRAINT_ERROR),
-          [1661755950.285799][3540:3545] CHIP:DMG:                         },
-          [1661755950.285831][3540:3545] CHIP:DMG:
-          [1661755950.285855][3540:3545] CHIP:DMG:                 },
-
-          ./chip-tool thermostat read occupied-heating-setpoint 1 1
-
-          On TH(chip-tool) verify that the occupied heating setpoint attribute value which is provided in previous step
-          [1661756337.957444][3574:3579] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0201 Attribute 0x0000_0012 DataVersion: 1052267276
-          [1661756337.957573][3574:3579] CHIP:TOO:   OccupiedHeatingSetpoint: 2000
-          [1661756337.957876][3574:3579] CHIP:EM: Sending Standalone Ack for MessageCounter:176529588 on exchange 9927i
-          [1661756337.958020][3574:3579] CHIP:IN: Prepared secure message 0xffff867cd978 to 0x0000000000000001 (1)  of type 0x10 and p
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
+          ./chip-tool thermostat write occupied-heating-setpoint 3000 1 1
+            On TH(chip-tool) verify that  DUT sends a success response
+            1676029222.303920][19403:19405] CHIP:DMG: WriteClient moving to [AwaitingDe]
+            [1676029222.303955][19403:19405] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+            [1676029222.304055][19403:19405] CHIP:EM: <<< [E:236i M:251820549 (Ack:138263425)] (S) Msg TX to 1:0000000000000001 [E8D5] --- Type 0000:10
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -531,11 +519,13 @@ tests:
           MinCoolSetpointLimit"
       PICS: TSTAT.S.F02 && TSTAT.S.F01 && TSTAT.S.A0017 && PICS_SKIP_SAMPLE_APP
       verification: |
-          Optional Attribute - If it is supported, then in TH(chip-tool) log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          ./chip-tool thermostat write unoccupied-cooling-setpoint 2200  1 1
-
-          https://github.com/project-chip/connectedhomeip/issues/15627
+          ./chip-tool thermostat write  occupied-heating-setpoint 500 1 1
+          On TH(chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87)
+          [1676029263.842915][19409:19411] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1676029263.842943][19409:19411] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+          [1676029263.843052][19409:19411] CHIP:EM: <<< [E:47350i M:72320003 (Ack:188090912)] (S) Msg TX to 1:0000000000000001 [E8D5] --- Type 0000:10 (SecureChannel:StandaloneAck)
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -594,15 +584,17 @@ tests:
           TSTAT.S.F02 && TSTAT.S.F01 && TSTAT.S.A0013 && TSTAT.S.F05 &&
           PICS_SKIP_SAMPLE_APP
       verification: |
-          Optional Attribute - If it is supported, then in TH(chip-tool) log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          ./chip-tool thermostat read unoccupied-cooling-setpoint   1 1
 
-          Verify in TH(chip-tool) Log:
+          below mentioned the example command to verify
 
-          [1650451290.847810][5403:5408] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-          [1650451290.847903][5403:5408] CHIP:EM: Sending Standalone Ack for MessageCounter:5212350 on exchange 30170i
-          https://github.com/project-chip/connectedhomeip/issues/15627
+          ./chip-tool thermostat write unoccupied-cooling-setpoint 2000  1 1
+          On TH(chip-tool) verify that  DUT sends a success response.  As its an optional attribute, we are not getting expected result
+          [1676029365.250210][19420:19422] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1676029365.250263][19420:19422] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          [1676029365.250403][19420:19422] CHIP:EM: <<< [E:16230i M:267641165 (Ack:117850882)] (S) Msg TX to 1:0000000000000001 [E8D5] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1676029365.250467][19420:19422] CHIP:IN: (S) Sending msg 267641165 on secure session with LSID: 45606
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -702,15 +694,15 @@ tests:
           MinHeatSetpointLimit"
       PICS: TSTAT.S.F02 && TSTAT.S.F00 && TSTAT.S.A0015 && PICS_SKIP_SAMPLE_APP
       verification: |
-          Optional Attribute - If it is supported, then in TH(chip-tool) log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          ./chip-tool thermostat read unoccupied-heating-setpoint  1 1
-          As its an optional attribute, we are not getting expected result
-          [1658389018.789254][3201:3206] CHIP:DMG:         SuppressResponse = true,
-          [1658389018.789288][3201:3206] CHIP:DMG:         InteractionModelRevision = 1
-          [1658389018.789312][3201:3206] CHIP:DMG: }
-          [1658389018.789426][3201:3206] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-          [1658389018.789511][3201:3206] CHIP:EM: Sending Standalone Ack for MessageCounter:175660806 on exchange 16788i
+          ./chip-tool thermostat write  unoccupied-cooling-setpoint 500 1 1
+          On TH(chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87). As its an optional attribute, we are not getting expected result
+
+          [1676029557.268065][19431:19433] CHIP:DMG: }
+          [1676029557.268220][19431:19433] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1676029557.268290][19431:19433] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          [1676029557.268470][19431:19433] CHIP:EM: <<< [E:8458i M:31631638 (Ack:115187982)] (S) Msg TX to 1:0000000000000001 [E8D5] --- Type 0000:10 (SecureChannel:StandaloneAck)
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -780,16 +772,19 @@ tests:
           TSTAT.S.F02 && TSTAT.S.F00 && TSTAT.S.A0013 && TSTAT.S.F05 &&
           PICS_SKIP_SAMPLE_APP
       verification: |
-          Optional Attribute - If it is supported, then in TH (chip-tool) log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          ./chip-tool thermostat read unoccupied-heating-setpoint  1 1
-          As its an optional attribute, we are not getting expected result
-          [1658389070.439643][3209:3214] CHIP:DMG:
-          [1658389070.439678][3209:3214] CHIP:DMG:         SuppressResponse = true,
-          [1658389070.439715][3209:3214] CHIP:DMG:         InteractionModelRevision = 1
-          [1658389070.439750][3209:3214] CHIP:DMG: }
-          [1658389070.439896][3209:3214] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
-          [1658389070.439997][3209:3214] CHIP:EM: Sending Standalone Ack for MessageCounter:26480890 on exchange 13280i
+
+          below mentioned the example command to verify
+
+          ./chip-tool thermostat write unoccupied-heating-setpoint 2000  1 1
+          On TH(chip-tool) verify that  DUT sends a success response.  As its an optional attribute, we are not getting expected result
+
+          [1676029629.242182][19437:19439] CHIP:DMG: }
+          [1676029629.242250][19437:19439] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1676029629.242280][19437:19439] CHIP:TOO: Response Failure: IM Error 0x00000586: General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
+          [1676029629.242366][19437:19439] CHIP:EM: <<< [E:51650i M:149591010 (Ack:214538556)] (S) Msg TX to 1:0000000000000001 [E8D5] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1676029629.242402][19437:19439] CHIP:IN: (S) Sending msg 149591010 on secure session with LSID: 6132
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -890,11 +885,11 @@ tests:
       verification: |
           ./chip-tool thermostat write min-heat-setpoint-limit 300  1 1
           On TH  (chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87)
-          [1658389492.560607][3266:3272] CHIP:DMG:         InteractionModelRevision = 1
-          [1658389492.560644][3266:3272] CHIP:DMG: }
-          [1658389492.560749][3266:3272] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1658389492.560915][3266:3272] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
-          [1658389492.561002][3266:3272] CHIP:EM: Sending Standalone Ack for MessageCounter:252582472 on exchange 3434i
+          [1676029705.839179][19450:19452] CHIP:DMG: }
+          [1676029705.839253][19450:19452] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1676029705.839287][19450:19452] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+          [1676029705.839411][19450:19452] CHIP:EM: <<< [E:34538i M:185292291 (Ack:127655640)] (S) Msg TX to 1:0000000000000001 [E8D5] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1676029705.839456][19450:19452] CHIP:IN: (S) Sending msg 185292291 on secure session with LSID: 61694
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -1079,27 +1074,13 @@ tests:
       PICS:
           TSTAT.S.F00  && TSTAT.S.A0016 && TSTAT.S.A0015 && PICS_SKIP_SAMPLE_APP
       verification: |
-          Optional Attribute -
-
-          ./chip-tool thermostat write  max-heat-setpoint-limit 7000 1 1
-
-          On TH(chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87)
-
-          [1658389771.305508][3310:3315] CHIP:DMG:         ],
-          [1658389771.305555][3310:3315] CHIP:DMG:
-          [1658389771.305594][3310:3315] CHIP:DMG:         InteractionModelRevision = 1
-          [1658389771.305632][3310:3315] CHIP:DMG: }
-          [1658389771.305737][3310:3315] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1658389771.305785][3310:3315] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
-          [1658389771.305867][3310:3315] CHIP:EM: Sending Standalone Ack for MessageCounter:187660216 on exchange 59285i
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
           ./chip-tool thermostat write  max-heat-setpoint-limit 100 1 1
           On TH(chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87)
-          [1658389806.716013][3316:3321] CHIP:DMG:
-          [1658389806.716046][3316:3321] CHIP:DMG:                         StatusIB =
-          [1658389806.716084][3316:3321] CHIP:DMG:                         {
-          [1658389806.716121][3316:3321] CHIP:DMG:                                 status = 0x87 (CONSTRAINT_ERROR),
-          [1658389806.716158][3316:3321] CHIP:DMG:                         },
+          [1676029976.380552][19475:19477] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1676029976.380598][19475:19477] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+          [1676029976.380705][19475:19477] CHIP:EM: <<< [E:10254i M:97110781 (Ack:264765613)] (S) Msg TX to 1:0000000000000001 [E8D5] --- Type 0000:10 (SecureChannel:StandaloneAck)
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -1158,7 +1139,7 @@ tests:
           TSTAT.S.F00 && TSTAT.S.A0016 && TSTAT.S.F05 && TSTAT.S.A0018 &&
           PICS_SKIP_SAMPLE_APP
       verification: |
-          ./chip-tool thermostat write  max-heat-setpoint-limit 2000 1 1
+          ./chip-tool thermostat write  max-heat-setpoint-limit 2000(Consider the different value but valid4) 1 1
           On TH(chip-tool) verify that  DUT sends a success response
           [1658389911.809423][3333:3338] CHIP:DMG:                                 Endpoint = 0x1,
           [1658389911.809492][3333:3338] CHIP:DMG:                                 Cluster = 0x201,
@@ -1262,10 +1243,10 @@ tests:
       PICS:
           TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0005 && PICS_SKIP_SAMPLE_APP
       verification: |
-          Optional Attribute -
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
 
-          ./chip-tool thermostat write max-heat-setpoint-limit 9000  1 1
+          ./chip-tool thermostat write max-heat-setpoint-limit 90  1 1
           On TH(chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87)
           [1658390040.444407][3343:3348] CHIP:DMG:
           [1658390040.444443][3343:3348] CHIP:DMG:                 },
@@ -1350,15 +1331,37 @@ tests:
           TSTAT.S.F01 && TSTAT.S.A0017 && TSTAT.S.A0015 && TSTAT.S.F05 &&
           PICS_SKIP_SAMPLE_APP
       verification: |
-          ./chip-tool thermostat write max-heat-setpoint-limit 2000 1 1
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          Verify in TH(chip-tool) Log:
-          [1658390406.512865][3384:3389] CHIP:DMG:
-          [1658390406.512895][3384:3389] CHIP:DMG:                         StatusIB =
-          [1658390406.512927][3384:3389] CHIP:DMG:                         {
-          [1658390406.512958][3384:3389] CHIP:DMG:                                 status = 0x00 (SUCCESS),
-          [1658390406.512992][3384:3389] CHIP:DMG:                         },
-          [1658390406.513023][3384:3389] CHIP:DMG:
+          Test Harness Client then attempts to write MinCoolSetpointLimit to both of the limits of LowerLimit & MaxCoolSetpointLimit and confirms that the device does accept the value.
+
+          ./chip-tool thermostat write max-heat-setpoint-limit 2000 1 1
+          On TH(chip-tool) verify that  DUT sends a success response
+          [1676030202.115210][19505:19507] CHIP:DMG: WriteResponseMessage =
+          [1676030202.115232][19505:19507] CHIP:DMG: {
+          [1676030202.115251][19505:19507] CHIP:DMG:         AttributeStatusIBs =
+          [1676030202.115280][19505:19507] CHIP:DMG:         [
+          [1676030202.115301][19505:19507] CHIP:DMG:                 AttributeStatusIB =
+          [1676030202.115327][19505:19507] CHIP:DMG:                 {
+          [1676030202.115350][19505:19507] CHIP:DMG:                         AttributePathIB =
+          [1676030202.115379][19505:19507] CHIP:DMG:                         {
+          [1676030202.115408][19505:19507] CHIP:DMG:                                 Endpoint = 0x1,
+          [1676030202.115437][19505:19507] CHIP:DMG:                                 Cluster = 0x201,
+          [1676030202.115468][19505:19507] CHIP:DMG:                                 Attribute = 0x0000_0016,
+          [1676030202.115497][19505:19507] CHIP:DMG:                         }
+          [1676030202.115529][19505:19507] CHIP:DMG:
+          [1676030202.115553][19505:19507] CHIP:DMG:                         StatusIB =
+          [1676030202.115583][19505:19507] CHIP:DMG:                         {
+          [1676030202.115610][19505:19507] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1676030202.115637][19505:19507] CHIP:DMG:                         },
+          [1676030202.115664][19505:19507] CHIP:DMG:
+          [1676030202.115687][19505:19507] CHIP:DMG:                 },
+          [1676030202.115714][19505:19507] CHIP:DMG:
+          [1676030202.115735][19505:19507] CHIP:DMG:         ],
+          [1676030202.115763][19505:19507] CHIP:DMG:
+          [1676030202.115784][19505:19507] CHIP:DMG:         InteractionModelRevision = 1
+          [1676030202.115805][19505:19507] CHIP:DMG: }
+          [1676030202.115869][19505:19507] CHIP:DMG: WriteClient moving to [AwaitingDe]
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -1430,16 +1433,14 @@ tests:
       PICS:
           TSTAT.S.F01 && TSTAT.S.A0018 && TSTAT.S.A0017 && PICS_SKIP_SAMPLE_APP
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          ./chip-tool thermostat write max-cool-setpoint-limit 9100 1 1
-          On TH(chip-tool)(chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87)
-          [1658396137.669807][3677:3682] CHIP:DMG:
-          [1658396137.669832][3677:3682] CHIP:DMG:         InteractionModelRevision = 1
-          [1658396137.669857][3677:3682] CHIP:DMG: }
-          [1658396137.669929][3677:3682] CHIP:DMG: WriteClient moving to [AwaitingDe]
-          [1658396137.669964][3677:3682] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
-          [1658396137.670019][3677:3682] CHIP:EM: Sending Standalone Ack for MessageCounter:77698449 on exchange 47844i
+          ./chip-tool thermostat write max-cool-setpoint-limit 100 1 1
+          On TH(chip-tool) verify that  DUT sends a CONSTRAINT_ERROR (0x87)
+          [1676030395.441963][19525:19527] CHIP:DMG: }
+          [1676030395.442028][19525:19527] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1676030395.442059][19525:19527] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+          [1676030395.442147][19525:19527] CHIP:EM: <<< [E:35527i M:176995637 (Ack:93643096)] (S) Msg TX to 1:0000000000000001 [E8D5] --- Type 0000:10 (SecureChannel:StandaloneAck)
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -1525,14 +1526,13 @@ tests:
           TSTAT.S.F01 && TSTAT.S.A0018 && TSTAT.S.A0016 && TSTAT.S.F05 &&
           PICS_SKIP_SAMPLE_APP
       verification: |
-          Optional attribute so its not compulsory to get the expected outcome
+          Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE. Below is the log of RPI the result may be vary on the basis of dut implementation.
 
-          ./chip-tool thermostat write max-cool-setpoint-limit 1600 1 1
+          ./chip-tool thermostat write max-cool-setpoint-limit 1900 1 1
           On TH verify that  DUT sends a success response
-          [1661766260.648041][10448:10453] CHIP:DMG:                         StatusIB =
-          [1661766260.648070][10448:10453] CHIP:DMG:                         {
-          [1661766260.648100][10448:10453] CHIP:DMG:                                 status = 0x87 (CONSTRAINT_ERROR),
-          [1661766260.648127][10448:10453] CHIP:DMG:                         },
+          [1676030512.074396][19536:19538] CHIP:DMG: WriteClient moving to [AwaitingDe]
+          [1676030512.074446][19536:19538] CHIP:TOO: Response Failure: IM Error 0x00000587: General error: 0x87 (CONSTRAINT_ERROR)
+          [1676030512.074579][19536:19538] CHIP:EM: <<< [E:30570i M:59217688 (Ack:139377342)] (S) Msg TX to 1:0000000000000001 [E8D5] --- Type 0000:10
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:

@@ -131,33 +131,33 @@ bool LockManager::IsValidHolidayScheduleIndex(uint8_t scheduleIndex)
 bool LockManager::ReadConfigValues()
 {
     size_t outLen;
-    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
                                      sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
 
-    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
                                      sizeof(EmberAfPluginDoorLockCredentialInfo) * ArraySize(mLockCredentials), outLen);
 
-    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames),
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames),
                                      sizeof(mUserNames), outLen);
 
-    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_CredentialData, reinterpret_cast<uint8_t *>(mCredentialData),
                                      sizeof(mCredentialData), outLen);
 
-    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials),
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials),
                                      sizeof(CredentialStruct) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser,
                                      outLen);
 
-    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *>(mWeekdaySchedule),
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *>(mWeekdaySchedule),
                                      sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
                                          LockParams.numberOfUsers,
                                      outLen);
 
-    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *>(mYeardaySchedule),
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_YearDaySchedules, reinterpret_cast<uint8_t *>(mYeardaySchedule),
                                      sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser *
                                          LockParams.numberOfUsers,
                                      outLen);
 
-    SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_HolidaySchedules, reinterpret_cast<uint8_t *>(&(mHolidaySchedule)),
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_HolidaySchedules, reinterpret_cast<uint8_t *>(&(mHolidaySchedule)),
                                      sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules, outLen);
 
     return true;
@@ -389,13 +389,13 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
     userInStorage.credentials = chip::Span<const CredentialStruct>(mCredentials[userIndex], totalCredentials);
 
     // Save user information in NVM flash
-    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&mLockUsers),
+    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_LockUser, reinterpret_cast<const uint8_t *>(&mLockUsers),
                                       sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
 
-    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(mCredentials),
+    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(mCredentials),
                                       sizeof(CredentialStruct) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser);
 
-    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_LockUserName, reinterpret_cast<const uint8_t *>(mUserNames),
+    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_LockUserName, reinterpret_cast<const uint8_t *>(mUserNames),
                                       sizeof(mUserNames));
 
     ChipLogProgress(Zcl, "Successfully set the user [mEndpointId=%d,index=%d]", endpointId, userIndex);
@@ -476,10 +476,10 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
     credentialInStorage.credentialData = chip::ByteSpan{ mCredentialData[credentialIndex], credentialData.size() };
 
     // Save credential information in NVM flash
-    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
+    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
                                       sizeof(EmberAfPluginDoorLockCredentialInfo) * LockParams.numberOfCredentialsPerUser);
 
-    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
+    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
                                       sizeof(mCredentialData));
 
     ChipLogProgress(Zcl, "Successfully set the credential [credentialType=%u]", to_underlying(credentialType));
@@ -535,8 +535,8 @@ DlStatus LockManager::SetWeekdaySchedule(chip::EndpointId endpointId, uint8_t we
     scheduleInStorage.status               = status;
 
     // Save schedule information in NVM flash
-    SILABSConfig::WriteConfigValueBin(
-        SILABSConfig::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
+    SilabsConfig::WriteConfigValueBin(
+        SilabsConfig::kConfigKey_WeekDaySchedules, reinterpret_cast<const uint8_t *>(mWeekdaySchedule),
         sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser * LockParams.numberOfUsers);
 
     return DlStatus::kSuccess;
@@ -584,8 +584,8 @@ DlStatus LockManager::SetYeardaySchedule(chip::EndpointId endpointId, uint8_t ye
     scheduleInStorage.status                  = status;
 
     // Save schedule information in NVM flash
-    SILABSConfig::WriteConfigValueBin(
-        SILABSConfig::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
+    SilabsConfig::WriteConfigValueBin(
+        SilabsConfig::kConfigKey_YearDaySchedules, reinterpret_cast<const uint8_t *>(mYeardaySchedule),
         sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser * LockParams.numberOfUsers);
 
     return DlStatus::kSuccess;
@@ -628,7 +628,7 @@ DlStatus LockManager::SetHolidaySchedule(chip::EndpointId endpointId, uint8_t ho
     scheduleInStorage.status                  = status;
 
     // Save schedule information in NVM flash
-    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_HolidaySchedules,
+    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_HolidaySchedules,
                                       reinterpret_cast<const uint8_t *>(&(mHolidaySchedule)),
                                       sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules);
 

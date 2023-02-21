@@ -32,7 +32,6 @@
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
-#include <app/chip-zcl-zpro-codec.h>
 #include <app/util/error-mapping.h>
 #include <atomic>
 #include <ble/BleUUID.h>

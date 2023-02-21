@@ -81,8 +81,6 @@ class AndroidApp(Enum):
             return "tv-server"
         elif self == AndroidApp.TV_CASTING_APP:
             return "tv-casting"
-        elif self == AndroidApp.JAVA_MATTER_CONTROLLER:
-            return "java-matter-controller"
         else:
             raise Exception("Unknown app type: %r" % self)
 
@@ -99,8 +97,6 @@ class AndroidApp(Enum):
             return "tv-app"
         elif self == AndroidApp.TV_CASTING_APP:
             return "tv-casting-app"
-        elif self == AndroidApp.JAVA_MATTER_CONTROLLER:
-            return "java-matter-controller"
         else:
             return None
 
@@ -294,16 +290,6 @@ class AndroidBuilder(Builder):
                 title="Building Example " + self.identifier,
             )
 
-    def createJavaExecutable(self, java_program):
-        self._Execute(
-            [
-                "chmod",
-                "+x",
-                "%s/bin/%s" % (self.output_dir, java_program),
-            ],
-            title="Make Java program executable",
-        )
-
     def generate(self):
         self._Execute(
             ["python3", "third_party/android_deps/set_up_android_deps.py"],
@@ -349,10 +335,7 @@ class AndroidBuilder(Builder):
 
             exampleName = self.app.ExampleName()
             if exampleName is not None:
-                if exampleName == "java-matter-controller":
-                    gn_gen += ["--root=%s/examples/%s/" % (self.root, exampleName)]
-                else:
-                    gn_gen += ["--root=%s/examples/%s/android/" % (self.root, exampleName)]
+                gn_gen += ["--root=%s/examples/%s/android/" % (self.root, exampleName)]
 
             if self.board.IsIde():
                 gn_gen += [
@@ -384,15 +367,6 @@ class AndroidBuilder(Builder):
                 )
 
             app_dir = os.path.join(self.root, "examples/", self.app.AppName())
-            if exampleName == "java-matter-controller":
-                self._Execute(
-                    [
-                        "cp",
-                        os.path.join(app_dir, "Manifest.txt"),
-                        self.output_dir,
-                    ],
-                    title="Copying Manifest.txt to " + self.output_dir,
-                )
 
     def _build(self):
         if self.board.IsIde():
@@ -420,32 +394,6 @@ class AndroidBuilder(Builder):
             if exampleName is None:
                 self.copyToSrcAndroid()
                 self.gradlewBuildSrcAndroid()
-            elif exampleName == "java-matter-controller":
-                jnilibs_dir = os.path.join(
-                    self.root,
-                    "examples/",
-                    self.app.ExampleName(),
-                    "app/libs/jniLibs",
-                    self.board.AbiName(),
-                )
-
-                libs_dir = os.path.join(
-                    self.root, "examples/", self.app.ExampleName(), "app/libs"
-                )
-
-                libs = [
-                    "libSetupPayloadParser.so",
-                    "libCHIPController.so",
-                    "libc++_shared.so",
-                ]
-
-                jars = {
-                    "CHIPController.jar": "third_party/connectedhomeip/src/controller/java/CHIPController.jar",
-                    "SetupPayloadParser.jar": "third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar",
-                }
-
-                self.copyToExampleApp(jnilibs_dir, libs_dir, libs, jars)
-                self.createJavaExecutable("java-matter-controller")
             elif exampleName == "tv-casting-app":
                 jnilibs_dir = os.path.join(
                     self.root,

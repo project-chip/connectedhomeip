@@ -32,8 +32,8 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer::Internal;
 
-#define CONVERT_KEYMAP_INDEX_TO_NVM3KEY(index) (SILABSConfig::kConfigKey_KvsFirstKeySlot + index)
-#define CONVERT_NVM3KEY_TO_KEYMAP_INDEX(nvm3Key) (nvm3Key - SILABSConfig::kConfigKey_KvsFirstKeySlot)
+#define CONVERT_KEYMAP_INDEX_TO_NVM3KEY(index) (SilabsConfig::kConfigKey_KvsFirstKeySlot + index)
+#define CONVERT_NVM3KEY_TO_KEYMAP_INDEX(nvm3Key) (nvm3Key - SilabsConfig::kConfigKey_KvsFirstKeySlot)
 
 namespace chip {
 namespace DeviceLayer {
@@ -45,12 +45,12 @@ char mKvsStoredKeyString[KeyValueStoreManagerImpl::kMaxEntries][PersistentStorag
 CHIP_ERROR KeyValueStoreManagerImpl::Init(void)
 {
     CHIP_ERROR err;
-    err = SILABSConfig::Init();
+    err = SilabsConfig::Init();
     SuccessOrExit(err);
 
     memset(mKvsStoredKeyString, 0, sizeof(mKvsStoredKeyString));
     size_t outLen;
-    err = SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_KvsStringKeyMap,
+    err = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_KvsStringKeyMap,
                                            reinterpret_cast<uint8_t *>(mKvsStoredKeyString), sizeof(mKvsStoredKeyString), outLen);
 
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND) // Initial boot
@@ -64,7 +64,7 @@ exit:
 
 bool KeyValueStoreManagerImpl::IsValidKvsNvm3Key(uint32_t nvm3Key) const
 {
-    return ((SILABSConfig::kConfigKey_KvsFirstKeySlot <= nvm3Key) && (nvm3Key <= SILABSConfig::kConfigKey_KvsLastKeySlot));
+    return ((SilabsConfig::kConfigKey_KvsFirstKeySlot <= nvm3Key) && (nvm3Key <= SilabsConfig::kConfigKey_KvsLastKeySlot));
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::MapKvsKeyToNvm3(const char * key, uint32_t & nvm3Key, bool isSlotNeeded) const
@@ -113,7 +113,7 @@ void KeyValueStoreManagerImpl::ForceKeyMapSave()
 
 void KeyValueStoreManagerImpl::OnScheduledKeyMapSave(System::Layer * systemLayer, void * appState)
 {
-    SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_KvsStringKeyMap,
+    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_KvsStringKeyMap,
                                       reinterpret_cast<const uint8_t *>(mKvsStoredKeyString), sizeof(mKvsStoredKeyString));
 }
 
@@ -138,7 +138,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
     size_t outLen;
-    err = SILABSConfig::ReadConfigValueBin(nvm3Key, reinterpret_cast<uint8_t *>(value), value_size, outLen, offset_bytes);
+    err = SilabsConfig::ReadConfigValueBin(nvm3Key, reinterpret_cast<uint8_t *>(value), value_size, outLen, offset_bytes);
     if (read_bytes_size)
     {
         *read_bytes_size = outLen;
@@ -160,10 +160,10 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     CHIP_ERROR err = MapKvsKeyToNvm3(key, nvm3Key, /* isSlotNeeded */ true);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
-    err = SILABSConfig::WriteConfigValueBin(nvm3Key, reinterpret_cast<const uint8_t *>(value), value_size);
+    err = SilabsConfig::WriteConfigValueBin(nvm3Key, reinterpret_cast<const uint8_t *>(value), value_size);
     if (err == CHIP_NO_ERROR)
     {
-        uint32_t keyIndex = nvm3Key - SILABSConfig::kConfigKey_KvsFirstKeySlot;
+        uint32_t keyIndex = nvm3Key - SilabsConfig::kConfigKey_KvsFirstKeySlot;
         Platform::CopyString(mKvsStoredKeyString[keyIndex], key);
         ScheduleKeyMapSave();
     }
@@ -179,7 +179,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     CHIP_ERROR err = MapKvsKeyToNvm3(key, nvm3Key);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
-    err = SILABSConfig::ClearConfigValue(nvm3Key);
+    err = SilabsConfig::ClearConfigValue(nvm3Key);
     if (err == CHIP_NO_ERROR)
     {
         uint32_t keyIndex = CONVERT_NVM3KEY_TO_KEYMAP_INDEX(nvm3Key);
@@ -194,9 +194,9 @@ CHIP_ERROR KeyValueStoreManagerImpl::ErasePartition(void)
 {
     // Iterate over all the Matter Kvs nvm3 records and delete each one...
     CHIP_ERROR err = CHIP_NO_ERROR;
-    for (uint32_t nvm3Key = SILABSConfig::kMinConfigKey_MatterKvs; nvm3Key < SILABSConfig::kMaxConfigKey_MatterKvs; nvm3Key++)
+    for (uint32_t nvm3Key = SilabsConfig::kMinConfigKey_MatterKvs; nvm3Key < SilabsConfig::kMaxConfigKey_MatterKvs; nvm3Key++)
     {
-        err = SILABSConfig::ClearConfigValue(nvm3Key);
+        err = SilabsConfig::ClearConfigValue(nvm3Key);
 
         if (err != CHIP_NO_ERROR)
         {
