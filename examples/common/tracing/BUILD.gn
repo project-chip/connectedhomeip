@@ -67,6 +67,8 @@ executable("chip-trace-decoder") {
 
   output_dir = root_out_dir
 
+  deps = [ "${chip_root}/src/platform/logging:force_stdio" ]
+
   public_deps = [
     "${chip_root}/src/lib",
     "${chip_root}/third_party/jsoncpp",
