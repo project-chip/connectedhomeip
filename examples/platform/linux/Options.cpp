@@ -193,7 +193,7 @@ const char * sDeviceOptionHelp =
 #endif
 #if CHIP_DEVICE_ENABLE_PORT_PARAMS
     "  --secured-commissioner-port <port>\n"
-    "       A 16-bit unsigned integer specifying the listen port to use for secure commissioner messages (default is 5550). Only "
+    "       A 16-bit unsigned integer specifying the listen port to use for secure commissioner messages (default is 5552). Only "
     "valid when app is both device and commissioner\n"
     "\n"
 #endif
