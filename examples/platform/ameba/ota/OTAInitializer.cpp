@@ -36,14 +36,14 @@ AmebaOTAImageProcessor gImageProcessor;
 extern "C" void amebaQueryImageCmdHandler()
 {
     ChipLogProgress(DeviceLayer, "Calling amebaQueryImageCmdHandler");
-    if(OTAInitializer::Instance().CheckInit()) 
+    if (OTAInitializer::Instance().CheckInit())
         PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->TriggerImmediateQuery(); });
 }
 
 extern "C" void amebaApplyUpdateCmdHandler()
 {
     ChipLogProgress(DeviceLayer, "Calling amebaApplyUpdateCmdHandler");
-    if(OTAInitializer::Instance().CheckInit()) 
+    if (OTAInitializer::Instance().CheckInit())
         PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->ApplyUpdate(); });
 }
 
