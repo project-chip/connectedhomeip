@@ -236,11 +236,9 @@ public class ClusterInfoMapping {
 
   {{/chip_cluster_responses}}
       {{#chip_server_cluster_attributes}}
-      {{#if isArray}}
-      {{#if isStruct}}
-
-      {{/if}}
-
+      {{#unless (isStrEqual chipCallback.name "Unsupported")}}
+      {{#if_basic_global_response}}
+      {{else}}
       public static class Delegated{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}AttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
@@ -252,18 +250,28 @@ public class ClusterInfoMapping {
           false. }}
         {{~#*inline "asJavaTypeForEntry"}}{{asJavaType type null parent.name forceNotList=true}}{{/inline~}}
         @Override
+        {{#if isArray}}
         public void onSuccess({{#if isNullable}}@Nullable{{/if}} List<{{> asJavaTypeForEntry isArray=false}}> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
           CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<{{> asJavaTypeForEntry isArray=false}}>");
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
+        {{else}}
+        public void onSuccess({{#if isNullable}}@Nullable{{/if}} {{>asJavaTypeForEntry isArray=false}} value) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "{{> asJavaTypeForEntry isArray=false}}");
+          responseValues.put(commandResponseInfo, value);
+          callback.onSuccess(responseValues);
+        }
+        {{/if}}
         @Override
         public void onError(Exception ex) {
           callback.onFailure(ex);
         }
       }
-      {{/if}}
+      {{/if_basic_global_response}}
+      {{/unless}}
       {{/chip_server_cluster_attributes}}
 
   {{/chip_client_clusters}}
