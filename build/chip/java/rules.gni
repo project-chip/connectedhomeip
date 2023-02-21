@@ -355,24 +355,6 @@ template("android_library") {
   }
 }
 
-template("android_binary") {
-  java_binary(target_name) {
-    forward_variables_from(invoker, "*")
-
-    if (!defined(javac_flags)) {
-      javac_flags = []
-    }
-
-    javac_flags += [
-      "-Xlint:-options",
-      "-source",
-      "8",
-      "-target",
-      "8",
-    ]
-  }
-}
-
 template("java_prebuilt") {
   java_library(target_name) {
     forward_variables_from(invoker, "*")
