@@ -234,8 +234,12 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  *
  * @param completion  response handler will receive either values or error.
  *
- *                    Received values are documented in the definition of
- *                    MTRDeviceResponseHandler.
+ *                    A path-specific error status will get turned into an error
+ *                    passed to the completion, so values will only be passed in
+ *                    when the write succeeds.  In that case, values will have
+ *                    the format documented in the definition of
+ *                    MTRDeviceResponseHandler and just contain a single entry
+ *                    with the path of the attribute that was written.
  */
 - (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
