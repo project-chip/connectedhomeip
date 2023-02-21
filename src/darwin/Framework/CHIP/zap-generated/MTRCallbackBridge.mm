@@ -8525,7 +8525,7 @@ void MTRBarrierControlAttributeListListAttributeCallbackSubscriptionBridge::OnSu
 }
 
 void MTRPumpConfigurationAndControlPumpStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value)
+    void * context, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -19595,15 +19595,15 @@ void MTRNullableWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value)
+void MTRPumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPumpConfigurationAndControlClusterControlModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -19618,8 +19618,8 @@ void MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscr
     }
 }
 
-void MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode> & value)
+void MTRNullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19630,7 +19630,7 @@ void MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallba
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -19645,15 +19645,15 @@ void MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallba
     }
 }
 
-void MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value)
+void MTRPumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -19668,8 +19668,8 @@ void MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubs
     }
 }
 
-void MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode> & value)
+void MTRNullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19680,7 +19680,7 @@ void MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCall
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

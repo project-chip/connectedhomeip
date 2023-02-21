@@ -1862,8 +1862,8 @@ namespace BarrierControl {} // namespace BarrierControl
 
 namespace PumpConfigurationAndControl {
 
-// Enum for PumpControlMode
-enum class PumpControlMode : uint8_t
+// Enum for ControlModeEnum
+enum class ControlModeEnum : uint8_t
 {
     kConstantSpeed        = 0x00,
     kConstantPressure     = 0x01,
@@ -1878,8 +1878,8 @@ enum class PumpControlMode : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Enum for PumpOperationMode
-enum class PumpOperationMode : uint8_t
+// Enum for OperationModeEnum
+enum class OperationModeEnum : uint8_t
 {
     kNormal  = 0x00,
     kMinimum = 0x01,
@@ -1901,11 +1901,11 @@ enum class PumpFeature : uint32_t
     kConstantSpeed       = 0x8,
     kConstantTemperature = 0x10,
     kAutomatic           = 0x20,
-    kLocal               = 0x40,
+    kLocalOperation      = 0x40,
 };
 
-// Bitmap for PumpStatus
-enum class PumpStatus : uint16_t
+// Bitmap for PumpStatusBitmap
+enum class PumpStatusBitmap : uint16_t
 {
     kDeviceFault       = 0x1,
     kSupplyfault       = 0x2,

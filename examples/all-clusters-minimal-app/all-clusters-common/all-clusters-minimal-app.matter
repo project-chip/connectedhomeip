@@ -2299,7 +2299,7 @@ server cluster WindowCovering = 258 {
 }
 
 server cluster PumpConfigurationAndControl = 512 {
-  enum PumpControlMode : ENUM8 {
+  enum ControlModeEnum : ENUM8 {
     kConstantSpeed = 0;
     kConstantPressure = 1;
     kProportionalPressure = 2;
@@ -2308,7 +2308,7 @@ server cluster PumpConfigurationAndControl = 512 {
     kAutomatic = 7;
   }
 
-  enum PumpOperationMode : ENUM8 {
+  enum OperationModeEnum : ENUM8 {
     kNormal = 0;
     kMinimum = 1;
     kMaximum = 2;
@@ -2322,10 +2322,10 @@ server cluster PumpConfigurationAndControl = 512 {
     kConstantSpeed = 0x8;
     kConstantTemperature = 0x10;
     kAutomatic = 0x20;
-    kLocal = 0x40;
+    kLocalOperation = 0x40;
   }
 
-  bitmap PumpStatus : BITMAP16 {
+  bitmap PumpStatusBitmap : BITMAP16 {
     kDeviceFault = 0x1;
     kSupplyfault = 0x2;
     kSpeedLow = 0x4;
@@ -2393,10 +2393,10 @@ server cluster PumpConfigurationAndControl = 512 {
   readonly attribute nullable int16u maxFlow = 2;
   readonly attribute nullable int16s minConstPressure = 3;
   readonly attribute nullable int16s maxConstPressure = 4;
-  readonly attribute PumpOperationMode effectiveOperationMode = 17;
-  readonly attribute PumpControlMode effectiveControlMode = 18;
+  readonly attribute OperationModeEnum effectiveOperationMode = 17;
+  readonly attribute ControlModeEnum effectiveControlMode = 18;
   readonly attribute nullable int16s capacity = 19;
-  attribute access(write: manage) PumpOperationMode operationMode = 32;
+  attribute access(write: manage) OperationModeEnum operationMode = 32;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
