@@ -75,7 +75,6 @@ Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0, 
 Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(0, &sEthernetDriver);
 } // namespace
 
-
 void ApplicationInit()
 {
     const bool kThreadEnabled = {
