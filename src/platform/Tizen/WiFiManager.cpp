@@ -29,6 +29,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/PlatformManager.h>
 
 #include "MainLoop.h"
 
@@ -272,13 +273,15 @@ void WiFiManager::_ConnectedCb(wifi_manager_error_e wifiErr, void * userData)
 {
     auto loop = reinterpret_cast<GMainLoop *>(userData);
 
-    if (wifiErr == WIFI_MANAGER_ERROR_NONE)
+    if (wifiErr == WIFI_MANAGER_ERROR_NONE || wifiErr == WIFI_MANAGER_ERROR_ALREADY_EXISTS)
     {
         ChipLogProgress(DeviceLayer, "WiFi is connected");
         if (sInstance.mpConnectCallback != nullptr)
         {
+            chip::DeviceLayer::PlatformMgr().LockChipStack();
             sInstance.mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
             sInstance.mpConnectCallback = nullptr;
+            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         }
     }
     else
@@ -286,8 +289,10 @@ void WiFiManager::_ConnectedCb(wifi_manager_error_e wifiErr, void * userData)
         ChipLogError(DeviceLayer, "FAIL: connect WiFi [%s]", get_error_message(wifiErr));
         if (sInstance.mpConnectCallback != nullptr)
         {
+            chip::DeviceLayer::PlatformMgr().LockChipStack();
             sInstance.mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), 0);
             sInstance.mpConnectCallback = nullptr;
+            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         }
     }
 
