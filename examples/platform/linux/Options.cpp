@@ -183,16 +183,20 @@ const char * sDeviceOptionHelp =
     "       passed, the iteration counts must match that used to generate the verifier otherwise failure will\n"
     "       arise.\n"
     "\n"
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     "  --secured-device-port <port>\n"
     "       A 16-bit unsigned integer specifying the listen port to use for secure device messages (default is 5540).\n"
-    "\n"
-    "  --secured-commissioner-port <port>\n"
-    "       A 16-bit unsigned integer specifying the listen port to use for secure commissioner messages (default is 5542). Only "
-    "valid when app is both device and commissioner\n"
     "\n"
     "  --unsecured-commissioner-port <port>\n"
     "       A 16-bit unsigned integer specifying the port to use for unsecured commissioner messages (default is 5550).\n"
     "\n"
+#endif
+#if CHIP_DEVICE_ENABLE_PORT_PARAMS
+    "  --secured-commissioner-port <port>\n"
+    "       A 16-bit unsigned integer specifying the listen port to use for secure commissioner messages (default is 5550). Only "
+    "valid when app is both device and commissioner\n"
+    "\n"
+#endif
     "  --commissioner-fabric-id <fabricid>\n"
     "       The fabric ID to be used when this device is a commissioner (default in code is 1).\n"
     "\n"
