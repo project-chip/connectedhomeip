@@ -18,7 +18,7 @@ from itertools import combinations
 from typing import Any, List, Optional
 
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
-from builders.android import AndroidApp, AndroidBoard, AndroidBuilder
+from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
 from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
 from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
@@ -296,6 +296,9 @@ def BuildAndroidTarget():
         TargetPart('tv-casting-app', app=AndroidApp.TV_CASTING_APP),
         TargetPart('java-matter-controller', app=AndroidApp.JAVA_MATTER_CONTROLLER),
     ])
+
+    # Modifiers
+    target.AppendModifier('no-debug', profile=AndroidProfile.RELEASE)
 
     return target
 
