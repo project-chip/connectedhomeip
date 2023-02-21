@@ -25,7 +25,9 @@
 #include "em_gpio.h"
 #include "em_ldma.h"
 #include "em_usart.h"
+#if SL_WIFI
 #include "spi_multiplex.h"
+#endif /* SL_WIFI */
 
 /****************************************************************************
  * @fn  void spi_drv_reinit()
