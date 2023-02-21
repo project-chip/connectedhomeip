@@ -225,12 +225,12 @@ class WildcardFragment : Fragment() {
             eventMin = eventMinEd.text.toString().toULong().toLong()
           }
           subscribe(
-                  type,
-                  minIntervalEd.text.toString().toInt(),
-                  maxIntervalEd.text.toString().toInt(),
-                  keepSubscriptionsSp.selectedItem.toString().toBoolean(),
-                  isFabricFilteredSp.selectedItem.toString().toBoolean(),
-                  eventMin
+            type,
+            minIntervalEd.text.toString().toInt(),
+            maxIntervalEd.text.toString().toInt(),
+            keepSubscriptionsSp.selectedItem.toString().toBoolean(),
+            isFabricFilteredSp.selectedItem.toString().toBoolean(),
+            eventMin
           )
         } else {
           Log.e(TAG, "minInterval or maxInterval is empty!" )
