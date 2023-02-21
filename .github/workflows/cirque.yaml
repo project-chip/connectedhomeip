@@ -62,6 +62,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               if: ${{ !env.ACT }}
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
@@ -83,6 +84,7 @@ jobs:
               run: echo "val=$(scripts/tests/cirque_tests.sh cachekeyhash)" >> $GITHUB_OUTPUT
             - name: Cirque Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               if: ${{ !env.ACT }}
               with:
                   key: ${{ runner.os }}-cirque-${{ steps.cirque-bootstrap-cache-key.outputs.val }}
