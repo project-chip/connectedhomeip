@@ -97,7 +97,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     MTRFrameworkInit();
 }
 
-+ (instancetype)sharedInstance
++ (MTRDeviceControllerFactory *)sharedInstance
 {
     static MTRDeviceControllerFactory * factory = nil;
     static dispatch_once_t onceToken;
@@ -815,7 +815,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     return [[MTRDeviceControllerFactory sharedInstance] isRunning];
 }
 
-+ (instancetype)sharedInstance
++ (MTRControllerFactory *)sharedInstance
 {
     // We could try to delegate to MTRDeviceControllerFactory's sharedInstance
     // here, but then we would have to add the backwards-compar selectors to

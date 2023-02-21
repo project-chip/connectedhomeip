@@ -160,7 +160,7 @@ bool AllClustersAppCommandHandler::IsClusterPresentOnAnyEndpoint(ClusterId clust
 
 void AllClustersAppCommandHandler::OnRebootSignalHandler(BootReasonType bootReason)
 {
-    if (ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(bootReason)) != CHIP_NO_ERROR)
+    if (ConfigurationMgr().StoreBootReason(static_cast<uint32_t>(bootReason)) == CHIP_NO_ERROR)
     {
         Server::GetInstance().GenerateShutDownEvent();
         PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });

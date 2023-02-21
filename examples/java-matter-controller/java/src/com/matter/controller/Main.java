@@ -60,6 +60,8 @@ public class Main {
         new PairCodeWifiCommand(controller, credentialsIssuer);
     PairCodeThreadCommand pairCodeThreadCommand =
         new PairCodeThreadCommand(controller, credentialsIssuer);
+    PairAddressPaseCommand pairAddressPaseCommand =
+        new PairAddressPaseCommand(controller, credentialsIssuer);
     PairAlreadyDiscoveredCommand pairAlreadyDiscoveredCommand =
         new PairAlreadyDiscoveredCommand(controller, credentialsIssuer);
     PairOnNetworkCommand pairOnNetworkCommand =
@@ -83,6 +85,7 @@ public class Main {
     clusterCommands.add(pairCodePaseCommand);
     clusterCommands.add(pairCodeWifiCommand);
     clusterCommands.add(pairCodeThreadCommand);
+    clusterCommands.add(pairAddressPaseCommand);
     clusterCommands.add(pairAlreadyDiscoveredCommand);
     clusterCommands.add(pairOnNetworkCommand);
     clusterCommands.add(pairOnNetworkShortCommand);

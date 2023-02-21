@@ -279,8 +279,8 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoin
         }
 #endif
 
-        // If at least one interface is used by the mDNS server, notify the application that DNS-SD is ready.
-        if (!mIsInitialized)
+        // If at least one IPv6 interface is used by the mDNS server, notify the application that DNS-SD is ready.
+        if (!mIsInitialized && addressType == chip::Inet::IPAddressType::kIPv6)
         {
 #if !CHIP_DEVICE_LAYER_NONE
             chip::DeviceLayer::ChipDeviceEvent event{};

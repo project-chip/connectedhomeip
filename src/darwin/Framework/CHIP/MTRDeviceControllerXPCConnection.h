@@ -45,7 +45,8 @@ typedef void (^MTRGetProxyHandleHandler)(dispatch_queue_t queue, MTRDeviceContro
 /**
  * This method is just for test purpsoe.
  */
-+ (instancetype)connectionWithWorkQueue:(dispatch_queue_t)workQueue connectBlock:(MTRXPCConnectBlock)connectBlock;
++ (MTRDeviceControllerXPCConnection *)connectionWithWorkQueue:(dispatch_queue_t)workQueue
+                                                 connectBlock:(MTRXPCConnectBlock)connectBlock;
 
 - (void)getProxyHandleWithCompletion:(MTRGetProxyHandleHandler)completion;
 - (void)registerReportHandlerWithController:(id<NSCopying>)controller

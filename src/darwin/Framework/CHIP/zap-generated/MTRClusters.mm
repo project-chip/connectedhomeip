@@ -2346,8 +2346,7 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                 }
                 request.effectIdentifier = static_cast<std::remove_reference_t<decltype(request.effectIdentifier)>>(
                     params.effectIdentifier.unsignedCharValue);
-                request.effectVariant
-                    = static_cast<std::remove_reference_t<decltype(request.effectVariant)>>(params.effectVariant.unsignedCharValue);
+                request.effectVariant = params.effectVariant.unsignedCharValue;
 
                 return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb,
                     self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);

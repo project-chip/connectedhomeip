@@ -81,6 +81,14 @@ class CommissioningTest:
         DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
         return java_process.wait()
 
+    def TestCmdAddressPaseOnly(self, nodeid, setuppin, address, port, timeout):
+        java_command = self.command + ['pairing', 'address-paseonly', nodeid, setuppin, address, port, timeout]
+        logging.info(f"Execute: {java_command}")
+        java_process = subprocess.Popen(
+            java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
+        return java_process.wait()
+
     def RunTest(self):
         if self.command_name == 'onnetwork-long':
             logging.info("Testing pairing onnetwork-long")
@@ -92,5 +100,10 @@ class CommissioningTest:
             code = self.TestCmdAlreadyDiscovered(self.nodeid, self.setup_pin_code, self.address, self.port, self.timeout)
             if code != 0:
                 raise Exception(f"Testing pairing already-discovered failed with error {code}")
+        elif self.command_name == 'address-paseonly':
+            logging.info("Testing pairing address-paseonly")
+            code = self.TestCmdAddressPaseOnly(self.nodeid, self.setup_pin_code, self.address, self.port, self.timeout)
+            if code != 0:
+                raise Exception(f"Testing pairing address-paseonly failed with error {code}")
         else:
             raise Exception(f"Unsupported command {self.command_name}")

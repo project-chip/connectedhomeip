@@ -29,6 +29,9 @@
 // We need this for initializating default reporting configurations.
 #include <app/reporting/reporting.h>
 
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceLayer.h>
+
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::BarrierControl;
@@ -51,6 +54,28 @@ static State state;
 #define ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_COMMAND_OPEN_EVENTS_ATTRIBUTE
 #define ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_COMMAND_CLOSE_EVENTS_ATTRIBUTE
 #endif
+
+/**********************************************************
+ * Matter timer scheduling glue logic
+ *********************************************************/
+
+void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint);
+
+static void timerCallback(System::Layer *, void * callbackContext)
+{
+    emberAfBarrierControlClusterServerTickCallback(static_cast<EndpointId>(reinterpret_cast<uintptr_t>(callbackContext)));
+}
+
+static void scheduleTimerCallbackMs(EndpointId endpoint, uint32_t delayMs)
+{
+    DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayMs), timerCallback,
+                                          reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
+}
+
+static void cancelEndpointTimerCallback(EndpointId endpoint)
+{
+    DeviceLayer::SystemLayer().CancelTimer(timerCallback, reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
+}
 
 // -----------------------------------------------------------------------------
 // Accessing attributes
@@ -224,7 +249,7 @@ void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)
     {
         emAfPluginBarrierControlServerSetBarrierPosition(endpoint, state.currentPosition);
         setMovingState(endpoint, EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_STOPPED);
-        emberAfDeactivateServerTick(endpoint, BarrierControl::Id);
+        cancelEndpointTimerCallback(endpoint);
     }
     else
     {
@@ -252,7 +277,7 @@ void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)
         setMovingState(
             endpoint,
             (state.increasing ? EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_OPENING : EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_CLOSING));
-        emberAfScheduleServerTick(endpoint, BarrierControl::Id, state.delayMs);
+        scheduleTimerCallbackMs(endpoint, state.delayMs);
     }
 }
 
@@ -296,7 +321,7 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(
         state.delayMs         = calculateDelayMs(endpoint, state.targetPosition, &state.increasing);
         emberAfBarrierControlClusterPrintln("Scheduling barrier move from %d to %d with %" PRIu32 "ms delay", state.currentPosition,
                                             state.targetPosition, state.delayMs);
-        emberAfScheduleServerTick(endpoint, BarrierControl::Id, state.delayMs);
+        scheduleTimerCallbackMs(endpoint, state.delayMs);
 
         if (state.currentPosition < state.targetPosition)
         {
@@ -318,10 +343,16 @@ bool emberAfBarrierControlClusterBarrierControlStopCallback(app::CommandHandler 
                                                             const Commands::BarrierControlStop::DecodableType & commandData)
 {
     EndpointId endpoint = commandPath.mEndpointId;
-    emberAfDeactivateServerTick(endpoint, BarrierControl::Id);
+    cancelEndpointTimerCallback(endpoint);
     setMovingState(endpoint, EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_STOPPED);
     sendDefaultResponse(commandObj, commandPath, Status::Success);
     return true;
 }
 
 void MatterBarrierControlPluginServerInitCallback() {}
+
+void MatterBarrierControlClusterServerShutdownCallback(EndpointId endpoint)
+{
+    emberAfBarrierControlClusterPrintln("Shuting barrier control server cluster on endpoint %d", endpoint);
+    cancelEndpointTimerCallback(endpoint);
+}

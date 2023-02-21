@@ -22,6 +22,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
+#include <platform/CHIPDeviceConfig.h>
 
 using chip::app::Clusters::OnOff::OnOffFeature;
 
@@ -68,6 +69,8 @@ public:
         return HasFeature(endpointId, OnOffFeature::kLighting);
     }
 
+    void cancelEndpointTimerCallback(chip::EndpointId endpoint);
+
 private:
     /**********************************************************
      * Functions Definitions
@@ -80,6 +83,12 @@ private:
     EmberEventControl * configureEventControl(chip::EndpointId endpoint);
 
     uint32_t calculateNextWaitTimeMS(void);
+
+    // Matter timer scheduling glue logic
+    static void timerCallback(chip::System::Layer *, void * callbackContext);
+    void scheduleTimerCallbackMs(EmberEventControl * control, uint32_t delayMs);
+    void cancelEndpointTimerCallback(EmberEventControl * control);
+
     /**********************************************************
      * Attributes Declaration
      *********************************************************/

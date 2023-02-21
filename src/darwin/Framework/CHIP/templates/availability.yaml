@@ -6696,6 +6696,7 @@
           DoorLock:
               LockDataTypeEnum:
                   - FingerVein
+                  - Face
           DiagnosticLogs:
               IntentEnum:
                   - EndUserSupport
@@ -6759,9 +6760,10 @@
       enum values:
           DoorLock:
               DlLockDataType:
-                  # This value never existed for this enum name so, don't start
-                  # exposing it.  It's exposed for LockDataTypeEnum
+                  # These values never existed for this enum name so, don't
+                  # start exposing them.  They're exposed for LockDataTypeEnum
                   - FingerVein
+                  - Face
   renames:
       attributes:
           TimeSynchronization:
