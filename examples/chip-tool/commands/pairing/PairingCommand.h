@@ -158,7 +158,6 @@ public:
 
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
-    bool IsDiscoverOnce() { return mDiscoverOnce.ValueOr(false); }
 
     /////////// DeviceAttestationDelegate /////////
     chip::Optional<uint16_t> FailSafeExpiryTimeoutSecs() const override;
