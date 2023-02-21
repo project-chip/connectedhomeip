@@ -51,9 +51,13 @@ enum
     kDeviceOption_Capabilities                          = 0x1007,
     kDeviceOption_Discriminator                         = 0x1008,
     kDeviceOption_Passcode                              = 0x1009,
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     kDeviceOption_SecuredDevicePort                     = 0x100a,
-    kDeviceOption_SecuredCommissionerPort               = 0x100b,
-    kDeviceOption_UnsecuredCommissionerPort             = 0x100c,
+    kDeviceOption_UnsecuredCommissionerPort             = 0x100b,
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    kDeviceOption_SecuredCommissionerPort               = 0x100c,
+#endif
     kDeviceOption_Command                               = 0x100d,
     kDeviceOption_PICS                                  = 0x100e,
     kDeviceOption_KVS                                   = 0x100f,
@@ -98,9 +102,13 @@ OptionDef sDeviceOptionDefs[] = {
     { "spake2p-verifier-base64", kArgumentRequired, kDeviceOption_Spake2pVerifierBase64 },
     { "spake2p-salt-base64", kArgumentRequired, kDeviceOption_Spake2pSaltBase64 },
     { "spake2p-iterations", kArgumentRequired, kDeviceOption_Spake2pIterations },
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     { "secured-device-port", kArgumentRequired, kDeviceOption_SecuredDevicePort },
-    { "secured-commissioner-port", kArgumentRequired, kDeviceOption_SecuredCommissionerPort },
     { "unsecured-commissioner-port", kArgumentRequired, kDeviceOption_UnsecuredCommissionerPort },
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    { "secured-commissioner-port", kArgumentRequired, kDeviceOption_SecuredCommissionerPort },
+#endif
     { "command", kArgumentRequired, kDeviceOption_Command },
     { "PICS", kArgumentRequired, kDeviceOption_PICS },
     { "KVS", kArgumentRequired, kDeviceOption_KVS },
@@ -377,17 +385,22 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     case kDeviceOption_SecuredDevicePort:
         LinuxDeviceOptions::GetInstance().securedDevicePort = static_cast<uint16_t>(atoi(aValue));
-        break;
-
-    case kDeviceOption_SecuredCommissionerPort:
-        LinuxDeviceOptions::GetInstance().securedCommissionerPort = static_cast<uint16_t>(atoi(aValue));
         break;
 
     case kDeviceOption_UnsecuredCommissionerPort:
         LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort = static_cast<uint16_t>(atoi(aValue));
         break;
+
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    case kDeviceOption_SecuredCommissionerPort:
+        LinuxDeviceOptions::GetInstance().securedCommissionerPort = static_cast<uint16_t>(atoi(aValue));
+        break;
+#endif
 
     case kDeviceOption_Command:
         LinuxDeviceOptions::GetInstance().command = aValue;

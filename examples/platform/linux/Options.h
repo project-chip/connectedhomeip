@@ -47,9 +47,13 @@ struct LinuxDeviceOptions
     uint32_t mBleDevice                 = 0;
     bool mWiFi                          = false;
     bool mThread                        = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     uint32_t securedDevicePort          = CHIP_PORT;
-    uint32_t securedCommissionerPort    = CHIP_PORT + 2;
     uint32_t unsecuredCommissionerPort  = CHIP_UDC_PORT;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    uint32_t securedCommissionerPort    = CHIP_PORT + 10;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     const char * command                = nullptr;
     const char * PICS                   = nullptr;
     const char * KVS                    = nullptr;
