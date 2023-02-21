@@ -107,10 +107,6 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 
 void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    bool isOTAInitialized = OTAInitializer::Instance().CheckInit();
-#endif
-
     if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
     {
         printf("IPv4 Server ready...");
@@ -126,7 +122,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
         chip::app::DnssdServer::Instance().StartServer();
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         // Init OTA requestor only when we have gotten IPv6 address
-        if (!isOTAInitialized)
+        if (OTAInitializer::Instance().CheckInit())
         {
             chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
                                                         InitOTARequestorHandler, nullptr);
