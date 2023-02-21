@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2022 Project CHIP Authors
+#   Copyright (c) 2022-2023 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -30,6 +30,12 @@ list(APPEND CONFIG_CHIP_EXTERNAL_TARGETS)
 # Additional Open IoT SDK build configuration 
 set(TFM_SUPPORT NO CACHE BOOL "Add Trusted Firmware-M (TF-M) support to application")
 set(TFM_NS_APP_VERSION "0.0.0" CACHE STRING "TF-M non-secure application version (in the x.x.x format)")
+set(CONFIG_CHIP_OPEN_IOT_SDK_LWIP_DEBUG NO CACHE BOOL "Enable LwIP debug logs")
+
+# Default LwIP options directory (should contain user_lwipopts.h file)
+if (NOT LWIP_PROJECT_OPTS_DIR)  
+    set(LWIP_PROJECT_OPTS_DIR ${OPEN_IOT_SDK_CONFIG}/lwip)
+endif()
 
 # Overwrite versions of Open IoT SDK components
 
@@ -162,12 +168,17 @@ if(TARGET lwip-cmsis-port)
     target_compile_definitions(lwipopts
         INTERFACE
             DEBUG_PRINT=printf
+            $<$<BOOL:${CONFIG_CHIP_OPEN_IOT_SDK_LWIP_DEBUG}>:LWIP_DEBUG>
+            $<$<BOOL:${CONFIG_CHIP_LIB_TESTS}>:CHIP_LIB_TESTS>
     )
 
-    if(TARGET lwip-cmsis-port)
-        # Link the emac factory to LwIP port
-        target_link_libraries(lwip-cmsis-port PUBLIC iotsdk-emac-factory)
-    endif()
+    target_include_directories(lwipopts
+        INTERFACE
+            ${LWIP_PROJECT_OPTS_DIR}
+    )
+
+    # Link the emac factory to LwIP port
+    target_link_libraries(lwip-cmsis-port PUBLIC iotsdk-emac-factory)
 endif()
 
 # MDH configuration

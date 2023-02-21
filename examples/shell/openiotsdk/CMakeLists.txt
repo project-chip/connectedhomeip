@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2022 Project CHIP Authors
+#   Copyright (c) 2022-2023 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -34,22 +34,6 @@ include(toolchain)
 project(${APP_TARGET} LANGUAGES C CXX ASM)
 
 include(sdk)
-
-# LwIP configuration
-if(TARGET lwip-cmsis-port)
-    # lwip requires user_lwipopts.h, we use the custom settings
-    target_include_directories(lwipopts
-        INTERFACE
-            ${OPEN_IOT_SDK_CONFIG}/lwip
-    )
-
-    if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-        target_compile_definitions(lwipopts
-            INTERFACE
-                LWIP_DEBUG
-        )
-    endif()
-endif()
 
 add_executable(${APP_TARGET})
 

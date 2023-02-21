@@ -250,6 +250,7 @@
             "args": [
                 "-Cbuild",
                 "-d${input:openiotsdkDebugMode}",
+                "-l${input:openiotsdkLwipDebug}",
                 "${input:openiotsdkExample}"
             ],
             "group": "build",
@@ -266,7 +267,12 @@
             "label": "Build Open IoT SDK unit-tests",
             "type": "shell",
             "command": "scripts/examples/openiotsdk_example.sh",
-            "args": ["-Cbuild", "-d${input:openiotsdkDebugMode}", "unit-tests"],
+            "args": [
+                "-Cbuild",
+                "-d${input:openiotsdkDebugMode}",
+                "-l${input:openiotsdkLwipDebug}",
+                "unit-tests"
+            ],
             "group": "build",
             "problemMatcher": {
                 "pattern": {
@@ -451,6 +457,13 @@
             "type": "pickString",
             "id": "openiotsdkDebugMode",
             "description": "Do you want to use debug mode?",
+            "options": ["false", "true"],
+            "default": "false"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkLwipDebug",
+            "description": "Do you want to use LwIP debug logs?",
             "options": ["false", "true"],
             "default": "false"
         },

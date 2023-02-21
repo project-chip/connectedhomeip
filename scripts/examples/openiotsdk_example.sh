@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-#    Copyright (c) 2020 Project CHIP Authors
+#    Copyright (c) 2022-2023 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ EXAMPLE_PATH=""
 BUILD_PATH=""
 TOOLCHAIN=arm-none-eabi-gcc
 DEBUG=false
+LWIP_DEBUG=false
 EXAMPLE=""
 FVP_BIN=FVP_Corstone_SSE-300_Ethos-U55
 GDB_PLUGIN="$FAST_MODEL_PLUGINS_PATH/GDBRemoteConnection.so"
@@ -55,13 +56,14 @@ Usage: $0 [options] example [test_name]
 Build, run or test the Open IoT SDK examples and unit-tests.
 
 Options:
-    -h,--help                       Show this help
-    -c,--clean                      Clean target build
-    -s,--scratch                    Remove build directory at all before building
-    -C,--command    <command>       Action to execute <build-run | run | test | build - default>
-    -d,--debug      <debug_enable>  Build in debug mode <true | false - default>
-    -p,--path       <build_path>    Build path <build_path - default is example_dir/build>
-    -n,--network    <network_name>  FVP network interface name <network_name - default is "user" which means user network mode>
+    -h,--help                           Show this help
+    -c,--clean                          Clean target build
+    -s,--scratch                        Remove build directory at all before building
+    -C,--command    <command>           Action to execute <build-run | run | test | build - default>
+    -d,--debug      <debug_enable>      Build in debug mode <true | false - default>
+    -l,--lwipdebug  <lwip_debug_enable> Build with LwIP debug logs support <true | false - default>
+    -p,--path       <build_path>        Build path <build_path - default is example_dir/build>
+    -n,--network    <network_name>      FVP network interface name <network_name - default is "user" which means user network mode>
 
 Examples:
 EOF
@@ -109,6 +111,10 @@ function build_with_cmake() {
     BUILD_OPTIONS=(-DCMAKE_SYSTEM_PROCESSOR=cortex-m55)
     if "$DEBUG"; then
         BUILD_OPTIONS+=(-DCMAKE_BUILD_TYPE=Debug)
+    fi
+
+    if "$LWIP_DEBUG"; then
+        BUILD_OPTIONS+=(-DCONFIG_CHIP_OPEN_IOT_SDK_LWIP_DEBUG=YES)
     fi
 
     cmake -G Ninja -S "$EXAMPLE_PATH" -B "$BUILD_PATH" --toolchain="$TOOLCHAIN_PATH" "${BUILD_OPTIONS[@]}"
@@ -233,8 +239,8 @@ function run_test() {
     fi
 }
 
-SHORT=C:,p:,d:,n:,c,s,h
-LONG=command:,path:,debug:,network:,clean,scratch,help
+SHORT=C:,p:,d:,l:,n:,c,s,h
+LONG=command:,path:,debug:,lwipdebug:,network:,clean,scratch,help
 OPTS=$(getopt -n build --options "$SHORT" --longoptions "$LONG" -- "$@")
 
 eval set -- "$OPTS"
@@ -259,6 +265,10 @@ while :; do
             ;;
         -d | --debug)
             DEBUG=$2
+            shift 2
+            ;;
+        -l | --lwipdebug)
+            LWIP_DEBUG=$2
             shift 2
             ;;
         -p | --path)
