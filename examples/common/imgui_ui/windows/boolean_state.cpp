@@ -33,6 +33,9 @@ void BooleanState::UpdateState()
     {
         // TODO: if src/app/clusters/boolean-state exists, we should use its
         //       mutation API.
+        //
+        // See  https://github.com/project-chip/connectedhomeip/issues/25225 for
+        // the feature request asking for a BooleanState HAL.
         chip::app::Clusters::BooleanState::Attributes::StateValue::Set(mEndpointId, mTargetState.Value());
         mTargetState.ClearValue();
     }
