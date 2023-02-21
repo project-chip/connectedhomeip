@@ -12300,8 +12300,8 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t groupKeySetID                        = static_cast<uint16_t>(0);
-    GroupKeySecurityPolicy groupKeySecurityPolicy = static_cast<GroupKeySecurityPolicy>(0);
+    uint16_t groupKeySetID                            = static_cast<uint16_t>(0);
+    GroupKeySecurityPolicyEnum groupKeySecurityPolicy = static_cast<GroupKeySecurityPolicyEnum>(0);
     DataModel::Nullable<chip::ByteSpan> epochKey0;
     DataModel::Nullable<uint64_t> epochStartTime0;
     DataModel::Nullable<chip::ByteSpan> epochKey1;

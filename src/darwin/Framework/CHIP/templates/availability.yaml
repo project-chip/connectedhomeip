@@ -3124,7 +3124,10 @@
           OperationalCredentials:
               - OperationalCertStatus
           GroupKeyManagement:
-              - GroupKeySecurityPolicy
+              # GroupKeySecurityPolicyEnum was originally just named
+              # GroupKeySecurityPolicy, but we generate the same API for both of
+              # those names, so the name can just change here.
+              - GroupKeySecurityPolicyEnum
           DoorLock:
               - DlAlarmCode
               - DlCredentialRule
@@ -3576,7 +3579,10 @@
                   - LabelConflict
                   - InvalidFabricIndex
           GroupKeyManagement:
-              GroupKeySecurityPolicy:
+              # GroupKeySecurityPolicyEnum was originally just named
+              # GroupKeySecurityPolicy, but we generate the same API for both of
+              # those names, so the name can just change here.
+              GroupKeySecurityPolicyEnum:
                   - TrustFirst
                   - CacheAndSync
           DoorLock:

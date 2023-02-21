@@ -18546,15 +18546,15 @@ void MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttrib
     }
 }
 
-void MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy value)
+void MTRGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -18569,8 +18569,8 @@ void MTRGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy> & value)
+void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18581,7 +18581,7 @@ void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallback
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

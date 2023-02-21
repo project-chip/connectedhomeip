@@ -1025,7 +1025,7 @@ server cluster OperationalCredentials = 62 {
 }
 
 server cluster GroupKeyManagement = 63 {
-  enum GroupKeySecurityPolicy : ENUM8 {
+  enum GroupKeySecurityPolicyEnum : ENUM8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
   }
@@ -1045,7 +1045,7 @@ server cluster GroupKeyManagement = 63 {
 
   struct GroupKeySetStruct {
     int16u groupKeySetID = 0;
-    GroupKeySecurityPolicy groupKeySecurityPolicy = 1;
+    GroupKeySecurityPolicyEnum groupKeySecurityPolicy = 1;
     nullable octet_string<16> epochKey0 = 2;
     nullable epoch_us epochStartTime0 = 3;
     nullable octet_string<16> epochKey1 = 4;
