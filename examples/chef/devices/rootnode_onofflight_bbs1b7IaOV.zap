@@ -1,5 +1,5 @@
 {
-  "featureLevel": 90,
+  "featureLevel": 92,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -7001,7 +7001,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "OccupancyBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -7017,7 +7017,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "enum8",
+              "type": "OccupancySensorTypeEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -7033,7 +7033,7 @@
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "bitmap8",
+              "type": "OccupancySensorTypeBitmap",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
