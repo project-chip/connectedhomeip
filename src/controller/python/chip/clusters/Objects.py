@@ -17395,15 +17395,15 @@ class PumpConfigurationAndControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="minConstTemp", Tag=0x0000000B, Type=typing.Union[None, Nullable, int]),
                 ClusterObjectFieldDescriptor(Label="maxConstTemp", Tag=0x0000000C, Type=typing.Union[None, Nullable, int]),
                 ClusterObjectFieldDescriptor(Label="pumpStatus", Tag=0x00000010, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="effectiveOperationMode", Tag=0x00000011, Type=PumpConfigurationAndControl.Enums.PumpOperationMode),
-                ClusterObjectFieldDescriptor(Label="effectiveControlMode", Tag=0x00000012, Type=PumpConfigurationAndControl.Enums.PumpControlMode),
+                ClusterObjectFieldDescriptor(Label="effectiveOperationMode", Tag=0x00000011, Type=PumpConfigurationAndControl.Enums.OperationModeEnum),
+                ClusterObjectFieldDescriptor(Label="effectiveControlMode", Tag=0x00000012, Type=PumpConfigurationAndControl.Enums.ControlModeEnum),
                 ClusterObjectFieldDescriptor(Label="capacity", Tag=0x00000013, Type=typing.Union[Nullable, int]),
                 ClusterObjectFieldDescriptor(Label="speed", Tag=0x00000014, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="lifetimeRunningHours", Tag=0x00000015, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="power", Tag=0x00000016, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="lifetimeEnergyConsumed", Tag=0x00000017, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="operationMode", Tag=0x00000020, Type=PumpConfigurationAndControl.Enums.PumpOperationMode),
-                ClusterObjectFieldDescriptor(Label="controlMode", Tag=0x00000021, Type=typing.Optional[PumpConfigurationAndControl.Enums.PumpControlMode]),
+                ClusterObjectFieldDescriptor(Label="operationMode", Tag=0x00000020, Type=PumpConfigurationAndControl.Enums.OperationModeEnum),
+                ClusterObjectFieldDescriptor(Label="controlMode", Tag=0x00000021, Type=typing.Optional[PumpConfigurationAndControl.Enums.ControlModeEnum]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -17426,15 +17426,15 @@ class PumpConfigurationAndControl(Cluster):
     minConstTemp: 'typing.Union[None, Nullable, int]' = None
     maxConstTemp: 'typing.Union[None, Nullable, int]' = None
     pumpStatus: 'typing.Optional[uint]' = None
-    effectiveOperationMode: 'PumpConfigurationAndControl.Enums.PumpOperationMode' = None
-    effectiveControlMode: 'PumpConfigurationAndControl.Enums.PumpControlMode' = None
+    effectiveOperationMode: 'PumpConfigurationAndControl.Enums.OperationModeEnum' = None
+    effectiveControlMode: 'PumpConfigurationAndControl.Enums.ControlModeEnum' = None
     capacity: 'typing.Union[Nullable, int]' = None
     speed: 'typing.Union[None, Nullable, uint]' = None
     lifetimeRunningHours: 'typing.Union[None, Nullable, uint]' = None
     power: 'typing.Union[None, Nullable, uint]' = None
     lifetimeEnergyConsumed: 'typing.Union[None, Nullable, uint]' = None
-    operationMode: 'PumpConfigurationAndControl.Enums.PumpOperationMode' = None
-    controlMode: 'typing.Optional[PumpConfigurationAndControl.Enums.PumpControlMode]' = None
+    operationMode: 'PumpConfigurationAndControl.Enums.OperationModeEnum' = None
+    controlMode: 'typing.Optional[PumpConfigurationAndControl.Enums.ControlModeEnum]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -17443,7 +17443,7 @@ class PumpConfigurationAndControl(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class PumpControlMode(MatterIntEnum):
+        class ControlModeEnum(MatterIntEnum):
             kConstantSpeed = 0x00
             kConstantPressure = 0x01
             kProportionalPressure = 0x02
@@ -17456,7 +17456,7 @@ class PumpConfigurationAndControl(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 4,
 
-        class PumpOperationMode(MatterIntEnum):
+        class OperationModeEnum(MatterIntEnum):
             kNormal = 0x00
             kMinimum = 0x01
             kMaximum = 0x02
@@ -17476,9 +17476,9 @@ class PumpConfigurationAndControl(Cluster):
             kConstantSpeed = 0x8
             kConstantTemperature = 0x10
             kAutomatic = 0x20
-            kLocal = 0x40
+            kLocalOperation = 0x40
 
-        class PumpStatus(IntFlag):
+        class PumpStatusBitmap(IntFlag):
             kDeviceFault = 0x1
             kSupplyfault = 0x2
             kSpeedLow = 0x4
@@ -17729,9 +17729,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=PumpConfigurationAndControl.Enums.PumpOperationMode)
+                return ClusterObjectFieldDescriptor(Type=PumpConfigurationAndControl.Enums.OperationModeEnum)
 
-            value: 'PumpConfigurationAndControl.Enums.PumpOperationMode' = 0
+            value: 'PumpConfigurationAndControl.Enums.OperationModeEnum' = 0
 
         @dataclass
         class EffectiveControlMode(ClusterAttributeDescriptor):
@@ -17745,9 +17745,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=PumpConfigurationAndControl.Enums.PumpControlMode)
+                return ClusterObjectFieldDescriptor(Type=PumpConfigurationAndControl.Enums.ControlModeEnum)
 
-            value: 'PumpConfigurationAndControl.Enums.PumpControlMode' = 0
+            value: 'PumpConfigurationAndControl.Enums.ControlModeEnum' = 0
 
         @dataclass
         class Capacity(ClusterAttributeDescriptor):
@@ -17841,9 +17841,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=PumpConfigurationAndControl.Enums.PumpOperationMode)
+                return ClusterObjectFieldDescriptor(Type=PumpConfigurationAndControl.Enums.OperationModeEnum)
 
-            value: 'PumpConfigurationAndControl.Enums.PumpOperationMode' = 0
+            value: 'PumpConfigurationAndControl.Enums.OperationModeEnum' = 0
 
         @dataclass
         class ControlMode(ClusterAttributeDescriptor):
@@ -17857,9 +17857,9 @@ class PumpConfigurationAndControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[PumpConfigurationAndControl.Enums.PumpControlMode])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[PumpConfigurationAndControl.Enums.ControlModeEnum])
 
-            value: 'typing.Optional[PumpConfigurationAndControl.Enums.PumpControlMode]' = None
+            value: 'typing.Optional[PumpConfigurationAndControl.Enums.ControlModeEnum]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

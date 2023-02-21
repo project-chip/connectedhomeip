@@ -56,9 +56,9 @@ static RemoteSensorType detectRemoteSensorConnected()
 
 static void setEffectiveModes(EndpointId endpoint)
 {
-    PumpControlMode controlMode;
-    PumpOperationMode operationMode;
-    BitMask<PumpStatus> pumpStatus;
+    ControlModeEnum controlMode;
+    OperationModeEnum operationMode;
+    BitMask<PumpStatusBitmap> pumpStatus;
     bool isControlModeAvailable = true;
     bool isPumpStatusAvailable  = true;
 
@@ -81,7 +81,7 @@ static void setEffectiveModes(EndpointId endpoint)
         const EmberAfAttributeMetadata * effectiveControlModeMetaData;
         effectiveControlModeMetaData = GetAttributeMetadata(
             app::ConcreteAttributePath(endpoint, PumpConfigurationAndControl::Id, Attributes::EffectiveControlMode::Id));
-        controlMode = static_cast<PumpControlMode>(effectiveControlModeMetaData->defaultValue.defaultValue);
+        controlMode = static_cast<ControlModeEnum>(effectiveControlModeMetaData->defaultValue.defaultValue);
     }
 
     if (isPumpStatusAvailable)
@@ -91,7 +91,7 @@ static void setEffectiveModes(EndpointId endpoint)
 
     switch (operationMode)
     {
-    case PumpOperationMode::kNormal: {
+    case OperationModeEnum::kNormal: {
         // The pump runs in the control mode as per the type of the remote sensor
         // If the remote sensor is a Flow sensor the mode would be ConstantFlow
         // If the remote sensor is a Pressure sensor the mode would be ConstantPressure (not ProportionalPressure)
@@ -103,30 +103,30 @@ static void setEffectiveModes(EndpointId endpoint)
         switch (sensorType)
         {
         case RemoteSensorType::kFlowSensor:
-            Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantFlow);
+            Attributes::EffectiveControlMode::Set(endpoint, ControlModeEnum::kConstantFlow);
             if (isPumpStatusAvailable)
             {
-                pumpStatus.Set(PumpStatus::kRemoteFlow);
-                pumpStatus.Clear(PumpStatus::kRemotePressure);
-                pumpStatus.Clear(PumpStatus::kRemoteTemperature);
+                pumpStatus.Set(PumpStatusBitmap::kRemoteFlow);
+                pumpStatus.Clear(PumpStatusBitmap::kRemotePressure);
+                pumpStatus.Clear(PumpStatusBitmap::kRemoteTemperature);
             }
             break;
         case RemoteSensorType::kPressureSensor:
-            Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantPressure);
+            Attributes::EffectiveControlMode::Set(endpoint, ControlModeEnum::kConstantPressure);
             if (isPumpStatusAvailable)
             {
-                pumpStatus.Clear(PumpStatus::kRemoteFlow);
-                pumpStatus.Set(PumpStatus::kRemotePressure);
-                pumpStatus.Clear(PumpStatus::kRemoteTemperature);
+                pumpStatus.Clear(PumpStatusBitmap::kRemoteFlow);
+                pumpStatus.Set(PumpStatusBitmap::kRemotePressure);
+                pumpStatus.Clear(PumpStatusBitmap::kRemoteTemperature);
             }
             break;
         case RemoteSensorType::kTemperatureSensor:
-            Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantTemperature);
+            Attributes::EffectiveControlMode::Set(endpoint, ControlModeEnum::kConstantTemperature);
             if (isPumpStatusAvailable)
             {
-                pumpStatus.Clear(PumpStatus::kRemoteFlow);
-                pumpStatus.Clear(PumpStatus::kRemotePressure);
-                pumpStatus.Set(PumpStatus::kRemoteTemperature);
+                pumpStatus.Clear(PumpStatusBitmap::kRemoteFlow);
+                pumpStatus.Clear(PumpStatusBitmap::kRemotePressure);
+                pumpStatus.Set(PumpStatusBitmap::kRemoteTemperature);
             }
             break;
         case RemoteSensorType::kNoSensor:
@@ -141,45 +141,45 @@ static void setEffectiveModes(EndpointId endpoint)
             Attributes::EffectiveControlMode::Set(endpoint, controlMode);
             if (isPumpStatusAvailable)
             {
-                pumpStatus.Clear(PumpStatus::kRemoteFlow);
-                pumpStatus.Clear(PumpStatus::kRemotePressure);
-                pumpStatus.Clear(PumpStatus::kRemoteTemperature);
+                pumpStatus.Clear(PumpStatusBitmap::kRemoteFlow);
+                pumpStatus.Clear(PumpStatusBitmap::kRemotePressure);
+                pumpStatus.Clear(PumpStatusBitmap::kRemoteTemperature);
             }
             break;
         }
         // Set the overall effective operation mode to Normal
-        Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kNormal);
+        Attributes::EffectiveOperationMode::Set(endpoint, OperationModeEnum::kNormal);
     }
     break;
 
         // The pump is controlled by the OperationMode attribute.
         // Maximum, Minimum or Local
 
-    case PumpOperationMode::kMaximum: {
+    case OperationModeEnum::kMaximum: {
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         uint8_t maxLevel;
 #endif
-        Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kMaximum);
-        Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantSpeed);
+        Attributes::EffectiveOperationMode::Set(endpoint, OperationModeEnum::kMaximum);
+        Attributes::EffectiveControlMode::Set(endpoint, ControlModeEnum::kConstantSpeed);
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         LevelControl::Attributes::MaxLevel::Get(endpoint, &maxLevel);
         LevelControl::Attributes::CurrentLevel::Set(endpoint, maxLevel);
 #endif
         if (isPumpStatusAvailable)
         {
-            pumpStatus.Clear(PumpStatus::kRemoteFlow);
-            pumpStatus.Clear(PumpStatus::kRemotePressure);
-            pumpStatus.Clear(PumpStatus::kRemoteTemperature);
+            pumpStatus.Clear(PumpStatusBitmap::kRemoteFlow);
+            pumpStatus.Clear(PumpStatusBitmap::kRemotePressure);
+            pumpStatus.Clear(PumpStatusBitmap::kRemoteTemperature);
         }
     }
     break;
 
-    case PumpOperationMode::kMinimum: {
+    case OperationModeEnum::kMinimum: {
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         uint8_t minLevel;
 #endif
-        Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kMinimum);
-        Attributes::EffectiveControlMode::Set(endpoint, PumpControlMode::kConstantSpeed);
+        Attributes::EffectiveOperationMode::Set(endpoint, OperationModeEnum::kMinimum);
+        Attributes::EffectiveControlMode::Set(endpoint, ControlModeEnum::kConstantSpeed);
 #ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         LevelControl::Attributes::MinLevel::Get(endpoint, &minLevel);
         if (minLevel == 0)
@@ -191,32 +191,32 @@ static void setEffectiveModes(EndpointId endpoint)
 #endif
         if (isPumpStatusAvailable)
         {
-            pumpStatus.Clear(PumpStatus::kRemoteFlow);
-            pumpStatus.Clear(PumpStatus::kRemotePressure);
-            pumpStatus.Clear(PumpStatus::kRemoteTemperature);
+            pumpStatus.Clear(PumpStatusBitmap::kRemoteFlow);
+            pumpStatus.Clear(PumpStatusBitmap::kRemotePressure);
+            pumpStatus.Clear(PumpStatusBitmap::kRemoteTemperature);
         }
     }
     break;
 
-    case PumpOperationMode::kLocal: {
+    case OperationModeEnum::kLocal: {
         // If the Application sets the OperatioMode to kLocal the application "owns" the EffectiveControlMode, which
         // it also does if the external entity sets the OperationMode to kLocal. So in any case the application
         // must set the EffectiveControlMode to something which applies to the current ControlMode in the application.
         // So to keeps things short: the application layer owns the EffetiveControlMode when OperationMode is kLocal.
-        Attributes::EffectiveOperationMode::Set(endpoint, PumpOperationMode::kLocal);
+        Attributes::EffectiveOperationMode::Set(endpoint, OperationModeEnum::kLocal);
         // Set the current ControlMode for now. Perhaps the application will set the EffectiveControlMode to something else.
         Attributes::EffectiveControlMode::Set(endpoint, controlMode);
         // Clear out the remote sensors from the PumpStatus flags.
         if (isPumpStatusAvailable)
         {
-            pumpStatus.Clear(PumpStatus::kRemoteFlow);
-            pumpStatus.Clear(PumpStatus::kRemotePressure);
-            pumpStatus.Clear(PumpStatus::kRemoteTemperature);
+            pumpStatus.Clear(PumpStatusBitmap::kRemoteFlow);
+            pumpStatus.Clear(PumpStatusBitmap::kRemotePressure);
+            pumpStatus.Clear(PumpStatusBitmap::kRemoteTemperature);
         }
     }
     break;
 
-    case PumpOperationMode::kUnknownEnumValue: {
+    case OperationModeEnum::kUnknownEnumValue: {
         // Not expected; see check in MatterPumpConfigurationAndControlClusterServerPreAttributeChangedCallback.
         break;
     }
@@ -260,49 +260,49 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
     switch (attributePath.mAttributeId)
     {
     case Attributes::ControlMode::Id: {
-        PumpControlMode controlMode;
-        NumericAttributeTraits<PumpControlMode>::StorageType tmp;
+        ControlModeEnum controlMode;
+        NumericAttributeTraits<ControlModeEnum>::StorageType tmp;
         memcpy(&tmp, value, size);
-        controlMode = NumericAttributeTraits<PumpControlMode>::StorageToWorking(tmp);
+        controlMode = NumericAttributeTraits<ControlModeEnum>::StorageToWorking(tmp);
         switch (controlMode)
         {
-        case PumpControlMode::kConstantFlow:
+        case ControlModeEnum::kConstantFlow:
             if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantFlow))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
-        case PumpControlMode::kConstantPressure:
+        case ControlModeEnum::kConstantPressure:
             if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantPressure))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
-        case PumpControlMode::kConstantSpeed:
+        case ControlModeEnum::kConstantSpeed:
             if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantSpeed))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
-        case PumpControlMode::kConstantTemperature:
+        case ControlModeEnum::kConstantTemperature:
             if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantTemperature))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
-        case PumpControlMode::kProportionalPressure:
+        case ControlModeEnum::kProportionalPressure:
             if (!HasFeature(attributePath.mEndpointId, PumpFeature::kCompensatedPressure))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
-        case PumpControlMode::kAutomatic:
+        case ControlModeEnum::kAutomatic:
             if (!HasFeature(attributePath.mEndpointId, PumpFeature::kAutomatic))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
-        case PumpControlMode::kUnknownEnumValue:
+        case ControlModeEnum::kUnknownEnumValue:
             status = Protocols::InteractionModel::Status::ConstraintError;
             break;
         }
@@ -310,35 +310,35 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
     break;
 
     case Attributes::OperationMode::Id:
-        PumpOperationMode operationMode;
-        NumericAttributeTraits<PumpOperationMode>::StorageType tmp;
+        OperationModeEnum operationMode;
+        NumericAttributeTraits<OperationModeEnum>::StorageType tmp;
         memcpy(&tmp, value, size);
-        operationMode = NumericAttributeTraits<PumpOperationMode>::StorageToWorking(tmp);
+        operationMode = NumericAttributeTraits<OperationModeEnum>::StorageToWorking(tmp);
 
         switch (operationMode)
         {
-        case PumpOperationMode::kMinimum:
+        case OperationModeEnum::kMinimum:
             if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantSpeed))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
-        case PumpOperationMode::kMaximum:
+        case OperationModeEnum::kMaximum:
             if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantSpeed))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
-        case PumpOperationMode::kLocal:
-            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kLocal))
+        case OperationModeEnum::kLocal:
+            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kLocalOperation))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
-        case PumpOperationMode::kNormal:
+        case OperationModeEnum::kNormal:
             status = Protocols::InteractionModel::Status::Success;
             break;
-        case PumpOperationMode::kUnknownEnumValue:
+        case OperationModeEnum::kUnknownEnumValue:
             status = Protocols::InteractionModel::Status::ConstraintError;
             break;
         }

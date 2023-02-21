@@ -418,14 +418,14 @@ typedef void (*NullableWindowCoveringClusterEndProductTypeAttributeCallback)(
 typedef void (*WindowCoveringClusterTypeAttributeCallback)(void *, chip::app::Clusters::WindowCovering::Type);
 typedef void (*NullableWindowCoveringClusterTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::Type> &);
-typedef void (*PumpConfigurationAndControlClusterPumpControlModeAttributeCallback)(
-    void *, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode);
-typedef void (*NullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode> &);
-typedef void (*PumpConfigurationAndControlClusterPumpOperationModeAttributeCallback)(
-    void *, chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode);
-typedef void (*NullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode> &);
+typedef void (*PumpConfigurationAndControlClusterControlModeEnumAttributeCallback)(
+    void *, chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum);
+typedef void (*NullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum> &);
+typedef void (*PumpConfigurationAndControlClusterOperationModeEnumAttributeCallback)(
+    void *, chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum);
+typedef void (*NullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum> &);
 typedef void (*ThermostatClusterSetpointAdjustModeAttributeCallback)(void *, chip::app::Clusters::Thermostat::SetpointAdjustMode);
 typedef void (*NullableThermostatClusterSetpointAdjustModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::SetpointAdjustMode> &);
@@ -975,7 +975,7 @@ typedef void (*BarrierControlEventListListAttributeCallback)(void * context,
 typedef void (*BarrierControlAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*PumpConfigurationAndControlPumpStatusAttributeCallback)(
-    void *, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus>);
+    void *, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap>);
 typedef void (*PumpConfigurationAndControlGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*PumpConfigurationAndControlAcceptedCommandListListAttributeCallback)(
@@ -8715,7 +8715,8 @@ public:
                                                                     MTRActionBlock action) :
         MTRCallbackBridge<PumpConfigurationAndControlPumpStatusAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value);
+    static void OnSuccessFn(void * context,
+                            chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap> value);
 };
 
 class MTRPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridge
@@ -19383,147 +19384,147 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge
-    : public MTRCallbackBridge<PumpConfigurationAndControlClusterPumpControlModeAttributeCallback>
+class MTRPumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<PumpConfigurationAndControlClusterControlModeEnumAttributeCallback>
 {
 public:
-    MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<PumpConfigurationAndControlClusterPumpControlModeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRPumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PumpConfigurationAndControlClusterControlModeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRPumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<PumpConfigurationAndControlClusterPumpControlModeAttributeCallback>(queue, handler, action,
+        MTRCallbackBridge<PumpConfigurationAndControlClusterControlModeEnumAttributeCallback>(queue, handler, action,
                                                                                               OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum value);
 };
 
-class MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge
-    : public MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge
+class MTRPumpConfigurationAndControlClusterControlModeEnumAttributeCallbackSubscriptionBridge
+    : public MTRPumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge
 {
 public:
-    MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge(
+    MTRPumpConfigurationAndControlClusterControlModeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge(queue, handler, action),
+        MTRPumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnDone;
+    using MTRPumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallback>
+class MTRNullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallback>
 {
 public:
-    MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge(dispatch_queue_t queue,
+    MTRNullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge(dispatch_queue_t queue,
                                                                                         ResponseHandler handler) :
-        MTRCallbackBridge<NullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallback>(queue, handler,
+        MTRCallbackBridge<NullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallback>(queue, handler,
                                                                                                       OnSuccessFn){};
 
-    MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge(dispatch_queue_t queue,
+    MTRNullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge(dispatch_queue_t queue,
                                                                                         ResponseHandler handler,
                                                                                         MTRActionBlock action) :
-        MTRCallbackBridge<NullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallback>(queue, handler, action,
+        MTRCallbackBridge<NullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallback>(queue, handler, action,
                                                                                                       OnSuccessFn){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode> & value);
+                const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum> & value);
 };
 
-class MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge
-    : public MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge
+class MTRNullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge
 {
 public:
-    MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge(
+    MTRNullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge(queue, handler, action),
+        MTRNullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnDone;
+    using MTRNullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge
-    : public MTRCallbackBridge<PumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>
+class MTRPumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<PumpConfigurationAndControlClusterOperationModeEnumAttributeCallback>
 {
 public:
-    MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<PumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRPumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<PumpConfigurationAndControlClusterOperationModeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTRPumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                                   MTRActionBlock action) :
-        MTRCallbackBridge<PumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>(queue, handler, action,
+        MTRCallbackBridge<PumpConfigurationAndControlClusterOperationModeEnumAttributeCallback>(queue, handler, action,
                                                                                                 OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum value);
 };
 
-class MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge
-    : public MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge
+class MTRPumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackSubscriptionBridge
+    : public MTRPumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge
 {
 public:
-    MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge(
+    MTRPumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge(queue, handler, action),
+        MTRPumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnDone;
+    using MTRPumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRPumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge
-    : public MTRCallbackBridge<NullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>
+class MTRNullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallback>
 {
 public:
-    MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge(dispatch_queue_t queue,
+    MTRNullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge(dispatch_queue_t queue,
                                                                                           ResponseHandler handler) :
-        MTRCallbackBridge<NullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>(queue, handler,
+        MTRCallbackBridge<NullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallback>(queue, handler,
                                                                                                         OnSuccessFn){};
 
-    MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge(dispatch_queue_t queue,
+    MTRNullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge(dispatch_queue_t queue,
                                                                                           ResponseHandler handler,
                                                                                           MTRActionBlock action) :
-        MTRCallbackBridge<NullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallback>(queue, handler, action,
+        MTRCallbackBridge<NullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallback>(queue, handler, action,
                                                                                                         OnSuccessFn){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode> & value);
+                const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum> & value);
 };
 
-class MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge
-    : public MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge
+class MTRNullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge
 {
 public:
-    MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge(
+    MTRNullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge(queue, handler, action),
+        MTRNullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnDone;
+    using MTRNullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

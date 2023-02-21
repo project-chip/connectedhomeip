@@ -16227,9 +16227,9 @@ struct TypeInfo
 namespace PumpStatus {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus>;
+    using Type             = chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PumpStatus::Id; }
@@ -16239,9 +16239,9 @@ struct TypeInfo
 namespace EffectiveOperationMode {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode;
-    using DecodableType    = chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode;
-    using DecodableArgType = chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode;
+    using Type             = chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum;
+    using DecodableType    = chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum;
+    using DecodableArgType = chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EffectiveOperationMode::Id; }
@@ -16251,9 +16251,9 @@ struct TypeInfo
 namespace EffectiveControlMode {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode;
-    using DecodableType    = chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode;
-    using DecodableArgType = chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode;
+    using Type             = chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum;
+    using DecodableType    = chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum;
+    using DecodableArgType = chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EffectiveControlMode::Id; }
@@ -16323,9 +16323,9 @@ struct TypeInfo
 namespace OperationMode {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode;
-    using DecodableType    = chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode;
-    using DecodableArgType = chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode;
+    using Type             = chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum;
+    using DecodableType    = chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum;
+    using DecodableArgType = chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationMode::Id; }
@@ -16335,9 +16335,9 @@ struct TypeInfo
 namespace ControlMode {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode;
-    using DecodableType    = chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode;
-    using DecodableArgType = chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode;
+    using Type             = chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum;
+    using DecodableType    = chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum;
+    using DecodableArgType = chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ControlMode::Id; }
@@ -16403,20 +16403,20 @@ struct TypeInfo
         Attributes::MinConstTemp::TypeInfo::DecodableType minConstTemp;
         Attributes::MaxConstTemp::TypeInfo::DecodableType maxConstTemp;
         Attributes::PumpStatus::TypeInfo::DecodableType pumpStatus =
-            static_cast<chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus>>(0);
+            static_cast<chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap>>(0);
         Attributes::EffectiveOperationMode::TypeInfo::DecodableType effectiveOperationMode =
-            static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode>(0);
+            static_cast<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum>(0);
         Attributes::EffectiveControlMode::TypeInfo::DecodableType effectiveControlMode =
-            static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode>(0);
+            static_cast<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum>(0);
         Attributes::Capacity::TypeInfo::DecodableType capacity;
         Attributes::Speed::TypeInfo::DecodableType speed;
         Attributes::LifetimeRunningHours::TypeInfo::DecodableType lifetimeRunningHours;
         Attributes::Power::TypeInfo::DecodableType power;
         Attributes::LifetimeEnergyConsumed::TypeInfo::DecodableType lifetimeEnergyConsumed;
         Attributes::OperationMode::TypeInfo::DecodableType operationMode =
-            static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode>(0);
+            static_cast<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum>(0);
         Attributes::ControlMode::TypeInfo::DecodableType controlMode =
-            static_cast<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode>(0);
+            static_cast<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

@@ -2527,20 +2527,21 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 
 namespace PumpStatus {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> * value); // PumpStatus
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value);
+                  chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap> * value); // PumpStatusBitmap
+EmberAfStatus Set(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap> value);
 } // namespace PumpStatus
 
 namespace EffectiveOperationMode {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode * value); // PumpOperationMode
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value);
+                  chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum * value); // OperationModeEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum value);
 } // namespace EffectiveOperationMode
 
 namespace EffectiveControlMode {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode * value); // PumpControlMode
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value);
+                  chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum * value); // ControlModeEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum value);
 } // namespace EffectiveControlMode
 
 namespace Capacity {
@@ -2580,14 +2581,14 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 
 namespace OperationMode {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode * value); // PumpOperationMode
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value);
+                  chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum * value); // OperationModeEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum value);
 } // namespace OperationMode
 
 namespace ControlMode {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode * value); // PumpControlMode
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value);
+                  chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum * value); // ControlModeEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum value);
 } // namespace ControlMode
 
 namespace FeatureMap {
