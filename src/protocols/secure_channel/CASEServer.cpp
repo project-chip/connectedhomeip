@@ -150,6 +150,14 @@ void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyE
     VerifyOrDie(mPinnedSecureSession.HasValue());
 }
 
+void CASEServer::OnSessionEstablishmentStarted()
+{
+    if (mAppDelegate != nullptr)
+    {
+        mAppDelegate->OnCASEStarted();
+    }
+}
+
 void CASEServer::OnSessionEstablishmentError(CHIP_ERROR err)
 {
     ChipLogError(Inet, "CASE Session establishment failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -167,7 +175,7 @@ void CASEServer::OnSessionEstablished(const SessionHandle & session)
                     ChipLogValueScopedNodeId(session->GetPeer()));
     if (mAppDelegate != nullptr)
     {
-        mAppDelegate->OnCASEComplete();
+        mAppDelegate->OnCASEComplete(session->GetPeer());
     }
     PrepareForSessionEstablishment(session->GetPeer());
 }

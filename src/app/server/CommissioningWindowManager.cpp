@@ -129,7 +129,7 @@ void CommissioningWindowManager::OnSessionEstablishmentError(CHIP_ERROR err)
     DeviceLayer::SystemLayer().CancelTimer(HandleSessionEstablishmentTimeout, this);
     if (mAppDelegate != nullptr)
     {
-        mAppDelegate->OnPASEFailed(err);
+        mAppDelegate->OnCommissioningSessionEstablishmentFailed(err);
     }
     HandleFailedAttempt(err);
 }
@@ -168,7 +168,7 @@ void CommissioningWindowManager::OnSessionEstablishmentStarted()
     DeviceLayer::SystemLayer().StartTimer(kPASESessionEstablishmentTimeout, HandleSessionEstablishmentTimeout, this);
     if (mAppDelegate != nullptr)
     {
-        mAppDelegate->OnPASEStarted();
+        mAppDelegate->OnCommissioningSessionEstablishmentStarted();
     }
 }
 
@@ -180,7 +180,6 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
     if (mAppDelegate != nullptr)
     {
         mAppDelegate->OnCommissioningSessionStarted();
-        mAppDelegate->OnPASEComplete();
     }
 
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, reinterpret_cast<intptr_t>(this));

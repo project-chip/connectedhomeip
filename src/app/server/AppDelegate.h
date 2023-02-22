@@ -22,11 +22,16 @@
 
 #pragma once
 #include <lib/core/CHIPError.h>
+#include <lib/core/ScopedNodeId.h>
 
 class AppDelegate
 {
 public:
     virtual ~AppDelegate() {}
+
+    /* OnCommissioningSessionStarted indicates that PASE Session establishment has
+     * completed and a PASE session now exists.
+     */
     virtual void OnCommissioningSessionStarted() {}
     virtual void OnCommissioningSessionStopped() {}
 
@@ -40,9 +45,13 @@ public:
      */
     virtual void OnCommissioningWindowOpened() {}
     virtual void OnCommissioningWindowClosed() {}
-    virtual void OnPASEStarted() {}
-    virtual void OnPASEFailed(CHIP_ERROR err) {}
-    virtual void OnPASEComplete() {}
+    /*
+     * The below methods related to CASE and PASE are for the responder side of relevant communications.
+     * The methods expose the notifications related to CASE and PASE sessions on the application side.
+     */
+    virtual void OnCommissioningSessionEstablishmentStarted() {}
+    virtual void OnCommissioningSessionEstablishmentFailed(CHIP_ERROR err) {}
+    virtual void OnCASEStarted() {}
     virtual void OnCASEFailed(CHIP_ERROR err) {}
-    virtual void OnCASEComplete() {}
+    virtual void OnCASEComplete(chip::ScopedNodeId id) {}
 };

@@ -41,7 +41,8 @@
 #include <common/Esp32AppServer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-
+#include <lib/core/ScopedNodeId.h>
+#include <lib/support/logging/CHIPLogging.h>
 #if CONFIG_HAVE_DISPLAY
 #include "DeviceWithDisplay.h"
 #endif
@@ -81,7 +82,11 @@ namespace {
 class AppCallbacks : public AppDelegate
 {
 public:
-    void OnCommissioningSessionStarted() override { bluetoothLED.Set(true); }
+    void OnCommissioningSessionStarted() override
+    {
+        ESP_LOGI(TAG, "PASE established successfully");
+        bluetoothLED.Set(true);
+    }
     void OnCommissioningSessionStopped() override
     {
         bluetoothLED.Set(false);
@@ -89,10 +94,16 @@ public:
     }
     void OnCommissioningWindowOpened() override { pairingWindowLED.Set(true); }
     void OnCommissioningWindowClosed() override { pairingWindowLED.Set(false); }
-    void OnPASEStarted() override { ESP_LOGI(TAG, "PASE started"); }
-    void OnPASEComplete() override { ESP_LOGI(TAG, "PASE established successfully"); }
-    void OnPASEFailed(CHIP_ERROR err) override { ESP_LOGE(TAG, "PASE failed err= %" CHIP_ERROR_FORMAT, err.Format()); }
-    void OnCASEComplete() override { ESP_LOGI(TAG, "CASE established successfully"); }
+    void OnCommissioningSessionEstablishmentStarted() override { ESP_LOGI(TAG, "PASE started"); }
+    void OnCommissioningSessionEstablishmentFailed(CHIP_ERROR err) override
+    {
+        ESP_LOGE(TAG, "PASE failed err= %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    void OnCASEStarted() override { ESP_LOGI(TAG, "CASE started"); }
+    void OnCASEComplete(ScopedNodeId id) override
+    {
+        ESP_LOGI(TAG, "CASE established successfully to peer:" ChipLogFormatScopedNodeId, ChipLogValueScopedNodeId(id));
+    }
     void OnCASEFailed(CHIP_ERROR err) override { ESP_LOGE(TAG, "CASE failed err= %" CHIP_ERROR_FORMAT, err.Format()); }
 };
 
