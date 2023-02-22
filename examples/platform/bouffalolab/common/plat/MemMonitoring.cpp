@@ -17,9 +17,10 @@
  */
 
 #include <FreeRTOS.h>
-#include <MemMonitoring.h>
 #include <plat.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
 #include <MemMonitoring.h>
 
 static StackType_t monitoringStack[MONITORING_STACK_SIZE_byte / sizeof(StackType_t)];
@@ -58,8 +59,10 @@ void MemMonitoring::HeapMonitoring(void * pvParameter)
         ChipLogProgress(NotSpecified, "\r\n");
         ChipLogProgress(NotSpecified, "SRAM Heap, min left: %d, current left %d", xPortGetMinimumEverFreeHeapSize(),
                         xPortGetFreeHeapSize());
+#ifdef CFG_USE_PSRAM
         ChipLogProgress(NotSpecified, "PSRAM Heap, min left: %d, current left %d", xPortGetMinimumEverFreeHeapSizePsram(),
                         xPortGetFreeHeapSizePsram());
+#endif
         ChipLogProgress(NotSpecified, "============================= / total run time %ld", pulTotalRunTime);
 
         vTaskDelay(pdMS_TO_TICKS(10000));
