@@ -48,6 +48,8 @@ using chip::Protocols::InteractionModel::Status;
 static OnOffEffect * firstEffect = nullptr;
 OnOffServer OnOffServer::instance;
 
+static EmberEventControl gEventControls[EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT];
+
 /**********************************************************
  * Function definition
  *********************************************************/
@@ -650,15 +652,12 @@ bool OnOffServer::areStartUpOnOffServerAttributesNonVolatile(EndpointId endpoint
  */
 EmberEventControl * OnOffServer::getEventControl(EndpointId endpoint)
 {
-    uint16_t index            = emberAfFindClusterServerEndpointIndex(endpoint, OnOff::Id);
-    EmberEventControl * event = nullptr;
-
-    if (index < ArraySize(eventControls))
+    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, OnOff::Id);
+    if (index >= ArraySize(gEventControls))
     {
-        event = &eventControls[index];
+        return nullptr;
     }
-
-    return event;
+    return &gEventControls[index];
 }
 
 /**

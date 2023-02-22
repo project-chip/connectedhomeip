@@ -22,7 +22,6 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
-#include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
 
 using chip::app::Clusters::OnOff::OnOffFeature;
@@ -95,7 +94,6 @@ private:
      *********************************************************/
 
     static OnOffServer instance;
-    EmberEventControl eventControls[EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT];
     chip::System::Clock::Timestamp nextDesiredOnWithTimedOffTimestamp;
 };
 
