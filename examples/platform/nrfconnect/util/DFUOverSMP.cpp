@@ -27,11 +27,9 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 
-#include <img_mgmt/img_mgmt.h>
-#include <os_mgmt/os_mgmt.h>
-#include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/dfu/mcuboot.h>
-#include <zephyr/mgmt/mcumgr/smp_bt.h>
+#include <zephyr/mgmt/mcumgr/mgmt/callbacks.h>
+#include <zephyr/mgmt/mcumgr/mgmt/mgmt.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
@@ -41,6 +39,43 @@ constexpr uint32_t kAdvertisingOptions     = BT_LE_ADV_OPT_CONNECTABLE;
 constexpr uint16_t kAdvertisingIntervalMin = 400;
 constexpr uint16_t kAdvertisingIntervalMax = 500;
 constexpr uint8_t kAdvertisingFlags        = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
+
+namespace {
+int32_t UploadConfirmHandler(uint32_t event, int32_t rc, bool * abort_more, void * data, size_t data_size)
+{
+    const img_mgmt_upload_check & imgData = *static_cast<img_mgmt_upload_check *>(data);
+    IgnoreUnusedVariable(imgData);
+
+    ChipLogProgress(SoftwareUpdate, "DFU over SMP progress: %u/%u B of image %u", static_cast<unsigned>(imgData.req->off),
+                    static_cast<unsigned>(imgData.action->size), static_cast<unsigned>(imgData.req->image));
+
+    return MGMT_ERR_EOK;
+}
+
+int32_t CommandHandler(uint32_t event, int32_t rc, bool * abort_more, void * data, size_t data_size)
+{
+    if (event == MGMT_EVT_OP_CMD_RECV)
+    {
+        GetFlashHandler().DoAction(ExternalFlashManager::Action::WAKE_UP);
+    }
+    else if (event == MGMT_EVT_OP_CMD_DONE)
+    {
+        GetFlashHandler().DoAction(ExternalFlashManager::Action::SLEEP);
+    }
+
+    return MGMT_ERR_EOK;
+}
+
+mgmt_callback sUploadCallback = {
+    .callback = UploadConfirmHandler,
+    .event_id = MGMT_EVT_OP_IMG_MGMT_DFU_CHUNK,
+};
+
+mgmt_callback sCommandCallback = {
+    .callback = CommandHandler,
+    .event_id = (MGMT_EVT_OP_CMD_RECV | MGMT_EVT_OP_CMD_DONE),
+};
+} // namespace
 
 DFUOverSMP DFUOverSMP::sDFUOverSMP;
 
@@ -68,28 +103,8 @@ void DFUOverSMP::Init()
         }
     };
 
-    os_mgmt_register_group();
-    img_mgmt_register_group();
-
-    img_mgmt_set_upload_cb([](const img_mgmt_upload_req req, const img_mgmt_upload_action action) {
-        ChipLogProgress(SoftwareUpdate, "DFU over SMP progress: %u/%u B of image %u", static_cast<unsigned>(req.off),
-                        static_cast<unsigned>(action.size), static_cast<unsigned>(req.image));
-        return 0;
-    });
-
-    mgmt_register_evt_cb([](uint8_t opcode, uint16_t group, uint8_t id, void * arg) {
-        switch (opcode)
-        {
-        case MGMT_EVT_OP_CMD_RECV:
-            GetFlashHandler().DoAction(ExternalFlashManager::Action::WAKE_UP);
-            break;
-        case MGMT_EVT_OP_CMD_DONE:
-            GetFlashHandler().DoAction(ExternalFlashManager::Action::SLEEP);
-            break;
-        default:
-            break;
-        }
-    });
+    mgmt_callback_register(&sUploadCallback);
+    mgmt_callback_register(&sCommandCallback);
 }
 
 void DFUOverSMP::ConfirmNewImage()
@@ -111,7 +126,6 @@ void DFUOverSMP::ConfirmNewImage()
 void DFUOverSMP::StartServer()
 {
     VerifyOrReturn(!mIsStarted, ChipLogProgress(SoftwareUpdate, "DFU over SMP was already started"));
-    smp_bt_register();
 
     // Synchronize access to the advertising arbiter that normally runs on the CHIP thread.
     PlatformMgr().LockChipStack();
