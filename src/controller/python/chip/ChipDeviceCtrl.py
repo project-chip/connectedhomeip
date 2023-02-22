@@ -944,7 +944,7 @@ class ChipDeviceController():
         Write a list of attributes on a target group.
 
         groupid: Group ID to send write attribute to.
-        attributes: A list of tuples of type (cluster-object, data-version):
+        attributes: A list of tuples of type (cluster-object, data-version). The data-version can be omitted.
 
         E.g
             (Clusters.UnitTesting.Attributes.XYZAttribute('hello'), 1) -- Group Write 'hello' with data version 1
