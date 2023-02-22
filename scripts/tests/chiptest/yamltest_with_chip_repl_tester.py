@@ -16,6 +16,7 @@
 
 import asyncio
 import atexit
+import builtins
 import logging
 import os
 import tempfile
@@ -23,7 +24,7 @@ import traceback
 
 # isort: off
 
-from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
+from chip import ChipDeviceCtrl  # noqa: F401 # Needed before chip.FabricAdmin
 import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 
 # isort: on
@@ -31,7 +32,7 @@ import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 # ensure matter IDL is availale for import, otherwise set relative paths
 try:
     from matter_idl import matter_idl_types
-except:
+except ImportError:
     SCRIPT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
     import sys
 
@@ -40,11 +41,13 @@ except:
 
     from matter_idl import matter_idl_types
 
+    __ALL__ = (matter_idl_types)
+
 
 import chip.CertificateAuthority
 import chip.native
 import click
-from chip.ChipStack import *
+from chip.ChipStack import ChipStack
 from chip.yaml.runner import ReplTestRunner
 from matter_yamltests.definitions import SpecDefinitionsFromPaths
 from matter_yamltests.parser import PostProcessCheckStatus, TestParser, TestParserConfig
@@ -53,6 +56,8 @@ _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 _CLUSTER_XML_DIRECTORY_PATH = os.path.abspath(
     os.path.join(_DEFAULT_CHIP_ROOT, "src/app/zap-templates/zcl/data-model/"))
+
+certificateAuthorityManager = None
 
 
 async def execute_test(yaml, runner):
