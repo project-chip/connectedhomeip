@@ -135,10 +135,10 @@ jobs:
             - name: Build example Telink Window Covering App
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-window' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-window-covering' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d window-app \
-                    out/telink-tlsr9518adk80d-window/zephyr/zephyr.elf \
+                    telink tlsr9518adk80d window-covering \
+                    out/telink-tlsr9518adk80d-window-covering/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: Uploading Size Reports

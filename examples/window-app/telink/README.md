@@ -1,9 +1,9 @@
 # Matter Telink Window Example Application
 
-The Telink Window Example demonstrates how to remotely control a
-window shutter device. It uses buttons to test changing cover position and
-device states and LEDs to show the state of these changes. You can use this example as
-a reference for creating your own application.
+The Telink Window Example demonstrates how to remotely control a window shutter
+device. It uses buttons to test changing cover position and device states and
+LEDs to show the state of these changes. You can use this example as a reference
+for creating your own application.
 
 ![Telink B91 EVK](http://wiki.telink-semi.cn/wiki/assets/Hardware/B91_Generic_Starter_Kit_Hardware_Guide/connection_chart.png)
 
@@ -58,13 +58,13 @@ To get output from device, connect UART to following pins:
 
 The following buttons are available on **tlsr9518adk80d** board:
 
-| Name     | Function               | Description                                                                                            |
-| :------- | :--------------------- | :----------------------------------------------------------------------------------------------------- |
-| Button 1 | Factory reset          | Tripple press performs factory reset to forget currently commissioned Thread network and back to uncommissioned state |
-| Button 2 | Open and ToggleMoveType control       | Manually triggers the Open state by one press and double press triggers the Lift-Tilt move type                                                           |
-| Button 3 | Thread start           | Commission thread with static credentials and enables the Thread on device       |
-| Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE     |
-| Button 5 | Close control       | Manually triggers the Close state by one press                                      |
+| Name     | Function                          | Description                                                                                                          |
+| :------- | :-------------------------------- | :------------------------------------------------------------------------------------------------------------------- |
+| Button 1 | Factory reset                     | Triple press performs factory reset to forget currently commissioned Thread network and back to uncommissioned state |
+| Button 2 | Open and Toggle Move Type control | Manually triggers the Open state by one press and double press triggers the Lift-Tilt move type                      |
+| Button 3 | Thread start                      | Commission thread with static credentials and enables the Thread on device                                           |
+| Button 4 | Open commission window            | The button is opening commissioning window to perform commissioning over BLE                                         |
+| Button 5 | Close control                     | Manually triggers the Close state by one press                                                                       |
 
 ### LEDs
 
