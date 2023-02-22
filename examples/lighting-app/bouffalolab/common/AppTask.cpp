@@ -531,7 +531,7 @@ void AppTask::TimerEventHandler(app_event_t event)
             else
             {
 
-#if defined (BL706_NIGHT_LIGHT) && ! defined (LED_BTN_RESET)
+#if defined(BL706_NIGHT_LIGHT) && !defined(LED_BTN_RESET)
 
                 if (GetAppTask().mButtonPressedTime)
                 {

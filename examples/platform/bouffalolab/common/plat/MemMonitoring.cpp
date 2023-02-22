@@ -17,11 +17,11 @@
  */
 
 #include <FreeRTOS.h>
-#include <plat.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <MemMonitoring.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
-#include <MemMonitoring.h>
+#include <plat.h>
+#include <platform/CHIPDeviceLayer.h>
 
 static StackType_t monitoringStack[MONITORING_STACK_SIZE_byte / sizeof(StackType_t)];
 static StaticTask_t monitoringTaskStruct;

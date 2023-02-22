@@ -83,7 +83,7 @@ bl_iot_sdk("sdk") {
   if (defined(enable_cdc_module) && enable_cdc_module) {
     defines += [ "CFG_USB_CDC_ENABLE" ]
   }
-  
+
   if (chip_enable_pw_rpc) {
     include_dirs += [ "${examples_plat_common_dir}/rpc" ]
     defines += [ "PW_RPC_ENABLED=1" ]

@@ -170,7 +170,7 @@ extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBu
 }
 
 #if (configUSE_TICK_HOOK != 0)
-extern "C" void vApplicationTickHook(void) 
+extern "C" void vApplicationTickHook(void)
 {
 #if defined(CFG_USB_CDC_ENABLE)
     extern void usb_cdc_monitor(void);
