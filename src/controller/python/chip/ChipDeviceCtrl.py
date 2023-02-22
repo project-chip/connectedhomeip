@@ -45,6 +45,7 @@ import dacite
 from . import FabricAdmin
 from . import clusters as Clusters
 from . import discovery
+from .api import opcreds
 from .ChipStack import *
 from .clusters import Attribute as ClusterAttribute
 from .clusters import ClusterObjects as ClusterObjects
@@ -1372,14 +1373,6 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_DeviceController_GetLogFilter = [None]
             self._dmLib.pychip_DeviceController_GetLogFilter = c_uint8
 
-            self._dmLib.pychip_OpCreds_AllocateController.argtypes = [c_void_p, POINTER(
-                c_void_p), c_uint64, c_uint64, c_uint16, c_char_p, c_bool, c_bool, POINTER(c_uint32), c_uint32, c_void_p]
-            self._dmLib.pychip_OpCreds_AllocateController.restype = PyChipError
-
-            self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow.argtypes = [
-                POINTER(c_void_p), c_void_p, POINTER(c_char), c_uint32, POINTER(c_char), c_uint32, POINTER(c_char), c_uint32, POINTER(c_char), c_uint32, c_uint16, c_bool]
-            self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow.restype = PyChipError
-
             self._dmLib.pychip_DeviceController_SetIpk.argtypes = [c_void_p, POINTER(c_char), c_size_t]
             self._dmLib.pychip_DeviceController_SetIpk.restype = PyChipError
 
@@ -1398,8 +1391,6 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback(_IssueNOCChainCallbackPythonCallback)
 
-        devCtrl = c_void_p(None)
-
         c_catTags = (c_uint32 * len(catTags))()
 
         for i, item in enumerate(catTags):
@@ -1407,10 +1398,11 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
         # TODO(erjiaqing@): Figure out how to control enableServerInteractions for a single device controller (node)
         self._externalKeyPair = keypair
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_OpCreds_AllocateController(c_void_p(
-                opCredsContext), pointer(devCtrl), fabricId, nodeId, adminVendorId, c_char_p(None if len(paaTrustStorePath) == 0 else str.encode(paaTrustStorePath)), useTestCommissioner, self._ChipStack.enableServerInteractions, c_catTags, len(catTags), None if keypair is None else keypair.native_object)
-        ).raise_on_error()
+        nativeKey = keypair.native_object if keypair is not None else None
+        devCtrl = self._ChipStack.Call(
+            lambda: opcreds.allocate_commissioner(fabricId=fabricId, nodeId=nodeId, adminVendorId=adminVendorId, opCredsContext=c_void_p(
+                opCredsContext), caseAuthTags=catTags, paaTrustStorePath=paaTrustStorePath, useTestCommissioner=useTestCommissioner, operationalKey=nativeKey)
+        )
 
         self._fabricAdmin = fabricAdmin
         self._fabricId = fabricId
@@ -1590,16 +1582,12 @@ class BareChipDeviceController(ChipDeviceControllerBase):
         '''
         super().__init__(name or f"ctrl(v/{adminVendorId})")
 
-        devCtrl = c_void_p(None)
-
         # Device should hold a reference to the key to avoid it being GC-ed.
         self._externalKeyPair = operationalKey
         nativeKey = operationalKey.create_native_object()
 
-        self._ChipStack.Call(
-            lambda: self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(
-                c_void_p(devCtrl), nativeKey, noc, len(noc), icac, len(icac) if icac else 0, rcac, len(rcac), ipk, len(ipk) if ipk else 0, adminVendorId, self._ChipStack.enableServerInteractions)
-        ).raise_on_error()
+        devCtrl = self._ChipStack.Call(lambda: opcreds.allocate_controller(
+            noc, icac, rcac, ipk, nativeKey, adminVendorId)).raise_on_error()
 
         self._set_dev_ctrl(devCtrl)
 

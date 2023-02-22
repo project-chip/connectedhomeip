@@ -1,6 +1,7 @@
 import ctypes
 import enum
 import glob
+import inspect
 import os
 import platform
 import typing
@@ -168,6 +169,24 @@ class NativeLibraryHandleMethodArguments:
 _nativeLibraryHandle: ctypes.CDLL = None
 
 
+def ensure_native_function(native_func_name: str, ret_type, arg_types):
+    if not getattr(_nativeLibraryHandle, native_func_name).argtypes:
+        setter = NativeLibraryHandleMethodArguments(_nativeLibraryHandle)
+        setter.Set(native_func_name, ret_type, arg_types)
+    return getattr(_nativeLibraryHandle, native_func_name)
+
+
+def native_function(python_func):
+    native_func_name = python_func.__name__
+    arg_types = [a.annotation for a in inspect.signature(python_func).parameters.values()]
+    ret_type = python_func.__annotations__['return']
+
+    def func(*args):
+        return ensure_native_function(native_func_name, ret_type, arg_types)(*args)
+
+    return func
+
+
 def _GetLibraryHandle(shouldInit: bool) -> ctypes.CDLL:
     """Get a memoized handle to the chip native code dll."""
 
@@ -196,3 +215,14 @@ def Init(bluetoothAdapter: int = None):
 
 def GetLibraryHandle():
     return _GetLibraryHandle(True)
+
+
+FabricId = ctypes.c_uint64
+NodeId = ctypes.c_uint64
+VendorId = ctypes.c_uint16
+
+CASEAuthTag = ctypes.c_uint32
+
+
+class pychip_P256Keypair(ctypes.c_void_p):
+    pass

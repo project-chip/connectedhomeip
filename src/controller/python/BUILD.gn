@@ -205,6 +205,7 @@ chip_python_wheel_action("chip-core") {
         "chip/ChipStack.py",
         "chip/FabricAdmin.py",
         "chip/__init__.py",
+        "chip/api/opcreds.py",
         "chip/ble/__init__.py",
         "chip/ble/commissioning/__init__.py",
         "chip/ble/get_adapters.py",
@@ -275,6 +276,7 @@ chip_python_wheel_action("chip-core") {
 
   py_packages = [
     "chip",
+    "chip.api",
     "chip.ble",
     "chip.ble.commissioning",
     "chip.configuration",
