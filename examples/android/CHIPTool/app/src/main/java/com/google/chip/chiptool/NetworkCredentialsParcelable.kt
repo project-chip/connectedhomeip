@@ -31,14 +31,14 @@ class NetworkCredentialsParcelable : Parcelable {
   private constructor(
     wifiCredentials: WiFiCredentials?, threadCredentials: ThreadCredentials?
   ) {
-    wiFiCredentials = wifiCredentials
+    this.wiFiCredentials = wifiCredentials
     this.threadCredentials = threadCredentials
   }
 
   // Begin Parcelable implementation
-  private constructor(`in`: Parcel) {
-    wiFiCredentials = `in`.readParcelable(WiFiCredentials::class.java.classLoader)
-    threadCredentials = `in`.readParcelable(ThreadCredentials::class.java.classLoader)
+  private constructor(parcel: Parcel) {
+    wiFiCredentials = parcel.readParcelable(WiFiCredentials::class.java.classLoader)
+    threadCredentials = parcel.readParcelable(ThreadCredentials::class.java.classLoader)
   }
 
   override fun describeContents(): Int {
@@ -60,9 +60,9 @@ class NetworkCredentialsParcelable : Parcelable {
     }
 
     // Begin Parcelable implementation
-    private constructor(`in`: Parcel) {
-      ssid = `in`.readString()
-      password = `in`.readString()
+    private constructor(parcel: Parcel) {
+      ssid = parcel.readString()
+      password = parcel.readString()
     }
 
     override fun describeContents(): Int {
@@ -75,8 +75,8 @@ class NetworkCredentialsParcelable : Parcelable {
     }
 
     companion object CREATOR : Parcelable.Creator<WiFiCredentials?> {
-      override fun createFromParcel(`in`: Parcel): WiFiCredentials? {
-        return WiFiCredentials(`in`)
+      override fun createFromParcel(parcel: Parcel): WiFiCredentials? {
+        return WiFiCredentials(parcel)
       }
 
       override fun newArray(size: Int): Array<WiFiCredentials?> {
@@ -93,9 +93,9 @@ class NetworkCredentialsParcelable : Parcelable {
     }
 
     // Begin Parcelable implementation
-    private constructor(`in`: Parcel) {
-      operationalDataset = ByteArray(`in`.readInt())
-      `in`.readByteArray(operationalDataset)
+    private constructor(parcel: Parcel) {
+      operationalDataset = ByteArray(parcel.readInt())
+      parcel.readByteArray(operationalDataset)
     }
 
     override fun describeContents(): Int {
@@ -108,8 +108,8 @@ class NetworkCredentialsParcelable : Parcelable {
     }
 
     companion object CREATOR : Parcelable.Creator<ThreadCredentials?> {
-      override fun createFromParcel(`in`: Parcel): ThreadCredentials? {
-        return ThreadCredentials(`in`)
+      override fun createFromParcel(parcel: Parcel): ThreadCredentials? {
+        return ThreadCredentials(parcel)
       }
 
       override fun newArray(size: Int): Array<ThreadCredentials?> {
@@ -137,8 +137,8 @@ class NetworkCredentialsParcelable : Parcelable {
 
     @JvmField
     val CREATOR = object : Parcelable.Creator<NetworkCredentialsParcelable?> {
-      override fun createFromParcel(`in`: Parcel): NetworkCredentialsParcelable? {
-        return NetworkCredentialsParcelable(`in`)
+      override fun createFromParcel(parcel: Parcel): NetworkCredentialsParcelable? {
+        return NetworkCredentialsParcelable(parcel)
       }
 
       override fun newArray(size: Int): Array<NetworkCredentialsParcelable?> {
