@@ -35,7 +35,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.35
+            image: connectedhomeip/chip-build:0.6.40
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -212,7 +212,12 @@ jobs:
                     linux debug lock-app \
                     out/linux-x64-lock/chip-lock-app \
                     /tmp/bloat_reports/
-
+            - name: Build example contact sensor with UI
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-contact-sensor-no-ble-with-ui \
+                        build"
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v3
               if: ${{ !env.ACT }}
