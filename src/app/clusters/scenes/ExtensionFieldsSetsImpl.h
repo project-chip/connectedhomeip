@@ -23,47 +23,64 @@
 namespace chip {
 namespace scenes {
 
+enum EFSTLVTag
+{
+    kTagEFSArrayContainer = 1,
+    kTagEFSFieldNum       = 1,
+    kTagEFSContainer,
+    kTagEFSClusterID,
+    kTagEFS,
+};
+
 using clusterId = chip::ClusterId;
 
 struct ExtensionFieldsSet
 {
-    static constexpr TLV::Tag TagClusterId() { return TLV::ContextTag(1); }
-    static constexpr TLV::Tag TagEFS() { return TLV::ContextTag(2); }
     clusterId mID                              = kInvalidClusterId;
     uint8_t mBytesBuffer[kMaxFieldsPerCluster] = { 0 };
     uint8_t mUsedBytes                         = 0;
 
     ExtensionFieldsSet() = default;
-    ExtensionFieldsSet(clusterId cmID, uint8_t * data, uint8_t dataSize) : mID(cmID), mUsedBytes(dataSize)
+    ExtensionFieldsSet(clusterId cmID, const uint8_t * data, uint8_t dataSize) : mID(cmID), mUsedBytes(dataSize)
     {
         if (dataSize <= kMaxFieldsPerCluster)
         {
             memcpy(mBytesBuffer, data, mUsedBytes);
         }
     }
+
+    ExtensionFieldsSet(clusterId cmID, ByteSpan bytes) : mID(cmID), mUsedBytes(static_cast<uint8_t>(bytes.size()))
+    {
+        if (bytes.size() <= kMaxFieldsPerCluster)
+        {
+            memcpy(mBytesBuffer, bytes.data(), bytes.size());
+        }
+    }
+
     ~ExtensionFieldsSet() = default;
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const
     {
         TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Structure, container));
+        ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(kTagEFSContainer), TLV::kTLVType_Structure, container));
 
-        ReturnErrorOnFailure(writer.Put(TagClusterId(), static_cast<uint16_t>(this->mID)));
-        ReturnErrorOnFailure(writer.PutBytes(TagEFS(), mBytesBuffer, mUsedBytes));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagEFSClusterID), static_cast<uint16_t>(this->mID)));
+        ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(kTagEFS), mBytesBuffer, mUsedBytes));
 
         return writer.EndContainer(container);
     }
+
     CHIP_ERROR Deserialize(TLV::TLVReader & reader)
     {
         ByteSpan buffer;
         TLV::TLVType container;
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(1)));
+        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(kTagEFSContainer)));
         ReturnErrorOnFailure(reader.EnterContainer(container));
 
-        ReturnErrorOnFailure(reader.Next(TagClusterId()));
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagEFSClusterID)));
         ReturnErrorOnFailure(reader.Get(this->mID));
 
-        ReturnErrorOnFailure(reader.Next(TagEFS()));
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagEFS)));
         ReturnErrorOnFailure(reader.Get(buffer));
         VerifyOrReturnError(buffer.size() <= kMaxFieldsPerCluster, CHIP_ERROR_BUFFER_TOO_SMALL);
         this->mUsedBytes = static_cast<uint8_t>(buffer.size());
@@ -86,22 +103,6 @@ struct ExtensionFieldsSet
         return (this->mID == other.mID && !memcmp(this->mBytesBuffer, other.mBytesBuffer, this->mUsedBytes) &&
                 this->mUsedBytes == other.mUsedBytes);
     }
-
-    CHIP_ERROR operator=(const ExtensionFieldsSet & other)
-    {
-        if (other.mUsedBytes <= kMaxFieldsPerCluster)
-        {
-            memcpy(this->mBytesBuffer, other.mBytesBuffer, other.mUsedBytes);
-        }
-        else
-        {
-            return CHIP_ERROR_BUFFER_TOO_SMALL;
-        }
-        this->mID        = other.mID;
-        this->mUsedBytes = other.mUsedBytes;
-
-        return CHIP_NO_ERROR;
-    }
 };
 
 class ExtensionFieldsSetsImpl : public ExtensionFieldsSets
@@ -114,7 +115,8 @@ public:
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override;
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override;
     void Clear() override;
-    bool IsEmpty() const override;
+    bool IsEmpty() const override { return (this->mFieldNum == 0); }
+    uint8_t GetFieldNum() const override { return this->mFieldNum; };
 
     // implementation
     CHIP_ERROR InsertFieldSet(ExtensionFieldsSet & field);
@@ -133,19 +135,18 @@ public:
         return true;
     }
 
-    CHIP_ERROR operator=(const ExtensionFieldsSetsImpl & other)
+    ExtensionFieldsSetsImpl & operator=(const ExtensionFieldsSetsImpl & other)
     {
         for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
         {
-            ReturnErrorOnFailure(this->mEFS[i] = other.mEFS[i]);
+            this->mEFS[i] = other.mEFS[i];
         }
         mFieldNum = other.mFieldNum;
 
-        return CHIP_NO_ERROR;
+        return *this;
     }
 
 protected:
-    static constexpr TLV::Tag TagFieldNum() { return TLV::ContextTag(1); }
     ExtensionFieldsSet mEFS[kMaxClusterPerScenes];
     uint8_t mFieldNum = 0;
 };

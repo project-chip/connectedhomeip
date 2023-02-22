@@ -22,6 +22,12 @@
 namespace chip {
 namespace scenes {
 
+enum SceneImplTLVTag
+{
+    kTagSceneCount = 1,
+    kTagNext,
+};
+
 using SceneTableEntry = DefaultSceneTableImpl::SceneTableEntry;
 using SceneStorageId  = DefaultSceneTableImpl::SceneStorageId;
 using SceneData       = DefaultSceneTableImpl::SceneData;
@@ -35,7 +41,7 @@ struct FabricHavingSceneList : public CommonPersistentData::FabricList
     }
 };
 
-static constexpr size_t kPersistentBufferMax = 128;
+static constexpr size_t kPersistentBufferMax = 256;
 
 struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentBufferMax>
 {
@@ -93,10 +99,6 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentBuffer
  */
 struct FabricSceneData : public PersistentData<kPersistentBufferMax>
 {
-    static constexpr TLV::Tag TagSceneCount() { return TLV::ContextTag(1); }
-    static constexpr TLV::Tag TagSceneMap() { return TLV::ContextTag(2); }
-    static constexpr TLV::Tag TagNext() { return TLV::ContextTag(3); }
-
     FabricIndex fabric_index = kUndefinedFabricIndex;
     uint8_t scene_count      = 0;
     SceneStorageId scene_map[kMaxScenePerFabric];
@@ -127,12 +129,12 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
         TLV::TLVType container;
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
 
-        ReturnErrorOnFailure(writer.Put(TagSceneCount(), static_cast<uint16_t>(scene_count)));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagSceneCount), static_cast<uint16_t>(scene_count)));
         for (uint8_t i = 0; i < kMaxScenePerFabric; i++)
         {
             ReturnErrorOnFailure(scene_map[i].Serialize(writer));
         }
-        ReturnErrorOnFailure(writer.Put(TagNext(), static_cast<uint16_t>(next)));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagNext), static_cast<uint16_t>(next)));
 
         return writer.EndContainer(container);
     }
@@ -145,13 +147,13 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
         TLV::TLVType container;
         ReturnErrorOnFailure(reader.EnterContainer(container));
 
-        ReturnErrorOnFailure(reader.Next(TagSceneCount()));
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagSceneCount)));
         ReturnErrorOnFailure(reader.Get(scene_count));
         for (uint8_t i = 0; i < kMaxScenePerFabric; i++)
         {
             ReturnErrorOnFailure(scene_map[i].Deserialize(reader));
         }
-        ReturnErrorOnFailure(reader.Next(TagNext()));
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagNext)));
         ReturnErrorOnFailure(reader.Get(next));
 
         return reader.ExitContainer(container);
@@ -254,7 +256,7 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
                 idx = index;
                 return CHIP_NO_ERROR; // return scene at current index if scene found
             }
-            if (scene_map[index].mSceneEndpointId == kInvalidEndpointId && firstFreeIdx == kUndefinedSceneIndex)
+            if (scene_map[index].mEndpointId == kInvalidEndpointId && firstFreeIdx == kUndefinedSceneIndex)
             {
                 firstFreeIdx = index;
             }
@@ -280,6 +282,7 @@ struct FabricSceneData : public PersistentData<kPersistentBufferMax>
         ReturnErrorOnFailure(Unregister(storage));
         return PersistentData::Delete(storage);
     }
+
     CHIP_ERROR SaveScene(PersistentStorageDelegate * storage, const SceneTableEntry & entry)
     {
         CHIP_ERROR err;
@@ -397,38 +400,37 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntryAtPosition(FabricIndex fa
     return CHIP_NO_ERROR;
 }
 
-/// @brief Registers handle to get extension fields set for a specific cluster. If the handler is already present in the handler
-/// array, it will be overwritten
-/// @param ID ID of the cluster used to fill the extension fields set
-/// @param get_function pointer to function to call to get the extension fiels set from the cluster
-/// @param set_function pointer to function to call send an extension field to the cluster
-/// @return CHIP_ERROR_NO_MEMORY if couldn't insert the handler, otherwise CHIP_NO_ERROR
-CHIP_ERROR DefaultSceneTableImpl::RegisterHandler(ClusterId ID, clusterFieldsHandle get_function, clusterFieldsHandle set_function)
+/// @brief Register a handler in the handler list
+/// @param handler Cluster specific handler for extension field sets interaction
+/// @return CHIP_NO_ERROR if handler was registered, CHIP_ERROR_NO_MEMORY if the handler list is full
+CHIP_ERROR DefaultSceneTableImpl::RegisterHandler(SceneHandler * handler)
 {
-    CHIP_ERROR err     = CHIP_ERROR_NO_MEMORY;
-    uint8_t idPosition = 0xff, fisrtEmptyPosition = 0xff;
-    for (uint8_t i = 0; i < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; i++)
+    CHIP_ERROR err             = CHIP_ERROR_NO_MEMORY;
+    uint8_t idPosition         = kInvalidPosition;
+    uint8_t fisrtEmptyPosition = kInvalidPosition;
+
+    for (uint8_t i = 0; i < kMaxSceneHandlers; i++)
     {
-        if (this->handlers[i].GetID() == ID)
+        if (this->mHandlers[i] == handler)
         {
             idPosition = i;
             break;
         }
-        if (!this->handlers[i].IsInitialized() && fisrtEmptyPosition == 0xff)
+        if (this->mHandlers[i] == nullptr && fisrtEmptyPosition == kInvalidPosition)
         {
             fisrtEmptyPosition = i;
         }
     }
 
     // if found, insert at found position, otherwise at first free possition, otherwise return error
-    if (idPosition < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES)
+    if (idPosition < kMaxSceneHandlers)
     {
-        this->handlers[idPosition].InitSceneHandler(ID, get_function, set_function);
-        err = CHIP_NO_ERROR;
+        this->mHandlers[idPosition] = handler;
+        err                         = CHIP_NO_ERROR;
     }
-    else if (fisrtEmptyPosition < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES)
+    else if (fisrtEmptyPosition < kMaxSceneHandlers)
     {
-        this->handlers[fisrtEmptyPosition].InitSceneHandler(ID, get_function, set_function);
+        this->mHandlers[fisrtEmptyPosition] = handler;
         this->handlerNum++;
         err = CHIP_NO_ERROR;
     }
@@ -438,60 +440,71 @@ CHIP_ERROR DefaultSceneTableImpl::RegisterHandler(ClusterId ID, clusterFieldsHan
 
 CHIP_ERROR DefaultSceneTableImpl::UnregisterHandler(uint8_t position)
 {
-    if (!HandlerListEmpty())
+    VerifyOrReturnError(position < kMaxSceneHandlers, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnValue(!this->HandlerListEmpty() && !(this->mHandlers[position] == nullptr), CHIP_NO_ERROR);
+
+    uint8_t next    = position + 1;
+    uint8_t moveNum = kMaxSceneHandlers - next;
+
+    // TODO: Implement general array management methods
+    // Compress array after removal
+    memmove(&this->mHandlers[position], &this->mHandlers[next], sizeof(SceneHandler *) * moveNum);
+
+    this->handlerNum--;
+    // Clear last occupied position
+    this->mHandlers[handlerNum] = nullptr;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene, clusterId cluster)
+{
+    ExtensionFieldsSet EFS;
+    MutableByteSpan EFSSpan = MutableByteSpan(EFS.mBytesBuffer, kMaxFieldsPerCluster);
+    if (!this->HandlerListEmpty())
     {
-        if (position < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES)
+        for (uint8_t i = 0; i < this->handlerNum; i++)
         {
-            if (this->handlers[position].IsInitialized())
+            if (this->mHandlers[i] != nullptr)
             {
-                this->handlers[position].ClearSceneHandler();
-                this->handlerNum--;
+                EFS.mID = cluster;
+                ReturnErrorOnFailure(this->mHandlers[i]->SerializeSave(scene.mStorageId.mEndpointId, cluster, EFSSpan));
+                EFS.mUsedBytes = (uint8_t) EFSSpan.size();
+                ReturnErrorOnFailure(scene.mStorageData.mExtensionFieldsSets.InsertFieldSet(EFS));
             }
-        }
-        else
-        {
-            return CHIP_ERROR_ACCESS_DENIED;
         }
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::EFSValuesFromCluster(ExtensionFieldsSetsImpl & fieldSets)
+CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(FabricIndex fabric_index, const SceneStorageId & scene_id)
 {
+    FabricSceneData fabric(fabric_index);
+    SceneTableData scene(fabric_index);
     ExtensionFieldsSet EFS;
+    TransitionTimeMs time;
+    clusterId cluster;
+
+    ReturnErrorOnFailure(fabric.Load(mStorage));
+    VerifyOrReturnError(fabric.Find(scene_id, scene.index) == CHIP_NO_ERROR, CHIP_ERROR_NOT_FOUND);
+    ReturnErrorOnFailure(scene.Load(mStorage));
+
     if (!this->HandlerListEmpty())
     {
-        for (uint8_t i = 0; i < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; i++)
+        for (uint8_t i = 0; i < scene.mStorageData.mExtensionFieldsSets.GetFieldNum(); i++)
         {
-            if (this->handlers[i].IsInitialized())
-            {
-                ReturnErrorOnFailure(this->handlers[i].GetClusterEFS(EFS));
-                ReturnErrorOnFailure(fieldSets.InsertFieldSet(EFS));
-            }
-        }
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DefaultSceneTableImpl::EFSValuesToCluster(ExtensionFieldsSetsImpl & fieldSets)
-{
-    ExtensionFieldsSet EFS;
-    if (!this->HandlerListEmpty())
-    {
-        for (uint8_t i = 0; i < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; i++)
-        {
-            fieldSets.GetFieldSetAtPosition(EFS, i);
+            scene.mStorageData.mExtensionFieldsSets.GetFieldSetAtPosition(EFS, i);
+            cluster = EFS.mID;
+            time    = scene.mStorageData.mSceneTransitionTime * 1000 +
+                (scene.mStorageData.mTransitionTime100ms ? scene.mStorageData.mTransitionTime100ms * 10 : 0);
+            ByteSpan EFSSpan = MutableByteSpan(EFS.mBytesBuffer, EFS.mUsedBytes);
 
             if (!EFS.IsEmpty())
             {
-                for (uint8_t j = 0; j < CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES; j++)
+                for (uint8_t j = 0; j < this->handlerNum; j++)
                 {
-                    if (EFS.mID == this->handlers[j].GetID())
-                    {
-                        ReturnErrorOnFailure(this->handlers[j].SetClusterEFS(EFS));
-                    }
+                    ReturnErrorOnFailure(this->mHandlers[j]->ApplyScene(scene.mStorageId.mEndpointId, cluster, EFSSpan, time));
                 }
             }
         }
@@ -548,7 +561,7 @@ bool DefaultSceneTableImpl::SceneEntryIteratorImpl::Next(SceneTableEntry & outpu
     // looks for next available scene
     while (mSceneIndex < kMaxScenePerFabric)
     {
-        if (fabric.scene_map[mSceneIndex].mSceneEndpointId != kInvalidEndpointId)
+        if (fabric.scene_map[mSceneIndex].mEndpointId != kInvalidEndpointId)
         {
             scene.index = mSceneIndex;
             VerifyOrReturnError(scene.Load(mProvider.mStorage) == CHIP_NO_ERROR, false);
