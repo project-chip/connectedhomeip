@@ -157,16 +157,16 @@ jobs:
                     linux debug tv-casting-app \
                     out/linux-x64-tv-casting-app/chip-tv-casting-app \
                     /tmp/bloat_reports/
-            - name: Build example lighting app with RPCs
+            - name: Build example lighting app with RPCs and UI
               timeout-minutes: 10
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target linux-x64-light-rpc \
+                        --target linux-x64-light-rpc-with-ui \
                         build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    linux debug+rpc lighting-app \
-                    out/linux-x64-light-rpc/chip-lighting-app \
+                    linux debug+rpc+ui lighting-app \
+                    out/linux-x64-light-rpc-with-ui/chip-lighting-app \
                     /tmp/bloat_reports/
             - name: Build example Standalone Bridge
               timeout-minutes: 10
@@ -212,7 +212,12 @@ jobs:
                     linux debug lock-app \
                     out/linux-x64-lock/chip-lock-app \
                     /tmp/bloat_reports/
-
+            - name: Build example contact sensor with UI
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-contact-sensor-no-ble-with-ui \
+                        build"
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v3
               if: ${{ !env.ACT }}
