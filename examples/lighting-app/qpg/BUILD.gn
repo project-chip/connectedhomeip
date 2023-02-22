@@ -66,8 +66,8 @@ qpg_executable("lighting_app") {
   deps = [
     ":factorydata_lib",
     ":sdk",
-    "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/examples/lighting-app/lighting-common:color-format",
+    "${chip_root}/examples/lighting-app/qpg/zap/",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
