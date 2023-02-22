@@ -894,23 +894,17 @@ class ChipDeviceController():
             ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
         return await future
 
-    async def SendGroupCommand(self, groupid: int, payload: ClusterObjects.ClusterCommand, timedRequestTimeoutMs: typing.Union[None, int] = None, interactionTimeoutMs: typing.Union[None, int] = None, busyWaitMs: typing.Union[None, int] = None):
+    def SendGroupCommand(self, groupid: int, payload: ClusterObjects.ClusterCommand, busyWaitMs: typing.Union[None, int] = None):
         '''
         Send a group cluster-object encapsulated command to a group_id and get returned a future that can be awaited upon to get confirmation command was sent.
-
-        timedWriteTimeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
-        interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the right
-                              timeout value based on transport characteristics as well as the responsiveness of the target.
         '''
         self.CheckIsActive()
 
-        eventLoop = asyncio.get_running_loop()
-        future = eventLoop.create_future()
-
         ClusterCommand.SendGroupCommand(
-            future, eventLoop, groupid, self.devCtrl, payload, timedRequestTimeoutMs=timedRequestTimeoutMs,
-            interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
-        return await future
+            groupid, self.devCtrl, payload, busyWaitMs=busyWaitMs).raise_on_error()
+
+        # None is the expected return for sending group commands.
+        return None
 
     async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]], timedRequestTimeoutMs: typing.Union[None, int] = None, interactionTimeoutMs: typing.Union[None, int] = None, busyWaitMs: typing.Union[None, int] = None):
         '''

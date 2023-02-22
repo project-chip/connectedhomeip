@@ -38,29 +38,27 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
                                              const uint8_t * payload, size_t length, uint16_t interactionTimeoutMs,
                                              uint16_t busyWaitMs);
 
-PyChipError pychip_CommandSender_SendGroupCommand(void * appContext, chip::GroupId groupId,
-                                                  chip::Controller::DeviceCommissioner * devCtrl, uint16_t timedRequestTimeoutMs,
+PyChipError pychip_CommandSender_SendGroupCommand(chip::GroupId groupId,
+                                                  chip::Controller::DeviceCommissioner * devCtrl,
                                                   chip::ClusterId clusterId, chip::CommandId commandId, const uint8_t * payload,
-                                                  size_t length, uint16_t interactionTimeoutMs, uint16_t busyWaitMs);
+                                                  size_t length, uint16_t busyWaitMs);
 }
 
 namespace chip {
 namespace python {
 
-using OnCommandSenderResponseCallback  = void (*)(PyObject appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
+using OnCommandSenderResponseCallback = void (*)(PyObject appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
                                                  chip::CommandId commandId,
                                                  std::underlying_type_t<Protocols::InteractionModel::Status> status,
                                                  chip::ClusterStatus clusterStatus, const uint8_t * payload, uint32_t length);
-using OnCommandSenderErrorCallback     = void (*)(PyObject appContext,
+using OnCommandSenderErrorCallback    = void (*)(PyObject appContext,
                                               std::underlying_type_t<Protocols::InteractionModel::Status> status,
                                               chip::ClusterStatus clusterStatus, PyChipError chiperror);
-using OnCommandSenderDoneCallback      = void (*)(PyObject appContext);
-using OnGroupCommandSenderDoneCallback = void (*)(PyObject appContext);
+using OnCommandSenderDoneCallback     = void (*)(PyObject appContext);
 
 OnCommandSenderResponseCallback gOnCommandSenderResponseCallback = nullptr;
 OnCommandSenderErrorCallback gOnCommandSenderErrorCallback       = nullptr;
 OnCommandSenderDoneCallback gOnCommandSenderDoneCallback         = nullptr;
-OnCommandSenderDoneCallback gOnGroupCommandSenderDoneCallback    = nullptr;
 
 class CommandSenderCallback : public CommandSender::Callback
 {
@@ -113,27 +111,8 @@ public:
         delete this;
     };
 
-protected:
+private:
     PyObject mAppContext = nullptr;
-};
-
-class GroupCommandSenderCallback : public CommandSenderCallback
-{
-public:
-    GroupCommandSenderCallback(PyObject appContext) : CommandSenderCallback(appContext) {}
-    void OnResponse(CommandSender * apCommandSender, const ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
-                    TLV::TLVReader * aData) override
-    {
-        // Group messages are not expected to provide a response.
-        chipDie();
-    }
-
-    void OnDone(CommandSender * apCommandSender) override
-    {
-        gOnGroupCommandSenderDoneCallback(mAppContext);
-        delete apCommandSender;
-        delete this;
-    };
 };
 
 } // namespace python
@@ -144,13 +123,11 @@ using namespace chip::python;
 extern "C" {
 void pychip_CommandSender_InitCallbacks(OnCommandSenderResponseCallback onCommandSenderResponseCallback,
                                         OnCommandSenderErrorCallback onCommandSenderErrorCallback,
-                                        OnCommandSenderDoneCallback onCommandSenderDoneCallback,
-                                        OnGroupCommandSenderDoneCallback onGroupCommandSenderDoneCallback)
+                                        OnCommandSenderDoneCallback onCommandSenderDoneCallback)
 {
-    gOnCommandSenderResponseCallback  = onCommandSenderResponseCallback;
-    gOnCommandSenderErrorCallback     = onCommandSenderErrorCallback;
-    gOnCommandSenderDoneCallback      = onCommandSenderDoneCallback;
-    gOnGroupCommandSenderDoneCallback = onGroupCommandSenderDoneCallback;
+    gOnCommandSenderResponseCallback = onCommandSenderResponseCallback;
+    gOnCommandSenderErrorCallback    = onCommandSenderErrorCallback;
+    gOnCommandSenderDoneCallback     = onCommandSenderDoneCallback;
 }
 
 PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, uint16_t timedRequestTimeoutMs,
@@ -200,19 +177,17 @@ exit:
     return ToPyChipError(err);
 }
 
-PyChipError pychip_CommandSender_SendGroupCommand(void * appContext, chip::GroupId groupId,
-                                                  chip::Controller::DeviceCommissioner * devCtrl, uint16_t timedRequestTimeoutMs,
+PyChipError pychip_CommandSender_SendGroupCommand(chip::GroupId groupId,
+                                                  chip::Controller::DeviceCommissioner * devCtrl,
                                                   chip::ClusterId clusterId, chip::CommandId commandId, const uint8_t * payload,
-                                                  size_t length, uint16_t interactionTimeoutMs, uint16_t busyWaitMs)
+                                                  size_t length, uint16_t busyWaitMs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     chip::Messaging::ExchangeManager * exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
     VerifyOrReturnError(exchangeManager != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
 
-    std::unique_ptr<GroupCommandSenderCallback> callback = std::make_unique<GroupCommandSenderCallback>(appContext);
-    std::unique_ptr<CommandSender> sender                = std::make_unique<CommandSender>(callback.get(), exchangeManager,
-                                                                            /* is timed request */ timedRequestTimeoutMs != 0);
+    std::unique_ptr<CommandSender> sender                = std::make_unique<CommandSender>(nullptr /* callback */, exchangeManager);
 
     app::CommandPathParams cmdParams = { groupId, clusterId, commandId, (app::CommandPathFlags::kGroupIdValid) };
 
@@ -227,8 +202,7 @@ PyChipError pychip_CommandSender_SendGroupCommand(void * appContext, chip::Group
         SuccessOrExit(writer->CopyContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kFields)), reader));
     }
 
-    SuccessOrExit(err = sender->FinishCommand(timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)
-                                                                         : Optional<uint16_t>::Missing()));
+    SuccessOrExit(err = sender->FinishCommand(Optional<uint16_t>::Missing()));
 
     {
         auto fabricIndex = devCtrl->GetFabricIndex();
@@ -236,9 +210,6 @@ PyChipError pychip_CommandSender_SendGroupCommand(void * appContext, chip::Group
         chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
         SuccessOrExit(err = sender->SendGroupCommandRequest(chip::SessionHandle(session)));
     }
-
-    sender.release();
-    callback.release();
 
     if (busyWaitMs)
     {

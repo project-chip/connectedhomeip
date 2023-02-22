@@ -188,10 +188,9 @@ class InvokeAction(BaseAction):
     def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
             if self._group_id:
-                resp = asyncio.run(dev_ctrl.SendGroupCommand(
+                resp = dev_ctrl.SendGroupCommand(
                     self._group_id, self._request_object,
-                    timedRequestTimeoutMs=self._interation_timeout_ms,
-                    busyWaitMs=self._busy_wait_ms))
+                    busyWaitMs=self._busy_wait_ms)
             else:
                 resp = asyncio.run(dev_ctrl.SendCommand(
                     self._node_id, self._endpoint, self._request_object,
