@@ -556,6 +556,8 @@ def BuildTelinkTarget():
         TargetPart('thermostat', app=TelinkApp.THERMOSTAT),
     ])
 
+    target.AppendModifier('rpc', enable_rpcs=True)
+
     return target
 
 
