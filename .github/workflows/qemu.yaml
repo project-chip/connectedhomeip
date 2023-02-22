@@ -38,7 +38,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32-qemu:0.6.35
+            image: connectedhomeip/chip-build-esp32-qemu:0.6.40
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
