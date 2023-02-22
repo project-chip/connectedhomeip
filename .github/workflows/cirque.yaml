@@ -31,7 +31,7 @@ jobs:
 
         env:
             DOCKER_RUN_VERSION: 0.6.35
-            GITHUB_CACHE_PATH: /tmp/cirque-cache/
+            GITHUB_CACHE_PATH: /tmp/cirque-cache
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -60,33 +60,36 @@ jobs:
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
 
-            - name: Get cirque cache key
-              id: cirque-key
-              run: |
-                  echo "::set-output name=val::$(scripts/tests/cirque_tests.sh cachekeyhash)"
-
-            - name: Cache
-              uses: actions/cache@v2
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
               if: ${{ !env.ACT }}
-              id: cache
               with:
-                  path: ${{ env.GITHUB_CACHE_PATH }}
-                  key: ${{ runner.os }}-cirque-${{ steps.cirque-key.outputs.val }}
-                  restore-keys: |
-                      ${{ runner.os }}-cirque-
-
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 15
               run: |
                   integrations/docker/images/chip-build-cirque/run.sh \
-                    --env GITHUB_ACTION_RUN=1 \
-                    --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
-                    --volume /tmp:/tmp \
-                    -- sh -c '\
-                       git config --global --add safe.directory "*" \
+                    -- sh -c " \
+                       git config --global --add safe.directory '*' \
                        && scripts/build/gn_bootstrap.sh \
-                    '
+                       && chown -R $(id -u):$(id -g) .environment \
+                    "
 
+            - name: Get Cirque Bootstrap cache key
+              id: cirque-bootstrap-cache-key
+              run: echo "val=$(scripts/tests/cirque_tests.sh cachekeyhash)" >> $GITHUB_OUTPUT
+            - name: Cirque Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              if: ${{ !env.ACT }}
+              with:
+                  key: ${{ runner.os }}-cirque-${{ steps.cirque-bootstrap-cache-key.outputs.val }}
+                  restore-keys: ${{ runner.os }}-cirque-
+                  path: ${{ env.GITHUB_CACHE_PATH }}
             - name: Cirque Bootstrap
               timeout-minutes: 15
               run: |
@@ -95,6 +98,7 @@ jobs:
                     --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
                     --volume /tmp:/tmp \
                     -- scripts/tests/cirque_tests.sh bootstrap
+
             - name: Artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1
@@ -107,13 +111,10 @@ jobs:
               timeout-minutes: 30
               run: |
                   integrations/docker/images/chip-build-cirque/run.sh \
-                    --env GITHUB_ACTION_RUN=1 \
-                    --env GITHUB_CACHE_PATH=${{ env.GITHUB_CACHE_PATH }} \
-                    --volume /tmp:/tmp \
-                    -- sh -c '\
-                       git config --global --add safe.directory "*" \
-                       && scripts/build/gn_gen_cirque.sh
-                      '
+                    -- sh -c " \
+                       git config --global --add safe.directory '*' \
+                       && scripts/build/gn_gen_cirque.sh \
+                      "
             - name: Run Tests
               timeout-minutes: 45
               run: |
@@ -125,6 +126,7 @@ jobs:
                      --volume /tmp:/tmp \
                      --volume /dev/pts:/dev/pts \
                      -- scripts/tests/cirque_tests.sh run_all_tests
+
             - name: Uploading Binaries
               uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
