@@ -37,6 +37,7 @@ public:
     virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader)     = 0;
     virtual void Clear()                                        = 0;
     virtual bool IsEmpty() const                                = 0;
+    virtual uint8_t GetFieldNum() const                         = 0;
 };
 } // namespace scenes
 } // namespace chip

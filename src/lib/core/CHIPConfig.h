@@ -1424,7 +1424,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief The maximum size of a single extension field set for a single cluster
  */
 #ifndef CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER
-#define CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER 15
+#define CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER 100
 #endif
 
 /**

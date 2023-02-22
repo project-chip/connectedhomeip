@@ -27,86 +27,135 @@ namespace scenes {
 
 using clusterId = chip::ClusterId;
 
-typedef CHIP_ERROR (*clusterFieldsHandle)(ExtensionFieldsSet & fields);
-
-/// @brief Class to allow extension field sets to be handled by the scene table without any knowledge of the cluster or its
-/// implementation
-class SceneHandler
+/// @brief Default implementation of handler, handle EFS from add scene and view scene commands for any cluster
+///        The implementation of SerializeSave and ApplyScene were omitted and must be implemented in a way that
+///        is compatible with the SerializeAdd output in order to function with the Default Scene Handler.
+///        It is worth noting that this implementation is very memory consuming. In the current worst case,
+///        (Color control cluster), the Extension Field Set's value pair list TLV occupies 99 bytes of memory
+class DefaultSceneHandlerImpl : public scenes::SceneHandler
 {
 public:
-    SceneHandler(ClusterId Id = kInvalidClusterId, clusterFieldsHandle getEFSHandle = nullptr,
-                 clusterFieldsHandle setEFSHandle = nullptr)
-    {
-        if (getEFSHandle != nullptr && setEFSHandle != nullptr && Id != kInvalidClusterId)
-        {
-            getEFS      = getEFSHandle;
-            setEFS      = setEFSHandle;
-            cID         = Id;
-            initialized = true;
-        }
-    };
-    ~SceneHandler(){};
+    static constexpr uint8_t kMaxValueSize = 4;
+    static constexpr uint8_t kMaxAvPair    = 15;
 
-    void InitSceneHandler(ClusterId Id, clusterFieldsHandle getEFSHandle, clusterFieldsHandle setEFSHandle)
-    {
-        if (getEFSHandle != nullptr && setEFSHandle != nullptr && Id != kInvalidClusterId)
-        {
-            getEFS      = getEFSHandle;
-            setEFS      = setEFSHandle;
-            cID         = Id;
-            initialized = true;
-        }
-    }
+    DefaultSceneHandlerImpl() = default;
+    ~DefaultSceneHandlerImpl() override{};
 
-    void ClearSceneHandler()
+    /// @brief Function to serialize data from an add scene command, assume the incoming extensionFieldSet is initialized
+    /// @param endpoint Target Endpoint
+    /// @param cluster Cluster in the Extension field set, filled by the function
+    /// @param serialyzedBytes Mutable Byte span to hold EFS data from command
+    /// @param extensionFieldSet Extension field set from commmand, pre initialized
+    /// @return CHIP_NO_ERROR if success, specific CHIP_ERROR otherwise
+    virtual CHIP_ERROR SerializeAdd(EndpointId endpoint, ClusterId & cluster, MutableByteSpan & serialyzedBytes,
+                                    app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet) override
     {
-        getEFS      = nullptr;
-        setEFS      = nullptr;
-        cID         = kInvalidClusterId;
-        initialized = false;
-    }
+        app::DataModel::List<app::Clusters::Scenes::Structs::AttributeValuePair::Type> attributeValueList;
+        app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType aVPair;
+        TLV::TLVWriter writer;
+        TLV::TLVType outer;
 
-    CHIP_ERROR GetClusterEFS(ExtensionFieldsSet & clusterFields)
-    {
-        if (this->IsInitialized())
+        uint8_t pairCount  = 0;
+        uint8_t valueBytes = 0;
+
+        VerifyOrReturnError(SupportsCluster(endpoint, extensionFieldSet.clusterID), CHIP_ERROR_INVALID_ARGUMENT);
+
+        cluster = extensionFieldSet.clusterID;
+
+        auto pair_iterator = extensionFieldSet.attributeValueList.begin();
+        while (pair_iterator.Next() && pairCount < kMaxAvPair)
         {
-            ReturnErrorOnFailure(getEFS(clusterFields));
+            aVPair                          = pair_iterator.GetValue();
+            mAVPairs[pairCount].attributeID = aVPair.attributeID;
+            auto value_iterator             = aVPair.attributeValue.begin();
+
+            valueBytes = 0;
+            while (value_iterator.Next() && valueBytes < kMaxValueSize)
+            {
+                mValueBuffer[pairCount][valueBytes] = value_iterator.GetValue();
+                valueBytes++;
+            }
+            // Check we could go through all bytes of the value
+            VerifyOrReturnError(value_iterator.Next() == false, CHIP_ERROR_BUFFER_TOO_SMALL);
+            mAVPairs[pairCount].attributeValue = mValueBuffer[pairCount];
+            mAVPairs[pairCount].attributeValue.reduce_size(valueBytes);
+            pairCount++;
         }
+
+        // Check we could go through all pairs in incomming command
+        VerifyOrReturnError(pair_iterator.Next() == false, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+        attributeValueList = mAVPairs;
+        attributeValueList.reduce_size(pairCount);
+
+        writer.Init(serialyzedBytes);
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
+        ReturnErrorOnFailure(app::DataModel::Encode(
+            writer, TLV::ContextTag(to_underlying(app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)),
+            attributeValueList));
+        ReturnErrorOnFailure(writer.EndContainer(outer));
 
         return CHIP_NO_ERROR;
     }
-    CHIP_ERROR SetClusterEFS(ExtensionFieldsSet & clusterFields)
+
+    /// @brief Simulates taking data from nvm and loading it in a command object if the cluster is supported by the endpoint
+    /// @param endpoint target endpoint
+    /// @param cluster  target cluster
+    /// @param serialyzedBytes data to deserialize into EFS
+    /// @return CHIP_NO_ERROR if Extension Field Set was successfully populated, specific CHIP_ERROR otherwise
+    virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, ByteSpan & serialyzedBytes,
+                                   app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & extensionFieldSet) override
     {
-        if (this->IsInitialized())
+        app::DataModel::DecodableList<app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType> attributeValueList;
+        app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType decodePair;
+
+        TLV::TLVReader reader;
+        TLV::TLVType outer;
+        uint8_t pairCount  = 0;
+        uint8_t valueBytes = 0;
+
+        VerifyOrReturnError(SupportsCluster(endpoint, cluster), CHIP_ERROR_INVALID_ARGUMENT);
+
+        extensionFieldSet.clusterID = cluster;
+        reader.Init(serialyzedBytes);
+        ReturnErrorOnFailure(reader.Next());
+        ReturnErrorOnFailure(reader.EnterContainer(outer));
+        ReturnErrorOnFailure(reader.Next());
+        attributeValueList.Decode(reader);
+
+        auto pair_iterator = attributeValueList.begin();
+        while (pair_iterator.Next() && pairCount < kMaxAvPair)
         {
-            ReturnErrorOnFailure(setEFS(clusterFields));
-        }
+            decodePair                      = pair_iterator.GetValue();
+            mAVPairs[pairCount].attributeID = decodePair.attributeID;
+            auto value_iterator             = decodePair.attributeValue.begin();
+            valueBytes                      = 0;
+
+            while (value_iterator.Next() && valueBytes < kMaxValueSize)
+            {
+                mValueBuffer[pairCount][valueBytes] = value_iterator.GetValue();
+                valueBytes++;
+            }
+            // Check we could go through all bytes of the value
+            VerifyOrReturnError(value_iterator.Next() == false, CHIP_ERROR_BUFFER_TOO_SMALL);
+            mAVPairs[pairCount].attributeValue = mValueBuffer[pairCount];
+            mAVPairs[pairCount].attributeValue.reduce_size(valueBytes);
+            pairCount++;
+        };
+
+        // Check we could go through all pairs stored in memory
+        VerifyOrReturnError(pair_iterator.Next() == false, CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorOnFailure(reader.ExitContainer(outer));
+
+        extensionFieldSet.attributeValueList = mAVPairs;
+        extensionFieldSet.attributeValueList.reduce_size(pairCount);
 
         return CHIP_NO_ERROR;
     }
 
-    bool IsInitialized() const { return this->initialized; }
-
-    ClusterId GetID() { return cID; }
-
-    bool operator==(const SceneHandler & other)
-    {
-        return (this->getEFS == other.getEFS && this->setEFS == other.setEFS && this->cID == other.cID &&
-                initialized == other.initialized);
-    }
-    void operator=(const SceneHandler & other)
-    {
-        this->getEFS      = other.getEFS;
-        this->setEFS      = other.setEFS;
-        this->cID         = other.cID;
-        this->initialized = true;
-    }
-
-protected:
-    clusterFieldsHandle getEFS = nullptr;
-    clusterFieldsHandle setEFS = nullptr;
-    ClusterId cID              = kInvalidClusterId;
-    bool initialized           = false;
+private:
+    app::Clusters::Scenes::Structs::AttributeValuePair::Type mAVPairs[kMaxAvPair];
+    uint8_t mValueBuffer[kMaxAvPair][kMaxValueSize];
 };
 
 /**
@@ -129,18 +178,17 @@ public:
 
     // Scene access by Id
     CHIP_ERROR SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry) override;
-    CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, DefaultSceneTableImpl::SceneStorageId scene_id,
-                                  SceneTableEntry & entry) override;
-    CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, DefaultSceneTableImpl::SceneStorageId scene_id) override;
+    CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry) override;
+    CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id) override;
     CHIP_ERROR RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scened_idx) override;
 
     // SceneHandlers
-    CHIP_ERROR RegisterHandler(ClusterId ID, clusterFieldsHandle get_function, clusterFieldsHandle set_function);
+    CHIP_ERROR RegisterHandler(SceneHandler * handler);
     CHIP_ERROR UnregisterHandler(uint8_t position);
 
     // Extension field sets operation
-    CHIP_ERROR EFSValuesFromCluster(ExtensionFieldsSetsImpl & fieldSets);
-    CHIP_ERROR EFSValuesToCluster(ExtensionFieldsSetsImpl & fieldSets);
+    CHIP_ERROR SceneSaveEFS(SceneTableEntry & scene, clusterId cluster);
+    CHIP_ERROR SceneApplyEFS(FabricIndex fabric_index, const SceneStorageId & scene_id);
 
     // Fabrics
     CHIP_ERROR RemoveFabric(FabricIndex fabric_index) override;
@@ -172,8 +220,6 @@ protected:
 
     chip::PersistentStorageDelegate * mStorage = nullptr;
     ObjectPool<SceneEntryIteratorImpl, kIteratorsMax> mSceneEntryIterators;
-    SceneHandler handlers[CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES];
-    uint8_t handlerNum = 0;
 }; // class DefaultSceneTableImpl
 
 /**

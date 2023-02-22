@@ -25,11 +25,11 @@ ExtensionFieldsSetsImpl::ExtensionFieldsSetsImpl() : ExtensionFieldsSets() {}
 CHIP_ERROR ExtensionFieldsSetsImpl::Serialize(TLV::TLVWriter & writer) const
 {
     TLV::TLVType container;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(1), TLV::kTLVType_Structure, container));
-    ReturnErrorOnFailure(writer.Put(TagFieldNum(), static_cast<uint8_t>(this->mFieldNum)));
+    ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(kTagEFSArrayContainer), TLV::kTLVType_Structure, container));
+    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagEFSFieldNum), static_cast<uint8_t>(this->mFieldNum)));
     if (!this->IsEmpty())
     {
-        for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
+        for (uint8_t i = 0; i < this->mFieldNum; i++)
         {
             if (!this->mEFS[i].IsEmpty())
             {
@@ -44,10 +44,10 @@ CHIP_ERROR ExtensionFieldsSetsImpl::Serialize(TLV::TLVWriter & writer) const
 CHIP_ERROR ExtensionFieldsSetsImpl::Deserialize(TLV::TLVReader & reader)
 {
     TLV::TLVType container;
-    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(1)));
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(kTagEFSArrayContainer)));
     ReturnErrorOnFailure(reader.EnterContainer(container));
 
-    ReturnErrorOnFailure(reader.Next(TagFieldNum()));
+    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagEFSFieldNum)));
     ReturnErrorOnFailure(reader.Get(this->mFieldNum));
 
     if (!this->IsEmpty())
@@ -73,11 +73,6 @@ void ExtensionFieldsSetsImpl::Clear()
     this->mFieldNum = 0;
 }
 
-bool ExtensionFieldsSetsImpl::IsEmpty() const
-{
-    return (this->mFieldNum == 0);
-}
-
 /// @brief Inserts a field Set set into the array of extension field Set sets for a scene entry.
 ///        If the same ID is present in the EFS array, it will overwrite it.
 /// @param fieldSet field set to be inserted
@@ -87,6 +82,9 @@ CHIP_ERROR ExtensionFieldsSetsImpl::InsertFieldSet(ExtensionFieldsSet & fieldSet
     CHIP_ERROR err             = CHIP_ERROR_NO_MEMORY;
     uint8_t idPosition         = kInvalidPosition;
     uint8_t firstEmptyPosition = kInvalidPosition;
+
+    VerifyOrReturnError(fieldSet.mID != kInvalidClusterId, CHIP_ERROR_INVALID_ARGUMENT);
+
     for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
     {
         if (this->mEFS[i].mID == fieldSet.mID)
@@ -104,12 +102,12 @@ CHIP_ERROR ExtensionFieldsSetsImpl::InsertFieldSet(ExtensionFieldsSet & fieldSet
     // if found, replace at found position, otherwise at insert first free position, otherwise return error
     if (idPosition < kMaxClusterPerScenes)
     {
-        ReturnErrorOnFailure(this->mEFS[idPosition] = fieldSet);
-        err = CHIP_NO_ERROR;
+        this->mEFS[idPosition] = fieldSet;
+        err                    = CHIP_NO_ERROR;
     }
     else if (firstEmptyPosition < kMaxClusterPerScenes)
     {
-        ReturnErrorOnFailure(this->mEFS[firstEmptyPosition] = fieldSet);
+        this->mEFS[firstEmptyPosition] = fieldSet;
         this->mFieldNum++;
         err = CHIP_NO_ERROR;
     }
@@ -119,23 +117,22 @@ CHIP_ERROR ExtensionFieldsSetsImpl::InsertFieldSet(ExtensionFieldsSet & fieldSet
 
 CHIP_ERROR ExtensionFieldsSetsImpl::GetFieldSetAtPosition(ExtensionFieldsSet & fieldSet, uint8_t position)
 {
-    if (position < this->mFieldNum)
-    {
-        ReturnErrorOnFailure(fieldSet = this->mEFS[position]);
-    }
+    VerifyOrReturnError(position < this->mFieldNum, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    fieldSet = this->mEFS[position];
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ExtensionFieldsSetsImpl::RemoveFieldAtPosition(uint8_t position)
 {
-
     VerifyOrReturnError(position < kMaxClusterPerScenes, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnValue(!this->IsEmpty() && !this->mEFS[position].IsEmpty(), CHIP_NO_ERROR);
 
     uint8_t next    = position + 1;
     uint8_t moveNum = kMaxClusterPerScenes - next;
 
+    // TODO: Implement general array management methods
     // Compress array after removal
     memmove(&this->mEFS[position], &this->mEFS[next], sizeof(ExtensionFieldsSet) * moveNum);
 
