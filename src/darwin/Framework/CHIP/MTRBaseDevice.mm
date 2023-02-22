@@ -952,56 +952,21 @@ private:
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
             MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-            auto resultArray = [[NSMutableArray alloc] init];
-            auto resultSuccess = [[NSMutableArray alloc] init];
-            auto resultFailure = [[NSMutableArray alloc] init];
-            auto onSuccessCb = [resultArray, resultSuccess](const app::ConcreteAttributePath & attribPath) {
-                [resultArray addObject:@ { MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath] }];
-                if ([resultSuccess count] == 0) {
-                    [resultSuccess addObject:[NSNumber numberWithBool:YES]];
-                }
+            // Controller::WriteAttribute guarantees that there will be exactly one call to either the success callback or the
+            // failure callback, for a non-group session.
+            auto onSuccessCb = [successCb, bridge](const app::ConcreteAttributePath & attribPath) {
+                auto resultArray = @[ @ { MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath] } ];
+                successCb(bridge, resultArray);
             };
 
-            auto onFailureCb = [resultArray, resultFailure](const app::ConcreteAttributePath * attribPath, CHIP_ERROR aError) {
-                if (attribPath) {
-                    [resultArray addObject:@ {
-                        MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:*attribPath],
-                        MTRErrorKey : [MTRError errorForCHIPErrorCode:aError],
-                    }];
-                } else {
-                    if ([resultFailure count] == 0) {
-                        [resultFailure addObject:[MTRError errorForCHIPErrorCode:aError]];
-                    }
-                }
-            };
-
-            auto onDoneCb
-                = [bridge, successCb, failureCb, resultArray, resultSuccess, resultFailure](app::WriteClient * pWriteClient) {
-                      if ([resultFailure count] > 0 || [resultSuccess count] == 0) {
-                          // Failure
-                          if (failureCb) {
-                              if ([resultFailure count] > 0) {
-                                  failureCb(bridge, [MTRError errorToCHIPErrorCode:resultFailure[0]]);
-                              } else if ([resultArray count] > 0) {
-                                  failureCb(bridge, [MTRError errorToCHIPErrorCode:resultArray[0][MTRErrorKey]]);
-                              } else {
-                                  failureCb(bridge, CHIP_ERROR_WRITE_FAILED);
-                              }
-                          }
-                      } else {
-                          // Success
-                          if (successCb) {
-                              successCb(bridge, resultArray);
-                          }
-                      }
-                  };
+            auto onFailureCb = [failureCb, bridge](
+                                   const app::ConcreteAttributePath * attribPath, CHIP_ERROR aError) { failureCb(bridge, aError); };
 
             return chip::Controller::WriteAttribute<MTRDataValueDictionaryDecodableType>(session,
                 static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
                 static_cast<chip::ClusterId>([clusterID unsignedLongValue]),
                 static_cast<chip::AttributeId>([attributeID unsignedLongValue]), MTRDataValueDictionaryDecodableType(value),
-                onSuccessCb, onFailureCb, (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]),
-                onDoneCb, NullOptional);
+                onSuccessCb, onFailureCb, (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]));
         });
     std::move(*bridge).DispatchAction(self);
 }
