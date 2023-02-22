@@ -28,6 +28,7 @@
 #include <app/clusters/bindings/bindings.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <lib/support/logging/CHIPLogging.h>
 using namespace chip;
 using namespace chip::app;

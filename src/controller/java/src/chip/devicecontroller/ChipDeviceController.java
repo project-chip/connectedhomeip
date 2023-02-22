@@ -85,42 +85,23 @@ public class ChipDeviceController {
   }
 
   /**
-   * If DeviceAttestationCompletionCallback is setted, then it will always be called when device
-   * attestation completes.
+   * If DeviceAttestationDelegate is setted, then it will always be called when device attestation
+   * completes. In case the device attestation fails, the client can decide to continue or stop the
+   * commissioning.
    *
-   * <p>When {@link
-   * DeviceAttestationDelegate.DeviceAttestationCompletionCallback#onDeviceAttestationCompleted(long,
-   * long, AttestationInfo, int)} is received, {@link #continueCommissioning(long, boolean)} must be
+   * <p>When {@link DeviceAttestationDelegate#onDeviceAttestationCompleted(long, long,
+   * AttestationInfo, int)} is received, {@link #continueCommissioning(long, boolean)} must be
    * called.
    *
    * @param failSafeExpiryTimeoutSecs the value to set for the fail-safe timer before
    *     onDeviceAttestationCompleted is invoked. The unit is seconds.
-   * @param completionCallback the callback will be invoked when deviceattestation completed with
-   *     device info for additional verification.
+   * @param deviceAttestationDelegate the delegate for device attestation completed with device info
+   *     for additional verification.
    */
-  public void setDeviceAttestationCompletionCallback(
-      int failSafeExpiryTimeoutSecs,
-      DeviceAttestationDelegate.DeviceAttestationCompletionCallback completionCallback) {
+  public void setDeviceAttestationDelegate(
+      int failSafeExpiryTimeoutSecs, DeviceAttestationDelegate deviceAttestationDelegate) {
     setDeviceAttestationDelegate(
-        deviceControllerPtr, failSafeExpiryTimeoutSecs, completionCallback);
-  }
-
-  /**
-   * If DeviceAttestationFailureCallback is setted, then it will be called when device attestation
-   * fails, and the client can decide to continue or stop the commissioning.
-   *
-   * <p>When {@link
-   * DeviceAttestationDelegate.DeviceAttestationFailureCallback#onDeviceAttestationFailed(long,
-   * long, int)} is received, {@link #continueCommissioning(long, boolean)} must be called.
-   *
-   * @param failSafeExpiryTimeoutSecs the value to set for the fail-safe timer before
-   *     onDeviceAttestationFailed is invoked. The unit is seconds.
-   * @param failureCallback the callback will be invoked when device attestation failed.
-   */
-  public void setDeviceAttestationFailureCallback(
-      int failSafeExpiryTimeoutSecs,
-      DeviceAttestationDelegate.DeviceAttestationFailureCallback failureCallback) {
-    setDeviceAttestationDelegate(deviceControllerPtr, failSafeExpiryTimeoutSecs, failureCallback);
+        deviceControllerPtr, failSafeExpiryTimeoutSecs, deviceAttestationDelegate);
   }
 
   public void pairDevice(

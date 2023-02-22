@@ -36,13 +36,19 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#define APP_FUNCTION_BUTTON &sl_button_btn0
-#define APP_LIGHT_SWITCH &sl_button_btn1
+#ifdef ENABLE_WSTK_LEDS
+#include "LEDWidget.h"
+#define APP_ACTION_LED 1
+#endif // ENABLE_WSTK_LEDS
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
 
 namespace {
+
+#ifdef ENABLE_WSTK_LEDS
+LEDWidget sLightLED;
+#endif // ENABLE_WSTK_LEDS
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 
@@ -128,16 +134,19 @@ CHIP_ERROR AppTask::Init()
         appError(err);
     }
 
-    /* TODO
-        err = LightMgr().Init();
-        if (err != CHIP_NO_ERROR)
-        {
-            SILABS_LOG("LightMgr::Init() failed");
-            appError(err);
-        }
+    err = LightMgr().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        SILABS_LOG("LightMgr::Init() failed");
+        appError(err);
+    }
 
-        LightMgr().SetCallbacks(ActionInitiated, ActionCompleted);
-    */
+    LightMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+
+#ifdef ENABLE_WSTK_LEDS
+    sLightLED.Init(APP_ACTION_LED);
+    sLightLED.Set(LightMgr().IsLightOn());
+#endif // ENABLE_WSTK_LEDS
 
     return err;
 }
@@ -227,11 +236,29 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     }
 }
 
+void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
+{
+    AppEvent button_event           = {};
+    button_event.Type               = AppEvent::kEventType_Button;
+    button_event.ButtonEvent.Action = btnAction;
+    if (button == SIWx917_BTN1 && btnAction == SL_SIMPLE_BUTTON_PRESSED)
+    {
+        button_event.Handler = LightActionEventHandler;
+        sAppTask.PostEvent(&button_event);
+    }
+    else if (button == SIWx917_BTN0)
+    {
+        button_event.Handler = BaseApplication::ButtonHandler;
+        sAppTask.PostEvent(&button_event);
+    }
+}
+
 void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {
     // Action initiated, update the light led
     bool lightOn = aAction == LightingManager::ON_ACTION;
-    SILABS_LOG("Turning light %s", (lightOn) ? "On" : "Off")
+    SILABS_LOG("Turning light %s", (lightOn) ? "On" : "Off");
+    sLightLED.Set(lightOn);
 
 #ifdef DISPLAY_ENABLED
     sAppTask.GetLCD().WriteDemoUI(lightOn);

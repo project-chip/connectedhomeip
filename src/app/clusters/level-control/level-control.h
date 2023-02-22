@@ -28,6 +28,7 @@
 
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/util/basic-types.h>
+#include <app/util/config.h>
 
 /** @brief Level Control Cluster Server Post Init
  *

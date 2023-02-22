@@ -49,7 +49,7 @@ using namespace ::chip::DeviceLayer;
 // If building with the EFR32-provided crypto backend, we can use the
 // opaque keystore
 #if CHIP_CRYPTO_PLATFORM
-#include <platform/silabs/EFR32/Efr32PsaOperationalKeystore.h>
+#include <platform/silabs/efr32/Efr32PsaOperationalKeystore.h>
 static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeystore;
 #endif
 
@@ -150,8 +150,6 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
 #ifdef HEAP_MONITORING
     MemMonitoring::startHeapMonitoring();
 #endif
-    SetDeviceInstanceInfoProvider(&EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider());
-    SetCommissionableDataProvider(&EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider());
 
     //==============================================
     // Init Matter Stack
@@ -160,6 +158,9 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
     // Init Chip memory management before the stack
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
+
+    SetDeviceInstanceInfoProvider(&EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider());
+    SetCommissionableDataProvider(&EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider());
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
 
@@ -250,5 +251,5 @@ extern "C" void vApplicationIdleHook(void)
     // FreeRTOS Idle callback
 
     // Check CHIP Config nvm3 and repack flash if necessary.
-    Internal::SILABSConfig::RepackNvm3Flash();
+    Internal::SilabsConfig::RepackNvm3Flash();
 }

@@ -32,7 +32,6 @@
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
-#include <app/chip-zcl-zpro-codec.h>
 #include <app/util/error-mapping.h>
 #include <atomic>
 #include <ble/BleUUID.h>
@@ -1337,9 +1336,9 @@ CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId,
     jobject endpointIdObj = env->CallObjectMethod(attributePath, getEndpointIdMethod);
     VerifyOrReturnError(endpointIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
     jobject clusterIdObj = env->CallObjectMethod(attributePath, getClusterIdMethod);
-    VerifyOrReturnError(endpointIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(clusterIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
     jobject attributeIdObj = env->CallObjectMethod(attributePath, getAttributeIdMethod);
-    VerifyOrReturnError(endpointIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(attributeIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     uint32_t endpointId = 0;
     ReturnErrorOnFailure(GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
@@ -1455,7 +1454,7 @@ CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard)
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, idType, "name", "()Ljava/lang/String;", &nameMethod));
 
     jstring typeNameString = static_cast<jstring>(env->CallObjectMethod(idType, nameMethod));
-    VerifyOrReturnError(idType != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+    VerifyOrReturnError(typeNameString != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
     JniUtfString typeNameJniString(env, typeNameString);
 
     isWildcard = strncmp(typeNameJniString.c_str(), "WILDCARD", 8) == 0;
@@ -1555,14 +1554,14 @@ CHIP_ERROR CreateDeviceAttestationDelegateBridge(JNIEnv * env, jlong handle, job
     CHIP_ERROR err                        = CHIP_NO_ERROR;
     chip::Optional<uint16_t> timeoutSecs  = chip::MakeOptional(static_cast<uint16_t>(failSafeExpiryTimeoutSecs));
     bool shouldWaitAfterDeviceAttestation = false;
-    jclass completionCallbackCls          = nullptr;
+    jclass deviceAttestationDelegateCls   = nullptr;
     jobject deviceAttestationDelegateRef  = env->NewGlobalRef(deviceAttestationDelegate);
-    VerifyOrExit(deviceAttestationDelegateRef != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
-    JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/DeviceAttestationDelegate$DeviceAttestationCompletionCallback", completionCallbackCls);
-    VerifyOrExit(completionCallbackCls != nullptr, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
-    if (env->IsInstanceOf(deviceAttestationDelegate, completionCallbackCls))
+    VerifyOrExit(deviceAttestationDelegateRef != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
+    JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/DeviceAttestationDelegate", deviceAttestationDelegateCls);
+    VerifyOrExit(deviceAttestationDelegateCls != nullptr, err = CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+
+    if (env->IsInstanceOf(deviceAttestationDelegate, deviceAttestationDelegateCls))
     {
         shouldWaitAfterDeviceAttestation = true;
     }

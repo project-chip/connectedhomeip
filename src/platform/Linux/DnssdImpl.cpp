@@ -731,7 +731,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
     case AVAHI_RESOLVER_FOUND:
         DnssdService result = {};
 
-        ChipLogError(DeviceLayer, "Avahi resolve found");
+        ChipLogProgress(DeviceLayer, "Avahi resolve found");
 
         Platform::CopyString(result.mName, name);
         CopyTypeWithoutProtocol(result.mType, type);

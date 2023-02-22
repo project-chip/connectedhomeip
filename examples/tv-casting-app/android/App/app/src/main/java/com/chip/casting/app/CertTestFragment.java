@@ -15,6 +15,8 @@ import com.chip.casting.ContentLauncherTypes;
 import com.chip.casting.FailureCallback;
 import com.chip.casting.MatterCallbackHandler;
 import com.chip.casting.MatterError;
+import com.chip.casting.MediaPlaybackTypes;
+import com.chip.casting.SubscriptionEstablishedCallback;
 import com.chip.casting.SuccessCallback;
 import com.chip.casting.TvCastingApp;
 import java.util.ArrayList;
@@ -79,8 +81,12 @@ public class CertTestFragment extends Fragment {
   private void runCertTests(Activity activity) {
     CertTestMatterSuccessFailureCallback successFailureCallback =
         new CertTestMatterSuccessFailureCallback(activity);
-    CertTestMatterSuccessFailureCallbackInteger successFailureCallbackInteger =
-        new CertTestMatterSuccessFailureCallbackInteger(successFailureCallback);
+    CertTestMatterSuccessCallback successCallback =
+        new CertTestMatterSuccessCallback(successFailureCallback);
+    CertTestMatterFailureCallback failureCallback =
+        new CertTestMatterFailureCallback(successFailureCallback);
+    CertTestMatterSuccessCallbackInteger successCallbackInteger =
+        new CertTestMatterSuccessCallbackInteger(successFailureCallback);
     CertTestMatterCallbackHandler callback =
         new CertTestMatterCallbackHandler(successFailureCallback);
 
@@ -197,6 +203,46 @@ public class CertTestFragment extends Fragment {
           tvCastingApp.mediaPlayback_stopPlayback(kContentApp, callback);
         });
 
+    runAndWait(
+        "mediaPlayback_previous",
+        successFailureCallback,
+        () -> {
+          // 3.8.5. [TC-MEDIAPLAYBACK-6.5] Mandatory Media Playback Verification (DUT as Client)
+          tvCastingApp.mediaPlayback_previous(kContentApp, callback);
+        });
+
+    runAndWait(
+        "mediaPlayback_rewind",
+        successFailureCallback,
+        () -> {
+          // 3.8.5. [TC-MEDIAPLAYBACK-6.5] Mandatory Media Playback Verification (DUT as Client)
+          tvCastingApp.mediaPlayback_rewind(kContentApp, callback);
+        });
+
+    runAndWait(
+        "mediaPlayback_fastForward",
+        successFailureCallback,
+        () -> {
+          // 3.8.5. [TC-MEDIAPLAYBACK-6.5] Mandatory Media Playback Verification (DUT as Client)
+          tvCastingApp.mediaPlayback_fastForward(kContentApp, callback);
+        });
+
+    runAndWait(
+        "mediaPlayback_startOver",
+        successFailureCallback,
+        () -> {
+          // 3.8.5. [TC-MEDIAPLAYBACK-6.5] Mandatory Media Playback Verification (DUT as Client)
+          tvCastingApp.mediaPlayback_startOver(kContentApp, callback);
+        });
+
+    runAndWait(
+        "mediaPlayback_seek",
+        successFailureCallback,
+        () -> {
+          // 3.8.5. [TC-MEDIAPLAYBACK-6.5] Mandatory Media Playback Verification (DUT as Client)
+          tvCastingApp.mediaPlayback_seek(kContentApp, 10000, callback);
+        });
+
     // Additional Tests
     // Mandatory
     // OnOff cluster
@@ -227,7 +273,7 @@ public class CertTestFragment extends Fragment {
         successFailureCallback,
         () -> {
           tvCastingApp.applicationBasic_readApplicationVersion(
-              kContentApp, successFailureCallback, successFailureCallback);
+              kContentApp, successCallback, failureCallback);
         });
 
     runAndWait(
@@ -235,7 +281,7 @@ public class CertTestFragment extends Fragment {
         successFailureCallback,
         () -> {
           tvCastingApp.applicationBasic_readVendorName(
-              kContentApp, successFailureCallback, successFailureCallback);
+              kContentApp, successCallback, failureCallback);
         });
 
     runAndWait(
@@ -243,7 +289,7 @@ public class CertTestFragment extends Fragment {
         successFailureCallback,
         () -> {
           tvCastingApp.applicationBasic_readApplicationName(
-              kContentApp, successFailureCallback, successFailureCallback);
+              kContentApp, successCallback, failureCallback);
         });
 
     runAndWait(
@@ -251,7 +297,7 @@ public class CertTestFragment extends Fragment {
         successFailureCallback,
         () -> {
           tvCastingApp.applicationBasic_readVendorID(
-              kContentApp, successFailureCallbackInteger, successFailureCallbackInteger);
+              kContentApp, successCallbackInteger, failureCallback);
         });
 
     runAndWait(
@@ -259,7 +305,46 @@ public class CertTestFragment extends Fragment {
         successFailureCallback,
         () -> {
           tvCastingApp.applicationBasic_readProductID(
-              kContentApp, successFailureCallbackInteger, successFailureCallbackInteger);
+              kContentApp, successCallbackInteger, failureCallback);
+        });
+
+    runAndWait(
+        "mediaPlayback_subscribeToCurrentState",
+        successFailureCallback,
+        () -> {
+          tvCastingApp.mediaPlayback_subscribeToCurrentState(
+              kContentApp,
+              new SuccessCallback<MediaPlaybackTypes.PlaybackStateEnum>() {
+                @Override
+                public void handle(MediaPlaybackTypes.PlaybackStateEnum response) {
+                  // Lets wait for the timeout to avoid the race condition issue in the SDK with
+                  // ReadClient::Close()
+                  // successFailureCallback.handle(MatterError.NO_ERROR);
+                  addCertTestStatus(
+                      activity, MatterError.NO_ERROR, "mediaPlayback_subscribeToCurrentState");
+                }
+              },
+              failureCallback,
+              0,
+              20,
+              new SubscriptionEstablishedCallback() {
+                @Override
+                public void handle() {
+                  // Lets wait for the timeout to avoid the race condition issue in the SDK with
+                  // ReadClient::Close()
+                  // successFailureCallback.handle(MatterError.NO_ERROR);
+                  addCertTestStatus(
+                      activity, MatterError.NO_ERROR, "mediaPlayback_subscribeToCurrentState");
+                }
+              });
+        });
+
+    runAndWait(
+        "shutdownAllSubscriptions",
+        successFailureCallback,
+        () -> {
+          tvCastingApp.shutdownAllSubscriptions();
+          successFailureCallback.handle(MatterError.NO_ERROR);
         });
 
     // Unsupported & Optional
@@ -304,7 +389,7 @@ public class CertTestFragment extends Fragment {
     callback.setCountDownLatch(cdl);
     runnable.run();
     try {
-      if (!cdl.await(10, TimeUnit.SECONDS)) {
+      if (!cdl.await(5, TimeUnit.SECONDS)) {
         Log.d(TAG, "Timed out for test to finish : " + testMethod);
       }
     } catch (InterruptedException e) {
@@ -334,8 +419,7 @@ public class CertTestFragment extends Fragment {
     }
   }
 
-  class CertTestMatterSuccessFailureCallback extends FailureCallback
-      implements SuccessCallback<String> {
+  class CertTestMatterSuccessFailureCallback {
     private Activity activity;
     private String testMethod;
     private CountDownLatch cdl;
@@ -352,7 +436,6 @@ public class CertTestFragment extends Fragment {
       this.cdl = cdl;
     }
 
-    @Override
     public void handle(MatterError error) {
       try {
         cdl.countDown();
@@ -365,7 +448,6 @@ public class CertTestFragment extends Fragment {
       }
     }
 
-    @Override
     public void handle(String response) {
       try {
         cdl.countDown();
@@ -379,18 +461,38 @@ public class CertTestFragment extends Fragment {
     }
   }
 
-  class CertTestMatterSuccessFailureCallbackInteger extends FailureCallback
-      implements SuccessCallback<Integer> {
-
+  class CertTestMatterSuccessCallback extends SuccessCallback<String> {
     private CertTestMatterSuccessFailureCallback delegate;
 
-    CertTestMatterSuccessFailureCallbackInteger(CertTestMatterSuccessFailureCallback delegate) {
+    CertTestMatterSuccessCallback(CertTestMatterSuccessFailureCallback delegate) {
       this.delegate = delegate;
     }
 
     @Override
-    public void handle(MatterError error) {
-      delegate.handle(error);
+    public void handle(String response) {
+      delegate.handle(response);
+    }
+  }
+
+  class CertTestMatterFailureCallback extends FailureCallback {
+    private CertTestMatterSuccessFailureCallback delegate;
+
+    CertTestMatterFailureCallback(CertTestMatterSuccessFailureCallback delegate) {
+      this.delegate = delegate;
+    }
+
+    @Override
+    public void handle(MatterError err) {
+      delegate.handle(err);
+    }
+  }
+
+  class CertTestMatterSuccessCallbackInteger extends SuccessCallback<Integer> {
+
+    private CertTestMatterSuccessFailureCallback delegate;
+
+    CertTestMatterSuccessCallbackInteger(CertTestMatterSuccessFailureCallback delegate) {
+      this.delegate = delegate;
     }
 
     @Override

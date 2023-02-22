@@ -86,8 +86,10 @@ if [ "$#" == "0" ]; then
             Set a Matter sotfware version string for the Silabs examples
             Used and formatted by default in this script.
             To skip that formatting or use your own version string use --no-version
-        use_rs911x
-            Build wifi example with extension board rs911x. (Default false)
+        use_rs9116
+            Build wifi example with extension board rs9116. (Default false)
+        use_SiWx917
+            Build wifi example with extension board SiWx917. (Default false)
         use_wf200
             Build wifi example with extension board wf200. (Default false)
         'import("//with_pw_rpc.gni")'
@@ -96,6 +98,8 @@ if [ "$#" == "0" ]; then
             Periodic query timeout variable for OTA in seconds
         rs91x_wpa3_only
             Support for WPA3 only mode on RS91x
+        siwx917_commissionable_data
+            Build with the commissionable data given in DeviceConfig.h (only for SiWx917)
         Presets
         --sed
             enable sleepy end device, set thread mtd
@@ -103,7 +107,7 @@ if [ "$#" == "0" ]; then
         --low-power
             disables all power consuming features for the most power efficient build
             This flag is to be used with --sed
-        --wifi <wf200 | rs911x>
+        --wifi <wf200 | rs9116>
             build wifi example variant for given exansion board
         --additional_data_advertising
             enable Addition data advertissing and rotating device ID
@@ -112,6 +116,9 @@ if [ "$#" == "0" ]; then
         --no-version
             Skip the silabs formating for the Matter software version string
             Currently : v1.0-<branchName>-<ShortCommitSha>
+        --release
+            Remove all logs and debugs features (including the LCD). Yield the smallest image size possible
+
     "
 elif [ "$#" -lt "2" ]; then
     echo "Invalid number of arguments
@@ -132,15 +139,17 @@ else
         case $1 in
             --wifi)
                 if [ -z "$2" ]; then
-                    echo "--wifi requires rs911x or wf200"
+                    echo "--wifi requires rs9116 or SiWx917 or wf200"
                     exit 1
                 fi
-                if [ "$2" = "rs911x" ]; then
-                    optArgs+="use_rs911x=true "
+                if [ "$2" = "rs9116" ]; then
+                    optArgs+="use_rs9116=true "
+                elif [ "$2" = "SiWx917" ]; then
+                    optArgs+="use_SiWx917=true "
                 elif [ "$2" = "wf200" ]; then
                     optArgs+="use_wf200=true "
                 else
-                    echo "Wifi usage: --wifi rs911x|wf200"
+                    echo "Wifi usage: --wifi rs9116|SiWx917|wf200"
                     exit 1
                 fi
                 USE_WIFI=true
@@ -171,12 +180,21 @@ else
                 optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
                 shift
                 ;;
+            # Option not to be used until ot-efr32 github is updated
+            # --use_ot_github_sources)
+            #   optArgs+="openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/openthread\" openthread_efr32_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/src/src\""
+            #    shift
+            #    ;;
             --no-version)
                 USE_GIT_SHA_FOR_VERSION=false
                 shift
                 ;;
+            --release)
+                optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
+                shift
+                ;;
             *)
-                if [ "$1" =~ *"use_rs911x=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
+                if [ "$1" =~ *"use_rs9116=true"* ] || [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true
                 fi
 
@@ -193,7 +211,7 @@ else
 
     if [ "$USE_GIT_SHA_FOR_VERSION" == true ]; then
         {
-            ShortCommitSha=$(git describe --always --dirty)
+            ShortCommitSha=$(git describe --always --dirty --exclude '*')
             branchName=$(git rev-parse --abbrev-ref HEAD)
             optArgs+="sl_matter_version_str=\"v1.0-$branchName-$ShortCommitSha\" "
         } &>/dev/null

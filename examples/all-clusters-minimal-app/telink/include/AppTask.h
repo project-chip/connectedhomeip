@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,9 @@
 #pragma once
 
 #include "AppEvent.h"
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
 #include "LEDWidget.h"
+#endif
 
 #include <zephyr/drivers/gpio.h>
 
@@ -43,8 +45,11 @@ private:
 
     void DispatchEvent(AppEvent * event);
 
-    static void UpdateStatusLED();
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+    static void UpdateLedStateEventHandler(AppEvent * aEvent);
     static void LEDStateUpdateHandler(LEDWidget * ledWidget);
+    static void UpdateStatusLED();
+#endif
     static void FactoryResetButtonEventHandler(void);
     static void StartBleAdvButtonEventHandler(void);
 
@@ -55,7 +60,6 @@ private:
     static void FactoryResetTimerEventHandler(AppEvent * aEvent);
     static void FactoryResetHandler(AppEvent * aEvent);
     static void StartBleAdvHandler(AppEvent * aEvent);
-    static void UpdateLedStateEventHandler(AppEvent * aEvent);
 
     static void InitButtons(void);
 

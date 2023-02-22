@@ -66,10 +66,32 @@ void ScriptDevicePairingDelegate::SetCommissioningStatusUpdateCallback(
     mOnCommissioningStatusUpdateCallback = callback;
 }
 
+void ScriptDevicePairingDelegate::OnStatusUpdate(DevicePairingDelegate::Status status)
+{
+    switch (status)
+    {
+    case DevicePairingDelegate::Status::SecurePairingSuccess:
+        ChipLogProgress(Zcl, "Secure Pairing Success");
+        break;
+    case DevicePairingDelegate::Status::SecurePairingFailed:
+        ChipLogError(Zcl, "Secure Pairing Failed");
+        if (mOnPairingCompleteCallback != nullptr && expectingPairingComplete)
+        {
+            // Incorrect state is the same error that chip-tool sends. We are also
+            // leveraging the on pairing complete callback to indicate that pairing
+            // has failed.
+            expectingPairingComplete = false;
+            mOnPairingCompleteCallback(ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
+        }
+        break;
+    }
+}
+
 void ScriptDevicePairingDelegate::OnPairingComplete(CHIP_ERROR error)
 {
-    if (mOnPairingCompleteCallback != nullptr)
+    if (mOnPairingCompleteCallback != nullptr && expectingPairingComplete)
     {
+        expectingPairingComplete = false;
         mOnPairingCompleteCallback(ToPyChipError(error));
     }
 }

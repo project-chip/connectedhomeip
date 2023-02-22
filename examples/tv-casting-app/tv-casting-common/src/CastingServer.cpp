@@ -112,13 +112,15 @@ CHIP_ERROR CastingServer::TargetVideoPlayerInfoInit(NodeId nodeId, FabricIndex f
                                                    mOnConnectionFailureClientCallback);
 }
 
-CHIP_ERROR CastingServer::DiscoverCommissioners()
+CHIP_ERROR CastingServer::DiscoverCommissioners(DeviceDiscoveryDelegate * deviceDiscoveryDelegate)
 {
     TargetVideoPlayerInfo * connectableVideoPlayerList = ReadCachedTargetVideoPlayerInfos();
     if (connectableVideoPlayerList == nullptr || !connectableVideoPlayerList[0].IsInitialized())
     {
         ChipLogProgress(AppServer, "No cached video players found during discovery");
     }
+
+    mCommissionableNodeController.RegisterDeviceDiscoveryDelegate(deviceDiscoveryDelegate);
 
     // Send discover commissioners request
     return mCommissionableNodeController.DiscoverCommissioners(
@@ -686,6 +688,30 @@ CHIP_ERROR CastingServer::MediaPlayback_Next(TargetEndpointInfo * endpoint, std:
 {
     ReturnErrorOnFailure(mNextCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
     return mNextCommand.Invoke(responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_Previous(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mPreviousCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mPreviousCommand.Invoke(responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_Rewind(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mRewindCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mRewindCommand.Invoke(responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_FastForward(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mFastForwardCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mFastForwardCommand.Invoke(responseCallback);
+}
+
+CHIP_ERROR CastingServer::MediaPlayback_StartOver(TargetEndpointInfo * endpoint, std::function<void(CHIP_ERROR)> responseCallback)
+{
+    ReturnErrorOnFailure(mStartOverCommand.SetTarget(mActiveTargetVideoPlayerInfo, endpoint->GetEndpointId()));
+    return mStartOverCommand.Invoke(responseCallback);
 }
 
 CHIP_ERROR CastingServer::MediaPlayback_Seek(TargetEndpointInfo * endpoint, uint64_t position,

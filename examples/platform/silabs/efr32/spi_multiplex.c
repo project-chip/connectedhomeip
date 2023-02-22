@@ -15,13 +15,19 @@
  *    limitations under the License.
  */
 
-#include "spi_multiplex.h"
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+#include "sl_wfx.h"
+#endif /* EFR32MG24 && WF200_WIFI */
+
 #include "dmadrv.h"
 #include "em_bus.h"
 #include "em_cmu.h"
 #include "em_gpio.h"
 #include "em_ldma.h"
 #include "em_usart.h"
+#if SL_WIFI
+#include "spi_multiplex.h"
+#endif /* SL_WIFI */
 
 /****************************************************************************
  * @fn  void spi_drv_reinit()
@@ -163,3 +169,48 @@ void post_lcd_spi_transfer(void)
 {
     xSemaphoreGive(spi_sem_sync_hdl);
 }
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+/****************************************************************************
+ * @fn  void pre_uart_transfer()
+ * @brief
+ *     Take a semaphore and setting GPIO, disable IRQ
+ * @param[in] None
+ * @return returns void
+ *****************************************************************************/
+void pre_uart_transfer(void)
+{
+    if (spi_sem_sync_hdl == NULL)
+    {
+        // UART is initialized before host SPI interface
+        // spi_sem_sync_hdl will not be initalized during execution
+        GPIO_PinModeSet(gpioPortA, 8, gpioModePushPull, 1);
+        return;
+    }
+    sl_wfx_disable_irq();
+    sl_wfx_host_disable_platform_interrupt();
+    if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
+    {
+        return;
+    }
+    GPIO_PinModeSet(gpioPortA, 8, gpioModePushPull, 1);
+}
+/****************************************************************************
+ * @fn  void post_uart_transfer()
+ * @brief
+ *     Reset GPIO, enabled IRQ, release semaphore
+ * @param[in] None
+ * @return returns void
+ *****************************************************************************/
+void post_uart_transfer(void)
+{
+    if (spi_sem_sync_hdl == NULL)
+    {
+        return;
+    }
+    GPIO_PinModeSet(gpioPortA, 8, gpioModeInputPull, 1);
+    set_spi_baudrate(EXP_HDR);
+    xSemaphoreGive(spi_sem_sync_hdl);
+    sl_wfx_host_enable_platform_interrupt();
+    sl_wfx_enable_irq();
+}
+#endif /* EFR32MG24 && WF200_WIFI */

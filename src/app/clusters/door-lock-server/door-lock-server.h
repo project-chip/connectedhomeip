@@ -24,12 +24,12 @@
 
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #ifndef DOOR_LOCK_SERVER_ENDPOINT
 #define DOOR_LOCK_SERVER_ENDPOINT 1
@@ -54,8 +54,10 @@ using chip::app::Clusters::DoorLock::UserStatusEnum;
 using chip::app::Clusters::DoorLock::UserTypeEnum;
 using chip::app::DataModel::List;
 using chip::app::DataModel::Nullable;
+using chip::app::DataModel::NullNullable;
 
-using LockOpCredentials = chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type;
+using CredentialStruct  = chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type;
+using LockOpCredentials = CredentialStruct;
 
 typedef bool (*RemoteLockOpHandler)(chip::EndpointId endpointId, const Optional<chip::ByteSpan> & pinCode,
                                     OperationErrorEnum & err);
@@ -94,7 +96,9 @@ public:
      *
      * @return true on success, false on failure.
      */
-    bool SetLockState(chip::EndpointId endpointId, DlLockState newLockState, OperationSourceEnum opSource);
+    bool SetLockState(chip::EndpointId endpointId, DlLockState newLockState, OperationSourceEnum opSource,
+                      const Nullable<uint16_t> & userIndex                        = NullNullable,
+                      const Nullable<List<const LockOpCredentials>> & credentials = NullNullable);
 
     /**
      * Updates the LockState attribute with new value.
@@ -178,6 +182,8 @@ public:
 
     bool OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
+    static void DoorLockOnAutoRelockCallback(chip::System::Layer *, void * callbackContext);
+
 private:
     chip::FabricIndex getFabricIndex(const chip::app::CommandHandler * commandObj);
     chip::NodeId getNodeId(const chip::app::CommandHandler * commandObj);
@@ -219,10 +225,11 @@ private:
                              uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
                              const Nullable<UserStatusEnum> & userStatus, const Nullable<UserTypeEnum> & userType,
                              const Nullable<CredentialRuleEnum> & credentialRule);
-    EmberAfStatus clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId, chip::NodeId sourceNodeId,
-                            uint16_t userIndex, bool sendUserChangeEvent);
-    EmberAfStatus clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId, chip::NodeId sourceNodeId,
-                            uint16_t userIndex, const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent);
+    chip::Protocols::InteractionModel::Status clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId,
+                                                        chip::NodeId sourceNodeId, uint16_t userIndex, bool sendUserChangeEvent);
+    chip::Protocols::InteractionModel::Status clearUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricId,
+                                                        chip::NodeId sourceNodeId, uint16_t userIndex,
+                                                        const EmberAfPluginDoorLockUserInfo & user, bool sendUserChangeEvent);
 
     bool clearFabricFromUsers(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
@@ -252,11 +259,13 @@ private:
                               const EmberAfPluginDoorLockCredentialInfo & existingCredential, const chip::ByteSpan & credentialData,
                               uint16_t userIndex, const Nullable<UserStatusEnum> & userStatus, Nullable<UserTypeEnum> userType);
 
-    EmberAfStatus clearCredential(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId,
-                                  CredentialTypeEnum credentialType, uint16_t credentialIndex, bool sendUserChangeEvent);
-    EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId);
-    EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId,
-                                   CredentialTypeEnum credentialType);
+    chip::Protocols::InteractionModel::Status clearCredential(chip::EndpointId endpointId, chip::FabricIndex modifier,
+                                                              chip::NodeId sourceNodeId, CredentialTypeEnum credentialType,
+                                                              uint16_t credentialIndex, bool sendUserChangeEvent);
+    chip::Protocols::InteractionModel::Status clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier,
+                                                               chip::NodeId sourceNodeId);
+    chip::Protocols::InteractionModel::Status clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier,
+                                                               chip::NodeId sourceNodeId, CredentialTypeEnum credentialType);
 
     bool clearFabricFromCredentials(chip::EndpointId endpointId, CredentialTypeEnum credentialType,
                                     chip::FabricIndex fabricToRemove);
@@ -404,7 +413,7 @@ private:
     void SendLockOperationEvent(chip::EndpointId endpointId, LockOperationTypeEnum opType, OperationSourceEnum opSource,
                                 OperationErrorEnum opErr, const Nullable<uint16_t> & userId,
                                 const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
-                                LockOpCredentials * credList, size_t credListSize, bool opSuccess = true);
+                                const Nullable<List<const LockOpCredentials>> & credentials = NullNullable, bool opSuccess = true);
 
     /**
      * @brief Schedule auto relocking with a given timeout
@@ -413,8 +422,6 @@ private:
      * @param timeoutSec    timeout in seconds
      */
     void ScheduleAutoRelock(chip::EndpointId endpointId, uint32_t timeoutSec);
-
-    static void DoorLockOnAutoRelockCallback(chip::EndpointId endpointId);
 
     /**
      * @brief Send generic event
@@ -531,8 +538,6 @@ private:
     friend bool emberAfDoorLockClusterClearYearDayScheduleCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::DecodableType & commandData);
-
-    EmberEventControl AutolockEvent; /**< for automatic relock scheduling */
 
     std::array<EmberAfDoorLockEndpointContext, EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT> mEndpointCtx;
 
@@ -992,3 +997,83 @@ bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t cr
  * @param lockoutEndTime Monotonic time of when lockout ends.
  */
 void emberAfPluginDoorLockLockoutStarted(chip::EndpointId endpointId, chip::System::Clock::Timestamp lockoutEndTime);
+
+/**
+ * @brief This callback is called when the Door Lock server needs to find out
+ * the number of Fingerprint credentials supported, since there is no attribute
+ * that represents that value.
+ *
+ * @param[in] endpointId ID of the endpoint that contains the door lock.
+ * @param[out] maxNumberOfCredentials the number of Fingerprint credentials supported by the lock.
+ *
+ * @return false on failure, true on success.  On failure, the cluster
+ * implementation will assume that 0 Fingerprint credentials are supported.
+ */
+bool emberAfPluginDoorLockGetNumberOfFingerprintCredentialsSupported(chip::EndpointId endpointId,
+                                                                     uint16_t & maxNumberOfCredentials);
+
+/**
+ * @brief This callback is called when the Door Lock server needs to find out
+ * the number of FingerVein credentials supported, since there is no attribute
+ * that represents that value.
+ *
+ * @param[in] endpointId ID of the endpoint that contains the door lock.
+ * @param[out] maxNumberOfCredentials the number of FingerVein credentials supported by the lock.
+ *
+ * @return false on failure, true on success.  On failure, the cluster
+ * implementation will assume that 0 FingerVein credentials are supported.
+ */
+bool emberAfPluginDoorLockGetNumberOfFingerVeinCredentialsSupported(chip::EndpointId endpointId, uint16_t & maxNumberOfCredentials);
+
+/**
+ * @brief This callback is called when the Door Lock server needs to find out
+ * the number of Face credentials supported, since there is no attribute
+ * that represents that value.
+ *
+ * @param[in] endpointId ID of the endpoint that contains the door lock.
+ * @param[out] maxNumberOfCredentials the number of Face credentials supported by the lock.
+ *
+ * @return false on failure, true on success.  On failure, the cluster
+ * implementation will assume that 0 Face credentials are supported.
+ */
+bool emberAfPluginDoorLockGetNumberOfFaceCredentialsSupported(chip::EndpointId endpointId, uint16_t & maxNumberOfCredentials);
+
+/**
+ * @brief This callback is called when the Door Lock server needs to find out
+ * the min and max lengths of Fingerprint credentials supported, since there are no
+ * attributes that represents those values.
+ *
+ * @param[in] endpointId ID of the endpoint that contains the door lock.
+ * @param[out] minLen the minimal length, in bytes, of a Fingerprint credential supported by the lock.
+ * @param[out] maxLen the minimal length, in bytes, of a Fingerprint credential supported by the lock.
+ *
+ * @return false on failure, true on success.
+ */
+bool emberAfPluginDoorLockGetFingerprintCredentialLengthConstraints(chip::EndpointId endpointId, uint8_t & minLen,
+                                                                    uint8_t & maxLen);
+
+/**
+ * @brief This callback is called when the Door Lock server needs to find out
+ * the min and max lengths of FingerVein credentials supported, since there are no
+ * attributes that represents those values.
+ *
+ * @param[in] endpointId ID of the endpoint that contains the door lock.
+ * @param[out] minLen the minimal length, in bytes, of a FingerVein credential supported by the lock.
+ * @param[out] maxLen the minimal length, in bytes, of a FingerVein credential supported by the lock.
+ *
+ * @return false on failure, true on success.
+ */
+bool emberAfPluginDoorLockGetFingerVeinCredentialLengthConstraints(chip::EndpointId endpointId, uint8_t & minLen, uint8_t & maxLen);
+
+/**
+ * @brief This callback is called when the Door Lock server needs to find out
+ * the min and max lengths of Face credentials supported, since there are no
+ * attributes that represents those values.
+ *
+ * @param[in] endpointId ID of the endpoint that contains the door lock.
+ * @param[out] minLen the minimal length, in bytes, of a Face credential supported by the lock.
+ * @param[out] maxLen the minimal length, in bytes, of a Face credential supported by the lock.
+ *
+ * @return false on failure, true on success.
+ */
+bool emberAfPluginDoorLockGetFaceCredentialLengthConstraints(chip::EndpointId endpointId, uint8_t & minLen, uint8_t & maxLen);

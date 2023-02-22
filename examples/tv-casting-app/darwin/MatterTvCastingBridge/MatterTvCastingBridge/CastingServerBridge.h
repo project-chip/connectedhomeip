@@ -45,7 +45,8 @@
  @param discoveryRequestSentHandler Handler to call after the Commissioner discovery request has been sent
  */
 - (void)discoverCommissioners:(dispatch_queue_t _Nonnull)clientQueue
-    discoveryRequestSentHandler:(nullable void (^)(bool))discoveryRequestSentHandler;
+      discoveryRequestSentHandler:(nullable void (^)(bool))discoveryRequestSentHandler
+    discoveredCommissionerHandler:(nullable void (^)(DiscoveredNodeData * _Nonnull))discoveredCommissionerHandler;
 
 /*!
  @brief Retrieve a discovered commissioner TV
@@ -481,6 +482,70 @@
           responseCallback:(void (^_Nonnull)(bool))responseCallback
                clientQueue:(dispatch_queue_t _Nonnull)clientQueue
         requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a MediaPlayback:Previous request to a TV
+
+ @param contentApp Content app endpoint to target
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)mediaPlayback_previous:(ContentApp * _Nonnull)contentApp
+              responseCallback:(void (^_Nonnull)(bool))responseCallback
+                   clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+            requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a MediaPlayback:FastForward request to a TV
+
+ @param contentApp Content app endpoint to target
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)mediaPlayback_fastForward:(ContentApp * _Nonnull)contentApp
+                 responseCallback:(void (^_Nonnull)(bool))responseCallback
+                      clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+               requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a MediaPlayback:Rewind request to a TV
+
+ @param contentApp Content app endpoint to target
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)mediaPlayback_rewind:(ContentApp * _Nonnull)contentApp
+            responseCallback:(void (^_Nonnull)(bool))responseCallback
+                 clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+          requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
+
+/*!
+ @brief Send a MediaPlayback:StartOver request to a TV
+
+ @param contentApp Content app endpoint to target
+
+ @param responseCallback Callback for when the response has been received
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Handler to call on sending the request
+ */
+- (void)mediaPlayback_startOver:(ContentApp * _Nonnull)contentApp
+               responseCallback:(void (^_Nonnull)(bool))responseCallback
+                    clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+             requestSentHandler:(void (^_Nonnull)(bool))requestSentHandler;
 
 /*!
  @brief Send a MediaPlayback:Seek request to a TV

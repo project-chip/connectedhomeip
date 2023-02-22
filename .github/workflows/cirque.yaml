@@ -17,6 +17,7 @@ name: Cirque
 on:
     push:
     pull_request:
+    merge_group:
     workflow_dispatch:
 
 concurrency:
@@ -96,7 +97,7 @@ jobs:
                     -- scripts/tests/cirque_tests.sh bootstrap
             - name: Artifact suffix
               id: outsuffix
-              uses: haya14busa/action-cond@v1.0.0
+              uses: haya14busa/action-cond@v1
               if: ${{ !env.ACT }}
               with:
                   cond: ${{ github.event.pull_request.number == '' }}

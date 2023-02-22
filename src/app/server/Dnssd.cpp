@@ -48,7 +48,7 @@ void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * event)
 {
     switch (event->Type)
     {
-    case DeviceLayer::DeviceEventType::kDnssdPlatformInitialized:
+    case DeviceLayer::DeviceEventType::kDnssdInitialized:
     case DeviceLayer::DeviceEventType::kDnssdRestartNeeded:
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     case DeviceLayer::DeviceEventType::kSEDIntervalChange:

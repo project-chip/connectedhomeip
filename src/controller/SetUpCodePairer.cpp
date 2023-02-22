@@ -348,9 +348,20 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
     ChipLogProgress(Controller, "Discovered device to be commissioned over DNS-SD");
 
     auto & resolutionData = nodeData.resolutionData;
-    for (size_t i = 0; i < resolutionData.numIPs; i++)
+
+    if (mDiscoveryType == DiscoveryType::kDiscoveryNetworkOnlyWithoutPASEAutoRetry)
     {
-        mDiscoveredParameters.emplace_back(nodeData.resolutionData, i);
+        // If the discovery type does not want the PASE auto retry mechanism, we will just store
+        // a single IP. So the discovery process is stopped as it won't be of any help anymore.
+        StopConnectOverIP();
+        mDiscoveredParameters.emplace_back(nodeData.resolutionData, 0);
+    }
+    else
+    {
+        for (size_t i = 0; i < resolutionData.numIPs; i++)
+        {
+            mDiscoveredParameters.emplace_back(nodeData.resolutionData, i);
+        }
     }
 
     ConnectToDiscoveredDevice();
@@ -447,14 +458,14 @@ void SetUpCodePairer::OnStatusUpdate(DevicePairingDelegate::Status status)
         if (!mDiscoveredParameters.empty())
         {
             ChipLogProgress(Controller, "Ignoring SecurePairingFailed status for now; we have more discovered devices to try");
-            status = DevicePairingDelegate::Status::SecurePairingDiscoveringMoreDevices;
+            return;
         }
 
         if (DiscoveryInProgress())
         {
             ChipLogProgress(Controller,
                             "Ignoring SecurePairingFailed status for now; we are waiting to see if we discover more devices");
-            status = DevicePairingDelegate::Status::SecurePairingDiscoveringMoreDevices;
+            return;
         }
     }
 

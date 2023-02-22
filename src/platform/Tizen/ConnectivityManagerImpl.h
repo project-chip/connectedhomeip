@@ -84,8 +84,9 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 
 public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    void StartWiFiManagement(void);
-    void StopWiFiManagement(void);
+    void StartWiFiManagement();
+    void StopWiFiManagement();
+    bool IsWiFiManagementStarted();
 #endif
 
 private:
@@ -115,9 +116,6 @@ private:
     void _MaintainOnDemandWiFiAP(void);
     System::Clock::Timeout _GetWiFiAPIdleTimeout(void);
     void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
-
-    static void ActivateWiFiManager(System::Layer * aLayer, void * aAppState);
-    static void DeactivateWiFiManager(System::Layer * aLayer, void * aAppState);
 #endif
 
     // ===== Members for internal use by the following friends.

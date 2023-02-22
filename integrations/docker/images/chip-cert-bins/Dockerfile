@@ -7,7 +7,7 @@ ARG COMMITHASH=7b99e6399c6069037c613782d78132c69b9dcabb
 # ZAP Development install, so that it runs on both x64 and arm64
 # Generally this should match with the ZAP version that is used for codegen within the
 # specified SHA
-ARG ZAP_VERSION=v2023.01.31-nightly
+ARG ZAP_VERSION=v2023.02.16-nightly
 
 # Ensure TARGETPLATFORM is set
 RUN case ${TARGETPLATFORM} in \
@@ -163,10 +163,10 @@ RUN case ${TARGETPLATFORM} in \
             set -x \
             && mkdir node_js \
             && cd node_js \
-            && wget https://nodejs.org/dist/v12.19.0/node-v12.19.0-linux-x64.tar.xz \
-            && tar xfvJ node-v12.19.0-linux-x64.tar.xz \
-            && mv node-v12.19.0-linux-x64 /opt/ \
-            && ln -s /opt/node-v12.19.0-linux-x64 /opt/node \
+            && wget https://nodejs.org/dist/v12.22.12/node-v12.22.12-linux-x64.tar.xz \
+            && tar xfvJ node-v12.22.12-linux-x64.tar.xz \
+            && mv node-v12.22.12-linux-x64 /opt/ \
+            && ln -s /opt/node-v12.22.12-linux-x64 /opt/node \
             && ln -s /opt/node/bin/* /usr/bin \
             && cd .. \
             && rm -rf node_js \
@@ -175,10 +175,10 @@ RUN case ${TARGETPLATFORM} in \
             set -x \
             && mkdir node_js \
             && cd node_js \
-            && wget https://nodejs.org/dist/v12.19.0/node-v12.19.0-linux-arm64.tar.xz \
-            && tar xfvJ node-v12.19.0-linux-arm64.tar.xz \
-            && mv node-v12.19.0-linux-arm64 /opt/ \
-            && ln -s /opt/node-v12.19.0-linux-arm64 /opt/node \
+            && wget https://nodejs.org/dist/v12.22.12/node-v12.22.12-linux-arm64.tar.xz \
+            && tar xfvJ node-v12.22.12-linux-arm64.tar.xz \
+            && mv node-v12.22.12-linux-arm64 /opt/ \
+            && ln -s /opt/node-v12.22.12-linux-arm64 /opt/node \
             && ln -s /opt/node/bin/* /usr/bin \
             && cd .. \
             && rm -rf node_js \

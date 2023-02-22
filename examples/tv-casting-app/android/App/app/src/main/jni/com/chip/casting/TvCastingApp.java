@@ -249,6 +249,14 @@ public class TvCastingApp {
 
   public native boolean mediaPlayback_next(ContentApp contentApp, Object responseHandler);
 
+  public native boolean mediaPlayback_previous(ContentApp contentApp, Object responseHandler);
+
+  public native boolean mediaPlayback_rewind(ContentApp contentApp, Object responseHandler);
+
+  public native boolean mediaPlayback_fastForward(ContentApp contentApp, Object responseHandler);
+
+  public native boolean mediaPlayback_startOver(ContentApp contentApp, Object responseHandler);
+
   public native boolean mediaPlayback_seek(
       ContentApp contentApp, long position, Object responseHandler);
 

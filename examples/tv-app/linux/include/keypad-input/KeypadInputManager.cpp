@@ -18,6 +18,7 @@
 
 #include "KeypadInputManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/util/config.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::KeypadInput;

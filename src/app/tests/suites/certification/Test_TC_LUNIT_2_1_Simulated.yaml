@@ -26,16 +26,16 @@ config:
     endpoint: 1
 
 tests:
-    - label: "Wait for the device to be commissioned"
-      cluster: "DelayCommands"
-      command: "WaitForCommissioning"
+    #- label: "Wait for the device to be commissioned"
+    #  cluster: "DelayCommands"
+    #  command: "WaitForCommissioning"
 
     - label: "DUT reads TemperatureUnit attribute from TH"
       PICS: LUNIT.C.A0000
       wait: "readAttribute"
       attribute: "TemperatureUnit"
 
-    - label: "DUT writes 3 to TemperatureUnit attribute on TH"
+    - label: "DUT writes 2 to TemperatureUnit attribute on TH"
       PICS: LUNIT.C.A0000
       wait: "writeAttribute"
       attribute: "TemperatureUnit"

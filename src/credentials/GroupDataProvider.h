@@ -33,7 +33,7 @@ namespace Credentials {
 class GroupDataProvider
 {
 public:
-    using SecurityPolicy                                  = app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy;
+    using SecurityPolicy                                  = app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum;
     static constexpr KeysetId kIdentityProtectionKeySetId = 0;
 
     struct GroupInfo

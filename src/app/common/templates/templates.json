@@ -9,8 +9,7 @@
         "templates/chip/helper.js"
     ],
     "resources": {
-        "weak-enum-list": "weak-enum-list.yaml",
-        "legacy-struct-list": "legacy-struct-list.yaml"
+        "config-data": "config-data.yaml"
     },
     "override": "../../zap-templates/common/override.js",
     "partials": [
@@ -32,11 +31,6 @@
         }
     ],
     "templates": [
-        {
-            "path": "../../zap-templates/templates/app/af-structs.zapt",
-            "name": "ZCL af-structs header",
-            "output": "af-structs.h"
-        },
         {
             "path": "../../zap-templates/templates/app/att-storage.zapt",
             "name": "ZCL att-storage header",

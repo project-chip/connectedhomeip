@@ -61,12 +61,16 @@ endpoint: "endpoint"i positive_integer "{" endpoint_content* "}"
 
 endpoint_device_type: "device" "type" id "=" positive_integer "," "version" positive_integer ";"
 endpoint_cluster_binding: "binding"i "cluster"i id ";"
-endpoint_server_cluster: "server"i "cluster"i id "{" endpoint_attribute_instantiation* "}"
+endpoint_server_cluster: "server"i "cluster"i id "{" endpoint_cluster_entry* "}"
+
 
 endpoint_attribute_storage: "ram"i      -> ram_attribute
                           | "persist"i  -> persist_attribute
                           | "callback"i -> callback_attribute
 
+?endpoint_cluster_entry: endpoint_emitted_event | endpoint_attribute_instantiation
+
+endpoint_emitted_event: "emits"i "event"i id ";"
 endpoint_attribute_instantiation: endpoint_attribute_storage "attribute"i id default_value? ";"
 
 bool_default: "true"i  -> bool_default_true

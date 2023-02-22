@@ -28,6 +28,9 @@ extern "C" {
 #include "sl_uartdrv_instances.h"
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
 #include "sl_uartdrv_eusart_vcom_config.h"
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+#include "spi_multiplex.h"
+#endif /* EFR32MG24 && WF200_WIFI */
 #endif
 #ifdef SL_CATALOG_UARTDRV_USART_PRESENT
 #include "sl_uartdrv_usart_vcom_config.h"
@@ -294,20 +297,26 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
     sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
 #endif
 
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    pre_uart_transfer();
+#endif /* EFR32MG24 && WF200_WIFI */
+
     // Use of ForceTransmit here. Transmit with DMA was causing errors with PW_RPC
-    // TODO Use DMA and find/fix what causes the issue with PW
-    if (UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) Buf, BufLength) == ECODE_EMDRV_UARTDRV_OK)
-    {
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
-        sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
-#endif
-        return BufLength;
-    }
+    // TODO: Use DMA and find/fix what causes the issue with PW
+    Ecode_t ecode_status = UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) Buf, BufLength);
+
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    post_uart_transfer();
+#endif /* EFR32MG24 && WF200_WIFI */
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
 #endif
 
+    if (ECODE_EMDRV_UARTDRV_OK == ecode_status)
+    {
+        return BufLength;
+    }
     return UART_CONSOLE_ERR;
 }
 

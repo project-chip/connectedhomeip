@@ -59,6 +59,7 @@ class HostApp(Enum):
     BRIDGE = auto()
     DYNAMIC_BRIDGE = auto()
     JAVA_MATTER_CONTROLLER = auto()
+    CONTACT_SENSOR = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -101,6 +102,8 @@ class HostApp(Enum):
             return 'dynamic-bridge-app/linux'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             return 'java-matter-controller'
+        elif self == HostApp.CONTACT_SENSOR:
+            return 'contact-sensor-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -174,6 +177,9 @@ class HostApp(Enum):
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             yield 'java-matter-controller'
             yield 'java-matter-controller.map'
+        elif self == HostApp.CONTACT_SENSOR:
+            yield 'contact-sensor-app'
+            yield 'contact-sensor-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -229,6 +235,7 @@ class HostBuilder(GnBuilder):
                  use_coverage=False, use_dmalloc=False,
                  minmdns_address_policy=None,
                  minmdns_high_verbosity=False,
+                 imgui_ui=False,
                  crypto_library: HostCryptoLibrary = None):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -281,6 +288,9 @@ class HostBuilder(GnBuilder):
 
         if use_libfuzzer:
             self.extra_gn_options.append('is_libfuzzer=true')
+
+        if imgui_ui:
+            self.extra_gn_options.append('chip_examples_enable_imgui_ui=true')
 
         self.use_coverage = use_coverage
         if use_coverage:

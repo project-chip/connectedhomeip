@@ -50,34 +50,7 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
 
 ### Installing prerequisites on macOS
 
-On macOS, first install Xcode from the Mac App Store. The remaining dependencies
-can be installed and satisfied using [Brew](https://brew.sh/):
-
-```
-brew install openssl pkg-config
-```
-
-However, that does not expose the package to `pkg-config`. To fix that, one
-needs to run something like the following:
-
-Intel:
-
-```
-cd /usr/local/lib/pkgconfig
-ln -s ../../Cellar/openssl@1.1/1.1.1g/lib/pkgconfig/* .
-```
-
-where `openssl@1.1/1.1.1g` may need to be replaced with the actual version of
-OpenSSL installed by Brew.
-
-Apple Silicon:
-
-```
-export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:"/opt/homebrew/opt/openssl@3/lib/pkgconfig"
-```
-
-Note: If using MacPorts, `port install openssl` is sufficient to satisfy this
-dependency.
+On macOS, install Xcode from the Mac App Store.
 
 ### Installing prerequisites on Raspberry Pi 4
 
@@ -130,20 +103,9 @@ Finally, reboot your RPi.
 
 ## Installing ZAP
 
-`zap-cli` is already installed in pre-built docker images for chip-build, such
-as
-[chip-build-vscode](https://hub.docker.com/r/connectedhomeip/chip-build-vscode).
-
-Zap generation and tooling relies on `zap-cli` being available on the current
-system. You can install it from the zap project
-[Releases](https://github.com/project-chip/zap/releases).
-
-You should install a compatible release version, generally checking against the
-release set in
-[integrations/docker/images/chip-build/Dockerfile](../../integrations/docker/images/chip-build/Dockerfile).
-
-On linux, installation from `zap-linux.zip` is recommended as it pulls fewer
-dependencies than the `.deb` package.
+`bootstrap.sh` will download a compatible zap version and set it up in `$PATH`.
+If you want to install/use a different version, you may download one from the
+zap project [Releases](https://github.com/project-chip/zap/releases)
 
 ### Which ZAP to use
 

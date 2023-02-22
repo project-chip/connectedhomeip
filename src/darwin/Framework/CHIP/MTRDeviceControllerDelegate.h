@@ -23,7 +23,8 @@ typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
     MTRCommissioningStatusUnknown = 0,
     MTRCommissioningStatusSuccess = 1,
     MTRCommissioningStatusFailed = 2,
-    MTRCommissioningStatusDiscoveringMoreDevices = 3
+    MTRCommissioningStatusDiscoveringMoreDevices MTR_NEWLY_DEPRECATED("MTRCommissioningStatusDiscoveringMoreDevices is not used.")
+    = 3,
 } API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 @class MTRDeviceController;
@@ -64,8 +65,8 @@ typedef NS_ENUM(NSUInteger, MTRPairingStatus) {
     MTRPairingStatusFailed API_DEPRECATED(
         "Please use MTRCommissioningStatusFailed", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 2,
-    MTRPairingStatusDiscoveringMoreDevices API_DEPRECATED("Please use MTRCommissioningStatusDiscoveringMoreDevices",
-        ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    MTRPairingStatusDiscoveringMoreDevices API_DEPRECATED("MTRPairingStatusDiscoveringMoreDevices is not used.", ios(16.1, 16.4),
+        macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 3
 } API_DEPRECATED("Please use MTRCommissioningStatus", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 

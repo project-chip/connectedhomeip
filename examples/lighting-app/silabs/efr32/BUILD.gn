@@ -35,6 +35,10 @@ efr32_project_dir = "${chip_root}/examples/lighting-app/silabs/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
+if (chip_enable_ble_rs911x) {
+  src_plat_dir = "${chip_root}/src/platform/silabs/efr32"
+}
+
 import("${examples_plat_dir}/args.gni")
 
 declare_args() {
@@ -49,7 +53,7 @@ efr32_sdk("sdk") {
   ]
 
   include_dirs = [
-    "${chip_root}/src/platform/silabs/EFR32",
+    "${chip_root}/src/platform/silabs/efr32",
     "${efr32_project_dir}/include",
     "${examples_plat_dir}",
     "${chip_root}/src/lib",
@@ -59,6 +63,15 @@ efr32_sdk("sdk") {
   if (use_wf200) {
     # TODO efr32_sdk should not need a header from this location
     include_dirs += [ "${examples_plat_dir}/wf200" ]
+  }
+
+  if (chip_enable_ble_rs911x) {
+    # TODO efr32_sdk should not need a header from this location
+    include_dirs += [
+      "${src_plat_dir}/rs911x",
+      "${examples_plat_dir}/rs911x",
+      "${examples_plat_dir}/rs911x/hal",
+    ]
   }
 
   defines = []
@@ -72,7 +85,6 @@ efr32_sdk("sdk") {
 
 efr32_executable("lighting_app") {
   output_name = "chip-efr32-lighting-example.out"
-  public_configs = [ "${efr32_sdk_build_root}:silabs_config" ]
   include_dirs = [ "include" ]
   defines = []
 
@@ -92,10 +104,6 @@ efr32_executable("lighting_app") {
     "${examples_plat_dir}:efr32-common",
     app_data_model,
   ]
-
-  if (!disable_lcd) {
-    defines += [ "IS_DEMO_LIGHT=1" ]
-  }
 
   if (chip_enable_pw_rpc) {
     defines += [

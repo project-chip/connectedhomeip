@@ -73,6 +73,10 @@ bool is_wifi_disconnection_event = false;
 /* Declare a variable to hold connection time intervals */
 uint32_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
 
+#if (RSI_BLE_ENABLE)
+extern rsi_semaphore_handle_t sl_rs_ble_init_sem;
+#endif
+
 /*
  * This file implements the interface to the RSI SAPIs
  */
@@ -113,6 +117,10 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
  *********************************************************************/
 int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
 {
+#ifdef SiWx917_WIFI
+    // TODO: for wisemcu
+    return 0;
+#else
     int32_t status;
     uint8_t buff[RSI_RESPONSE_MAX_SIZE] = { 0 };
     status                              = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
@@ -132,6 +140,7 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
         extra_info->overrun_count     = test->overrun_count - temp_reset->overrun_count;
     }
     return status;
+#endif
 }
 
 /******************************************************************
@@ -144,6 +153,10 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
  *********************************************************************/
 int32_t wfx_rsi_reset_count()
 {
+#ifdef SiWx917_WIFI
+    // TODO: for wisemcu
+    return 0;
+#else
     int32_t status;
     uint8_t buff[RSI_RESPONSE_MAX_SIZE] = { 0 };
     status                              = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
@@ -163,6 +176,7 @@ int32_t wfx_rsi_reset_count()
         temp_reset->overrun_count     = test->overrun_count;
     }
     return status;
+#endif
 }
 
 /******************************************************************
@@ -307,7 +321,7 @@ static int32_t wfx_rsi_init(void)
     status = rsi_driver_init(wfx_rsi_drv_buf, WFX_RSI_BUF_SZ);
     if ((status < RSI_DRIVER_STATUS) || (status > WFX_RSI_BUF_SZ))
     {
-        WFX_RSI_LOG("%s: error: RSI drv init failed with status: %02x", __func__, status);
+        WFX_RSI_LOG("%s: error: RSI Driver initialization failed with status: %02x", __func__, status);
         return status;
     }
 
@@ -330,11 +344,14 @@ static int32_t wfx_rsi_init(void)
         return RSI_ERROR_INVALID_PARAM;
     }
 
-    /* Initialize WiSeConnect or Module features. */
-    WFX_RSI_LOG("%s: rsi_wireless_init", __func__);
+#if (RSI_BLE_ENABLE)
+    if ((status = rsi_wireless_init(OPER_MODE_0, RSI_OPERMODE_WLAN_BLE)) != RSI_SUCCESS)
+    {
+#else
     if ((status = rsi_wireless_init(OPER_MODE_0, COEX_MODE_0)) != RSI_SUCCESS)
     {
-        WFX_RSI_LOG("%s: error: rsi_wireless_init failed with status: %02x", __func__, status);
+#endif
+        WFX_RSI_LOG("%s: error: Initialize WiSeConnect failed with status: %02x", __func__, status);
         return status;
     }
 
@@ -387,6 +404,11 @@ static int32_t wfx_rsi_init(void)
         return status;
     }
 #endif
+
+#if (RSI_BLE_ENABLE)
+    rsi_semaphore_post(&sl_rs_ble_init_sem);
+#endif
+
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
     WFX_RSI_LOG("%s: RSI: OK", __func__);
     return RSI_SUCCESS;

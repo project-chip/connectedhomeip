@@ -1855,7 +1855,6 @@
               RetrieveLogsRequest:
                   - intent
                   - requestedProtocol
-                  - transferFileDesignator
               RetrieveLogsResponse:
                   - status
                   - content
@@ -3101,8 +3100,14 @@
               - RoutingRole
               - ThreadConnectionStatus
           WiFiNetworkDiagnostics:
-              - AssociationFailureCause
-              - SecurityType
+              # AssociationFailureCauseEnum was originally just named
+              # AssociationFailureCause, but we generate the same API for both
+              # of those names, so the name can just change here.
+              - AssociationFailureCauseEnum
+              # SecurityTypeEnum was originally just named SecurityType, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              - SecurityTypeEnum
               - WiFiConnectionStatus
               - WiFiVersionType
           EthernetNetworkDiagnostics:
@@ -3119,7 +3124,10 @@
           OperationalCredentials:
               - OperationalCertStatus
           GroupKeyManagement:
-              - GroupKeySecurityPolicy
+              # GroupKeySecurityPolicyEnum was originally just named
+              # GroupKeySecurityPolicy, but we generate the same API for both of
+              # those names, so the name can just change here.
+              - GroupKeySecurityPolicyEnum
           DoorLock:
               - DlAlarmCode
               - DlCredentialRule
@@ -3481,12 +3489,18 @@
                   - Connected
                   - NotConnected
           WiFiNetworkDiagnostics:
-              AssociationFailureCause:
+              # AssociationFailureCauseEnum was originally just named
+              # AssociationFailureCause, but we generate the same API for both
+              # of those names, so the name can just change here.
+              AssociationFailureCauseEnum:
                   - Unknown
                   - AssociationFailed
                   - AuthenticationFailed
                   - SsidNotFound
-              SecurityType:
+              # SecurityTypeEnum was originally just named SecurityType, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              SecurityTypeEnum:
                   - Unspecified
                   - None
                   - WEP
@@ -3565,7 +3579,10 @@
                   - LabelConflict
                   - InvalidFabricIndex
           GroupKeyManagement:
-              GroupKeySecurityPolicy:
+              # GroupKeySecurityPolicyEnum was originally just named
+              # GroupKeySecurityPolicy, but we generate the same API for both of
+              # those names, so the name can just change here.
+              GroupKeySecurityPolicyEnum:
                   - TrustFirst
                   - CacheAndSync
           DoorLock:
@@ -6001,7 +6018,7 @@
               - DlOperationSource
               - DlUserStatus
               - DlUserType
-              # The enums after this come from the silabs types-silabs.xml, not the
+              # The enums after this come from the draft/types/door-lock.xml, not the
               # door lock cluster XML
               #
               # DoorLockUserStatus is not marked deprecated here because the
@@ -6503,5 +6520,320 @@
                   HeatSetpointPresent: HeatSetpointFieldPresent
                   CoolSetpointPresent: CoolSetpointFieldPresent
 
-- release: "Future"
+- release: "First after major API revamp"
   versions: "future"
+  introduced:
+      global attributes:
+          - EventList
+      attributes:
+          Scenes:
+              - EventList
+          OnOff:
+              - EventList
+          OnOffSwitchConfiguration:
+              - EventList
+          LevelControl:
+              - EventList
+          BinaryInputBasic:
+              - EventList
+          PulseWidthModulation:
+              - EventList
+          Descriptor:
+              - EventList
+          Binding:
+              - EventList
+          Identify:
+              - EventList
+          AccessControl:
+              - EventList
+          Actions:
+              - EventList
+          BasicInformation:
+              - EventList
+          OTASoftwareUpdateProvider:
+              - EventList
+          OTASoftwareUpdateRequestor:
+              - EventList
+          LocalizationConfiguration:
+              - EventList
+          TimeFormatLocalization:
+              - EventList
+          UnitLocalization:
+              - EventList
+          PowerSourceConfiguration:
+              - EventList
+          PowerSource:
+              - EventList
+          GeneralCommissioning:
+              - EventList
+          NetworkCommissioning:
+              - EventList
+          DiagnosticLogs:
+              - EventList
+          GeneralDiagnostics:
+              - EventList
+          SoftwareDiagnostics:
+              - EventList
+          ThreadNetworkDiagnostics:
+              - EventList
+          WiFiNetworkDiagnostics:
+              - EventList
+          EthernetNetworkDiagnostics:
+              - EventList
+          TimeSynchronization:
+              - EventList
+              - DSTOffset
+          BridgedDeviceBasicInformation:
+              - EventList
+          Switch:
+              - EventList
+          AdministratorCommissioning:
+              - EventList
+          OperationalCredentials:
+              - EventList
+          GroupKeyManagement:
+              - EventList
+          FixedLabel:
+              - EventList
+          UserLabel:
+              - EventList
+          ProxyConfiguration:
+              - EventList
+          ProxyDiscovery:
+              - EventList
+          ProxyValid:
+              - EventList
+          BooleanState:
+              - EventList
+          ModeSelect:
+              - EventList
+          DoorLock:
+              - EventList
+          WindowCovering:
+              - EventList
+          BarrierControl:
+              - EventList
+          PumpConfigurationAndControl:
+              - EventList
+          FanControl:
+              - EventList
+          ThermostatUserInterfaceConfiguration:
+              - EventList
+          ColorControl:
+              - EventList
+          BallastConfiguration:
+              - EventList
+          IlluminanceMeasurement:
+              - EventList
+          TemperatureMeasurement:
+              - EventList
+          PressureMeasurement:
+              - EventList
+          Thermostat:
+              - EventList
+          FlowMeasurement:
+              - EventList
+          RelativeHumidityMeasurement:
+              - EventList
+          OccupancySensing:
+              - EventList
+          WakeOnLAN:
+              - EventList
+          Channel:
+              - EventList
+          Groups:
+              - EventList
+          TargetNavigator:
+              - EventList
+          MediaPlayback:
+              - EventList
+          MediaInput:
+              - EventList
+          LowPower:
+              - EventList
+          KeypadInput:
+              - EventList
+          ContentLauncher:
+              - EventList
+          AudioOutput:
+              - EventList
+          ApplicationLauncher:
+              - EventList
+          ApplicationBasic:
+              - EventList
+          AccountLogin:
+              - EventList
+          ElectricalMeasurement:
+              - EventList
+          UnitTesting:
+              - EventList
+          FaultInjection:
+              - EventList
+      command fields:
+          DiagnosticLogs:
+              RetrieveLogsRequest:
+                  # Not really usable in earlier releases: wrong type.
+                  - transferFileDesignator
+      structs:
+          TimeSynchronization:
+              - DSTOffsetStruct
+              - TimeZoneStruct
+      struct fields:
+          TimeSynchronization:
+              DSTOffsetStruct:
+                  - offset
+                  - validStarting
+                  - validUntil
+              TimeZoneStruct:
+                  - offset
+                  - validAt
+                  - name
+      enums:
+          DiagnosticLogs:
+              - IntentEnum
+              - StatusEnum
+              - TransferProtocolEnum
+          OccupancySensing:
+              - OccupancySensorTypeEnum
+          WiFiNetworkDiagnostics:
+              - ConnectionStatusEnum
+              - WiFiVersionEnum
+          PumpConfigurationAndControl:
+              - ControlModeEnum
+              - OperationModeEnum
+      enum values:
+          DoorLock:
+              LockDataTypeEnum:
+                  - FingerVein
+                  - Face
+          DiagnosticLogs:
+              IntentEnum:
+                  - EndUserSupport
+                  - NetworkDiag
+                  - CrashLogs
+              StatusEnum:
+                  - Success
+                  - Exhausted
+                  - NoLogs
+                  - Busy
+                  - Denied
+              TransferProtocolEnum:
+                  - ResponsePayload
+                  - BDX
+          OccupancySensing:
+              OccupancySensorTypeEnum:
+                  - PIR
+                  - Ultrasonic
+                  - PIRAndUltrasonic
+                  - PhysicalContact
+          WiFiNetworkDiagnostics:
+              ConnectionStatusEnum:
+                  - Connected
+                  - NotConnected
+              WiFiVersionEnum:
+                  - A
+                  - B
+                  - G
+                  - N
+                  - Ac
+                  - Ax
+          PumpConfigurationAndControl:
+              ControlModeEnum:
+                  - ConstantSpeed
+                  - ConstantPressure
+                  - ProportionalPressure
+                  - ConstantFlow
+                  - ConstantTemperature
+                  - Automatic
+              OperationModeEnum:
+                  - Normal
+                  - Minimum
+                  - Maximum
+                  - Local
+      bitmaps:
+          OccupancySensing:
+              - OccupancyBitmap
+              - OccupancySensorTypeBitmap
+          PumpConfigurationAndControl:
+              - PumpStatusBitmap
+      bitmap values:
+          OccupancySensing:
+              OccupancyBitmap:
+                  - Occupied
+              OccupancySensorTypeBitmap:
+                  - PIR
+                  - Ultrasonic
+                  - PhysicalContact
+          PumpConfigurationAndControl:
+              PumpFeature:
+                  - LocalOperation
+              PumpStatusBitmap:
+                  - DeviceFault
+                  - Supplyfault
+                  - SpeedLow
+                  - SpeedHigh
+                  - LocalOverride
+                  - Running
+                  - RemotePressure
+                  - RemoteFlow
+                  - RemoteTemperature
+  deprecated:
+      attributes:
+          TimeSynchronization:
+              - DstOffset
+      structs:
+          TimeSynchronization:
+              - DstOffsetType
+              - TimeZoneType
+      enums:
+          DiagnosticLogs:
+              - LogsIntent
+              - LogsStatus
+              - LogsTransferProtocol
+          WiFiNetworkDiagnostics:
+              - WiFiConnectionStatus
+              - WiFiVersionType
+          PumpConfigurationAndControl:
+              - PumpControlMode
+              - PumpOperationMode
+      bitmaps:
+          PumpConfigurationAndControl:
+              - PumpStatus
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpFeature:
+                  - Local
+  removed:
+      enum values:
+          DoorLock:
+              DlLockDataType:
+                  # These values never existed for this enum name so, don't
+                  # start exposing them.  They're exposed for LockDataTypeEnum
+                  - FingerVein
+                  - Face
+  renames:
+      attributes:
+          TimeSynchronization:
+              DSTOffset: DstOffset
+      structs:
+          TimeSynchronization:
+              DSTOffsetStruct: DstOffsetType
+              TimeZoneStruct: TimeZoneType
+      enums:
+          DiagnosticLogs:
+              IntentEnum: LogsIntent
+              StatusEnum: LogsStatus
+              TransferProtocolEnum: LogsTransferProtocol
+          WiFiNetworkDiagnostics:
+              ConnectionStatusEnum: WiFiConnectionStatus
+              WiFiVersionEnum: WiFiVersionType
+          PumpConfigurationAndControl:
+              ControlModeEnum: PumpControlMode
+              OperationModeEnum: PumpOperationMode
+      bitmaps:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap: PumpStatus
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpFeature:
+                  LocalOperation: Local

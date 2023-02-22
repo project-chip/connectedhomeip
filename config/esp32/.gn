@@ -25,9 +25,9 @@ default_args = {
   target_os = "freertos"
 
   pw_build_PIP_CONSTRAINTS =
-      [ "//third_party/connectedhomeip/scripts/constraints.txt" ]
+      [ "//third_party/connectedhomeip/scripts/setup/constraints.txt" ]
   pw_build_PIP_REQUIREMENTS =
-      [ "//third_party/connectedhomeip/scripts/requirements.txt" ]
+      [ "//third_party/connectedhomeip/scripts/setup/requirements.txt" ]
 
   import("//args.gni")
 }

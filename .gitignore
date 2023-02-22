@@ -74,3 +74,9 @@ examples/thermostat/ameba/build
 
 # Downloaded zap without a pigweed root (via zap_download.py)
 .zap
+
+# When building esp-idf application, if any component is fetched using idf-component-manager then they are stored in
+# managed_component directory. Along with that dependencies.lock file is generated.
+# https://github.com/espressif/idf-component-manager#using-with-a-project
+examples/*/esp32/managed_components
+examples/*/esp32/dependencies.lock

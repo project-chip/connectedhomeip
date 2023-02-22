@@ -26,12 +26,9 @@
 #define CLUSTER_MASK_INIT_FUNCTION (0x01)
 // Does this cluster have attribute changed function?
 #define CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION (0x02)
-// Does this cluster have default response function?
-#define CLUSTER_MASK_DEFAULT_RESPONSE_FUNCTION (0x04)
-// Does this cluster have message sent function?
-#define CLUSTER_MASK_MESSAGE_SENT_FUNCTION (0x08)
-// Does this cluster have manufacturer specific attribute changed function?
-#define CLUSTER_MASK_MANUFACTURER_SPECIFIC_ATTRIBUTE_CHANGED_FUNCTION (0x10)
+// Bits 0x04 and 0x08 are free.
+// Does this cluster have shutdown function?
+#define CLUSTER_MASK_SHUTDOWN_FUNCTION (0x10)
 // Does this cluster have pre-attribute changed function?
 #define CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION (0x20)
 // Cluster is a server

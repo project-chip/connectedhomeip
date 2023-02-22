@@ -105,6 +105,17 @@ union EmberAfDefaultOrMinMaxAttributeValue
     const EmberAfAttributeMinMaxValue * ptrToMinMaxValue;
 };
 
+enum class EmberAfAttributeWritePermission
+{
+    DenyWrite            = 0,
+    AllowWriteNormal     = 1,
+    AllowWriteOfReadOnly = 2,
+    UnsupportedAttribute = 0x86, // Protocols::InteractionModel::Status::UnsupportedAttribute
+    InvalidValue         = 0x87, // Protocols::InteractionModel::Status::ConstraintError
+    ReadOnly             = 0x88, // Protocols::InteractionModel::Status::UnsupportedWrite
+    InvalidDataType      = 0x8d, // Protocols::InteractionModel::Status::InvalidDataType
+};
+
 // Attribute masks modify how attributes are used by the framework
 //
 // Attribute that has this mask is NOT read-only

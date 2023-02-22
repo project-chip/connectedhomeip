@@ -57,8 +57,6 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 
 @end
 
-typedef void (^MTROperationalCertificateIssuedHandler)(MTROperationalCertificateChain * _Nullable info, NSError * _Nullable error);
-
 API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @protocol MTROperationalCertificateIssuer
 @required
@@ -80,7 +78,8 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 - (void)issueOperationalCertificateForRequest:(MTROperationalCSRInfo *)csrInfo
                               attestationInfo:(MTRDeviceAttestationInfo *)attestationInfo
                                    controller:(MTRDeviceController *)controller
-                                   completion:(MTROperationalCertificateIssuedHandler)completion;
+                                   completion:(void (^)(MTROperationalCertificateChain * _Nullable info,
+                                                  NSError * _Nullable error))completion;
 
 /**
  * A way for MTROperationalCertificateIssuer to control whether it wants the
@@ -111,8 +110,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 
 @end
 
-API_DEPRECATED(
-    "Please use MTROperationalCertificateIssuedHandler", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+API_DEPRECATED("MTRNOCChainIssuer is deprecated", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 typedef void (^MTRNOCChainGenerationCompleteHandler)(NSData * operationalCertificate, NSData * intermediateCertificate,
     NSData * rootCertificate, NSData * _Nullable ipk, NSNumber * _Nullable adminSubject, NSError * __autoreleasing * error);
 

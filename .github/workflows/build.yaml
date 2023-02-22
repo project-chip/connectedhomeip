@@ -17,6 +17,7 @@ name: Builds
 on:
     push:
     pull_request:
+    merge_group:
     workflow_dispatch:
 
 concurrency:
@@ -27,7 +28,6 @@ env:
     CHIP_NO_LOG_TIMESTAMPS: true
 
 jobs:
-
     build_linux_gcc_debug:
         name: Build on Linux (gcc_debug)
         timeout-minutes: 85
@@ -66,6 +66,14 @@ jobs:
               run: |
                   mkdir /tmp/cores || true
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -77,6 +85,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Setup Build
               run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
             - name: Run Build
@@ -173,6 +182,14 @@ jobs:
               run: |
                   mkdir /tmp/cores || true
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -184,6 +201,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Setup and Build Simulated Device
               timeout-minutes: 20
               run: |
@@ -203,18 +221,18 @@ jobs:
               env:
                   LSAN_OPTIONS: detect_leaks=1
               run: |
-                    for BUILD_TYPE in asan tsan ubsan; do
-                        case $BUILD_TYPE in
-                            "asan") GN_ARGS='is_clang=true is_asan=true';;
-                            "msan") GN_ARGS='is_clang=true is_msan=true';;
-                            "tsan") GN_ARGS='is_clang=true is_tsan=true chip_enable_wifi=false';;
-                            "ubsan") GN_ARGS='is_clang=true is_ubsan=true';;
-                        esac
+                  for BUILD_TYPE in asan tsan ubsan; do
+                      case $BUILD_TYPE in
+                          "asan") GN_ARGS='is_clang=true is_asan=true';;
+                          "msan") GN_ARGS='is_clang=true is_msan=true';;
+                          "tsan") GN_ARGS='is_clang=true is_tsan=true chip_enable_wifi=false';;
+                          "ubsan") GN_ARGS='is_clang=true is_ubsan=true';;
+                      esac
 
-                        rm -rf ./out/sanitizers
-                        BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
-                        BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
-                    done
+                      rm -rf ./out/sanitizers
+                      BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
+                      BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
+                  done
             - name: Ensure codegen is done for sanitize
               timeout-minutes: 45
               run: |
@@ -323,9 +341,18 @@ jobs:
                   attempt_delay: 2000
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
+
             - name: Setup Build, Run Build and Run Tests
               timeout-minutes: 50
               run: |
@@ -343,9 +370,9 @@ jobs:
             - name: Run Python Setup Payload Generator Test
               timeout-minutes: 10
               run: |
-                scripts/run_in_build_env.sh 'scripts/examples/gn_build_example.sh examples/chip-tool out/'
-                scripts/run_in_build_env.sh 'pip3 install -r src/setup_payload/python/requirements.txt'
-                scripts/run_in_build_env.sh 'python3 src/setup_payload/tests/run_python_setup_payload_gen_test.py out/chip-tool'
+                  scripts/run_in_build_env.sh 'scripts/examples/gn_build_example.sh examples/chip-tool out/'
+                  scripts/run_in_build_env.sh 'pip3 install -r src/setup_payload/python/requirements.txt'
+                  scripts/run_in_build_env.sh 'python3 src/setup_payload/tests/run_python_setup_payload_gen_test.py out/chip-tool'
 
     build_darwin:
         name: Build on Darwin (clang, python_lib, simulated)
@@ -369,19 +396,17 @@ jobs:
             #     languages: "cpp"
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform darwin
-            - name: Setup Environment
-              run: brew install openssl pkg-config
             - name: Try to ensure the directory for diagnostic log collection exists
               run: |
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
-            - name: Fix pkgconfig link
-              working-directory: /usr/local/lib/pkgconfig
-              run: |
-                  pwd
-                  ls -la /usr/local/Cellar/
-                  ls -la /usr/local/Cellar/openssl@1.1
-                  OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
-                  ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -393,6 +418,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Setup and Build Simulated Device
               timeout-minutes: 20
               run: |
@@ -472,6 +498,14 @@ jobs:
                   attempt_delay: 2000
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -482,8 +516,8 @@ jobs:
                   name: bootstrap-logs
                   path: |
                       .environment/gn_out/.ninja_log
-                      .environment/pigweed-venv/*.log           
+                      .environment/pigweed-venv/*.log
+
             - name: Run Build Coverage
               timeout-minutes: 20
               run: ./scripts/build_coverage.sh
-           
