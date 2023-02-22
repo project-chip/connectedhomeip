@@ -27,7 +27,7 @@ tests:
     - label: "TH1 fully commissions the DUT"
       verification: |
           "DUT side:
-          sudo ./chip-all-clusters-app --wifi 
+          sudo ./chip-all-clusters-app --wifi
 
           TH side:
           ./chip-tool pairing code 1 34970112332 --trace_decode 1
@@ -44,7 +44,7 @@ tests:
 
           [1674780232627] [8807:372926] CHIP: [DMG] InvokeResponseMessage =
           [1674780232627] [8807:372926] CHIP: [DMG] {
-          [1674780232627] [8807:372926] CHIP: [DMG]         suppressResponse = false, 
+          [1674780232627] [8807:372926] CHIP: [DMG]         suppressResponse = false,
           [1674780232627] [8807:372926] CHIP: [DMG]         InvokeResponseIBs =
           [1674780232627] [8807:372926] CHIP: [DMG]         [
           [1674780232627] [8807:372926] CHIP: [DMG]                 InvokeResponseIB =
@@ -57,17 +57,17 @@ tests:
           [1674780232627] [8807:372926] CHIP: [DMG]                                         ClusterId = 0x3e,
           [1674780232627] [8807:372926] CHIP: [DMG]                                         CommandId = 0x8,
           [1674780232627] [8807:372926] CHIP: [DMG]                                 },
-          [1674780232627] [8807:372926] CHIP: [DMG]                                 
-          [1674780232627] [8807:372926] CHIP: [DMG]                                 CommandFields = 
+          [1674780232627] [8807:372926] CHIP: [DMG]
+          [1674780232627] [8807:372926] CHIP: [DMG]                                 CommandFields =
           [1674780232627] [8807:372926] CHIP: [DMG]                                 {
-          [1674780232627] [8807:372926] CHIP: [DMG]                                         0x0 = 11, 
+          [1674780232627] [8807:372926] CHIP: [DMG]                                         0x0 = 11,
           [1674780232627] [8807:372926] CHIP: [DMG]                                 },
           [1674780232627] [8807:372926] CHIP: [DMG]                         },
-          [1674780232627] [8807:372926] CHIP: [DMG]                         
+          [1674780232627] [8807:372926] CHIP: [DMG]
           [1674780232627] [8807:372926] CHIP: [DMG]                 },
-          [1674780232627] [8807:372926] CHIP: [DMG]                 
+          [1674780232627] [8807:372926] CHIP: [DMG]
           [1674780232627] [8807:372926] CHIP: [DMG]         ],
-          [1674780232627] [8807:372926] CHIP: [DMG]         
+          [1674780232627] [8807:372926] CHIP: [DMG]
           [1674780232627] [8807:372926] CHIP: [DMG]         InteractionModelRevision = 1
           [1674780232627] [8807:372926] CHIP: [DMG] },
           [1674780232627] [8807:372926] CHIP: [DMG] Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
