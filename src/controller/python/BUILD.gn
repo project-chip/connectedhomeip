@@ -51,6 +51,8 @@ shared_library("ChipDeviceCtrl") {
 
   sources += [ "chip/native/CommonStackInit.cpp" ]
 
+  defines = []
+
   if (chip_controller) {
     sources += [
       "ChipCommissionableNodeController-ScriptBinding.cpp",
@@ -76,6 +78,8 @@ shared_library("ChipDeviceCtrl") {
       "chip/native/PyChipError.cpp",
       "chip/utils/DeviceProxyUtils.cpp",
     ]
+    defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
+    defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
   } else {
     sources += [
       "chip/server/Options.cpp",

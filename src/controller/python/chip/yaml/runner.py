@@ -156,6 +156,11 @@ class InvokeAction(BaseAction):
         self._expected_response_object = None
         self._endpoint = test_step.endpoint
         self._node_id = test_step.node_id
+        self._group_id = test_step.group_id
+
+        if self._node_id is None and self._group_id is None:
+            raise UnexpectedParsingError(
+                'Both node_id and group_id are None, at least one needs to be provided')
 
         command = context.data_model_lookup.get_command(self._cluster, self._command_name)
 
@@ -182,10 +187,15 @@ class InvokeAction(BaseAction):
 
     def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
-            resp = asyncio.run(dev_ctrl.SendCommand(
-                self._node_id, self._endpoint, self._request_object,
-                timedRequestTimeoutMs=self._interation_timeout_ms,
-                busyWaitMs=self._busy_wait_ms))
+            if self._group_id:
+                resp = dev_ctrl.SendGroupCommand(
+                    self._group_id, self._request_object,
+                    busyWaitMs=self._busy_wait_ms)
+            else:
+                resp = asyncio.run(dev_ctrl.SendCommand(
+                    self._node_id, self._endpoint, self._request_object,
+                    timedRequestTimeoutMs=self._interation_timeout_ms,
+                    busyWaitMs=self._busy_wait_ms))
         except chip.interaction_model.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
 
@@ -736,6 +746,7 @@ class ReplTestRunner:
         self._certificate_authority_manager = certificate_authority_manager
         self._dev_ctrls = {}
 
+        alpha_dev_ctrl.InitGroupTestingData()
         self._dev_ctrls['alpha'] = alpha_dev_ctrl
 
     def _invoke_action_factory(self, test_step, cluster: str):
@@ -1014,6 +1025,7 @@ class ReplTestRunner:
                     fabric = certificate_authority.NewFabricAdmin(vendorId=0xFFF1,
                                                                   fabricId=fabric_id)
                 dev_ctrl = fabric.NewController()
+                dev_ctrl.InitGroupTestingData()
                 self._dev_ctrls[action.identity] = dev_ctrl
         else:
             dev_ctrl = self._dev_ctrls['alpha']

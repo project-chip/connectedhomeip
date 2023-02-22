@@ -894,6 +894,18 @@ class ChipDeviceController():
             ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
         return await future
 
+    def SendGroupCommand(self, groupid: int, payload: ClusterObjects.ClusterCommand, busyWaitMs: typing.Union[None, int] = None):
+        '''
+        Send a group cluster-object encapsulated command to a group_id and get returned a future that can be awaited upon to get confirmation command was sent.
+        '''
+        self.CheckIsActive()
+
+        ClusterCommand.SendGroupCommand(
+            groupid, self.devCtrl, payload, busyWaitMs=busyWaitMs).raise_on_error()
+
+        # None is the expected return for sending group commands.
+        return None
+
     async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]], timedRequestTimeoutMs: typing.Union[None, int] = None, interactionTimeoutMs: typing.Union[None, int] = None, busyWaitMs: typing.Union[None, int] = None):
         '''
         Write a list of attributes on a target node.
@@ -1289,6 +1301,15 @@ class ChipDeviceController():
                 self.devCtrl, py_object(self), csr.NOCSRElements, len(csr.NOCSRElements), nodeId)
         )
 
+    def InitGroupTestingData(self):
+        """Populates the Device Controller's GroupDataProvider with known test group info and keys."""
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_OpCreds_InitGroupTestingData(
+                self.devCtrl)
+        ).raise_on_error()
+
     # ----- Private Members -----
     def _InitLib(self):
         if self._dmLib is None:
@@ -1454,6 +1475,10 @@ class ChipDeviceController():
                 c_void_p, py_object, c_char_p, c_size_t, c_uint64
             ]
             self._dmLib.pychip_DeviceController_IssueNOCChain.restype = PyChipError
+
+            self._dmLib.pychip_OpCreds_InitGroupTestingData.argtypes = [
+                c_void_p]
+            self._dmLib.pychip_OpCreds_InitGroupTestingData.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback.argtypes = [
                 _IssueNOCChainCallbackPythonCallbackFunct]
