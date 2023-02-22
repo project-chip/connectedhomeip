@@ -428,8 +428,10 @@ bool BoltLockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, c
     userInStorage.lastModifiedBy = modifier;
     userInStorage.createdBy      = creator;
 
-    memcpy(mCredentials, credentials, totalCredentials * sizeof(CredentialStruct));
-
+    for (size_t i = 0; i < totalCredentials; ++i)
+    {
+        mCredentials[userIndex][i] = credentials[i];
+    }
     userInStorage.credentials = chip::Span<const CredentialStruct>(mCredentials[userIndex], totalCredentials);
 
     // Save user information in NVM flash
