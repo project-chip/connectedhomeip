@@ -67,45 +67,9 @@
 
 - (instancetype)initWithWorkQueue:(dispatch_queue_t)workQueue connectBlock:(NSXPCConnection * (^)(void) )connectBlock
 {
-    // Classes that are used by MTRDevice responses.  In particular, needs to
-    // include NSError.
-    //
-    // TODO: should this include NSOrderedSet, NSSet, NSDate, NSNull, even
-    // though we don't use them?  Should we have public API for some sort for
-    // this set?
-    __auto_type * allowedClasses = [NSSet setWithArray:@[
-        [NSString class], [NSNumber class], [NSData class], [NSArray class], [NSDictionary class], [NSError class]
-    ]];
     if ([super init]) {
-        _remoteDeviceServerProtocol = [NSXPCInterface interfaceWithProtocol:@protocol(MTRDeviceControllerServerProtocol)];
-        _remoteDeviceClientProtocol = [NSXPCInterface interfaceWithProtocol:@protocol(MTRDeviceControllerClientProtocol)];
-        [_remoteDeviceServerProtocol
-               setClasses:allowedClasses
-              forSelector:@selector(readAttributeWithController:nodeId:endpointId:clusterId:attributeId:params:completion:)
-            argumentIndex:0
-                  ofReply:YES];
-        [_remoteDeviceServerProtocol
-               setClasses:allowedClasses
-              forSelector:@selector
-              (writeAttributeWithController:nodeId:endpointId:clusterId:attributeId:value:timedWriteTimeout:completion:)
-            argumentIndex:0
-                  ofReply:YES];
-        [_remoteDeviceServerProtocol
-               setClasses:allowedClasses
-              forSelector:@selector
-              (invokeCommandWithController:nodeId:endpointId:clusterId:commandId:fields:timedInvokeTimeout:completion:)
-            argumentIndex:0
-                  ofReply:YES];
-
-        [_remoteDeviceServerProtocol
-               setClasses:allowedClasses
-              forSelector:@selector(readAttributeCacheWithController:nodeId:endpointId:clusterId:attributeId:completion:)
-            argumentIndex:0
-                  ofReply:YES];
-        [_remoteDeviceClientProtocol setClasses:allowedClasses
-                                    forSelector:@selector(handleReportWithController:nodeId:values:error:)
-                                  argumentIndex:2
-                                        ofReply:NO];
+        _remoteDeviceServerProtocol = [MTRDeviceController interfaceForServerProtocol];
+        _remoteDeviceClientProtocol = [MTRDeviceController interfaceForClientProtocol];
         _connectBlock = connectBlock;
         _workQueue = workQueue;
         _reportRegistry = [[NSMutableDictionary alloc] init];

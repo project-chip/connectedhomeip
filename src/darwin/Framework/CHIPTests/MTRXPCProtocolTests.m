@@ -324,40 +324,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     _xpcListener = [NSXPCListener anonymousListener];
     [_xpcListener setDelegate:(id<NSXPCListenerDelegate>) self];
-    _serviceInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRDeviceControllerServerProtocol)];
-    _clientInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRDeviceControllerClientProtocol)];
-    // Classes that are used by MTRDevice responses.  In particular, needs to
-    // include NSError.
-    //
-    // TODO: should this include NSOrderedSet, NSSet, NSDate, NSNull, even
-    // though we don't use them?  Should we have public API for some sort for
-    // this set?
-    __auto_type * allowedClasses = [NSSet setWithArray:@[
-        [NSString class], [NSNumber class], [NSData class], [NSArray class], [NSDictionary class], [NSError class]
-    ]];
-    [_serviceInterface setClasses:allowedClasses
-                      forSelector:@selector(readAttributeWithController:nodeId:endpointId:clusterId:attributeId:params:completion:)
-                    argumentIndex:0
-                          ofReply:YES];
-    [_serviceInterface setClasses:allowedClasses
-                      forSelector:@selector
-                      (writeAttributeWithController:nodeId:endpointId:clusterId:attributeId:value:timedWriteTimeout:completion:)
-                    argumentIndex:0
-                          ofReply:YES];
-    [_serviceInterface setClasses:allowedClasses
-                      forSelector:@selector
-                      (invokeCommandWithController:nodeId:endpointId:clusterId:commandId:fields:timedInvokeTimeout:completion:)
-                    argumentIndex:0
-                          ofReply:YES];
-
-    [_serviceInterface setClasses:allowedClasses
-                      forSelector:@selector(readAttributeCacheWithController:nodeId:endpointId:clusterId:attributeId:completion:)
-                    argumentIndex:0
-                          ofReply:YES];
-    [_clientInterface setClasses:allowedClasses
-                     forSelector:@selector(handleReportWithController:nodeId:values:error:)
-                   argumentIndex:2
-                         ofReply:NO];
+    _serviceInterface = [MTRDeviceController interfaceForServerProtocol];
+    _clientInterface = [MTRDeviceController interfaceForClientProtocol];
 
     [_xpcListener resume];
     _controllerUUID = [[NSUUID UUID] UUIDString];

@@ -850,10 +850,7 @@ private:
             // interactionStatus tracks whether the whole read interaction has failed.
             //
             // Make sure interactionStatus survives even if this block scope is destroyed.
-            auto interactionStatus = Platform::MakeShared<CHIP_ERROR>(CHIP_NO_ERROR);
-            if (interactionStatus == nullptr) {
-                return CHIP_ERROR_NO_MEMORY;
-            }
+            auto interactionStatus = std::make_shared<CHIP_ERROR>(CHIP_NO_ERROR);
 
             auto resultArray = [[NSMutableArray alloc] init];
             auto onSuccessCb = [resultArray](const app::ConcreteClusterPath & clusterPath, const uint32_t aValueId,
@@ -1513,10 +1510,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
             // interactionStatus tracks whether the whole read interaction has failed.
             //
             // Make sure interactionStatus survives even if this block scope is destroyed.
-            auto interactionStatus = Platform::MakeShared<CHIP_ERROR>(CHIP_NO_ERROR);
-            if (interactionStatus == nullptr) {
-                return CHIP_ERROR_NO_MEMORY;
-            }
+            auto interactionStatus = std::make_shared<CHIP_ERROR>(CHIP_NO_ERROR);
 
             auto resultArray = [[NSMutableArray alloc] init];
             auto onSuccessCb = [resultArray](const app::ConcreteClusterPath & clusterPath, const uint32_t aValueId,
