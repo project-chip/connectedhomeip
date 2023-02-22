@@ -194,13 +194,19 @@ CHIP_ERROR TLVCircularBuffer::OnInit(TLVWriter & writer, uint8_t *& bufStart, ui
 
 CHIP_ERROR TLVCircularBuffer::GetNewBuffer(TLVWriter & ioWriter, uint8_t *& outBufStart, uint32_t & outBufLen)
 {
-    uint8_t * tail = QueueTail();
-
     if (mQueueLength >= mQueueSize)
     {
         // Queue is out of space, need to evict an element
         ReturnErrorOnFailure(EvictHead());
     }
+
+    GetCurrentWritableBuffer(outBufStart, outBufLen);
+    return CHIP_NO_ERROR;
+}
+
+void TLVCircularBuffer::GetCurrentWritableBuffer(uint8_t *& outBufStart, uint32_t & outBufLen) const
+{
+    uint8_t * tail = QueueTail();
 
     // set the output values, returned buffer must be contiguous
     outBufStart = tail;
@@ -213,8 +219,6 @@ CHIP_ERROR TLVCircularBuffer::GetNewBuffer(TLVWriter & ioWriter, uint8_t *& outB
     {
         outBufLen = static_cast<uint32_t>(mQueueHead - tail);
     }
-
-    return CHIP_NO_ERROR;
 }
 
 /**
