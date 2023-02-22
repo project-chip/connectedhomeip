@@ -219,7 +219,7 @@ CHIP_ERROR AppTask::Init(void)
     // between the main and the CHIP threads.
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
-    err = ConnectivityMgr().SetBLEDeviceName("Telink Window Covering");
+    err = ConnectivityMgr().SetBLEDeviceName("TelinkWindow");
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("SetBLEDeviceName fail");
