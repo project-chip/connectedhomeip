@@ -88,6 +88,11 @@ template("bl_iot_sdk") {
     libs = [ "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_rf/lib/libbl702_rf.a" ]
 
     cflags_c = [ "-Wno-format-truncation" ]
+
+    configs += [
+      ":${sdk_target_name}_config", 
+      ":${sdk_target_name}_config_freertos",
+    ]
   }
 
   config("${sdk_target_name}_config_BSP_Driver") {
