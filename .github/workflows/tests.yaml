@@ -82,6 +82,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |
@@ -321,6 +322,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |
@@ -422,6 +424,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |
@@ -507,6 +510,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |
@@ -581,7 +585,7 @@ jobs:
                      --tool-cluster "pairing" \
                      --tool-args "address-paseonly --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
                      --factoryreset \
-                  '                  
+                  '
             - name: Uploading core files
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
@@ -631,6 +635,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |

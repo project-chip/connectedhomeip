@@ -52,6 +52,11 @@ void post_bootloader_spi_transfer(void);
 void pre_lcd_spi_transfer(void);
 void post_lcd_spi_transfer(void);
 
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+void pre_uart_transfer(void);
+void post_uart_transfer(void);
+#endif /* EFR32MG24 && WF200_WIFI */
+
 #ifdef __cplusplus
 }
 #endif

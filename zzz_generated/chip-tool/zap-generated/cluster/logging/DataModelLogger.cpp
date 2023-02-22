@@ -7413,17 +7413,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("MaxConstTemp", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::PumpStatus::Id: {
-            chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus> value;
+            chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PumpStatus", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::EffectiveOperationMode::Id: {
-            chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value;
+            chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EffectiveOperationMode", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::EffectiveControlMode::Id: {
-            chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
+            chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("EffectiveControlMode", 1, value);
         }
@@ -7453,12 +7453,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("LifetimeEnergyConsumed", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::OperationMode::Id: {
-            chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value;
+            chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("OperationMode", 1, value);
         }
         case PumpConfigurationAndControl::Attributes::ControlMode::Id: {
-            chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value;
+            chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ControlMode", 1, value);
         }

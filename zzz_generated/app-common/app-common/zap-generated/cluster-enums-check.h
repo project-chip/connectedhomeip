@@ -1033,9 +1033,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalCredentials:
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::GroupKeySecurityPolicy val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::GroupKeySecurityPolicyEnum val)
 {
-    using EnumType = GroupKeyManagement::GroupKeySecurityPolicy;
+    using EnumType = GroupKeyManagement::GroupKeySecurityPolicyEnum;
     switch (val)
     {
     case EnumType::kTrustFirst:
@@ -1435,9 +1435,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(WindowCovering::Type va
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(PumpConfigurationAndControl::PumpControlMode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(PumpConfigurationAndControl::ControlModeEnum val)
 {
-    using EnumType = PumpConfigurationAndControl::PumpControlMode;
+    using EnumType = PumpConfigurationAndControl::ControlModeEnum;
     switch (val)
     {
     case EnumType::kConstantSpeed:
@@ -1451,9 +1451,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PumpConfigurationAndCon
         return static_cast<EnumType>(4);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(PumpConfigurationAndControl::PumpOperationMode val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(PumpConfigurationAndControl::OperationModeEnum val)
 {
-    using EnumType = PumpConfigurationAndControl::PumpOperationMode;
+    using EnumType = PumpConfigurationAndControl::OperationModeEnum;
     switch (val)
     {
     case EnumType::kNormal:

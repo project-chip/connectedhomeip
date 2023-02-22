@@ -24,6 +24,7 @@ _DEFINITION = '''<?xml version="1.0"?>
     <command source="client" code="0" name="PairWithCode">
         <arg name="nodeId" type="node_id"/>
         <arg name="payload" type="char_string"/>
+        <arg name="discoverOnce" type="boolean" optional="true"/>
     </command>
 
     <command source="client" code="1" name="Unpair">

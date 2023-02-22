@@ -12539,12 +12539,12 @@ void registerClusterPumpConfigurationAndControl(Commands & commands, CredentialI
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<int16_t>>>(Id, "max-const-temp", INT16_MIN, INT16_MAX,
                                                                              Attributes::MaxConstTemp::Id,
                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatus>>>(
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap>>>(
             Id, "pump-status", 0, UINT16_MAX, Attributes::PumpStatus::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode>>(
+        make_unique<WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum>>(
             Id, "effective-operation-mode", 0, UINT8_MAX, Attributes::EffectiveOperationMode::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode>>(
+        make_unique<WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum>>(
             Id, "effective-control-mode", 0, UINT8_MAX, Attributes::EffectiveControlMode::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<int16_t>>>(
@@ -12559,9 +12559,9 @@ void registerClusterPumpConfigurationAndControl(Commands & commands, CredentialI
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "lifetime-energy-consumed", 0, UINT32_MAX,
                                                                               Attributes::LifetimeEnergyConsumed::Id,
                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode>>(
+        make_unique<WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum>>(
             Id, "operation-mode", 0, UINT8_MAX, Attributes::OperationMode::Id, WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode>>(
+        make_unique<WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum>>(
             Id, "control-mode", 0, UINT8_MAX, Attributes::ControlMode::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,

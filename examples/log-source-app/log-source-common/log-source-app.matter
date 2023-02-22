@@ -432,6 +432,8 @@ endpoint 0 {
   binding cluster DiagnosticLogs;
 
   server cluster AccessControl {
+    emits event AccessControlEntryChanged;
+    emits event AccessControlExtensionChanged;
     callback attribute acl;
     callback attribute extension;
     callback attribute subjectsPerAccessControlEntry default = 4;
