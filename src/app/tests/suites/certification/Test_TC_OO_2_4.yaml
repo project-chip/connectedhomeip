@@ -238,7 +238,7 @@ tests:
       PICS: OO.S.C00.Rsp
       command: "Off"
 
-      # We get an acknowledgment that the command off above is recieved, but it takes
+      # We get an acknowledgment that the command off above is received, but it takes
       # a few milliseconds for the off command to actually turn it off. Without this
       # delay the preceding reboot command might happen before the command is fully
       # processed resulting in flaky test failure that comes from the readAddribute
@@ -246,8 +246,6 @@ tests:
     - label: "Wait for send Off command to take affect"
       cluster: "DelayCommands"
       command: "WaitForMs"
-      # We know the lockout value, but it's in seconds. Previous read from UserCodeTemporaryDisableTime verified that
-      # the lockout time is 10 seconds, so we can just put 10000ms here.
       arguments:
           values:
               - name: "ms"
