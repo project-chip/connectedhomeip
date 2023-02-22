@@ -243,7 +243,7 @@ tests:
       # delay the preceding reboot command might happen before the command is fully
       # processed resulting in flaky test failure that comes from the readAddribute
       # verification after the reboot.
-    - label: "Wait for the lockout to end"
+    - label: "Wait for send Off command to take affect"
       cluster: "DelayCommands"
       command: "WaitForMs"
       # We know the lockout value, but it's in seconds. Previous read from UserCodeTemporaryDisableTime verified that
