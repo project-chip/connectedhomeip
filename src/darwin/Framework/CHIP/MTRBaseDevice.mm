@@ -1001,9 +1001,29 @@ private:
     void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aCommandPath,
         const app::StatusIB & aStatus, TLV::TLVReader * aReader) override;
 
-    void OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override { mOnError(aError); }
+    void OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override
+    {
+        if (mCalledCallback) {
+            return;
+        }
+        mCalledCallback = true;
 
-    void OnDone(app::CommandSender * apCommandSender) override { mOnDone(apCommandSender); }
+        mOnError(aError);
+    }
+
+    void OnDone(app::CommandSender * apCommandSender) override
+    {
+        if (!mCalledCallback) {
+            // This can happen if the server sends a response with an empty
+            // InvokeResponses list.  Since we are not sending wildcard command
+            // paths, that's not a valid response and we should treat it as an
+            // error.  Use the error we would have gotten if we in fact expected
+            // a nonempty list.
+            OnError(apCommandSender, CHIP_END_OF_TLV);
+        }
+
+        mOnDone(apCommandSender);
+    }
 
     OnSuccessCallbackType mOnSuccess;
     OnErrorCallbackType mOnError;
@@ -1011,11 +1031,17 @@ private:
     chip::ClusterId mClusterId;
     // Id of the command we send.
     chip::CommandId mCommandId;
+    bool mCalledCallback = false;
 };
 
 void NSObjectCommandCallback::OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aCommandPath,
     const app::StatusIB & aStatus, TLV::TLVReader * aReader)
 {
+    if (mCalledCallback) {
+        return;
+    }
+    mCalledCallback = true;
+
     MTRDataValueDictionaryDecodableType response;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -1061,11 +1087,11 @@ exit:
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
             MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-            auto resultArray = [[NSMutableArray alloc] init];
-            auto resultSuccess = [[NSMutableArray alloc] init];
-            auto resultFailure = [[NSMutableArray alloc] init];
-            auto onSuccessCb = [resultArray, resultSuccess](const app::ConcreteCommandPath & commandPath,
-                                   const app::StatusIB & status, const MTRDataValueDictionaryDecodableType & responseData) {
+            // NSObjectCommandCallback guarantees that there will be exactly one call to either the success callback or the failure
+            // callback.
+            auto onSuccessCb = [successCb, bridge](const app::ConcreteCommandPath & commandPath, const app::StatusIB & status,
+                                   const MTRDataValueDictionaryDecodableType & responseData) {
+                auto resultArray = [[NSMutableArray alloc] init];
                 if (responseData.GetDecodedObject()) {
                     [resultArray addObject:@ {
                         MTRCommandPathKey : [[MTRCommandPath alloc] initWithPath:commandPath],
@@ -1074,16 +1100,10 @@ exit:
                 } else {
                     [resultArray addObject:@ { MTRCommandPathKey : [[MTRCommandPath alloc] initWithPath:commandPath] }];
                 }
-                if ([resultSuccess count] == 0) {
-                    [resultSuccess addObject:[NSNumber numberWithBool:YES]];
-                }
+                successCb(bridge, resultArray);
             };
 
-            auto onFailureCb = [resultFailure](CHIP_ERROR aError) {
-                if ([resultFailure count] == 0) {
-                    [resultFailure addObject:[MTRError errorForCHIPErrorCode:aError]];
-                }
-            };
+            auto onFailureCb = [failureCb, bridge](CHIP_ERROR aError) { failureCb(bridge, aError); };
 
             app::CommandPathParams commandPath = { static_cast<chip::EndpointId>([endpointID unsignedShortValue]), 0,
                 static_cast<chip::ClusterId>([clusterID unsignedLongValue]),
@@ -1094,23 +1114,7 @@ exit:
             VerifyOrReturnError(decoder != nullptr, CHIP_ERROR_NO_MEMORY);
 
             auto rawDecoderPtr = decoder.get();
-            auto onDoneCb = [rawDecoderPtr, bridge, successCb, failureCb, resultArray, resultSuccess, resultFailure](
-                                app::CommandSender * commandSender) {
-                if ([resultFailure count] > 0 || [resultSuccess count] == 0) {
-                    // Failure
-                    if (failureCb) {
-                        if ([resultFailure count] > 0) {
-                            failureCb(bridge, [MTRError errorToCHIPErrorCode:resultFailure[0]]);
-                        } else {
-                            failureCb(bridge, CHIP_ERROR_WRITE_FAILED);
-                        }
-                    }
-                } else {
-                    // Success
-                    if (successCb) {
-                        successCb(bridge, resultArray);
-                    }
-                }
+            auto onDoneCb = [rawDecoderPtr](app::CommandSender * commandSender) {
                 chip::Platform::Delete(commandSender);
                 chip::Platform::Delete(rawDecoderPtr);
             };
