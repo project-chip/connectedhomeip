@@ -16,9 +16,53 @@
 from ..pseudo_cluster import PseudoCluster
 from .accessory_server_bridge import AccessoryServerBridge
 
+_DEFINITION = '''<?xml version="1.0"?>
+<configurator>
+<cluster>
+    <name>SystemCommands</name>
+    <code>0xFFF1FD03</code>
+
+    <command source="client" code="0" name="Start">
+      <arg name="registerKey" type="char_string" optional="true"/>
+      <arg name="discriminator" type="int16u" optional="true"/>
+      <arg name="port" type="int16u" optional="true"/>
+      <arg name="minCommissioningTimeout" type="int16u" optional="true"/>
+      <arg name="kvs" type="char_string" optional="true"/>
+      <arg name="filepath" type="char_string" optional="true"/>
+      <arg name="otaDownloadPath" type="char_string" optional="true"/>
+    </command>
+
+    <command source="client" code="1" name="Stop">
+      <arg name="registerKey" type="char_string" optional="true"/>
+    </command>
+
+    <command source="client" code="2" name="Reboot">
+      <arg name="registerKey" type="char_string" optional="true"/>
+    </command>
+
+    <command source="client" code="3" name="FactoryReset">
+      <arg name="registerKey" type="char_string" optional="true"/>
+    </command>
+
+    <command source="client" code="4" name="CreateOtaImage">
+      <arg name="otaImageFilePath" type="char_string"/>
+      <arg name="rawImageFilePath" type="char_string"/>
+      <arg name="rawImageContent" type="char_string"/>
+    </command>
+
+    <command source="client" code="5" name="CompareFiles">
+      <arg name="file1" type="char_string"/>
+      <arg name="file2" type="char_string"/>
+    </command>
+
+</cluster>
+</configurator>
+'''
+
 
 class SystemCommands(PseudoCluster):
     name = 'SystemCommands'
+    definition = _DEFINITION
 
     async def Start(self, request):
         AccessoryServerBridge.start(request)

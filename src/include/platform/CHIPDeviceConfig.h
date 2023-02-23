@@ -79,7 +79,7 @@
  * The priority of the chip task.
  */
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY
-#define CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY 1
+#define CHIP_DEVICE_CONFIG_CHIP_TASK_PRIORITY 2
 #endif
 
 /**
@@ -89,6 +89,51 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE
 #define CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE 100
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
+ *
+ * Enable support for background event processing.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING
+#define CHIP_DEVICE_CONFIG_ENABLE_BG_EVENT_PROCESSING 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BG_TASK_NAME
+ *
+ * The name of the background task.
+ */
+#ifndef CHIP_DEVICE_CONFIG_BG_TASK_NAME
+#define CHIP_DEVICE_CONFIG_BG_TASK_NAME "BG"
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BG_TASK_STACK_SIZE
+ *
+ * The size (in bytes) of the background task stack.
+ */
+#ifndef CHIP_DEVICE_CONFIG_BG_TASK_STACK_SIZE
+#define CHIP_DEVICE_CONFIG_BG_TASK_STACK_SIZE (6 * 1024)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY
+ *
+ * The priority of the background task.
+ */
+#ifndef CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY
+#define CHIP_DEVICE_CONFIG_BG_TASK_PRIORITY 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BG_MAX_EVENT_QUEUE_SIZE
+ *
+ * The maximum number of events that can be held in the chip background event queue.
+ */
+#ifndef CHIP_DEVICE_CONFIG_BG_MAX_EVENT_QUEUE_SIZE
+#define CHIP_DEVICE_CONFIG_BG_MAX_EVENT_QUEUE_SIZE 1
 #endif
 
 /**
@@ -648,7 +693,7 @@
  * The priority of the OpenThread task.
  */
 #ifndef CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY
-#define CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY 2
+#define CHIP_DEVICE_CONFIG_THREAD_TASK_PRIORITY 3
 #endif
 
 /**

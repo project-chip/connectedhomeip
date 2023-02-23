@@ -20,13 +20,10 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include <app-common/zap-generated/af-structs.h>
-
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
-#include <app/chip-zcl-zpro-codec.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
@@ -992,7 +989,7 @@ int main(int argc, char * argv[])
 
     // Setup composed device with two temperature sensors and a power source
     ComposedDevice ComposedDevice("Composed Device", "Bedroom");
-    DevicePowerSource ComposedPowerSource("Composed Power Source", "Bedroom", EMBER_AF_POWER_SOURCE_FEATURE_BATTERY);
+    DevicePowerSource ComposedPowerSource("Composed Power Source", "Bedroom", PowerSource::PowerSourceFeature::kBattery);
 
     ComposedDevice.SetReachable(true);
     ComposedTempSensor1.SetReachable(true);

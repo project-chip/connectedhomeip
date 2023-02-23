@@ -3,10 +3,82 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 55;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		037C3CA72991A44B00B7EEE2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 037C3CA62991A44B00B7EEE2 /* Foundation.framework */; };
+		037C3D742991B32700B7EEE2 /* Matter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B202528D2459E34F00F97062 /* Matter.framework */; };
+		037C3DAD2991BD4F00B7EEE2 /* PairingCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D7D2991BD4F00B7EEE2 /* PairingCommandBridge.h */; };
+		037C3DAE2991BD4F00B7EEE2 /* PairingCommandBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 037C3D7E2991BD4F00B7EEE2 /* PairingCommandBridge.mm */; };
+		037C3DAF2991BD4F00B7EEE2 /* DeviceControllerDelegateBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D7F2991BD4F00B7EEE2 /* DeviceControllerDelegateBridge.h */; };
+		037C3DB02991BD4F00B7EEE2 /* Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D802991BD4F00B7EEE2 /* Commands.h */; };
+		037C3DB12991BD5000B7EEE2 /* OpenCommissioningWindowCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D812991BD4F00B7EEE2 /* OpenCommissioningWindowCommand.h */; };
+		037C3DB22991BD5000B7EEE2 /* PreWarmCommissioningCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D822991BD4F00B7EEE2 /* PreWarmCommissioningCommand.h */; };
+		037C3DB32991BD5000B7EEE2 /* OpenCommissioningWindowCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = 037C3D832991BD4F00B7EEE2 /* OpenCommissioningWindowCommand.mm */; };
+		037C3DB42991BD5000B7EEE2 /* DeviceControllerDelegateBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 037C3D842991BD4F00B7EEE2 /* DeviceControllerDelegateBridge.mm */; };
+		037C3DB52991BD5000B7EEE2 /* WriteAttributeCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D862991BD4F00B7EEE2 /* WriteAttributeCommandBridge.h */; };
+		037C3DB62991BD5000B7EEE2 /* ModelCommandBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 037C3D872991BD4F00B7EEE2 /* ModelCommandBridge.mm */; };
+		037C3DB72991BD5000B7EEE2 /* ModelCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D882991BD4F00B7EEE2 /* ModelCommandBridge.h */; };
+		037C3DB82991BD5000B7EEE2 /* ClusterCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D892991BD4F00B7EEE2 /* ClusterCommandBridge.h */; };
+		037C3DB92991BD5000B7EEE2 /* ReportCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D8A2991BD4F00B7EEE2 /* ReportCommandBridge.h */; };
+		037C3DBA2991BD5000B7EEE2 /* TestCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D8C2991BD4F00B7EEE2 /* TestCommandBridge.h */; };
+		037C3DBB2991BD5000B7EEE2 /* Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D8E2991BD4F00B7EEE2 /* Commands.h */; };
+		037C3DBC2991BD5000B7EEE2 /* OTASoftwareUpdateInteractive.mm in Sources */ = {isa = PBXBuildFile; fileRef = 037C3D8F2991BD4F00B7EEE2 /* OTASoftwareUpdateInteractive.mm */; };
+		037C3DBD2991BD5000B7EEE2 /* OTAProviderDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D902991BD4F00B7EEE2 /* OTAProviderDelegate.h */; };
+		037C3DBE2991BD5000B7EEE2 /* OTASoftwareUpdateInteractive.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D912991BD4F00B7EEE2 /* OTASoftwareUpdateInteractive.h */; };
+		037C3DBF2991BD5100B7EEE2 /* OTAProviderDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 037C3D922991BD4F00B7EEE2 /* OTAProviderDelegate.mm */; };
+		037C3DC02991BD5100B7EEE2 /* Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D942991BD4F00B7EEE2 /* Commands.h */; };
+		037C3DC12991BD5100B7EEE2 /* SetupPayloadParseCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = 037C3D952991BD4F00B7EEE2 /* SetupPayloadParseCommand.mm */; };
+		037C3DC22991BD5100B7EEE2 /* SetupPayloadParseCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D962991BD4F00B7EEE2 /* SetupPayloadParseCommand.h */; };
+		037C3DC32991BD5100B7EEE2 /* Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D982991BD4F00B7EEE2 /* Commands.h */; };
+		037C3DC42991BD5100B7EEE2 /* StorageManagementCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = 037C3D992991BD4F00B7EEE2 /* StorageManagementCommand.mm */; };
+		037C3DC52991BD5100B7EEE2 /* StorageManagementCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D9A2991BD4F00B7EEE2 /* StorageManagementCommand.h */; };
+		037C3DC72991BD5100B7EEE2 /* CHIPToolKeypair.mm in Sources */ = {isa = PBXBuildFile; fileRef = 037C3D9D2991BD4F00B7EEE2 /* CHIPToolKeypair.mm */; };
+		037C3DC82991BD5100B7EEE2 /* CHIPToolKeypair.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D9E2991BD4F00B7EEE2 /* CHIPToolKeypair.h */; };
+		037C3DC92991BD5100B7EEE2 /* MTRDevice_Externs.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3D9F2991BD4F00B7EEE2 /* MTRDevice_Externs.h */; };
+		037C3DCA2991BD5100B7EEE2 /* CHIPCommandStorageDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 037C3DA02991BD4F00B7EEE2 /* CHIPCommandStorageDelegate.mm */; };
+		037C3DCB2991BD5100B7EEE2 /* CHIPCommandStorageDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3DA12991BD4F00B7EEE2 /* CHIPCommandStorageDelegate.h */; };
+		037C3DCC2991BD5100B7EEE2 /* MTRError_Utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3DA22991BD4F00B7EEE2 /* MTRError_Utils.h */; };
+		037C3DCD2991BD5100B7EEE2 /* MTRLogging.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3DA32991BD4F00B7EEE2 /* MTRLogging.h */; };
+		037C3DCE2991BD5100B7EEE2 /* CHIPCommandBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3DA42991BD4F00B7EEE2 /* CHIPCommandBridge.h */; };
+		037C3DCF2991BD5200B7EEE2 /* MTRError.mm in Sources */ = {isa = PBXBuildFile; fileRef = 037C3DA52991BD4F00B7EEE2 /* MTRError.mm */; };
+		037C3DD02991BD5200B7EEE2 /* InteractiveCommands.mm in Sources */ = {isa = PBXBuildFile; fileRef = 037C3DA72991BD4F00B7EEE2 /* InteractiveCommands.mm */; };
+		037C3DD12991BD5200B7EEE2 /* Commands.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3DA82991BD4F00B7EEE2 /* Commands.h */; };
+		037C3DD22991BD5200B7EEE2 /* InteractiveCommands.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3DA92991BD4F00B7EEE2 /* InteractiveCommands.h */; };
+		037C3DD32991BD5200B7EEE2 /* logging.h in Headers */ = {isa = PBXBuildFile; fileRef = 037C3DAB2991BD4F00B7EEE2 /* logging.h */; };
+		037C3DD42991BD5200B7EEE2 /* logging.mm in Sources */ = {isa = PBXBuildFile; fileRef = 037C3DAC2991BD4F00B7EEE2 /* logging.mm */; };
+		037C3DD52991C2E200B7EEE2 /* CHIPCommandBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 037C3D9C2991BD4F00B7EEE2 /* CHIPCommandBridge.mm */; };
+		0382FA2A2992F05E00247BBB /* Command.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0382FA292992F05E00247BBB /* Command.cpp */; };
+		0382FA2C2992F06C00247BBB /* Commands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0382FA2B2992F06C00247BBB /* Commands.cpp */; };
+		0382FA302992F40C00247BBB /* ComplexArgumentParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0382FA2F2992F40C00247BBB /* ComplexArgumentParser.cpp */; };
+		0382FA312992FD6E00247BBB /* MTRLogging.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3DECCB712934AFE200585AEC /* MTRLogging.mm */; };
+		0382FA322992FDCE00247BBB /* MTRFramework.mm in Sources */ = {isa = PBXBuildFile; fileRef = 515C1C6D284F9FFB00A48F0C /* MTRFramework.mm */; };
+		039145E12993102B00257B3E /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 039145E02993102B00257B3E /* main.mm */; };
+		039145E3299311FF00257B3E /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 039145E2299311FF00257B3E /* IOKit.framework */; platformFilters = (macos, ); };
+		039145E52993124800257B3E /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 039145E42993124800257B3E /* SystemConfiguration.framework */; platformFilters = (macos, ); };
+		039145E82993179300257B3E /* GetCommissionerNodeIdCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = 039145E62993179300257B3E /* GetCommissionerNodeIdCommand.mm */; };
+		039145E92993179300257B3E /* GetCommissionerNodeIdCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 039145E72993179300257B3E /* GetCommissionerNodeIdCommand.h */; };
+		039145EC29931ABF00257B3E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 039145EA29931A4900257B3E /* Security.framework */; };
+		039145EE29931B2600257B3E /* Network.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 039145ED29931B2600257B3E /* Network.framework */; };
+		039145F029931B2D00257B3E /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 039145EF29931B2D00257B3E /* CoreBluetooth.framework */; };
+		039546962991CEEC006D42A8 /* libCHIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 037C3CCF2991A8B400B7EEE2 /* libCHIP.a */; };
+		0395469E2991DFC5006D42A8 /* json_writer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 039546982991DFC4006D42A8 /* json_writer.cpp */; };
+		0395469F2991DFC5006D42A8 /* json_reader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0395469A2991DFC4006D42A8 /* json_reader.cpp */; };
+		039546A02991DFC5006D42A8 /* json_tool.h in Headers */ = {isa = PBXBuildFile; fileRef = 0395469B2991DFC4006D42A8 /* json_tool.h */; };
+		039546A12991DFC5006D42A8 /* json_value.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0395469C2991DFC4006D42A8 /* json_value.cpp */; };
+		039546A62991E151006D42A8 /* InteractionModel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 039546A52991E132006D42A8 /* InteractionModel.cpp */; };
+		039546BC2991E1CB006D42A8 /* LogCommands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 039546AF2991E193006D42A8 /* LogCommands.cpp */; };
+		039546BD2991E1CB006D42A8 /* SystemCommands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 039546B32991E194006D42A8 /* SystemCommands.cpp */; };
+		039546BE2991E1CB006D42A8 /* DelayCommands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 039546AC2991E185006D42A8 /* DelayCommands.cpp */; };
+		039547012992D461006D42A8 /* generic-callback-stubs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */; };
+		039547022992D952006D42A8 /* privilege-storage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D84374A29498BAE0070D20A /* privilege-storage.cpp */; };
+		039547032992D991006D42A8 /* MTRIMDispatch.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51431AF827D2973E008A7943 /* MTRIMDispatch.mm */; };
+		039547042992D9BF006D42A8 /* ota-provider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 51431AFA27D29CA4008A7943 /* ota-provider.cpp */; };
+		0395470F2992DB37006D42A8 /* complete.c in Sources */ = {isa = PBXBuildFile; fileRef = 0395470C2992DB37006D42A8 /* complete.c */; };
+		03F430A7299410C000166449 /* ExamplePersistentStorage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 03F430A6299410C000166449 /* ExamplePersistentStorage.cpp */; };
+		03F430A82994112B00166449 /* editline.c in Sources */ = {isa = PBXBuildFile; fileRef = 0395470B2992DB37006D42A8 /* editline.c */; };
+		03F430AA2994113500166449 /* sysunix.c in Sources */ = {isa = PBXBuildFile; fileRef = 03F430A92994113500166449 /* sysunix.c */; };
 		1E5801C328941C050033A199 /* MTRTestOTAProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 1E748B3828941A44008A1BE8 /* MTRTestOTAProvider.m */; };
 		1EC3238D271999E2002A8BF0 /* cluster-objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1EC3238C271999E2002A8BF0 /* cluster-objects.cpp */; };
 		1EC4CE5D25CC26E900D7304F /* MTRBaseClusters.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1EC4CE5925CC26E900D7304F /* MTRBaseClusters.mm */; };
@@ -153,6 +225,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		037C3D762991B32700B7EEE2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B20252842459E34F00F97062 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B202528C2459E34F00F97062;
+			remoteInfo = Matter;
+		};
 		B20252982459E34F00F97062 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = B20252842459E34F00F97062 /* Project object */;
@@ -177,6 +256,80 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		037C3CA52991A44B00B7EEE2 /* darwin-framework-tool */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "darwin-framework-tool"; sourceTree = BUILT_PRODUCTS_DIR; };
+		037C3CA62991A44B00B7EEE2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		037C3CCF2991A8B400B7EEE2 /* libCHIP.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCHIP.a; path = lib/libCHIP.a; sourceTree = "<group>"; };
+		037C3D7D2991BD4F00B7EEE2 /* PairingCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PairingCommandBridge.h; sourceTree = "<group>"; };
+		037C3D7E2991BD4F00B7EEE2 /* PairingCommandBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PairingCommandBridge.mm; sourceTree = "<group>"; };
+		037C3D7F2991BD4F00B7EEE2 /* DeviceControllerDelegateBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceControllerDelegateBridge.h; sourceTree = "<group>"; };
+		037C3D802991BD4F00B7EEE2 /* Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
+		037C3D812991BD4F00B7EEE2 /* OpenCommissioningWindowCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenCommissioningWindowCommand.h; sourceTree = "<group>"; };
+		037C3D822991BD4F00B7EEE2 /* PreWarmCommissioningCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreWarmCommissioningCommand.h; sourceTree = "<group>"; };
+		037C3D832991BD4F00B7EEE2 /* OpenCommissioningWindowCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenCommissioningWindowCommand.mm; sourceTree = "<group>"; };
+		037C3D842991BD4F00B7EEE2 /* DeviceControllerDelegateBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DeviceControllerDelegateBridge.mm; sourceTree = "<group>"; };
+		037C3D862991BD4F00B7EEE2 /* WriteAttributeCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WriteAttributeCommandBridge.h; sourceTree = "<group>"; };
+		037C3D872991BD4F00B7EEE2 /* ModelCommandBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ModelCommandBridge.mm; sourceTree = "<group>"; };
+		037C3D882991BD4F00B7EEE2 /* ModelCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModelCommandBridge.h; sourceTree = "<group>"; };
+		037C3D892991BD4F00B7EEE2 /* ClusterCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClusterCommandBridge.h; sourceTree = "<group>"; };
+		037C3D8A2991BD4F00B7EEE2 /* ReportCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReportCommandBridge.h; sourceTree = "<group>"; };
+		037C3D8C2991BD4F00B7EEE2 /* TestCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestCommandBridge.h; sourceTree = "<group>"; };
+		037C3D8E2991BD4F00B7EEE2 /* Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
+		037C3D8F2991BD4F00B7EEE2 /* OTASoftwareUpdateInteractive.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OTASoftwareUpdateInteractive.mm; sourceTree = "<group>"; };
+		037C3D902991BD4F00B7EEE2 /* OTAProviderDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OTAProviderDelegate.h; sourceTree = "<group>"; };
+		037C3D912991BD4F00B7EEE2 /* OTASoftwareUpdateInteractive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OTASoftwareUpdateInteractive.h; sourceTree = "<group>"; };
+		037C3D922991BD4F00B7EEE2 /* OTAProviderDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OTAProviderDelegate.mm; sourceTree = "<group>"; };
+		037C3D942991BD4F00B7EEE2 /* Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
+		037C3D952991BD4F00B7EEE2 /* SetupPayloadParseCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SetupPayloadParseCommand.mm; sourceTree = "<group>"; };
+		037C3D962991BD4F00B7EEE2 /* SetupPayloadParseCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SetupPayloadParseCommand.h; sourceTree = "<group>"; };
+		037C3D982991BD4F00B7EEE2 /* Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
+		037C3D992991BD4F00B7EEE2 /* StorageManagementCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = StorageManagementCommand.mm; sourceTree = "<group>"; };
+		037C3D9A2991BD4F00B7EEE2 /* StorageManagementCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StorageManagementCommand.h; sourceTree = "<group>"; };
+		037C3D9C2991BD4F00B7EEE2 /* CHIPCommandBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPCommandBridge.mm; sourceTree = "<group>"; };
+		037C3D9D2991BD4F00B7EEE2 /* CHIPToolKeypair.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPToolKeypair.mm; sourceTree = "<group>"; };
+		037C3D9E2991BD4F00B7EEE2 /* CHIPToolKeypair.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPToolKeypair.h; sourceTree = "<group>"; };
+		037C3D9F2991BD4F00B7EEE2 /* MTRDevice_Externs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDevice_Externs.h; sourceTree = "<group>"; };
+		037C3DA02991BD4F00B7EEE2 /* CHIPCommandStorageDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPCommandStorageDelegate.mm; sourceTree = "<group>"; };
+		037C3DA12991BD4F00B7EEE2 /* CHIPCommandStorageDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPCommandStorageDelegate.h; sourceTree = "<group>"; };
+		037C3DA22991BD4F00B7EEE2 /* MTRError_Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRError_Utils.h; sourceTree = "<group>"; };
+		037C3DA32991BD4F00B7EEE2 /* MTRLogging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRLogging.h; sourceTree = "<group>"; };
+		037C3DA42991BD4F00B7EEE2 /* CHIPCommandBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPCommandBridge.h; sourceTree = "<group>"; };
+		037C3DA52991BD4F00B7EEE2 /* MTRError.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRError.mm; sourceTree = "<group>"; };
+		037C3DA72991BD4F00B7EEE2 /* InteractiveCommands.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = InteractiveCommands.mm; sourceTree = "<group>"; };
+		037C3DA82991BD4F00B7EEE2 /* Commands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
+		037C3DA92991BD4F00B7EEE2 /* InteractiveCommands.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InteractiveCommands.h; sourceTree = "<group>"; };
+		037C3DAB2991BD4F00B7EEE2 /* logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = logging.h; sourceTree = "<group>"; };
+		037C3DAC2991BD4F00B7EEE2 /* logging.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = logging.mm; sourceTree = "<group>"; };
+		0382FA292992F05E00247BBB /* Command.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Command.cpp; path = commands/common/Command.cpp; sourceTree = "<group>"; };
+		0382FA2B2992F06C00247BBB /* Commands.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Commands.cpp; path = commands/common/Commands.cpp; sourceTree = "<group>"; };
+		0382FA2F2992F40C00247BBB /* ComplexArgumentParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ComplexArgumentParser.cpp; path = "../../zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp"; sourceTree = "<group>"; };
+		039145E02993102B00257B3E /* main.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		039145E2299311FF00257B3E /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator16.3.sdk/System/Library/Frameworks/IOKit.framework; sourceTree = DEVELOPER_DIR; };
+		039145E42993124800257B3E /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS16.3.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
+		039145E62993179300257B3E /* GetCommissionerNodeIdCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GetCommissionerNodeIdCommand.mm; sourceTree = "<group>"; };
+		039145E72993179300257B3E /* GetCommissionerNodeIdCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetCommissionerNodeIdCommand.h; sourceTree = "<group>"; };
+		039145EA29931A4900257B3E /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS16.3.sdk/System/Library/Frameworks/Security.framework; sourceTree = DEVELOPER_DIR; };
+		039145ED29931B2600257B3E /* Network.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Network.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS16.3.sdk/System/Library/PrivateFrameworks/Network.framework; sourceTree = DEVELOPER_DIR; };
+		039145EF29931B2D00257B3E /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS16.3.sdk/System/Library/Frameworks/CoreBluetooth.framework; sourceTree = DEVELOPER_DIR; };
+		039546982991DFC4006D42A8 /* json_writer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json_writer.cpp; sourceTree = "<group>"; };
+		039546992991DFC4006D42A8 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		0395469A2991DFC4006D42A8 /* json_reader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json_reader.cpp; sourceTree = "<group>"; };
+		0395469B2991DFC4006D42A8 /* json_tool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_tool.h; sourceTree = "<group>"; };
+		0395469C2991DFC4006D42A8 /* json_value.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = json_value.cpp; sourceTree = "<group>"; };
+		0395469D2991DFC4006D42A8 /* json_valueiterator.inl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = json_valueiterator.inl; sourceTree = "<group>"; };
+		039546A52991E132006D42A8 /* InteractionModel.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = InteractionModel.cpp; sourceTree = "<group>"; };
+		039546AC2991E185006D42A8 /* DelayCommands.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DelayCommands.cpp; sourceTree = "<group>"; };
+		039546AF2991E193006D42A8 /* LogCommands.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LogCommands.cpp; sourceTree = "<group>"; };
+		039546B32991E194006D42A8 /* SystemCommands.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SystemCommands.cpp; sourceTree = "<group>"; };
+		039546B62991E194006D42A8 /* FactoryReset.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = FactoryReset.py; sourceTree = "<group>"; };
+		039546B72991E194006D42A8 /* Stop.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Stop.py; sourceTree = "<group>"; };
+		039546B82991E194006D42A8 /* Start.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Start.py; sourceTree = "<group>"; };
+		039546B92991E194006D42A8 /* CreateOtaImage.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CreateOtaImage.py; sourceTree = "<group>"; };
+		039546BA2991E194006D42A8 /* CompareFiles.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = CompareFiles.py; sourceTree = "<group>"; };
+		039546BB2991E194006D42A8 /* Reboot.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Reboot.py; sourceTree = "<group>"; };
+		0395470B2992DB37006D42A8 /* editline.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = editline.c; path = repo/src/editline.c; sourceTree = "<group>"; };
+		0395470C2992DB37006D42A8 /* complete.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = complete.c; path = repo/src/complete.c; sourceTree = "<group>"; };
+		03F430A6299410C000166449 /* ExamplePersistentStorage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExamplePersistentStorage.cpp; sourceTree = "<group>"; };
+		03F430A92994113500166449 /* sysunix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = sysunix.c; path = repo/src/sysunix.c; sourceTree = "<group>"; };
 		1E748B3828941A44008A1BE8 /* MTRTestOTAProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRTestOTAProvider.m; sourceTree = "<group>"; };
 		1E748B3928941A45008A1BE8 /* MTRTestOTAProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestOTAProvider.h; sourceTree = "<group>"; };
 		1EC3238C271999E2002A8BF0 /* cluster-objects.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "cluster-objects.cpp"; path = "../../../../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp"; sourceTree = "<group>"; };
@@ -354,6 +507,21 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		037C3CA22991A44B00B7EEE2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				039145F029931B2D00257B3E /* CoreBluetooth.framework in Frameworks */,
+				039145EE29931B2600257B3E /* Network.framework in Frameworks */,
+				039145EC29931ABF00257B3E /* Security.framework in Frameworks */,
+				039145E52993124800257B3E /* SystemConfiguration.framework in Frameworks */,
+				039145E3299311FF00257B3E /* IOKit.framework in Frameworks */,
+				039546962991CEEC006D42A8 /* libCHIP.a in Frameworks */,
+				037C3D742991B32700B7EEE2 /* Matter.framework in Frameworks */,
+				037C3CA72991A44B00B7EEE2 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B202528A2459E34F00F97062 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -374,6 +542,240 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		037C3CA82991A44B00B7EEE2 /* darwin-framework-tool */ = {
+			isa = PBXGroup;
+			children = (
+				039145E02993102B00257B3E /* main.mm */,
+				03F430A52994100000166449 /* controller */,
+				039547092992DB02006D42A8 /* editline */,
+				039546AD2991E193006D42A8 /* log */,
+				039546B12991E194006D42A8 /* system */,
+				039546A72991E185006D42A8 /* delay */,
+				039546A22991E132006D42A8 /* interaction_model */,
+				039546972991DFC4006D42A8 /* lib_json */,
+				039546872991C400006D42A8 /* chip-tool */,
+				037C3D7B2991BD4F00B7EEE2 /* commands */,
+				037C3DAA2991BD4F00B7EEE2 /* logging */,
+			);
+			name = "darwin-framework-tool";
+			path = "../../../examples/darwin-framework-tool";
+			sourceTree = SOURCE_ROOT;
+		};
+		037C3D7B2991BD4F00B7EEE2 /* commands */ = {
+			isa = PBXGroup;
+			children = (
+				037C3D7C2991BD4F00B7EEE2 /* pairing */,
+				037C3D852991BD4F00B7EEE2 /* clusters */,
+				037C3D8B2991BD4F00B7EEE2 /* tests */,
+				037C3D8D2991BD4F00B7EEE2 /* provider */,
+				037C3D932991BD4F00B7EEE2 /* payload */,
+				037C3D972991BD4F00B7EEE2 /* storage */,
+				037C3D9B2991BD4F00B7EEE2 /* common */,
+				037C3DA62991BD4F00B7EEE2 /* interactive */,
+			);
+			path = commands;
+			sourceTree = "<group>";
+		};
+		037C3D7C2991BD4F00B7EEE2 /* pairing */ = {
+			isa = PBXGroup;
+			children = (
+				037C3D7D2991BD4F00B7EEE2 /* PairingCommandBridge.h */,
+				037C3D7E2991BD4F00B7EEE2 /* PairingCommandBridge.mm */,
+				039145E72993179300257B3E /* GetCommissionerNodeIdCommand.h */,
+				039145E62993179300257B3E /* GetCommissionerNodeIdCommand.mm */,
+				037C3D7F2991BD4F00B7EEE2 /* DeviceControllerDelegateBridge.h */,
+				037C3D802991BD4F00B7EEE2 /* Commands.h */,
+				037C3D812991BD4F00B7EEE2 /* OpenCommissioningWindowCommand.h */,
+				037C3D822991BD4F00B7EEE2 /* PreWarmCommissioningCommand.h */,
+				037C3D832991BD4F00B7EEE2 /* OpenCommissioningWindowCommand.mm */,
+				037C3D842991BD4F00B7EEE2 /* DeviceControllerDelegateBridge.mm */,
+			);
+			path = pairing;
+			sourceTree = "<group>";
+		};
+		037C3D852991BD4F00B7EEE2 /* clusters */ = {
+			isa = PBXGroup;
+			children = (
+				037C3D862991BD4F00B7EEE2 /* WriteAttributeCommandBridge.h */,
+				037C3D872991BD4F00B7EEE2 /* ModelCommandBridge.mm */,
+				037C3D882991BD4F00B7EEE2 /* ModelCommandBridge.h */,
+				037C3D892991BD4F00B7EEE2 /* ClusterCommandBridge.h */,
+				037C3D8A2991BD4F00B7EEE2 /* ReportCommandBridge.h */,
+			);
+			path = clusters;
+			sourceTree = "<group>";
+		};
+		037C3D8B2991BD4F00B7EEE2 /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				037C3D8C2991BD4F00B7EEE2 /* TestCommandBridge.h */,
+			);
+			path = tests;
+			sourceTree = "<group>";
+		};
+		037C3D8D2991BD4F00B7EEE2 /* provider */ = {
+			isa = PBXGroup;
+			children = (
+				037C3D8E2991BD4F00B7EEE2 /* Commands.h */,
+				037C3D8F2991BD4F00B7EEE2 /* OTASoftwareUpdateInteractive.mm */,
+				037C3D902991BD4F00B7EEE2 /* OTAProviderDelegate.h */,
+				037C3D912991BD4F00B7EEE2 /* OTASoftwareUpdateInteractive.h */,
+				037C3D922991BD4F00B7EEE2 /* OTAProviderDelegate.mm */,
+			);
+			path = provider;
+			sourceTree = "<group>";
+		};
+		037C3D932991BD4F00B7EEE2 /* payload */ = {
+			isa = PBXGroup;
+			children = (
+				037C3D942991BD4F00B7EEE2 /* Commands.h */,
+				037C3D952991BD4F00B7EEE2 /* SetupPayloadParseCommand.mm */,
+				037C3D962991BD4F00B7EEE2 /* SetupPayloadParseCommand.h */,
+			);
+			path = payload;
+			sourceTree = "<group>";
+		};
+		037C3D972991BD4F00B7EEE2 /* storage */ = {
+			isa = PBXGroup;
+			children = (
+				037C3D982991BD4F00B7EEE2 /* Commands.h */,
+				037C3D992991BD4F00B7EEE2 /* StorageManagementCommand.mm */,
+				037C3D9A2991BD4F00B7EEE2 /* StorageManagementCommand.h */,
+			);
+			path = storage;
+			sourceTree = "<group>";
+		};
+		037C3D9B2991BD4F00B7EEE2 /* common */ = {
+			isa = PBXGroup;
+			children = (
+				037C3D9C2991BD4F00B7EEE2 /* CHIPCommandBridge.mm */,
+				037C3D9D2991BD4F00B7EEE2 /* CHIPToolKeypair.mm */,
+				037C3D9E2991BD4F00B7EEE2 /* CHIPToolKeypair.h */,
+				037C3D9F2991BD4F00B7EEE2 /* MTRDevice_Externs.h */,
+				037C3DA02991BD4F00B7EEE2 /* CHIPCommandStorageDelegate.mm */,
+				037C3DA12991BD4F00B7EEE2 /* CHIPCommandStorageDelegate.h */,
+				037C3DA22991BD4F00B7EEE2 /* MTRError_Utils.h */,
+				037C3DA32991BD4F00B7EEE2 /* MTRLogging.h */,
+				037C3DA42991BD4F00B7EEE2 /* CHIPCommandBridge.h */,
+				037C3DA52991BD4F00B7EEE2 /* MTRError.mm */,
+			);
+			path = common;
+			sourceTree = "<group>";
+		};
+		037C3DA62991BD4F00B7EEE2 /* interactive */ = {
+			isa = PBXGroup;
+			children = (
+				037C3DA72991BD4F00B7EEE2 /* InteractiveCommands.mm */,
+				037C3DA82991BD4F00B7EEE2 /* Commands.h */,
+				037C3DA92991BD4F00B7EEE2 /* InteractiveCommands.h */,
+			);
+			path = interactive;
+			sourceTree = "<group>";
+		};
+		037C3DAA2991BD4F00B7EEE2 /* logging */ = {
+			isa = PBXGroup;
+			children = (
+				037C3DAB2991BD4F00B7EEE2 /* logging.h */,
+				037C3DAC2991BD4F00B7EEE2 /* logging.mm */,
+			);
+			path = logging;
+			sourceTree = "<group>";
+		};
+		039546872991C400006D42A8 /* chip-tool */ = {
+			isa = PBXGroup;
+			children = (
+				0382FA2F2992F40C00247BBB /* ComplexArgumentParser.cpp */,
+				0382FA2B2992F06C00247BBB /* Commands.cpp */,
+				0382FA292992F05E00247BBB /* Command.cpp */,
+			);
+			name = "chip-tool";
+			path = "../chip-tool";
+			sourceTree = "<group>";
+		};
+		039546972991DFC4006D42A8 /* lib_json */ = {
+			isa = PBXGroup;
+			children = (
+				039546982991DFC4006D42A8 /* json_writer.cpp */,
+				039546992991DFC4006D42A8 /* CMakeLists.txt */,
+				0395469A2991DFC4006D42A8 /* json_reader.cpp */,
+				0395469B2991DFC4006D42A8 /* json_tool.h */,
+				0395469C2991DFC4006D42A8 /* json_value.cpp */,
+				0395469D2991DFC4006D42A8 /* json_valueiterator.inl */,
+			);
+			name = lib_json;
+			path = ../../third_party/jsoncpp/repo/src/lib_json;
+			sourceTree = "<group>";
+		};
+		039546A22991E132006D42A8 /* interaction_model */ = {
+			isa = PBXGroup;
+			children = (
+				039546A52991E132006D42A8 /* InteractionModel.cpp */,
+			);
+			name = interaction_model;
+			path = ../../src/app/tests/suites/commands/interaction_model;
+			sourceTree = "<group>";
+		};
+		039546A72991E185006D42A8 /* delay */ = {
+			isa = PBXGroup;
+			children = (
+				039546AC2991E185006D42A8 /* DelayCommands.cpp */,
+			);
+			name = delay;
+			path = ../../src/app/tests/suites/commands/delay;
+			sourceTree = "<group>";
+		};
+		039546AD2991E193006D42A8 /* log */ = {
+			isa = PBXGroup;
+			children = (
+				039546AF2991E193006D42A8 /* LogCommands.cpp */,
+			);
+			name = log;
+			path = ../../src/app/tests/suites/commands/log;
+			sourceTree = "<group>";
+		};
+		039546B12991E194006D42A8 /* system */ = {
+			isa = PBXGroup;
+			children = (
+				039546B32991E194006D42A8 /* SystemCommands.cpp */,
+				039546B52991E194006D42A8 /* scripts */,
+			);
+			name = system;
+			path = ../../src/app/tests/suites/commands/system;
+			sourceTree = "<group>";
+		};
+		039546B52991E194006D42A8 /* scripts */ = {
+			isa = PBXGroup;
+			children = (
+				039546B62991E194006D42A8 /* FactoryReset.py */,
+				039546B72991E194006D42A8 /* Stop.py */,
+				039546B82991E194006D42A8 /* Start.py */,
+				039546B92991E194006D42A8 /* CreateOtaImage.py */,
+				039546BA2991E194006D42A8 /* CompareFiles.py */,
+				039546BB2991E194006D42A8 /* Reboot.py */,
+			);
+			path = scripts;
+			sourceTree = "<group>";
+		};
+		039547092992DB02006D42A8 /* editline */ = {
+			isa = PBXGroup;
+			children = (
+				0395470C2992DB37006D42A8 /* complete.c */,
+				03F430A92994113500166449 /* sysunix.c */,
+				0395470B2992DB37006D42A8 /* editline.c */,
+			);
+			name = editline;
+			path = ../../third_party/editline;
+			sourceTree = "<group>";
+		};
+		03F430A52994100000166449 /* controller */ = {
+			isa = PBXGroup;
+			children = (
+				03F430A6299410C000166449 /* ExamplePersistentStorage.cpp */,
+			);
+			name = controller;
+			path = ../../src/controller;
+			sourceTree = "<group>";
+		};
 		1E857311265519DE0050A4D9 /* app */ = {
 			isa = PBXGroup;
 			children = (
@@ -468,6 +870,7 @@
 				BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */,
 				B202528F2459E34F00F97062 /* CHIP */,
 				B202529A2459E34F00F97062 /* CHIPTests */,
+				037C3CA82991A44B00B7EEE2 /* darwin-framework-tool */,
 				B202528E2459E34F00F97062 /* Products */,
 				BA09EB3E2474762900605257 /* Frameworks */,
 			);
@@ -478,6 +881,7 @@
 			children = (
 				B202528D2459E34F00F97062 /* Matter.framework */,
 				B20252962459E34F00F97062 /* MatterTests.xctest */,
+				037C3CA52991A44B00B7EEE2 /* darwin-framework-tool */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -629,8 +1033,15 @@
 		BA09EB3E2474762900605257 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				039145EF29931B2D00257B3E /* CoreBluetooth.framework */,
+				039145ED29931B2600257B3E /* Network.framework */,
+				039145EA29931A4900257B3E /* Security.framework */,
+				039145E42993124800257B3E /* SystemConfiguration.framework */,
+				039145E2299311FF00257B3E /* IOKit.framework */,
+				037C3CCF2991A8B400B7EEE2 /* libCHIP.a */,
 				3DECCB6D29347D2C00585AEC /* Security.framework */,
 				BA09EB3F2474762900605257 /* libCHIP.a */,
+				037C3CA62991A44B00B7EEE2 /* Foundation.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -638,6 +1049,41 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		037C3CCD2991A76300B7EEE2 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				039546A02991DFC5006D42A8 /* json_tool.h in Headers */,
+				037C3DB12991BD5000B7EEE2 /* OpenCommissioningWindowCommand.h in Headers */,
+				039145E92993179300257B3E /* GetCommissionerNodeIdCommand.h in Headers */,
+				037C3DCE2991BD5100B7EEE2 /* CHIPCommandBridge.h in Headers */,
+				037C3DD22991BD5200B7EEE2 /* InteractiveCommands.h in Headers */,
+				037C3DAF2991BD4F00B7EEE2 /* DeviceControllerDelegateBridge.h in Headers */,
+				037C3DC32991BD5100B7EEE2 /* Commands.h in Headers */,
+				037C3DB82991BD5000B7EEE2 /* ClusterCommandBridge.h in Headers */,
+				037C3DC82991BD5100B7EEE2 /* CHIPToolKeypair.h in Headers */,
+				037C3DB52991BD5000B7EEE2 /* WriteAttributeCommandBridge.h in Headers */,
+				037C3DCD2991BD5100B7EEE2 /* MTRLogging.h in Headers */,
+				037C3DC92991BD5100B7EEE2 /* MTRDevice_Externs.h in Headers */,
+				037C3DC22991BD5100B7EEE2 /* SetupPayloadParseCommand.h in Headers */,
+				037C3DD12991BD5200B7EEE2 /* Commands.h in Headers */,
+				037C3DB92991BD5000B7EEE2 /* ReportCommandBridge.h in Headers */,
+				037C3DBE2991BD5000B7EEE2 /* OTASoftwareUpdateInteractive.h in Headers */,
+				037C3DBD2991BD5000B7EEE2 /* OTAProviderDelegate.h in Headers */,
+				037C3DB02991BD4F00B7EEE2 /* Commands.h in Headers */,
+				037C3DC02991BD5100B7EEE2 /* Commands.h in Headers */,
+				037C3DCB2991BD5100B7EEE2 /* CHIPCommandStorageDelegate.h in Headers */,
+				037C3DD32991BD5200B7EEE2 /* logging.h in Headers */,
+				037C3DB72991BD5000B7EEE2 /* ModelCommandBridge.h in Headers */,
+				037C3DC52991BD5100B7EEE2 /* StorageManagementCommand.h in Headers */,
+				037C3DCC2991BD5100B7EEE2 /* MTRError_Utils.h in Headers */,
+				037C3DBA2991BD5000B7EEE2 /* TestCommandBridge.h in Headers */,
+				037C3DAD2991BD4F00B7EEE2 /* PairingCommandBridge.h in Headers */,
+				037C3DBB2991BD5000B7EEE2 /* Commands.h in Headers */,
+				037C3DB22991BD5000B7EEE2 /* PreWarmCommissioningCommand.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B20252882459E34F00F97062 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -721,6 +1167,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		037C3CA42991A44B00B7EEE2 /* darwin-framework-tool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 037C3CAF2991A44B00B7EEE2 /* Build configuration list for PBXNativeTarget "darwin-framework-tool" */;
+			buildPhases = (
+				037C3CCD2991A76300B7EEE2 /* Headers */,
+				037C3CA12991A44B00B7EEE2 /* Sources */,
+				037C3CA22991A44B00B7EEE2 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				037C3D772991B32700B7EEE2 /* PBXTargetDependency */,
+			);
+			name = "darwin-framework-tool";
+			productName = "darwin-framework-tool";
+			productReference = 037C3CA52991A44B00B7EEE2 /* darwin-framework-tool */;
+			productType = "com.apple.product-type.tool";
+		};
 		B202528C2459E34F00F97062 /* Matter */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B20252A12459E34F00F97062 /* Build configuration list for PBXNativeTarget "Matter" */;
@@ -769,6 +1233,9 @@
 				LastUpgradeCheck = 1140;
 				ORGANIZATIONNAME = CHIP;
 				TargetAttributes = {
+					037C3CA42991A44B00B7EEE2 = {
+						CreatedOnToolsVersion = 14.1;
+					};
 					B202528C2459E34F00F97062 = {
 						CreatedOnToolsVersion = 11.4.1;
 					};
@@ -792,6 +1259,7 @@
 			targets = (
 				B202528C2459E34F00F97062 /* Matter */,
 				B20252952459E34F00F97062 /* MatterTests */,
+				037C3CA42991A44B00B7EEE2 /* darwin-framework-tool */,
 			);
 		};
 /* End PBXProject section */
@@ -836,6 +1304,49 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		037C3CA12991A44B00B7EEE2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				039546A62991E151006D42A8 /* InteractionModel.cpp in Sources */,
+				03F430AA2994113500166449 /* sysunix.c in Sources */,
+				039145E82993179300257B3E /* GetCommissionerNodeIdCommand.mm in Sources */,
+				0395469F2991DFC5006D42A8 /* json_reader.cpp in Sources */,
+				0395469E2991DFC5006D42A8 /* json_writer.cpp in Sources */,
+				037C3DD52991C2E200B7EEE2 /* CHIPCommandBridge.mm in Sources */,
+				039546BC2991E1CB006D42A8 /* LogCommands.cpp in Sources */,
+				039547042992D9BF006D42A8 /* ota-provider.cpp in Sources */,
+				039547022992D952006D42A8 /* privilege-storage.cpp in Sources */,
+				0382FA2C2992F06C00247BBB /* Commands.cpp in Sources */,
+				03F430A7299410C000166449 /* ExamplePersistentStorage.cpp in Sources */,
+				039547032992D991006D42A8 /* MTRIMDispatch.mm in Sources */,
+				039546BD2991E1CB006D42A8 /* SystemCommands.cpp in Sources */,
+				0395470F2992DB37006D42A8 /* complete.c in Sources */,
+				039546BE2991E1CB006D42A8 /* DelayCommands.cpp in Sources */,
+				037C3DC12991BD5100B7EEE2 /* SetupPayloadParseCommand.mm in Sources */,
+				037C3DBF2991BD5100B7EEE2 /* OTAProviderDelegate.mm in Sources */,
+				037C3DD02991BD5200B7EEE2 /* InteractiveCommands.mm in Sources */,
+				037C3DC42991BD5100B7EEE2 /* StorageManagementCommand.mm in Sources */,
+				037C3DBC2991BD5000B7EEE2 /* OTASoftwareUpdateInteractive.mm in Sources */,
+				0382FA2A2992F05E00247BBB /* Command.cpp in Sources */,
+				039546A12991DFC5006D42A8 /* json_value.cpp in Sources */,
+				0382FA322992FDCE00247BBB /* MTRFramework.mm in Sources */,
+				0382FA302992F40C00247BBB /* ComplexArgumentParser.cpp in Sources */,
+				039145E12993102B00257B3E /* main.mm in Sources */,
+				037C3DD42991BD5200B7EEE2 /* logging.mm in Sources */,
+				03F430A82994112B00166449 /* editline.c in Sources */,
+				037C3DB32991BD5000B7EEE2 /* OpenCommissioningWindowCommand.mm in Sources */,
+				037C3DAE2991BD4F00B7EEE2 /* PairingCommandBridge.mm in Sources */,
+				037C3DCA2991BD5100B7EEE2 /* CHIPCommandStorageDelegate.mm in Sources */,
+				037C3DCF2991BD5200B7EEE2 /* MTRError.mm in Sources */,
+				037C3DC72991BD5100B7EEE2 /* CHIPToolKeypair.mm in Sources */,
+				037C3DB62991BD5000B7EEE2 /* ModelCommandBridge.mm in Sources */,
+				037C3DB42991BD5000B7EEE2 /* DeviceControllerDelegateBridge.mm in Sources */,
+				039547012992D461006D42A8 /* generic-callback-stubs.cpp in Sources */,
+				0382FA312992FD6E00247BBB /* MTRLogging.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B20252892459E34F00F97062 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -919,6 +1430,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		037C3D772991B32700B7EEE2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B202528C2459E34F00F97062 /* Matter */;
+			targetProxy = 037C3D762991B32700B7EEE2 /* PBXContainerItemProxy */;
+		};
 		B20252992459E34F00F97062 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = B202528C2459E34F00F97062 /* Matter */;
@@ -927,6 +1443,103 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		037C3CAD2991A44B00B7EEE2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CHIP_BUILD_TOOLS = true;
+				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					CHIP_HAVE_CONFIG_H,
+					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
+					CONFIG_BUILD_FOR_HOST_UNIT_TEST,
+					CONFIG_USE_LOCAL_STORAGE,
+				);
+				"HEADER_SEARCH_PATHS[arch=*]" = (
+					"$(CHIP_ROOT)/examples/darwin-framework-tool",
+					"$(CHIP_ROOT)/src",
+					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
+					"$(CHIP_ROOT)/zzz_generated/app-common",
+					"$(CHIP_ROOT)/third_party/nlio/repo/include",
+					"$(CHIP_ROOT)/third_party/jsoncpp/repo/include",
+					"$(CHIP_ROOT)/zzz_generated/darwin-framework-tool",
+					"$(CHIP_ROOT)/config/ios",
+					"$(CHIP_ROOT)/third_party/editline/repo/include",
+					"$(CHIP_ROOT)/src/include",
+					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/gen/include",
+					"$(CHIP_ROOT)/zzz_generated/darwin/controller-clusters",
+					"$(CHIP_ROOT)/third_party/inipp/repo/inipp",
+					"$(CHIP_ROOT)/third_party/editline/include",
+					"$(CHIP_ROOT)/examples/chip-tool",
+					"$(CHIP_ROOT)/examples/chip-tool/commands/clusters",
+					"$(CHIP_ROOT)/zzz_generated/chip-tool",
+				);
+				"LIBRARY_SEARCH_PATHS[arch=*]" = (
+					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/lib",
+					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/obj/src/app/lib",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				STRIP_INSTALLED_PRODUCT = NO;
+				USER_HEADER_SEARCH_PATHS = "";
+			};
+			name = Debug;
+		};
+		037C3CAE2991A44B00B7EEE2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CHIP_BUILD_TOOLS = true;
+				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					CHIP_HAVE_CONFIG_H,
+					"CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>",
+					CONFIG_BUILD_FOR_HOST_UNIT_TEST,
+					CONFIG_USE_LOCAL_STORAGE,
+				);
+				"HEADER_SEARCH_PATHS[arch=*]" = (
+					"$(CHIP_ROOT)/examples//darwin-framework-tool",
+					"$(CHIP_ROOT)/src",
+					"$(CHIP_ROOT)/third_party/nlassert/repo/include",
+					"$(CHIP_ROOT)/zzz_generated/darwin-framework-tool",
+					"$(CHIP_ROOT)/zzz_generated/app-common",
+					"$(CHIP_ROOT)/third_party/nlio/repo/include",
+					"$(CHIP_ROOT)/third_party/jsoncpp/repo/include",
+					"$(CHIP_ROOT)/config/ios",
+					"$(CHIP_ROOT)/third_party/editline/repo/include",
+					"$(CHIP_ROOT)/src/include",
+					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/gen/include",
+					"$(CHIP_ROOT)/zzz_generated/darwin/controller-clusters",
+					"$(SRCROOT)/darwin-framework-tool",
+					"$(CHIP_ROOT)/third_party/inipp/repo/inipp",
+					"$(CHIP_ROOT)/third_party/editline/include",
+					"$(CHIP_ROOT)/examples/chip-tool/commands/clusters",
+					"$(CHIP_ROOT)/examples/chip-tool",
+					"$(CHIP_ROOT)/zzz_generated/chip-tool",
+				);
+				"LIBRARY_SEARCH_PATHS[arch=*]" = (
+					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/lib",
+					"$(CONFIGURATION_TEMP_DIR)/Matter.build/out/obj/src/app/lib",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "";
+			};
+			name = Release;
+		};
 		BA09EB732474881D00605257 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1027,13 +1640,9 @@
 					"$(CHIP_ROOT)/src/app/util",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(TEMP_DIR)/out/gen/include",
-					/* Compile time codegen would need this: 
-					   "$(TEMP_DIR)/out/gen/src/controller/data_model/zapgen/", 
-					 */
 					"$(CHIP_ROOT)/zzz_generated/",
 					"$(CHIP_ROOT)/zzz_generated/app-common",
 					"$(CHIP_ROOT)/zzz_generated/controller-clusters",
-					/* darwin-specific bypassing compile time codegen for header inclusion */
 					"$(CHIP_ROOT)/zzz_generated/darwin/controller-clusters",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
@@ -1183,13 +1792,9 @@
 					"$(CHIP_ROOT)/src/app/util",
 					"$(CHIP_ROOT)/third_party/nlio/repo/include",
 					"$(TEMP_DIR)/out/gen/include",
-					/* Compile time codegen would need this: 
-					   "$(TEMP_DIR)/out/gen/src/controller/data_model/zapgen/", 
-					 */
 					"$(CHIP_ROOT)/zzz_generated/",
 					"$(CHIP_ROOT)/zzz_generated/app-common",
 					"$(CHIP_ROOT)/zzz_generated/controller-clusters",
-					/* darwin-specific bypassing compile time codegen for header inclusion */
 					"$(CHIP_ROOT)/zzz_generated/darwin/controller-clusters",
 				);
 				INFOPLIST_FILE = CHIP/Info.plist;
@@ -1250,6 +1855,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		037C3CAF2991A44B00B7EEE2 /* Build configuration list for PBXNativeTarget "darwin-framework-tool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				037C3CAD2991A44B00B7EEE2 /* Debug */,
+				037C3CAE2991A44B00B7EEE2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		B20252872459E34F00F97062 /* Build configuration list for PBXProject "Matter" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

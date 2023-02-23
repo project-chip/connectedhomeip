@@ -29,6 +29,9 @@ config:
         type: node_id
         defaultValue: 0xC00FEE
     endpoint: 0
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
     discriminator:
         type: int16u
         defaultValue: 3840
@@ -76,6 +79,14 @@ tests:
               - name: "CommissioningTimeout"
                 value: 180
 
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
+
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
       cluster: "CommissionerCommands"
@@ -108,6 +119,14 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     - label: "TH_CR3 Commissions with DUT_CE"
       PICS: CADMIN.S
@@ -180,7 +199,9 @@ tests:
       verification: |
           Using TH_CR2 read attribute
 
-          ./chip-tool basic read node-label 2 0  --commissioner-name beta
+          Verify read command fail as expected since the DUT_CE is no longer on the network on TH_CR2 (chip-tool) log
+
+          ./chip-tool  basicinformation read node-label 2 0  --commissioner-name beta
 
           Received error (protocol code 2) during pairing process. ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1551: CHIP Error 0x00000054: Invalid CASE parameter
           [1651819620.929567][4359:4364] CHIP:CTL: OperationalDeviceProxy[B8070CD13C99D367:0000000000000002]: State change 3 --> 2
@@ -220,6 +241,14 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"

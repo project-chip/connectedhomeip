@@ -17,6 +17,7 @@ name: Tests
 on:
     push:
     pull_request:
+    merge_group:
     workflow_dispatch:
 
 concurrency:
@@ -47,7 +48,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.35
+            image: connectedhomeip/chip-build:0.6.40
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -78,6 +79,15 @@ jobs:
                   mkdir /tmp/cores || true
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
                   mkdir objdir-clone || true
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -89,6 +99,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Validate that xml are parsable
               timeout-minutes: 10
               # The sub-items being run here are the same as the input XMLs listed
@@ -98,11 +109,6 @@ jobs:
               # does not enforce that the content is understood (that part is covered by parser
               # unit tests)
               #
-              # Also note ordering: global attributes are parsed first because other XML files may
-              # reference these.
-              #
-              # TODO: some multipass/postprocess may be more appropriate to allow any ordering of
-              #       things.
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/py_matter_idl/matter_idl/xml_parser.py \
@@ -186,13 +192,12 @@ jobs:
                       src/app/zap-templates/zcl/data-model/draft/onoff-switch-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/silabs/ha-devices.xml \
                       src/app/zap-templates/zcl/data-model/silabs/lo-devices.xml \
-                      src/app/zap-templates/zcl/data-model/silabs/types-silabs.xml \
                       src/app/zap-templates/zcl/data-model/silabs/zll-devices.xml \
                     "
             - name: Build Apps
               timeout-minutes: 60
               run: |
-                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env --include_yamltests'
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
@@ -306,7 +311,7 @@ jobs:
               run: scripts/checkout_submodules.py --shallow --platform darwin
             - name: Setup Environment
               # coreutils for stdbuf
-              run: brew install openssl pkg-config coreutils
+              run: brew install coreutils
             - name:
                   Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
@@ -314,14 +319,15 @@ jobs:
                   sudo chown ${USER} /cores || true
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
                   mkdir objdir-clone || true
-            - name: Fix pkgconfig link
-              working-directory: /usr/local/lib/pkgconfig
-              run: |
-                  pwd
-                  ls -la /usr/local/Cellar/
-                  ls -la /usr/local/Cellar/openssl@1.1
-                  OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
-                  ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -333,6 +339,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Build Apps
               timeout-minutes: 90
               run: |
@@ -399,13 +406,13 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.35
+            image: connectedhomeip/chip-build:0.6.40
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
             - name: Try to ensure the directories for core dumping exist and we
@@ -414,6 +421,15 @@ jobs:
                   mkdir /tmp/cores || true
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
                   mkdir objdir-clone || true
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -425,6 +441,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Build Python REPL and example apps
               timeout-minutes: 50
               run: |
@@ -475,13 +492,13 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.35
+            image: connectedhomeip/chip-build:0.6.40
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
             - name: Try to ensure the directories for core dumping exist and we
@@ -490,6 +507,15 @@ jobs:
                   mkdir /tmp/cores || true
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
                   mkdir objdir-clone || true
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -501,6 +527,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Build Java Matter Controller and all clusters app
               timeout-minutes: 50
               run: |
@@ -523,7 +550,7 @@ jobs:
                      --tool-args "commissionables" \
                      --factoryreset \
                   '
-            - name: Run Pairing over Onnetwork Test
+            - name: Run Pairing Onnetwork Test
               timeout-minutes: 10
               run: |
                   scripts/run_in_build_env.sh \
@@ -532,7 +559,31 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
-                     --tool-args "onnetwork-long --nodeid 1 --setup-payload 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --factoryreset \
+                  '
+            - name: Run Pairing AlreadyDiscovered Test
+              timeout-minutes: 10
+              run: |
+                  scripts/run_in_build_env.sh \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "pairing" \
+                     --tool-args "already-discovered --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
+                     --factoryreset \
+                  '
+            - name: Run Pairing Address-PaseOnly Test
+              timeout-minutes: 10
+              run: |
+                  scripts/run_in_build_env.sh \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "pairing" \
+                     --tool-args "address-paseonly --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
                      --factoryreset \
                   '
             - name: Uploading core files
@@ -568,12 +619,12 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform darwin
             - name: Setup Environment
               # coreutils for stdbuf
-              run: brew install openssl pkg-config coreutils
+              run: brew install coreutils
             - name:
                   Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
@@ -581,14 +632,15 @@ jobs:
                   sudo chown ${USER} /cores || true
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
                   mkdir objdir-clone || true
-            - name: Fix pkgconfig link
-              working-directory: /usr/local/lib/pkgconfig
-              run: |
-                  pwd
-                  ls -la /usr/local/Cellar/
-                  ls -la /usr/local/Cellar/openssl@1.1
-                  OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
-                  ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -600,6 +652,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Build Python REPL and example apps
               timeout-minutes: 50
               run: |

@@ -98,7 +98,7 @@
         "Test_TC_DLOG_3_1"
     ],
     "Descriptor": ["Test_TC_DESC_2_1"],
-    "GeneralCommissioning": ["Test_TC_CGEN_2_2", "Test_TC_CGEN_2_4"],
+    "GeneralCommissioning": ["Test_TC_CGEN_2_2"],
     "GeneralDiagnostics": [
         "Test_TC_DGGEN_2_2",
         "Test_TC_DGGEN_2_3",

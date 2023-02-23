@@ -43,15 +43,6 @@ namespace Python {
 class DLL_EXPORT PlaceholderOperationalCredentialsIssuer : public Controller::OperationalCredentialsDelegate
 {
 public:
-    //
-    // Constructor to create an instance of this object that vends out operational credentials for a given fabric.
-    //
-    // An index should be provided to numerically identify this instance relative to others in a multi-fabric deployment. This is
-    // needed given the interactions of this object with persistent storage. Consequently, the index is used to scope the entries
-    // read/written to/from storage.
-    //
-    // It is recommended that this index track the fabric index within which this issuer is operating.
-    //
     PlaceholderOperationalCredentialsIssuer() {}
     ~PlaceholderOperationalCredentialsIssuer() override {}
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -196,6 +196,10 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, arraySize == 0);
     }
+    else if (aPath.mAttributeId == Globals::Attributes::EventList::Id)
+    {
+        // Nothing to check for this one; depends on the endpoint.
+    }
     else if (aPath.mAttributeId == Globals::Attributes::AttributeList::Id)
     {
         // Nothing to check for this one; depends on the endpoint.
@@ -310,7 +314,7 @@ void TestReadEvents::TestEventChunking(nlTestSuite * apSuite, void * apContext)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
@@ -377,7 +381,7 @@ void TestReadEvents::TestMixedEventsAndAttributesChunking(nlTestSuite * apSuite,
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
@@ -429,7 +433,7 @@ void TestReadEvents::TestMixedEventsAndAttributesChunking(nlTestSuite * apSuite,
         // ServerGeneratedCommandList = 9).
         //
         NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
-        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 9);
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 10);
         NL_TEST_ASSERT(apSuite, readCallback.mEventCount == static_cast<uint32_t>(lastEventNumber - firstEventNumber + 1));
 
         NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -456,7 +460,7 @@ void TestReadEvents::TestMixedEventsAndLargeAttributesChunking(nlTestSuite * apS
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
-    InitDataModelHandler(&ctx.GetExchangeManager());
+    InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
     DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];

@@ -29,6 +29,7 @@
 
 #include <credentials/FabricTable.h>
 #include <crypto/RandUtils.h>
+#include <crypto/SessionKeystore.h>
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -379,13 +380,17 @@ public:
      * @brief
      *   Initialize a Secure Session Manager
      *
-     * @param systemLayer           System, layer to use
+     * @param systemLayer           System layer to use
      * @param transportMgr          Transport to use
      * @param messageCounterManager The message counter manager
+     * @param storageDelegate       Persistent storage implementation
+     * @param fabricTable           Fabric table to hold information about joined fabrics
+     * @param sessionKeystore       Session keystore for management of symmetric encryption keys
      */
     CHIP_ERROR Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
                     Transport::MessageCounterManagerInterface * messageCounterManager,
-                    chip::PersistentStorageDelegate * storageDelegate, FabricTable * fabricTable);
+                    chip::PersistentStorageDelegate * storageDelegate, FabricTable * fabricTable,
+                    Crypto::SessionKeystore & sessionKeystore);
 
     /**
      * @brief
@@ -446,6 +451,8 @@ public:
 
     FabricTable * GetFabricTable() const { return mFabricTable; }
 
+    Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
+
 private:
     /**
      *    The State of a secure transport object.
@@ -462,8 +469,9 @@ private:
         kPayloadIsUnencrypted,
     };
 
-    System::Layer * mSystemLayer = nullptr;
-    FabricTable * mFabricTable   = nullptr;
+    System::Layer * mSystemLayer               = nullptr;
+    FabricTable * mFabricTable                 = nullptr;
+    Crypto::SessionKeystore * mSessionKeystore = nullptr;
     Transport::UnauthenticatedSessionTable<CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE> mUnauthenticatedSessions;
     Transport::SecureSessionTable mSecureSessions;
     State mState; // < Initialization state of the object

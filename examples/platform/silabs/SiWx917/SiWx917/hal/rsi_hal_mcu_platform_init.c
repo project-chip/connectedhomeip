@@ -32,6 +32,10 @@
 #define ICACHE_DISABLE
 #define DEBUG_DISABLE
 
+/* QSPI clock config params */
+#define INTF_PLL_500_CTRL_VALUE 0xD900
+#define INTF_PLL_CLK 160000000 /* PLL out clock 160MHz */
+
 #define PMU_GOOD_TIME 31  /*Duration in us*/
 #define XTAL_GOOD_TIME 31 /*Duration in us*/
 
@@ -55,6 +59,8 @@
  */
 int soc_pll_config(void)
 {
+    int32_t status = RSI_OK;
+
     RSI_CLK_SocPllLockConfig(1, 1, 7);
 
     RSI_CLK_SocPllRefClkConfig(2);
@@ -77,7 +83,19 @@ int soc_pll_config(void)
     RSI_CLK_M4SocClkConfig(M4CLK, M4_SOCPLLCLK, 0);
 
 #ifdef SWITCH_QSPI_TO_SOC_PLL
-    RSI_CLK_QspiClkConfig(M4CLK, QSPI_INTFPLLCLK, 0, 0, 0);
+    /* program intf pll to 160Mhz */
+    SPI_MEM_MAP_PLL(INTF_PLL_500_CTRL_REG9) = INTF_PLL_500_CTRL_VALUE;
+    status                                  = RSI_CLK_SetIntfPllFreq(M4CLK, INTF_PLL_CLK, SOC_PLL_REF_FREQUENCY);
+    if (status != RSI_OK)
+    {
+        SILABS_LOG("Failed to Config Interface PLL Clock, status:%d", status);
+    }
+    else
+    {
+        SILABS_LOG("Configured Interface PLL Clock to %d", INTF_PLL_CLK);
+    }
+
+    RSI_CLK_QspiClkConfig(M4CLK, QSPI_INTFPLLCLK, 0, 0, 1);
 #endif /* SWITCH_QSPI_TO_SOC_PLL */
 
     return 0;
@@ -100,13 +118,13 @@ void RSI_Wakeupsw_config(void)
     RSI_NPSSGPIO_InputBufferEn(NPSS_GPIO_2, 1);
 
     /*Configure the NPSS GPIO mode to wake up  */
-    RSI_NPSSGPIO_SetPinMux(NPSS_GPIO_2, 2);
+    RSI_NPSSGPIO_SetPinMux(NPSS_GPIO_2, NPSSGPIO_PIN_MUX_MODE2);
 
     /*Configure the NPSS GPIO direction to input */
     RSI_NPSSGPIO_SetDir(NPSS_GPIO_2, NPSS_GPIO_DIR_OUTPUT);
 
-    /* Enables rise edge interrupt detection for UULP_VBAT_GPIO_0 */
-    RSI_NPSSGPIO_SetIntLevelLowEnable(NPSS_GPIO_2_INTR);
+    /* Enables fall edge interrupt detection for UULP_VBAT_GPIO_0 */
+    RSI_NPSSGPIO_SetIntFallEdgeEnable(NPSS_GPIO_2_INTR);
 
     /* Un mask the NPSS GPIO interrupt*/
     RSI_NPSSGPIO_IntrUnMask(NPSS_GPIO_2_INTR);
@@ -118,9 +136,9 @@ void RSI_Wakeupsw_config(void)
     RSI_NPSSGPIO_ClrIntr(NPSS_GPIO_2_INTR);
 
     /*Enable the NPSS GPIO interrupt slot*/
-    NVIC_EnableIRQ(21);
+    NVIC_EnableIRQ(NPSS_TO_MCU_GPIO_INTR_IRQn);
 
-    NVIC_SetPriority(21, 7);
+    NVIC_SetPriority(NPSS_TO_MCU_GPIO_INTR_IRQn, 7);
 }
 
 void RSI_Wakeupsw_config_gpio0(void)
@@ -140,8 +158,8 @@ void RSI_Wakeupsw_config_gpio0(void)
     /* Set the GPIO to wake from deep sleep */
     RSI_NPSSGPIO_SetWkpGpio(NPSS_GPIO_0_INTR);
 
-    /* Enables rise edge interrupt detection for UULP_VBAT_GPIO_0 */
-    RSI_NPSSGPIO_SetIntLevelLowEnable(NPSS_GPIO_0_INTR);
+    /* Enables fall edge interrupt detection for UULP_VBAT_GPIO_0 */
+    RSI_NPSSGPIO_SetIntFallEdgeEnable(NPSS_GPIO_0_INTR);
 
     /* Un mask the NPSS GPIO interrupt*/
     RSI_NPSSGPIO_IntrUnMask(NPSS_GPIO_0_INTR);
@@ -153,8 +171,8 @@ void RSI_Wakeupsw_config_gpio0(void)
     RSI_NPSSGPIO_ClrIntr(NPSS_GPIO_0_INTR);
 
     // 21 being the NPSS_TO_MCU_GPIO_INTR_IRQn
-    NVIC_EnableIRQ(21);
-    NVIC_SetPriority(21, 7);
+    NVIC_EnableIRQ(NPSS_TO_MCU_GPIO_INTR_IRQn);
+    NVIC_SetPriority(NPSS_TO_MCU_GPIO_INTR_IRQn, 7);
 }
 
 /*==============================================*/

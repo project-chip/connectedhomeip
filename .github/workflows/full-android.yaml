@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-android:0.6.35
+            image: connectedhomeip/chip-build-android:0.6.40
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -62,6 +62,15 @@ jobs:
               name: Checkout (ACT for local build)
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform android
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -73,6 +82,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Build Android arm-chip-tool
               run: |
                   ./scripts/run_in_build_env.sh \

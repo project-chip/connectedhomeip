@@ -106,11 +106,6 @@ bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId)
 EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                     uint8_t * dataPtr, EmberAfAttributeType dataType);
 
-// For now, just define emberAfWriteServerAttribute to emberAfWriteAttribute, to
-// minimize code churn.
-// TODO: Remove this define.
-#define emberAfWriteServerAttribute emberAfWriteAttribute
-
 /**
  * @brief Read the attribute value, performing all the checks.
  *
@@ -122,11 +117,6 @@ EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId c
  */
 EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                    uint8_t * dataPtr, uint16_t readLength);
-
-// For now, just define emberAfReadServerAttribute to emberAfReadAttribute, to
-// minimize code churn.
-// TODO: Remove this define.
-#define emberAfReadServerAttribute emberAfReadAttribute
 
 /**
  * @brief this function returns the size of the ZCL data in bytes.
@@ -229,37 +219,9 @@ enum
 bool emberAfIsTypeSigned(EmberAfAttributeType dataType);
 
 /**
- * @brief Function that extracts a 64-bit integer from the message buffer
- */
-uint64_t emberAfGetInt64u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
-#define emberAfGetInt64s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt64u(message, currentIndex, msgLen))
-
-/**
- * @brief Function that extracts a 32-bit integer from the message buffer
- */
-uint32_t emberAfGetInt32u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
-#define emberAfGetInt32s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt32u(message, currentIndex, msgLen))
-
-/**
- * @brief Function that extracts a 24-bit integer from the message buffer
- */
-uint32_t emberAfGetInt24u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
-#define emberAfGetInt24s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt24u(message, currentIndex, msgLen))
-
-/**
  * @brief Function that extracts a 16-bit integer from the message buffer
  */
 uint16_t emberAfGetInt16u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
-#define emberAfGetInt16s(message, currentIndex, msgLen) chip::CastToSigned(emberAfGetInt16u(message, currentIndex, msgLen))
-
-/**
- * @brief Function that extracts a ZCL string from the message buffer
- */
-uint8_t * emberAfGetString(uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
-/**
- * @brief Function that extracts a ZCL long string from the message buffer
- */
-uint8_t * emberAfGetLongString(uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
 
 /**
  * @brief Macro for consistency, that extracts single byte out of the message
@@ -365,235 +327,15 @@ void emberAfGetEui64(EmberEUI64 returnEui64);
  */
 EmberNodeId emberAfGetNodeId(void);
 
-/**
- * @brief Returns the current network state.  This call caches the results
- *   on the host to prevent frequent EZSP transactions.
- */
-EmberNetworkStatus emberAfNetworkState(void);
-
 /** @} END Miscellaneous */
-
-/** @name Sleep Control */
-//@{
-
-/**
- * @brief Friendly define for use in the scheduling or canceling client events
- * with emberAfScheduleClusterTick() and emberAfDeactivateClusterTick().
- */
-#define EMBER_AF_CLIENT_CLUSTER_TICK true
-
-/**
- * @brief Friendly define for use in the scheduling or canceling server events
- * with emberAfScheduleClusterTick() and emberAfDeactivateClusterTick().
- */
-#define EMBER_AF_SERVER_CLUSTER_TICK false
-
-/**
- * @brief This function is used to schedule a cluster-related event inside the
- * application framework's event mechanism.  This function provides a wrapper
- * for the Ember stack event mechanism which allows the cluster code to access
- * its events by their endpoint, cluster id, and client/server identity.  The
- * passed poll and sleep controls allow the cluster to indicate whether it
- * needs to long or short poll and whether it needs to stay awake or if it can
- * sleep.
- *
- * @param endpoint the endpoint of the event to be scheduled.
- * @param clusterId the cluster id of the event to be scheduled.
- * @param isClient ::EMBER_AF_CLIENT_CLUSTER_TICK if the event to be scheduled
- *        is associated with a client cluster or ::EMBER_AF_SERVER_CLUSTER_TICK
- *        otherwise.
- * @param delayMs the number of milliseconds until the event should be called.
- * @param pollControl ::EMBER_AF_SHORT_POLL if the cluster needs to short poll
- *        or ::EMBER_AF_LONG_POLL otherwise.
- * @param sleepControl ::EMBER_AF_STAY_AWAKE if the cluster needs to stay awake
- *        or EMBER_AF_OK_TO_SLEEP otherwise.
- *
- * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
- */
-EmberStatus emberAfScheduleTickExtended(chip::EndpointId endpoint, chip::ClusterId clusterId, bool isClient, uint32_t delayMs,
-                                        EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl);
-
-/**
- * @brief This function is used to schedule a cluster-related event inside the
- * This function is a wrapper for ::emberAfScheduleTickExtended.  The cluster
- * on the given endpoint will be set to long poll if sleepControl is set to
- * ::EMBER_AF_OK_TO_HIBERNATE or will be set to short poll otherwise.  It will
- * stay awake if sleepControl is ::EMBER_AF_STAY_AWAKE and will sleep
- * otherwise.
- *
- * @param endpoint the endpoint of the event to be scheduled.
- * @param clusterId the cluster id of the event to be scheduled.
- * @param isClient ::EMBER_AF_CLIENT_CLUSTER_TICK if the event to be scheduled
- *        is associated with a client cluster or ::EMBER_AF_SERVER_CLUSTER_TICK
- *        otherwise.
- * @param delayMs the number of milliseconds until the event should be called.
- * @param sleepControl the priority of the event, what the processor should
- *        be allowed to do in terms of sleeping while the event is active.
- *
- * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
- */
-EmberStatus emberAfScheduleClusterTick(chip::EndpointId endpoint, chip::ClusterId clusterId, bool isClient, uint32_t delayMs,
-                                       EmberAfEventSleepControl sleepControl);
-
-/**
- * @brief A function used to schedule a cluster server event.  This function
- * is a wrapper for ::emberAfScheduleTickExtended.
- *
- * @param endpoint the endpoint of the event to be scheduled.
- * @param clusterId the cluster id of the event to be scheduled.
- * @param delayMs the number of milliseconds until the event should be called.
- * @param pollControl ::EMBER_AF_SHORT_POLL if the cluster needs to short poll
- *        or ::EMBER_AF_LONG_POLL otherwise.
- * @param sleepControl ::EMBER_AF_STAY_AWAKE if the cluster needs to stay awake
- *        or EMBER_AF_OK_TO_SLEEP otherwise.
- *
- * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
- */
-EmberStatus emberAfScheduleServerTickExtended(chip::EndpointId endpoint, chip::ClusterId clusterId, uint32_t delayMs,
-                                              EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl);
-
-/**
- * @brief A function used to schedule a cluster server event.  This function
- * is a wrapper for ::emberAfScheduleServerTickExtended.  It indicates that
- * the cluster server on the given endpoint can long poll and can sleep.
- *
- * @param endpoint the endpoint of the event to be scheduled
- * @param clusterId the cluster id of the event to be scheduled.
- * @param delayMs the number of milliseconds until the event should be called.
- *
- * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
- */
-EmberStatus emberAfScheduleServerTick(chip::EndpointId endpoint, chip::ClusterId clusterId, uint32_t delayMs);
-
-/**
- * @brief A function used to deactivate a cluster-related event.  This function
- * provides a wrapper for the Ember stack's event mechanism which allows an
- * event to be accessed by its endpoint, cluster id, and client/server
- * identity.
- *
- * @param endpoint the endpoint of the event to be deactivated.
- * @param clusterId the cluster id of the event to be deactivated.
- * @param isClient ::EMBER_AF_CLIENT_CLUSTER_TICK if the event to be
- *        deactivated is a client cluster ::EMBER_AF_SERVER_CLUSTER_TICK
- *        otherwise.
- *
- * @return EMBER_SUCCESS if the event was deactivated or an error otherwise.
- */
-EmberStatus emberAfDeactivateClusterTick(chip::EndpointId endpoint, chip::ClusterId clusterId, bool isClient);
-
-/**
- * @brief A function used to deactivate a cluster server event.  This function
- * is a wrapper for ::emberAfDeactivateClusterTick.
- *
- * @param endpoint the endpoint of the event to be deactivated.
- * @param clusterId the cluster id of the event to be deactivated.
- *
- * @return EMBER_SUCCESS if the event was deactivated or an error otherwise.
- */
-EmberStatus emberAfDeactivateServerTick(chip::EndpointId endpoint, chip::ClusterId clusterId);
-
-/**
- * @brief Sets the ::EmberEventControl to run "delayMs" milliseconds in the
- * future.  This function first verifies that the delay is within the
- * acceptable range before scheduling the event.
- *
- * @param control a pointer to the event control.
- * @param delayMs the number of milliseconds until the next event.
- *
- * @return If delayMs is less than or equal to
-           ::EMBER_MAX_EVENT_CONTROL_DELAY_MS, this function will schedule the
-           event and return ::EMBER_SUCCESS.  Otherwise it will return
-           ::EMBER_BAD_ARGUMENT.
- */
-EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t delayMs);
-
-/** @} END Sleep Control */
 
 /** @name Messaging */
 // @{
 
 /**
- * @brief Sends a default response to a cluster command.
- *
- * This function is used to prepare and send a default response to a cluster
- * command.
- *
- * @param cmd The cluster command to which to respond.
- * @param status Status code for the default response command.
- * @return An ::EmberStatus value that indicates the success or failure of
- * sending the response.
- */
-EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberAfStatus status);
-
-/**
- * @brief Sends a default response to a cluster command using the
- * current command.
- *
- * This function is used to prepare and send a default response to a cluster
- * command.
- *
- * @param status Status code for the default response command.
- * @return An ::EmberStatus value that indicates the success or failure of
- * sending the response.
- */
-EmberStatus emberAfSendImmediateDefaultResponse(EmberAfStatus status);
-
-/**
- * @brief Access to client API APS frame.
- */
-EmberApsFrame * emberAfGetCommandApsFrame(void);
-
-/**
  * @brief Set the source and destination endpoints in the client API APS frame.
  */
 void emberAfSetCommandEndpoints(chip::EndpointId sourceEndpoint, chip::EndpointId destinationEndpoint);
-
-/**
- * @brief Use this function to find devices in the network with endpoints
- *   matching a given cluster ID in their descriptors.
- *   Target may either be a specific device, or the broadcast
- *   address EMBER_RX_ON_WHEN_IDLE_BROADCAST_ADDRESS.
- *
- * With this function a service discovery is initiated and received
- * responses are returned by executing the callback function passed in.
- * For unicast discoveries, the callback will be executed only once.
- * Either the target will return a result or a timeout will occur.
- * For broadcast discoveries, the callback may be called multiple times
- * and after a period of time the discovery will be finished with a final
- * call to the callback.
- *
- * @param target The destination node ID for the discovery; either a specific
- *  node's ID or EMBER_RX_ON_WHEN_IDLE_BROADCAST_ADDRESS.
- * @param clusterId The cluster being discovered.
- * @param serverCluster EMBER_AF_SERVER_CLUSTER_DISCOVERY (true) if discovering
- *  servers for the target cluster; EMBER_AF_CLIENT_CLUSTER_DISCOVERY (false)
- *  if discovering clients for that cluster.
- * @param callback Function pointer for the callback function triggered when
- *  a match is discovered.  (For broadcast discoveries, this is called once per
- *  matching node, even if a node has multiple matching endpoints.)
- */
-EmberStatus emberAfFindDevicesByCluster(EmberNodeId target, chip::ClusterId clusterId, bool serverCluster,
-                                        EmberAfServiceDiscoveryCallback * callback);
-
-#if !defined(DOXYGEN_SHOULD_SKIP_THIS)
-/**
- * @brief Use this macro to retrieve the current command. This
- * macro may only be used within the command parsing context. For instance
- * Any of the command handling callbacks may use this macro. If this macro
- * is used outside the command context, the returned EmberAfClusterCommand pointer
- * will be null.
- */
-#define emberAfCurrentCommand() (emAfCurrentCommand)
-extern EmberAfClusterCommand * emAfCurrentCommand;
-#endif
-
-/**
- * @brief returns the current endpoint that is being served.
- *
- * The purpose of this macro is mostly to access endpoint that
- * is being served in the command callbacks.
- */
-#define emberAfCurrentEndpoint() (emberAfCurrentCommand()->apsFrame->destinationEndpoint)
 
 /** @} END Messaging */
 
@@ -641,12 +383,6 @@ extern EmberAfClusterCommand * emAfCurrentCommand;
 #define EMBER_TEST_ASSERT(x)
 #endif
 #endif
-
-/**
- * @brief API for parsing a cluster-specific message.  Implemented by
- * generated code.
- */
-EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
 
 /**
  * Returns the pointer to the data version storage for the given endpoint and

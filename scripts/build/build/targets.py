@@ -18,7 +18,7 @@ from itertools import combinations
 from typing import Any, List, Optional
 
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
-from builders.android import AndroidApp, AndroidBoard, AndroidBuilder
+from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
 from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
 from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
@@ -118,6 +118,7 @@ def BuildHostTarget():
         TargetPart('tests', app=HostApp.TESTS),
         TargetPart('chip-cert', app=HostApp.CERT_TOOL),
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
+        TargetPart('contact-sensor', app=HostApp.CONTACT_SENSOR),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -148,6 +149,7 @@ def BuildHostTarget():
     target.AppendModifier('clang', use_clang=True)
     target.AppendModifier('test', extra_tests=True)
     target.AppendModifier('rpc', enable_rpcs=True)
+    target.AppendModifier('with-ui', imgui_ui=True)
 
     return target
 
@@ -191,6 +193,7 @@ def BuildEfr32Target():
     target.AppendFixedTargets([
         TargetPart('brd4161a', board=Efr32Board.BRD4161A),
         TargetPart('brd4187c', board=Efr32Board.BRD4187C),
+        TargetPart('brd4186c', board=Efr32Board.BRD4186C),
         TargetPart('brd4163a', board=Efr32Board.BRD4163A),
         TargetPart('brd4164a', board=Efr32Board.BRD4164A),
         TargetPart('brd4166a', board=Efr32Board.BRD4166A),
@@ -207,6 +210,7 @@ def BuildEfr32Target():
         TargetPart('unit-test', app=Efr32App.UNIT_TEST),
         TargetPart('light', app=Efr32App.LIGHT),
         TargetPart('lock', app=Efr32App.LOCK),
+        TargetPart('thermostat', app=Efr32App.THERMOSTAT)
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
@@ -292,6 +296,9 @@ def BuildAndroidTarget():
         TargetPart('tv-casting-app', app=AndroidApp.TV_CASTING_APP),
         TargetPart('java-matter-controller', app=AndroidApp.JAVA_MATTER_CONTROLLER),
     ])
+
+    # Modifiers
+    target.AppendModifier('no-debug', profile=AndroidProfile.RELEASE)
 
     return target
 
@@ -381,6 +388,8 @@ def BuildK32WTarget():
     target.AppendModifier(name="no-ota", disable_ota=True)
     target.AppendModifier(name="low-power", low_power=True).OnlyIfRe("-nologs")
     target.AppendModifier(name="nologs", disable_logs=True)
+    target.AppendModifier(name="crypto-platform", crypto_platform=True)
+    target.AppendModifier(name="tokenizer", tokenizer=True).ExceptIfRe("-nologs")
 
     return target
 

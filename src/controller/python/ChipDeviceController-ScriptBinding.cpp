@@ -60,6 +60,7 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <crypto/RawKeySessionKeystore.h>
 #include <inet/IPAddress.h>
 #include <lib/core/TLV.h>
 #include <lib/dnssd/Resolver.h>
@@ -102,6 +103,7 @@ chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 chip::Controller::ScriptPairingDeviceDiscoveryDelegate sPairingDeviceDiscoveryDelegate;
 chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
+chip::Crypto::RawKeySessionKeystore sSessionKeystore;
 
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
@@ -231,9 +233,12 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
     FactoryInitParams factoryParams;
 
     factoryParams.fabricIndependentStorage = storageAdapter;
+    factoryParams.sessionKeystore          = &sSessionKeystore;
 
     sGroupDataProvider.SetStorageDelegate(storageAdapter);
+    sGroupDataProvider.SetSessionKeystore(factoryParams.sessionKeystore);
     PyReturnErrorOnFailure(ToPyChipError(sGroupDataProvider.Init()));
+    Credentials::SetGroupDataProvider(&sGroupDataProvider);
     factoryParams.groupDataProvider = &sGroupDataProvider;
 
     PyReturnErrorOnFailure(ToPyChipError(sPersistentStorageOpCertStore.Init(storageAdapter)));
@@ -348,6 +353,7 @@ void pychip_DeviceController_SetLogFilter(uint8_t category)
 PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
                                                uint32_t setupPINCode, chip::NodeId nodeid)
 {
+    sPairingDelegate.SetExpectingPairingComplete(true);
     return ToPyChipError(devCtrl->PairDevice(nodeid,
                                              chip::RendezvousParameters()
                                                  .SetPeerAddress(Transport::PeerAddress(Transport::Type::kBle))
@@ -369,12 +375,14 @@ PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommission
     addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
     params.SetPeerAddress(addr).SetDiscriminator(0);
 
+    sPairingDelegate.SetExpectingPairingComplete(true);
     return ToPyChipError(devCtrl->PairDevice(nodeid, params, sCommissioningParameters));
 }
 
 PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
                                                     chip::NodeId nodeid)
 {
+    sPairingDelegate.SetExpectingPairingComplete(true);
     return ToPyChipError(devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters));
 }
 
@@ -467,6 +475,7 @@ PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::Dev
     VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr), ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
     addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
     params.SetPeerAddress(addr).SetDiscriminator(0);
+    sPairingDelegate.SetExpectingPairingComplete(true);
     return ToPyChipError(devCtrl->EstablishPASEConnection(nodeid, params));
 }
 
@@ -477,6 +486,7 @@ PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::De
     RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
     addr.SetTransportType(chip::Transport::Type::kBle);
     params.SetPeerAddress(addr).SetDiscriminator(discriminator);
+    sPairingDelegate.SetExpectingPairingComplete(true);
     return ToPyChipError(devCtrl->EstablishPASEConnection(nodeid, params));
 }
 

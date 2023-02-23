@@ -16,6 +16,7 @@
 #
 
 import logging
+import builtins
 
 from chip import ChipDeviceCtrl
 from chip import clusters as Clusters
@@ -30,9 +31,9 @@ class CommissioningFlowBlocks:
         self._logger = logger
         self._credential_provider = credential_provider
 
-    async def arm_failsafe(self, parameter: commissioning.PaseParameters, node_id: int):
+    async def arm_failsafe(self, node_id: int, duration_seconds: int = 180):
         response = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Commands.ArmFailSafe(
-            expiryLengthSeconds=parameter.failsafe_expiry_length_seconds
+            expiryLengthSeconds=duration_seconds
         ))
         if response.errorCode != 0:
             raise commissioning.CommissionFailure(repr(response))
@@ -50,24 +51,37 @@ class CommissioningFlowBlocks:
         csr_nonce = await self._credential_provider.get_csr_nonce()
 
         self._logger.info("Sending AttestationRequest")
-        attestation_elements = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.AttestationRequest(
-            attestationNonce=attestation_nonce
-        ))
+        try:
+            attestation_elements = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.AttestationRequest(
+                attestationNonce=attestation_nonce
+            ))
+        except Exception as ex:
+            raise commissioning.CommissionFailure(f"Failed to get AttestationElements: {ex}")
 
         self._logger.info("Getting CertificateChain - DAC")
-        dac = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.CertificateChainRequest(
-            certificateType=1
-        ))
+        # Failures are exceptions
+        try:
+            dac = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.CertificateChainRequest(
+                certificateType=1
+            ))
+        except Exception as ex:
+            raise commissioning.CommissionFailure(f"Failed to get DAC: {ex}")
 
         self._logger.info("Getting CertificateChain - PAI")
-        pai = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.CertificateChainRequest(
-            certificateType=2
-        ))
+        try:
+            pai = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.CertificateChainRequest(
+                certificateType=2
+            ))
+        except Exception as ex:
+            raise commissioning.CommissionFailure(f"Failed to get PAI: {ex}")
 
         self._logger.info("Getting OpCSRRequest")
-        csr = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.CSRRequest(
-            CSRNonce=csr_nonce
-        ))
+        try:
+            csr = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.CSRRequest(
+                CSRNonce=csr_nonce
+            ))
+        except Exception as ex:
+            raise commissioning.CommissionFailure(f"Failed to get OpCSRRequest: {ex}")
 
         self._logger.info("Getting device certificate")
         commissionee_credentials = await self._credential_provider.get_commissionee_credentials(
@@ -83,9 +97,28 @@ class CommissioningFlowBlocks:
                 product_id=device_info.productID))
 
         self._logger.info("Adding Trusted Root Certificate")
-        response = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.AddTrustedRootCertificate(
-            rootCACertificate=commissionee_credentials.rcac
-        ))
+        try:
+            response = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.AddTrustedRootCertificate(
+                rootCACertificate=commissionee_credentials.rcac
+            ))
+        except Exception as ex:
+            raise commissioning.CommissionFailure(f"Failed to add Root Certificate: {ex}")
+
+        try:
+            certificate_data = tlv.TLVReader(commissionee_credentials.noc).get()['Any']
+
+            self._logger.info(f"Parsed NOC TLV: {certificate_data}")
+
+            # TODO: chip.tlv.Reader will remove tag information in List containers. Which is used in NOC TLV
+            # Should extract matter-node-id and matter-fabric-id after List TLV is well handled.
+        except:
+            self._logger.exception("The certificate should be a valid CHIP Certificate, but failed to parse it")
+
+        # TODO: Calculate compressed fabric id based on the NOC infomations.
+        self._logger.info(
+            f"Commissioning FabricID: {commissionee_credentials.fabric_id:016X} "
+            f"Compressed FabricID: {self._devCtrl.GetCompressedFabricId():016X} "
+            f"Node ID: {commissionee_credentials.node_id:016X}")
 
         self._logger.info("Adding Operational Certificate")
         response = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.AddNOC(
@@ -98,24 +131,15 @@ class CommissioningFlowBlocks:
         if response.statusCode != 0:
             raise commissioning.CommissionFailure(repr(response))
 
+        self._logger.info("Update controller IPK")
+        self._devCtrl.SetIpk(commissionee_credentials.ipk)
+
         self._logger.info("Setting fabric label")
         response = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.UpdateFabricLabel(
             label=parameter.fabric_label
         ))
         if response.statusCode != 0:
             raise commissioning.CommissionFailure(repr(response))
-
-        try:
-            certificate_data = tlv.TLVReader(commissionee_credentials.noc).get()['Any']
-
-            self._logger.info(f"Parsed NOC TLV: {certificate_data}")
-
-            # TODO: chip.tlv.Reader will remove tag information in List containers. Which is used in NOC TLV
-            # Should extract matter-node-id and matter-fabric-id after List TLV is well handled.
-        except:
-            self._logger.exception("The certificate should be a valid CHIP Certificate, but failed to parse it")
-
-        self._logger.info(f"Device peer id: {commissionee_credentials.fabric_id:016X}:{commissionee_credentials.node_id:016X}")
 
         return commissionee_credentials.node_id
 

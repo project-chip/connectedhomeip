@@ -50,34 +50,7 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
 
 ### Installing prerequisites on macOS
 
-On macOS, first install Xcode from the Mac App Store. The remaining dependencies
-can be installed and satisfied using [Brew](https://brew.sh/):
-
-```
-brew install openssl pkg-config
-```
-
-However, that does not expose the package to `pkg-config`. To fix that, one
-needs to run something like the following:
-
-Intel:
-
-```
-cd /usr/local/lib/pkgconfig
-ln -s ../../Cellar/openssl@1.1/1.1.1g/lib/pkgconfig/* .
-```
-
-where `openssl@1.1/1.1.1g` may need to be replaced with the actual version of
-OpenSSL installed by Brew.
-
-Apple Silicon:
-
-```
-export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:"/opt/homebrew/opt/openssl@3/lib/pkgconfig"
-```
-
-Note: If using MacPorts, `port install openssl` is sufficient to satisfy this
-dependency.
+On macOS, install Xcode from the Mac App Store.
 
 ### Installing prerequisites on Raspberry Pi 4
 

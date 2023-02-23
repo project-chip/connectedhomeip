@@ -18,7 +18,7 @@ import("//build_overrides/jlink.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${efr32_sdk_build_root}/silabs_board.gni")
 
-if (silabs_board == "BRD4325A") {  # CCP board
+if (silabs_board == "BRD4325B") {  # CCP board
   import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
 } else {
   import("${efr32_sdk_build_root}/efr32_sdk.gni")
@@ -86,6 +86,7 @@ if (use_silabs_thread_lib) {
 
     include_dirs = [
       "${chip_root}/examples/platform/silabs/efr32",
+      "${chip_root}/examples/platform/silabs",
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}",
       "${sl_ot_efr32_root}/platform-abstraction/efr32",
       "${sl_openthread_root}/src/",

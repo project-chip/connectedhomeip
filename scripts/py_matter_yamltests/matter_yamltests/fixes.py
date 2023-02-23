@@ -98,7 +98,7 @@ def convert_yaml_octet_string_to_bytes(s: str) -> bytes:
     return binascii.unhexlify(accumulated_hex)
 
 
-def try_add_yaml_support_for_scientific_notation_without_dot(loader):
+def add_yaml_support_for_scientific_notation_without_dot(loader):
     regular_expression = re.compile(u'''^(?:
      [-+]?(?:[0-9][0-9_]*)\\.[0-9_]*(?:[eE][-+]?[0-9]+)?
     |[-+]?(?:[0-9][0-9_]*)(?:[eE][-+]?[0-9]+)
@@ -111,7 +111,6 @@ def try_add_yaml_support_for_scientific_notation_without_dot(loader):
         u'tag:yaml.org,2002:float',
         regular_expression,
         list(u'-+0123456789.'))
-    return loader
 
 
 # This is a gross hack. The previous runner has a some internal states where an identity match one
@@ -130,10 +129,10 @@ def try_update_yaml_node_id_test_runner_state(tests, config):
 
         if test.cluster == 'CommissionerCommands' or test.cluster == 'DelayCommands':
             if test.command == 'PairWithCode' or test.command == 'WaitForCommissionee':
-                if test.response_with_placeholders:
+                if test.responses_with_placeholders:
                     # It the test expects an error, we should not update the
                     # nodeId of the identity.
-                    error = test.response_with_placeholders.get('error')
+                    error = test.responses_with_placeholders[0].get('error')
                     if error:
                         continue
 

@@ -31,9 +31,10 @@ tests:
       verification: |
           Verify that the OTA Requestor App receives the write command and does not reject the value as invalid.
 
-          ./chip-tool otasoftwareupdaterequestor write default-ota-providers "[{"fabricIndex": 1, "providerNodeID": 123, "endpoint": 0}]" 321 0
+          ./chip-tool otasoftwareupdaterequestor write default-otaproviders "[{"fabricIndex": 1, "providerNodeID": 123, "endpoint": 0}]" 321 0
 
-          verify on TH [OTA-REQ] Logs:
+
+          Verify write request for the DefaultOTAProviders attribute on TH [OTA-REQ] Logs:
 
           [1662651310.444641][30167:30167] CHIP:IM: Received Write request
           [1662651310.444820][30167:30167] CHIP:DMG: IM WH moving to [Initialized]
@@ -90,9 +91,9 @@ tests:
           Verify that the OTA Requestor App responds to the read command
 
 
-           ./chip-tool otasoftwareupdaterequestor read default-ota-providers 321 0
+          ./chip-tool otasoftwareupdaterequestor read default-otaproviders 321 0
 
-          verify on TH [OTA-REQ] Logs:
+          Verify read request for the DefaultOTAProviders attribute on TH [OTA-REQ] Logs:
           [1662651381.708529][30167:30167] CHIP:IM: Received Read request
           [1662651381.708619][30167:30167] CHIP:DMG: ReadRequestMessage =
           [1662651381.708648][30167:30167] CHIP:DMG: {
@@ -126,7 +127,7 @@ tests:
 
           ./chip-tool otasoftwareupdaterequestor read update-possible 321 0
 
-          verify on TH [OTA-REQ] Logs:
+          Verify UpdatePossible attribute on TH [OTA-REQ] Logs:
 
           [1662651426.055059][30167:30167] CHIP:IM: Received Read request
           [1662651426.055180][30167:30167] CHIP:DMG: ReadRequestMessage =
@@ -152,14 +153,14 @@ tests:
       disabled: true
 
     - label:
-          "DUT sends a read request to read the UpdateState attribute from the
+          "DUT sends a read request to read the UpdateState Attribute from the
           TH."
       verification: |
           Verify that the OTA Requestor App responds to the read command
 
           ./chip-tool otasoftwareupdaterequestor read update-state 321 0
 
-          verify on TH [OTA-REQ] Logs:
+          Verify UpdateState attribute on TH [OTA-REQ] Logs:
 
           [1662651459.324406][30167:30167] CHIP:IM: Received Read request
           [1662651459.324545][30167:30167] CHIP:DMG: ReadRequestMessage =
@@ -195,7 +196,8 @@ tests:
           ./chip-tool accesscontrol write acl "[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": [321], "targets": null}]" 123 0
 
           Run the announce ota provider command to start the software update and check the UpdateStateProgress
-          ./chip-tool otasoftwareupdaterequestor announce-ota-provider 123 0 0 0 321 0
+
+          ./chip-tool otasoftwareupdaterequestor announce-otaprovider 123 0 0 0 321 0
 
           where 321  is OTA Requestor node ID and 123 is OTA Provider node ID
 
@@ -203,7 +205,7 @@ tests:
 
            ./chip-tool otasoftwareupdaterequestor read update-state-progress 321 0
 
-          verify on TH [OTA-REQ] Logs:
+          Verify UpdateStateProgress attribute on TH [OTA-REQ] Logs:
 
           [1662651648.244248][30167:30167] CHIP:IM: Received Read request
           [1662651648.244329][30167:30167] CHIP:DMG: ReadRequestMessage =

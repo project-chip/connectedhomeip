@@ -21,7 +21,7 @@ package com.google.chip.chiptool.setuppayloadscanner
 import android.os.Parcelable
 import chip.setuppayload.DiscoveryCapability
 import chip.setuppayload.SetupPayload
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 /** Class to hold the CHIP device information. */
 @Parcelize

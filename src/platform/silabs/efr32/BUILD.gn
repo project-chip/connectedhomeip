@@ -14,10 +14,9 @@
 
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/src/platform/device.gni")
-
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
 silabs_platform_dir = "${chip_root}/src/platform/silabs"
@@ -36,7 +35,7 @@ config("efr32-platform-wifi-config") {
   include_dirs = [ "wifi" ]
   defines = []
 
-  if (use_rs911x && use_rs911x_sockets) {
+  if (use_rs9116 && use_rs911x_sockets) {
     include_dirs += [ "wifi/rsi-sockets" ]
     defines += [
       "RS911X_SOCKETS",
@@ -66,11 +65,21 @@ static_library("efr32") {
     "${silabs_platform_dir}/SystemPlatformConfig.h",
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "BLEManagerImpl.cpp",
     "ConfigurationManagerImpl.cpp",
     "KeyValueStoreManagerImpl.cpp",
     "PlatformManagerImpl.cpp",
   ]
+
+  if (chip_enable_ble_rs911x) {
+    sources += [
+      "rs911x/BLEManagerImpl.cpp",
+      "rs911x/rsi_ble_config.h",
+      "rs911x/wfx_sl_ble_init.c",
+      "rs911x/wfx_sl_ble_init.h",
+    ]
+  } else {
+    sources += [ "BLEManagerImpl.cpp" ]
+  }
 
   if (chip_enable_ota_requestor) {
     sources += [

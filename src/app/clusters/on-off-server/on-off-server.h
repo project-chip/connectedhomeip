@@ -22,6 +22,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
+#include <platform/CHIPDeviceConfig.h>
 
 using chip::app::Clusters::OnOff::OnOffFeature;
 
@@ -48,14 +49,14 @@ public:
 
     static OnOffServer & Instance();
 
-    bool offCommand(const chip::app::ConcreteCommandPath & commandPath);
-    bool onCommand(const chip::app::ConcreteCommandPath & commandPath);
-    bool toggleCommand(const chip::app::ConcreteCommandPath & commandPath);
+    bool offCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
+    bool onCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
+    bool toggleCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
     void initOnOffServer(chip::EndpointId endpoint);
     bool offWithEffectCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                               const chip::app::Clusters::OnOff::Commands::OffWithEffect::DecodableType & commandData);
     bool OnWithRecallGlobalSceneCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath);
-    bool OnWithTimedOffCommand(const chip::app::ConcreteCommandPath & commandPath,
+    bool OnWithTimedOffCommand(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                const chip::app::Clusters::OnOff::Commands::OnWithTimedOff::DecodableType & commandData);
     void updateOnOffTimeCommand(chip::EndpointId endpoint);
     EmberAfStatus getOnOffValue(chip::EndpointId endpoint, bool * currentOnOffValue);
@@ -67,6 +68,8 @@ public:
     {
         return HasFeature(endpointId, OnOffFeature::kLighting);
     }
+
+    void cancelEndpointTimerCallback(chip::EndpointId endpoint);
 
 private:
     /**********************************************************
@@ -80,35 +83,47 @@ private:
     EmberEventControl * configureEventControl(chip::EndpointId endpoint);
 
     uint32_t calculateNextWaitTimeMS(void);
+
+    // Matter timer scheduling glue logic
+    static void timerCallback(chip::System::Layer *, void * callbackContext);
+    void scheduleTimerCallbackMs(EmberEventControl * control, uint32_t delayMs);
+    void cancelEndpointTimerCallback(EmberEventControl * control);
+
     /**********************************************************
      * Attributes Declaration
      *********************************************************/
 
     static OnOffServer instance;
-    EmberEventControl eventControls[EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT];
     chip::System::Clock::Timestamp nextDesiredOnWithTimedOffTimestamp;
 };
 
 struct OnOffEffect
 {
     using OffWithEffectTriggerCommand = void (*)(OnOffEffect *);
+    using EffectVariantType           = std::underlying_type_t<chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant>;
+    static_assert(
+        std::is_same<EffectVariantType, std::underlying_type_t<chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant>>::value,
+        "chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant and "
+        "chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant underlying types differ.");
 
     chip::EndpointId mEndpoint;
     OffWithEffectTriggerCommand mOffWithEffectTrigger = nullptr;
     chip::app::Clusters::OnOff::OnOffEffectIdentifier mEffectIdentifier;
-    uint8_t mEffectVariant;
+    EffectVariantType mEffectVariant;
     OnOffEffect * nextEffect = nullptr;
 
-    OnOffEffect(
-        chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
-        chip::app::Clusters::OnOff::OnOffEffectIdentifier effectIdentifier = EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF,
+    OnOffEffect(chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
+                chip::app::Clusters::OnOff::OnOffEffectIdentifier effectIdentifier =
+                    chip::app::Clusters::OnOff::OnOffEffectIdentifier::kDelayedAllOff,
 
-        /*
-         * effectVariant's type depends on the effect effectIdentifier so we don't know the type at compile time.
-         * Casting to uint8_t for more flexibility since the type can be OnOffDelayedAllOffEffectVariant or
-         * OnOffDelayedAllOffEffectVariant
-         */
-        uint8_t effectVariant = static_cast<uint8_t>(EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS));
+                /*
+                 * effectVariant's type depends on the effectIdentifier so we don't know the type at compile time.
+                 * The assertion at the beginning of this method ensures the effect variants share the same base type.
+                 * Casting to the common base type for more flexibility since the type can be OnOffDelayedAllOffEffectVariant or
+                 * OnOffDelayedAllOffEffectVariant
+                 */
+                EffectVariantType =
+                    chip::to_underlying(chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant::kFadeToOffIn0p8Seconds));
     ~OnOffEffect();
 
     bool hasNext() { return this->nextEffect != nullptr; }

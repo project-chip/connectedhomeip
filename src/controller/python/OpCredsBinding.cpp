@@ -544,6 +544,21 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
+PyChipError pychip_OpCreds_InitGroupTestingData(chip::Controller::DeviceCommissioner * devCtrl)
+{
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
+    chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
+
+    CHIP_ERROR err = devCtrl->GetCompressedFabricIdBytes(compressedFabricIdSpan);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+
+    err = chip::GroupTesting::InitData(&sGroupDataProvider, devCtrl->GetFabricIndex(), compressedFabricIdSpan);
+
+    return ToPyChipError(err);
+}
+
 PyChipError pychip_OpCreds_SetMaximallyLargeCertsUsed(OpCredsContext * context, bool enabled)
 {
     VerifyOrReturnError(context != nullptr && context->mAdapter != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));
@@ -567,6 +582,22 @@ PyChipError pychip_DeviceController_DeleteDeviceController(chip::Controller::Dev
     }
 
     return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_SetIpk(chip::Controller::DeviceCommissioner * devCtrl, const uint8_t * ipk, size_t ipkLen)
+{
+    VerifyOrReturnError(ipk != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
+    chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
+
+    err = devCtrl->GetCompressedFabricIdBytes(compressedFabricIdSpan);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+
+    CHIP_ERROR err = chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), ByteSpan(ipk, ipkLen),
+                                                             compressedFabricIdSpan);
+
+    return ToPyChipError(err);
 }
 
 bool pychip_TestCommissionerUsed()

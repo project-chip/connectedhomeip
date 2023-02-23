@@ -14,6 +14,8 @@ import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipClusters
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
+import com.google.chip.chiptool.databinding.AttestationTestFragmentBinding
+import com.google.chip.chiptool.databinding.SensorClientFragmentBinding
 import com.google.chip.chiptool.util.DeviceIdUtil
 import com.jjoe64.graphview.LabelFormatter
 import com.jjoe64.graphview.Viewport
@@ -22,13 +24,6 @@ import com.jjoe64.graphview.series.LineGraphSeries
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import kotlinx.android.synthetic.main.sensor_client_fragment.clusterNameSpinner
-import kotlinx.android.synthetic.main.sensor_client_fragment.deviceIdEd
-import kotlinx.android.synthetic.main.sensor_client_fragment.endpointIdEd
-import kotlinx.android.synthetic.main.sensor_client_fragment.lastValueTv
-import kotlinx.android.synthetic.main.sensor_client_fragment.readSensorBtn
-import kotlinx.android.synthetic.main.sensor_client_fragment.sensorGraph
-import kotlinx.android.synthetic.main.sensor_client_fragment.watchSensorBtn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -51,40 +46,47 @@ class SensorClientFragment : Fragment() {
   // Device whose attribute is subscribed
   private var subscribedDevicePtr = 0L
 
+  private var _binding: SensorClientFragmentBinding? = null
+  private val binding get() = _binding!!
+
   override fun onCreateView(
       inflater: LayoutInflater,
       container: ViewGroup?,
       savedInstanceState: Bundle?
   ): View {
+    _binding = SensorClientFragmentBinding.inflate(inflater, container, false)
     scope = viewLifecycleOwner.lifecycleScope
-    return inflater.inflate(R.layout.sensor_client_fragment, container, false)
+
+    return binding.root
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
     ChipClient.getDeviceController(requireContext()).setCompletionListener(null)
-    deviceIdEd.setOnEditorActionListener { textView, actionId, _ ->
+    binding.deviceIdEd.setOnEditorActionListener { textView, actionId, _ ->
       if (actionId == EditorInfo.IME_ACTION_DONE) {
         resetSensorGraph() // reset the graph on device change
       }
       actionId == EditorInfo.IME_ACTION_DONE
     }
-    endpointIdEd.setOnEditorActionListener { textView, actionId, _ ->
+
+    binding.endpointIdEd.setOnEditorActionListener { textView, actionId, _ ->
       if (actionId == EditorInfo.IME_ACTION_DONE)
         resetSensorGraph() // reset the graph on endpoint change
       actionId == EditorInfo.IME_ACTION_DONE
     }
-    clusterNameSpinner.adapter = makeClusterNamesAdapter()
-    clusterNameSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
+    binding.clusterNameSpinner.adapter = makeClusterNamesAdapter()
+    binding.clusterNameSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
       override fun onNothingSelected(parent: AdapterView<*>?) = Unit
       override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         resetSensorGraph() // reset the graph on cluster change
       }
     }
 
-    readSensorBtn.setOnClickListener { scope.launch { readSensorCluster() } }
-    watchSensorBtn.setOnCheckedChangeListener { _, isChecked ->
+    binding.readSensorBtn.setOnClickListener { scope.launch { readSensorCluster() } }
+    binding.watchSensorBtn.setOnCheckedChangeListener { _, isChecked ->
       if (isChecked) {
         scope.launch { subscribeSensorCluster() }
       } else {
@@ -93,14 +95,14 @@ class SensorClientFragment : Fragment() {
     }
 
     val currentTime = Calendar.getInstance().time.time
-    sensorGraph.addSeries(sensorData)
-    sensorGraph.viewport.isXAxisBoundsManual = true
-    sensorGraph.viewport.setMinX(currentTime.toDouble())
-    sensorGraph.viewport.setMaxX(currentTime.toDouble() + MIN_REFRESH_PERIOD_S * 1000 * MAX_DATA_POINTS)
-    sensorGraph.gridLabelRenderer.padding = 30
-    sensorGraph.gridLabelRenderer.numHorizontalLabels = 4
-    sensorGraph.gridLabelRenderer.setHorizontalLabelsAngle(150)
-    sensorGraph.gridLabelRenderer.labelFormatter = object : LabelFormatter {
+    binding.sensorGraph.addSeries(sensorData)
+    binding.sensorGraph.viewport.isXAxisBoundsManual = true
+    binding.sensorGraph.viewport.setMinX(currentTime.toDouble())
+    binding.sensorGraph.viewport.setMaxX(currentTime.toDouble() + MIN_REFRESH_PERIOD_S * 1000 * MAX_DATA_POINTS)
+    binding.sensorGraph.gridLabelRenderer.padding = 30
+    binding.sensorGraph.gridLabelRenderer.numHorizontalLabels = 4
+    binding.sensorGraph.gridLabelRenderer.setHorizontalLabelsAngle(150)
+    binding.sensorGraph.gridLabelRenderer.labelFormatter = object : LabelFormatter {
       override fun setViewport(viewport: Viewport?) = Unit
       override fun formatLabel(value: Double, isValueX: Boolean): String {
         if (isValueX)
@@ -114,7 +116,7 @@ class SensorClientFragment : Fragment() {
 
   override fun onStart() {
     super.onStart()
-    deviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
+    binding.deviceIdEd.setText(DeviceIdUtil.getLastDeviceId(requireContext()).toString())
   }
 
   override fun onStop() {
@@ -122,9 +124,14 @@ class SensorClientFragment : Fragment() {
     super.onStop()
   }
 
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+  }
+
   private fun resetSensorGraph() {
-    watchSensorBtn.isChecked = false
-    sensorGraph.visibility = View.INVISIBLE
+    binding.watchSensorBtn.isChecked = false
+    binding.sensorGraph.visibility = View.INVISIBLE
     sensorData.resetData(emptyArray())
   }
 
@@ -140,9 +147,9 @@ class SensorClientFragment : Fragment() {
 
   private suspend fun readSensorCluster() {
     try {
-      val deviceId = deviceIdEd.text.toString().toULong().toLong()
-      val endpointId = endpointIdEd.text.toString().toInt()
-      val clusterName = clusterNameSpinner.selectedItem.toString()
+      val deviceId = binding.deviceIdEd.text.toString().toULong().toLong()
+      val endpointId = binding.endpointIdEd.text.toString().toInt()
+      val clusterName = binding.clusterNameSpinner.selectedItem.toString()
       val clusterRead = CLUSTERS[clusterName]!!["read"] as (Long, Int, ReadCallback) -> Unit
       val device = ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
       val callback = makeReadCallback(clusterName, false)
@@ -155,9 +162,9 @@ class SensorClientFragment : Fragment() {
 
   private suspend fun subscribeSensorCluster() {
     try {
-      val deviceId = deviceIdEd.text.toString().toULong().toLong()
-      val endpointId = endpointIdEd.text.toString().toInt()
-      val clusterName = clusterNameSpinner.selectedItem.toString()
+      val deviceId = binding.deviceIdEd.text.toString().toULong().toLong()
+      val endpointId = binding.endpointIdEd.text.toString().toInt()
+      val clusterName = binding.clusterNameSpinner.selectedItem.toString()
       val clusterSubscribe = CLUSTERS[clusterName]!!["subscribe"] as (Long, Int, ReadCallback) -> Unit
       val device = ChipClient.getConnectedDevicePointer(requireContext(), deviceId)
       val callback = makeReadCallback(clusterName, true)
@@ -199,7 +206,7 @@ class SensorClientFragment : Fragment() {
 
   private fun consumeSensorValue(value: Double, unitSymbol: String, addToGraph: Boolean) {
     requireActivity().runOnUiThread {
-      lastValueTv.text = requireContext().getString(
+      binding.lastValueTv.text = requireContext().getString(
           R.string.sensor_client_last_value_text, value, unitSymbol
       )
 
@@ -212,7 +219,7 @@ class SensorClientFragment : Fragment() {
           // related to calculating the viewport when there is only one data point by
           // duplicating the first sample.
           sensorData.appendData(dataPoint, true, MAX_DATA_POINTS)
-          sensorGraph.visibility = View.VISIBLE
+          binding.sensorGraph.visibility = View.VISIBLE
         }
       }
     }

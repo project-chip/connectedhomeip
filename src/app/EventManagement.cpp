@@ -858,6 +858,17 @@ bool CircularEventBuffer::IsFinalDestinationForPriority(PriorityLevel aPriority)
     return !((mpNext != nullptr) && (mpNext->mPriority <= aPriority));
 }
 
+/**
+ * @brief
+ * TLVCircularBuffer::OnInit can modify the state of the buffer, but we don't want that behavior here.
+ * We want to make sure we don't change our state, and just report the currently-available space.
+ */
+CHIP_ERROR CircularEventBuffer::OnInit(TLV::TLVWriter & writer, uint8_t *& bufStart, uint32_t & bufLen)
+{
+    GetCurrentWritableBuffer(bufStart, bufLen);
+    return CHIP_NO_ERROR;
+}
+
 void CircularEventReader::Init(CircularEventBufferWrapper * apBufWrapper)
 {
     CircularEventBuffer * prev;

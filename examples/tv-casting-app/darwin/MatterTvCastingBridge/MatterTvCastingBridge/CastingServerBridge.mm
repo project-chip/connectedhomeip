@@ -19,6 +19,7 @@
 #import "CastingServer.h"
 
 #import "CommissionableDataProviderImpl.hpp"
+#import "CommissionerDiscoveryDelegateImpl.h"
 #import "ConversionUtils.hpp"
 #import "DeviceAttestationCredentialsProviderImpl.hpp"
 #import "MatterCallbacks.h"
@@ -43,6 +44,8 @@
 @property chip::Credentials::DeviceAttestationCredentialsProvider * deviceAttestationCredentialsProvider;
 
 @property chip::CommonCaseDeviceServerInitParams * serverInitParams;
+
+@property CommissionerDiscoveryDelegateImpl * commissionerDiscoveryDelegate;
 
 @property TargetVideoPlayerInfo * previouslyConnectedVideoPlayer;
 
@@ -97,6 +100,8 @@
             ChipLogError(AppServer, "InitChipStack failed: %s", ErrorStr(err));
             return nil;
         }
+
+        _commissionerDiscoveryDelegate = new CommissionerDiscoveryDelegateImpl();
 
         _commandResponseCallbacks = [NSMutableDictionary dictionary];
         _subscriptionEstablishedCallbacks = [NSMutableDictionary dictionary];
@@ -268,12 +273,19 @@
 }
 
 - (void)discoverCommissioners:(dispatch_queue_t _Nonnull)clientQueue
-    discoveryRequestSentHandler:(nullable void (^)(bool))discoveryRequestSentHandler
+      discoveryRequestSentHandler:(nullable void (^)(bool))discoveryRequestSentHandler
+    discoveredCommissionerHandler:(nullable void (^)(DiscoveredNodeData *))discoveredCommissionerHandler
 {
     ChipLogProgress(AppServer, "CastingServerBridge().discoverCommissioners() called");
     dispatch_async(_chipWorkQueue, ^{
         bool discoveryRequestStatus = true;
-        CHIP_ERROR err = CastingServer::GetInstance()->DiscoverCommissioners();
+
+        if (discoveredCommissionerHandler != nil) {
+            TargetVideoPlayerInfo * cachedTargetVideoPlayerInfos = CastingServer::GetInstance()->ReadCachedTargetVideoPlayerInfos();
+            self->_commissionerDiscoveryDelegate->SetUp(clientQueue, discoveredCommissionerHandler, cachedTargetVideoPlayerInfos);
+        }
+        CHIP_ERROR err = CastingServer::GetInstance()->DiscoverCommissioners(
+            discoveredCommissionerHandler != nil ? self->_commissionerDiscoveryDelegate : nullptr);
         if (err != CHIP_NO_ERROR) {
             ChipLogError(AppServer, "CastingServerBridge().discoverCommissioners() failed: %" CHIP_ERROR_FORMAT, err.Format());
             discoveryRequestStatus = false;

@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.chip.chiptool.R
-import kotlinx.android.synthetic.main.cluster_interaction_history_fragment.view.historyCommandList
+import com.google.chip.chiptool.databinding.ClusterInteractionHistoryFragmentBinding
 
 /**
  * A simple [Fragment] subclass for the cluster interaction history component
@@ -16,18 +16,25 @@ import kotlinx.android.synthetic.main.cluster_interaction_history_fragment.view.
  * create an instance of this fragment.
  */
 class ClusterInteractionHistoryFragment : Fragment() {
+  private var _binding: ClusterInteractionHistoryFragmentBinding? = null
+  private val binding get() = _binding!!
 
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
     savedInstanceState: Bundle?
-  ): View? {
-    // Inflate the layout for this fragment
+  ): View {
+    _binding = ClusterInteractionHistoryFragmentBinding.inflate(inflater, container, false)
     Log.d(TAG, clusterInteractionHistoryList.toString())
-    return inflater.inflate(R.layout.cluster_interaction_history_fragment, container, false).apply {
-      historyCommandList.adapter =
-        HistoryCommandAdapter(clusterInteractionHistoryList, HistoryCommandListener(), inflater)
-      historyCommandList.layoutManager = LinearLayoutManager(requireContext())
-    }
+    binding.historyCommandList.adapter =
+      HistoryCommandAdapter(clusterInteractionHistoryList, HistoryCommandListener(), inflater)
+    binding.historyCommandList.layoutManager = LinearLayoutManager(requireContext())
+
+    return binding.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
   private fun showFragment(fragment: Fragment, showOnBack: Boolean = true) {

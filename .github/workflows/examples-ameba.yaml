@@ -17,6 +17,7 @@ name: Build example - Ameba
 on:
     push:
     pull_request:
+    merge_group:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -35,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-ameba:0.6.35
+            image: connectedhomeip/chip-build-ameba:0.6.40
             options: --user root
 
         steps:
@@ -49,6 +50,16 @@ jobs:
                   attempt_delay: 2000
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform ameba
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
+            - name: Bootstrap
+              run: scripts/build/gn_bootstrap.sh
             - name: Build example Ameba All Clusters App
               run: |
                   ./scripts/run_in_build_env.sh \

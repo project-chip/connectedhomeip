@@ -750,6 +750,18 @@ class ChipDeviceControllerBase():
             ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
         return await future
 
+    def SendGroupCommand(self, groupid: int, payload: ClusterObjects.ClusterCommand, busyWaitMs: typing.Union[None, int] = None):
+        '''
+        Send a group cluster-object encapsulated command to a group_id and get returned a future that can be awaited upon to get confirmation command was sent.
+        '''
+        self.CheckIsActive()
+
+        ClusterCommand.SendGroupCommand(
+            groupid, self.devCtrl, payload, busyWaitMs=busyWaitMs).raise_on_error()
+
+        # None is the expected return for sending group commands.
+        return None
+
     async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]], timedRequestTimeoutMs: typing.Union[None, int] = None, interactionTimeoutMs: typing.Union[None, int] = None, busyWaitMs: typing.Union[None, int] = None):
         '''
         Write a list of attributes on a target node.
@@ -782,6 +794,34 @@ class ChipDeviceControllerBase():
         ClusterAttribute.WriteAttributes(
             future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
         return await future
+
+    def WriteGroupAttribute(self, groupid: int, attributes: typing.List[typing.Tuple[ClusterObjects.ClusterAttributeDescriptor, int]], busyWaitMs: typing.Union[None, int] = None):
+        '''
+        Write a list of attributes on a target group.
+
+        groupid: Group ID to send write attribute to.
+        attributes: A list of tuples of type (cluster-object, data-version). The data-version can be omitted.
+
+        E.g
+            (Clusters.UnitTesting.Attributes.XYZAttribute('hello'), 1) -- Group Write 'hello' with data version 1
+        '''
+        self.CheckIsActive()
+
+        attrs = []
+        invalid_endpoint = 0xFFFF
+        for v in attributes:
+            if len(v) == 2:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    invalid_endpoint, v[0], v[1], 1, v[0].value))
+            else:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    invalid_endpoint, v[0], 0, 0, v[0].value))
+
+        ClusterAttribute.WriteGroupAttributes(
+            groupid, self.devCtrl, attrs, busyWaitMs=busyWaitMs).raise_on_error()
+
+        # An empty list is the expected return for sending group write attribute.
+        return []
 
     def _parseAttributePathTuple(self, pathTuple: typing.Union[
         None,  # Empty tuple, all wildcard
@@ -1020,7 +1060,7 @@ class ChipDeviceControllerBase():
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster], int],
         # Concrete path
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent], int]
-    ]], eventNumberFilter: typing.Optional[int] = None, reportInterval: typing.Tuple[int, int] = None, keepSubscriptions: bool = False):
+    ]], eventNumberFilter: typing.Optional[int] = None, fabricFiltered: bool = True, reportInterval: typing.Tuple[int, int] = None, keepSubscriptions: bool = False):
         '''
         Read a list of events from a target node, this is a wrapper of DeviceController.Read()
 
@@ -1044,7 +1084,7 @@ class ChipDeviceControllerBase():
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
         '''
-        res = await self.Read(nodeid=nodeid, events=events, eventNumberFilter=eventNumberFilter, reportInterval=reportInterval, keepSubscriptions=keepSubscriptions)
+        res = await self.Read(nodeid=nodeid, events=events, eventNumberFilter=eventNumberFilter, fabricFiltered=fabricFiltered, reportInterval=reportInterval, keepSubscriptions=keepSubscriptions)
         if isinstance(res, ClusterAttribute.SubscriptionTransaction):
             return res
         else:
@@ -1134,6 +1174,20 @@ class ChipDeviceControllerBase():
         self.CheckIsActive()
 
         self._ChipStack.blockingCB = blockingCB
+
+    def SetIpk(self, ipk: bytes):
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetIpk(self.devCtrl, ipk, len(ipk))
+        ).raise_on_error()
+
+    def InitGroupTestingData(self):
+        """Populates the Device Controller's GroupDataProvider with known test group info and keys."""
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_OpCreds_InitGroupTestingData(
+                self.devCtrl)
+        ).raise_on_error()
 
     # ----- Private Members -----
     def _InitLib(self):
@@ -1301,6 +1355,10 @@ class ChipDeviceControllerBase():
             ]
             self._dmLib.pychip_DeviceController_IssueNOCChain.restype = PyChipError
 
+            self._dmLib.pychip_OpCreds_InitGroupTestingData.argtypes = [
+                c_void_p]
+            self._dmLib.pychip_OpCreds_InitGroupTestingData.restype = PyChipError
+
             self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback.argtypes = [
                 _IssueNOCChainCallbackPythonCallbackFunct]
             self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback.restype = None
@@ -1321,6 +1379,9 @@ class ChipDeviceControllerBase():
             self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow.argtypes = [
                 POINTER(c_void_p), c_void_p, c_char_p, c_uint32, c_char_p, c_uint32, c_char_p, c_uint32, c_char_p, c_uint32, c_uint16, c_bool]
             self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow.restype = PyChipError
+
+            self._dmLib.pychip_DeviceController_SetIpk.argtypes = [c_void_p, POINTER(c_uint8), c_size_t]
+            self._dmLib.pychip_DeviceController_SetIpk.restype = PyChipError
 
 
 class ChipDeviceController(ChipDeviceControllerBase):
@@ -1455,7 +1516,6 @@ class ChipDeviceController(ChipDeviceControllerBase):
                 self.devCtrl, nodeId, setupPinCode, int(filterType), str(filter).encode("utf-8") + b"\x00" if filter is not None else None)
         )
         if not self._ChipStack.commissioningCompleteEvent.isSet():
-            # Error 50 is a timeout
             return False, -1
         return self._ChipStack.commissioningEventRes == 0, self._ChipStack.commissioningEventRes
 
@@ -1475,7 +1535,6 @@ class ChipDeviceController(ChipDeviceControllerBase):
                 self.devCtrl, setupPayload, nodeid)
         )
         if not self._ChipStack.commissioningCompleteEvent.isSet():
-            # Error 50 is a timeout
             return False
         return self._ChipStack.commissioningEventRes == 0
 
@@ -1494,7 +1553,6 @@ class ChipDeviceController(ChipDeviceControllerBase):
                 self.devCtrl, ipaddr.encode("utf-8"), setupPinCode, nodeid)
         )
         if not self._ChipStack.commissioningCompleteEvent.isSet():
-            # Error 50 is a timeout
             return False
         return self._ChipStack.commissioningEventRes == 0
 

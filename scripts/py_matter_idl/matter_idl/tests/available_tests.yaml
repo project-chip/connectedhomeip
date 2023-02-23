@@ -76,3 +76,12 @@ cpp-app:
     inputs/large_lighting_app.matter:
         app/PluginApplicationCallbacks.h: outputs/large_lighting_app/cpp-app/PluginApplicationCallbacks.h
         app/callback-stub.cpp: outputs/large_lighting_app/cpp-app/callback-stub.cpp
+
+custom-example-proto:
+    inputs/several_clusters.matter:
+        proto/first_cluster.proto: outputs/proto/first_cluster.proto
+        proto/second_cluster.proto: outputs/proto/second_cluster.proto
+        proto/third_cluster.proto: outputs/proto/third_cluster.proto
+
+    inputs/large_all_clusters_app.matter:
+        proto/ota_software_update_provider_cluster.proto: outputs/proto/ota_software_update_provider_cluster.proto

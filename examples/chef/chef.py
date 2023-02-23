@@ -321,15 +321,15 @@ def main() -> int:
                       help="specifies the Vendor ID. Default is 0xFFF1", metavar="VID", default=0xFFF1)
     parser.add_option("-p", "--pid", dest="pid", type=int,
                       help="specifies the Product ID. Default is 0x8000", metavar="PID", default=0x8000)
+    parser.add_option("-P", "--pname", dest="pname", type=str, metavar="PRODUCT_NAME",
+                      help="specifies the Product Name. Default is TEST_PRODUCT", default="TEST_PRODUCT")
     parser.add_option("", "--rpc_console", help="Opens PW RPC Console",
                       action="store_true", dest="do_rpc_console")
     parser.add_option("-y", "--tty", help="Enumerated USB tty/serial interface enumerated for your physical device. E.g.: /dev/ACM0",
                       dest="tty", metavar="TTY", default=None)
-    parser.add_option("", "--use_zzz", help="Use pre generated output from the ZAP tool found in the zzz_generated folder. Used to decrease execution time of CI/CD jobs",
-                      dest="use_zzz", action="store_true")
 
     # Build CD params.
-    parser.add_option("", "--build_all", help="For use in CD only. Builds and bundles all chef examples for the specified platform. Uses --use_zzz. Chef exits after completion.",
+    parser.add_option("", "--build_all", help="For use in CD only. Builds and bundles all chef examples for the specified platform. Chef exits after completion.",
                       dest="build_all", action="store_true")
     parser.add_option("", "--dry_run", help="Display list of target builds of the --build_all command without building them.",
                       dest="dry_run", action="store_true")
@@ -340,7 +340,7 @@ def main() -> int:
     parser.add_option("-k", "--keep_going", help="For use in CD only. Continues building all sample apps in the event of an error.",
                       dest="keep_going", action="store_true")
     parser.add_option(
-        "", "--ci", help="Builds Chef examples defined in cicd_config. Uses --use_zzz. Uses specified target from -t. Chef exits after completion.", dest="ci", action="store_true")
+        "", "--ci", help="Builds Chef examples defined in cicd_config. Uses specified target from -t. Chef exits after completion.", dest="ci", action="store_true")
     parser.add_option(
         "", "--enable_ipv4", help="Enable IPv4 mDNS. Only applicable to platforms that can support IPV4 (e.g, Linux, ESP32)",
         action="store_true", default=False)
@@ -365,7 +365,7 @@ def main() -> int:
                 shell.run_cmd(
                     "export GNUARMEMB_TOOLCHAIN_PATH=\"$PW_ARM_CIPD_INSTALL_DIR\"")
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
-            command = f"./chef.py -cbr --use_zzz -d {device_name} -t {options.build_target}"
+            command = f"./chef.py -cbr -d {device_name} -t {options.build_target}"
             flush_print(f"Building {command}", with_border=True)
             shell.run_cmd(command)
             bundle(options.build_target, device_name)
@@ -395,7 +395,7 @@ def main() -> int:
                     if options.dry_run:
                         flush_print(archive_name)
                         continue
-                    command = f"./chef.py -cbr --use_zzz -d {device_name} -t {platform} "
+                    command = f"./chef.py -cbr -d {device_name} -t {platform} "
                     command += " ".join(args)
                     flush_print(f"Building {command}", with_border=True)
                     shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
@@ -600,21 +600,6 @@ def main() -> int:
                     f"""Truncate the software version string from \"{sw_ver_string}\" to \"{truncated_sw_ver_string}\" due to 64 bytes limitation""")
                 sw_ver_string = truncated_sw_ver_string
 
-        if options.use_zzz:
-            flush_print("Using pre-generated ZAP output")
-            zzz_dir = os.path.join(_REPO_BASE_PATH,
-                                   "zzz_generated",
-                                   "chef-"+options.sample_device_type_name,
-                                   "zap-generated")
-            if not os.path.exists(zzz_dir):
-                flush_print(textwrap.dedent(f"""\
-                You have specified --use_zzz
-                for device {options.sample_device_type_name}
-                which does not exist in the cached ZAP output.
-                """))
-                exit(1)
-            shutil.rmtree(gen_dir, ignore_errors=True)
-            shutil.copytree(zzz_dir, gen_dir)
         flush_print("Building...")
 
         flush_print(
@@ -626,6 +611,7 @@ def main() -> int:
                 f.write(textwrap.dedent(f"""\
                         set(CONFIG_DEVICE_VENDOR_ID {options.vid})
                         set(CONFIG_DEVICE_PRODUCT_ID {options.pid})
+                        set(CONFIG_DEVICE_PRODUCT_NAME \"{options.pname}\")
                         set(CONFIG_ENABLE_PW_RPC {"1" if options.do_rpc else "0"})
                         set(SAMPLE_NAME {options.sample_device_type_name})
                         set(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING \"{sw_ver_string}\")"""))
@@ -716,7 +702,7 @@ def main() -> int:
                 'chip_shell_cmd_server = false',
                 'chip_build_libshell = true',
                 'chip_config_network_layer_ble = false',
-                f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}"]',
+                f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\\"{str(options.pname)}\\""]',
             ])
 
             uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
@@ -763,6 +749,7 @@ def main() -> int:
             if sw_ver_string:
                 linux_args.append(
                     f'chip_device_config_device_software_version_string = "{sw_ver_string}"')
+
             with open(f"{_CHEF_SCRIPT_PATH}/linux/args.gni", "w") as f:
                 f.write("\n".join(linux_args))
             with open(f"{_CHEF_SCRIPT_PATH}/linux/sample.gni", "w") as f:

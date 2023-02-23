@@ -177,8 +177,10 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     setupParams.operationalCredentialsDelegate = opCredsIssuer;
     setupParams.defaultCommissioner            = &wrapper->mAutoCommissioner;
     initParams.fabricIndependentStorage        = wrapperStorage;
+    initParams.sessionKeystore                 = &wrapper->mSessionKeystore;
 
     wrapper->mGroupDataProvider.SetStorageDelegate(wrapperStorage);
+    wrapper->mGroupDataProvider.SetSessionKeystore(initParams.sessionKeystore);
 
     CommissioningParameters params = wrapper->mAutoCommissioner.GetCommissioningParameters();
     params.SetFailsafeTimerSeconds(failsafeTimerSeconds);

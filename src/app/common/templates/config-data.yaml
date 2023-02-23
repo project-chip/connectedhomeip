@@ -1,0 +1,79 @@
+WeakEnums:
+    # Allow-list of enums that we generate as enums, not enum classes.
+    # The goal is to drive this down to 0.
+    - BarrierControlBarrierPosition
+    - BarrierControlMovingState
+    - ColorControlOptions
+    - ColorLoopAction
+    - ColorLoopDirection
+    - ColorMode
+    - ContentLaunchStatus
+    - ContentLaunchStreamingType
+    - EnhancedColorMode
+    - HardwareFaultEnum
+    - HueDirection
+    - HueMoveMode
+    - HueStepMode
+    - IdentifyEffectIdentifier
+    - IdentifyEffectVariant
+    - IdentifyIdentifyType
+    - InterfaceTypeEnum
+    - LevelControlOptions
+    - MoveMode
+    - NetworkFaultEnum
+    - PHYRateEnum
+    - RadioFaultEnum
+    - RoutingRole
+    - SaturationMoveMode
+    - SaturationStepMode
+    - StepMode
+
+DefineBitmaps:
+    # Allow-list of bitmaps that we generates as #define as well as enum classes.
+    # The goal is to drive this down to 0.
+    - BarrierControlCapabilities
+    - BarrierControlSafetyStatus
+    - ColorLoopUpdateFlags
+    - LevelControlFeature
+
+# We need a more configurable way of deciding which clusters have which init functions....
+# See https://github.com/project-chip/connectedhomeip/issues/4369
+ClustersWithInitFunctions:
+    - Basic
+    - Color Control
+    - Groups
+    - Identify
+    - Level Control
+    - Localization Configuration
+    - Occupancy Sensing
+    - On/Off
+    - Pump Configuration and Control
+    - Scenes
+    - Time Format Localization
+    - Thermostat
+    - Mode Select
+
+ClustersWithAttributeChangedFunctions:
+    - Bridged Device Basic
+    - Door Lock
+    - Identify
+    - Pump Configuration and Control
+    - Window Covering
+    - Fan Control
+
+ClustersWithShutdownFunctions:
+    - Barrier Control
+    - On/Off
+    - Door Lock
+    - Level Control
+    - Color Control
+
+ClustersWithPreAttributeChangeFunctions:
+    - Door Lock
+    - Pump Configuration and Control
+    - Thermostat User Interface Configuration
+    - Time Format Localization
+    - Localization Configuration
+    - Mode Select
+    - Fan Control
+    - Thermostat

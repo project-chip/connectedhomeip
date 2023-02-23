@@ -54,11 +54,11 @@ CHIP_ERROR SlWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     err                          = CHIP_NO_ERROR;
 #else
     // If reading fails, wifi is not provisioned, no need to go further.
-    err = SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_WiFiSSID, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid),
+    err = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_WiFiSSID, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid),
                                            ssidLen);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
-    err = SILABSConfig::ReadConfigValueStr(SILABSConfig::kConfigKey_WiFiPSK, mSavedNetwork.credentials,
+    err = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_WiFiPSK, mSavedNetwork.credentials,
                                            sizeof(mSavedNetwork.credentials), credentialsLen);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
@@ -74,9 +74,9 @@ CHIP_ERROR SlWiFiDriver::CommitConfiguration()
 {
     uint8_t securityType = WFX_SEC_WPA2;
 
-    ReturnErrorOnFailure(SILABSConfig::WriteConfigValueStr(SILABSConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid));
-    ReturnErrorOnFailure(SILABSConfig::WriteConfigValueStr(SILABSConfig::kConfigKey_WiFiPSK, mStagingNetwork.credentials));
-    ReturnErrorOnFailure(SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_WiFiSEC, &securityType, sizeof(securityType)));
+    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid));
+    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiPSK, mStagingNetwork.credentials));
+    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_WiFiSEC, &securityType, sizeof(securityType)));
 
     mSavedNetwork = mStagingNetwork;
     return CHIP_NO_ERROR;

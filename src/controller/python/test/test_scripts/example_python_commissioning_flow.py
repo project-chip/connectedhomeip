@@ -38,7 +38,7 @@ class ExampleCustomMatterCommissioningFlow(commissioning_flow_blocks.Commissioni
             node_id = device.node_id
 
             self._logger.info("Sending ArmFailSafe to device")
-            await self.arm_failsafe(parameter=parameter, node_id=node_id)
+            await self.arm_failsafe(node_id=node_id, duration_seconds=parameter.failsafe_expiry_length_seconds)
 
             self._logger.info("Setting Regulatory Configuration")
             await self.send_regulatory_config(parameter=parameter, node_id=node_id)

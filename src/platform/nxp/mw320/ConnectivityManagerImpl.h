@@ -85,7 +85,7 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     void StartWiFiManagement();
     CHIP_ERROR GetWiFiBssId(ByteSpan & value);
-    CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType);
+    CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType);
     CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion);
 #endif
     CHIP_ERROR GetConfiguredNetwork(NetworkCommissioning::Network & network);

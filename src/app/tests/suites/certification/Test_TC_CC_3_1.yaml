@@ -243,14 +243,24 @@ tests:
               - name: "ms"
                 value: 10000
 
+    #https://github.com/CHIP-Specifications/chip-test-scripts/issues/493#issuecomment-1422075950
     - label: "TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              minValue: 166
-              maxValue: 224
+      PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool colorcontrol read current-hue 1 1
+
+          After another 10 seconds , Verify that CurrentHue value as 195 On  TH(chip-tool)  Logs:
+          [1649661821.298198][8292:8297] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087274517
+          [1649661821.298271][8292:8297] CHIP:TOO:   current hue: 195 (value can vary)
+          [1649661821.298374][8292:8297] CHIP:EM: Sending Standalone Ack for MessageCounter:13643708 on exchange 28536i
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait 10s"
       PICS: CC.S.F00
@@ -261,14 +271,24 @@ tests:
               - name: "ms"
                 value: 10000
 
+    #https://github.com/CHIP-Specifications/chip-test-scripts/issues/493#issuecomment-1422075950
     - label: "TH reads CurrentHue attribute from DUT"
-      PICS: CC.S.F00 && CC.S.A0000
-      command: "readAttribute"
-      attribute: "CurrentHue"
-      response:
-          constraints:
-              minValue: 115
-              maxValue: 155
+      PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
+      verification: |
+          ./chip-tool colorcontrol read current-hue 1 1
+          After another 10 seconds , Verify that CurrentHue value as 135 On  TH(chip-tool)  Logs:
+
+          [1649661821.298198][8292:8297] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0300 Attribute 0x0000_0000 DataVersion: 4087274517
+          [1649661821.298271][8292:8297] CHIP:TOO:   current hue: 135
+          [1649661821.298374][8292:8297] CHIP:EM: Sending Standalone Ack for MessageCounter:13643708 on exchange 28536i"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "Wait 5s"
       PICS: CC.S.F00

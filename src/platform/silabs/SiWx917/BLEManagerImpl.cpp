@@ -59,7 +59,7 @@ extern rsi_ble_event_conn_status_t conn_event_to_app;
 extern sl_wfx_msg_t event_msg;
 
 StaticTask_t rsiBLETaskStruct;
-rsi_semaphore_handle_t sl_ble_init_sem;
+rsi_semaphore_handle_t sl_rs_ble_init_sem;
 rsi_semaphore_handle_t sl_ble_event_sem;
 
 /* wfxRsi Task will use as its stack */
@@ -99,9 +99,9 @@ void sl_ble_event_handling_task(void)
     int32_t event_id;
 
     WFX_RSI_LOG("%s starting", __func__);
-    rsi_semaphore_create(&sl_ble_init_sem, 0);
+    rsi_semaphore_create(&sl_rs_ble_init_sem, 0);
     //! This semaphore is waiting for wifi module initialization.
-    rsi_semaphore_wait(&sl_ble_init_sem, 0);
+    rsi_semaphore_wait(&sl_rs_ble_init_sem, 0);
 
     sl_ble_init();
 

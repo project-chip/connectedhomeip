@@ -29,6 +29,7 @@ pw_python_package("matter_yamltests") {
     "matter_yamltests/__init__.py",
     "matter_yamltests/constraints.py",
     "matter_yamltests/definitions.py",
+    "matter_yamltests/errors.py",
     "matter_yamltests/fixes.py",
     "matter_yamltests/parser.py",
     "matter_yamltests/pics_checker.py",
@@ -38,6 +39,7 @@ pw_python_package("matter_yamltests") {
     "matter_yamltests/pseudo_clusters/clusters/system_commands.py",
     "matter_yamltests/pseudo_clusters/pseudo_cluster.py",
     "matter_yamltests/pseudo_clusters/pseudo_clusters.py",
+    "matter_yamltests/yaml_loader.py",
   ]
 
   python_deps = [ "${chip_root}/scripts/py_matter_idl:matter_idl" ]
@@ -46,6 +48,7 @@ pw_python_package("matter_yamltests") {
     "test_spec_definitions.py",
     "test_pics_checker.py",
     "test_pseudo_clusters.py",
+    "test_yaml_loader.py",
   ]
 
   # TODO: at a future time consider enabling all (* or missing) here to get

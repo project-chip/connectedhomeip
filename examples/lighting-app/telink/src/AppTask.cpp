@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -70,7 +70,8 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 namespace {
-constexpr int kFactoryResetTriggerTimeout       = 2000;
+constexpr int kFactoryResetCalcTimeout          = 3000;
+constexpr int kFactoryResetTriggerCntr          = 3;
 constexpr int kAppEventQueueSize                = 10;
 constexpr uint8_t kButtonPushEvent              = 1;
 constexpr uint8_t kButtonReleaseEvent           = 0;
@@ -100,8 +101,11 @@ uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] =
 
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 k_timer sFactoryResetTimer;
+uint8_t sFactoryResetCntr = 0;
 
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
 LEDWidget sStatusLED;
+#endif
 #if USE_RGB_PWM
 uint8_t sBrightness;
 PWMDevice::Action_t sColorAction = PWMDevice::INVALID_ACTION;
@@ -115,11 +119,10 @@ Button sLightingButton;
 Button sThreadStartButton;
 Button sBleAdvStartButton;
 
-bool sIsThreadProvisioned       = false;
-bool sIsThreadEnabled           = false;
-bool sIsThreadAttached          = false;
-bool sHaveBLEConnections        = false;
-bool sIsFactoryResetTimerActive = false;
+bool sIsThreadProvisioned = false;
+bool sIsThreadEnabled     = false;
+bool sIsThreadAttached    = false;
+bool sHaveBLEConnections  = false;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
@@ -156,12 +159,14 @@ CHIP_ERROR AppTask::Init(void)
     LOG_INF("SW Version: %u, %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
     // Initialize LEDs
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
     LEDWidget::InitGpio(LEDS_PORT);
     LEDWidget::SetStateUpdateCallback(LEDStateUpdateHandler);
 
     sStatusLED.Init(SYSTEM_STATE_LED);
 
     UpdateStatusLED();
+#endif
 
     InitButtons();
 
@@ -227,9 +232,7 @@ CHIP_ERROR AppTask::Init(void)
 #endif
 
     static CommonCaseDeviceServerInitParams initParams;
-    // static OTATestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    // initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
@@ -278,13 +281,8 @@ CHIP_ERROR AppTask::StartApp(void)
 
     while (true)
     {
-        int ret = k_msgq_get(&sAppEventQueue, &event, K_MSEC(10));
-
-        while (!ret)
-        {
-            DispatchEvent(&event);
-            ret = k_msgq_get(&sAppEventQueue, &event, K_NO_WAIT);
-        }
+        k_msgq_get(&sAppEventQueue, &event, K_FOREVER);
+        DispatchEvent(&event);
     }
 }
 
@@ -399,15 +397,20 @@ void AppTask::FactoryResetButtonEventHandler(void)
 
 void AppTask::FactoryResetHandler(AppEvent * aEvent)
 {
-    if (!sIsFactoryResetTimerActive)
+    if (sFactoryResetCntr == 0)
     {
-        k_timer_start(&sFactoryResetTimer, K_MSEC(kFactoryResetTriggerTimeout), K_NO_WAIT);
-        sIsFactoryResetTimerActive = true;
+        k_timer_start(&sFactoryResetTimer, K_MSEC(kFactoryResetCalcTimeout), K_NO_WAIT);
     }
-    else
+
+    sFactoryResetCntr++;
+    LOG_INF("Factory Reset Trigger Counter: %d/%d", sFactoryResetCntr, kFactoryResetTriggerCntr);
+
+    if (sFactoryResetCntr == kFactoryResetTriggerCntr)
     {
         k_timer_stop(&sFactoryResetTimer);
-        sIsFactoryResetTimerActive = false;
+        sFactoryResetCntr = 0;
+
+        chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 
@@ -470,6 +473,7 @@ void AppTask::StartBleAdvHandler(AppEvent * aEvent)
     }
 }
 
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
 void AppTask::UpdateLedStateEventHandler(AppEvent * aEvent)
 {
     if (aEvent->Type == AppEvent::kEventType_UpdateLedState)
@@ -505,6 +509,7 @@ void AppTask::UpdateStatusLED(void)
         sStatusLED.Blink(50, 950);
     }
 }
+#endif
 
 void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
 {
@@ -512,13 +517,17 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
     {
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         UpdateStatusLED();
+#endif
         break;
     case DeviceEventType::kThreadStateChange:
         sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
         sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
         sIsThreadAttached    = ConnectivityMgr().IsThreadAttached();
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         UpdateStatusLED();
+#endif
         break;
     case DeviceEventType::kThreadConnectivityChange:
 #if CONFIG_CHIP_OTA_REQUESTOR
@@ -660,9 +669,8 @@ void AppTask::FactoryResetTimerEventHandler(AppEvent * aEvent)
         return;
     }
 
-    sIsFactoryResetTimerActive = false;
-    LOG_INF("FactoryResetHandler");
-    chip::Server::GetInstance().ScheduleFactoryReset();
+    sFactoryResetCntr = 0;
+    LOG_INF("Factory Reset Trigger Counter is cleared");
 }
 
 void AppTask::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
@@ -691,10 +699,17 @@ void AppTask::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
 
 void AppTask::InitButtons(void)
 {
-    sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, true, FactoryResetButtonEventHandler);
-    sLightingButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, false, LightingActionButtonEventHandler);
-    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, false, StartThreadButtonEventHandler);
-    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, false, StartBleAdvButtonEventHandler);
+#if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
+    sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_1, FactoryResetButtonEventHandler);
+    sLightingButton.Configure(BUTTON_PORT, BUTTON_PIN_2, LightingActionButtonEventHandler);
+    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, StartThreadButtonEventHandler);
+    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, StartBleAdvButtonEventHandler);
+#else
+    sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
+    sLightingButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, LightingActionButtonEventHandler);
+    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
+    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, StartBleAdvButtonEventHandler);
+#endif
 
     ButtonManagerInst().AddButton(sFactoryResetButton);
     ButtonManagerInst().AddButton(sLightingButton);

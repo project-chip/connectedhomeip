@@ -29,11 +29,11 @@ public class ClusterReadMapping {
               {{/if_basic_global_response}}) callback
             );
           },
-          {{#if isArray}}
-            () -> new ClusterInfoMapping.Delegated{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback(),
-          {{else}}
+          {{#if_basic_global_response}}
             () -> new ClusterInfoMapping.Delegated{{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback(),
-          {{/if}}
+          {{else}}
+            () -> new ClusterInfoMapping.Delegated{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback(),
+          {{/if_basic_global_response}}
           read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams
         );
         read{{asUpperCamelCase ../name}}InteractionInfo.put("read{{asUpperCamelCase name}}Attribute", read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo);
