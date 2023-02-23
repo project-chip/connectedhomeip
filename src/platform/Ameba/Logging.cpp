@@ -27,15 +27,30 @@
 #include <core/CHIPConfig.h>
 #include <support/logging/Constants.h>
 
+#include "Logging.h"
 #include <stdio.h>
 
 #ifdef LOG_LOCAL_LEVEL
 #undef LOG_LOCAL_LEVEL
 #endif
 
+// using namespace chip::Logging;
+
 namespace chip {
 namespace Logging {
 namespace Platform {
+
+static uint8_t LogLevel = AMEBA_LOGLEVEL_DETAIL;
+
+void LogSetLevel(uint8_t level)
+{
+    LogLevel = level;
+}
+
+uint8_t LogGetLevel()
+{
+    return LogLevel;
+}
 
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
@@ -50,14 +65,17 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     switch (category)
     {
     case kLogCategory_Error:
-        printf("%s %s\r\n", tag, formattedMsg);
+        if (LogLevel >= AMEBA_LOGLEVEL_ERROR)
+            printf("%s %s\r\n", tag, formattedMsg);
         break;
     case kLogCategory_Progress:
     default:
-        printf("%s %s\r\n", tag, formattedMsg);
+        if (LogLevel >= AMEBA_LOGLEVEL_PROGRESS)
+            printf("%s %s\r\n", tag, formattedMsg);
         break;
     case kLogCategory_Detail:
-        printf("%s %s\r\n", tag, formattedMsg);
+        if (LogLevel >= AMEBA_LOGLEVEL_DETAIL)
+            printf("%s %s\r\n", tag, formattedMsg);
         break;
     }
 }
