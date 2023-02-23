@@ -25,6 +25,10 @@ if (!build_java_matter_controller) {
 shared_library("jni") {
   output_name = "libCHIPController"
 
+  if (current_os == "mac") {
+    output_extension = "dylib"
+  }
+
   sources = [
     "AndroidCallbacks-JNI.cpp",
     "AndroidCallbacks.cpp",
@@ -54,12 +58,7 @@ shared_library("jni") {
     "zap-generated/CHIPReadCallbacks.cpp",
     "zap-generated/CHIPReadCallbacks.h",
   ]
-  if (build_java_matter_controller) {
-    sources += [
-      "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
-      "${chip_root}/src/controller/ExamplePersistentStorage.h",
-    ]
-  }
+
   deps = [
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/controller/data_model:java-jni-sources",
@@ -70,13 +69,22 @@ shared_library("jni") {
     "${chip_root}/src/platform",
   ]
 
-  public_configs = [ "${chip_root}/src:includes" ]
-
   if (build_java_matter_controller) {
     defines = [ "JAVA_MATTER_CONTROLLER_TEST" ]
-    include_dirs = java_matter_controller_dependent_paths
 
-    deps += [ "${chip_root}/src/platform/Linux" ]
+    sources += [
+      "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
+      "${chip_root}/src/controller/ExamplePersistentStorage.h",
+    ]
+
+    include_dirs = java_matter_controller_dependent_paths
+    deps += [ "${chip_root}/third_party/inipp" ]
+
+    if (current_os == "mac") {
+      deps += [ "${chip_root}/src/platform/Darwin" ]
+    } else {
+      deps += [ "${chip_root}/src/platform/Linux" ]
+    }
 
     cflags = [ "-Wno-unknown-pragmas" ]
 
@@ -87,7 +95,13 @@ shared_library("jni") {
     output_dir = "${root_out_dir}/lib/jni/${android_abi}"
   }
 
-  ldflags = [ "-Wl,--gc-sections" ]
+  if (current_os == "mac") {
+    ldflags = [ "-Wl,-dead_strip" ]
+  } else {
+    ldflags = [ "-Wl,--gc-sections" ]
+  }
+
+  public_configs = [ "${chip_root}/src:includes" ]
 }
 
 if (chip_link_tests) {
@@ -105,8 +119,11 @@ if (chip_link_tests) {
     if (build_java_matter_controller) {
       defines = [ "JAVA_MATTER_CONTROLLER_TEST" ]
       include_dirs = java_matter_controller_dependent_paths
-
-      deps += [ "${chip_root}/src/platform/Linux" ]
+      if (current_os == "mac") {
+        deps += [ "${chip_root}/src/platform/Darwin" ]
+      } else {
+        deps += [ "${chip_root}/src/platform/Linux" ]
+      }
 
       cflags = [ "-Wno-unknown-pragmas" ]
 
