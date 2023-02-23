@@ -4100,7 +4100,7 @@ void MTRPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionBr
 }
 
 void MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault> & value)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4138,7 +4138,7 @@ void MTRPowerSourceActiveWiredFaultsListAttributeCallbackSubscriptionBridge::OnS
 }
 
 void MTRPowerSourceActiveBatFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFault> & value)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4176,7 +4176,7 @@ void MTRPowerSourceActiveBatFaultsListAttributeCallbackSubscriptionBridge::OnSub
 }
 
 void MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault> & value)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16840,15 +16840,15 @@ void MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRPowerSourceClusterBatChargeFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatChargeFault value)
+void MTRPowerSourceClusterBatApprovedChemistryEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatApprovedChemistryEnum value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPowerSourceClusterBatApprovedChemistryEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16863,8 +16863,58 @@ void MTRPowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeFault> & value)
+void MTRNullablePowerSourceClusterBatApprovedChemistryEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatApprovedChemistryEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullablePowerSourceClusterBatApprovedChemistryEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRPowerSourceClusterBatChargeFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatChargeFaultEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRPowerSourceClusterBatChargeFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullablePowerSourceClusterBatChargeFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16875,7 +16925,7 @@ void MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePowerSourceClusterBatChargeFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16890,15 +16940,15 @@ void MTRNullablePowerSourceClusterBatChargeFaultAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRPowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatChargeLevel value)
+void MTRPowerSourceClusterBatChargeLevelEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatChargeLevelEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPowerSourceClusterBatChargeLevelEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16913,8 +16963,8 @@ void MTRPowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeLevel> & value)
+void MTRNullablePowerSourceClusterBatChargeLevelEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeLevelEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16925,7 +16975,7 @@ void MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePowerSourceClusterBatChargeLevelEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16940,15 +16990,15 @@ void MTRNullablePowerSourceClusterBatChargeLevelAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRPowerSourceClusterBatChargeStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatChargeState value)
+void MTRPowerSourceClusterBatChargeStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatChargeStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPowerSourceClusterBatChargeStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16963,8 +17013,8 @@ void MTRPowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeState> & value)
+void MTRNullablePowerSourceClusterBatChargeStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16975,7 +17025,7 @@ void MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePowerSourceClusterBatChargeStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16990,15 +17040,65 @@ void MTRNullablePowerSourceClusterBatChargeStateAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRPowerSourceClusterBatFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatFault value)
+void MTRPowerSourceClusterBatCommonDesignationEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatCommonDesignationEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRPowerSourceClusterBatCommonDesignationEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullablePowerSourceClusterBatCommonDesignationEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatCommonDesignationEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullablePowerSourceClusterBatCommonDesignationEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRPowerSourceClusterBatFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatFaultEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPowerSourceClusterBatFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17013,8 +17113,8 @@ void MTRPowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRNullablePowerSourceClusterBatFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatFault> & value)
+void MTRNullablePowerSourceClusterBatFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17025,7 +17125,7 @@ void MTRNullablePowerSourceClusterBatFaultAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePowerSourceClusterBatFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17040,15 +17140,15 @@ void MTRNullablePowerSourceClusterBatFaultAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRPowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatReplaceability value)
+void MTRPowerSourceClusterBatReplaceabilityEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::BatReplaceabilityEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPowerSourceClusterBatReplaceabilityEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17063,8 +17163,8 @@ void MTRPowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatReplaceability> & value)
+void MTRNullablePowerSourceClusterBatReplaceabilityEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatReplaceabilityEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17075,7 +17175,7 @@ void MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePowerSourceClusterBatReplaceabilityEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17090,15 +17190,15 @@ void MTRNullablePowerSourceClusterBatReplaceabilityAttributeCallbackSubscription
     }
 }
 
-void MTRPowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::PowerSourceStatus value)
+void MTRPowerSourceClusterPowerSourceStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::PowerSourceStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPowerSourceClusterPowerSourceStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17113,8 +17213,8 @@ void MTRPowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::PowerSourceStatus> & value)
+void MTRNullablePowerSourceClusterPowerSourceStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::PowerSourceStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17125,7 +17225,7 @@ void MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackBridge::OnSu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePowerSourceClusterPowerSourceStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17140,15 +17240,15 @@ void MTRNullablePowerSourceClusterPowerSourceStatusAttributeCallbackSubscription
     }
 }
 
-void MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::WiredCurrentType value)
+void MTRPowerSourceClusterWiredCurrentTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPowerSourceClusterWiredCurrentTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17163,8 +17263,8 @@ void MTRPowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredCurrentType> & value)
+void MTRNullablePowerSourceClusterWiredCurrentTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredCurrentTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17175,7 +17275,7 @@ void MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePowerSourceClusterWiredCurrentTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17190,15 +17290,15 @@ void MTRNullablePowerSourceClusterWiredCurrentTypeAttributeCallbackSubscriptionB
     }
 }
 
-void MTRPowerSourceClusterWiredFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::WiredFault value)
+void MTRPowerSourceClusterWiredFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PowerSource::WiredFaultEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRPowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRPowerSourceClusterWiredFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -17213,8 +17313,8 @@ void MTRPowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRNullablePowerSourceClusterWiredFaultAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredFault> & value)
+void MTRNullablePowerSourceClusterWiredFaultEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -17225,7 +17325,7 @@ void MTRNullablePowerSourceClusterWiredFaultAttributeCallbackBridge::OnSuccessFn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePowerSourceClusterWiredFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullablePowerSourceClusterWiredFaultEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

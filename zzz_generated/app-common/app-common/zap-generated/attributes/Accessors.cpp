@@ -3654,9 +3654,9 @@ namespace Attributes {
 
 namespace Status {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatus * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatusEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::PowerSourceStatus>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::PowerSourceStatusEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
@@ -3668,9 +3668,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::P
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatus value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::PowerSourceStatusEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::PowerSourceStatus>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::PowerSourceStatusEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -3852,9 +3852,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 
 namespace WiredCurrentType {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::WiredCurrentType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::WiredCurrentTypeEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
@@ -3866,9 +3866,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::W
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::WiredCurrentType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::WiredCurrentTypeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -4188,9 +4188,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 
 namespace BatChargeLevel {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevel * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevelEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeLevel>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeLevelEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
@@ -4202,9 +4202,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::B
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevel value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeLevelEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeLevel>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeLevelEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -4250,9 +4250,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
 
 namespace BatReplaceability {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceability * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceabilityEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatReplaceability>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatReplaceabilityEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
@@ -4264,9 +4264,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::B
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceability value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatReplaceabilityEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatReplaceability>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatReplaceabilityEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -4342,9 +4342,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 namespace BatCommonDesignation {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatCommonDesignationEnum * value)
 {
-    using Traits = NumericAttributeTraits<uint32_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatCommonDesignationEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
@@ -4356,9 +4356,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatCommonDesignationEnum value)
 {
-    using Traits = NumericAttributeTraits<uint32_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatCommonDesignationEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -4366,7 +4366,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatCommonDesignation
@@ -4433,9 +4433,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 namespace BatApprovedChemistry {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatApprovedChemistryEnum * value)
 {
-    using Traits = NumericAttributeTraits<uint32_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatApprovedChemistryEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
@@ -4447,9 +4447,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatApprovedChemistryEnum value)
 {
-    using Traits = NumericAttributeTraits<uint32_t>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatApprovedChemistryEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -4457,7 +4457,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::PowerSource::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE);
 }
 
 } // namespace BatApprovedChemistry
@@ -4526,9 +4526,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 
 namespace BatChargeState {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeState * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeStateEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeState>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeStateEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::PowerSource::Id, Id, readable, sizeof(temp));
@@ -4540,9 +4540,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::B
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeState value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::PowerSource::BatChargeStateEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeState>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::PowerSource::BatChargeStateEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;

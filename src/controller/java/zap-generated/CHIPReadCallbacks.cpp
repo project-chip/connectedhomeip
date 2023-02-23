@@ -7947,7 +7947,7 @@ CHIPPowerSourceActiveWiredFaultsAttributeCallback::~CHIPPowerSourceActiveWiredFa
 }
 
 void CHIPPowerSourceActiveWiredFaultsAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFaultEnum> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8216,7 +8216,7 @@ CHIPPowerSourceActiveBatFaultsAttributeCallback::~CHIPPowerSourceActiveBatFaults
 }
 
 void CHIPPowerSourceActiveBatFaultsAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFault> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFaultEnum> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8421,7 +8421,7 @@ CHIPPowerSourceActiveBatChargeFaultsAttributeCallback::~CHIPPowerSourceActiveBat
 }
 
 void CHIPPowerSourceActiveBatChargeFaultsAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFaultEnum> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;

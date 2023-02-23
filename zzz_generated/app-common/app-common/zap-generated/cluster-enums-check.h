@@ -423,9 +423,52 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(UnitLocalization::TempU
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatChargeFault val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatApprovedChemistryEnum val)
 {
-    using EnumType = PowerSource::BatChargeFault;
+    using EnumType = PowerSource::BatApprovedChemistryEnum;
+    switch (val)
+    {
+    case EnumType::kUnspecified:
+    case EnumType::kAlkaline:
+    case EnumType::kLithiumCarbonFluoride:
+    case EnumType::kLithiumChromiumOxide:
+    case EnumType::kLithiumCopperOxide:
+    case EnumType::kLithiumIronDisulfide:
+    case EnumType::kLithiumManganeseDioxide:
+    case EnumType::kLithiumThionylChloride:
+    case EnumType::kMagnesium:
+    case EnumType::kMercuryOxide:
+    case EnumType::kNickelOxyhydride:
+    case EnumType::kSilverOxide:
+    case EnumType::kZincAir:
+    case EnumType::kZincCarbon:
+    case EnumType::kZincChloride:
+    case EnumType::kZincManganeseDioxide:
+    case EnumType::kLeadAcid:
+    case EnumType::kLithiumCobaltOxide:
+    case EnumType::kLithiumIon:
+    case EnumType::kLithiumIonPolymer:
+    case EnumType::kLithiumIronPhosphate:
+    case EnumType::kLithiumSulfur:
+    case EnumType::kLithiumTitanate:
+    case EnumType::kNickelCadmium:
+    case EnumType::kNickelHydrogen:
+    case EnumType::kNickelIron:
+    case EnumType::kNickelMetalHydride:
+    case EnumType::kNickelZinc:
+    case EnumType::kSilverZinc:
+    case EnumType::kSodiumIon:
+    case EnumType::kSodiumSulfur:
+    case EnumType::kZincBromide:
+    case EnumType::kZincCerium:
+        return val;
+    default:
+        return static_cast<EnumType>(33);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatChargeFaultEnum val)
+{
+    using EnumType = PowerSource::BatChargeFaultEnum;
     switch (val)
     {
     case EnumType::kUnspecified:
@@ -444,9 +487,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatChargeF
         return static_cast<EnumType>(11);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatChargeLevel val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatChargeLevelEnum val)
 {
-    using EnumType = PowerSource::BatChargeLevel;
+    using EnumType = PowerSource::BatChargeLevelEnum;
     switch (val)
     {
     case EnumType::kOk:
@@ -457,9 +500,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatChargeL
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatChargeState val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatChargeStateEnum val)
 {
-    using EnumType = PowerSource::BatChargeState;
+    using EnumType = PowerSource::BatChargeStateEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -471,12 +514,103 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatChargeS
         return static_cast<EnumType>(4);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatFault val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatCommonDesignationEnum val)
 {
-    using EnumType = PowerSource::BatFault;
+    using EnumType = PowerSource::BatCommonDesignationEnum;
     switch (val)
     {
-    case EnumType::kUnspecfied:
+    case EnumType::kUnspecified:
+    case EnumType::kAaa:
+    case EnumType::kAa:
+    case EnumType::kC:
+    case EnumType::kD:
+    case EnumType::k4v5:
+    case EnumType::k6v0:
+    case EnumType::k9v0:
+    case EnumType::k12aa:
+    case EnumType::kAaaa:
+    case EnumType::kA:
+    case EnumType::kB:
+    case EnumType::kF:
+    case EnumType::kN:
+    case EnumType::kNo6:
+    case EnumType::kSubC:
+    case EnumType::kA23:
+    case EnumType::kA27:
+    case EnumType::kBa5800:
+    case EnumType::kDuplex:
+    case EnumType::k4sr44:
+    case EnumType::k523:
+    case EnumType::k531:
+    case EnumType::k15v0:
+    case EnumType::k22v5:
+    case EnumType::k30v0:
+    case EnumType::k45v0:
+    case EnumType::k67v5:
+    case EnumType::kJ:
+    case EnumType::kCr123a:
+    case EnumType::kCr2:
+    case EnumType::k2cr5:
+    case EnumType::kCrP2:
+    case EnumType::kCrV3:
+    case EnumType::kSr41:
+    case EnumType::kSr43:
+    case EnumType::kSr44:
+    case EnumType::kSr45:
+    case EnumType::kSr48:
+    case EnumType::kSr54:
+    case EnumType::kSr55:
+    case EnumType::kSr57:
+    case EnumType::kSr58:
+    case EnumType::kSr59:
+    case EnumType::kSr60:
+    case EnumType::kSr63:
+    case EnumType::kSr64:
+    case EnumType::kSr65:
+    case EnumType::kSr66:
+    case EnumType::kSr67:
+    case EnumType::kSr68:
+    case EnumType::kSr69:
+    case EnumType::kSr516:
+    case EnumType::kSr731:
+    case EnumType::kSr712:
+    case EnumType::kLr932:
+    case EnumType::kA5:
+    case EnumType::kA10:
+    case EnumType::kA13:
+    case EnumType::kA312:
+    case EnumType::kA675:
+    case EnumType::kAc41e:
+    case EnumType::k10180:
+    case EnumType::k10280:
+    case EnumType::k10440:
+    case EnumType::k14250:
+    case EnumType::k14430:
+    case EnumType::k14500:
+    case EnumType::k14650:
+    case EnumType::k15270:
+    case EnumType::k16340:
+    case EnumType::kRcr123a:
+    case EnumType::k17500:
+    case EnumType::k17670:
+    case EnumType::k18350:
+    case EnumType::k18500:
+    case EnumType::k18650:
+    case EnumType::k19670:
+    case EnumType::k25500:
+    case EnumType::k26650:
+    case EnumType::k32600:
+        return val;
+    default:
+        return static_cast<EnumType>(81);
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatFaultEnum val)
+{
+    using EnumType = PowerSource::BatFaultEnum;
+    switch (val)
+    {
+    case EnumType::kUnspecified:
     case EnumType::kOverTemp:
     case EnumType::kUnderTemp:
         return val;
@@ -484,9 +618,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatFault v
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatReplaceability val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatReplaceabilityEnum val)
 {
-    using EnumType = PowerSource::BatReplaceability;
+    using EnumType = PowerSource::BatReplaceabilityEnum;
     switch (val)
     {
     case EnumType::kUnspecified:
@@ -498,9 +632,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::BatReplace
         return static_cast<EnumType>(4);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::PowerSourceStatus val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::PowerSourceStatusEnum val)
 {
-    using EnumType = PowerSource::PowerSourceStatus;
+    using EnumType = PowerSource::PowerSourceStatusEnum;
     switch (val)
     {
     case EnumType::kUnspecified:
@@ -512,9 +646,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::PowerSourc
         return static_cast<EnumType>(4);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::WiredCurrentType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::WiredCurrentTypeEnum val)
 {
-    using EnumType = PowerSource::WiredCurrentType;
+    using EnumType = PowerSource::WiredCurrentTypeEnum;
     switch (val)
     {
     case EnumType::kAc:
@@ -524,12 +658,12 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::WiredCurre
         return static_cast<EnumType>(2);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::WiredFault val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(PowerSource::WiredFaultEnum val)
 {
-    using EnumType = PowerSource::WiredFault;
+    using EnumType = PowerSource::WiredFaultEnum;
     switch (val)
     {
-    case EnumType::kUnspecfied:
+    case EnumType::kUnspecified:
     case EnumType::kOverVoltage:
     case EnumType::kUnderVoltage:
         return val;
