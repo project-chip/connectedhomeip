@@ -494,6 +494,10 @@ struct ChipDeviceEvent final
             uint64_t nodeId;
             FabricIndex fabricIndex;
         } CommissioningComplete;
+        struct
+        {
+            FabricIndex fabricIndex;
+        } BindingsChanged;
 
         struct
         {

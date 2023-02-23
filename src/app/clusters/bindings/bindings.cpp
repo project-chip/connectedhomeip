@@ -54,6 +54,8 @@ private:
     CHIP_ERROR WriteBindingTable(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder);
 
     CHIP_ERROR NotifyBindingsChanged();
+
+    FabricIndex mAccessingFabricIndex;
 };
 
 BindingTableAccess gAttrAccess;
@@ -196,19 +198,19 @@ void BindingTableAccess::OnListWriteEnd(const app::ConcreteAttributePath & aPath
 
 CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath & path, AttributeValueDecoder & decoder)
 {
-    FabricIndex accessingFabricIndex = decoder.AccessingFabricIndex();
+    mAccessingFabricIndex = decoder.AccessingFabricIndex();
     if (!path.IsListOperation() || path.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
     {
         DecodableBindingListType newBindingList;
 
         ReturnErrorOnFailure(decoder.Decode(newBindingList));
-        ReturnErrorOnFailure(CheckValidBindingList(path.mEndpointId, newBindingList, accessingFabricIndex));
+        ReturnErrorOnFailure(CheckValidBindingList(path.mEndpointId, newBindingList, mAccessingFabricIndex));
 
         // Clear all entries for the current accessing fabric and endpoint
         auto bindingTableIter = BindingTable::GetInstance().begin();
         while (bindingTableIter != BindingTable::GetInstance().end())
         {
-            if (bindingTableIter->local == path.mEndpointId && bindingTableIter->fabricIndex == accessingFabricIndex)
+            if (bindingTableIter->local == path.mEndpointId && bindingTableIter->fabricIndex == mAccessingFabricIndex)
             {
                 if (bindingTableIter->type == EMBER_UNICAST_BINDING)
                 {
@@ -255,7 +257,8 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
 CHIP_ERROR BindingTableAccess::NotifyBindingsChanged()
 {
     DeviceLayer::ChipDeviceEvent event;
-    event.Type = DeviceLayer::DeviceEventType::kBindingsChangedViaCluster;
+    event.Type                        = DeviceLayer::DeviceEventType::kBindingsChangedViaCluster;
+    event.BindingsChanged.fabricIndex = mAccessingFabricIndex;
     return chip::DeviceLayer::PlatformMgr().PostEvent(&event);
 }
 
