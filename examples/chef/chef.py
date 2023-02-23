@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import hashlib
 import json
 import optparse
 import os
@@ -23,7 +22,7 @@ import shutil
 import sys
 import tarfile
 import textwrap
-from typing import Any, Dict, Sequence
+from typing import Any, Dict
 
 import constants
 import stateful_shell
@@ -280,7 +279,8 @@ def main() -> int:
 
         Notes:
         - Whenever you change a device type, make sure to also use options -zbe
-        - Be careful if you have more than one device connected. The script assumes you have only one device connected and might flash the wrong one\
+        - Be careful if you have more than one device connected.
+          The script assumes you have only one device connected and might flash the wrong one
         """)
     parser = optparse.OptionParser(usage=usage)
 
@@ -313,9 +313,13 @@ def main() -> int:
                                'linux', 'silabs-thread', 'ameba'],
                       metavar="TARGET",
                       default="esp32")
-    parser.add_option("-r", "--rpc", help="enables Pigweed RPC interface. Enabling RPC disables the shell interface. Your sdkconfig configurations will be reverted to default. Default is PW RPC off. When enabling or disabling this flag, on the first build force a clean build with -c",
+    parser.add_option("-r", "--rpc",
+                      help=("enables Pigweed RPC interface. Enabling RPC disables the shell interface. "
+                            "Your sdkconfig configurations will be reverted to default. Default is PW RPC off. "
+                            "When enabling or disabling this flag, on the first build force a clean build with -c"),
                       action="store_true", dest="do_rpc", default=False)
-    parser.add_option("-a", "--automated_test_stamp", help="provide the additional stamp \"branch:commit_id\" as the software version string for automated tests.",
+    parser.add_option("-a", "--automated_test_stamp",
+                      help="provide the additional stamp \"branch:commit_id\" as the software version string for automated tests.",
                       action="store_true", dest="do_automated_test_stamp")
     parser.add_option("-v", "--vid", dest="vid", type=int,
                       help="specifies the Vendor ID. Default is 0xFFF1", metavar="VID", default=0xFFF1)
@@ -325,22 +329,31 @@ def main() -> int:
                       help="specifies the Product Name. Default is TEST_PRODUCT", default="TEST_PRODUCT")
     parser.add_option("", "--rpc_console", help="Opens PW RPC Console",
                       action="store_true", dest="do_rpc_console")
-    parser.add_option("-y", "--tty", help="Enumerated USB tty/serial interface enumerated for your physical device. E.g.: /dev/ACM0",
+    parser.add_option("-y", "--tty",
+                      help="Enumerated USB tty/serial interface enumerated for your physical device. E.g.: /dev/ACM0",
                       dest="tty", metavar="TTY", default=None)
-
     # Build CD params.
-    parser.add_option("", "--build_all", help="For use in CD only. Builds and bundles all chef examples for the specified platform. Chef exits after completion.",
+    parser.add_option("", "--build_all",
+                      help=("For use in CD only. Builds and bundles all chef examples for "
+                            "the specified platform. Chef exits after completion."),
                       dest="build_all", action="store_true")
     parser.add_option("", "--dry_run", help="Display list of target builds of the --build_all command without building them.",
                       dest="dry_run", action="store_true")
-    parser.add_option("", "--build_exclude", help="For use with --build_all. Build labels to exclude. Accepts a regex pattern. Mutually exclusive with --build_include.",
+    parser.add_option("", "--build_exclude",
+                      help=("For use with --build_all. Build labels to exclude. "
+                            "Accepts a regex pattern. Mutually exclusive with --build_include."),
                       dest="build_exclude")
-    parser.add_option("", "--build_include", help="For use with --build_all. Build labels to include. Accepts a regex pattern. Mutually exclusive with --build_exclude.",
+    parser.add_option("", "--build_include",
+                      help=("For use with --build_all. Build labels to include. "
+                            "Accepts a regex pattern. Mutually exclusive with --build_exclude."),
                       dest="build_include")
-    parser.add_option("-k", "--keep_going", help="For use in CD only. Continues building all sample apps in the event of an error.",
+    parser.add_option("-k", "--keep_going",
+                      help="For use in CD only. Continues building all sample apps in the event of an error.",
                       dest="keep_going", action="store_true")
-    parser.add_option(
-        "", "--ci", help="Builds Chef examples defined in cicd_config. Uses specified target from -t. Chef exits after completion.", dest="ci", action="store_true")
+    parser.add_option("", "--ci",
+                      help=("Builds Chef examples defined in cicd_config. "
+                            "Uses specified target from -t. Chef exits after completion."),
+                      dest="ci", action="store_true")
     parser.add_option(
         "", "--enable_ipv4", help="Enable IPv4 mDNS. Only applicable to platforms that can support IPV4 (e.g, Linux, ESP32)",
         action="store_true", default=False)
@@ -452,14 +465,12 @@ def main() -> int:
             flush_print(
                 'Path for esp32 SDK was not found. Make sure esp32.IDF_PATH is set on your config.yaml file')
             exit(1)
-        plat_folder = os.path.normpath(f"{_CHEF_SCRIPT_PATH}/esp32")
         shell.run_cmd(f'source {config["esp32"]["IDF_PATH"]}/export.sh')
     elif options.build_target == "nrfconnect":
         if config['nrfconnect']['ZEPHYR_BASE'] is None:
             flush_print(
                 'Path for nrfconnect SDK was not found. Make sure nrfconnect.ZEPHYR_BASE is set on your config.yaml file')
             exit(1)
-        plat_folder = os.path.normpath(f"{_CHEF_SCRIPT_PATH}/nrfconnect")
         shell.run_cmd(
             f'source {config["nrfconnect"]["ZEPHYR_BASE"]}/zephyr-env.sh')
         shell.run_cmd("export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb")
@@ -532,7 +543,8 @@ def main() -> int:
         shell.run_cmd(f"rm -rf {gen_dir}")
         shell.run_cmd(f"mkdir -p {gen_dir}")
         shell.run_cmd(
-            f"{_REPO_BASE_PATH}/scripts/tools/zap/generate.py {_CHEF_SCRIPT_PATH}/devices/{options.sample_device_type_name}.zap -o {gen_dir}")
+            f"{_REPO_BASE_PATH}/scripts/tools/zap/generate.py "
+            f"{_CHEF_SCRIPT_PATH}/devices/{options.sample_device_type_name}.zap -o {gen_dir}")
         # af-gen-event.h is not generated
         shell.run_cmd(f"touch {gen_dir}/af-gen-event.h")
 
@@ -545,7 +557,8 @@ def main() -> int:
             shell.run_cmd(
                 f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig_rpc.defaults")
             shell.run_cmd(
-                f"[ -f {_CHEF_SCRIPT_PATH}/esp32/sdkconfig ] || cp {_CHEF_SCRIPT_PATH}/esp32/sdkconfig_rpc.defaults {_CHEF_SCRIPT_PATH}/esp32/sdkconfig")
+                f"[ -f {_CHEF_SCRIPT_PATH}/esp32/sdkconfig ] || cp "
+                f"{_CHEF_SCRIPT_PATH}/esp32/sdkconfig_rpc.defaults {_CHEF_SCRIPT_PATH}/esp32/sdkconfig")
         else:
             flush_print(f"RPC PW on {options.build_target} not supported")
 
@@ -555,7 +568,8 @@ def main() -> int:
             shell.run_cmd(
                 f"export SDKCONFIG_DEFAULTS={_CHEF_SCRIPT_PATH}/esp32/sdkconfig.defaults")
             shell.run_cmd(
-                f"[ -f {_CHEF_SCRIPT_PATH}/esp32/sdkconfig ] || cp {_CHEF_SCRIPT_PATH}/esp32/sdkconfig.defaults {_CHEF_SCRIPT_PATH}/esp32/sdkconfig")
+                f"[ -f {_CHEF_SCRIPT_PATH}/esp32/sdkconfig ] || cp "
+                f"{_CHEF_SCRIPT_PATH}/esp32/sdkconfig.defaults {_CHEF_SCRIPT_PATH}/esp32/sdkconfig")
 
     #
     # Menuconfig
@@ -586,7 +600,7 @@ def main() -> int:
         if options.do_automated_test_stamp:
             branch = ""
             for branch_text in shell.run_cmd("git branch", return_cmd_output=True).split("\n"):
-                match_texts = re.findall("\* (.*)", branch_text)
+                match_texts = re.findall(r"\* (.*)", branch_text)
                 if match_texts:
                     branch = match_texts[0]
                     break
@@ -597,7 +611,8 @@ def main() -> int:
             if len(sw_ver_string) >= 64:
                 truncated_sw_ver_string = f"""{branch[:22]}:{commit_id}"""
                 flush_print(
-                    f"""Truncate the software version string from \"{sw_ver_string}\" to \"{truncated_sw_ver_string}\" due to 64 bytes limitation""")
+                    f"Truncate the software version string from \"{sw_ver_string}\" to "
+                    f"\"{truncated_sw_ver_string}\" due to 64 bytes limitation")
                 sw_ver_string = truncated_sw_ver_string
 
         flush_print("Building...")
@@ -620,14 +635,15 @@ def main() -> int:
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
             if options.enable_ipv4:
                 shell.run_cmd(
-                    f"sed -i 's/CONFIG_DISABLE_IPV4=y/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/g' sdkconfig ")
+                    "sed -i 's/CONFIG_DISABLE_IPV4=y/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/g' sdkconfig ")
             else:
                 shell.run_cmd(
-                    f"sed -i 's/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/CONFIG_DISABLE_IPV4=y/g' sdkconfig ")
+                    "sed -i 's/#\\ CONFIG_DISABLE_IPV4\\ is\\ not\\ set/CONFIG_DISABLE_IPV4=y/g' sdkconfig ")
             shell.run_cmd("idf.py build")
             shell.run_cmd("idf.py build flashing_script")
             shell.run_cmd(
-                f"(cd build/ && tar cJvf $(git rev-parse HEAD)-{options.sample_device_type_name}.tar.xz --files-from=chip-shell.flashbundle.txt)")
+                f"(cd build/ && tar cJvf $(git rev-parse HEAD)-{options.sample_device_type_name}.tar.xz "
+                f"--files-from=chip-shell.flashbundle.txt)")
             shell.run_cmd(
                 f"cp build/$(git rev-parse HEAD)-{options.sample_device_type_name}.tar.xz {_CHEF_SCRIPT_PATH}")
         elif options.build_target == "nrfconnect":
@@ -668,15 +684,17 @@ def main() -> int:
                 shell.run_cmd(
                     f"cd {config['ameba']['AMEBA_SDK']}/project/realtek_amebaD_va0_example/GCC-RELEASE")
                 if options.do_clean:
-                    shell.run_cmd(f"rm -rf out")
+                    shell.run_cmd("rm -rf out")
                 shell.run_cmd(
-                    f"./build.sh {config['ameba']['MATTER_SDK']} ninja {config['ameba']['AMEBA_SDK']}/project/realtek_amebaD_va0_example/GCC-RELEASE/out chef-app")
+                    f"./build.sh {config['ameba']['MATTER_SDK']} ninja "
+                    f"{config['ameba']['AMEBA_SDK']}/project/realtek_amebaD_va0_example/GCC-RELEASE/out chef-app")
                 shell.run_cmd("ninja -C out")
             elif config['ameba']['MODEL'] == 'Z2':
                 shell.run_cmd(
                     f"cd {config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE")
                 shell.run_cmd("rm -f project_include.mk")
-                with open(f"{config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE/project_include.mk", "w") as f:
+                cmd = f"{config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE/project_include.mk"
+                with open(cmd, "w") as f:
                     f.write(textwrap.dedent(f"""\
                         SAMPLE_NAME = {options.sample_device_type_name}
                         CHEF_FLAGS =
@@ -702,7 +720,10 @@ def main() -> int:
                 'chip_shell_cmd_server = false',
                 'chip_build_libshell = true',
                 'chip_config_network_layer_ble = false',
-                f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", "CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}", "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\\"{str(options.pname)}\\""]',
+                (f'target_defines = ["CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID={options.vid}", '
+                 f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID={options.pid}", '
+                 f'"CONFIG_ENABLE_PW_RPC={int(options.do_rpc)}", '
+                 f'"CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\\"{str(options.pname)}\\""]'),
             ])
 
             uname_resp = shell.run_cmd("uname -m", return_cmd_output=True)
@@ -758,7 +779,7 @@ def main() -> int:
                         sample_name = "{options.sample_device_type_name}"
                         """))
             if options.do_clean:
-                shell.run_cmd(f"rm -rf out")
+                shell.run_cmd("rm -rf out")
             shell.run_cmd("gn gen out")
             shell.run_cmd("ninja -C out")
 
@@ -799,14 +820,20 @@ def main() -> int:
                 shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/ameba")
                 shell.run_cmd(
                     f"cd {config['ameba']['AMEBA_SDK']}/tools/AmebaD/Image_Tool_Linux")
-                shell.run_cmd(
-                    f"{config['ameba']['AMEBA_SDK']}/tools/AmebaD/Image_Tool_Linux/flash.sh {config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}/project/realtek_amebaD_va0_example/GCC-RELEASE/out", raise_on_returncode=False)
+                shell.run_cmd((
+                    f"{config['ameba']['AMEBA_SDK']}/tools/AmebaD/Image_Tool_Linux/flash.sh "
+                    f"{config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}"
+                    f"/project/realtek_amebaD_va0_example/GCC-RELEASE/out"
+                ), raise_on_returncode=False)
             else:
                 shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/ameba")
                 shell.run_cmd(
                     f"cd {config['ameba']['AMEBA_SDK']}/tools/AmebaZ2/Image_Tool_Linux")
-                shell.run_cmd(
-                    f"{config['ameba']['AMEBA_SDK']}/tools/AmebaZ2/Image_Tool_Linux/flash.sh {config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE/application_is/Debug/bin", raise_on_returncode=False)
+                shell.run_cmd((
+                    f"{config['ameba']['AMEBA_SDK']}/tools/AmebaZ2/Image_Tool_Linux/flash.sh "
+                    f"{config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}"
+                    f"/project/realtek_amebaz2_v0_example/GCC-RELEASE/application_is/Debug/bin"
+                ), raise_on_returncode=False)
 
     #
     # Terminal interaction
@@ -817,21 +844,24 @@ def main() -> int:
         if options.build_target == "esp32":
             if config['esp32']['TTY'] is None:
                 flush_print(
-                    'The path for the serial enumeration for esp32 is not set. Make sure esp32.TTY is set on your config.yaml file')
+                    'The path for the serial enumeration for esp32 is not set. '
+                    'Make sure esp32.TTY is set on your config.yaml file')
                 exit(1)
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/esp32")
             shell.run_cmd(f"idf.py -p {config['esp32']['TTY']} monitor")
         elif options.build_target == "nrfconnect":
             if config['nrfconnect']['TTY'] is None:
                 flush_print(
-                    'The path for the serial enumeration for nordic is not set. Make sure nrfconnect.TTY is set on your config.yaml file')
+                    'The path for the serial enumeration for nordic is not set. '
+                    'Make sure nrfconnect.TTY is set on your config.yaml file')
                 exit(1)
             shell.run_cmd("killall screen")
             shell.run_cmd(f"screen {config['nrfconnect']['TTY']} 115200")
         elif (options.build_target == "silabs-thread"):
             if config['silabs-thread']['TTY'] is None:
                 flush_print(
-                    'The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.TTY is set on your config.yaml file')
+                    'The path for the serial enumeration for silabs-thread is not set. '
+                    'Make sure silabs-thread.TTY is set on your config.yaml file')
                 exit(1)
 
             shell.run_cmd("killall screen")
@@ -864,14 +894,16 @@ def main() -> int:
             if (sys.platform == "linux") or (sys.platform == "linux2"):
                 if (config['silabs-thread']['TTY'] is None):
                     flush_print(
-                        'The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.TTY is set on your config.yaml file')
+                        'The path for the serial enumeration for silabs-thread is not set. '
+                        'Make sure silabs-thread.TTY is set on your config.yaml file')
                     exit(1)
                 shell.run_cmd(
                     f"python3 -m chip_rpc.console --device {config['silabs-thread']['TTY']} -b 115200")
             elif sys.platform == "darwin":
                 if (config['silabs-thread']['CU'] is None):
                     flush_print(
-                        'The path for the serial enumeration for silabs-thread is not set. Make sure silabs-thread.CU is set on your config.yaml file')
+                        'The path for the serial enumeration for silabs-thread is not set. '
+                        'Make sure silabs-thread.CU is set on your config.yaml file')
                     exit(1)
                 shell.run_cmd(
                     f"python3 -m chip_rpc.console --device {config['silabs-thread']['CU']} -b 115200")
