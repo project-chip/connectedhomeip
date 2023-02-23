@@ -34,8 +34,6 @@
 #undef LOG_LOCAL_LEVEL
 #endif
 
-// using namespace chip::Logging;
-
 namespace chip {
 namespace Logging {
 namespace Platform {
