@@ -261,7 +261,10 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  *
  * @param timeoutMs   timeout in milliseconds for timed invoke, or nil.
  *
- * @param completion  response handler will receive either values or error.
+ * @param completion  response handler will receive either values or error.  A
+ *                    path-specific error status from the command invocation
+ *                    will result in an error being passed to the completion, so
+ *                    values will only be passed in when the command succeeds.
  */
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID

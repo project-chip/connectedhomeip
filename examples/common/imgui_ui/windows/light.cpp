@@ -23,6 +23,9 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
 
+#include <app/clusters/level-control/level-control.h>
+#include <app/clusters/on-off-server/on-off-server.h>
+
 namespace example {
 namespace Ui {
 namespace Windows {
@@ -65,9 +68,35 @@ ImVec4 HueSaturationToColor(float hueDegrees, float saturationPercent)
 
 void Light::UpdateState()
 {
+    if (mTargetLightIsOn.HasValue())
+    {
+        EmberAfStatus status = OnOffServer::Instance().setOnOffValue(
+            mEndpointId, mTargetLightIsOn.Value() ? OnOff::Commands::On::Id : OnOff::Commands::Off::Id,
+            false /* initiatedByLevelChange */);
+
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            ChipLogError(AppServer, "Failed to set on/off value: %d", status);
+        }
+
+        mTargetLightIsOn.ClearValue();
+    }
     OnOff::Attributes::OnOff::Get(mEndpointId, &mLightIsOn);
 
     // Level Control
+    if (mTargetLevel.HasValue())
+    {
+        LevelControl::Commands::MoveToLevel::DecodableType data;
+
+        data.level = mTargetLevel.Value();
+        data.optionsMask.Set(LevelControl::LevelControlOptions::kExecuteIfOff);
+        data.optionsOverride.Set(LevelControl::LevelControlOptions::kExecuteIfOff);
+
+        (void) LevelControlServer::MoveToLevel(mEndpointId, data);
+
+        mTargetLevel.ClearValue();
+    }
+
     LevelControl::Attributes::CurrentLevel::Get(mEndpointId, mCurrentLevel);
     LevelControl::Attributes::MinLevel::Get(mEndpointId, &mMinLevel);
     LevelControl::Attributes::MaxLevel::Get(mEndpointId, &mMaxLevel);
@@ -88,15 +117,14 @@ void Light::Render()
     ImGui::Begin("Light state");
     ImGui::Text("Light on endpoint %d", mEndpointId);
 
-    ImGui::Text("On-Off:");
     ImGui::Indent();
-    if (mLightIsOn)
     {
-        ImGui::Text("Light is ON");
-    }
-    else
-    {
-        ImGui::Text("Light is OFF");
+        bool uiValue = mLightIsOn;
+        ImGui::Checkbox("Light is ON", &uiValue);
+        if (uiValue != mLightIsOn)
+        {
+            mTargetLightIsOn.SetValue(uiValue); // schedule future update
+        }
     }
 
     // bright yellow vs dark yellow on/off view
@@ -115,8 +143,12 @@ void Light::Render()
     }
     else
     {
-        int levelValue = mCurrentLevel.Value();
-        ImGui::SliderInt("Current Level", &levelValue, mMinLevel, mMaxLevel);
+        int uiValue = mCurrentLevel.Value();
+        ImGui::SliderInt("Current Level", &uiValue, mMinLevel, mMaxLevel);
+        if (uiValue != mCurrentLevel.Value())
+        {
+            mTargetLevel.SetValue(uiValue); // schedule future update
+        }
     }
     ImGui::Unindent();
 

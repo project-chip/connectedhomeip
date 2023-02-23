@@ -2612,27 +2612,6 @@
           ],
           "events": [
             {
-              "name": "HardwareFaultChange",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "RadioFaultChange",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "NetworkFaultChange",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
               "name": "BootReason",
               "code": 3,
               "mfgCode": null,

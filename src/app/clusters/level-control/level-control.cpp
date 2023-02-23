@@ -451,6 +451,14 @@ static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId,
 bool emberAfLevelControlClusterMoveToLevelCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                    const Commands::MoveToLevel::DecodableType & commandData)
 {
+    commandObj->AddStatus(commandPath, LevelControlServer::MoveToLevel(commandPath.mEndpointId, commandData));
+    return true;
+}
+
+namespace LevelControlServer {
+
+Status MoveToLevel(EndpointId endpointId, const Commands::MoveToLevel::DecodableType & commandData)
+{
     auto & level           = commandData.level;
     auto & transitionTime  = commandData.transitionTime;
     auto & optionsMask     = commandData.optionsMask;
@@ -467,15 +475,12 @@ bool emberAfLevelControlClusterMoveToLevelCallback(app::CommandHandler * command
                                           optionsMask.Raw(), optionsOverride.Raw());
     }
 
-    Status status = moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevel::Id, level, transitionTime,
-                                       Optional<BitMask<LevelControlOptions>>(optionsMask),
-                                       Optional<BitMask<LevelControlOptions>>(optionsOverride),
-                                       INVALID_STORED_LEVEL); // Don't revert to the stored level
-
-    commandObj->AddStatus(commandPath, status);
-
-    return true;
+    return moveToLevelHandler(endpointId, Commands::MoveToLevel::Id, level, transitionTime,
+                              Optional<BitMask<LevelControlOptions>>(optionsMask),
+                              Optional<BitMask<LevelControlOptions>>(optionsOverride),
+                              INVALID_STORED_LEVEL); // Don't revert to the stored level
 }
+} // namespace LevelControlServer
 
 bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(app::CommandHandler * commandObj,
                                                             const app::ConcreteCommandPath & commandPath,

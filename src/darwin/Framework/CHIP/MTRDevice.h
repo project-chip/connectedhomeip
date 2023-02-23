@@ -146,7 +146,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param timeout   timeout in milliseconds for timed invoke, or nil. This value must be within [1, UINT16_MAX], and will be clamped
  * to this range.
  *
- * @param completion  response handler will receive either values or error.
+ * @param completion  response handler will receive either values or error.  A
+ *                    path-specific error status from the command invocation
+ *                    will result in an error being passed to the completion, so
+ *                    values will only be passed in when the command succeeds.
  */
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID

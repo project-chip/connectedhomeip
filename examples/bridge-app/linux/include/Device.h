@@ -179,8 +179,10 @@ public:
         kChanged_Description = kChanged_Last << 2,
     } Changed;
 
-    DevicePowerSource(const char * szDeviceName, std::string szLocation, uint32_t aFeatureMap) :
-        Device(szDeviceName, szLocation), mFeatureMap(aFeatureMap){};
+    DevicePowerSource(const char * szDeviceName, std::string szLocation,
+                      chip::BitFlags<chip::app::Clusters::PowerSource::PowerSourceFeature> aFeatureMap) :
+        Device(szDeviceName, szLocation),
+        mFeatureMap(aFeatureMap){};
 
     using DeviceCallback_fn = std::function<void(DevicePowerSource *, DevicePowerSource::Changed_t)>;
     void SetChangeCallback(DeviceCallback_fn aChanged_CB) { mChanged_CB = aChanged_CB; }
@@ -188,7 +190,7 @@ public:
     void SetBatChargeLevel(uint8_t aBatChargeLevel);
     void SetDescription(std::string aDescription);
 
-    inline uint32_t GetFeatureMap() { return mFeatureMap; };
+    inline uint32_t GetFeatureMap() { return mFeatureMap.Raw(); };
     inline uint8_t GetBatChargeLevel() { return mBatChargeLevel; };
     inline uint8_t GetOrder() { return mOrder; };
     inline uint8_t GetStatus() { return mStatus; };
@@ -202,7 +204,7 @@ private:
     uint8_t mOrder           = 0;
     uint8_t mStatus          = 0;
     std::string mDescription = "Primary Battery";
-    uint32_t mFeatureMap;
+    chip::BitFlags<chip::app::Clusters::PowerSource::PowerSourceFeature> mFeatureMap;
     DeviceCallback_fn mChanged_CB;
 };
 
