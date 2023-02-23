@@ -68,10 +68,7 @@ buildconfig_header("chip_buildconfig") {
 }
 
 source_set("chip_config_header") {
-  sources = [
-    "CHIPConfig.h",
-    "CHIPEventLoggingConfig.h",
-  ]
+  sources = [ "CHIPConfig.h" ]
 
   public_configs = [ "${chip_root}/src:includes" ]
 

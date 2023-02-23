@@ -24,7 +24,6 @@
 #include <app/RequiredPrivilege.h>
 #include <assert.h>
 #include <inttypes.h>
-#include <lib/core/CHIPEventLoggingConfig.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -428,7 +427,9 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, c
     CircularTLVWriter checkpoint = writer;
     EventLoadOutContext ctxt     = EventLoadOutContext(writer, aEventOptions.mPriority, mLastEventNumber);
     EventOptions opts;
+
     Timestamp timestamp;
+#if CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
     System::Clock::Milliseconds64 utc_time;
     err = System::SystemClock().GetClock_RealTimeMS(utc_time);
     if (err == CHIP_NO_ERROR)
@@ -436,6 +437,7 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, c
         timestamp = Timestamp::Epoch(utc_time);
     }
     else
+#endif // CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
     {
         auto systemTimeMs = System::SystemClock().GetMonotonicMilliseconds64() - mMonotonicStartupTime;
         timestamp         = Timestamp::System(systemTimeMs);
