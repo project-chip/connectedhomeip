@@ -591,11 +591,11 @@ PyChipError pychip_DeviceController_SetIpk(chip::Controller::DeviceCommissioner 
     uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
     chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
 
-    err = devCtrl->GetCompressedFabricIdBytes(compressedFabricIdSpan);
+    CHIP_ERROR err = devCtrl->GetCompressedFabricIdBytes(compressedFabricIdSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
 
-    CHIP_ERROR err = chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), ByteSpan(ipk, ipkLen),
-                                                             compressedFabricIdSpan);
+    err = chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), ByteSpan(ipk, ipkLen),
+                                                  compressedFabricIdSpan);
 
     return ToPyChipError(err);
 }

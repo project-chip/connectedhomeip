@@ -21,8 +21,14 @@ import builtins
 from chip import ChipDeviceCtrl
 from chip import clusters as Clusters
 from chip import commissioning, tlv
+import chip.credentials.cert
+import chip.crypto.fabric
 
 from . import pase
+
+from cryptography import x509
+from cryptography.hazmat.primitives import serialization
+import base64
 
 
 class CommissioningFlowBlocks:
@@ -105,20 +111,39 @@ class CommissioningFlowBlocks:
             raise commissioning.CommissionFailure(f"Failed to add Root Certificate: {ex}")
 
         try:
-            certificate_data = tlv.TLVReader(commissionee_credentials.noc).get()['Any']
+            x509_rcac = x509.load_pem_x509_certificate(
+                b'''-----BEGIN CERTIFICATE-----\n''' +
+                base64.b64encode(chip.credentials.cert.convert_chip_cert_to_x509_cert(commissionee_credentials.rcac)) +
+                b'''\n-----END CERTIFICATE-----''')
+            root_public_key = x509_rcac.public_key().public_bytes(serialization.Encoding.X962,
+                                                                  serialization.PublicFormat.UncompressedPoint)
 
-            self._logger.info(f"Parsed NOC TLV: {certificate_data}")
+            x509_noc = x509.load_pem_x509_certificate(
+                b'''-----BEGIN CERTIFICATE-----\n''' +
+                base64.b64encode(chip.credentials.cert.convert_chip_cert_to_x509_cert(commissionee_credentials.noc)) +
+                b'''\n-----END CERTIFICATE-----''')
 
-            # TODO: chip.tlv.Reader will remove tag information in List containers. Which is used in NOC TLV
-            # Should extract matter-node-id and matter-fabric-id after List TLV is well handled.
+            for subject in x509_noc.subject:
+                if subject.oid.dotted_string == '1.3.6.1.4.1.37244.1.1':
+                    cert_fabric_id = int(subject.value, 16)
+                elif subject.oid.dotted_string == '1.3.6.1.4.1.37244.1.5':
+                    cert_node_id = int(subject.value, 16)
+
+            if cert_fabric_id != commissionee_credentials.fabric_id:
+                self._logger.warning("Fabric ID in certificate does not match the fabric id in commissionee credentials struct.")
+            if cert_node_id != commissionee_credentials.node_id:
+                self._logger.warning("Node ID in certificate does not match the node id in commissionee credentials struct.")
+
+            compressed_fabric_id = chip.crypto.fabric.generate_compressed_fabric_id(root_public_key, cert_fabric_id)
+
         except:
             self._logger.exception("The certificate should be a valid CHIP Certificate, but failed to parse it")
+            raise
 
-        # TODO: Calculate compressed fabric id based on the NOC infomations.
         self._logger.info(
-            f"Commissioning FabricID: {commissionee_credentials.fabric_id:016X} "
-            f"Compressed FabricID: {self._devCtrl.GetCompressedFabricId():016X} "
-            f"Node ID: {commissionee_credentials.node_id:016X}")
+            f"Commissioning FabricID: {cert_fabric_id:016X} "
+            f"Compressed FabricID: {compressed_fabric_id:016X} "
+            f"Node ID: {cert_node_id:016X}")
 
         self._logger.info("Adding Operational Certificate")
         response = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.AddNOC(
