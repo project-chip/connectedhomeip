@@ -28,6 +28,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
+#include <crypto/RawKeySessionKeystore.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
@@ -205,6 +206,8 @@ private:
     chip::Credentials::GroupDataProviderImpl mGroupDataProvider;
     // TODO: This may need to be injected as an OperationalCertificateStore *
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
+    // TODO: This may need to be injected as a SessionKeystore*
+    chip::Crypto::RawKeySessionKeystore mSessionKeystore;
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;

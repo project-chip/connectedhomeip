@@ -24,6 +24,7 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <errno.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -79,7 +80,7 @@ public:
         NL_TEST_ASSERT(suite,
                        CHIP_NO_ERROR ==
                            mSessionManager.Init(&ctx.GetSystemLayer(), &ctx.GetTransportMgr(), &ctx.GetMessageCounterManager(),
-                                                &mStorage, &ctx.GetFabricTable()));
+                                                &mStorage, &ctx.GetFabricTable(), ctx.GetSessionKeystore()));
         // The setup here is really weird: we are using one session manager for
         // the actual messages we send (the PASE handshake, so the
         // unauthenticated sessions) and a different one for allocating the PASE
@@ -194,12 +195,14 @@ FabricTable gCommissionerFabrics;
 FabricIndex gCommissionerFabricIndex;
 GroupDataProviderImpl gCommissionerGroupDataProvider;
 TestPersistentStorageDelegate gCommissionerStorageDelegate;
+Crypto::DefaultSessionKeystore gCommissionerSessionKeystore;
 
 FabricTable gDeviceFabrics;
 FabricIndex gDeviceFabricIndex;
 GroupDataProviderImpl gDeviceGroupDataProvider;
 TestPersistentStorageDelegate gDeviceStorageDelegate;
 TestOperationalKeystore gDeviceOperationalKeystore;
+Crypto::DefaultSessionKeystore gDeviceSessionKeystore;
 
 Credentials::PersistentStorageOpCertStore gCommissionerOpCertStore;
 Credentials::PersistentStorageOpCertStore gDeviceOpCertStore;
@@ -233,6 +236,7 @@ CHIP_ERROR InitCredentialSets()
 {
     gCommissionerStorageDelegate.ClearStorage();
     gCommissionerGroupDataProvider.SetStorageDelegate(&gCommissionerStorageDelegate);
+    gCommissionerGroupDataProvider.SetSessionKeystore(&gCommissionerSessionKeystore);
     ReturnErrorOnFailure(gCommissionerGroupDataProvider.Init());
 
     FabricInfo commissionerFabric;
@@ -261,6 +265,7 @@ CHIP_ERROR InitCredentialSets()
 
     gDeviceStorageDelegate.ClearStorage();
     gDeviceGroupDataProvider.SetStorageDelegate(&gDeviceStorageDelegate);
+    gDeviceGroupDataProvider.SetSessionKeystore(&gDeviceSessionKeystore);
     ReturnErrorOnFailure(gDeviceGroupDataProvider.Init());
     FabricInfo deviceFabric;
 

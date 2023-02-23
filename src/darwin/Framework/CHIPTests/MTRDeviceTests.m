@@ -354,6 +354,7 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoke command: MoveToLevelWithOnOff values: %@, error: %@", values, error);
 
+                                 XCTAssertNil(error);
                                  XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                  {
@@ -485,6 +486,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
+                                 XCTAssertNil(error);
                                  XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                  {
@@ -535,6 +537,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
+                                 XCTAssertNil(error);
                                  XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                  {
@@ -1090,6 +1093,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
+                                 XCTAssertNil(error);
                                  XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                  {
@@ -1681,6 +1685,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
+                                 XCTAssertNil(error);
                                  XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                  {
@@ -1711,6 +1716,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
+                                 XCTAssertNil(error);
                                  XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                  {
@@ -1760,6 +1766,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                              completion:^(id _Nullable values, NSError * _Nullable error) {
                                  NSLog(@"invoke command: On values: %@, error: %@", values, error);
 
+                                 XCTAssertNil(error);
                                  XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], 0);
 
                                  {

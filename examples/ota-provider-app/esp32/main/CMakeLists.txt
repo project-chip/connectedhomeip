@@ -18,7 +18,6 @@
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
 idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_CURRENT_LIST_DIR}/include"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/ota-provider-app/"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/ota-provider-app"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
                       SRC_DIRS

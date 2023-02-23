@@ -25,6 +25,8 @@
 #import <inet/InetError.h>
 #import <lib/support/TypeTraits.h>
 
+#import <objc/runtime.h>
+
 CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error)
 {
     if (error == nil) {
@@ -43,8 +45,9 @@ CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error)
         return CHIP_ERROR_INTERNAL;
     }
 
-    if (error.userInfo != nil) {
-        id underlyingError = error.userInfo[@"underlyingError"];
+    {
+        void * key = (__bridge void *) NSClassFromString(@"MTRErrorHolder");
+        id underlyingError = objc_getAssociatedObject(error, key);
         if (underlyingError != nil) {
             NSValue * chipErrorValue = [underlyingError valueForKey:@"error"];
             if (chipErrorValue != nil) {

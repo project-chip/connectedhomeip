@@ -35,7 +35,11 @@ CommissionerCommands::PairWithCode(const char * identity,
 
     // To reduce the scanning latency in some setups, and since the primary use for PairWithCode is to commission a device to
     // another commissioner, assume that the commissionable device is available on the network.
-    chip::Controller::DiscoveryType discoveryType = chip::Controller::DiscoveryType::kDiscoveryNetworkOnly;
+    auto discoveryType = chip::Controller::DiscoveryType::kDiscoveryNetworkOnly;
+    if (value.discoverOnce.ValueOr(false))
+    {
+        discoveryType = chip::Controller::DiscoveryType::kDiscoveryNetworkOnlyWithoutPASEAutoRetry;
+    }
     return GetCommissioner(identity).PairDevice(value.nodeId, code, discoveryType);
 }
 
@@ -126,8 +130,6 @@ void CommissionerCommands::OnStatusUpdate(DevicePairingDelegate::Status status)
     case DevicePairingDelegate::Status::SecurePairingFailed:
         ChipLogError(chipTool, "Secure Pairing Failed");
         OnResponse(ConvertToStatusIB(CHIP_ERROR_INCORRECT_STATE), nullptr);
-        break;
-    case DevicePairingDelegate::Status::SecurePairingDiscoveringMoreDevices:
         break;
     }
 }

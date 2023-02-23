@@ -315,7 +315,9 @@ class ClusterDetailFragment : Fragment() {
     val clusterCallbackTypeTv: TextView = callbackItem.findViewById(R.id.clusterCallbackTypeTv)
 
     clusterCallbackNameTv.text = variableNameType.name
-    clusterCallbackDataTv.text = if (response.javaClass == ByteArray::class.java) {
+    clusterCallbackDataTv.text = if (response == null) {
+      "null"
+    } else if (response.javaClass == ByteArray::class.java) {
       (response as ByteArray).decodeToString()
     } else {
       response.toString()

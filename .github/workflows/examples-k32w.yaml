@@ -38,7 +38,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-k32w:0.6.36
+            image: connectedhomeip/chip-build-k32w:0.6.40
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -61,6 +61,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |
@@ -79,7 +80,7 @@ jobs:
                       .environment/pigweed-venv/*.log
 
             - name: Build examples
-              timeout-minutes: 50
+              timeout-minutes: 70
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \

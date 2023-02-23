@@ -26,7 +26,12 @@ void DiscoverCommissionablesCommandBase::OnDiscoveredDevice(const chip::Dnssd::D
 {
     nodeData.LogDetail();
     LogErrorOnFailure(RemoteDataModelLogger::LogDiscoveredNodeData(nodeData));
-    SetCommandExitStatus(CHIP_NO_ERROR);
+
+    if (mDiscoverOnce.ValueOr(true))
+    {
+        CurrentCommissioner().StopCommissionableDiscovery();
+        SetCommandExitStatus(CHIP_NO_ERROR);
+    }
 }
 
 CHIP_ERROR DiscoverCommissionablesCommand::RunCommand()

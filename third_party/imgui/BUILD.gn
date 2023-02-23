@@ -23,8 +23,19 @@ config("imgui_config") {
   defines = [ "CHIP_IMGUI_ENABLED=1" ]
 
   # FUTURE: these should be parsed from `sdl2-config --cflags`
-  include_dirs += [ "/usr/include/SDL2" ]
-  defines += [ "_REENTRANT" ]
+  if (current_os == "mac") {
+    # Default path setup by `brew install sdl2`
+    include_dirs += [ "/usr/local/include/SDL2" ]
+    defines += [ "_THREAD_SAFE" ]
+    ldflags = [
+      "-framework",
+      "OpenGL",
+    ]
+  } else {
+    # Linux defaults
+    include_dirs += [ "/usr/include/SDL2" ]
+    defines += [ "_REENTRANT" ]
+  }
 }
 
 source_set("imgui") {
@@ -51,13 +62,14 @@ source_set("imgui") {
   ]
 
   # FUTURE: SDL2 libs should be from `sdl2-config --libs`
-  #         Also different platforms may require different seettings (e.g. on mac this
-  #         seems to need `-framework OpenGl -framework CoreFoundation`
   libs = [
     "SDL2",
-    "GL",
     "dl",
   ]
+
+  if (current_os == "linux") {
+    libs += [ "GL" ]
+  }
 
   public_configs = [ ":imgui_config" ]
 }

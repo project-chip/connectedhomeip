@@ -109,6 +109,8 @@ private:
                                                       ///< lesser priority are dropped when they get bumped out of this buffer
 
     size_t mRequiredSpaceForEvicted = 0; ///< Required space for previous buffer to evict event to new buffer
+
+    CHIP_ERROR OnInit(TLV::TLVWriter & writer, uint8_t *& bufStart, uint32_t & bufLen) override;
 };
 
 class CircularEventReader;

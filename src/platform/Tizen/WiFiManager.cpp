@@ -29,6 +29,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/PlatformManager.h>
 
 #include "MainLoop.h"
 
@@ -272,13 +273,15 @@ void WiFiManager::_ConnectedCb(wifi_manager_error_e wifiErr, void * userData)
 {
     auto loop = reinterpret_cast<GMainLoop *>(userData);
 
-    if (wifiErr == WIFI_MANAGER_ERROR_NONE)
+    if (wifiErr == WIFI_MANAGER_ERROR_NONE || wifiErr == WIFI_MANAGER_ERROR_ALREADY_EXISTS)
     {
         ChipLogProgress(DeviceLayer, "WiFi is connected");
         if (sInstance.mpConnectCallback != nullptr)
         {
+            chip::DeviceLayer::PlatformMgr().LockChipStack();
             sInstance.mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
             sInstance.mpConnectCallback = nullptr;
+            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         }
     }
     else
@@ -286,8 +289,10 @@ void WiFiManager::_ConnectedCb(wifi_manager_error_e wifiErr, void * userData)
         ChipLogError(DeviceLayer, "FAIL: connect WiFi [%s]", get_error_message(wifiErr));
         if (sInstance.mpConnectCallback != nullptr)
         {
+            chip::DeviceLayer::PlatformMgr().LockChipStack();
             sInstance.mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), 0);
             sInstance.mpConnectCallback = nullptr;
+            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         }
     }
 
@@ -601,41 +606,26 @@ void WiFiManager::Deinit()
 
 CHIP_ERROR WiFiManager::IsActivated(bool * isWiFiActivated)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int wifiErr    = WIFI_MANAGER_ERROR_NONE;
-
-    wifiErr = wifi_manager_is_activated(sInstance.mWiFiManagerHandle, isWiFiActivated);
-    if (wifiErr == WIFI_MANAGER_ERROR_NONE)
-    {
-        ChipLogProgress(DeviceLayer, "WiFi is %s", *isWiFiActivated ? "activated" : "deactivated");
-    }
-    else
-    {
-        err = CHIP_ERROR_INCORRECT_STATE;
-        ChipLogError(DeviceLayer, "FAIL: check whether WiFi is activated [%s]", get_error_message(wifiErr));
-    }
-
-    return err;
+    int wifiErr = wifi_manager_is_activated(sInstance.mWiFiManagerHandle, isWiFiActivated);
+    VerifyOrReturnError(wifiErr == WIFI_MANAGER_ERROR_NONE, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(DeviceLayer, "FAIL: Check whether WiFi is activated: %s", get_error_message(wifiErr)));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WiFiManager::Activate()
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
-    int wifiErr          = WIFI_MANAGER_ERROR_NONE;
     bool isWiFiActivated = false;
     bool dbusAsyncErr    = false;
 
-    wifiErr = wifi_manager_is_activated(sInstance.mWiFiManagerHandle, &isWiFiActivated);
-    VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE, err = CHIP_ERROR_INCORRECT_STATE;
-                 ChipLogError(DeviceLayer, "FAIL: check whether WiFi is activated [%s]", get_error_message(wifiErr)));
-
+    VerifyOrExit((err = IsActivated(&isWiFiActivated)) == CHIP_NO_ERROR, );
     VerifyOrExit(isWiFiActivated == false, ChipLogProgress(DeviceLayer, "WiFi is already activated"));
 
     dbusAsyncErr = MainLoop::Instance().AsyncRequest(_WiFiActivate);
-    if (dbusAsyncErr == false)
-    {
-        err = CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrExit(dbusAsyncErr == true, {
+        ChipLogError(DeviceLayer, "FAIL: Async request: Activate WiFi");
+        err = CHIP_ERROR_INTERNAL;
+    });
 
 exit:
     return err;
@@ -644,21 +634,17 @@ exit:
 CHIP_ERROR WiFiManager::Deactivate()
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
-    int wifiErr          = WIFI_MANAGER_ERROR_NONE;
     bool isWiFiActivated = false;
     bool dbusAsyncErr    = false;
 
-    wifiErr = wifi_manager_is_activated(sInstance.mWiFiManagerHandle, &isWiFiActivated);
-    VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE, err = CHIP_ERROR_INCORRECT_STATE;
-                 ChipLogError(DeviceLayer, "FAIL: check whether WiFi is activated [%s]", get_error_message(wifiErr)));
-
+    VerifyOrExit((err = IsActivated(&isWiFiActivated)) == CHIP_NO_ERROR, );
     VerifyOrExit(isWiFiActivated == true, ChipLogProgress(DeviceLayer, "WiFi is already deactivated"));
 
     dbusAsyncErr = MainLoop::Instance().AsyncRequest(_WiFiDeactivate);
-    if (dbusAsyncErr == false)
-    {
-        err = CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrExit(dbusAsyncErr == true, {
+        ChipLogError(DeviceLayer, "FAIL: Async request: Deactivate WiFi");
+        err = CHIP_ERROR_INTERNAL;
+    });
 
 exit:
     return err;
@@ -668,7 +654,6 @@ CHIP_ERROR WiFiManager::Connect(const char * ssid, const char * key,
                                 DeviceLayer::NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * apCallback)
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
-    int wifiErr               = WIFI_MANAGER_ERROR_NONE;
     bool isWiFiActivated      = false;
     bool dbusAsyncErr         = false;
     wifi_manager_ap_h foundAp = nullptr;
@@ -676,30 +661,30 @@ CHIP_ERROR WiFiManager::Connect(const char * ssid, const char * key,
     g_strlcpy(sInstance.mWiFiSSID, ssid, sizeof(sInstance.mWiFiSSID));
     g_strlcpy(sInstance.mWiFiKey, key, sizeof(sInstance.mWiFiKey));
 
-    wifiErr = wifi_manager_is_activated(sInstance.mWiFiManagerHandle, &isWiFiActivated);
-    VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE, err = CHIP_ERROR_INCORRECT_STATE;
-                 ChipLogError(DeviceLayer, "FAIL: check whether WiFi is activated [%s]", get_error_message(wifiErr)));
-
-    VerifyOrExit(isWiFiActivated == true, ChipLogProgress(DeviceLayer, "WiFi is deactivated"));
+    VerifyOrExit((err = IsActivated(&isWiFiActivated)) == CHIP_NO_ERROR, );
+    VerifyOrExit(isWiFiActivated == true, {
+        ChipLogProgress(DeviceLayer, "WiFi is not activated");
+        err = CHIP_ERROR_INCORRECT_STATE;
+    });
 
     sInstance.mpConnectCallback = apCallback;
 
     foundAp = sInstance._WiFiGetFoundAP();
     if (foundAp != nullptr)
     {
-        dbusAsyncErr = MainLoop::Instance().AsyncRequest(_WiFiConnect, static_cast<gpointer>(foundAp));
-        if (dbusAsyncErr == false)
-        {
-            err = CHIP_ERROR_INCORRECT_STATE;
-        }
+        dbusAsyncErr = MainLoop::Instance().AsyncRequest(_WiFiConnect, foundAp);
+        VerifyOrExit(dbusAsyncErr == true, {
+            ChipLogError(DeviceLayer, "FAIL: Async request: Connect WiFi");
+            err = CHIP_ERROR_INTERNAL;
+        });
     }
     else
     {
         dbusAsyncErr = MainLoop::Instance().AsyncRequest(_WiFiScan);
-        if (dbusAsyncErr == false)
-        {
-            err = CHIP_ERROR_INCORRECT_STATE;
-        }
+        VerifyOrExit(dbusAsyncErr == true, {
+            ChipLogError(DeviceLayer, "FAIL: Async request: Scan WiFi");
+            err = CHIP_ERROR_INTERNAL;
+        });
     }
 
 exit:
@@ -715,11 +700,11 @@ CHIP_ERROR WiFiManager::Disconnect(const char * ssid)
 
     g_strlcpy(sInstance.mWiFiSSID, ssid, sizeof(sInstance.mWiFiSSID));
 
-    wifiErr = wifi_manager_is_activated(sInstance.mWiFiManagerHandle, &isWiFiActivated);
-    VerifyOrExit(wifiErr == WIFI_MANAGER_ERROR_NONE, err = CHIP_ERROR_INCORRECT_STATE;
-                 ChipLogError(DeviceLayer, "FAIL: check whether WiFi is activated [%s]", get_error_message(wifiErr)));
-
-    VerifyOrExit(isWiFiActivated == true, ChipLogProgress(DeviceLayer, "WiFi is deactivated"));
+    VerifyOrExit((err = IsActivated(&isWiFiActivated)) == CHIP_NO_ERROR, );
+    VerifyOrExit(isWiFiActivated == true, {
+        ChipLogProgress(DeviceLayer, "WiFi is not activated");
+        err = CHIP_ERROR_INCORRECT_STATE;
+    });
 
     foundAp = sInstance._WiFiGetFoundAP();
     VerifyOrExit(foundAp != nullptr, );

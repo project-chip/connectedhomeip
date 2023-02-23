@@ -41,7 +41,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-mbed-os:0.6.35
+            image: connectedhomeip/chip-build-mbed-os:0.6.40
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -75,6 +75,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |

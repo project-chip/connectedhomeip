@@ -157,7 +157,7 @@ public:
      * WiFi network diagnostics methods
      */
     virtual CHIP_ERROR GetWiFiBssId(ByteSpan & value);
-    virtual CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType);
+    virtual CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType);
     virtual CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion);
     virtual CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber);
     virtual CHIP_ERROR GetWiFiRssi(int8_t & rssi);
@@ -333,7 +333,8 @@ inline CHIP_ERROR DiagnosticDataProvider::GetWiFiBssId(ByteSpan & value)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-inline CHIP_ERROR DiagnosticDataProvider::GetWiFiSecurityType(uint8_t & securityType)
+inline CHIP_ERROR
+DiagnosticDataProvider::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

@@ -20,6 +20,7 @@
 // Prevent multiple inclusion
 #pragma once
 
+#include <app/util/endpoint-config-defines.h>
 #include <lib/core/CHIPConfig.h>
 
 // Default values for the attributes longer than a pointer,
@@ -59,24 +60,6 @@
 
 #define GENERATED_DEFAULTS_COUNT (2)
 
-#define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
-#define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
-    {                                                                                                                              \
-        &generatedDefaults[index]                                                                                                  \
-    }
-#define ZAP_MIN_MAX_DEFAULTS_INDEX(index)                                                                                          \
-    {                                                                                                                              \
-        &minMaxDefaults[index]                                                                                                     \
-    }
-#define ZAP_EMPTY_DEFAULT()                                                                                                        \
-    {                                                                                                                              \
-        (uint32_t) 0                                                                                                               \
-    }
-#define ZAP_SIMPLE_DEFAULT(x)                                                                                                      \
-    {                                                                                                                              \
-        (uint32_t) x                                                                                                               \
-    }
-
 // This is an array of EmberAfAttributeMinMaxValue structures.
 #define GENERATED_MIN_MAX_DEFAULT_COUNT 4
 #define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
@@ -97,7 +80,6 @@
         } /* StartUpColorTemperatureMireds */                                                                                      \
     }
 
-#define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
 #define GENERATED_ATTRIBUTE_COUNT 271
 #define GENERATED_ATTRIBUTES                                                                                                       \
@@ -543,11 +525,6 @@
             { ZAP_SIMPLE_DEFAULT(3), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },   /* ClusterRevision */                                 \
     }
 
-// This is an array of EmberAfCluster structures.
-#define ZAP_ATTRIBUTE_INDEX(index) (&generatedAttributes[index])
-
-#define ZAP_GENERATED_COMMANDS_INDEX(index) (&generatedCommands[index])
-
 // clang-format off
 #define GENERATED_EVENT_COUNT 15
 #define GENERATED_EVENTS { \
@@ -580,8 +557,6 @@
 
 // clang-format on
 
-#define ZAP_GENERATED_EVENTS_INDEX(index) (&generatedEvents[index])
-
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
     const EmberAfGenericClusterFunction chipFuncArrayGroupsServer[] = {                                                            \
@@ -601,12 +576,15 @@
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayOnOffServer[] = {                                                             \
         (EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback,                                                     \
+        (EmberAfGenericClusterFunction) MatterOnOffClusterServerShutdownCallback,                                                  \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayLevelControlServer[] = {                                                      \
         (EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback,                                              \
+        (EmberAfGenericClusterFunction) MatterLevelControlClusterServerShutdownCallback,                                           \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayColorControlServer[] = {                                                      \
         (EmberAfGenericClusterFunction) emberAfColorControlClusterServerInitCallback,                                              \
+        (EmberAfGenericClusterFunction) MatterColorControlClusterServerShutdownCallback,                                           \
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayOccupancySensingServer[] = {                                                  \
         (EmberAfGenericClusterFunction) emberAfOccupancySensingClusterServerInitCallback,                                          \
@@ -785,9 +763,8 @@
 
 // clang-format on
 
-#define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
+// This is an array of EmberAfCluster structures.
 #define GENERATED_CLUSTER_COUNT 29
-
 // clang-format off
 #define GENERATED_CLUSTERS { \
   { \
@@ -1108,7 +1085,7 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(214), \
       .attributeCount = 7, \
       .clusterSize = 13, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
       .functions = chipFuncArrayOnOffServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 88 ) ,\
       .generatedCommandList = nullptr ,\
@@ -1121,7 +1098,7 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(221), \
       .attributeCount = 16, \
       .clusterSize = 27, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
       .functions = chipFuncArrayLevelControlServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 95 ) ,\
       .generatedCommandList = nullptr ,\
@@ -1147,7 +1124,7 @@
       .attributes = ZAP_ATTRIBUTE_INDEX(243), \
       .attributeCount = 23, \
       .clusterSize = 40, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
+      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
       .functions = chipFuncArrayColorControlServer, \
       .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 104 ) ,\
       .generatedCommandList = nullptr ,\
@@ -1170,8 +1147,6 @@
 }
 
 // clang-format on
-
-#define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
 
 #define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 28
 

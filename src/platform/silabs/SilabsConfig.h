@@ -47,7 +47,7 @@ namespace Internal {
 
 /**
  *
- * This implementation uses the Silicon Labs SILABS NVM3 flash data storage library
+ * This implementation uses the Silicon Labs Silabs NVM3 flash data storage library
  * as the underlying storage layer.
  *
  * NOTE: This class is designed to be mixed-in to the concrete subclass of the
@@ -69,12 +69,12 @@ constexpr uint32_t kUserNvm3KeyDomainHiLimit = 0x00FFFFU; // User Domain NVM3 Ke
 constexpr uint32_t kMatterNvm3KeyDomain      = 0x080000U;
 constexpr uint32_t kMatterNvm3KeyLoLimit     = 0x087200U; // Do not modify without Silabs GSDK team approval
 constexpr uint32_t kMatterNvm3KeyHiLimit     = 0x087FFFU; // Do not modify without Silabs GSDK team approval
-constexpr inline uint32_t SILABSConfigKey(uint8_t keyBaseOffset, uint8_t id)
+constexpr inline uint32_t SilabsConfigKey(uint8_t keyBaseOffset, uint8_t id)
 {
     return kMatterNvm3KeyDomain | static_cast<uint32_t>(keyBaseOffset) << 8 | id;
 }
 
-class SILABSConfig
+class SilabsConfig
 {
 public:
     // Definitions for Silicon Labs EFR32 NVM3 driver:-
@@ -94,75 +94,75 @@ public:
 
     // Key definitions for well-known configuration values.
     // Factory config keys
-    static constexpr Key kConfigKey_SerialNum             = SILABSConfigKey(kMatterFactory_KeyBase, 0x00);
-    static constexpr Key kConfigKey_MfrDeviceId           = SILABSConfigKey(kMatterFactory_KeyBase, 0x01);
-    static constexpr Key kConfigKey_MfrDeviceCert         = SILABSConfigKey(kMatterFactory_KeyBase, 0x02);
-    static constexpr Key kConfigKey_MfrDevicePrivateKey   = SILABSConfigKey(kMatterFactory_KeyBase, 0x03);
-    static constexpr Key kConfigKey_ManufacturingDate     = SILABSConfigKey(kMatterFactory_KeyBase, 0x04);
-    static constexpr Key kConfigKey_SetupPayloadBitSet    = SILABSConfigKey(kMatterFactory_KeyBase, 0x05);
-    static constexpr Key kConfigKey_MfrDeviceICACerts     = SILABSConfigKey(kMatterFactory_KeyBase, 0x06);
-    static constexpr Key kConfigKey_SetupDiscriminator    = SILABSConfigKey(kMatterFactory_KeyBase, 0x07);
-    static constexpr Key kConfigKey_Spake2pIterationCount = SILABSConfigKey(kMatterFactory_KeyBase, 0x08);
-    static constexpr Key kConfigKey_Spake2pSalt           = SILABSConfigKey(kMatterFactory_KeyBase, 0x09);
-    static constexpr Key kConfigKey_Spake2pVerifier       = SILABSConfigKey(kMatterFactory_KeyBase, 0x0A);
-    static constexpr Key kConfigKey_ProductId             = SILABSConfigKey(kMatterFactory_KeyBase, 0x0B);
-    static constexpr Key kConfigKey_VendorId              = SILABSConfigKey(kMatterFactory_KeyBase, 0x0C);
-    static constexpr Key kConfigKey_VendorName            = SILABSConfigKey(kMatterFactory_KeyBase, 0x0D);
-    static constexpr Key kConfigKey_ProductName           = SILABSConfigKey(kMatterFactory_KeyBase, 0x0E);
-    static constexpr Key kConfigKey_HardwareVersionString = SILABSConfigKey(kMatterFactory_KeyBase, 0x0F);
-    static constexpr Key KConfigKey_ProductLabel          = SILABSConfigKey(kMatterFactory_KeyBase, 0x10);
-    static constexpr Key kConfigKey_ProductURL            = SILABSConfigKey(kMatterFactory_KeyBase, 0x11);
-    static constexpr Key kConfigKey_PartNumber            = SILABSConfigKey(kMatterFactory_KeyBase, 0x12);
-    static constexpr Key kConfigKey_UniqueId              = SILABSConfigKey(kMatterFactory_KeyBase, 0x1F);
+    static constexpr Key kConfigKey_SerialNum             = SilabsConfigKey(kMatterFactory_KeyBase, 0x00);
+    static constexpr Key kConfigKey_MfrDeviceId           = SilabsConfigKey(kMatterFactory_KeyBase, 0x01);
+    static constexpr Key kConfigKey_MfrDeviceCert         = SilabsConfigKey(kMatterFactory_KeyBase, 0x02);
+    static constexpr Key kConfigKey_MfrDevicePrivateKey   = SilabsConfigKey(kMatterFactory_KeyBase, 0x03);
+    static constexpr Key kConfigKey_ManufacturingDate     = SilabsConfigKey(kMatterFactory_KeyBase, 0x04);
+    static constexpr Key kConfigKey_SetupPayloadBitSet    = SilabsConfigKey(kMatterFactory_KeyBase, 0x05);
+    static constexpr Key kConfigKey_MfrDeviceICACerts     = SilabsConfigKey(kMatterFactory_KeyBase, 0x06);
+    static constexpr Key kConfigKey_SetupDiscriminator    = SilabsConfigKey(kMatterFactory_KeyBase, 0x07);
+    static constexpr Key kConfigKey_Spake2pIterationCount = SilabsConfigKey(kMatterFactory_KeyBase, 0x08);
+    static constexpr Key kConfigKey_Spake2pSalt           = SilabsConfigKey(kMatterFactory_KeyBase, 0x09);
+    static constexpr Key kConfigKey_Spake2pVerifier       = SilabsConfigKey(kMatterFactory_KeyBase, 0x0A);
+    static constexpr Key kConfigKey_ProductId             = SilabsConfigKey(kMatterFactory_KeyBase, 0x0B);
+    static constexpr Key kConfigKey_VendorId              = SilabsConfigKey(kMatterFactory_KeyBase, 0x0C);
+    static constexpr Key kConfigKey_VendorName            = SilabsConfigKey(kMatterFactory_KeyBase, 0x0D);
+    static constexpr Key kConfigKey_ProductName           = SilabsConfigKey(kMatterFactory_KeyBase, 0x0E);
+    static constexpr Key kConfigKey_HardwareVersionString = SilabsConfigKey(kMatterFactory_KeyBase, 0x0F);
+    static constexpr Key KConfigKey_ProductLabel          = SilabsConfigKey(kMatterFactory_KeyBase, 0x10);
+    static constexpr Key kConfigKey_ProductURL            = SilabsConfigKey(kMatterFactory_KeyBase, 0x11);
+    static constexpr Key kConfigKey_PartNumber            = SilabsConfigKey(kMatterFactory_KeyBase, 0x12);
+    static constexpr Key kConfigKey_UniqueId              = SilabsConfigKey(kMatterFactory_KeyBase, 0x1F);
     // Matter Config Keys
-    static constexpr Key kConfigKey_ServiceConfig      = SILABSConfigKey(kMatterConfig_KeyBase, 0x01);
-    static constexpr Key kConfigKey_PairedAccountId    = SILABSConfigKey(kMatterConfig_KeyBase, 0x02);
-    static constexpr Key kConfigKey_ServiceId          = SILABSConfigKey(kMatterConfig_KeyBase, 0x03);
-    static constexpr Key kConfigKey_LastUsedEpochKeyId = SILABSConfigKey(kMatterConfig_KeyBase, 0x05);
-    static constexpr Key kConfigKey_FailSafeArmed      = SILABSConfigKey(kMatterConfig_KeyBase, 0x06);
-    static constexpr Key kConfigKey_GroupKey           = SILABSConfigKey(kMatterConfig_KeyBase, 0x07);
-    static constexpr Key kConfigKey_HardwareVersion    = SILABSConfigKey(kMatterConfig_KeyBase, 0x08);
-    static constexpr Key kConfigKey_RegulatoryLocation = SILABSConfigKey(kMatterConfig_KeyBase, 0x09);
-    static constexpr Key kConfigKey_CountryCode        = SILABSConfigKey(kMatterConfig_KeyBase, 0x0A);
-    static constexpr Key kConfigKey_WiFiSSID           = SILABSConfigKey(kMatterConfig_KeyBase, 0x0C);
-    static constexpr Key kConfigKey_WiFiPSK            = SILABSConfigKey(kMatterConfig_KeyBase, 0x0D);
-    static constexpr Key kConfigKey_WiFiSEC            = SILABSConfigKey(kMatterConfig_KeyBase, 0x0E);
-    static constexpr Key kConfigKey_GroupKeyBase       = SILABSConfigKey(kMatterConfig_KeyBase, 0x0F);
-    static constexpr Key kConfigKey_LockUser           = SILABSConfigKey(kMatterConfig_KeyBase, 0x10);
-    static constexpr Key kConfigKey_Credential         = SILABSConfigKey(kMatterConfig_KeyBase, 0x11);
-    static constexpr Key kConfigKey_LockUserName       = SILABSConfigKey(kMatterConfig_KeyBase, 0x12);
-    static constexpr Key kConfigKey_CredentialData     = SILABSConfigKey(kMatterConfig_KeyBase, 0x13);
-    static constexpr Key kConfigKey_UserCredentials    = SILABSConfigKey(kMatterConfig_KeyBase, 0x14);
-    static constexpr Key kConfigKey_WeekDaySchedules   = SILABSConfigKey(kMatterConfig_KeyBase, 0x15);
-    static constexpr Key kConfigKey_YearDaySchedules   = SILABSConfigKey(kMatterConfig_KeyBase, 0x16);
-    static constexpr Key kConfigKey_HolidaySchedules   = SILABSConfigKey(kMatterConfig_KeyBase, 0x17);
-    static constexpr Key kConfigKey_OpKeyMap           = SILABSConfigKey(kMatterConfig_KeyBase, 0x20);
+    static constexpr Key kConfigKey_ServiceConfig      = SilabsConfigKey(kMatterConfig_KeyBase, 0x01);
+    static constexpr Key kConfigKey_PairedAccountId    = SilabsConfigKey(kMatterConfig_KeyBase, 0x02);
+    static constexpr Key kConfigKey_ServiceId          = SilabsConfigKey(kMatterConfig_KeyBase, 0x03);
+    static constexpr Key kConfigKey_LastUsedEpochKeyId = SilabsConfigKey(kMatterConfig_KeyBase, 0x05);
+    static constexpr Key kConfigKey_FailSafeArmed      = SilabsConfigKey(kMatterConfig_KeyBase, 0x06);
+    static constexpr Key kConfigKey_GroupKey           = SilabsConfigKey(kMatterConfig_KeyBase, 0x07);
+    static constexpr Key kConfigKey_HardwareVersion    = SilabsConfigKey(kMatterConfig_KeyBase, 0x08);
+    static constexpr Key kConfigKey_RegulatoryLocation = SilabsConfigKey(kMatterConfig_KeyBase, 0x09);
+    static constexpr Key kConfigKey_CountryCode        = SilabsConfigKey(kMatterConfig_KeyBase, 0x0A);
+    static constexpr Key kConfigKey_WiFiSSID           = SilabsConfigKey(kMatterConfig_KeyBase, 0x0C);
+    static constexpr Key kConfigKey_WiFiPSK            = SilabsConfigKey(kMatterConfig_KeyBase, 0x0D);
+    static constexpr Key kConfigKey_WiFiSEC            = SilabsConfigKey(kMatterConfig_KeyBase, 0x0E);
+    static constexpr Key kConfigKey_GroupKeyBase       = SilabsConfigKey(kMatterConfig_KeyBase, 0x0F);
+    static constexpr Key kConfigKey_LockUser           = SilabsConfigKey(kMatterConfig_KeyBase, 0x10);
+    static constexpr Key kConfigKey_Credential         = SilabsConfigKey(kMatterConfig_KeyBase, 0x11);
+    static constexpr Key kConfigKey_LockUserName       = SilabsConfigKey(kMatterConfig_KeyBase, 0x12);
+    static constexpr Key kConfigKey_CredentialData     = SilabsConfigKey(kMatterConfig_KeyBase, 0x13);
+    static constexpr Key kConfigKey_UserCredentials    = SilabsConfigKey(kMatterConfig_KeyBase, 0x14);
+    static constexpr Key kConfigKey_WeekDaySchedules   = SilabsConfigKey(kMatterConfig_KeyBase, 0x15);
+    static constexpr Key kConfigKey_YearDaySchedules   = SilabsConfigKey(kMatterConfig_KeyBase, 0x16);
+    static constexpr Key kConfigKey_HolidaySchedules   = SilabsConfigKey(kMatterConfig_KeyBase, 0x17);
+    static constexpr Key kConfigKey_OpKeyMap           = SilabsConfigKey(kMatterConfig_KeyBase, 0x20);
 
     static constexpr Key kConfigKey_GroupKeyMax =
-        SILABSConfigKey(kMatterConfig_KeyBase, 0x1E); // Allows 16 Group Keys to be created.
+        SilabsConfigKey(kMatterConfig_KeyBase, 0x1E); // Allows 16 Group Keys to be created.
 
     // Matter Counter Keys
-    static constexpr Key kConfigKey_BootCount             = SILABSConfigKey(kMatterCounter_KeyBase, 0x00);
-    static constexpr Key kConfigKey_TotalOperationalHours = SILABSConfigKey(kMatterCounter_KeyBase, 0x01);
-    static constexpr Key kConfigKey_LifeTimeCounter       = SILABSConfigKey(kMatterCounter_KeyBase, 0x02);
+    static constexpr Key kConfigKey_BootCount             = SilabsConfigKey(kMatterCounter_KeyBase, 0x00);
+    static constexpr Key kConfigKey_TotalOperationalHours = SilabsConfigKey(kMatterCounter_KeyBase, 0x01);
+    static constexpr Key kConfigKey_LifeTimeCounter       = SilabsConfigKey(kMatterCounter_KeyBase, 0x02);
 
     // Matter KVS storage Keys
-    static constexpr Key kConfigKey_KvsStringKeyMap = SILABSConfigKey(kMatterKvs_KeyBase, 0x00);
-    static constexpr Key kConfigKey_KvsFirstKeySlot = SILABSConfigKey(kMatterKvs_KeyBase, 0x01);
-    static constexpr Key kConfigKey_KvsLastKeySlot  = SILABSConfigKey(kMatterKvs_KeyBase, KVS_MAX_ENTRIES);
+    static constexpr Key kConfigKey_KvsStringKeyMap = SilabsConfigKey(kMatterKvs_KeyBase, 0x00);
+    static constexpr Key kConfigKey_KvsFirstKeySlot = SilabsConfigKey(kMatterKvs_KeyBase, 0x01);
+    static constexpr Key kConfigKey_KvsLastKeySlot  = SilabsConfigKey(kMatterKvs_KeyBase, KVS_MAX_ENTRIES);
 
     // Set key id limits for each group.
-    static constexpr Key kMinConfigKey_MatterFactory = SILABSConfigKey(kMatterFactory_KeyBase, 0x00);
-    static constexpr Key kMaxConfigKey_MatterFactory = SILABSConfigKey(kMatterFactory_KeyBase, 0x1F);
-    static constexpr Key kMinConfigKey_MatterConfig  = SILABSConfigKey(kMatterConfig_KeyBase, 0x00);
-    static constexpr Key kMaxConfigKey_MatterConfig  = SILABSConfigKey(kMatterConfig_KeyBase, 0x20);
+    static constexpr Key kMinConfigKey_MatterFactory = SilabsConfigKey(kMatterFactory_KeyBase, 0x00);
+    static constexpr Key kMaxConfigKey_MatterFactory = SilabsConfigKey(kMatterFactory_KeyBase, 0x1F);
+    static constexpr Key kMinConfigKey_MatterConfig  = SilabsConfigKey(kMatterConfig_KeyBase, 0x00);
+    static constexpr Key kMaxConfigKey_MatterConfig  = SilabsConfigKey(kMatterConfig_KeyBase, 0x20);
 
     // Allows 32 Counters to be created.
-    static constexpr Key kMinConfigKey_MatterCounter = SILABSConfigKey(kMatterCounter_KeyBase, 0x00);
-    static constexpr Key kMaxConfigKey_MatterCounter = SILABSConfigKey(kMatterCounter_KeyBase, 0x1F);
+    static constexpr Key kMinConfigKey_MatterCounter = SilabsConfigKey(kMatterCounter_KeyBase, 0x00);
+    static constexpr Key kMaxConfigKey_MatterCounter = SilabsConfigKey(kMatterCounter_KeyBase, 0x1F);
 
-    static constexpr Key kMinConfigKey_MatterKvs = SILABSConfigKey(kMatterKvs_KeyBase, 0x00);
-    static constexpr Key kMaxConfigKey_MatterKvs = SILABSConfigKey(kMatterKvs_KeyBase, 0xFF);
+    static constexpr Key kMinConfigKey_MatterKvs = SilabsConfigKey(kMatterKvs_KeyBase, 0x00);
+    static constexpr Key kMaxConfigKey_MatterKvs = SilabsConfigKey(kMatterKvs_KeyBase, 0xFF);
 
     static CHIP_ERROR Init(void);
     static void DeInit(void);

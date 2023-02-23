@@ -162,7 +162,6 @@ template("chip_data_model") {
       "${_app_root}/util/ClientMonitoringRegistrationTable.cpp",
       "${_app_root}/util/ClientMonitoringRegistrationTable.h",
       "${_app_root}/util/DataModelHandler.cpp",
-      "${_app_root}/util/af-event.cpp",
       "${_app_root}/util/attribute-size-util.cpp",
       "${_app_root}/util/attribute-storage.cpp",
       "${_app_root}/util/attribute-table.cpp",
@@ -192,6 +191,12 @@ template("chip_data_model") {
     _custom_impl_clusters = []
     if (defined(invoker.zap_clusters_with_custom_implementation)) {
       _custom_impl_clusters = invoker.zap_clusters_with_custom_implementation
+    }
+
+    if (_cluster_sources == []) {
+      # The variable is only used within the nested foreach-loop and will be
+      # unused before it goes out of scope when the outter-loop is not entered.
+      not_needed([ "_custom_impl_clusters" ])
     }
 
     foreach(cluster, _cluster_sources) {

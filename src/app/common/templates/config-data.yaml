@@ -18,21 +18,23 @@ WeakEnums:
     - IdentifyEffectVariant
     - IdentifyIdentifyType
     - InterfaceTypeEnum
-    - KeypadLockout
     - LevelControlOptions
     - MoveMode
     - NetworkFaultEnum
-    - OnOffDelayedAllOffEffectVariant
-    - OnOffDyingLightEffectVariant
-    - OnOffEffectIdentifier
     - PHYRateEnum
     - RadioFaultEnum
     - RoutingRole
     - SaturationMoveMode
     - SaturationStepMode
-    - SecurityType
     - StepMode
-    - TemperatureDisplayMode
+
+DefineBitmaps:
+    # Allow-list of bitmaps that we generates as #define as well as enum classes.
+    # The goal is to drive this down to 0.
+    - BarrierControlCapabilities
+    - BarrierControlSafetyStatus
+    - ColorLoopUpdateFlags
+    - LevelControlFeature
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
@@ -58,6 +60,13 @@ ClustersWithAttributeChangedFunctions:
     - Pump Configuration and Control
     - Window Covering
     - Fan Control
+
+ClustersWithShutdownFunctions:
+    - Barrier Control
+    - On/Off
+    - Door Lock
+    - Level Control
+    - Color Control
 
 ClustersWithPreAttributeChangeFunctions:
     - Door Lock

@@ -1,1 +1,1 @@
-0.6.39 Version bump reason: [Tizen] Fixup for QEMU docker image
+0.6.40 Version bump reason: [Linux] add libsdl2 to allow ui variants to be built

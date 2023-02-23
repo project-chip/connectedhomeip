@@ -269,7 +269,7 @@ client cluster OnOff = 6 {
 
   request struct OffWithEffectRequest {
     OnOffEffectIdentifier effectIdentifier = 0;
-    OnOffDelayedAllOffEffectVariant effectVariant = 1;
+    int8u effectVariant = 1;
   }
 
   request struct OnWithTimedOffRequest {
@@ -330,7 +330,7 @@ server cluster OnOff = 6 {
 
   request struct OffWithEffectRequest {
     OnOffEffectIdentifier effectIdentifier = 0;
-    OnOffDelayedAllOffEffectVariant effectVariant = 1;
+    int8u effectVariant = 1;
   }
 
   request struct OnWithTimedOffRequest {
@@ -1172,14 +1172,19 @@ server cluster SoftwareDiagnostics = 52 {
 }
 
 server cluster WiFiNetworkDiagnostics = 54 {
-  enum AssociationFailureCause : ENUM8 {
+  enum AssociationFailureCauseEnum : ENUM8 {
     kUnknown = 0;
     kAssociationFailed = 1;
     kAuthenticationFailed = 2;
     kSsidNotFound = 3;
   }
 
-  enum SecurityType : ENUM8 {
+  enum ConnectionStatusEnum : ENUM8 {
+    kConnected = 0;
+    kNotConnected = 1;
+  }
+
+  enum SecurityTypeEnum : ENUM8 {
     kUnspecified = 0;
     kNone = 1;
     kWep = 2;
@@ -1188,12 +1193,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
     kWpa3 = 5;
   }
 
-  enum WiFiConnectionStatus : ENUM8 {
-    kConnected = 0;
-    kNotConnected = 1;
-  }
-
-  enum WiFiVersionType : ENUM8 {
+  enum WiFiVersionEnum : ENUM8 {
     kA = 0;
     kB = 1;
     kG = 2;
@@ -1212,17 +1212,17 @@ server cluster WiFiNetworkDiagnostics = 54 {
   }
 
   info event AssociationFailure = 1 {
-    AssociationFailureCause associationFailure = 0;
+    AssociationFailureCauseEnum associationFailure = 0;
     INT16U status = 1;
   }
 
   info event ConnectionStatus = 2 {
-    WiFiConnectionStatus connectionStatus = 0;
+    ConnectionStatusEnum connectionStatus = 0;
   }
 
   readonly attribute nullable octet_string<6> bssid = 0;
-  readonly attribute nullable SecurityType securityType = 1;
-  readonly attribute nullable WiFiVersionType wiFiVersion = 2;
+  readonly attribute nullable SecurityTypeEnum securityType = 1;
+  readonly attribute nullable WiFiVersionEnum wiFiVersion = 2;
   readonly attribute nullable int16u channelNumber = 3;
   readonly attribute nullable int8s rssi = 4;
   readonly attribute nullable int32u beaconLostCount = 5;
@@ -1871,7 +1871,7 @@ server cluster WindowCovering = 258 {
 }
 
 server cluster PumpConfigurationAndControl = 512 {
-  enum PumpControlMode : ENUM8 {
+  enum ControlModeEnum : ENUM8 {
     kConstantSpeed = 0;
     kConstantPressure = 1;
     kProportionalPressure = 2;
@@ -1880,7 +1880,7 @@ server cluster PumpConfigurationAndControl = 512 {
     kAutomatic = 7;
   }
 
-  enum PumpOperationMode : ENUM8 {
+  enum OperationModeEnum : ENUM8 {
     kNormal = 0;
     kMinimum = 1;
     kMaximum = 2;
@@ -1894,10 +1894,10 @@ server cluster PumpConfigurationAndControl = 512 {
     kConstantSpeed = 0x8;
     kConstantTemperature = 0x10;
     kAutomatic = 0x20;
-    kLocal = 0x40;
+    kLocalOperation = 0x40;
   }
 
-  bitmap PumpStatus : BITMAP16 {
+  bitmap PumpStatusBitmap : BITMAP16 {
     kDeviceFault = 0x1;
     kSupplyfault = 0x2;
     kSpeedLow = 0x4;
@@ -1973,16 +1973,16 @@ server cluster PumpConfigurationAndControl = 512 {
   readonly attribute nullable int16u maxConstFlow = 10;
   readonly attribute nullable int16s minConstTemp = 11;
   readonly attribute nullable int16s maxConstTemp = 12;
-  readonly attribute PumpStatus pumpStatus = 16;
-  readonly attribute PumpOperationMode effectiveOperationMode = 17;
-  readonly attribute PumpControlMode effectiveControlMode = 18;
+  readonly attribute PumpStatusBitmap pumpStatus = 16;
+  readonly attribute OperationModeEnum effectiveOperationMode = 17;
+  readonly attribute ControlModeEnum effectiveControlMode = 18;
   readonly attribute nullable int16s capacity = 19;
   readonly attribute nullable int16u speed = 20;
   attribute access(write: manage) nullable int24u lifetimeRunningHours = 21;
   readonly attribute nullable int24u power = 22;
   attribute access(write: manage) nullable int32u lifetimeEnergyConsumed = 23;
-  attribute access(write: manage) PumpOperationMode operationMode = 32;
-  attribute access(write: manage) PumpControlMode controlMode = 33;
+  attribute access(write: manage) OperationModeEnum operationMode = 32;
+  attribute access(write: manage) ControlModeEnum controlMode = 33;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2321,9 +2321,26 @@ server cluster RelativeHumidityMeasurement = 1029 {
 }
 
 server cluster OccupancySensing = 1030 {
-  readonly attribute bitmap8 occupancy = 0;
-  readonly attribute enum8 occupancySensorType = 1;
-  readonly attribute bitmap8 occupancySensorTypeBitmap = 2;
+  enum OccupancySensorTypeEnum : ENUM8 {
+    kPir = 0;
+    kUltrasonic = 1;
+    kPIRAndUltrasonic = 2;
+    kPhysicalContact = 3;
+  }
+
+  bitmap OccupancyBitmap : BITMAP8 {
+    kOccupied = 0x1;
+  }
+
+  bitmap OccupancySensorTypeBitmap : BITMAP8 {
+    kPir = 0x1;
+    kUltrasonic = 0x2;
+    kPhysicalContact = 0x4;
+  }
+
+  readonly attribute OccupancyBitmap occupancy = 0;
+  readonly attribute OccupancySensorTypeEnum occupancySensorType = 1;
+  readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
   attribute access(write: manage) int16u PIROccupiedToUnoccupiedDelay = 16;
   attribute access(write: manage) int16u PIRUnoccupiedToOccupiedDelay = 17;
   attribute access(write: manage) int8u PIRUnoccupiedToOccupiedThreshold = 18;
@@ -2960,6 +2977,9 @@ endpoint 0 {
   }
 
   server cluster BasicInformation {
+    emits event StartUp;
+    emits event ShutDown;
+    emits event Leave;
     callback attribute dataModelRevision default = 10;
     callback attribute vendorName;
     callback attribute vendorID;
@@ -3074,6 +3094,7 @@ endpoint 0 {
   }
 
   server cluster GeneralDiagnostics {
+    emits event BootReason;
     callback attribute networkInterfaces;
     callback attribute rebootCount;
     callback attribute upTime;
@@ -3097,6 +3118,9 @@ endpoint 0 {
   }
 
   server cluster WiFiNetworkDiagnostics {
+    emits event Disconnection;
+    emits event AssociationFailure;
+    emits event ConnectionStatus;
     callback attribute bssid;
     callback attribute securityType;
     callback attribute wiFiVersion;

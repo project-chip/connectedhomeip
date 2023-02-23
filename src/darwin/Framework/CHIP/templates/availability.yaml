@@ -3100,8 +3100,14 @@
               - RoutingRole
               - ThreadConnectionStatus
           WiFiNetworkDiagnostics:
-              - AssociationFailureCause
-              - SecurityType
+              # AssociationFailureCauseEnum was originally just named
+              # AssociationFailureCause, but we generate the same API for both
+              # of those names, so the name can just change here.
+              - AssociationFailureCauseEnum
+              # SecurityTypeEnum was originally just named SecurityType, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              - SecurityTypeEnum
               - WiFiConnectionStatus
               - WiFiVersionType
           EthernetNetworkDiagnostics:
@@ -3118,7 +3124,10 @@
           OperationalCredentials:
               - OperationalCertStatus
           GroupKeyManagement:
-              - GroupKeySecurityPolicy
+              # GroupKeySecurityPolicyEnum was originally just named
+              # GroupKeySecurityPolicy, but we generate the same API for both of
+              # those names, so the name can just change here.
+              - GroupKeySecurityPolicyEnum
           DoorLock:
               - DlAlarmCode
               - DlCredentialRule
@@ -3480,12 +3489,18 @@
                   - Connected
                   - NotConnected
           WiFiNetworkDiagnostics:
-              AssociationFailureCause:
+              # AssociationFailureCauseEnum was originally just named
+              # AssociationFailureCause, but we generate the same API for both
+              # of those names, so the name can just change here.
+              AssociationFailureCauseEnum:
                   - Unknown
                   - AssociationFailed
                   - AuthenticationFailed
                   - SsidNotFound
-              SecurityType:
+              # SecurityTypeEnum was originally just named SecurityType, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              SecurityTypeEnum:
                   - Unspecified
                   - None
                   - WEP
@@ -3564,7 +3579,10 @@
                   - LabelConflict
                   - InvalidFabricIndex
           GroupKeyManagement:
-              GroupKeySecurityPolicy:
+              # GroupKeySecurityPolicyEnum was originally just named
+              # GroupKeySecurityPolicy, but we generate the same API for both of
+              # those names, so the name can just change here.
+              GroupKeySecurityPolicyEnum:
                   - TrustFirst
                   - CacheAndSync
           DoorLock:
@@ -6675,10 +6693,19 @@
               - IntentEnum
               - StatusEnum
               - TransferProtocolEnum
+          OccupancySensing:
+              - OccupancySensorTypeEnum
+          WiFiNetworkDiagnostics:
+              - ConnectionStatusEnum
+              - WiFiVersionEnum
+          PumpConfigurationAndControl:
+              - ControlModeEnum
+              - OperationModeEnum
       enum values:
           DoorLock:
               LockDataTypeEnum:
                   - FingerVein
+                  - Face
           DiagnosticLogs:
               IntentEnum:
                   - EndUserSupport
@@ -6693,6 +6720,63 @@
               TransferProtocolEnum:
                   - ResponsePayload
                   - BDX
+          OccupancySensing:
+              OccupancySensorTypeEnum:
+                  - PIR
+                  - Ultrasonic
+                  - PIRAndUltrasonic
+                  - PhysicalContact
+          WiFiNetworkDiagnostics:
+              ConnectionStatusEnum:
+                  - Connected
+                  - NotConnected
+              WiFiVersionEnum:
+                  - A
+                  - B
+                  - G
+                  - N
+                  - Ac
+                  - Ax
+          PumpConfigurationAndControl:
+              ControlModeEnum:
+                  - ConstantSpeed
+                  - ConstantPressure
+                  - ProportionalPressure
+                  - ConstantFlow
+                  - ConstantTemperature
+                  - Automatic
+              OperationModeEnum:
+                  - Normal
+                  - Minimum
+                  - Maximum
+                  - Local
+      bitmaps:
+          OccupancySensing:
+              - OccupancyBitmap
+              - OccupancySensorTypeBitmap
+          PumpConfigurationAndControl:
+              - PumpStatusBitmap
+      bitmap values:
+          OccupancySensing:
+              OccupancyBitmap:
+                  - Occupied
+              OccupancySensorTypeBitmap:
+                  - PIR
+                  - Ultrasonic
+                  - PhysicalContact
+          PumpConfigurationAndControl:
+              PumpFeature:
+                  - LocalOperation
+              PumpStatusBitmap:
+                  - DeviceFault
+                  - Supplyfault
+                  - SpeedLow
+                  - SpeedHigh
+                  - LocalOverride
+                  - Running
+                  - RemotePressure
+                  - RemoteFlow
+                  - RemoteTemperature
   deprecated:
       attributes:
           TimeSynchronization:
@@ -6706,13 +6790,27 @@
               - LogsIntent
               - LogsStatus
               - LogsTransferProtocol
+          WiFiNetworkDiagnostics:
+              - WiFiConnectionStatus
+              - WiFiVersionType
+          PumpConfigurationAndControl:
+              - PumpControlMode
+              - PumpOperationMode
+      bitmaps:
+          PumpConfigurationAndControl:
+              - PumpStatus
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpFeature:
+                  - Local
   removed:
       enum values:
           DoorLock:
               DlLockDataType:
-                  # This value never existed for this enum name so, don't start
-                  # exposing it.  It's exposed for LockDataTypeEnum
+                  # These values never existed for this enum name so, don't
+                  # start exposing them.  They're exposed for LockDataTypeEnum
                   - FingerVein
+                  - Face
   renames:
       attributes:
           TimeSynchronization:
@@ -6726,3 +6824,16 @@
               IntentEnum: LogsIntent
               StatusEnum: LogsStatus
               TransferProtocolEnum: LogsTransferProtocol
+          WiFiNetworkDiagnostics:
+              ConnectionStatusEnum: WiFiConnectionStatus
+              WiFiVersionEnum: WiFiVersionType
+          PumpConfigurationAndControl:
+              ControlModeEnum: PumpControlMode
+              OperationModeEnum: PumpOperationMode
+      bitmaps:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap: PumpStatus
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpFeature:
+                  LocalOperation: Local

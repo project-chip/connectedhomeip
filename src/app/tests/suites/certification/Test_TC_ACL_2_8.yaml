@@ -24,6 +24,9 @@ config:
     nodeId2:
         type: node_id
         defaultValue: 0xCAFE
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
     payload:
         type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00"
@@ -75,6 +78,14 @@ tests:
                 value: 1000
               - name: "Salt"
                 value: "SPAKE2P Key Salt"
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     - label: "TH2 starts a commissioning process with DUT"
       identity: "beta"

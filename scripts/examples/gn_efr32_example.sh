@@ -98,6 +98,8 @@ if [ "$#" == "0" ]; then
             Periodic query timeout variable for OTA in seconds
         rs91x_wpa3_only
             Support for WPA3 only mode on RS91x
+        siwx917_commissionable_data
+            Build with the commissionable data given in DeviceConfig.h (only for SiWx917)
         Presets
         --sed
             enable sleepy end device, set thread mtd

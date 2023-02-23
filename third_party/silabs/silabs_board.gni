@@ -35,6 +35,7 @@ declare_args() {
   use_rs9116 = false
   use_SiWx917 = false
   use_rs911x_sockets = false
+  chip_enable_ble_rs911x = false
 }
 
 declare_args() {
