@@ -82,8 +82,8 @@ static MTRDeviceController * sController = nil;
 - (instancetype)init
 {
     if ([super init]) {
-        _serviceInterface = [MTRDeviceController interfaceForServerProtocol];
-        _clientInterface = [MTRDeviceController interfaceForClientProtocol];
+        _serviceInterface = [MTRDeviceController xpcInterfaceForServerProtocol];
+        _clientInterface = [MTRDeviceController xpcInterfaceForClientProtocol];
         _servers = [NSMutableDictionary dictionary];
         _clusterStateCacheDictionary = [NSMutableDictionary dictionary];
         _xpcListener = [NSXPCListener anonymousListener];

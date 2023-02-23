@@ -68,8 +68,8 @@
 - (instancetype)initWithWorkQueue:(dispatch_queue_t)workQueue connectBlock:(NSXPCConnection * (^)(void) )connectBlock
 {
     if ([super init]) {
-        _remoteDeviceServerProtocol = [MTRDeviceController interfaceForServerProtocol];
-        _remoteDeviceClientProtocol = [MTRDeviceController interfaceForClientProtocol];
+        _remoteDeviceServerProtocol = [MTRDeviceController xpcInterfaceForServerProtocol];
+        _remoteDeviceClientProtocol = [MTRDeviceController xpcInterfaceForClientProtocol];
         _connectBlock = connectBlock;
         _workQueue = workQueue;
         _reportRegistry = [[NSMutableDictionary alloc] init];

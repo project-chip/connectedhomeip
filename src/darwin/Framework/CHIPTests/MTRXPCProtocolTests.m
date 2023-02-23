@@ -324,8 +324,8 @@ static const uint16_t kNegativeTimeoutInSeconds = 1;
 
     _xpcListener = [NSXPCListener anonymousListener];
     [_xpcListener setDelegate:(id<NSXPCListenerDelegate>) self];
-    _serviceInterface = [MTRDeviceController interfaceForServerProtocol];
-    _clientInterface = [MTRDeviceController interfaceForClientProtocol];
+    _serviceInterface = [MTRDeviceController xpcInterfaceForServerProtocol];
+    _clientInterface = [MTRDeviceController xpcInterfaceForClientProtocol];
 
     [_xpcListener resume];
     _controllerUUID = [[NSUUID UUID] UUIDString];
