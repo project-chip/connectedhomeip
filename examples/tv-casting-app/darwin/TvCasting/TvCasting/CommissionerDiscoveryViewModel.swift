@@ -69,7 +69,9 @@ class CommissionerDiscoveryViewModel: ObservableObject {
                     if(commissioner != nil){
                         if(self.commissioners.contains(commissioner!))
                         {
-                            self.Log.info("Skipping previously discovered commissioner \(commissioner!.description)")
+                            var index = self.commissioners.firstIndex(of: commissioner!)
+                            self.commissioners[index!] = commissioner!
+                            self.Log.info("Updating previously discovered commissioner \(commissioner!.description)")
                         }
                         else
                         {

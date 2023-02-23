@@ -510,6 +510,13 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     // resolving.
     interface.fullyQualifiedDomainName = hostnameWithDomain;
 
+    // DNSServiceResolve caches old entries with the same interface ID. This means that when the broadcast with the
+    // same interface has been updated then it will not be reflected in the list of interfaces. In this case, remove
+    // the existing entry in the map since the resolve seems to store it in sequential order and the last entry is
+    // the most up to date.
+    if ((interfaces.find(interfaceId)) != interfaces.end()) {
+        interfaces.erase(interfaceId);
+    }
     interfaces.insert(std::make_pair(interfaceId, std::move(interface)));
 }
 
