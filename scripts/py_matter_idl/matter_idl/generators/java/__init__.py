@@ -17,7 +17,6 @@ import enum
 import logging
 from typing import List, Set, Union
 
-from matter_idl import matter_idl_types
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.generators.types import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
                                          ParseDataType, TypeLookupContext)
@@ -76,7 +75,7 @@ def CallbackName(attr: Attribute, cluster: Cluster, context: TypeLookupContext) 
     Figure out what callback name to use when a variable requires a read callback.
 
     These are split into native types, like Boolean/Float/Double/CharString, where
-    one callback type can support anything. 
+    one callback type can support anything.
 
     For specific types (e.g. A struct) codegen will generate its own callback name
     specific to that type.
@@ -240,7 +239,7 @@ class EncodableValue:
             elif t == FundamentalType.DOUBLE:
                 return "Double"
             else:
-                raise Error("Unknown fundamental type")
+                raise Exception("Unknown fundamental type")
         elif type(t) == BasicInteger:
             if t.byte_count >= 4:
                 return "Long"
@@ -277,7 +276,7 @@ class EncodableValue:
             elif t == FundamentalType.DOUBLE:
                 return "Ljava/lang/Double;"
             else:
-                raise Error("Unknown fundamental type")
+                raise Exception("Unknown fundamental type")
         elif type(t) == BasicInteger:
             if t.byte_count >= 4:
                 return "Ljava/lang/Long;"
@@ -301,7 +300,7 @@ def EncodableValueFrom(field: Field, context: TypeLookupContext) -> EncodableVal
     Filter to convert a standard field to an EncodableValue.
 
     This converts the AST information (field name/info + lookup context) into
-    a java-generator specific wrapper that can be manipulated and 
+    a java-generator specific wrapper that can be manipulated and
     queried for properties like java native name or JNI string signature.
     """
     attrs = set()
