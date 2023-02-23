@@ -15,9 +15,10 @@
 #    limitations under the License.
 #
 
-import chip.native
 import builtins
 import ctypes
+
+import chip.native
 
 
 def _handle():
