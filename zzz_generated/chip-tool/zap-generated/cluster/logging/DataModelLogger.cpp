@@ -5194,17 +5194,17 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case TimeFormatLocalization::Attributes::HourFormat::Id: {
-            chip::app::Clusters::TimeFormatLocalization::HourFormat value;
+            chip::app::Clusters::TimeFormatLocalization::HourFormatEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("HourFormat", 1, value);
         }
         case TimeFormatLocalization::Attributes::ActiveCalendarType::Id: {
-            chip::app::Clusters::TimeFormatLocalization::CalendarType value;
+            chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ActiveCalendarType", 1, value);
         }
         case TimeFormatLocalization::Attributes::SupportedCalendarTypes::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedCalendarTypes", 1, value);
         }
