@@ -514,7 +514,8 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     // same interface has been updated then it will not be reflected in the list of interfaces. In this case, remove
     // the existing entry in the map since the resolve seems to store it in sequential order and the last entry is
     // the most up to date.
-    if ((interfaces.find(interfaceId)) != interfaces.end()) {
+    if ((interfaces.find(interfaceId)) != interfaces.end())
+    {
         interfaces.erase(interfaceId);
     }
     interfaces.insert(std::make_pair(interfaceId, std::move(interface)));
