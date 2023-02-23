@@ -210,7 +210,7 @@ tests:
           1. TH is in commissioning mode and discoverable by DUT over IP through DNS-SD advertisements. This can also be verified using through the DUT's pairing command over IP.
 
           Verify in TH as commissionee side:
-          $ ./out/all-clusters-app/chip-all-clusters-app 
+          $ ./out/all-clusters-app/chip-all-clusters-app
           [1674677598.616629][246997:246997] CHIP:IN: New secure session activated for device <FFFFFFFB00000000, 0>, LSID:34764 PSID:10974!
           [1674677598.616691][246997:246997] CHIP:SVR: Commissioning completed session establishment step
       disabled: true

@@ -116,7 +116,7 @@ tests:
           [1657785422.724929][2083:2083] CHIP:DMG: Endpoint 1, Cluster 0x0000_0003 update version to 435c9140
 
 
-          Verify the Multicast address follows the format "FF35:0040:FD<Fabric ID>00:<Group ID> and UDP port is 5540   on DUT(chip-tool)log 
+          Verify the Multicast address follows the format "FF35:0040:FD<Fabric ID>00:<Group ID> and UDP port is 5540   on DUT(chip-tool)log
 
           <<< [E:15304i M:15000] (G) Msg TX to 1:FFFFFFFFFFFF0001 [D5AE] --- Type 0001:08 (IM:InvokeCommandRequest)
           [1670395515.064662][14427:14429] CHIP:IN: (G) Sending msg 15000 to Multicast IPV6 address "UDP:[ff35:40:fd00::100:1]:5540"
