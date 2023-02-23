@@ -949,6 +949,32 @@ def WriteAttributes(future: Future, eventLoop, device, attributes: List[Attribut
     return res
 
 
+def WriteGroupAttributes(groupId: int, devCtrl: c_void_p, attributes: List[AttributeWriteRequest], busyWaitMs: Union[None, int] = None) -> PyChipError:
+    handle = chip.native.GetLibraryHandle()
+
+    writeargs = []
+    for attr in attributes:
+        path = chip.interaction_model.AttributePathIBstruct.parse(
+            b'\x00' * chip.interaction_model.AttributePathIBstruct.sizeof())
+        path.EndpointId = attr.EndpointId
+        path.ClusterId = attr.Attribute.cluster_id
+        path.AttributeId = attr.Attribute.attribute_id
+        path.DataVersion = attr.DataVersion
+        path.HasDataVersion = attr.HasDataVersion
+        path = chip.interaction_model.AttributePathIBstruct.build(path)
+        tlv = attr.Attribute.ToTLV(None, attr.Data)
+        writeargs.append(ctypes.c_char_p(path))
+        writeargs.append(ctypes.c_char_p(bytes(tlv)))
+        writeargs.append(ctypes.c_int(len(tlv)))
+
+    return builtins.chipStack.Call(
+        lambda: handle.pychip_WriteClient_WriteGroupAttributes(
+            ctypes.c_uint16(groupId), devCtrl,
+            ctypes.c_uint16(0 if busyWaitMs is None else busyWaitMs),
+            ctypes.c_size_t(len(attributes)), *writeargs)
+    )
+
+
 # This struct matches the PyReadAttributeParams in attribute.cpp, for passing various params together.
 _ReadParams = construct.Struct(
     "MinInterval" / construct.Int32ul,
@@ -1081,6 +1107,7 @@ def Init():
         setter = chip.native.NativeLibraryHandleMethodArguments(handle)
 
         handle.pychip_WriteClient_WriteAttributes.restype = PyChipError
+        handle.pychip_WriteClient_WriteGroupAttributes.restype = PyChipError
         setter.Set('pychip_WriteClient_InitCallbacks', None, [
                    _OnWriteResponseCallbackFunct, _OnWriteErrorCallbackFunct, _OnWriteDoneCallbackFunct])
         handle.pychip_ReadClient_Read.restype = PyChipError

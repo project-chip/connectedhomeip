@@ -547,7 +547,12 @@ class WriteAttributeAction(BaseAction):
         self._endpoint = test_step.endpoint
         self._interation_timeout_ms = test_step.timed_interaction_timeout_ms
         self._node_id = test_step.node_id
+        self._group_id = test_step.group_id
         self._request_object = None
+
+        if self._node_id is None and self._group_id is None:
+            raise UnexpectedParsingError(
+                'Both node_id and group_id are None, at least one needs to be provided')
 
         attribute = context.data_model_lookup.get_attribute(
             self._cluster, self._attribute_name)
@@ -575,12 +580,21 @@ class WriteAttributeAction(BaseAction):
 
     def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
-            resp = asyncio.run(
-                dev_ctrl.WriteAttribute(self._node_id, [(self._endpoint, self._request_object)],
-                                        timedRequestTimeoutMs=self._interation_timeout_ms,
-                                        busyWaitMs=self._busy_wait_ms))
+            if self._group_id:
+                resp = dev_ctrl.WriteGroupAttribute(self._group_id, [(self._request_object,)],
+                                                    busyWaitMs=self._busy_wait_ms)
+            else:
+                resp = asyncio.run(
+                    dev_ctrl.WriteAttribute(self._node_id, [(self._endpoint, self._request_object)],
+                                            timedRequestTimeoutMs=self._interation_timeout_ms,
+                                            busyWaitMs=self._busy_wait_ms))
         except chip.interaction_model.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
+
+        # Group writes are expected to have no response upon success.
+        if self._group_id and len(resp) == 0:
+            return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
+
         if len(resp) == 1 and isinstance(resp[0], AttributeStatus):
             if resp[0].Status == chip.interaction_model.Status.Success:
                 return _ActionResult(status=_ActionStatus.SUCCESS, response=None)

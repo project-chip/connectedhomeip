@@ -939,6 +939,34 @@ class ChipDeviceController():
             future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
         return await future
 
+    def WriteGroupAttribute(self, groupid: int, attributes: typing.List[typing.Tuple[ClusterObjects.ClusterAttributeDescriptor, int]], busyWaitMs: typing.Union[None, int] = None):
+        '''
+        Write a list of attributes on a target group.
+
+        groupid: Group ID to send write attribute to.
+        attributes: A list of tuples of type (cluster-object, data-version). The data-version can be omitted.
+
+        E.g
+            (Clusters.UnitTesting.Attributes.XYZAttribute('hello'), 1) -- Group Write 'hello' with data version 1
+        '''
+        self.CheckIsActive()
+
+        attrs = []
+        invalid_endpoint = 0xFFFF
+        for v in attributes:
+            if len(v) == 2:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    invalid_endpoint, v[0], v[1], 1, v[0].value))
+            else:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    invalid_endpoint, v[0], 0, 0, v[0].value))
+
+        ClusterAttribute.WriteGroupAttributes(
+            groupid, self.devCtrl, attrs, busyWaitMs=busyWaitMs).raise_on_error()
+
+        # An empty list is the expected return for sending group write attribute.
+        return []
+
     def _parseAttributePathTuple(self, pathTuple: typing.Union[
         None,  # Empty tuple, all wildcard
         typing.Tuple[int],  # Endpoint
