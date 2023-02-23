@@ -459,6 +459,69 @@ server cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+server cluster AccessControl = 31 {
+  enum AccessControlEntryAuthModeEnum : ENUM8 {
+    kPase = 1;
+    kCase = 2;
+    kGroup = 3;
+  }
+
+  enum AccessControlEntryPrivilegeEnum : ENUM8 {
+    kView = 1;
+    kProxyView = 2;
+    kOperate = 3;
+    kManage = 4;
+    kAdminister = 5;
+  }
+
+  enum ChangeTypeEnum : ENUM8 {
+    kChanged = 0;
+    kAdded = 1;
+    kRemoved = 2;
+  }
+
+  fabric_scoped struct AccessControlEntryStruct {
+    fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
+    fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
+    nullable fabric_sensitive int64u subjects[] = 3;
+    nullable fabric_sensitive Target targets[] = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  struct Target {
+    nullable cluster_id cluster = 0;
+    nullable endpoint_no endpoint = 1;
+    nullable devtype_id deviceType = 2;
+  }
+
+  fabric_sensitive info event access(read: administer) AccessControlEntryChanged = 0 {
+    nullable node_id adminNodeID = 1;
+    nullable INT16U adminPasscodeID = 2;
+    ChangeTypeEnum changeType = 3;
+    nullable AccessControlEntryStruct latestValue = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  fabric_sensitive info event access(read: administer) AccessControlExtensionChanged = 1 {
+    nullable node_id adminNodeID = 1;
+    nullable INT16U adminPasscodeID = 2;
+    ChangeTypeEnum changeType = 3;
+    nullable AccessControlExtensionStruct latestValue = 4;
+    fabric_idx fabricIndex = 254;
+  }
+
+  attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
+  readonly attribute int16u subjectsPerAccessControlEntry = 2;
+  readonly attribute int16u targetsPerAccessControlEntry = 3;
+  readonly attribute int16u accessControlEntriesPerFabric = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 server cluster Actions = 37 {
   enum ActionErrorEnum : ENUM8 {
     kUnknown = 0;
@@ -2966,6 +3029,21 @@ endpoint 0 {
     callback attribute partsList;
     ram      attribute featureMap;
     callback attribute clusterRevision default = 1;
+  }
+
+  server cluster AccessControl {
+    emits event AccessControlEntryChanged;
+    emits event AccessControlExtensionChanged;
+    callback attribute acl;
+    callback attribute subjectsPerAccessControlEntry;
+    callback attribute targetsPerAccessControlEntry;
+    callback attribute accessControlEntriesPerFabric;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster Actions {
