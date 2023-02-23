@@ -104,8 +104,11 @@ class BouffalolabBuilder(GnBuilder):
 
         if bouffalo_chip == "bl702":
             self.argsOpt.append('module_type=\"{}\"'.format(module_type))
-            if enable_cdc:
-                self.argsOpt.append('enable_cdc_module=true')
+
+        if enable_cdc:
+            if bouffalo_chip != "bl702":
+                raise Exception('Chip %s does NOT support USB CDC' % bouffalo_chip)
+            self.argsOpt.append('enable_cdc_module=true')
 
         if enable_rpcs:
             self.argsOpt.append('import("//with_pw_rpc.gni")')
