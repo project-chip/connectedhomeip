@@ -952,8 +952,12 @@
  * @def CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE
  *
  * @brief
- *   A size, in bytes, of the individual critical event logging buffer.
- *   Note: the critical event buffer must exist.
+ *   A size, in bytes, of the buffer reserved for storing CRITICAL events and no
+ *   other events.  CRITICAL events will never be evicted until this buffer is
+ *   full, so its size and the sizes of events determine how many of the last N
+ *   CRITICAL events are guaranteed to be available.
+ *
+ *   Note: this number must be nonzero.
  */
 #ifndef CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE (1024)
@@ -967,9 +971,13 @@
  * @def CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE
  *
  * @brief
- *   A size, in bytes, of the individual info event logging buffer.
- *   Note: set to 0 to disable info event buffer and all support
- *   for the info level events.
+ *   A size, in bytes, of the buffer reserved for storing events at INFO
+ *   priority and higher.  INFO-priority events will not be evicted until this
+ *   buffer is full (with INFO and CRITICAL events in it) and the oldest event
+ *   in the buffer is an INFO-priority event (which cannot be evicted into the
+ *   CRITICAL event buffer).
+ *
+ *   Note: set to 0 to treat INFO events as effectively equivalent to DEBUG events.
  */
 #ifndef CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE (512)
@@ -979,9 +987,14 @@
  * @def CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
  *
  * @brief
- *   A size, in bytes, of the individual debug event logging buffer.
- *   Note: set to 0 to disable debug event buffer and all support
- *   for the debug level events.
+ *   A size, in bytes, of the buffer used for storing newly generated events,
+ *   and the only buffer in which DEBUG-priority events are allowed.
+ *   DEBUG-priority events will start getting evicted when this buffer is full
+ *   (with DEBUG, INFO, and CRITICAL events in it) and the oldest event in the
+ *   buffer is a DEBUG-priority event, which cannot be evicted into the INFO
+ *   event buffer.
+ *
+ *   Note: set to 0 to disable storing DEBUG events.
  */
 #ifndef CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)

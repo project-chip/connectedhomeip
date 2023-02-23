@@ -37,6 +37,33 @@
 #include <lib/support/CHIPCounter.h>
 #include <messaging/ExchangeMgr.h>
 
+/**
+ * Events are stored in the LogStorageResources provided to
+ * EventManagement::Init.
+ *
+ * A newly generated event will be placed in the lowest-priority (in practice
+ * DEBUG) buffer, the one associated with the first LogStorageResource.  If
+ * there is no space in that buffer, space will be created by evicting the
+ * oldest event currently in that buffer, until enough space is available.
+ *
+ * When an event is evicted from a buffer, there are two possibilities:
+ *
+ * 1) If the next LogStorageResource has a priority that is no higher than the
+ *    event's priority, the event will be moved to that LogStorageResource's
+ *    buffer.  This may in turn require events to be evicted from that buffer.
+ * 2) If the next LogStorageResource has a priority that is higher than the
+ *    event's priority, then the event is just dropped.
+ *
+ * This means that LogStorageResources at a given priority level are reserved
+ * for events of that priority level or higher priority.
+ *
+ * As a simple example, assume there are only two priority levels, DEBUG and
+ * CRITICAL, and two LogStorageResources with those priorities.  In that case,
+ * old CRITICAL events will not start getting dropped until both buffers are
+ * full, while old DEBUG events will start getting dropped once the DEBUG
+ * LogStorageResource buffer is full.
+ */
+
 #define CHIP_CONFIG_EVENT_GLOBAL_PRIORITY PriorityLevel::Debug
 
 namespace chip {
@@ -162,31 +189,28 @@ struct LogStorageResources
 
 /**
  * @brief
- *   A class for managing the in memory event logs.
- *   Assume we have two importance levels. DEBUG and CRITICAL, for simplicity,
- *   A new incoming event will always get logged in buffer with debug buffer no matter it is Debug or CRITICAL event.
- *   In order for it to get logged, we need to free up space.  So we look at the tail of the buffer.
- *   If the tail of the buffer contains a DEBUG event, that will be dropped.  If the tail of the buffer contains
- *   a CRITICAL event, that  event will be 'promoted' to the next level of buffers, where it will undergo the same procedure
- *   The outcome of this management policy is that the critical buffer is dedicated to the critical events, and the
- *   debug buffer is shared between critical and debug events.
+ *   A class for managing the in memory event logs.  See documentation at the
+ *   top of the file describing the eviction policy for events when there is no
+ *   more space for new events.
  */
 
 class EventManagement
 {
 public:
     /**
-     * @brief
-     * Initialize the EventManagement with an array of LogStorageResources.  The
-     * array must provide a resource for each valid priority level, the elements
-     * of the array must be in increasing numerical value of priority (and in
-     * increasing priority); the first element in the array corresponds to the
-     * resources allocated for least important events, and the last element
-     * corresponds to the most critical events.
+     * Initialize the EventManagement with an array of LogStorageResources and
+     * an equal-length array of CircularEventBuffers that correspond to those
+     * LogStorageResources. The array of LogStorageResources must provide a
+     * resource for each valid priority level, the elements of the array must be
+     * in increasing numerical value of priority (and in increasing priority);
+     * the first element in the array corresponds to the resources allocated for
+     * least important events, and the last element corresponds to the most
+     * critical events.
      *
      * @param[in] apExchangeManager         ExchangeManager to be used with this logging subsystem
      *
-     * @param[in] aNumBuffers  Number of elements in inLogStorageResources array
+     * @param[in] aNumBuffers  Number of elements in the apLogStorageResources
+     *                         and apCircularEventBuffer arrays.
      *
      * @param[in] apCircularEventBuffer  An array of CircularEventBuffer for each priority level.
      *
