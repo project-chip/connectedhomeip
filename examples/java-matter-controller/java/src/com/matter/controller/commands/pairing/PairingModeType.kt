@@ -15,12 +15,8 @@
  *   limitations under the License.
  *
  */
+package com.matter.controller.commands.pairing
 
-package com.matter.controller.commands.common;
-
-/**
- * @brief Credentials Issuer for the Command
- * @details Contains all credential information of the issuer of the command, such as operational
- *     credentials for a given fabric, the DAC verifier of the commisioner, etc ..
- */
-public class CredentialsIssuer {}
+enum class PairingModeType {
+  NONE, CODE, CODE_PASE_ONLY, ADDRESS_PASE_ONLY, BLE, SOFT_AP, ALREADY_DISCOVERED, ON_NETWORK
+}

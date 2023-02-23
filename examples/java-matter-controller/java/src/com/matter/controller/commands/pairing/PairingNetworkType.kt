@@ -15,26 +15,8 @@
  *   limitations under the License.
  *
  */
+package com.matter.controller.commands.pairing
 
-package com.matter.controller.commands.common;
-
-public enum ArgumentType {
-  NUMBER_INT8,
-  NUMBER_INT16,
-  NUMBER_INT32,
-  NUMBER_INT64,
-  FLOAT,
-  DOUBLE,
-  BOOL,
-  STRING,
-  CHARSTRING,
-  OCTETSTRING,
-  ATTRIBUTE,
-  ADDRESS,
-  COMPLEX,
-  CUSTOM,
-  VECTOR_BOOL,
-  VECTOR16,
-  VECTOR32,
-  VECTOR_CUSTOM,
+enum class PairingNetworkType {
+  NONE, WIFI, THREAD
 }
