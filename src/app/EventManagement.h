@@ -436,13 +436,20 @@ private:
     CHIP_ERROR CopyToNextBuffer(CircularEventBuffer * apEventBuffer);
 
     /**
-     * @brief eusure current buffer has enough space, if not, when current buffer is final destination of last tail's event
-     * priority, we need to drop event, otherwises, move the last event to the buffer with higher priority
+     * @brief Ensure that:
      *
-     * @param[in] aRequiredSpace  require space
+     * 1) There could be aRequiredSpace bytes available (if enough things were
+     *    evicted) in all buffers that can hold events with priority aPriority.
+     *
+     * 2) There are in fact aRequiredSpace bytes available in our
+     *    lowest-priority buffer.  This might involve evicting some events to
+     *    higher-priority buffers or dropping them.
+     *
+     * @param[in] aRequiredSpace  required space
+     * @param[in] aPriority       priority of the event we are making space for.
      *
      */
-    CHIP_ERROR EnsureSpaceInCircularBuffer(size_t aRequiredSpace);
+    CHIP_ERROR EnsureSpaceInCircularBuffer(size_t aRequiredSpace, PriorityLevel aPriority);
 
     /**
      * @brief Iterate the event elements inside event tlv and mark the fabric index as kUndefinedFabricIndex if

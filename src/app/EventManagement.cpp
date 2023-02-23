@@ -165,21 +165,32 @@ exit:
     return err;
 }
 
-CHIP_ERROR EventManagement::EnsureSpaceInCircularBuffer(size_t aRequiredSpace)
+CHIP_ERROR EventManagement::EnsureSpaceInCircularBuffer(size_t aRequiredSpace, PriorityLevel aPriority)
 {
     CHIP_ERROR err                    = CHIP_NO_ERROR;
     size_t requiredSpace              = aRequiredSpace;
     CircularEventBuffer * eventBuffer = mpEventBuffer;
     ReclaimEventCtx ctx;
 
+    // Check that we have this much space in all our event buffers that might
+    // hold the event. If we do not, that will prevent the event from being
+    // properly evicted into higher-priority bufers.  We want to discover
+    // this early, so that testing surfaces the need to make those buffers
+    // larger.
+    for (auto * currentBuffer = mpEventBuffer; currentBuffer; currentBuffer = currentBuffer->GetNextCircularEventBuffer())
+    {
+        VerifyOrExit(requiredSpace <= currentBuffer->GetTotalDataLength(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+        if (currentBuffer->IsFinalDestinationForPriority(aPriority))
+        {
+            break;
+        }
+    }
+
     // check whether we actually need to do anything, exit if we don't
     VerifyOrExit(requiredSpace > eventBuffer->AvailableDataLength(), err = CHIP_NO_ERROR);
 
     while (true)
     {
-        // check that the request can ultimately be satisfied.
-        VerifyOrExit(requiredSpace <= eventBuffer->GetTotalDataLength(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-
         if (requiredSpace > eventBuffer->AvailableDataLength())
         {
             ctx.mpEventBuffer             = eventBuffer;
@@ -415,7 +426,6 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, c
     uint32_t requestSize         = 0;
     aEventNumber                 = 0;
     CircularTLVWriter checkpoint = writer;
-    CircularEventBuffer * buffer = nullptr;
     EventLoadOutContext ctxt     = EventLoadOutContext(writer, aEventOptions.mPriority, mLastEventNumber);
     EventOptions opts;
     Timestamp timestamp;
@@ -449,27 +459,11 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, c
     SuccessOrExit(err);
 
     // Ensure we have space in the in-memory logging queues
-    err = EnsureSpaceInCircularBuffer(requestSize);
+    err = EnsureSpaceInCircularBuffer(requestSize, aEventOptions.mPriority);
     SuccessOrExit(err);
 
     err = ConstructEvent(&ctxt, apDelegate, &opts);
     SuccessOrExit(err);
-
-    // Check the number of bytes written.  If the event is too large
-    // to be evicted from subsequent buffers, drop it now.
-    buffer = mpEventBuffer;
-    while (true)
-    {
-        VerifyOrExit(buffer->GetTotalDataLength() >= writer.GetLengthWritten(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-        if (buffer->IsFinalDestinationForPriority(opts.mPriority))
-        {
-            break;
-        }
-
-        buffer = buffer->GetNextCircularEventBuffer();
-        assert(buffer != nullptr);
-        // code guarantees that every PriorityLevel has a buffer destination.
-    }
 
     mBytesWritten += writer.GetLengthWritten();
 
