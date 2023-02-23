@@ -32,6 +32,8 @@ static_library("telink") {
     "../Zephyr/SystemTimeSupport.cpp",
     "../Zephyr/ZephyrConfig.cpp",
     "../Zephyr/ZephyrConfig.h",
+    "BLEAdvertisingArbiter.cpp",
+    "BLEAdvertisingArbiter.h",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",
