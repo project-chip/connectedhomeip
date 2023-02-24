@@ -37,10 +37,16 @@ if(CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS AND NOT TFM_SUPPORT)
     message( FATAL_ERROR "You can not use PSA Protected Storage without TF-M support" )
 endif()
 
+if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    set(CONFIG_CHIP_DEBUG YES)
+else()
+    set(CONFIG_CHIP_DEBUG NO)
+endif()
+
 # Add CHIP sources
 add_subdirectory(${OPEN_IOT_SDK_CONFIG} ./chip_build)
 
-# Additional openiotsdk-chip target configuration
+# Additional chip target configuration
 
 # TF-M support requires the right order of generating targets
 if(TFM_SUPPORT)
