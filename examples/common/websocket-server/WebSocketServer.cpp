@@ -21,11 +21,19 @@
 #include <lib/support/ScopedBuffer.h>
 #include <libwebsockets.h>
 
+#include <deque>
+#include <mutex>
+
 constexpr uint16_t kDefaultWebSocketServerPort = 9002;
 constexpr uint16_t kMaxMessageBufferLen        = 8192;
 
 namespace {
 lws * gWebSocketInstance = nullptr;
+std::deque<std::string> gMessageQueue;
+
+// This mutex protect the global gMessageQueue instance such that messages
+// can be added/removed from multiple threads.
+std::mutex gMutex;
 
 void LogWebSocketCallbackReason(lws_callback_reasons reason)
 {
@@ -102,29 +110,39 @@ static int OnWebSocketCallback(lws * wsi, lws_callback_reasons reason, void * us
 {
     LogWebSocketCallbackReason(reason);
 
+    WebSocketServer * server = nullptr;
+    auto protocol            = lws_get_protocol(wsi);
+    if (protocol)
+    {
+        server = static_cast<WebSocketServer *>(protocol->user);
+        if (nullptr == server)
+        {
+            ChipLogError(chipTool, "Failed to retrieve the server interactive context.");
+            return -1;
+        }
+    }
+
     if (LWS_CALLBACK_RECEIVE == reason)
     {
         char msg[kMaxMessageBufferLen + 1 /* for null byte */] = {};
         VerifyOrDie(sizeof(msg) > len);
         memcpy(msg, in, len);
 
-        auto protocol = lws_get_protocol(wsi);
-        auto delegate = static_cast<WebSocketServerDelegate *>(protocol->user);
-        if (nullptr == delegate)
+        server->OnWebSocketMessageReceived(msg);
+    }
+    else if (LWS_CALLBACK_SERVER_WRITEABLE == reason)
+    {
+        std::lock_guard<std::mutex> lock(gMutex);
+
+        for (auto & msg : gMessageQueue)
         {
-            ChipLogError(chipTool, "Failed to retrieve the server interactive context.");
-            return -1;
+            chip::Platform::ScopedMemoryBuffer<unsigned char> buffer;
+            VerifyOrDie(buffer.Calloc(LWS_PRE + msg.size()));
+            memcpy(&buffer[LWS_PRE], (void *) msg.c_str(), msg.size());
+            lws_write(wsi, &buffer[LWS_PRE], msg.size(), LWS_WRITE_TEXT);
         }
 
-        if (!delegate->OnWebSocketMessageReceived(msg))
-        {
-            auto context = lws_get_context(wsi);
-            lws_default_loop_exit(context);
-        }
-    }
-    else if (LWS_CALLBACK_CLIENT_ESTABLISHED == reason)
-    {
-        lws_callback_on_writable(wsi);
+        gMessageQueue.clear();
     }
     else if (LWS_CALLBACK_ESTABLISHED == reason)
     {
@@ -143,7 +161,7 @@ CHIP_ERROR WebSocketServer::Run(chip::Optional<uint16_t> port, WebSocketServerDe
 {
     VerifyOrReturnError(nullptr != delegate, CHIP_ERROR_INVALID_ARGUMENT);
 
-    lws_protocols protocols[] = { { "ws", OnWebSocketCallback, 0, 0, 0, delegate, 0 }, LWS_PROTOCOL_LIST_TERM };
+    lws_protocols protocols[] = { { "ws", OnWebSocketCallback, 0, 0, 0, this, 0 }, LWS_PROTOCOL_LIST_TERM };
 
     lws_context_creation_info info;
     memset(&info, 0, sizeof(info));
@@ -155,18 +173,36 @@ CHIP_ERROR WebSocketServer::Run(chip::Optional<uint16_t> port, WebSocketServerDe
     auto context = lws_create_context(&info);
     VerifyOrReturnError(nullptr != context, CHIP_ERROR_INTERNAL);
 
-    lws_context_default_loop_run_destroy(context);
+    mRunning  = true;
+    mDelegate = delegate;
+
+    while (mRunning)
+    {
+        lws_service(context, -1);
+
+        std::lock_guard<std::mutex> lock(gMutex);
+        if (gMessageQueue.size())
+        {
+            lws_callback_on_writable(gWebSocketInstance);
+        }
+    }
+    lws_context_destroy(context);
     return CHIP_NO_ERROR;
+}
+
+bool WebSocketServer::OnWebSocketMessageReceived(char * msg)
+{
+    auto shouldContinue = mDelegate->OnWebSocketMessageReceived(msg);
+    if (!shouldContinue)
+    {
+        mRunning = false;
+    }
+    return shouldContinue;
 }
 
 CHIP_ERROR WebSocketServer::Send(const char * msg)
 {
-    VerifyOrReturnError(nullptr != gWebSocketInstance, CHIP_ERROR_INCORRECT_STATE);
-
-    chip::Platform::ScopedMemoryBuffer<unsigned char> buffer;
-    VerifyOrReturnError(buffer.Calloc(LWS_PRE + strlen(msg)), CHIP_ERROR_NO_MEMORY);
-    memcpy(&buffer[LWS_PRE], (void *) msg, strlen(msg));
-    lws_write(gWebSocketInstance, &buffer[LWS_PRE], strlen(msg), LWS_WRITE_TEXT);
-
+    std::lock_guard<std::mutex> lock(gMutex);
+    gMessageQueue.push_back(msg);
     return CHIP_NO_ERROR;
 }
