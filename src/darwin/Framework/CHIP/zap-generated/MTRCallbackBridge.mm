@@ -16790,15 +16790,15 @@ void MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscrip
     }
 }
 
-void MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::UnitLocalization::TempUnit value)
+void MTRUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::UnitLocalization::TempUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRUnitLocalizationClusterTempUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16813,8 +16813,8 @@ void MTRUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnit> & value)
+void MTRNullableUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16825,7 +16825,7 @@ void MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableUnitLocalizationClusterTempUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
