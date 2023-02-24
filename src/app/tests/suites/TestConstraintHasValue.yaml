@@ -1,0 +1,214 @@
+# Copyright (c) 2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Test Cluster HasValue Constraints Tests
+
+config:
+    nodeId: 0x12344321
+    cluster: "Unit Testing"
+    endpoint: 1
+
+tests:
+    - label: "Read attribute NULLABLE_INT8U Default Value"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          value: 0
+
+    - label: "Write attribute NULLABLE_INT8U with a value"
+      command: "writeAttribute"
+      attribute: "nullable_int8u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_INT8U with a value"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          constraints:
+              hasValue: true
+
+    - label: "Write attribute NULLABLE_INT8U with a null value"
+      command: "writeAttribute"
+      attribute: "nullable_int8u"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_INT8U with a null value"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          constraints:
+              hasValue: true
+
+    - label: "Write attribute NULLABLE_INT8U back to Default Value"
+      command: "writeAttribute"
+      attribute: "nullable_int8u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_OCTET_STRING Default Value"
+      command: "readAttribute"
+      attribute: "nullable_octet_string"
+      response:
+          value: ""
+
+    - label: "Write attribute NULLABLE_OCTET_STRING with a value"
+      command: "writeAttribute"
+      attribute: "nullable_octet_string"
+      arguments:
+          value: "TestValue"
+
+    - label: "Read attribute NULLABLE_OCTET_STRING with a value"
+      command: "readAttribute"
+      attribute: "nullable_octet_string"
+      response:
+          constraints:
+              hasValue: true
+
+    - label: "Write attribute NULLABLE_OCTET_STRING with a null value"
+      command: "writeAttribute"
+      attribute: "nullable_octet_string"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_OCTET_STRING with a null value"
+      command: "readAttribute"
+      attribute: "nullable_octet_string"
+      response:
+          constraints:
+              hasValue: true
+
+    - label: "Write attribute NULLABLE_OCTET_STRING back to Default Value"
+      command: "writeAttribute"
+      attribute: "nullable_octet_string"
+      arguments:
+          value: ""
+
+    - label: "Read struct containing nullables and optionals Default Value"
+      command: "readAttribute"
+      attribute: "nullables_and_optionals_struct"
+      response:
+          values:
+              - name: "NullableInt"
+                value: null
+              - name: "NullableList"
+                value: null
+              - name: "NullableString"
+                value: null
+              - name: "NullableStruct"
+                value: null
+              - name: "NullableOptionalInt"
+                constraints:
+                    hasValue: false
+
+    - label:
+          "Write struct containing nullables and optionals with a value for
+          NullableOptionalInt"
+      command: "writeAttribute"
+      attribute: "nullables_and_optionals_struct"
+      arguments:
+          value:
+              {
+                  NullableInt: null,
+                  NullableList: null,
+                  NullableString: null,
+                  NullableStruct: null,
+                  NullableOptionalInt: 0,
+              }
+
+    - label:
+          "Read struct containing nullables and optionals with a value for
+          NullableOptionalInt"
+      command: "readAttribute"
+      attribute: "nullables_and_optionals_struct"
+      response:
+          values:
+              - name: "NullableInt"
+                value: null
+              - name: "NullableList"
+                value: null
+              - name: "NullableString"
+                value: null
+              - name: "NullableStruct"
+                value: null
+              - name: "NullableOptionalInt"
+                constraints:
+                    hasValue: true
+
+    - label:
+          "Write struct containing nullables and optionals with a null value for
+          NullableOptionalInt"
+      command: "writeAttribute"
+      attribute: "nullables_and_optionals_struct"
+      arguments:
+          value:
+              {
+                  NullableInt: null,
+                  NullableList: null,
+                  NullableString: null,
+                  NullableStruct: null,
+                  NullableOptionalInt: null,
+              }
+
+    - label:
+          "Read struct containing nullables and optionals with a null value for
+          NullableOptionalInt"
+      command: "readAttribute"
+      attribute: "nullables_and_optionals_struct"
+      response:
+          values:
+              - name: "NullableInt"
+                value: null
+              - name: "NullableList"
+                value: null
+              - name: "NullableString"
+                value: null
+              - name: "NullableStruct"
+                value: null
+              - name: "NullableOptionalInt"
+                constraints:
+                    hasValue: true
+
+    - label:
+          "Write struct containing nullables and optionals back to Default Value"
+      command: "writeAttribute"
+      attribute: "nullables_and_optionals_struct"
+      arguments:
+          value:
+              {
+                  NullableInt: null,
+                  NullableList: null,
+                  NullableString: null,
+                  NullableStruct: null,
+              }
+
+    - label:
+          "Check that the nullables_and_optionals_struct has been written back
+          to default properly"
+      command: "readAttribute"
+      attribute: "nullables_and_optionals_struct"
+      response:
+          values:
+              - name: "NullableInt"
+                value: null
+              - name: "NullableList"
+                value: null
+              - name: "NullableString"
+                value: null
+              - name: "NullableStruct"
+                value: null
+              - name: "NullableOptionalInt"
+                constraints:
+                    hasValue: false

@@ -125,6 +125,13 @@ def _GetSlowTests() -> Set[str]:
     }
 
 
+def _GetPythonYamlOnlyTests() -> Set[str]:
+    """List of tests that does not have a codegen version."""
+    return {
+        "TestConstraintHasValue",
+    }
+
+
 def _GetInDevelopmentTests() -> Set[str]:
     """Tests that fail in YAML for some reason.
 
@@ -191,6 +198,7 @@ def _hardcoded_python_yaml_tests():
     manual_tests = _GetManualTests()
     flaky_tests = _GetFlakyTests()
     slow_tests = _GetSlowTests()
+    python_yaml_only_tests = _GetPythonYamlOnlyTests()
     in_development_tests = _GetInDevelopmentTests()
 
     for path in _AllYamlTests():
@@ -207,6 +215,9 @@ def _hardcoded_python_yaml_tests():
         if path.name in slow_tests:
             tags.add(TestTag.SLOW)
 
+        if path.name in python_yaml_only_tests:
+            tags.add(TestTag.PYTHON_YAML_ONLY)
+
         if path.name in in_development_tests:
             tags.add(TestTag.IN_DEVELOPMENT)
 
@@ -221,6 +232,22 @@ def _hardcoded_python_yaml_tests():
 def AllYamlTests():
     for test in _hardcoded_python_yaml_tests():
         yield test
+
+
+def AllChipToolPythonTests(chip_tool: str):
+    for test in tests_with_command(chip_tool, is_manual=False):
+        yield test
+
+    for test in tests_with_command(chip_tool, is_manual=True):
+        yield test
+
+    for test in _GetPythonYamlOnlyTests():
+        yield TestDefinition(
+            run_name=test,
+            name=test,
+            target=target_for_name(test),
+            tags=set([TestTag.PYTHON_YAML_ONLY])
+        )
 
 
 def AllChipToolTests(chip_tool: str):

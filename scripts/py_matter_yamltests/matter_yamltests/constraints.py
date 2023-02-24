@@ -114,6 +114,22 @@ class ConstraintNotValueError(ConstraintCheckError):
         super().__init__(context, 'notValue', reason)
 
 
+class ConstraintValue:
+    def __init__(self, *args):
+        if len(args):
+            self._value = args[0]
+            self._has_value = True
+        else:
+            self._value = None
+            self._has_value = False
+
+    def get(self):
+        return self._value
+
+    def has_value(self) -> bool:
+        return self._has_value
+
+
 class BaseConstraint(ABC):
     '''Constraint Interface'''
 
@@ -124,6 +140,11 @@ class BaseConstraint(ABC):
         self._context = context
 
     def validate(self, value, value_type_name):
+        if not value.has_value():
+            reason = f"The constraint expects a value but there isn't one."
+            self._raise_error(reason)
+
+        value = value.get()
         if value is None and self._is_null_allowed:
             return
 
@@ -202,12 +223,11 @@ class _ConstraintHasValue(BaseConstraint):
         if self.check_response(value, value_type_name):
             return
 
-        reason = self.get_reason(value, value_type_name)
+        reason = self.get_reason(value.get(), value_type_name)
         raise ConstraintHasValueError(self._context, reason)
 
     def check_response(self, value, value_type_name) -> bool:
-        has_value = value is not None
-        return self._has_value == has_value
+        return self._has_value == value.has_value()
 
     def get_reason(self, value, value_type_name) -> str:
         if self._has_value:

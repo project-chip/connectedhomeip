@@ -181,6 +181,8 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     # Figures out selected test that match the given name(s)
     if runtime == TestRunTime.CHIP_REPL_PYTHON:
         all_tests = [test for test in chiptest.AllYamlTests()]
+    elif runtime == TestRunTime.CHIP_TOOL_PYTHON:
+        all_tests = [test for test in chiptest.AllChipToolPythonTests(chip_tool)]
     else:
         all_tests = [test for test in chiptest.AllChipToolTests(chip_tool)]
 

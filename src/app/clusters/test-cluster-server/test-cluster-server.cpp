@@ -101,6 +101,8 @@ private:
     CHIP_ERROR WriteNullableStruct(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadListFabricScopedAttribute(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteListFabricScopedAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
+    CHIP_ERROR ReadNullablesAndOptionalsStructAttribute(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteNullablesAndOptionalsStructAttribute(AttributeValueDecoder & aDecoder);
 };
 
 TestAttrAccess gAttrAccess;
@@ -136,6 +138,8 @@ const char sLongOctetStringBuf[513] = "0123456789abcdef0123456789abcdef012345678
 SimpleEnum gSimpleEnums[kAttributeListLength];
 size_t gSimpleEnumCount = 0;
 Structs::NullablesAndOptionalsStruct::Type gNullablesAndOptionalsStruct;
+
+Structs::NullablesAndOptionalsStruct::Type gNullablesAndOptionalsStructNotInList;
 
 CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -173,6 +177,9 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     }
     case WriteOnlyInt8u::Id: {
         return StatusIB(Protocols::InteractionModel::Status::UnsupportedRead).ToChipError();
+    }
+    case NullablesAndOptionalsStruct::Id: {
+        return ReadNullablesAndOptionalsStructAttribute(aEncoder);
     }
     default: {
         break;
@@ -215,6 +222,9 @@ CHIP_ERROR TestAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attrib
     }
     case ClusterErrorBoolean::Id: {
         return StatusIB(Protocols::InteractionModel::Status::Failure, 17).ToChipError();
+    }
+    case NullablesAndOptionalsStruct::Id: {
+        return WriteNullablesAndOptionalsStructAttribute(aDecoder);
     }
     default: {
         break;
@@ -522,6 +532,21 @@ CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(const C
     }
 
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR TestAttrAccess::ReadNullablesAndOptionalsStructAttribute(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(gNullablesAndOptionalsStructNotInList);
+}
+
+CHIP_ERROR TestAttrAccess::WriteNullablesAndOptionalsStructAttribute(AttributeValueDecoder & aDecoder)
+{
+    // We only support setting the NullableOptionalInt field for now.
+    Structs::NullablesAndOptionalsStruct::DecodableType temp;
+    ReturnErrorOnFailure(aDecoder.Decode(temp));
+
+    gNullablesAndOptionalsStructNotInList.nullableOptionalInt = temp.nullableOptionalInt;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR TestAttrAccess::ReadStructAttribute(AttributeValueEncoder & aEncoder)

@@ -215,6 +215,7 @@ class TestTag(Enum):
     MANUAL = auto()          # requires manual input. Generally not run automatically
     SLOW = auto()            # test uses Sleep and is generally slow (>=10s is a typical threshold)
     FLAKY = auto()           # test is considered flaky (usually a bug/time dependent issue)
+    PYTHON_YAML_ONLY = auto()  # test does not have a codegen version
     IN_DEVELOPMENT = auto()  # test may not pass or undergoes changes
 
     def to_s(self):

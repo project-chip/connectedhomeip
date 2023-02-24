@@ -18,7 +18,7 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 
 from . import fixes
-from .constraints import get_constraints, is_typed_constraint
+from .constraints import ConstraintValue, get_constraints, is_typed_constraint
 from .definitions import SpecDefinitions
 from .errors import TestStepError, TestStepKeyError, TestStepValueNameError
 from .pics_checker import PICSChecker
@@ -738,7 +738,7 @@ class TestStep:
                 break
 
             received_value = received_response.get('value')
-            if not self.is_attribute and not self.is_event:
+            if isinstance(value, dict) and 'name' in value:
                 expected_name = value.get('name')
                 if expected_name not in received_value:
                     result.error(check_type, error_name_does_not_exist.format(
@@ -785,14 +785,15 @@ class TestStep:
             if 'constraints' not in value:
                 continue
 
-            received_value = received_response.get('value')
-            if not self.is_attribute and not self.is_event:
+            expected_name = 'value'
+            if isinstance(value, dict) and 'name' in value:
+                received_value = received_response.get(expected_name)
                 expected_name = value.get('name')
-                if received_value is None or expected_name not in received_value:
-                    received_value = None
+                if expected_name in received_value:
+                    received_value = ConstraintValue(received_value.get(
+                        expected_name) if received_value else None)
                 else:
-                    received_value = received_value.get(
-                        expected_name) if received_value else None
+                    received_value = ConstraintValue()
 
                 if self._test.response_mapping:
                     response_type_name = self._test.response_mapping.get(
@@ -802,6 +803,12 @@ class TestStep:
                     # If there is a constraint check for the type it is likely an incorrect
                     # constraint check by the test writter.
                     response_type_name = None
+            else:
+                if expected_name in received_response:
+                    received_value = ConstraintValue(
+                        received_response.get(expected_name))
+                else:
+                    received_value = ConstraintValue()
 
             constraints = get_constraints(value['constraints'])
 
