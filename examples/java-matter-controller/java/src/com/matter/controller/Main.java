@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2022 Project CHIP Authors
+ *   Copyright (c) 2022-2023 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -105,6 +105,7 @@ public class Main {
             ControllerParams.newBuilder()
                 .setUdpListenPort(0)
                 .setControllerVendorId(0xFFF1)
+                .setCountryCode("US")
                 .build());
 
     CredentialsIssuer credentialsIssuer = new CredentialsIssuer();
