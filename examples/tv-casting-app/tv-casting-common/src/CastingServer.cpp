@@ -345,7 +345,8 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
     if (event->Type == DeviceLayer::DeviceEventType::kBindingsChangedViaCluster)
     {
         ChipLogProgress(AppServer, "CastingServer::DeviceEventCallback kBindingsChangedViaCluster received");
-        if (CastingServer::GetInstance()->GetActiveTargetVideoPlayer()->IsInitialized())
+        if (CastingServer::GetInstance()->GetActiveTargetVideoPlayer()->IsInitialized() &&
+            CastingServer::GetInstance()->GetActiveTargetVideoPlayer()->GetOperationalDeviceProxy() != nullptr)
         {
             ChipLogProgress(AppServer,
                             "CastingServer::DeviceEventCallback already connected to video player, reading server clusters");
@@ -355,40 +356,40 @@ void CastingServer::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * eve
         else if (CastingServer::GetInstance()->mUdcInProgress)
         {
             ChipLogProgress(AppServer,
-                            "CastingServer::DeviceEventCallback UDC is in progress while handling kBindingsChangedViaCluster");
+                            "CastingServer::DeviceEventCallback UDC is in progress while handling kBindingsChangedViaCluster with "
+                            "fabricIndex: %d",
+                            event->BindingsChanged.fabricIndex);
             CastingServer::GetInstance()->mUdcInProgress = false;
-            if (CastingServer::GetInstance()->mTargetVideoPlayerNumIPs > 0)
+
+            // find targetPeerNodeId from binding table by matching the binding's fabricIndex with the accessing fabricIndex
+            // received in BindingsChanged event
+            for (const auto & binding : BindingTable::GetInstance())
             {
-                TargetVideoPlayerInfo * connectableVideoPlayerList =
-                    CastingServer::GetInstance()->ReadCachedTargetVideoPlayerInfos();
-                if (connectableVideoPlayerList == nullptr || !connectableVideoPlayerList[0].IsInitialized())
+                ChipLogProgress(
+                    AppServer,
+                    "CastingServer::DeviceEventCallback Read cached binding type=%d fabrixIndex=%d nodeId=0x" ChipLogFormatX64
+                    " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
+                    binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
+                    binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+                if (binding.type == EMBER_UNICAST_BINDING && event->BindingsChanged.fabricIndex == binding.fabricIndex)
                 {
-                    ChipLogError(AppServer, "CastingServer::DeviceEventCallback No cached video players found");
-                    CastingServer::GetInstance()->mCommissioningCompleteCallback(CHIP_ERROR_INCORRECT_STATE);
-                    return;
+                    ChipLogProgress(
+                        NotSpecified,
+                        "CastingServer::DeviceEventCallback Matched accessingFabricIndex with nodeId=0x" ChipLogFormatX64,
+                        ChipLogValueX64(binding.nodeId));
+                    targetPeerNodeId     = binding.nodeId;
+                    targetFabricIndex    = binding.fabricIndex;
+                    runPostCommissioning = true;
+                    break;
                 }
+            }
 
-                for (size_t i = 0; i < kMaxCachedVideoPlayers && connectableVideoPlayerList[i].IsInitialized(); i++)
-                {
-                    if (connectableVideoPlayerList[i].IsSameAs(CastingServer::GetInstance()->mTargetVideoPlayerDeviceName,
-                                                               CastingServer::GetInstance()->mTargetVideoPlayerNumIPs,
-                                                               CastingServer::GetInstance()->mTargetVideoPlayerIpAddress))
-                    {
-                        ChipLogProgress(AppServer,
-                                        "CastingServer::DeviceEventCallback found the video player to initialize/connect to");
-                        targetPeerNodeId     = connectableVideoPlayerList[i].GetNodeId();
-                        targetFabricIndex    = connectableVideoPlayerList[i].GetFabricIndex();
-                        runPostCommissioning = true;
-                    }
-                }
-
-                if (targetPeerNodeId == 0 && runPostCommissioning == false)
-                {
-                    ChipLogError(AppServer,
-                                 "CastingServer::DeviceEventCallback did NOT find the video player to initialize/connect to");
-                    CastingServer::GetInstance()->mCommissioningCompleteCallback(CHIP_ERROR_INCORRECT_STATE);
-                    return;
-                }
+            if (targetPeerNodeId == 0 && runPostCommissioning == false)
+            {
+                ChipLogError(AppServer, "CastingServer::DeviceEventCallback accessingFabricIndex: %d did not match bindings",
+                             event->BindingsChanged.fabricIndex);
+                CastingServer::GetInstance()->mCommissioningCompleteCallback(CHIP_ERROR_INCORRECT_STATE);
+                return;
             }
         }
     }

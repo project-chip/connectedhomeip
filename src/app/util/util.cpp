@@ -139,16 +139,6 @@ void MatterProxyConfigurationPluginServerInitCallback() {}
 void MatterFanControlPluginServerInitCallback() {}
 
 // ****************************************
-// This function is called by the application when the stack goes down,
-// such as after a leave network. This allows zcl utils to clear state
-// that should not be kept when changing networks
-// ****************************************
-void emberAfStackDown()
-{
-    emberAfRegistrationAbortCallback();
-}
-
-// ****************************************
 // Print out information about each cluster
 // ****************************************
 

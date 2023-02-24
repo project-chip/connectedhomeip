@@ -831,7 +831,7 @@ server cluster TimeFormatLocalization = 44 {
 }
 
 server cluster UnitLocalization = 45 {
-  enum TempUnit : ENUM8 {
+  enum TempUnitEnum : ENUM8 {
     kFahrenheit = 0;
     kCelsius = 1;
     kKelvin = 2;
@@ -841,7 +841,7 @@ server cluster UnitLocalization = 45 {
     kTemperatureUnit = 0x1;
   }
 
-  attribute TempUnit temperatureUnit = 0;
+  attribute TempUnitEnum temperatureUnit = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

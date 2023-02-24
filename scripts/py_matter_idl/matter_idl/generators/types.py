@@ -13,8 +13,9 @@
 # limitations under the License.
 
 import enum
+import logging
 from dataclasses import dataclass
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from matter_idl import matter_idl_types  # to explicitly say 'Enum'
 from matter_idl.matter_idl_types import DataType
@@ -80,7 +81,7 @@ class FundamentalType(enum.Enum):
         elif self == FundamentalType.DOUBLE:
             return "double"
         else:
-            raise Error("Type not handled: %r" % self)
+            raise Exception("Type not handled: %r" % self)
 
     @property
     def byte_count(self):
@@ -91,7 +92,7 @@ class FundamentalType(enum.Enum):
         elif self == FundamentalType.DOUBLE:
             return 8
         else:
-            raise Error("Type not handled: %r" % self)
+            raise Exception("Type not handled: %r" % self)
 
     @property
     def bits(self):
@@ -109,11 +110,11 @@ class IdlEnumType:
 
     @property
     def byte_count(self):
-        return base_type.byte_count()
+        return self.base_type.byte_count()
 
     @property
     def bits(self):
-        return base_type.bits()
+        return self.base_type.bits()
 
 
 @dataclass
@@ -128,11 +129,11 @@ class IdlBitmapType:
 
     @property
     def byte_count(self):
-        return base_type.byte_count()
+        return self.base_type.byte_count()
 
     @property
     def bits(self):
-        return base_type.bits()
+        return self.base_type.bits()
 
 
 class IdlItemType(enum.Enum):
@@ -399,7 +400,7 @@ def ParseDataType(data_type: DataType, lookup: TypeLookupContext) -> Union[Basic
     if lookup.find_struct(data_type.name):
         result.item_type = IdlItemType.STRUCT
     else:
-        logging.warn(
+        logging.warning(
             "Data type %s is NOT known, but treating it as a generic IDL type." % data_type)
 
     return result
