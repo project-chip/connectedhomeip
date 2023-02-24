@@ -13,9 +13,10 @@
 # limitations under the License.
 
 import logging
-from typing import List, Optional, Union
 
-from matter_idl.matter_idl_types import *
+from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
+                                         Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, Struct, StructQuality,
+                                         StructTag)
 
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
@@ -355,10 +356,8 @@ class CommandHandler(BaseHandler):
 
             if name.endswith('Request'):
                 request_name = name
-                command_name = name[:-7]
             else:
                 request_name = name+'Request'
-                command_name = name
 
             self._struct.name = request_name
 
