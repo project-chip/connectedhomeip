@@ -155,25 +155,28 @@ private:
     }
     CHIP_ERROR ReadGroupKeyMap(EndpointId endpoint, AttributeValueEncoder & aEncoder)
     {
-        auto fabric_index = aEncoder.AccessingFabricIndex();
-        auto provider     = GetGroupDataProvider();
+        auto provider = GetGroupDataProvider();
         VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
 
-        CHIP_ERROR err = aEncoder.EncodeList([provider, fabric_index](const auto & encoder) -> CHIP_ERROR {
-            auto iter = provider->IterateGroupKeys(fabric_index);
-            VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
-
-            GroupDataProvider::GroupKey mapping;
-            while (iter->Next(mapping))
+        CHIP_ERROR err = aEncoder.EncodeList([provider](const auto & encoder) -> CHIP_ERROR {
+            for (auto & fabric : Server::GetInstance().GetFabricTable())
             {
-                GroupKeyManagement::Structs::GroupKeyMapStruct::Type key = {
-                    .groupId       = mapping.group_id,
-                    .groupKeySetID = mapping.keyset_id,
-                    .fabricIndex   = fabric_index,
-                };
-                encoder.Encode(key);
+                auto fabric_index = fabric.GetFabricIndex();
+                auto iter         = provider->IterateGroupKeys(fabric_index);
+                VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
+
+                GroupDataProvider::GroupKey mapping;
+                while (iter->Next(mapping))
+                {
+                    GroupKeyManagement::Structs::GroupKeyMapStruct::Type key = {
+                        .groupId       = mapping.group_id,
+                        .groupKeySetID = mapping.keyset_id,
+                        .fabricIndex   = fabric_index,
+                    };
+                    encoder.Encode(key);
+                }
+                iter->Release();
             }
-            iter->Release();
             return CHIP_NO_ERROR;
         });
         return err;
@@ -240,20 +243,23 @@ private:
 
     CHIP_ERROR ReadGroupTable(EndpointId endpoint, AttributeValueEncoder & aEncoder)
     {
-        auto fabric_index = aEncoder.AccessingFabricIndex();
-        auto provider     = GetGroupDataProvider();
+        auto provider = GetGroupDataProvider();
         VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
 
-        CHIP_ERROR err = aEncoder.EncodeList([provider, fabric_index](const auto & encoder) -> CHIP_ERROR {
-            auto iter = provider->IterateGroupInfo(fabric_index);
-            VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
-
-            GroupDataProvider::GroupInfo info;
-            while (iter->Next(info))
+        CHIP_ERROR err = aEncoder.EncodeList([provider](const auto & encoder) -> CHIP_ERROR {
+            for (auto & fabric : Server::GetInstance().GetFabricTable())
             {
-                encoder.Encode(GroupTableCodec(provider, fabric_index, info));
+                auto fabric_index = fabric.GetFabricIndex();
+                auto iter         = provider->IterateGroupInfo(fabric_index);
+                VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
+
+                GroupDataProvider::GroupInfo info;
+                while (iter->Next(info))
+                {
+                    encoder.Encode(GroupTableCodec(provider, fabric_index, info));
+                }
+                iter->Release();
             }
-            iter->Release();
             return CHIP_NO_ERROR;
         });
         return err;
