@@ -674,7 +674,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
 
                     // Handle busy error separately as we have a query image response status that maps to busy
                     if (err == CHIP_ERROR_BUSY) {
-                        ChipLogError(Controller, "Resource is busy handling another request.");
+                        ChipLogError(Controller, "Responding with Busy due to being in the middle of handling another BDX transfer");
                         Commands::QueryImageResponse::Type response;
                         response.status = static_cast<OTAQueryStatus>(MTROTASoftwareUpdateProviderOTAQueryStatusBusy);
                         response.delayedActionTime.SetValue(delegateResponse.delayedActionTime.ValueOr(kDelayedActionTimeSeconds));
