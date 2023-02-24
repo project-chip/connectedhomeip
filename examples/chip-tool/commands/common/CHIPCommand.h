@@ -94,6 +94,14 @@ public:
     void SetCommandExitStatus(CHIP_ERROR status)
     {
         mCommandExitStatus = status;
+        // In interactive mode the stack is not shut down once a command is ended.
+        // That means calling `ErrorStr(err)` from the main thread when command
+        // completion is signaled may race since `ErrorStr` uses a static sErrorStr
+        // buffer for computing the error string.  Call it here instead.
+        if (IsInteractive() && CHIP_NO_ERROR != status)
+        {
+            ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(status));
+        }
         StopWaiting();
     }
 
