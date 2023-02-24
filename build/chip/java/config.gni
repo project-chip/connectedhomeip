@@ -17,10 +17,16 @@ declare_args() {
   java_matter_controller_dependent_paths = []
   build_java_matter_controller = false
   if (java_path != "") {
-    java_matter_controller_dependent_paths += [
-      "${java_path}/include/",
-      "${java_path}/include/linux/",
-    ]
+    java_matter_controller_dependent_paths += [ "${java_path}/include/" ]
+
+    if (current_os == "mac") {
+      java_matter_controller_dependent_paths +=
+          [ "${java_path}/include/darwin/" ]
+    } else {
+      java_matter_controller_dependent_paths +=
+          [ "${java_path}/include/linux/" ]
+    }
+
     build_java_matter_controller = true
   }
 }
