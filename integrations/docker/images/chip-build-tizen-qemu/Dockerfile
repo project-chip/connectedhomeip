@@ -16,6 +16,8 @@ RUN set -x \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
     bc \
     genisoimage \
+    libgmp-dev \
+    libmpc-dev \
     qemu-system-arm \
     # Cleanup
     && apt-get clean \
@@ -32,13 +34,14 @@ COPY files/0001-smack-add-permissive-mode.patch $TIZEN_SDK_ROOT/files/
 RUN set -x \
     && mkdir -p /tmp/workdir && cd /tmp/workdir \
     # Download Linux rpi4 kernel
-    && wget --progress=dot:giga -r -nd --no-parent -A 'rpi4-linux-kernel-*.src.rpm' \
-    http://download.tizen.org/snapshots/tizen/$TIZEN_VERSION-unified/latest/repos/standard/source/ \
+    && wget --progress=dot:giga -r -nd --no-parent -e robots=off -A 'rpi4-linux-kernel-*.src.rpm' \
+    http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/source/ \
     # Prepare kernel source (Linux kernel + Tizen patchset)
     && unrpm rpi4-linux-kernel-*.src.rpm \
+    && rm rpi4-linux-kernel-*.src.rpm \
     && tar -xJf linux-kernel-*.tar.xz \
     && rm linux-kernel-*.tar.xz \
-    && cd linux-kernel-* \
+    && cd *linux-kernel-* \
     && zcat ../*-to-*.diff.gz | patch -p1 \
     && patch -p1 < $TIZEN_SDK_ROOT/files/0001-smack-add-permissive-mode.patch \
     # Compile
@@ -66,8 +69,8 @@ RUN set -x \
     && mkdir -p /tmp/workdir && cd /tmp/workdir \
     && SYSTEMD_SYSTEM=/usr/lib/systemd/system \
     # Download Tizen images
-    && wget --progress=dot:giga -r -nd --no-parent -A 'tizen-*.tar.gz' \
-    http://download.tizen.org/snapshots/tizen/unified/latest/images/standard/tizen-headless-armv7l/  \
+    && wget --progress=dot:giga -r -nd --no-parent -e robots=off -A 'tizen-*.tar.gz' \
+    http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/images/standard/tizen-headless-armv7l/  \
     # Unpack
     && tar -xzf tizen-*.tar.gz \
     && mv system-data.img $TIZEN_IOT_IMAGE_DATA \
