@@ -40,15 +40,16 @@ const char * ToCertificate(const chip::ByteSpan & source, chip::MutableCharSpan 
         return destination.data();
     }
 
-    size_t base64DataLen = BASE64_ENCODED_LEN(source.size()) + 1;
-    if (base64DataLen + strlen(header) + strlen(footer) > destination.size())
+    size_t base64DataLen = BASE64_ENCODED_LEN(source.size());
+    size_t bufferLen     = base64DataLen + 1; // add one character for null-terminator
+    if (bufferLen + strlen(header) + strlen(footer) > destination.size())
     {
         ChipLogError(DataManagement, "The certificate buffer is too small to hold the base64 encoded certificate");
         return destination.data();
     }
 
     chip::Platform::ScopedMemoryBuffer<char> str;
-    str.Alloc(base64DataLen);
+    str.Alloc(bufferLen);
 
     auto encodedLen       = chip::Base64Encode(source.data(), source.size(), str.Get());
     str.Get()[encodedLen] = '\0';

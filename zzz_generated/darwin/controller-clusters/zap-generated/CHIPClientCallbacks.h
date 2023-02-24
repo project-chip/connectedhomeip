@@ -210,11 +210,11 @@ typedef void (*PowerSourceConfigurationEventListListAttributeCallback)(
 typedef void (*PowerSourceConfigurationAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*PowerSourceActiveWiredFaultsListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault> & data);
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFaultEnum> & data);
 typedef void (*PowerSourceActiveBatFaultsListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFault> & data);
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFaultEnum> & data);
 typedef void (*PowerSourceActiveBatChargeFaultsListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault> & data);
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFaultEnum> & data);
 typedef void (*PowerSourceGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*PowerSourceAcceptedCommandListListAttributeCallback)(

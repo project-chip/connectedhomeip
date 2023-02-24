@@ -89,6 +89,7 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
+#endif
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
@@ -98,7 +99,6 @@
 /* The SoftwareVersion attribute of the Basic cluster. */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x0001
-#endif
 #endif
 
 /**
@@ -111,16 +111,6 @@
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION 1
 
-/**
- * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
- *
- * A string identifying the firmware revision running on the device.
- * CHIP service currently expects the firmware version to be in the format
- * {MAJOR_VERSION}.0d{MINOR_VERSION}
- */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING "0.1ALPHA"
-#endif
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
  *

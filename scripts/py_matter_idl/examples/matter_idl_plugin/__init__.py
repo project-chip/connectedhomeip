@@ -13,11 +13,10 @@
 # limitations under the License.
 
 import os
-from typing import List
 
 import jinja2
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Attribute, Cluster, ClusterSide, Command, Field, Idl
+from matter_idl.matter_idl_types import Cluster, ClusterSide, Command, Field, Idl
 
 
 def toUpperSnakeCase(s):
@@ -57,9 +56,18 @@ def toEnumEntryName(enumEntry, enumName):
 
 def toProtobufType(zapType: str) -> str:
     """ Convert zap type to protobuf type """
-    u32Types = ["uint32", "enum8", "enum16", "enum32", "bitmap8", "bitmap16", "bitmap32", "cluster_id", "attrib_id", "event_id", "command_id",
-                "endpoint_no", "group_id", "devtype_id", "fabric_idx", "vendor_id", "status_code", "faulttype", "levelcontroloptions", "percent100ths", "percent"]
-    u64Types = ["uint64", "enum64", "bitmap64", "node_id", "fabric_id", "int40u", "int48u", "int56u", "int64u"]
+    u32Types = [
+        "uint32", "enum8", "enum16", "enum32", "bitmap8",
+        "bitmap16", "bitmap32", "cluster_id", "attrib_id",
+        "event_id", "command_id", "endpoint_no", "group_id",
+        "devtype_id", "fabric_idx", "vendor_id", "status_code",
+        "faulttype", "levelcontroloptions", "percent100ths",
+        "percent"
+    ]
+    u64Types = [
+        "uint64", "enum64", "bitmap64", "node_id", "fabric_id",
+        "int40u", "int48u", "int56u", "int64u"
+    ]
     i32Types = ["int32", "int8s", "int16s", "int24s", "int32s"]
     i64Types = ["int64", "int40s", "int48s", "int56s", "int64s"]
     floatTypes = ["float", "double"]
@@ -149,7 +157,7 @@ def commandResponseArgs(command: Command, cluster: Cluster):
 
 def toEncodedTag(tag, typeNum: EncodingDataType):
     """ Return the final encoded tag from the given field number and field encoded data type.
-        The Matter field type information is encoded into the upper range of the protobuf field 
+        The Matter field type information is encoded into the upper range of the protobuf field
         tag for stateless translation to Matter TLV. """
     tag = (int(typeNum) << 19) | int(tag)
     return tag
@@ -228,7 +236,8 @@ class CustomGenerator(CodeGenerator):
             if cluster.side != ClusterSide.CLIENT:
                 continue
 
-            filename = "proto/%s_cluster.proto" % toLowerSnakeCase(cluster.name)
+            filename = "proto/%s_cluster.proto" % toLowerSnakeCase(
+                cluster.name)
 
             # Header containing a macro to initialize all cluster plugins
             self.internal_render_one_output(

@@ -497,7 +497,7 @@ def BuildBouffalolabTarget():
         TargetPart('BL602-NIGHT-LIGHT', board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
         TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit, module_type="BL706C-22"),
         TargetPart('BL706-IoT-DVK', board=BouffalolabBoard.BL706_IoT_DVK, module_type="BL706C-22"),
-        TargetPart('BL706-NIGHT-LIGHT', board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL702"),
+        TargetPart('BL706-NIGHT-LIGHT', board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
     ])
 
     # Apps
@@ -508,6 +508,7 @@ def BuildBouffalolabTarget():
     target.AppendModifier('shell', enable_shell=True)
     target.AppendModifier('115200', baudrate=115200)
     target.AppendModifier('rpc', enable_rpcs=True)
+    target.AppendModifier('cdc', enable_cdc=True)
 
     return target
 

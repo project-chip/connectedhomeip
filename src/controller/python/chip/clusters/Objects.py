@@ -5961,37 +5961,37 @@ class PowerSource(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="status", Tag=0x00000000, Type=PowerSource.Enums.PowerSourceStatus),
+                ClusterObjectFieldDescriptor(Label="status", Tag=0x00000000, Type=PowerSource.Enums.PowerSourceStatusEnum),
                 ClusterObjectFieldDescriptor(Label="order", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="description", Tag=0x00000002, Type=str),
                 ClusterObjectFieldDescriptor(Label="wiredAssessedInputVoltage", Tag=0x00000003, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="wiredAssessedInputFrequency", Tag=0x00000004, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="wiredCurrentType", Tag=0x00000005, Type=typing.Optional[PowerSource.Enums.WiredCurrentType]),
+                ClusterObjectFieldDescriptor(Label="wiredCurrentType", Tag=0x00000005, Type=typing.Optional[PowerSource.Enums.WiredCurrentTypeEnum]),
                 ClusterObjectFieldDescriptor(Label="wiredAssessedCurrent", Tag=0x00000006, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="wiredNominalVoltage", Tag=0x00000007, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="wiredMaximumCurrent", Tag=0x00000008, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="wiredPresent", Tag=0x00000009, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="activeWiredFaults", Tag=0x0000000A, Type=typing.Optional[typing.List[PowerSource.Enums.WiredFault]]),
+                ClusterObjectFieldDescriptor(Label="activeWiredFaults", Tag=0x0000000A, Type=typing.Optional[typing.List[PowerSource.Enums.WiredFaultEnum]]),
                 ClusterObjectFieldDescriptor(Label="batVoltage", Tag=0x0000000B, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="batPercentRemaining", Tag=0x0000000C, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="batTimeRemaining", Tag=0x0000000D, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="batChargeLevel", Tag=0x0000000E, Type=typing.Optional[PowerSource.Enums.BatChargeLevel]),
+                ClusterObjectFieldDescriptor(Label="batChargeLevel", Tag=0x0000000E, Type=typing.Optional[PowerSource.Enums.BatChargeLevelEnum]),
                 ClusterObjectFieldDescriptor(Label="batReplacementNeeded", Tag=0x0000000F, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="batReplaceability", Tag=0x00000010, Type=typing.Optional[PowerSource.Enums.BatReplaceability]),
+                ClusterObjectFieldDescriptor(Label="batReplaceability", Tag=0x00000010, Type=typing.Optional[PowerSource.Enums.BatReplaceabilityEnum]),
                 ClusterObjectFieldDescriptor(Label="batPresent", Tag=0x00000011, Type=typing.Optional[bool]),
-                ClusterObjectFieldDescriptor(Label="activeBatFaults", Tag=0x00000012, Type=typing.Optional[typing.List[PowerSource.Enums.BatFault]]),
+                ClusterObjectFieldDescriptor(Label="activeBatFaults", Tag=0x00000012, Type=typing.Optional[typing.List[PowerSource.Enums.BatFaultEnum]]),
                 ClusterObjectFieldDescriptor(Label="batReplacementDescription", Tag=0x00000013, Type=typing.Optional[str]),
-                ClusterObjectFieldDescriptor(Label="batCommonDesignation", Tag=0x00000014, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="batCommonDesignation", Tag=0x00000014, Type=typing.Optional[PowerSource.Enums.BatCommonDesignationEnum]),
                 ClusterObjectFieldDescriptor(Label="batANSIDesignation", Tag=0x00000015, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="batIECDesignation", Tag=0x00000016, Type=typing.Optional[str]),
-                ClusterObjectFieldDescriptor(Label="batApprovedChemistry", Tag=0x00000017, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="batApprovedChemistry", Tag=0x00000017, Type=typing.Optional[PowerSource.Enums.BatApprovedChemistryEnum]),
                 ClusterObjectFieldDescriptor(Label="batCapacity", Tag=0x00000018, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="batQuantity", Tag=0x00000019, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="batChargeState", Tag=0x0000001A, Type=typing.Optional[PowerSource.Enums.BatChargeState]),
+                ClusterObjectFieldDescriptor(Label="batChargeState", Tag=0x0000001A, Type=typing.Optional[PowerSource.Enums.BatChargeStateEnum]),
                 ClusterObjectFieldDescriptor(Label="batTimeToFullCharge", Tag=0x0000001B, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="batFunctionalWhileCharging", Tag=0x0000001C, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="batChargingCurrent", Tag=0x0000001D, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="activeBatChargeFaults", Tag=0x0000001E, Type=typing.Optional[typing.List[PowerSource.Enums.BatChargeFault]]),
+                ClusterObjectFieldDescriptor(Label="activeBatChargeFaults", Tag=0x0000001E, Type=typing.Optional[typing.List[PowerSource.Enums.BatChargeFaultEnum]]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -6000,37 +6000,37 @@ class PowerSource(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    status: 'PowerSource.Enums.PowerSourceStatus' = None
+    status: 'PowerSource.Enums.PowerSourceStatusEnum' = None
     order: 'uint' = None
     description: 'str' = None
     wiredAssessedInputVoltage: 'typing.Union[None, Nullable, uint]' = None
     wiredAssessedInputFrequency: 'typing.Union[None, Nullable, uint]' = None
-    wiredCurrentType: 'typing.Optional[PowerSource.Enums.WiredCurrentType]' = None
+    wiredCurrentType: 'typing.Optional[PowerSource.Enums.WiredCurrentTypeEnum]' = None
     wiredAssessedCurrent: 'typing.Union[None, Nullable, uint]' = None
     wiredNominalVoltage: 'typing.Optional[uint]' = None
     wiredMaximumCurrent: 'typing.Optional[uint]' = None
     wiredPresent: 'typing.Optional[bool]' = None
-    activeWiredFaults: 'typing.Optional[typing.List[PowerSource.Enums.WiredFault]]' = None
+    activeWiredFaults: 'typing.Optional[typing.List[PowerSource.Enums.WiredFaultEnum]]' = None
     batVoltage: 'typing.Union[None, Nullable, uint]' = None
     batPercentRemaining: 'typing.Union[None, Nullable, uint]' = None
     batTimeRemaining: 'typing.Union[None, Nullable, uint]' = None
-    batChargeLevel: 'typing.Optional[PowerSource.Enums.BatChargeLevel]' = None
+    batChargeLevel: 'typing.Optional[PowerSource.Enums.BatChargeLevelEnum]' = None
     batReplacementNeeded: 'typing.Optional[bool]' = None
-    batReplaceability: 'typing.Optional[PowerSource.Enums.BatReplaceability]' = None
+    batReplaceability: 'typing.Optional[PowerSource.Enums.BatReplaceabilityEnum]' = None
     batPresent: 'typing.Optional[bool]' = None
-    activeBatFaults: 'typing.Optional[typing.List[PowerSource.Enums.BatFault]]' = None
+    activeBatFaults: 'typing.Optional[typing.List[PowerSource.Enums.BatFaultEnum]]' = None
     batReplacementDescription: 'typing.Optional[str]' = None
-    batCommonDesignation: 'typing.Optional[uint]' = None
+    batCommonDesignation: 'typing.Optional[PowerSource.Enums.BatCommonDesignationEnum]' = None
     batANSIDesignation: 'typing.Optional[str]' = None
     batIECDesignation: 'typing.Optional[str]' = None
-    batApprovedChemistry: 'typing.Optional[uint]' = None
+    batApprovedChemistry: 'typing.Optional[PowerSource.Enums.BatApprovedChemistryEnum]' = None
     batCapacity: 'typing.Optional[uint]' = None
     batQuantity: 'typing.Optional[uint]' = None
-    batChargeState: 'typing.Optional[PowerSource.Enums.BatChargeState]' = None
+    batChargeState: 'typing.Optional[PowerSource.Enums.BatChargeStateEnum]' = None
     batTimeToFullCharge: 'typing.Union[None, Nullable, uint]' = None
     batFunctionalWhileCharging: 'typing.Optional[bool]' = None
     batChargingCurrent: 'typing.Union[None, Nullable, uint]' = None
-    activeBatChargeFaults: 'typing.Optional[typing.List[PowerSource.Enums.BatChargeFault]]' = None
+    activeBatChargeFaults: 'typing.Optional[typing.List[PowerSource.Enums.BatChargeFaultEnum]]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -6039,7 +6039,47 @@ class PowerSource(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class BatChargeFault(MatterIntEnum):
+        class BatApprovedChemistryEnum(MatterIntEnum):
+            kUnspecified = 0x00
+            kAlkaline = 0x01
+            kLithiumCarbonFluoride = 0x02
+            kLithiumChromiumOxide = 0x03
+            kLithiumCopperOxide = 0x04
+            kLithiumIronDisulfide = 0x05
+            kLithiumManganeseDioxide = 0x06
+            kLithiumThionylChloride = 0x07
+            kMagnesium = 0x08
+            kMercuryOxide = 0x09
+            kNickelOxyhydride = 0x0A
+            kSilverOxide = 0x0B
+            kZincAir = 0x0C
+            kZincCarbon = 0x0D
+            kZincChloride = 0x0E
+            kZincManganeseDioxide = 0x0F
+            kLeadAcid = 0x10
+            kLithiumCobaltOxide = 0x11
+            kLithiumIon = 0x12
+            kLithiumIonPolymer = 0x13
+            kLithiumIronPhosphate = 0x14
+            kLithiumSulfur = 0x15
+            kLithiumTitanate = 0x16
+            kNickelCadmium = 0x17
+            kNickelHydrogen = 0x18
+            kNickelIron = 0x19
+            kNickelMetalHydride = 0x1A
+            kNickelZinc = 0x1B
+            kSilverZinc = 0x1C
+            kSodiumIon = 0x1D
+            kSodiumSulfur = 0x1E
+            kZincBromide = 0x1F
+            kZincCerium = 0x20
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 33,
+
+        class BatChargeFaultEnum(MatterIntEnum):
             kUnspecified = 0x00
             kAmbientTooHot = 0x01
             kAmbientTooCold = 0x02
@@ -6057,7 +6097,7 @@ class PowerSource(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 11,
 
-        class BatChargeLevel(MatterIntEnum):
+        class BatChargeLevelEnum(MatterIntEnum):
             kOk = 0x00
             kWarning = 0x01
             kCritical = 0x02
@@ -6067,7 +6107,7 @@ class PowerSource(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 3,
 
-        class BatChargeState(MatterIntEnum):
+        class BatChargeStateEnum(MatterIntEnum):
             kUnknown = 0x00
             kIsCharging = 0x01
             kIsAtFullCharge = 0x02
@@ -6078,8 +6118,96 @@ class PowerSource(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 4,
 
-        class BatFault(MatterIntEnum):
-            kUnspecfied = 0x00
+        class BatCommonDesignationEnum(MatterIntEnum):
+            kUnspecified = 0x00
+            kAaa = 0x01
+            kAa = 0x02
+            kC = 0x03
+            kD = 0x04
+            k4v5 = 0x05
+            k6v0 = 0x06
+            k9v0 = 0x07
+            k12aa = 0x08
+            kAaaa = 0x09
+            kA = 0x0A
+            kB = 0x0B
+            kF = 0x0C
+            kN = 0x0D
+            kNo6 = 0x0E
+            kSubC = 0x0F
+            kA23 = 0x10
+            kA27 = 0x11
+            kBa5800 = 0x12
+            kDuplex = 0x13
+            k4sr44 = 0x14
+            k523 = 0x15
+            k531 = 0x16
+            k15v0 = 0x17
+            k22v5 = 0x18
+            k30v0 = 0x19
+            k45v0 = 0x1A
+            k67v5 = 0x1B
+            kJ = 0x1C
+            kCr123a = 0x1D
+            kCr2 = 0x1E
+            k2cr5 = 0x1F
+            kCrP2 = 0x20
+            kCrV3 = 0x21
+            kSr41 = 0x22
+            kSr43 = 0x23
+            kSr44 = 0x24
+            kSr45 = 0x25
+            kSr48 = 0x26
+            kSr54 = 0x27
+            kSr55 = 0x28
+            kSr57 = 0x29
+            kSr58 = 0x2A
+            kSr59 = 0x2B
+            kSr60 = 0x2C
+            kSr63 = 0x2D
+            kSr64 = 0x2E
+            kSr65 = 0x2F
+            kSr66 = 0x30
+            kSr67 = 0x31
+            kSr68 = 0x32
+            kSr69 = 0x33
+            kSr516 = 0x34
+            kSr731 = 0x35
+            kSr712 = 0x36
+            kLr932 = 0x37
+            kA5 = 0x38
+            kA10 = 0x39
+            kA13 = 0x3A
+            kA312 = 0x3B
+            kA675 = 0x3C
+            kAc41e = 0x3D
+            k10180 = 0x3E
+            k10280 = 0x3F
+            k10440 = 0x40
+            k14250 = 0x41
+            k14430 = 0x42
+            k14500 = 0x43
+            k14650 = 0x44
+            k15270 = 0x45
+            k16340 = 0x46
+            kRcr123a = 0x47
+            k17500 = 0x48
+            k17670 = 0x49
+            k18350 = 0x4A
+            k18500 = 0x4B
+            k18650 = 0x4C
+            k19670 = 0x4D
+            k25500 = 0x4E
+            k26650 = 0x4F
+            k32600 = 0x50
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 81,
+
+        class BatFaultEnum(MatterIntEnum):
+            kUnspecified = 0x00
             kOverTemp = 0x01
             kUnderTemp = 0x02
             # All received enum values that are not listed above will be mapped
@@ -6088,7 +6216,7 @@ class PowerSource(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 3,
 
-        class BatReplaceability(MatterIntEnum):
+        class BatReplaceabilityEnum(MatterIntEnum):
             kUnspecified = 0x00
             kNotReplaceable = 0x01
             kUserReplaceable = 0x02
@@ -6099,7 +6227,7 @@ class PowerSource(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 4,
 
-        class PowerSourceStatus(MatterIntEnum):
+        class PowerSourceStatusEnum(MatterIntEnum):
             kUnspecified = 0x00
             kActive = 0x01
             kStandby = 0x02
@@ -6110,7 +6238,7 @@ class PowerSource(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 4,
 
-        class WiredCurrentType(MatterIntEnum):
+        class WiredCurrentTypeEnum(MatterIntEnum):
             kAc = 0x00
             kDc = 0x01
             # All received enum values that are not listed above will be mapped
@@ -6119,8 +6247,8 @@ class PowerSource(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 2,
 
-        class WiredFault(MatterIntEnum):
-            kUnspecfied = 0x00
+        class WiredFaultEnum(MatterIntEnum):
+            kUnspecified = 0x00
             kOverVoltage = 0x01
             kUnderVoltage = 0x02
             # All received enum values that are not listed above will be mapped
@@ -6145,12 +6273,12 @@ class PowerSource(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[PowerSource.Enums.BatChargeFault]),
-                            ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[PowerSource.Enums.BatChargeFault]),
+                            ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[PowerSource.Enums.BatChargeFaultEnum]),
+                            ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[PowerSource.Enums.BatChargeFaultEnum]),
                     ])
 
-            current: 'typing.List[PowerSource.Enums.BatChargeFault]' = field(default_factory=lambda: [])
-            previous: 'typing.List[PowerSource.Enums.BatChargeFault]' = field(default_factory=lambda: [])
+            current: 'typing.List[PowerSource.Enums.BatChargeFaultEnum]' = field(default_factory=lambda: [])
+            previous: 'typing.List[PowerSource.Enums.BatChargeFaultEnum]' = field(default_factory=lambda: [])
 
         @dataclass
         class BatFaultChangeType(ClusterObject):
@@ -6158,12 +6286,12 @@ class PowerSource(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[PowerSource.Enums.BatFault]),
-                            ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[PowerSource.Enums.BatFault]),
+                            ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[PowerSource.Enums.BatFaultEnum]),
+                            ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[PowerSource.Enums.BatFaultEnum]),
                     ])
 
-            current: 'typing.List[PowerSource.Enums.BatFault]' = field(default_factory=lambda: [])
-            previous: 'typing.List[PowerSource.Enums.BatFault]' = field(default_factory=lambda: [])
+            current: 'typing.List[PowerSource.Enums.BatFaultEnum]' = field(default_factory=lambda: [])
+            previous: 'typing.List[PowerSource.Enums.BatFaultEnum]' = field(default_factory=lambda: [])
 
         @dataclass
         class WiredFaultChangeType(ClusterObject):
@@ -6171,12 +6299,12 @@ class PowerSource(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[PowerSource.Enums.WiredFault]),
-                            ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[PowerSource.Enums.WiredFault]),
+                            ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[PowerSource.Enums.WiredFaultEnum]),
+                            ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[PowerSource.Enums.WiredFaultEnum]),
                     ])
 
-            current: 'typing.List[PowerSource.Enums.WiredFault]' = field(default_factory=lambda: [])
-            previous: 'typing.List[PowerSource.Enums.WiredFault]' = field(default_factory=lambda: [])
+            current: 'typing.List[PowerSource.Enums.WiredFaultEnum]' = field(default_factory=lambda: [])
+            previous: 'typing.List[PowerSource.Enums.WiredFaultEnum]' = field(default_factory=lambda: [])
 
 
 
@@ -6194,9 +6322,9 @@ class PowerSource(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=PowerSource.Enums.PowerSourceStatus)
+                return ClusterObjectFieldDescriptor(Type=PowerSource.Enums.PowerSourceStatusEnum)
 
-            value: 'PowerSource.Enums.PowerSourceStatus' = 0
+            value: 'PowerSource.Enums.PowerSourceStatusEnum' = 0
 
         @dataclass
         class Order(ClusterAttributeDescriptor):
@@ -6274,9 +6402,9 @@ class PowerSource(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[PowerSource.Enums.WiredCurrentType])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[PowerSource.Enums.WiredCurrentTypeEnum])
 
-            value: 'typing.Optional[PowerSource.Enums.WiredCurrentType]' = None
+            value: 'typing.Optional[PowerSource.Enums.WiredCurrentTypeEnum]' = None
 
         @dataclass
         class WiredAssessedCurrent(ClusterAttributeDescriptor):
@@ -6354,9 +6482,9 @@ class PowerSource(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[PowerSource.Enums.WiredFault]])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[PowerSource.Enums.WiredFaultEnum]])
 
-            value: 'typing.Optional[typing.List[PowerSource.Enums.WiredFault]]' = None
+            value: 'typing.Optional[typing.List[PowerSource.Enums.WiredFaultEnum]]' = None
 
         @dataclass
         class BatVoltage(ClusterAttributeDescriptor):
@@ -6418,9 +6546,9 @@ class PowerSource(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[PowerSource.Enums.BatChargeLevel])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[PowerSource.Enums.BatChargeLevelEnum])
 
-            value: 'typing.Optional[PowerSource.Enums.BatChargeLevel]' = None
+            value: 'typing.Optional[PowerSource.Enums.BatChargeLevelEnum]' = None
 
         @dataclass
         class BatReplacementNeeded(ClusterAttributeDescriptor):
@@ -6450,9 +6578,9 @@ class PowerSource(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[PowerSource.Enums.BatReplaceability])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[PowerSource.Enums.BatReplaceabilityEnum])
 
-            value: 'typing.Optional[PowerSource.Enums.BatReplaceability]' = None
+            value: 'typing.Optional[PowerSource.Enums.BatReplaceabilityEnum]' = None
 
         @dataclass
         class BatPresent(ClusterAttributeDescriptor):
@@ -6482,9 +6610,9 @@ class PowerSource(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[PowerSource.Enums.BatFault]])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[PowerSource.Enums.BatFaultEnum]])
 
-            value: 'typing.Optional[typing.List[PowerSource.Enums.BatFault]]' = None
+            value: 'typing.Optional[typing.List[PowerSource.Enums.BatFaultEnum]]' = None
 
         @dataclass
         class BatReplacementDescription(ClusterAttributeDescriptor):
@@ -6514,9 +6642,9 @@ class PowerSource(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[PowerSource.Enums.BatCommonDesignationEnum])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Optional[PowerSource.Enums.BatCommonDesignationEnum]' = None
 
         @dataclass
         class BatANSIDesignation(ClusterAttributeDescriptor):
@@ -6562,9 +6690,9 @@ class PowerSource(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[PowerSource.Enums.BatApprovedChemistryEnum])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Optional[PowerSource.Enums.BatApprovedChemistryEnum]' = None
 
         @dataclass
         class BatCapacity(ClusterAttributeDescriptor):
@@ -6610,9 +6738,9 @@ class PowerSource(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[PowerSource.Enums.BatChargeState])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[PowerSource.Enums.BatChargeStateEnum])
 
-            value: 'typing.Optional[PowerSource.Enums.BatChargeState]' = None
+            value: 'typing.Optional[PowerSource.Enums.BatChargeStateEnum]' = None
 
         @dataclass
         class BatTimeToFullCharge(ClusterAttributeDescriptor):
@@ -6674,9 +6802,9 @@ class PowerSource(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[PowerSource.Enums.BatChargeFault]])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[PowerSource.Enums.BatChargeFaultEnum]])
 
-            value: 'typing.Optional[typing.List[PowerSource.Enums.BatChargeFault]]' = None
+            value: 'typing.Optional[typing.List[PowerSource.Enums.BatChargeFaultEnum]]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -6790,12 +6918,12 @@ class PowerSource(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[PowerSource.Enums.WiredFault]),
-                            ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[PowerSource.Enums.WiredFault]),
+                            ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[PowerSource.Enums.WiredFaultEnum]),
+                            ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[PowerSource.Enums.WiredFaultEnum]),
                     ])
 
-            current: 'typing.List[PowerSource.Enums.WiredFault]' = field(default_factory=lambda: [])
-            previous: 'typing.List[PowerSource.Enums.WiredFault]' = field(default_factory=lambda: [])
+            current: 'typing.List[PowerSource.Enums.WiredFaultEnum]' = field(default_factory=lambda: [])
+            previous: 'typing.List[PowerSource.Enums.WiredFaultEnum]' = field(default_factory=lambda: [])
 
         @dataclass
         class BatFaultChange(ClusterEvent):
@@ -6811,12 +6939,12 @@ class PowerSource(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[PowerSource.Enums.BatFault]),
-                            ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[PowerSource.Enums.BatFault]),
+                            ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[PowerSource.Enums.BatFaultEnum]),
+                            ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[PowerSource.Enums.BatFaultEnum]),
                     ])
 
-            current: 'typing.List[PowerSource.Enums.BatFault]' = field(default_factory=lambda: [])
-            previous: 'typing.List[PowerSource.Enums.BatFault]' = field(default_factory=lambda: [])
+            current: 'typing.List[PowerSource.Enums.BatFaultEnum]' = field(default_factory=lambda: [])
+            previous: 'typing.List[PowerSource.Enums.BatFaultEnum]' = field(default_factory=lambda: [])
 
         @dataclass
         class BatChargeFaultChange(ClusterEvent):
@@ -6832,12 +6960,12 @@ class PowerSource(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[PowerSource.Enums.BatChargeFault]),
-                            ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[PowerSource.Enums.BatChargeFault]),
+                            ClusterObjectFieldDescriptor(Label="current", Tag=0, Type=typing.List[PowerSource.Enums.BatChargeFaultEnum]),
+                            ClusterObjectFieldDescriptor(Label="previous", Tag=1, Type=typing.List[PowerSource.Enums.BatChargeFaultEnum]),
                     ])
 
-            current: 'typing.List[PowerSource.Enums.BatChargeFault]' = field(default_factory=lambda: [])
-            previous: 'typing.List[PowerSource.Enums.BatChargeFault]' = field(default_factory=lambda: [])
+            current: 'typing.List[PowerSource.Enums.BatChargeFaultEnum]' = field(default_factory=lambda: [])
+            previous: 'typing.List[PowerSource.Enums.BatChargeFaultEnum]' = field(default_factory=lambda: [])
 
 
 @dataclass

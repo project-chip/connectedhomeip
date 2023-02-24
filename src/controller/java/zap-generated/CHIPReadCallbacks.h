@@ -3353,7 +3353,7 @@ public:
     }
 
     static void CallbackFn(void * context,
-                           const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault> & list);
+                           const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFaultEnum> & list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
@@ -3474,7 +3474,7 @@ public:
     }
 
     static void CallbackFn(void * context,
-                           const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFault> & list);
+                           const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFaultEnum> & list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
@@ -3565,7 +3565,7 @@ public:
     }
 
     static void CallbackFn(void * context,
-                           const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault> & list);
+                           const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFaultEnum> & list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(

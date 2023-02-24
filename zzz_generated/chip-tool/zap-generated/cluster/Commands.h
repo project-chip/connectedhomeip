@@ -9886,7 +9886,7 @@ void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * 
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                         //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),               //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                 //
-        make_unique<WriteAttribute<chip::app::Clusters::PowerSource::PowerSourceStatus>>(
+        make_unique<WriteAttribute<chip::app::Clusters::PowerSource::PowerSourceStatusEnum>>(
             Id, "status", 0, UINT8_MAX, Attributes::Status::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "order", 0, UINT8_MAX, Attributes::Order::Id, WriteCommandType::kForceWrite,
                                              credsIssuerConfig), //
@@ -9898,7 +9898,7 @@ void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * 
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "wired-assessed-input-frequency", 0, UINT16_MAX,
                                                                               Attributes::WiredAssessedInputFrequency::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::PowerSource::WiredCurrentType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::PowerSource::WiredCurrentTypeEnum>>(
             Id, "wired-current-type", 0, UINT8_MAX, Attributes::WiredCurrentType::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "wired-assessed-current", 0, UINT32_MAX,
@@ -9910,7 +9910,7 @@ void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * 
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "wired-present", 0, 1, Attributes::WiredPresent::Id, WriteCommandType::kForceWrite,
                                           credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::PowerSource::WiredFault>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::PowerSource::WiredFaultEnum>>>(
             Id, "active-wired-faults", Attributes::ActiveWiredFaults::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(
             Id, "bat-voltage", 0, UINT32_MAX, Attributes::BatVoltage::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
@@ -9920,33 +9920,35 @@ void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * 
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "bat-time-remaining", 0, UINT32_MAX,
                                                                               Attributes::BatTimeRemaining::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::PowerSource::BatChargeLevel>>(
+        make_unique<WriteAttribute<chip::app::Clusters::PowerSource::BatChargeLevelEnum>>(
             Id, "bat-charge-level", 0, UINT8_MAX, Attributes::BatChargeLevel::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "bat-replacement-needed", 0, 1, Attributes::BatReplacementNeeded::Id,
                                           WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::PowerSource::BatReplaceability>>(
+        make_unique<WriteAttribute<chip::app::Clusters::PowerSource::BatReplaceabilityEnum>>(
             Id, "bat-replaceability", 0, UINT8_MAX, Attributes::BatReplaceability::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "bat-present", 0, 1, Attributes::BatPresent::Id, WriteCommandType::kForceWrite,
                                           credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::PowerSource::BatFault>>>(
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::PowerSource::BatFaultEnum>>>(
             Id, "active-bat-faults", Attributes::ActiveBatFaults::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "bat-replacement-description", Attributes::BatReplacementDescription::Id,
                                                     WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint32_t>>(Id, "bat-common-designation", 0, UINT32_MAX, Attributes::BatCommonDesignation::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::PowerSource::BatCommonDesignationEnum>>(
+            Id, "bat-common-designation", 0, UINT16_MAX, Attributes::BatCommonDesignation::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "bat-ansidesignation", Attributes::BatANSIDesignation::Id,
                                                     WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::CharSpan>>(Id, "bat-iecdesignation", Attributes::BatIECDesignation::Id,
                                                     WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<uint32_t>>(Id, "bat-approved-chemistry", 0, UINT32_MAX, Attributes::BatApprovedChemistry::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::PowerSource::BatApprovedChemistryEnum>>(
+            Id, "bat-approved-chemistry", 0, UINT16_MAX, Attributes::BatApprovedChemistry::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttribute<uint32_t>>(Id, "bat-capacity", 0, UINT32_MAX, Attributes::BatCapacity::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "bat-quantity", 0, UINT8_MAX, Attributes::BatQuantity::Id,
                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::PowerSource::BatChargeState>>(
+        make_unique<WriteAttribute<chip::app::Clusters::PowerSource::BatChargeStateEnum>>(
             Id, "bat-charge-state", 0, UINT8_MAX, Attributes::BatChargeState::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "bat-time-to-full-charge", 0, UINT32_MAX,
@@ -9957,7 +9959,8 @@ void registerClusterPowerSource(Commands & commands, CredentialIssuerCommands * 
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "bat-charging-current", 0, UINT32_MAX,
                                                                               Attributes::BatChargingCurrent::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::PowerSource::BatChargeFault>>>(
+        make_unique<
+            WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::PowerSource::BatChargeFaultEnum>>>(
             Id, "active-bat-charge-faults", Attributes::ActiveBatChargeFaults::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
