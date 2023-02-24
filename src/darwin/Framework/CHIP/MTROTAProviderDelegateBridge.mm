@@ -680,13 +680,17 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                         response.delayedActionTime.SetValue(delegateResponse.delayedActionTime.ValueOr(kDelayedActionTimeSeconds));
                         handler->AddResponse(cachedCommandPath, response);
                         handle.Release();
+                        // We do not reset state when we get the busy error because that means we are locked in a BDX transfer
+                        // session with another requestor when we get this query image request. We do not want to interrupt the
+                        // ongoing transfer instead just respond to the second requestor with a busy status and a delayedActionTime
+                        // in which the requestor can retry.
                         return;
                     }
                     LogErrorOnFailure(err);
                     handler->AddStatus(cachedCommandPath, StatusIB(err).mStatus);
                     handle.Release();
-                    // We need to reset state here to clean up any initialization we might have done including starting the timer
-                    // while preparing for transfer if any failure occurs afterwards.
+                    // We need to reset state here to clean up any initialization we might have done including starting the BDX
+                    // timeout timer while preparing for transfer if any failure occurs afterwards.
                     gOtaSender.ResetState();
                     return;
                 }
