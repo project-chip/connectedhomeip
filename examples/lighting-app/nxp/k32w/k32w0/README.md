@@ -488,7 +488,7 @@ Here is the interpretation of the fields:
 
 ```
 00400000 -> start address 0x00004000
-CD04     -> 0x4C9 pages of 512-bytes (= 612,5kB)
+C904     -> 0x4C9 pages of 512-bytes (= 612.5kB)
 01       -> bootable flag
 01       -> image type for the application
 ```
