@@ -537,6 +537,13 @@ config("stack_protector_default") {
   cflags = [ "-fno-stack-protector" ]
 }
 
+config("prefix_mappings_default") {
+  cflags = []
+  foreach(prefix_mapping, prefix_mappings) {
+    cflags += [ "-fdebug-prefix-map=${prefix_mapping}" ]
+  }
+}
+
 config("pic_default") {
   if (enable_pic) {
     cflags = [ "-fPIC" ]
