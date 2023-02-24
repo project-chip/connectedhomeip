@@ -3066,7 +3066,10 @@
               - CalendarType
               - HourFormat
           UnitLocalization:
-              - TempUnit
+              # TempUnitEnum was originally just named TempUnit, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              - TempUnitEnum
           PowerSource:
               # All the PowerSource enums originally did not have the "Enum"
               # suffix, but we generate the same API whether that suffix is
@@ -3338,7 +3341,10 @@
                   - 12hr
                   - 24hr
           UnitLocalization:
-              TempUnit:
+              # TempUnitEnum was originally just named TempUnit, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              TempUnitEnum:
                   - Fahrenheit
                   - Celsius
                   - Kelvin

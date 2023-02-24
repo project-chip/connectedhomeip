@@ -223,9 +223,9 @@ typedef void (*TimeFormatLocalizationClusterHourFormatAttributeCallback)(void *,
                                                                          chip::app::Clusters::TimeFormatLocalization::HourFormat);
 typedef void (*NullableTimeFormatLocalizationClusterHourFormatAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::HourFormat> &);
-typedef void (*UnitLocalizationClusterTempUnitAttributeCallback)(void *, chip::app::Clusters::UnitLocalization::TempUnit);
-typedef void (*NullableUnitLocalizationClusterTempUnitAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnit> &);
+typedef void (*UnitLocalizationClusterTempUnitEnumAttributeCallback)(void *, chip::app::Clusters::UnitLocalization::TempUnitEnum);
+typedef void (*NullableUnitLocalizationClusterTempUnitEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnitEnum> &);
 typedef void (*PowerSourceClusterBatApprovedChemistryEnumAttributeCallback)(
     void *, chip::app::Clusters::PowerSource::BatApprovedChemistryEnum);
 typedef void (*NullablePowerSourceClusterBatApprovedChemistryEnumAttributeCallback)(
@@ -15568,68 +15568,68 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge
-    : public MTRCallbackBridge<UnitLocalizationClusterTempUnitAttributeCallback>
+class MTRUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitLocalizationClusterTempUnitEnumAttributeCallback>
 {
 public:
-    MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<UnitLocalizationClusterTempUnitAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitLocalizationClusterTempUnitEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              MTRActionBlock action) :
-        MTRCallbackBridge<UnitLocalizationClusterTempUnitAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  MTRActionBlock action) :
+        MTRCallbackBridge<UnitLocalizationClusterTempUnitEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::UnitLocalization::TempUnit value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::UnitLocalization::TempUnitEnum value);
 };
 
-class MTRUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge
-    : public MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge
+class MTRUnitLocalizationClusterTempUnitEnumAttributeCallbackSubscriptionBridge
+    : public MTRUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge
 {
 public:
-    MTRUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          MTRActionBlock action,
-                                                                          MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge(queue, handler, action),
+    MTRUnitLocalizationClusterTempUnitEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnDone;
+    using MTRUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableUnitLocalizationClusterTempUnitAttributeCallback>
+class MTRNullableUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableUnitLocalizationClusterTempUnitEnumAttributeCallback>
 {
 public:
-    MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NullableUnitLocalizationClusterTempUnitAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTRNullableUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableUnitLocalizationClusterTempUnitEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      MTRActionBlock action) :
-        MTRCallbackBridge<NullableUnitLocalizationClusterTempUnitAttributeCallback>(queue, handler, action, OnSuccessFn){};
+    MTRNullableUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          MTRActionBlock action) :
+        MTRCallbackBridge<NullableUnitLocalizationClusterTempUnitEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnit> & value);
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnitEnum> & value);
 };
 
-class MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge
-    : public MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge
+class MTRNullableUnitLocalizationClusterTempUnitEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackSubscriptionBridge(
+    MTRNullableUnitLocalizationClusterTempUnitEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge(queue, handler, action),
+        MTRNullableUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableUnitLocalizationClusterTempUnitAttributeCallbackBridge::OnDone;
+    using MTRNullableUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
