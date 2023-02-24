@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@
 
 #pragma once
 
-// ---- Contact Sensor Example App Config ----
+// ---- Pump Example App Config ----
 
 // Buttons config
 #define BUTTON_PORT DEVICE_DT_GET(DT_NODELABEL(gpioc))
@@ -31,5 +31,7 @@
 // LEDs config
 #define LEDS_PORT DEVICE_DT_GET(DT_NODELABEL(gpiob))
 #define SYSTEM_STATE_LED 7
-#define CONTACT_STATE_LED 6
+#define PUMP_STATE_LED 6
 #define LIGHTING_PWM_SPEC_IDENTIFY_GREEN PWM_DT_SPEC_GET(DT_ALIAS(pwm_led3))
+// Time it takes in ms for the simulated pump to move from one state to another.
+#define PUMP_START_PERIOS_MS 2000
