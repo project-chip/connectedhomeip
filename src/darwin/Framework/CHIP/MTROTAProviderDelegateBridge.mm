@@ -461,7 +461,7 @@ private:
         CHIP_ERROR err = mSystemLayer->StartTimer(kBdxInitReceivedTimeout, HandleBdxInitReceivedTimeoutExpired, this);
         LogErrorOnFailure(err);
 
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+        ReturnErrorOnFailure(err);
 
         mFabricIndex.SetValue(fabricIndex);
         mNodeId.SetValue(nodeId);
