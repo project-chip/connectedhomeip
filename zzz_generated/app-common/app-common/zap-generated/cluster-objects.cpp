@@ -21093,6 +21093,9 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ClusterErrorBoolean::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, clusterErrorBoolean));
         break;
+    case Attributes::NullablesAndOptionalsStruct::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, nullablesAndOptionalsStruct));
+        break;
     case Attributes::Unsupported::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, unsupported));
         break;

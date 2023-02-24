@@ -3531,6 +3531,7 @@ server cluster UnitTesting = 4294048773 {
   attribute boolean timedWriteBoolean = 48;
   attribute boolean generalErrorBoolean = 49;
   attribute boolean clusterErrorBoolean = 50;
+  attribute NullablesAndOptionalsStruct nullablesAndOptionalsStruct = 51;
   attribute nullable boolean nullableBoolean = 16384;
   attribute nullable Bitmap8MaskMap nullableBitmap8 = 16385;
   attribute nullable Bitmap16MaskMap nullableBitmap16 = 16386;
@@ -4297,6 +4298,7 @@ endpoint 1 {
     ram      attribute timedWriteBoolean;
     callback attribute generalErrorBoolean;
     callback attribute clusterErrorBoolean;
+    callback attribute nullablesAndOptionalsStruct;
     ram      attribute nullableBoolean;
     ram      attribute nullableBitmap8;
     ram      attribute nullableBitmap16;

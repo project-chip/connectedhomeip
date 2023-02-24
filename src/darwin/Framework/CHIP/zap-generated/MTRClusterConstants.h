@@ -7861,6 +7861,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterUnitTestingAttributeClusterErrorBooleanID API_AVAILABLE(
         ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000032,
+    MTRAttributeIDTypeClusterUnitTestingAttributeNullablesAndOptionalsStructID MTR_NEWLY_AVAILABLE = 0x00000033,
     MTRAttributeIDTypeClusterUnitTestingAttributeUnsupportedID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x000000FF,
     MTRAttributeIDTypeClusterUnitTestingAttributeNullableBooleanID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))

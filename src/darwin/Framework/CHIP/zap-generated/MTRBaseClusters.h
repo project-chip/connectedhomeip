@@ -18005,6 +18005,28 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
                                                        (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+- (void)readAttributeNullablesAndOptionalsStructWithCompletion:
+    (void (^)(MTRUnitTestingClusterNullablesAndOptionalsStruct * _Nullable value, NSError * _Nullable error))completion
+    MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeNullablesAndOptionalsStructWithValue:(MTRUnitTestingClusterNullablesAndOptionalsStruct * _Nonnull)value
+                                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeNullablesAndOptionalsStructWithValue:(MTRUnitTestingClusterNullablesAndOptionalsStruct * _Nonnull)value
+                                                    params:(MTRWriteParams * _Nullable)params
+                                                completion:(MTRStatusCompletion)completion MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeNullablesAndOptionalsStructWithParams:(MTRSubscribeParams *)params
+                                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                                  reportHandler:
+                                                      (void (^)(MTRUnitTestingClusterNullablesAndOptionalsStruct * _Nullable value,
+                                                          NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
++ (void)
+    readAttributeNullablesAndOptionalsStructWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                                         endpoint:(NSNumber *)endpoint
+                                                            queue:(dispatch_queue_t)queue
+                                                       completion:
+                                                           (void (^)(
+                                                               MTRUnitTestingClusterNullablesAndOptionalsStruct * _Nullable value,
+                                                               NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
 - (void)readAttributeUnsupportedWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeUnsupportedWithValue:(NSNumber * _Nonnull)value

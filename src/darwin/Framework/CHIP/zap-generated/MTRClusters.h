@@ -6742,6 +6742,14 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
                                             params:(MTRWriteParams * _Nullable)params
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+- (NSDictionary<NSString *, id> *)readAttributeNullablesAndOptionalsStructWithParams:(MTRReadParams * _Nullable)params
+    MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeNullablesAndOptionalsStructWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_NEWLY_AVAILABLE;
+- (void)writeAttributeNullablesAndOptionalsStructWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                                    params:(MTRWriteParams * _Nullable)params MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeUnsupportedWithParams:(MTRReadParams * _Nullable)params
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeUnsupportedWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary

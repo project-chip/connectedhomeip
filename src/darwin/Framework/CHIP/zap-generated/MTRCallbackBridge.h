@@ -1117,6 +1117,8 @@ typedef void (*UnitTestingListLongOctetStringListAttributeCallback)(
 typedef void (*UnitTestingListFabricScopedListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::DecodableType> & data);
+typedef void (*UnitTestingNullablesAndOptionalsStructStructAttributeCallback)(
+    void *, const chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType &);
 typedef void (*UnitTestingNullableBitmap8AttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> &);
 typedef void (*UnitTestingNullableBitmap16AttributeCallback)(
@@ -10674,6 +10676,40 @@ public:
     void OnSubscriptionEstablished();
     using MTRUnitTestingListFabricScopedListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRUnitTestingListFabricScopedListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRUnitTestingNullablesAndOptionalsStructStructAttributeCallbackBridge
+    : public MTRCallbackBridge<UnitTestingNullablesAndOptionalsStructStructAttributeCallback>
+{
+public:
+    MTRUnitTestingNullablesAndOptionalsStructStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<UnitTestingNullablesAndOptionalsStructStructAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRUnitTestingNullablesAndOptionalsStructStructAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           MTRActionBlock action) :
+        MTRCallbackBridge<UnitTestingNullablesAndOptionalsStructStructAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType & value);
+};
+
+class MTRUnitTestingNullablesAndOptionalsStructStructAttributeCallbackSubscriptionBridge
+    : public MTRUnitTestingNullablesAndOptionalsStructStructAttributeCallbackBridge
+{
+public:
+    MTRUnitTestingNullablesAndOptionalsStructStructAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRUnitTestingNullablesAndOptionalsStructStructAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRUnitTestingNullablesAndOptionalsStructStructAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRUnitTestingNullablesAndOptionalsStructStructAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

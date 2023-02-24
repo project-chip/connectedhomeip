@@ -28319,6 +28319,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterErrorBoolean
+namespace NullablesAndOptionalsStruct {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::Type;
+    using DecodableType    = chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullablesAndOptionalsStruct::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NullablesAndOptionalsStruct
 namespace Unsupported {
 struct TypeInfo
 {
@@ -28842,7 +28854,8 @@ struct TypeInfo
         Attributes::TimedWriteBoolean::TypeInfo::DecodableType timedWriteBoolean     = static_cast<bool>(0);
         Attributes::GeneralErrorBoolean::TypeInfo::DecodableType generalErrorBoolean = static_cast<bool>(0);
         Attributes::ClusterErrorBoolean::TypeInfo::DecodableType clusterErrorBoolean = static_cast<bool>(0);
-        Attributes::Unsupported::TypeInfo::DecodableType unsupported                 = static_cast<bool>(0);
+        Attributes::NullablesAndOptionalsStruct::TypeInfo::DecodableType nullablesAndOptionalsStruct;
+        Attributes::Unsupported::TypeInfo::DecodableType unsupported = static_cast<bool>(0);
         Attributes::NullableBoolean::TypeInfo::DecodableType nullableBoolean;
         Attributes::NullableBitmap8::TypeInfo::DecodableType nullableBitmap8;
         Attributes::NullableBitmap16::TypeInfo::DecodableType nullableBitmap16;
