@@ -6535,152 +6535,9 @@
 - release: "First after major API revamp"
   versions: "future"
   introduced:
-      global attributes:
-          - EventList
       attributes:
-          Scenes:
-              - EventList
-          OnOff:
-              - EventList
-          OnOffSwitchConfiguration:
-              - EventList
-          LevelControl:
-              - EventList
-          BinaryInputBasic:
-              - EventList
-          PulseWidthModulation:
-              - EventList
-          Descriptor:
-              - EventList
-          Binding:
-              - EventList
-          Identify:
-              - EventList
-          AccessControl:
-              - EventList
-          Actions:
-              - EventList
-          BasicInformation:
-              - EventList
-          OTASoftwareUpdateProvider:
-              - EventList
-          OTASoftwareUpdateRequestor:
-              - EventList
-          LocalizationConfiguration:
-              - EventList
-          TimeFormatLocalization:
-              - EventList
-          UnitLocalization:
-              - EventList
-          PowerSourceConfiguration:
-              - EventList
-          PowerSource:
-              - EventList
-          GeneralCommissioning:
-              - EventList
-          NetworkCommissioning:
-              - EventList
-          DiagnosticLogs:
-              - EventList
-          GeneralDiagnostics:
-              - EventList
-          SoftwareDiagnostics:
-              - EventList
-          ThreadNetworkDiagnostics:
-              - EventList
-          WiFiNetworkDiagnostics:
-              - EventList
-          EthernetNetworkDiagnostics:
-              - EventList
           TimeSynchronization:
-              - EventList
               - DSTOffset
-          BridgedDeviceBasicInformation:
-              - EventList
-          Switch:
-              - EventList
-          AdministratorCommissioning:
-              - EventList
-          OperationalCredentials:
-              - EventList
-          GroupKeyManagement:
-              - EventList
-          FixedLabel:
-              - EventList
-          UserLabel:
-              - EventList
-          ProxyConfiguration:
-              - EventList
-          ProxyDiscovery:
-              - EventList
-          ProxyValid:
-              - EventList
-          BooleanState:
-              - EventList
-          ModeSelect:
-              - EventList
-          DoorLock:
-              - EventList
-          WindowCovering:
-              - EventList
-          BarrierControl:
-              - EventList
-          PumpConfigurationAndControl:
-              - EventList
-          FanControl:
-              - EventList
-          ThermostatUserInterfaceConfiguration:
-              - EventList
-          ColorControl:
-              - EventList
-          BallastConfiguration:
-              - EventList
-          IlluminanceMeasurement:
-              - EventList
-          TemperatureMeasurement:
-              - EventList
-          PressureMeasurement:
-              - EventList
-          Thermostat:
-              - EventList
-          FlowMeasurement:
-              - EventList
-          RelativeHumidityMeasurement:
-              - EventList
-          OccupancySensing:
-              - EventList
-          WakeOnLAN:
-              - EventList
-          Channel:
-              - EventList
-          Groups:
-              - EventList
-          TargetNavigator:
-              - EventList
-          MediaPlayback:
-              - EventList
-          MediaInput:
-              - EventList
-          LowPower:
-              - EventList
-          KeypadInput:
-              - EventList
-          ContentLauncher:
-              - EventList
-          AudioOutput:
-              - EventList
-          ApplicationLauncher:
-              - EventList
-          ApplicationBasic:
-              - EventList
-          AccountLogin:
-              - EventList
-          ElectricalMeasurement:
-              - EventList
-          UnitTesting:
-              - EventList
-          FaultInjection:
-              - EventList
       command fields:
           DiagnosticLogs:
               RetrieveLogsRequest:
@@ -6946,6 +6803,153 @@
               PumpFeature:
                   - Local
   removed:
+      global attributes:
+          # EventList is provisional for now.
+          - EventList
+      attributes:
+          # EventList is provisional for now.
+          Scenes:
+              - EventList
+          OnOff:
+              - EventList
+          OnOffSwitchConfiguration:
+              - EventList
+          LevelControl:
+              - EventList
+          BinaryInputBasic:
+              - EventList
+          PulseWidthModulation:
+              - EventList
+          Descriptor:
+              - EventList
+          Binding:
+              - EventList
+          Identify:
+              - EventList
+          AccessControl:
+              - EventList
+          Actions:
+              - EventList
+          BasicInformation:
+              - EventList
+          OTASoftwareUpdateProvider:
+              - EventList
+          OTASoftwareUpdateRequestor:
+              - EventList
+          LocalizationConfiguration:
+              - EventList
+          TimeFormatLocalization:
+              - EventList
+          UnitLocalization:
+              - EventList
+          PowerSourceConfiguration:
+              - EventList
+          PowerSource:
+              - EventList
+          GeneralCommissioning:
+              - EventList
+          NetworkCommissioning:
+              - EventList
+          DiagnosticLogs:
+              - EventList
+          GeneralDiagnostics:
+              - EventList
+          SoftwareDiagnostics:
+              - EventList
+          ThreadNetworkDiagnostics:
+              - EventList
+          WiFiNetworkDiagnostics:
+              - EventList
+          EthernetNetworkDiagnostics:
+              - EventList
+          TimeSynchronization:
+              - EventList
+          BridgedDeviceBasicInformation:
+              - EventList
+          Switch:
+              - EventList
+          AdministratorCommissioning:
+              - EventList
+          OperationalCredentials:
+              - EventList
+          GroupKeyManagement:
+              - EventList
+          FixedLabel:
+              - EventList
+          UserLabel:
+              - EventList
+          ProxyConfiguration:
+              - EventList
+          ProxyDiscovery:
+              - EventList
+          ProxyValid:
+              - EventList
+          BooleanState:
+              - EventList
+          ModeSelect:
+              - EventList
+          DoorLock:
+              - EventList
+          WindowCovering:
+              - EventList
+          BarrierControl:
+              - EventList
+          PumpConfigurationAndControl:
+              - EventList
+          FanControl:
+              - EventList
+          ThermostatUserInterfaceConfiguration:
+              - EventList
+          ColorControl:
+              - EventList
+          BallastConfiguration:
+              - EventList
+          IlluminanceMeasurement:
+              - EventList
+          TemperatureMeasurement:
+              - EventList
+          PressureMeasurement:
+              - EventList
+          Thermostat:
+              - EventList
+          FlowMeasurement:
+              - EventList
+          RelativeHumidityMeasurement:
+              - EventList
+          OccupancySensing:
+              - EventList
+          WakeOnLAN:
+              - EventList
+          Channel:
+              - EventList
+          Groups:
+              - EventList
+          TargetNavigator:
+              - EventList
+          MediaPlayback:
+              - EventList
+          MediaInput:
+              - EventList
+          LowPower:
+              - EventList
+          KeypadInput:
+              - EventList
+          ContentLauncher:
+              - EventList
+          AudioOutput:
+              - EventList
+          ApplicationLauncher:
+              - EventList
+          ApplicationBasic:
+              - EventList
+          AccountLogin:
+              - EventList
+          ElectricalMeasurement:
+              - EventList
+          UnitTesting:
+              - EventList
+          FaultInjection:
+              - EventList
       enum values:
           DoorLock:
               DlLockDataType:
