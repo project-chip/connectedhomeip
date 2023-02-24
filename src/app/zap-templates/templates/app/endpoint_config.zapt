@@ -52,7 +52,7 @@
 // This is an array of EmberAfCluster structures.
 #define GENERATED_CLUSTER_COUNT {{endpoint_cluster_count}}
 // clang-format off
-#define GENERATED_CLUSTERS {{chip_endpoint_cluster_list}}
+#define GENERATED_CLUSTERS {{chip_endpoint_cluster_list order="clusterId,attributes,attributeCount,clusterSize,mask,functions,acceptedCommandList,generatedCommandList,eventList,eventCount"}}
 // clang-format on
 
 #define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT {{chip_endpoint_data_version_count}}
