@@ -76,6 +76,15 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  */
 + (MTRSubscribeParams * _Nullable)decodeXPCSubscribeParams:(NSDictionary<NSString *, id> * _Nullable)params;
 
+/**
+ * Returns an NSXPCInterface configured for MTRDeviceControllerServerProtocol.
+ */
++ (NSXPCInterface *)xpcInterfaceForServerProtocol MTR_NEWLY_AVAILABLE;
+
+/**
+ * Returns an NSXPCInterface configured for MTRDeviceControllerClientProtocol.
+ */
++ (NSXPCInterface *)xpcInterfaceForClientProtocol MTR_NEWLY_AVAILABLE;
 @end
 
 /**
