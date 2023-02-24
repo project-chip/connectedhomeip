@@ -461,9 +461,7 @@ private:
         CHIP_ERROR err = mSystemLayer->StartTimer(kBdxInitReceivedTimeout, HandleBdxInitReceivedTimeoutExpired, this);
         LogErrorOnFailure(err);
 
-        // The caller of this method maps CHIP_ERROR to specific BDX Status Codes (see GetBdxStatusCodeFromChipError)
-        // and those are used by the BDX session to prepare the status report.
-        VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
         mFabricIndex.SetValue(fabricIndex);
         mNodeId.SetValue(nodeId);
@@ -615,7 +613,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
     auto * commandParams = [[MTROTASoftwareUpdateProviderClusterQueryImageParams alloc] init];
     CHIP_ERROR err = ConvertToQueryImageParams(commandData, commandParams);
     if (err != CHIP_NO_ERROR) {
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        commandObj->AddStatus(commandPath, StatusIB(err).mStatus);
         return;
     }
 
@@ -639,12 +637,13 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                 auto isBDXProtocolSupported = [commandParams.protocolsSupported
                     containsObject:@(MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous)];
 
-                // The logic we are following here is if none of the protocols supported by the requestor are supported by us, we can't transfer
-                // the image even if we had an image available and we would return a Protocol Not Supported status. Assumption here
-                // is the requestor would send us a list of all the protocols it supports. If one/more of the protocols supported by the requestor are
-                // supported by us, we check if an image is not available due to various reasons - image not available, delegate reporting
-                // busy, we will respond with the status in the delegate response. If update is available, we try to prepare for
-                // transfer and build the uri in the response with a status of Image Available
+                // The logic we are following here is if none of the protocols supported by the requestor are supported by us, we
+                // can't transfer the image even if we had an image available and we would return a Protocol Not Supported status.
+                // Assumption here is the requestor would send us a list of all the protocols it supports. If one/more of the
+                // protocols supported by the requestor are supported by us, we check if an image is not available due to various
+                // reasons - image not available, delegate reporting busy, we will respond with the status in the delegate response.
+                // If update is available, we try to prepare for transfer and build the uri in the response with a status of Image
+                // Available
 
                 // If the protocol requested is not supported, return status - Protocol Not Supported
                 if (!isBDXProtocolSupported) {
@@ -657,7 +656,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                 }
 
                 Commands::QueryImageResponse::Type delegateResponse;
-                ConvertFromQueryImageResponseParms(data, delegateResponse);
+                ConvertFromQueryImageResponseParams(data, delegateResponse);
 
                 // If update is not available, return the delegate response
                 if (!hasUpdate) {
@@ -674,7 +673,8 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
 
                     // Handle busy error separately as we have a query image response status that maps to busy
                     if (err == CHIP_ERROR_BUSY) {
-                        ChipLogError(Controller, "Responding with Busy due to being in the middle of handling another BDX transfer");
+                        ChipLogError(
+                            Controller, "Responding with Busy due to being in the middle of handling another BDX transfer");
                         Commands::QueryImageResponse::Type response;
                         response.status = static_cast<OTAQueryStatus>(MTROTASoftwareUpdateProviderOTAQueryStatusBusy);
                         response.delayedActionTime.SetValue(delegateResponse.delayedActionTime.ValueOr(kDelayedActionTimeSeconds));
@@ -685,6 +685,8 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                     LogErrorOnFailure(err);
                     handler->AddStatus(cachedCommandPath, StatusIB(err).mStatus);
                     handle.Release();
+                    // We need to reset state here to clean up any initialization we might have done including starting the timer
+                    // while preparing for transfer if any failure occurs afterwards.
                     gOtaSender.ResetState();
                     return;
                 }
@@ -878,7 +880,7 @@ CHIP_ERROR MTROTAProviderDelegateBridge::ConvertToQueryImageParams(
     return CHIP_NO_ERROR;
 }
 
-void MTROTAProviderDelegateBridge::ConvertFromQueryImageResponseParms(
+void MTROTAProviderDelegateBridge::ConvertFromQueryImageResponseParams(
     const MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * responseParams,
     Commands::QueryImageResponse::Type & response)
 {
