@@ -666,8 +666,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                     return;
                 }
 
-                // If there is an update available, return a response with status - Available and set the image Uri in the
-                // response
+                // If there is an update available, try to prepare for a transfer.
                 auto fabricIndex = handler->GetSubjectDescriptor().fabricIndex;
                 auto nodeId = handler->GetSubjectDescriptor().subject;
                 CHIP_ERROR err = gOtaSender.PrepareForTransfer(fabricIndex, nodeId);
