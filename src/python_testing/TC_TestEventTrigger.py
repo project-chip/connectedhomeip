@@ -40,75 +40,75 @@ class TestEventTrigger(MatterBaseTest):
         with asserts.assert_raises_regex(InteractionModelError,
                                          "ConstraintError", "All-zero TestEventTrigger key must return ConstraintError"):
             await dev_ctrl.SendCommand(
-                                self.dut_node_id,
-                                endpoint=0,
-                                payload=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=kAllZerosKey,
-                                                                                              eventTrigger=kValidEventTrigger)
-                            )
+                self.dut_node_id,
+                endpoint=0,
+                payload=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=kAllZerosKey,
+                                                                              eventTrigger=kValidEventTrigger)
+            )
 
     @async_test_body
     async def test_incorrect_key(self):
         dev_ctrl = self.default_controller
         test_event_triggers_enabled = await self.read_single_attribute(
-                                                    dev_ctrl,
-                                                    self.dut_node_id,
-                                                    endpoint=0,
-                                                    attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
-                                                )
+            dev_ctrl,
+            self.dut_node_id,
+            endpoint=0,
+            attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
+        )
         asserts.assert_true(test_event_triggers_enabled, "This test expects Test Event Triggers are Enabled")
 
         with asserts.assert_raises_regex(InteractionModelError,
                                          "ConstraintError", "Bad TestEventTrigger key must return ConstraintError"):
             await dev_ctrl.SendCommand(
-                    self.dut_node_id,
-                    endpoint=0,
-                    payload=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=kBadKey,
-                                                                                  eventTrigger=kValidEventTrigger)
-                )
+                self.dut_node_id,
+                endpoint=0,
+                payload=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=kBadKey,
+                                                                              eventTrigger=kValidEventTrigger)
+            )
 
     @async_test_body
     async def test_correct_key_valid_code(self):
         dev_ctrl = self.default_controller
         test_event_triggers_enabled = await self.read_single_attribute(
-                                                    dev_ctrl,
-                                                    self.dut_node_id,
-                                                    endpoint=0,
-                                                    attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
-                                                )
+            dev_ctrl,
+            self.dut_node_id,
+            endpoint=0,
+            attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
+        )
         asserts.assert_true(test_event_triggers_enabled, "This test expects Test Event Triggers are Enabled")
 
         # No response to command --> Success yields "None".
         asserts.assert_is_none(
             await dev_ctrl.SendCommand(
-                    self.dut_node_id,
-                    endpoint=0,
-                    payload=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=kExpectedKey,
-                                                                                  eventTrigger=kValidEventTrigger)
-                )
+                self.dut_node_id,
+                endpoint=0,
+                payload=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey=kExpectedKey,
+                                                                              eventTrigger=kValidEventTrigger)
             )
+        )
 
     @async_test_body
     async def test_correct_key_invalid_code(self):
         dev_ctrl = self.default_controller
         test_event_triggers_enabled = await self.read_single_attribute(
-                                                    dev_ctrl,
-                                                    self.dut_node_id,
-                                                    endpoint=0,
-                                                    attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
-                                                )
+            dev_ctrl,
+            self.dut_node_id,
+            endpoint=0,
+            attribute=Clusters.GeneralDiagnostics.Attributes.TestEventTriggersEnabled
+        )
         asserts.assert_true(test_event_triggers_enabled, "This test expects Test Event Triggers are Enabled")
 
         with asserts.assert_raises_regex(InteractionModelError,
                                          "InvalidCommand",
                                          "Unsupported EventTrigger must return InvalidCommand"):
             await dev_ctrl.SendCommand(
-                        self.dut_node_id,
-                        endpoint=0,
-                        payload=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
-                            enableKey=kExpectedKey,
-                            eventTrigger=kInvalidEventTrigger
-                        )
-                    )
+                self.dut_node_id,
+                endpoint=0,
+                payload=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
+                    enableKey=kExpectedKey,
+                    eventTrigger=kInvalidEventTrigger
+                )
+            )
 
 
 if __name__ == "__main__":
