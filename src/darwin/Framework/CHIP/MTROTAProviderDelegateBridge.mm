@@ -641,8 +641,8 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
 
                 // The logic we are following here is if none of the protocols supported by the requestor are supported by us, we can't transfer
                 // the image even if we had an image available and we would return a Protocol Not Supported status. Assumption here
-                // is the requestor would send all the supported protocols. If one/more of the protocols send by the requestor are
-                // supported, we check if an image is not available due to various reasons - image not available, delegate reporting
+                // is the requestor would send us a list of all the protocols it supports. If one/more of the protocols supported by the requestor are
+                // supported by us, we check if an image is not available due to various reasons - image not available, delegate reporting
                 // busy, we will respond with the status in the delegate response. If update is available, we try to prepare for
                 // transfer and build the uri in the response with a status of Image Available
 
