@@ -24,7 +24,12 @@
 
 #include "FreeRTOS.h"
 #include <credentials/DeviceAttestationCredsProvider.h>
+
+#ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
+#include <platform/cc13xx_26xx/cc13x2_26x2/CC13X2_26X2DeviceAttestationCreds.h>
+#else
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#endif
 
 #include <app/util/af-types.h>
 #include <app/util/af.h>
@@ -174,7 +179,12 @@ int AppTask::Init()
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
+#ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(CC13X2_26X2::GetCC13X2_26X2DacProvider());
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
+
 
     // Initialize LEDs
     PLAT_LOG("Initialize LEDs");

@@ -25,10 +25,15 @@
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+
+#ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
+#include <platform/cc13xx_26xx/cc13x2_26x2/CC13X2_26X2DeviceAttestationCreds.h>
+#else
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
@@ -150,7 +155,12 @@ CHIP_ERROR AppTask::Init()
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
+#ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(CC13X2_26X2::GetCC13X2_26X2DacProvider());
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     InitializeOTARequestor();
 #endif
