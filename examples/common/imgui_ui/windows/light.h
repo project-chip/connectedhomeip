@@ -22,6 +22,7 @@
 
 #include <app/data-model/Nullable.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/Optional.h>
 
 #include <app-common/zap-generated/cluster-enums.h>
 
@@ -45,11 +46,14 @@ private:
 
     // OnOff
     bool mLightIsOn = false;
+    chip::Optional<bool> mTargetLightIsOn; // allow UI control of this
 
     // Level
     uint8_t mMinLevel = 0;
     uint8_t mMaxLevel = 0;
     chip::app::DataModel::Nullable<uint8_t> mCurrentLevel;
+    chip::Optional<uint8_t> mTargetLevel; // allow UI control of this
+
     uint16_t mLevelRemainingTime10sOfSec = 0;
 
     // Color control

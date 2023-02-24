@@ -36,6 +36,34 @@
 #include <lib/core/TLVCircularBuffer.h>
 #include <lib/support/CHIPCounter.h>
 #include <messaging/ExchangeMgr.h>
+#include <system/SystemClock.h>
+
+/**
+ * Events are stored in the LogStorageResources provided to
+ * EventManagement::Init.
+ *
+ * A newly generated event will be placed in the lowest-priority (in practice
+ * DEBUG) buffer, the one associated with the first LogStorageResource.  If
+ * there is no space in that buffer, space will be created by evicting the
+ * oldest event currently in that buffer, until enough space is available.
+ *
+ * When an event is evicted from a buffer, there are two possibilities:
+ *
+ * 1) If the next LogStorageResource has a priority that is no higher than the
+ *    event's priority, the event will be moved to that LogStorageResource's
+ *    buffer.  This may in turn require events to be evicted from that buffer.
+ * 2) If the next LogStorageResource has a priority that is higher than the
+ *    event's priority, then the event is just dropped.
+ *
+ * This means that LogStorageResources at a given priority level are reserved
+ * for events of that priority level or higher priority.
+ *
+ * As a simple example, assume there are only two priority levels, DEBUG and
+ * CRITICAL, and two LogStorageResources with those priorities.  In that case,
+ * old CRITICAL events will not start getting dropped until both buffers are
+ * full, while old DEBUG events will start getting dropped once the DEBUG
+ * LogStorageResource buffer is full.
+ */
 
 #define CHIP_CONFIG_EVENT_GLOBAL_PRIORITY PriorityLevel::Debug
 
@@ -109,6 +137,8 @@ private:
                                                       ///< lesser priority are dropped when they get bumped out of this buffer
 
     size_t mRequiredSpaceForEvicted = 0; ///< Required space for previous buffer to evict event to new buffer
+
+    CHIP_ERROR OnInit(TLV::TLVWriter & writer, uint8_t *& bufStart, uint32_t & bufLen) override;
 };
 
 class CircularEventReader;
@@ -160,31 +190,28 @@ struct LogStorageResources
 
 /**
  * @brief
- *   A class for managing the in memory event logs.
- *   Assume we have two importance levels. DEBUG and CRITICAL, for simplicity,
- *   A new incoming event will always get logged in buffer with debug buffer no matter it is Debug or CRITICAL event.
- *   In order for it to get logged, we need to free up space.  So we look at the tail of the buffer.
- *   If the tail of the buffer contains a DEBUG event, that will be dropped.  If the tail of the buffer contains
- *   a CRITICAL event, that  event will be 'promoted' to the next level of buffers, where it will undergo the same procedure
- *   The outcome of this management policy is that the critical buffer is dedicated to the critical events, and the
- *   debug buffer is shared between critical and debug events.
+ *   A class for managing the in memory event logs.  See documentation at the
+ *   top of the file describing the eviction policy for events when there is no
+ *   more space for new events.
  */
 
 class EventManagement
 {
 public:
     /**
-     * @brief
-     * Initialize the EventManagement with an array of LogStorageResources.  The
-     * array must provide a resource for each valid priority level, the elements
-     * of the array must be in increasing numerical value of priority (and in
-     * increasing priority); the first element in the array corresponds to the
-     * resources allocated for least important events, and the last element
-     * corresponds to the most critical events.
+     * Initialize the EventManagement with an array of LogStorageResources and
+     * an equal-length array of CircularEventBuffers that correspond to those
+     * LogStorageResources. The array of LogStorageResources must provide a
+     * resource for each valid priority level, the elements of the array must be
+     * in increasing numerical value of priority (and in increasing priority);
+     * the first element in the array corresponds to the resources allocated for
+     * least important events, and the last element corresponds to the most
+     * critical events.
      *
      * @param[in] apExchangeManager         ExchangeManager to be used with this logging subsystem
      *
-     * @param[in] aNumBuffers  Number of elements in inLogStorageResources array
+     * @param[in] aNumBuffers  Number of elements in the apLogStorageResources
+     *                         and apCircularEventBuffer arrays.
      *
      * @param[in] apCircularEventBuffer  An array of CircularEventBuffer for each priority level.
      *
@@ -192,10 +219,15 @@ public:
      *
      * @param[in] apEventNumberCounter   A counter to use for event numbers.
      *
+     * @param[in] aMonotonicStartupTime  Time we should consider as "monotonic
+     *                                   time 0" for cases when we use
+     *                                   system-time event timestamps.
+     *
      */
     void Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
               const LogStorageResources * const apLogStorageResources,
-              MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter);
+              MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
+              System::Clock::Milliseconds64 aMonotonicStartupTime);
 
     static EventManagement & GetInstance();
 
@@ -219,12 +251,17 @@ public:
      *
      * @param[in] apEventNumberCounter   A counter to use for event numbers.
      *
+     * @param[in] aMonotonicStartupTime  Time we should consider as "monotonic
+     *                                   time 0" for cases when we use
+     *                                   system-time event timestamps.
+     *
      * @note This function must be called prior to the logging being used.
      */
-    static void CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
-                                      CircularEventBuffer * apCircularEventBuffer,
-                                      const LogStorageResources * const apLogStorageResources,
-                                      MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter);
+    static void
+    CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
+                          CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources,
+                          MonotonicallyIncreasingCounter<EventNumber> * apEventNumberCounter,
+                          System::Clock::Milliseconds64 aMonotonicStartupTime = System::SystemClock().GetMonotonicMilliseconds64());
 
     static void DestroyEventManagement();
 
@@ -360,11 +397,7 @@ private:
 
         int mFieldsToRead = 0;
         /* PriorityLevel and DeltaTime are there if that is not first event when putting events in report*/
-#if CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS & CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
-        Timestamp mCurrentTime = Timestamp::System(System::Clock::kZero);
-#else
-        Timestamp mCurrentTime = Timestamp::Epoch(System::Clock::kZero);
-#endif
+        Timestamp mCurrentTime   = Timestamp::System(System::Clock::kZero);
         PriorityLevel mPriority  = PriorityLevel::First;
         ClusterId mClusterId     = 0;
         EndpointId mEndpointId   = 0;
@@ -403,13 +436,20 @@ private:
     CHIP_ERROR CopyToNextBuffer(CircularEventBuffer * apEventBuffer);
 
     /**
-     * @brief eusure current buffer has enough space, if not, when current buffer is final destination of last tail's event
-     * priority, we need to drop event, otherwises, move the last event to the buffer with higher priority
+     * @brief Ensure that:
      *
-     * @param[in] aRequiredSpace  require space
+     * 1) There could be aRequiredSpace bytes available (if enough things were
+     *    evicted) in all buffers that can hold events with priority aPriority.
+     *
+     * 2) There are in fact aRequiredSpace bytes available in our
+     *    lowest-priority buffer.  This might involve evicting some events to
+     *    higher-priority buffers or dropping them.
+     *
+     * @param[in] aRequiredSpace  required space
+     * @param[in] aPriority       priority of the event we are making space for.
      *
      */
-    CHIP_ERROR EnsureSpaceInCircularBuffer(size_t aRequiredSpace);
+    CHIP_ERROR EnsureSpaceInCircularBuffer(size_t aRequiredSpace, PriorityLevel aPriority);
 
     /**
      * @brief Iterate the event elements inside event tlv and mark the fabric index as kUndefinedFabricIndex if
@@ -511,6 +551,8 @@ private:
 
     EventNumber mLastEventNumber = 0; ///< Last event Number vended
     Timestamp mLastEventTimestamp;    ///< The timestamp of the last event in this buffer
+
+    System::Clock::Milliseconds64 mMonotonicStartupTime;
 };
 } // namespace app
 } // namespace chip

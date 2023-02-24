@@ -35,7 +35,6 @@ extern const EmberAfClusterName zclClusterNames[];
 
 void emberAfInit();
 uint16_t emberAfFindClusterNameIndex(chip::ClusterId cluster);
-void emberAfStackDown(void);
 
 /**
  * Retrieves the difference between the two passed values.

@@ -235,7 +235,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
         };
 
         chip::app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
-                                                       &logStorageResources[0], &sGlobalEventIdCounter);
+                                                       &logStorageResources[0], &sGlobalEventIdCounter,
+                                                       std::chrono::duration_cast<System::Clock::Milliseconds64>(mInitTimestamp));
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 

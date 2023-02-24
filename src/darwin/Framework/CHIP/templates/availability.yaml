@@ -3066,16 +3066,22 @@
               - CalendarType
               - HourFormat
           UnitLocalization:
-              - TempUnit
+              # TempUnitEnum was originally just named TempUnit, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              - TempUnitEnum
           PowerSource:
-              - BatChargeFault
-              - BatChargeLevel
-              - BatChargeState
-              - BatFault
-              - BatReplaceability
-              - PowerSourceStatus
-              - WiredCurrentType
-              - WiredFault
+              # All the PowerSource enums originally did not have the "Enum"
+              # suffix, but we generate the same API whether that suffix is
+              # there or not, so the names can just change here.
+              - BatChargeFaultEnum
+              - BatChargeLevelEnum
+              - BatChargeStateEnum
+              - BatFaultEnum
+              - BatReplaceabilityEnum
+              - PowerSourceStatusEnum
+              - WiredCurrentTypeEnum
+              - WiredFaultEnum
           GeneralCommissioning:
               - CommissioningError
               - RegulatoryLocationType
@@ -3335,12 +3341,18 @@
                   - 12hr
                   - 24hr
           UnitLocalization:
-              TempUnit:
+              # TempUnitEnum was originally just named TempUnit, but
+              # we generate the same API for both of those names, so the name
+              # can just change here.
+              TempUnitEnum:
                   - Fahrenheit
                   - Celsius
                   - Kelvin
           PowerSource:
-              BatChargeFault:
+              # All the PowerSource enums originally did not have the "Enum"
+              # suffix, but we generate the same API whether that suffix is
+              # there or not, so the names can just change here.
+              BatChargeFaultEnum:
                   - Unspecfied
                   - AmbientTooHot
                   - AmbientTooCold
@@ -3352,33 +3364,33 @@
                   - ChargerOverVoltage
                   - ChargerUnderVoltage
                   - SafetyTimeout
-              BatChargeLevel:
+              BatChargeLevelEnum:
                   - Ok
                   - Warning
                   - Critical
-              BatChargeState:
+              BatChargeStateEnum:
                   - Unknown
                   - IsCharging
                   - IsAtFullCharge
                   - IsNotCharging
-              BatFault:
+              BatFaultEnum:
                   - Unspecfied
                   - OverTemp
                   - UnderTemp
-              BatReplaceability:
+              BatReplaceabilityEnum:
                   - Unspecified
                   - NotReplaceable
                   - UserReplaceable
                   - FactoryReplaceable
-              PowerSourceStatus:
+              PowerSourceStatusEnum:
                   - Unspecfied
                   - Active
                   - Standby
                   - Unavailable
-              WiredCurrentType:
+              WiredCurrentTypeEnum:
                   - AC
                   - DC
-              WiredFault:
+              WiredFaultEnum:
                   - Unspecfied
                   - OverVoltage
                   - UnderVoltage
@@ -5501,11 +5513,11 @@
                   - CASE
                   - Group
           PowerSource:
-              BatChargeLevel:
+              BatChargeLevelEnum:
                   - OK
-              BatChargeFault:
+              BatChargeFaultEnum:
                   - Unspecified
-              PowerSourceStatus:
+              PowerSourceStatusEnum:
                   - Unspecified
           ThreadNetworkDiagnostics:
               ConnectionStatusEnum:
@@ -6037,11 +6049,11 @@
               CommissioningError:
                   - Ok
           PowerSource:
-              BatChargeLevel:
+              BatChargeLevelEnum:
                   - Ok
-              BatChargeFault:
+              BatChargeFaultEnum:
                   - Unspecfied
-              PowerSourceStatus:
+              PowerSourceStatusEnum:
                   - Unspecfied
           WiFiNetworkDiagnostics:
               WiFiVersionType:
@@ -6417,11 +6429,11 @@
               CommissioningError:
                   OK: Ok
           PowerSource:
-              BatChargeLevel:
+              BatChargeLevelEnum:
                   OK: Ok
-              BatChargeFault:
+              BatChargeFaultEnum:
                   Unspecified: Unspecfied
-              PowerSourceStatus:
+              PowerSourceStatusEnum:
                   Unspecified: Unspecfied
           WiFiNetworkDiagnostics:
               WiFiVersionType:
@@ -6523,9 +6535,279 @@
 - release: "First after major API revamp"
   versions: "future"
   introduced:
+      attributes:
+          TimeSynchronization:
+              - DSTOffset
+      command fields:
+          DiagnosticLogs:
+              RetrieveLogsRequest:
+                  # Not really usable in earlier releases: wrong type.
+                  - transferFileDesignator
+      structs:
+          TimeSynchronization:
+              - DSTOffsetStruct
+              - TimeZoneStruct
+      struct fields:
+          TimeSynchronization:
+              DSTOffsetStruct:
+                  - offset
+                  - validStarting
+                  - validUntil
+              TimeZoneStruct:
+                  - offset
+                  - validAt
+                  - name
+      enums:
+          DiagnosticLogs:
+              - IntentEnum
+              - StatusEnum
+              - TransferProtocolEnum
+          OccupancySensing:
+              - OccupancySensorTypeEnum
+          WiFiNetworkDiagnostics:
+              - ConnectionStatusEnum
+              - WiFiVersionEnum
+          PumpConfigurationAndControl:
+              - ControlModeEnum
+              - OperationModeEnum
+          PowerSource:
+              - BatCommonDesignationEnum
+              - BatApprovedChemistryEnum
+      enum values:
+          DoorLock:
+              LockDataTypeEnum:
+                  - FingerVein
+                  - Face
+          DiagnosticLogs:
+              IntentEnum:
+                  - EndUserSupport
+                  - NetworkDiag
+                  - CrashLogs
+              StatusEnum:
+                  - Success
+                  - Exhausted
+                  - NoLogs
+                  - Busy
+                  - Denied
+              TransferProtocolEnum:
+                  - ResponsePayload
+                  - BDX
+          OccupancySensing:
+              OccupancySensorTypeEnum:
+                  - PIR
+                  - Ultrasonic
+                  - PIRAndUltrasonic
+                  - PhysicalContact
+          WiFiNetworkDiagnostics:
+              ConnectionStatusEnum:
+                  - Connected
+                  - NotConnected
+              WiFiVersionEnum:
+                  - A
+                  - B
+                  - G
+                  - N
+                  - Ac
+                  - Ax
+          PumpConfigurationAndControl:
+              ControlModeEnum:
+                  - ConstantSpeed
+                  - ConstantPressure
+                  - ProportionalPressure
+                  - ConstantFlow
+                  - ConstantTemperature
+                  - Automatic
+              OperationModeEnum:
+                  - Normal
+                  - Minimum
+                  - Maximum
+                  - Local
+          PowerSource:
+              WiredFaultEnum:
+                  - Unspecified
+              BatFaultEnum:
+                  - Unspecified
+              BatCommonDesignationEnum:
+                  - Unspecified
+                  - AAA
+                  - AA
+                  - C
+                  - D
+                  - 4v5
+                  - 6v0
+                  - 9v0
+                  - 12AA
+                  - AAAA
+                  - A
+                  - B
+                  - F
+                  - N
+                  - No6
+                  - SubC
+                  - A23
+                  - A27
+                  - BA5800
+                  - Duplex
+                  - 4SR44
+                  - "523"
+                  - "531"
+                  - 15v0
+                  - 22v5
+                  - 30v0
+                  - 45v0
+                  - 67v5
+                  - J
+                  - CR123A
+                  - CR2
+                  - 2CR5
+                  - CRP2
+                  - CRV3
+                  - SR41
+                  - SR43
+                  - SR44
+                  - SR45
+                  - SR48
+                  - SR54
+                  - SR55
+                  - SR57
+                  - SR58
+                  - SR59
+                  - SR60
+                  - SR63
+                  - SR64
+                  - SR65
+                  - SR66
+                  - SR67
+                  - SR68
+                  - SR69
+                  - SR516
+                  - SR731
+                  - SR712
+                  - LR932
+                  - A5
+                  - A10
+                  - A13
+                  - A312
+                  - A675
+                  - AC41E
+                  - "10180"
+                  - "10280"
+                  - "10440"
+                  - "14250"
+                  - "14430"
+                  - "14500"
+                  - "14650"
+                  - "15270"
+                  - "16340"
+                  - RCR123A
+                  - "17500"
+                  - "17670"
+                  - "18350"
+                  - "18500"
+                  - "18650"
+                  - "19670"
+                  - "25500"
+                  - "26650"
+                  - "32600"
+              BatApprovedChemistryEnum:
+                  - Unspecified
+                  - Alkaline
+                  - LithiumCarbonFluoride
+                  - LithiumChromiumOxide
+                  - LithiumCopperOxide
+                  - LithiumIronDisulfide
+                  - LithiumManganeseDioxide
+                  - LithiumThionylChloride
+                  - Magnesium
+                  - MercuryOxide
+                  - NickelOxyhydride
+                  - SilverOxide
+                  - ZincAir
+                  - ZincCarbon
+                  - ZincChloride
+                  - ZincManganeseDioxide
+                  - LeadAcid
+                  - LithiumCobaltOxide
+                  - LithiumIon
+                  - LithiumIonPolymer
+                  - LithiumIronPhosphate
+                  - LithiumSulfur
+                  - LithiumTitanate
+                  - NickelCadmium
+                  - NickelHydrogen
+                  - NickelIron
+                  - NickelMetalHydride
+                  - NickelZinc
+                  - SilverZinc
+                  - SodiumIon
+                  - SodiumSulfur
+                  - ZincBromide
+                  - ZincCerium
+      bitmaps:
+          OccupancySensing:
+              - OccupancyBitmap
+              - OccupancySensorTypeBitmap
+          PumpConfigurationAndControl:
+              - PumpStatusBitmap
+      bitmap values:
+          OccupancySensing:
+              OccupancyBitmap:
+                  - Occupied
+              OccupancySensorTypeBitmap:
+                  - PIR
+                  - Ultrasonic
+                  - PhysicalContact
+          PumpConfigurationAndControl:
+              PumpFeature:
+                  - LocalOperation
+              PumpStatusBitmap:
+                  - DeviceFault
+                  - Supplyfault
+                  - SpeedLow
+                  - SpeedHigh
+                  - LocalOverride
+                  - Running
+                  - RemotePressure
+                  - RemoteFlow
+                  - RemoteTemperature
+  deprecated:
+      attributes:
+          TimeSynchronization:
+              - DstOffset
+      structs:
+          TimeSynchronization:
+              - DstOffsetType
+              - TimeZoneType
+      enums:
+          DiagnosticLogs:
+              - LogsIntent
+              - LogsStatus
+              - LogsTransferProtocol
+          WiFiNetworkDiagnostics:
+              - WiFiConnectionStatus
+              - WiFiVersionType
+          PumpConfigurationAndControl:
+              - PumpControlMode
+              - PumpOperationMode
+      enum values:
+          PowerSource:
+              WiredFaultEnum:
+                  - Unspecfied
+              BatFaultEnum:
+                  - Unspecfied
+      bitmaps:
+          PumpConfigurationAndControl:
+              - PumpStatus
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpFeature:
+                  - Local
+  removed:
       global attributes:
+          # EventList is provisional for now.
           - EventList
       attributes:
+          # EventList is provisional for now.
           Scenes:
               - EventList
           OnOff:
@@ -6582,7 +6864,6 @@
               - EventList
           TimeSynchronization:
               - EventList
-              - DSTOffset
           BridgedDeviceBasicInformation:
               - EventList
           Switch:
@@ -6669,141 +6950,6 @@
               - EventList
           FaultInjection:
               - EventList
-      command fields:
-          DiagnosticLogs:
-              RetrieveLogsRequest:
-                  # Not really usable in earlier releases: wrong type.
-                  - transferFileDesignator
-      structs:
-          TimeSynchronization:
-              - DSTOffsetStruct
-              - TimeZoneStruct
-      struct fields:
-          TimeSynchronization:
-              DSTOffsetStruct:
-                  - offset
-                  - validStarting
-                  - validUntil
-              TimeZoneStruct:
-                  - offset
-                  - validAt
-                  - name
-      enums:
-          DiagnosticLogs:
-              - IntentEnum
-              - StatusEnum
-              - TransferProtocolEnum
-          OccupancySensing:
-              - OccupancySensorTypeEnum
-          WiFiNetworkDiagnostics:
-              - ConnectionStatusEnum
-              - WiFiVersionEnum
-          PumpConfigurationAndControl:
-              - ControlModeEnum
-              - OperationModeEnum
-      enum values:
-          DoorLock:
-              LockDataTypeEnum:
-                  - FingerVein
-                  - Face
-          DiagnosticLogs:
-              IntentEnum:
-                  - EndUserSupport
-                  - NetworkDiag
-                  - CrashLogs
-              StatusEnum:
-                  - Success
-                  - Exhausted
-                  - NoLogs
-                  - Busy
-                  - Denied
-              TransferProtocolEnum:
-                  - ResponsePayload
-                  - BDX
-          OccupancySensing:
-              OccupancySensorTypeEnum:
-                  - PIR
-                  - Ultrasonic
-                  - PIRAndUltrasonic
-                  - PhysicalContact
-          WiFiNetworkDiagnostics:
-              ConnectionStatusEnum:
-                  - Connected
-                  - NotConnected
-              WiFiVersionEnum:
-                  - A
-                  - B
-                  - G
-                  - N
-                  - Ac
-                  - Ax
-          PumpConfigurationAndControl:
-              ControlModeEnum:
-                  - ConstantSpeed
-                  - ConstantPressure
-                  - ProportionalPressure
-                  - ConstantFlow
-                  - ConstantTemperature
-                  - Automatic
-              OperationModeEnum:
-                  - Normal
-                  - Minimum
-                  - Maximum
-                  - Local
-      bitmaps:
-          OccupancySensing:
-              - OccupancyBitmap
-              - OccupancySensorTypeBitmap
-          PumpConfigurationAndControl:
-              - PumpStatusBitmap
-      bitmap values:
-          OccupancySensing:
-              OccupancyBitmap:
-                  - Occupied
-              OccupancySensorTypeBitmap:
-                  - PIR
-                  - Ultrasonic
-                  - PhysicalContact
-          PumpConfigurationAndControl:
-              PumpFeature:
-                  - LocalOperation
-              PumpStatusBitmap:
-                  - DeviceFault
-                  - Supplyfault
-                  - SpeedLow
-                  - SpeedHigh
-                  - LocalOverride
-                  - Running
-                  - RemotePressure
-                  - RemoteFlow
-                  - RemoteTemperature
-  deprecated:
-      attributes:
-          TimeSynchronization:
-              - DstOffset
-      structs:
-          TimeSynchronization:
-              - DstOffsetType
-              - TimeZoneType
-      enums:
-          DiagnosticLogs:
-              - LogsIntent
-              - LogsStatus
-              - LogsTransferProtocol
-          WiFiNetworkDiagnostics:
-              - WiFiConnectionStatus
-              - WiFiVersionType
-          PumpConfigurationAndControl:
-              - PumpControlMode
-              - PumpOperationMode
-      bitmaps:
-          PumpConfigurationAndControl:
-              - PumpStatus
-      bitmap values:
-          PumpConfigurationAndControl:
-              PumpFeature:
-                  - Local
-  removed:
       enum values:
           DoorLock:
               DlLockDataType:
@@ -6830,6 +6976,12 @@
           PumpConfigurationAndControl:
               ControlModeEnum: PumpControlMode
               OperationModeEnum: PumpOperationMode
+      enum values:
+          PowerSource:
+              WiredFaultEnum:
+                  Unspecified: Unspecfied
+              BatFaultEnum:
+                  Unspecified: Unspecfied
       bitmaps:
           PumpConfigurationAndControl:
               PumpStatusBitmap: PumpStatus

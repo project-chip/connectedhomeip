@@ -193,6 +193,12 @@ template("chip_data_model") {
       _custom_impl_clusters = invoker.zap_clusters_with_custom_implementation
     }
 
+    if (_cluster_sources == []) {
+      # The variable is only used within the nested foreach-loop and will be
+      # unused before it goes out of scope when the outter-loop is not entered.
+      not_needed([ "_custom_impl_clusters" ])
+    }
+
     foreach(cluster, _cluster_sources) {
       _custom_impl = false
       foreach(ci, _custom_impl_clusters) {

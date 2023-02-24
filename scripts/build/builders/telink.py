@@ -26,7 +26,10 @@ class TelinkApp(Enum):
     CONTACT_SENSOR = auto()
     LIGHT = auto()
     SWITCH = auto()
+    LOCK = auto()
     OTA_REQUESTOR = auto()
+    PUMP = auto()
+    PUMP_CONTROLLER = auto()
     THERMOSTAT = auto()
     WINDOW_COVERING = auto()
 
@@ -41,8 +44,14 @@ class TelinkApp(Enum):
             return 'lighting-app'
         elif self == TelinkApp.SWITCH:
             return 'light-switch-app'
+        elif self == TelinkApp.LOCK:
+            return 'lock-app'
         elif self == TelinkApp.OTA_REQUESTOR:
             return 'ota-requestor-app'
+        elif self == TelinkApp.PUMP:
+            return 'pump-app'
+        elif self == TelinkApp.PUMP_CONTROLLER:
+            return 'pump-controller-app'
         elif self == TelinkApp.THERMOSTAT:
             return 'thermostat'
         elif self == TelinkApp.WINDOW_COVERING:
@@ -61,8 +70,14 @@ class TelinkApp(Enum):
             return 'chip-telink-lighting-example'
         elif self == TelinkApp.SWITCH:
             return 'chip-telink-light-switch-example'
+        elif self == TelinkApp.LOCK:
+            return 'chip-telink-lock-example'
         elif self == TelinkApp.OTA_REQUESTOR:
             return 'chip-telink-ota-requestor-example'
+        elif self == TelinkApp.PUMP:
+            return 'chip-telink-pump-example'
+        elif self == TelinkApp.PUMP_CONTROLLER:
+            return 'chip-telink-pump-controller-example'
         elif self == TelinkApp.THERMOSTAT:
             return 'chip-telink-thermostat-example'
         elif self == TelinkApp.WINDOW_COVERING:

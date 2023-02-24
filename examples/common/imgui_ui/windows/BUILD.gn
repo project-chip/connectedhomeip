@@ -51,6 +51,10 @@ static_library("light") {
     "${chip_root}/third_party/imgui",
   ]
 
+  # TODO: this is because on-off-server.h is generally only available
+  #       in the app and we do not want to directly bind to lighting-app
+  check_includes = false
+
   public_configs = [ "${chip_root}/src:includes" ]
 }
 

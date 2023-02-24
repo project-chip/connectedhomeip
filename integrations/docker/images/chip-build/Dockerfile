@@ -45,6 +45,7 @@ RUN set -x \
     libpixman-1-dev \
     libreadline-dev \
     libsdl-pango-dev \
+    libsdl2-dev \
     libssl-dev \
     libtool \
     libudev-dev \

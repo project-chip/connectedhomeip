@@ -65,15 +65,19 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
     OperationalState state = ComputeOperationalState(target, current);
     UpdateOperationalStatus(MoveType::LIFT, state);
 
-    chip::Percent100ths step = CalculateSingleStep(MoveType::LIFT);
+    chip::Percent100ths position = CalculateNextPosition(MoveType::LIFT);
 
     if (state == OperationalState::MovingUpOrOpen)
     {
-        positionToSet.SetNonNull(step > target.Value() ? step : target.Value());
+        positionToSet.SetNonNull(position > target.Value() ? position : target.Value());
     }
     else if (state == OperationalState::MovingDownOrClose)
     {
-        positionToSet.SetNonNull(step < target.Value() ? step : target.Value());
+        positionToSet.SetNonNull(position < target.Value() ? position : target.Value());
+    }
+    else
+    {
+        positionToSet.SetNonNull(current.Value());
     }
 
     LiftPositionSet(Endpoint(), positionToSet);
@@ -95,7 +99,7 @@ void WindowCovering::DriveCurrentLiftPosition(intptr_t)
     }
 }
 
-chip::Percent100ths WindowCovering::CalculateSingleStep(MoveType aMoveType)
+chip::Percent100ths WindowCovering::CalculateNextPosition(MoveType aMoveType)
 {
     EmberAfStatus status{};
     chip::Percent100ths percent100ths{};
@@ -170,15 +174,19 @@ void WindowCovering::DriveCurrentTiltPosition(intptr_t)
     OperationalState state = ComputeOperationalState(target, current);
     UpdateOperationalStatus(MoveType::TILT, state);
 
-    chip::Percent100ths step = CalculateSingleStep(MoveType::TILT);
+    chip::Percent100ths position = CalculateNextPosition(MoveType::TILT);
 
     if (state == OperationalState::MovingUpOrOpen)
     {
-        positionToSet.SetNonNull(step > target.Value() ? step : target.Value());
+        positionToSet.SetNonNull(position > target.Value() ? position : target.Value());
     }
     else if (state == OperationalState::MovingDownOrClose)
     {
-        positionToSet.SetNonNull(step < target.Value() ? step : target.Value());
+        positionToSet.SetNonNull(position < target.Value() ? position : target.Value());
+    }
+    else
+    {
+        positionToSet.SetNonNull(current.Value());
     }
 
     TiltPositionSet(Endpoint(), positionToSet);
@@ -226,7 +234,7 @@ void WindowCovering::StartMove(MoveType aMoveType)
 void WindowCovering::SetSingleStepTarget(OperationalState aDirection)
 {
     UpdateOperationalStatus(mCurrentUIMoveType, aDirection);
-    SetTargetPosition(aDirection, CalculateSingleStep(mCurrentUIMoveType));
+    SetTargetPosition(aDirection, CalculateNextPosition(mCurrentUIMoveType));
 }
 
 void WindowCovering::UpdateOperationalStatus(MoveType aMoveType, OperationalState aDirection)

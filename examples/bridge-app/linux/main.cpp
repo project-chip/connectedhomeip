@@ -989,7 +989,7 @@ int main(int argc, char * argv[])
 
     // Setup composed device with two temperature sensors and a power source
     ComposedDevice ComposedDevice("Composed Device", "Bedroom");
-    DevicePowerSource ComposedPowerSource("Composed Power Source", "Bedroom", EMBER_AF_POWER_SOURCE_FEATURE_BATTERY);
+    DevicePowerSource ComposedPowerSource("Composed Power Source", "Bedroom", PowerSource::PowerSourceFeature::kBattery);
 
     ComposedDevice.SetReachable(true);
     ComposedTempSensor1.SetReachable(true);

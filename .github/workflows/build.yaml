@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.35
+            image: connectedhomeip/chip-build:0.6.40
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -69,6 +69,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |
@@ -147,7 +148,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.35
+            image: connectedhomeip/chip-build:0.6.40
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -185,6 +186,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |
@@ -316,7 +318,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.35
+            image: connectedhomeip/chip-build:0.6.40
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -344,6 +346,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |
@@ -402,6 +405,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |
@@ -481,7 +485,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.6.35
+            image: connectedhomeip/chip-build:0.6.40
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -501,6 +505,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |

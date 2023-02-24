@@ -51,6 +51,7 @@ executable("chip-lighting-app") {
     deps += [
       "${chip_root}/examples/common/imgui_ui",
       "${chip_root}/examples/common/imgui_ui/windows:light",
+      "${chip_root}/examples/common/imgui_ui/windows:occupancy_sensing",
       "${chip_root}/examples/common/imgui_ui/windows:qrcode",
     ]
   }

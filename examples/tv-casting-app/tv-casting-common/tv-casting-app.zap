@@ -1820,7 +1820,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "TempUnit",
+              "type": "TempUnitEnum",
               "included": 1,
               "storageOption": "NVM",
               "singleton": 0,
@@ -2611,27 +2611,6 @@
             }
           ],
           "events": [
-            {
-              "name": "HardwareFaultChange",
-              "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "RadioFaultChange",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "NetworkFaultChange",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
             {
               "name": "BootReason",
               "code": 3,

@@ -12,16 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import enum
-import logging
-from typing import List, Set, Union
+from typing import List
 
-from matter_idl import matter_idl_types
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.generators.types import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
-                                         ParseDataType, TypeLookupContext)
-from matter_idl.matter_idl_types import Attribute, Cluster, ClusterSide, Command, DataType, Field, FieldQuality, Idl
-from stringcase import capitalcase
+from matter_idl.matter_idl_types import Cluster, ClusterSide, Idl
 
 
 def serverClustersOnly(clusters: List[Cluster]) -> List[Cluster]:

@@ -700,6 +700,12 @@ void DoorLockServer::setCredentialCommandHandler(
         // if userIndex is NULL then we're changing the programming user PIN
         if (userIndex.IsNull())
         {
+            if (!userStatus.IsNull() || userType != UserTypeEnum::kProgrammingUser)
+            {
+                emberAfDoorLockClusterPrintln("[SetCredential] Unable to modify programming PIN: invalid argument "
+                                              "[endpointId=%d,credentialIndex=%d]",
+                                              commandPath.mEndpointId, credentialIndex);
+            }
             status = modifyProgrammingPIN(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
                                           existingCredential, credentialData);
             sendSetCredentialResponse(commandObj, commandPath, status, 0, nextAvailableCredentialSlot);
@@ -2245,7 +2251,16 @@ DlStatus DoorLockServer::createCredential(chip::EndpointId endpointId, chip::Fab
     }
     else
     {
-        // appclusters, 5.2.4.40: if user index is NULL, we should try to modify the existing user
+        // appclusters, 5.2.4.40: if user index is NULL, we should try to modify
+        // the existing user.  In this case userStatus and userType shall both
+        // be null.
+        if (!userStatus.IsNull() || !userType.IsNull())
+        {
+            emberAfDoorLockClusterPrintln("[SetCredential] Unable to add credential: invalid arguments "
+                                          "[endpointId=%d,credentialIndex=%d,credentialType=%u]",
+                                          endpointId, credentialIndex, to_underlying(credentialType));
+            return DlStatus::kInvalidField;
+        }
         status = createNewCredentialAndAddItToUser(endpointId, creatorFabricIdx, userIndex.Value(), credential, credentialData);
     }
 
@@ -2314,7 +2329,7 @@ DlStatus DoorLockServer::modifyCredential(chip::EndpointId endpointId, chip::Fab
 {
 
     // appclusters, 5.2.4.40: when modifying a credential, userStatus and userType shall both be NULL.
-    if (!userStatus.IsNull() || (!userType.IsNull() && UserTypeEnum::kProgrammingUser != userType.Value()))
+    if (!userStatus.IsNull() || !userType.IsNull())
     {
         emberAfDoorLockClusterPrintln("[SetCredential] Unable to modify the credential: invalid arguments "
                                       "[endpointId=%d,credentialIndex=%d,credentialType=%u]",

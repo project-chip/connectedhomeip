@@ -215,6 +215,11 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  *
  * A non-nil attributeID along with a nil clusterID will only succeed if the
  * attribute ID is for a global attribute that applies to all clusters.
+ *
+ * The completion will be called with an error if the entire read interaction fails.
+ * Otherwise it will be called with values, which may be empty (e.g. if no paths
+ * matched the wildcard) or may include per-path errors if particular paths
+ * failed.
  */
 - (void)readAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
                            clusterID:(NSNumber * _Nullable)clusterID
@@ -261,7 +266,10 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  *
  * @param timeoutMs   timeout in milliseconds for timed invoke, or nil.
  *
- * @param completion  response handler will receive either values or error.
+ * @param completion  response handler will receive either values or error.  A
+ *                    path-specific error status from the command invocation
+ *                    will result in an error being passed to the completion, so
+ *                    values will only be passed in when the command succeeds.
  */
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID
@@ -341,6 +349,11 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  *
  * If all of endpointID, clusterID, eventID are nil, all events on the
  * device will be read.
+ *
+ * The completion will be called with an error if the entire read interaction fails.
+ * Otherwise it will be called with values, which may be empty (e.g. if no paths
+ * matched the wildcard) or may include per-path errors if particular paths
+ * failed.
  */
 
 - (void)readEventsWithEndpointID:(NSNumber * _Nullable)endpointID
