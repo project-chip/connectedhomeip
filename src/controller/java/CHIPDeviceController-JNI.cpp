@@ -83,7 +83,8 @@ static CHIP_ERROR ParseAttributePathList(jobject attributePathList,
 static CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId, ClusterId & outClusterId,
                                      AttributeId & outAttributeId);
 static CHIP_ERROR ParseEventPathList(jobject eventPathList, std::vector<app::EventPathParams> & outEventPathParamsList);
-static CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId, bool & outIsUrgent);
+static CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId,
+                                 bool & outIsUrgent);
 static CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard);
 static CHIP_ERROR CreateDeviceAttestationDelegateBridge(JNIEnv * env, jlong handle, jobject deviceAttestationDelegate,
                                                         jint failSafeExpiryTimeoutSecs,
@@ -1384,7 +1385,8 @@ CHIP_ERROR ParseEventPathList(jobject eventPathList, std::vector<app::EventPathP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId, bool & outIsUrgent)
+CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId,
+                          bool & outIsUrgent)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
