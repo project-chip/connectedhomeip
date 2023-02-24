@@ -101,10 +101,10 @@ async def GrantPrivilege(adminCtrl: ChipDeviceController, grantedCtrl: ChipDevic
                     "ACLs -- will exceed minimas!")
 
             currentAcls.append(Clusters.AccessControl.Structs.AccessControlEntryStruct(
-                                privilege=privilege,
-                                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                                subjects=targetSubjects
-                            ))
+                privilege=privilege,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                subjects=targetSubjects
+            ))
 
     # Step 4: Prune ACLs which have empty subjects.
     currentAcls = [acl for acl in currentAcls if acl.subjects != NullValue and len(acl.subjects) != 0]

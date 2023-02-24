@@ -29,9 +29,8 @@ from chip.clusters import ClusterObjects as ClustersObjects
 from chip.clusters.Attribute import (AttributeStatus, EventReadResult, SubscriptionTransaction, TypedAttributePath,
                                      ValueDecodeFailure)
 from chip.exceptions import ChipStackError
-from chip.yaml.errors import ActionCreationError, UnexpectedActionCreationError
 from chip.yaml.data_model_lookup import DataModelLookup
-
+from chip.yaml.errors import ActionCreationError, UnexpectedActionCreationError
 from matter_yamltests.pseudo_clusters.clusters.delay_commands import DelayCommands
 from matter_yamltests.pseudo_clusters.clusters.log_commands import LogCommands
 from matter_yamltests.pseudo_clusters.clusters.system_commands import SystemCommands
