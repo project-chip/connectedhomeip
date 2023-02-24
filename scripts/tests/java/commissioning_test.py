@@ -18,12 +18,9 @@
 #
 
 import argparse
-import asyncio
 import logging
-import os
 import queue
 import subprocess
-import sys
 import threading
 import typing
 
@@ -46,7 +43,8 @@ class CommissioningTest:
         parser.add_argument('-s', '--setup-payload', dest='setup_payload',
                             help="Setup Payload (manual pairing code or QR code content)")
         parser.add_argument('-c', '--setup-pin-code', dest='setup_pin_code',
-                            help="Setup PIN code which can be used for password-authenticated session establishment (PASE) with the Commissionee")
+                            help=("Setup PIN code which can be used for password-authenticated "
+                                  "session establishment (PASE) with the Commissionee"))
         parser.add_argument('-n', '--nodeid', help="The Node ID issued to the device", default='1')
         parser.add_argument('-d', '--discriminator', help="Discriminator of the device", default='3840')
         parser.add_argument('-u', '--paa-trust-store-path', dest='paa_trust_store_path',
