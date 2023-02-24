@@ -14,7 +14,7 @@
 #    limitations under the License.
 #
 
-from ctypes import CFUNCTYPE, c_char_p, c_int32, c_uint8
+from ctypes import CFUNCTYPE, c_char_p, c_int32, c_uint8, c_uint16, c_uint32, uint8_t
 from typing import Optional
 
 from chip.exceptions import ChipStackError
