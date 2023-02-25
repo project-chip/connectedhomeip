@@ -33,8 +33,6 @@
 #define CHIP_CONFIG_KVS_PATH "/tmp/chip_casting_kvs"
 #endif
 
-#include <CHIPProjectConfig.h>
-
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 0
 
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT 1
@@ -61,3 +59,12 @@
 #define CHIP_ENABLE_ROTATING_DEVICE_ID 1
 
 #define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH 128
+
+// Disable this since it should not be enabled for production setups
+#define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 0
+
+#define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 4
+
+// Include the CHIPProjectConfig from config/standalone
+// Add this at the end so that we can hit our #defines first
+#include <CHIPProjectConfig.h>
