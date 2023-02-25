@@ -42,7 +42,7 @@ public:
      *
      * @param maxAllowedQueuedPackets - max number of pending-in-queue not yet processed predicate-matching packets
      */
-    DropIfTooManyQueuedPacketsFilter(size_t maxAllowedQueuedPackets) : mMaxAllowedQueuedPackets(maxAllowedQueuedPackets) {}
+    DropIfTooManyQueuedPacketsFilter(int maxAllowedQueuedPackets) : mMaxAllowedQueuedPackets(maxAllowedQueuedPackets) {}
 
     /**
      * @brief Set the predicate to use for filtering
