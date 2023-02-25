@@ -38,7 +38,7 @@ using namespace chip::Inet;
 class DropIfTooManyQueuedPacketsHarness : public DropIfTooManyQueuedPacketsFilter
 {
 public:
-    DropIfTooManyQueuedPacketsHarness(int maxAllowedQueuedPackets) : DropIfTooManyQueuedPacketsFilter(maxAllowedQueuedPackets) {}
+    DropIfTooManyQueuedPacketsHarness(size_t maxAllowedQueuedPackets) : DropIfTooManyQueuedPacketsFilter(maxAllowedQueuedPackets) {}
 
     void OnDropped(const void * endpoint, const IPPacketInfo & pktInfo,
                    const chip::System::PacketBufferHandle & pktPayload) override
