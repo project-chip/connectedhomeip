@@ -109,10 +109,8 @@ exclude = third_party
           src/controller/python/chip/FabricAdmin.py
           src/controller/python/chip/ble/scan_devices.py
           src/controller/python/chip/clusters/Attribute.py
-          src/controller/python/chip/clusters/CHIPClusters.py
           src/controller/python/chip/clusters/ClusterObjects.py
           src/controller/python/chip/clusters/Command.py
-          src/controller/python/chip/clusters/Objects.py
           src/controller/python/chip/clusters/__init__.py
           src/controller/python/chip/discovery/__init__.py
           src/controller/python/chip/interaction_model/__init__.py
