@@ -1380,7 +1380,7 @@ class ChipDeviceControllerBase():
                 POINTER(c_void_p), c_void_p, c_char_p, c_uint32, c_char_p, c_uint32, c_char_p, c_uint32, c_char_p, c_uint32, c_uint16, c_bool]
             self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow.restype = PyChipError
 
-            self._dmLib.pychip_DeviceController_SetIpk.argtypes = [c_void_p, POINTER(c_uint8), c_size_t]
+            self._dmLib.pychip_DeviceController_SetIpk.argtypes = [c_void_p, POINTER(c_char), c_size_t]
             self._dmLib.pychip_DeviceController_SetIpk.restype = PyChipError
 
 
