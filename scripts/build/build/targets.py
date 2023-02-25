@@ -560,6 +560,8 @@ def BuildTelinkTarget():
         TargetPart('window-covering', app=TelinkApp.WINDOW_COVERING),
     ])
 
+    target.AppendModifier('rpc', enable_rpcs=True)
+
     return target
 
 
