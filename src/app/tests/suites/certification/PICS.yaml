@@ -33,6 +33,9 @@ PICS:
     - label: "Is DUT Software Component?"
       id: MCORE.DT_SW_COMP
 
+    - label: "Does the device implement the (0xFFFA) EventList attribute ?"
+      id: MCORE.Afffa
+
     - label:
           "Does the device support communication over Bluetooth Low Energy (BLE)
           ?"

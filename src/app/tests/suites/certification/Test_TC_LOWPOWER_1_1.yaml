@@ -57,6 +57,15 @@ tests:
           constraints:
               type: list
 
+    - label: "Read the global EventList attribute in AttributeList"
+      PICS: MCORE.Afffa
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65530]
+
     - label: "Read the global attribute: AcceptedCommandList"
       command: "readAttribute"
       attribute: "AcceptedCommandList"

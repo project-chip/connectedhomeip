@@ -75,6 +75,15 @@ tests:
               type: list
               contains: [65528, 65529, 65531, 65532, 65533]
 
+    - label: "Read the global EventList attribute in AttributeList"
+      PICS: MCORE.Afffa
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65530]
+
     - label: "Read the optional attribute(ChannelList): AttributeList"
       PICS: CHANNEL.S.A0000
       command: "readAttribute"

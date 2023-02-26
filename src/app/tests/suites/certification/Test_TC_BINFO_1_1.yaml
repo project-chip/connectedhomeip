@@ -77,6 +77,15 @@ tests:
                       65533,
                   ]
 
+    - label: "TH reads the global EventList attribute in AttributeList"
+      PICS: MCORE.Afffa
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65530]
+
     - label: "TH reads optional attribute(ManufacturingDate) in attributeList"
       PICS: BINFO.S.A000b
       command: "readAttribute"

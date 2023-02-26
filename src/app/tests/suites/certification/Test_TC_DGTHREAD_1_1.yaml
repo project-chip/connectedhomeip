@@ -127,6 +127,15 @@ tests:
                       65533,
                   ]
 
+    - label: "TH reads global EventList attribute in AttributeList"
+      PICS: MCORE.Afffa
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [65530]
+
     - label:
           "TH reads Feature dependent attribute(DGTHREAD.S.F01(ERRCNT)) in
           attributeList"
