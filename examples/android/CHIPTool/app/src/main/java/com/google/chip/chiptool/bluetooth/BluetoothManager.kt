@@ -43,8 +43,18 @@ class BluetoothManager : BleCallback {
         .toByteArray()
   }
 
-  suspend fun getBluetoothDevice(context: Context, discriminator: Int): BluetoothDevice? {
+  private fun getServiceDataMask(isManualPairingMode: Boolean): ByteArray {
+    val manualPairingMask = when(isManualPairingMode) {
+      true -> 0x00     false -> 0xff
+    }
+    return intArrayOf(0xff, manualPairingMask, 0xff).map { it.toByte() }.toByteArray()
+  }
 
+  suspend fun getBluetoothDevice(context: Context, discriminator: Int): BluetoothDevice? {
+    return getBluetoothDevice(context, discriminator, false)
+  }
+
+  suspend fun getBluetoothDevice(context: Context, discriminator: Int, isManualPairingMode: Boolean): BluetoothDevice? {
     if (! bluetoothAdapter.isEnabled) {
       bluetoothAdapter.enable();
     }
@@ -75,9 +85,11 @@ class BluetoothManager : BleCallback {
         }
 
         val serviceData = getServiceData(discriminator)
+        val serviceDataMask = getServiceDataMask(isManualPairingMode)
+
         val scanFilter =
             ScanFilter.Builder()
-                .setServiceData(ParcelUuid(UUID.fromString(CHIP_UUID)), serviceData)
+                .setServiceData(ParcelUuid(UUID.fromString(CHIP_UUID)), serviceData, serviceDataMask)
                 .build()
 
         val scanSettings = ScanSettings.Builder()
