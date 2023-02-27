@@ -823,6 +823,9 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
 
     if (moveMode == EMBER_ZCL_HUE_MOVE_MODE_STOP)
     {
+        // Per spec any staturation transition must also be cancelled.
+        Color16uTransitionState * saturationState = getSaturationTransitionState(endpoint);
+        initSaturationTransitionState(endpoint, saturationState);
         commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
@@ -1264,6 +1267,9 @@ bool ColorControlServer::moveSaturationCommand(app::CommandHandler * commandObj,
 
     if (moveMode == EMBER_ZCL_SATURATION_MOVE_MODE_STOP || rate == 0)
     {
+        // Per spec any hue transition must also be cancelled.
+        ColorHueTransitionState * hueState = getColorHueTransitionState(endpoint);
+        initHueTransitionState(endpoint, hueState, false /*isEnhancedHue don't care*/);
         commandObj->AddStatus(commandPath, Status::Success);
         return true;
     }
