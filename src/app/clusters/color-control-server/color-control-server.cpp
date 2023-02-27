@@ -364,9 +364,9 @@ bool ColorControlServer::computeNewColor16uValue(ColorControlServer::Color16uTra
     }
     else if (p->finalValue > p->initialValue)
     {
-        newValue32u = ((uint32_t) (p->finalValue - p->initialValue));
-        newValue32u *= ((uint32_t) (p->stepsRemaining));
-        newValue32u /= ((uint32_t) (p->stepsTotal));
+        newValue32u = ((uint32_t)(p->finalValue - p->initialValue));
+        newValue32u *= ((uint32_t)(p->stepsRemaining));
+        newValue32u /= ((uint32_t)(p->stepsTotal));
         p->currentValue = static_cast<uint16_t>(p->finalValue - static_cast<uint16_t>(newValue32u));
 
         if (static_cast<uint16_t>(newValue32u) > p->finalValue || p->currentValue > p->highLimit)
@@ -376,9 +376,9 @@ bool ColorControlServer::computeNewColor16uValue(ColorControlServer::Color16uTra
     }
     else
     {
-        newValue32u = ((uint32_t) (p->initialValue - p->finalValue));
-        newValue32u *= ((uint32_t) (p->stepsRemaining));
-        newValue32u /= ((uint32_t) (p->stepsTotal));
+        newValue32u = ((uint32_t)(p->initialValue - p->finalValue));
+        newValue32u *= ((uint32_t)(p->stepsRemaining));
+        newValue32u /= ((uint32_t)(p->stepsTotal));
         p->currentValue = static_cast<uint16_t>(p->finalValue + static_cast<uint16_t>(newValue32u));
 
         if (p->finalValue > UINT16_MAX - static_cast<uint16_t>(newValue32u) || p->currentValue < p->lowLimit)
@@ -1808,7 +1808,7 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
     else
     {
         colorXTransitionState->finalValue = MIN_CIE_XY_VALUE;
-        unsignedRate                      = (uint16_t) (rateX * -1);
+        unsignedRate                      = (uint16_t)(rateX * -1);
     }
     transitionTimeX                       = computeTransitionTimeFromStateAndRate(colorXTransitionState, unsignedRate);
     colorXTransitionState->stepsRemaining = transitionTimeX;
@@ -1827,7 +1827,7 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
     else
     {
         colorYTransitionState->finalValue = MIN_CIE_XY_VALUE;
-        unsignedRate                      = (uint16_t) (rateY * -1);
+        unsignedRate                      = (uint16_t)(rateY * -1);
     }
     transitionTimeY                       = computeTransitionTimeFromStateAndRate(colorYTransitionState, unsignedRate);
     colorYTransitionState->stepsRemaining = transitionTimeY;
@@ -2462,8 +2462,8 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
         else
         {
             uint32_t tempDelta = (((uint32_t) tempPhysMax - (uint32_t) tempCoupleMin) * currentLevel.Value()) /
-                (uint32_t) (MAX_CURRENT_LEVEL - MIN_CURRENT_LEVEL + 1);
-            newColorTemp = (uint16_t) ((uint32_t) tempPhysMax - tempDelta);
+                (uint32_t)(MAX_CURRENT_LEVEL - MIN_CURRENT_LEVEL + 1);
+            newColorTemp = (uint16_t)((uint32_t) tempPhysMax - tempDelta);
         }
 
         // Apply new color temp.
