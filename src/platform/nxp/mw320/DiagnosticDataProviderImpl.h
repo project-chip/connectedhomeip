@@ -71,7 +71,7 @@ public:
 
     CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion) override;
     CHIP_ERROR GetWiFiBssId(ByteSpan & value) override;
-    CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType) override;
+    CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType) override;
 };
 
 /**

@@ -76,4 +76,6 @@ static_library("shell_common") {
   }
 
   public_configs = [ ":shell_common_config" ]
+
+  cflags = [ "-Wconversion" ]
 }

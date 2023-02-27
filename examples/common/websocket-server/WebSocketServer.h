@@ -23,9 +23,17 @@
 #include <lib/core/Optional.h>
 #include <lib/support/CHIPMem.h>
 
-class WebSocketServer
+#include <string>
+
+class WebSocketServer : public WebSocketServerDelegate
 {
 public:
     CHIP_ERROR Run(chip::Optional<uint16_t> port, WebSocketServerDelegate * delegate);
     CHIP_ERROR Send(const char * msg);
+
+    bool OnWebSocketMessageReceived(char * msg) override;
+
+private:
+    bool mRunning;
+    WebSocketServerDelegate * mDelegate = nullptr;
 };

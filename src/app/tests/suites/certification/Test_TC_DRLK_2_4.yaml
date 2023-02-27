@@ -74,7 +74,7 @@ tests:
               - name: "CredentialRule"
                 value: 0
               - name: "Credentials"
-                value: null
+                value: []
               - name: "CreatorFabricIndex"
                 value: 1
               - name: "LastModifiedFabricIndex"

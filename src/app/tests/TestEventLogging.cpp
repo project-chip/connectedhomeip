@@ -115,12 +115,8 @@ void ENFORCE_FORMAT(1, 2) SimpleDumpWriter(const char * aFormat, ...)
 void PrintEventLog()
 {
     chip::TLV::TLVReader reader;
-    size_t elementCount;
     chip::app::CircularEventBufferWrapper bufWrapper;
-    chip::app::EventManagement::GetInstance().GetEventReader(reader, chip::app::PriorityLevel::Debug, &bufWrapper);
-
-    chip::TLV::Utilities::Count(reader, elementCount, false);
-    printf("Found %u elements\n", static_cast<unsigned int>(elementCount));
+    chip::app::EventManagement::GetInstance().GetEventReader(reader, chip::app::PriorityLevel::Critical, &bufWrapper);
     chip::TLV::Debug::Dump(reader, SimpleDumpWriter);
 }
 

@@ -406,12 +406,12 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                     if (delegate)
                     {
                         delegate->OnDisconnectionDetected(reason);
-                        delegate->OnConnectionStatusChanged(static_cast<uint8_t>(WiFiConnectionStatus::kConnected));
+                        delegate->OnConnectionStatusChanged(static_cast<uint8_t>(ConnectionStatusEnum::kConnected));
                     }
 
                     if (mAssociattionStarted)
                     {
-                        uint8_t associationFailureCause = static_cast<uint8_t>(AssociationFailureCause::kUnknown);
+                        uint8_t associationFailureCause = static_cast<uint8_t>(AssociationFailureCauseEnum::kUnknown);
                         uint16_t status                 = WLAN_STATUS_UNSPECIFIED_FAILURE;
 
                         switch (abs(reason))
@@ -421,13 +421,13 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                         case WLAN_REASON_DISASSOC_STA_HAS_LEFT:
                         case WLAN_REASON_DISASSOC_LOW_ACK:
                         case WLAN_REASON_BSS_TRANSITION_DISASSOC:
-                            associationFailureCause = static_cast<uint8_t>(AssociationFailureCause::kAssociationFailed);
+                            associationFailureCause = static_cast<uint8_t>(AssociationFailureCauseEnum::kAssociationFailed);
                             status = wpa_fi_w1_wpa_supplicant1_interface_get_assoc_status_code(mWpaSupplicant.iface);
                             break;
                         case WLAN_REASON_PREV_AUTH_NOT_VALID:
                         case WLAN_REASON_DEAUTH_LEAVING:
                         case WLAN_REASON_IEEE_802_1X_AUTH_FAILED:
-                            associationFailureCause = static_cast<uint8_t>(AssociationFailureCause::kAuthenticationFailed);
+                            associationFailureCause = static_cast<uint8_t>(AssociationFailureCauseEnum::kAuthenticationFailed);
                             status = wpa_fi_w1_wpa_supplicant1_interface_get_auth_status_code(mWpaSupplicant.iface);
                             break;
                         default:
@@ -453,7 +453,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                 {
                     if (delegate)
                     {
-                        delegate->OnConnectionStatusChanged(static_cast<uint8_t>(WiFiConnectionStatus::kNotConnected));
+                        delegate->OnConnectionStatusChanged(static_cast<uint8_t>(ConnectionStatusEnum::kNotConnected));
                     }
 
                     DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
@@ -1188,7 +1188,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(ByteSpan & value)
     return err;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(uint8_t & securityType)
+CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & securityType)
 {
     const gchar * mode = nullptr;
 
@@ -1205,35 +1205,35 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(uint8_t & securityType)
 
     if (strncmp(mode, "WPA-PSK", 7) == 0)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA;
+        securityType = SecurityTypeEnum::kWpa;
     }
     else if (strncmp(mode, "WPA2-PSK", 8) == 0)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA2;
+        securityType = SecurityTypeEnum::kWpa2;
     }
     else if (strncmp(mode, "WPA2-EAP", 8) == 0)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA2;
+        securityType = SecurityTypeEnum::kWpa2;
     }
     else if (strncmp(mode, "WPA3-PSK", 8) == 0)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA3;
+        securityType = SecurityTypeEnum::kWpa3;
     }
     else if (strncmp(mode, "WEP", 3) == 0)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_WEP;
+        securityType = SecurityTypeEnum::kWep;
     }
     else if (strncmp(mode, "NONE", 4) == 0)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
+        securityType = SecurityTypeEnum::kNone;
     }
     else if (strncmp(mode, "WPA-NONE", 8) == 0)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
+        securityType = SecurityTypeEnum::kNone;
     }
     else
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED;
+        securityType = SecurityTypeEnum::kUnspecified;
     }
 
     return CHIP_NO_ERROR;
@@ -1242,7 +1242,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(uint8_t & securityType)
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(uint8_t & wiFiVersion)
 {
     // We don't have direct API to get the WiFi version yet, return 802.11n on Linux simulation.
-    wiFiVersion = to_underlying(WiFiVersionType::kN);
+    wiFiVersion = to_underlying(WiFiVersionEnum::kN);
 
     return CHIP_NO_ERROR;
 }

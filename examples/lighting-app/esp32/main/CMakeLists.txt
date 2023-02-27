@@ -18,7 +18,6 @@
 
 set(PRIV_INCLUDE_DIRS_LIST
                       "${APP_GEN_DIR}"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/lighting-app"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/lighting-app/lighting-common/include"
                       "${CMAKE_CURRENT_LIST_DIR}/include"

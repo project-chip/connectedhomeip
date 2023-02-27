@@ -149,6 +149,9 @@ list(
     ${chip_dir}/examples/lighting-app/ameba/main/Globals.cpp
     ${chip_dir}/examples/lighting-app/ameba/main/LEDWidget.cpp
 
+    ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_hook.c
+    ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_table.c
+
     ${chip_dir}/examples/providers/DeviceInfoProviderImpl.cpp
 )
 

@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2022 Project CHIP Authors
+ *   Copyright (c) 2022-2023 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,6 +60,8 @@ public class Main {
         new PairCodeWifiCommand(controller, credentialsIssuer);
     PairCodeThreadCommand pairCodeThreadCommand =
         new PairCodeThreadCommand(controller, credentialsIssuer);
+    PairAddressPaseCommand pairAddressPaseCommand =
+        new PairAddressPaseCommand(controller, credentialsIssuer);
     PairAlreadyDiscoveredCommand pairAlreadyDiscoveredCommand =
         new PairAlreadyDiscoveredCommand(controller, credentialsIssuer);
     PairOnNetworkCommand pairOnNetworkCommand =
@@ -83,6 +85,7 @@ public class Main {
     clusterCommands.add(pairCodePaseCommand);
     clusterCommands.add(pairCodeWifiCommand);
     clusterCommands.add(pairCodeThreadCommand);
+    clusterCommands.add(pairAddressPaseCommand);
     clusterCommands.add(pairAlreadyDiscoveredCommand);
     clusterCommands.add(pairOnNetworkCommand);
     clusterCommands.add(pairOnNetworkShortCommand);
@@ -102,6 +105,7 @@ public class Main {
             ControllerParams.newBuilder()
                 .setUdpListenPort(0)
                 .setControllerVendorId(0xFFF1)
+                .setCountryCode("US")
                 .build());
 
     CredentialsIssuer credentialsIssuer = new CredentialsIssuer();

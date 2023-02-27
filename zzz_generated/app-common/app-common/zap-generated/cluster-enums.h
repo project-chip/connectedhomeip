@@ -507,8 +507,8 @@ enum class HourFormat : uint8_t
 
 namespace UnitLocalization {
 
-// Enum for TempUnit
-enum class TempUnit : uint8_t
+// Enum for TempUnitEnum
+enum class TempUnitEnum : uint8_t
 {
     kFahrenheit = 0x00,
     kCelsius    = 0x01,
@@ -531,8 +531,51 @@ namespace PowerSourceConfiguration {} // namespace PowerSourceConfiguration
 
 namespace PowerSource {
 
-// Enum for BatChargeFault
-enum class BatChargeFault : uint8_t
+// Enum for BatApprovedChemistryEnum
+enum class BatApprovedChemistryEnum : uint16_t
+{
+    kUnspecified             = 0x00,
+    kAlkaline                = 0x01,
+    kLithiumCarbonFluoride   = 0x02,
+    kLithiumChromiumOxide    = 0x03,
+    kLithiumCopperOxide      = 0x04,
+    kLithiumIronDisulfide    = 0x05,
+    kLithiumManganeseDioxide = 0x06,
+    kLithiumThionylChloride  = 0x07,
+    kMagnesium               = 0x08,
+    kMercuryOxide            = 0x09,
+    kNickelOxyhydride        = 0x0A,
+    kSilverOxide             = 0x0B,
+    kZincAir                 = 0x0C,
+    kZincCarbon              = 0x0D,
+    kZincChloride            = 0x0E,
+    kZincManganeseDioxide    = 0x0F,
+    kLeadAcid                = 0x10,
+    kLithiumCobaltOxide      = 0x11,
+    kLithiumIon              = 0x12,
+    kLithiumIonPolymer       = 0x13,
+    kLithiumIronPhosphate    = 0x14,
+    kLithiumSulfur           = 0x15,
+    kLithiumTitanate         = 0x16,
+    kNickelCadmium           = 0x17,
+    kNickelHydrogen          = 0x18,
+    kNickelIron              = 0x19,
+    kNickelMetalHydride      = 0x1A,
+    kNickelZinc              = 0x1B,
+    kSilverZinc              = 0x1C,
+    kSodiumIon               = 0x1D,
+    kSodiumSulfur            = 0x1E,
+    kZincBromide             = 0x1F,
+    kZincCerium              = 0x20,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 33,
+};
+
+// Enum for BatChargeFaultEnum
+enum class BatChargeFaultEnum : uint8_t
 {
     kUnspecified         = 0x00,
     kAmbientTooHot       = 0x01,
@@ -552,8 +595,8 @@ enum class BatChargeFault : uint8_t
     kUnknownEnumValue = 11,
 };
 
-// Enum for BatChargeLevel
-enum class BatChargeLevel : uint8_t
+// Enum for BatChargeLevelEnum
+enum class BatChargeLevelEnum : uint8_t
 {
     kOk       = 0x00,
     kWarning  = 0x01,
@@ -565,8 +608,8 @@ enum class BatChargeLevel : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for BatChargeState
-enum class BatChargeState : uint8_t
+// Enum for BatChargeStateEnum
+enum class BatChargeStateEnum : uint8_t
 {
     kUnknown        = 0x00,
     kIsCharging     = 0x01,
@@ -579,12 +622,103 @@ enum class BatChargeState : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Enum for BatFault
-enum class BatFault : uint8_t
+// Enum for BatCommonDesignationEnum
+enum class BatCommonDesignationEnum : uint16_t
 {
-    kUnspecfied = 0x00,
-    kOverTemp   = 0x01,
-    kUnderTemp  = 0x02,
+    kUnspecified = 0x00,
+    kAaa         = 0x01,
+    kAa          = 0x02,
+    kC           = 0x03,
+    kD           = 0x04,
+    k4v5         = 0x05,
+    k6v0         = 0x06,
+    k9v0         = 0x07,
+    k12aa        = 0x08,
+    kAaaa        = 0x09,
+    kA           = 0x0A,
+    kB           = 0x0B,
+    kF           = 0x0C,
+    kN           = 0x0D,
+    kNo6         = 0x0E,
+    kSubC        = 0x0F,
+    kA23         = 0x10,
+    kA27         = 0x11,
+    kBa5800      = 0x12,
+    kDuplex      = 0x13,
+    k4sr44       = 0x14,
+    k523         = 0x15,
+    k531         = 0x16,
+    k15v0        = 0x17,
+    k22v5        = 0x18,
+    k30v0        = 0x19,
+    k45v0        = 0x1A,
+    k67v5        = 0x1B,
+    kJ           = 0x1C,
+    kCr123a      = 0x1D,
+    kCr2         = 0x1E,
+    k2cr5        = 0x1F,
+    kCrP2        = 0x20,
+    kCrV3        = 0x21,
+    kSr41        = 0x22,
+    kSr43        = 0x23,
+    kSr44        = 0x24,
+    kSr45        = 0x25,
+    kSr48        = 0x26,
+    kSr54        = 0x27,
+    kSr55        = 0x28,
+    kSr57        = 0x29,
+    kSr58        = 0x2A,
+    kSr59        = 0x2B,
+    kSr60        = 0x2C,
+    kSr63        = 0x2D,
+    kSr64        = 0x2E,
+    kSr65        = 0x2F,
+    kSr66        = 0x30,
+    kSr67        = 0x31,
+    kSr68        = 0x32,
+    kSr69        = 0x33,
+    kSr516       = 0x34,
+    kSr731       = 0x35,
+    kSr712       = 0x36,
+    kLr932       = 0x37,
+    kA5          = 0x38,
+    kA10         = 0x39,
+    kA13         = 0x3A,
+    kA312        = 0x3B,
+    kA675        = 0x3C,
+    kAc41e       = 0x3D,
+    k10180       = 0x3E,
+    k10280       = 0x3F,
+    k10440       = 0x40,
+    k14250       = 0x41,
+    k14430       = 0x42,
+    k14500       = 0x43,
+    k14650       = 0x44,
+    k15270       = 0x45,
+    k16340       = 0x46,
+    kRcr123a     = 0x47,
+    k17500       = 0x48,
+    k17670       = 0x49,
+    k18350       = 0x4A,
+    k18500       = 0x4B,
+    k18650       = 0x4C,
+    k19670       = 0x4D,
+    k25500       = 0x4E,
+    k26650       = 0x4F,
+    k32600       = 0x50,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 81,
+};
+
+// Enum for BatFaultEnum
+enum class BatFaultEnum : uint8_t
+{
+    kUnspecified = 0x00,
+    kOverTemp    = 0x01,
+    kUnderTemp   = 0x02,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -592,8 +726,8 @@ enum class BatFault : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for BatReplaceability
-enum class BatReplaceability : uint8_t
+// Enum for BatReplaceabilityEnum
+enum class BatReplaceabilityEnum : uint8_t
 {
     kUnspecified        = 0x00,
     kNotReplaceable     = 0x01,
@@ -606,8 +740,8 @@ enum class BatReplaceability : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Enum for PowerSourceStatus
-enum class PowerSourceStatus : uint8_t
+// Enum for PowerSourceStatusEnum
+enum class PowerSourceStatusEnum : uint8_t
 {
     kUnspecified = 0x00,
     kActive      = 0x01,
@@ -620,8 +754,8 @@ enum class PowerSourceStatus : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Enum for WiredCurrentType
-enum class WiredCurrentType : uint8_t
+// Enum for WiredCurrentTypeEnum
+enum class WiredCurrentTypeEnum : uint8_t
 {
     kAc = 0x00,
     kDc = 0x01,
@@ -632,10 +766,10 @@ enum class WiredCurrentType : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Enum for WiredFault
-enum class WiredFault : uint8_t
+// Enum for WiredFaultEnum
+enum class WiredFaultEnum : uint8_t
 {
-    kUnspecfied   = 0x00,
+    kUnspecified  = 0x00,
     kOverVoltage  = 0x01,
     kUnderVoltage = 0x02,
     // All received enum values that are not listed above will be mapped
@@ -976,8 +1110,8 @@ enum class ThreadNetworkDiagnosticsFeature : uint32_t
 
 namespace WiFiNetworkDiagnostics {
 
-// Enum for AssociationFailureCause
-enum class AssociationFailureCause : uint8_t
+// Enum for AssociationFailureCauseEnum
+enum class AssociationFailureCauseEnum : uint8_t
 {
     kUnknown              = 0x00,
     kAssociationFailed    = 0x01,
@@ -990,11 +1124,20 @@ enum class AssociationFailureCause : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for SecurityType
-enum class SecurityType : uint8_t
+// Enum for ConnectionStatusEnum
+enum class ConnectionStatusEnum : uint8_t
+{
+    kConnected    = 0x00,
+    kNotConnected = 0x01,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 2,
+};
+
+// Enum for SecurityTypeEnum
+enum class SecurityTypeEnum : uint8_t
 {
     kUnspecified = 0x00,
     kNone        = 0x01,
@@ -1008,25 +1151,9 @@ enum class SecurityType : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 6,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using SecurityType                                                                         = EmberAfSecurityType;
-static SecurityType __attribute__((unused)) kSecurityTypekUnknownEnumValue                 = static_cast<SecurityType>(6);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
-// Enum for WiFiConnectionStatus
-enum class WiFiConnectionStatus : uint8_t
-{
-    kConnected    = 0x00,
-    kNotConnected = 0x01,
-    // All received enum values that are not listed above will be mapped
-    // to kUnknownEnumValue. This is a helper enum value that should only
-    // be used by code to process how it handles receiving and unknown
-    // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 2,
-};
-
-// Enum for WiFiVersionType
-enum class WiFiVersionType : uint8_t
+// Enum for WiFiVersionEnum
+enum class WiFiVersionEnum : uint8_t
 {
     kA  = 0x00,
     kB  = 0x01,
@@ -1212,8 +1339,8 @@ enum class NodeOperationalCertStatusEnum : uint8_t
 
 namespace GroupKeyManagement {
 
-// Enum for GroupKeySecurityPolicy
-enum class GroupKeySecurityPolicy : uint8_t
+// Enum for GroupKeySecurityPolicyEnum
+enum class GroupKeySecurityPolicyEnum : uint8_t
 {
     kTrustFirst   = 0x00,
     kCacheAndSync = 0x01,
@@ -1474,11 +1601,12 @@ enum class LockDataTypeEnum : uint8_t
     kRfid            = 0x07,
     kFingerprint     = 0x08,
     kFingerVein      = 0x09,
+    kFace            = 0x0A,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 10,
+    kUnknownEnumValue = 11,
 };
 
 // Enum for LockOperationTypeEnum
@@ -1868,8 +1996,8 @@ namespace BarrierControl {} // namespace BarrierControl
 
 namespace PumpConfigurationAndControl {
 
-// Enum for PumpControlMode
-enum class PumpControlMode : uint8_t
+// Enum for ControlModeEnum
+enum class ControlModeEnum : uint8_t
 {
     kConstantSpeed        = 0x00,
     kConstantPressure     = 0x01,
@@ -1884,8 +2012,8 @@ enum class PumpControlMode : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Enum for PumpOperationMode
-enum class PumpOperationMode : uint8_t
+// Enum for OperationModeEnum
+enum class OperationModeEnum : uint8_t
 {
     kNormal  = 0x00,
     kMinimum = 0x01,
@@ -1907,11 +2035,11 @@ enum class PumpFeature : uint32_t
     kConstantSpeed       = 0x8,
     kConstantTemperature = 0x10,
     kAutomatic           = 0x20,
-    kLocal               = 0x40,
+    kLocalOperation      = 0x40,
 };
 
-// Bitmap for PumpStatus
-enum class PumpStatus : uint16_t
+// Bitmap for PumpStatusBitmap
+enum class PumpStatusBitmap : uint16_t
 {
     kDeviceFault       = 0x1,
     kSupplyfault       = 0x2,

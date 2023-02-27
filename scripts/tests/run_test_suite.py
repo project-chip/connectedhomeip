@@ -146,23 +146,29 @@ class RunContext:
     help='What test tags to exclude when running. Exclude options takes precedence over include.',
 )
 @click.option(
-    '--run-yamltests-with-chip-repl',
-    default=False,
-    is_flag=True,
-    help='Run YAML tests using chip-repl based python parser only')
+    '--runner',
+    type=click.Choice(['codegen', 'chip_repl_python', 'chip_tool_python'], case_sensitive=False),
+    default='codegen',
+    help='Run YAML tests using the specified runner.')
 @click.option(
     '--chip-tool',
     help='Binary path of chip tool app to use to run the test')
 @click.pass_context
 def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
-         no_log_timestamps, root, internal_inside_unshare, include_tags, exclude_tags, run_yamltests_with_chip_repl, chip_tool):
+         no_log_timestamps, root, internal_inside_unshare, include_tags, exclude_tags, runner, chip_tool):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
         log_fmt = '%(levelname)-7s %(message)s'
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
-    if chip_tool is None and not run_yamltests_with_chip_repl:
+    runtime = TestRunTime.CHIP_TOOL_BUILTIN
+    if runner == 'chip_repl_python':
+        runtime = TestRunTime.CHIP_REPL_PYTHON
+    elif runner == 'chip_tool_python':
+        runtime = TestRunTime.CHIP_TOOL_PYTHON
+
+    if chip_tool is None and not runtime == TestRunTime.CHIP_REPL_PYTHON:
         # non yaml tests REQUIRE chip-tool. Yaml tests should not require chip-tool
         chip_tool = FindBinaryPath('chip-tool')
 
@@ -173,7 +179,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
         exclude_tags = set([TestTag.__members__[t] for t in exclude_tags])
 
     # Figures out selected test that match the given name(s)
-    if run_yamltests_with_chip_repl:
+    if runtime == TestRunTime.CHIP_REPL_PYTHON:
         all_tests = [test for test in chiptest.AllYamlTests()]
     else:
         all_tests = [test for test in chiptest.AllChipToolTests(chip_tool)]
@@ -218,7 +224,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     context.obj = RunContext(root=root, tests=tests,
                              in_unshare=internal_inside_unshare,
                              chip_tool=chip_tool, dry_run=dry_run,
-                             runtime=TestRunTime.PYTHON_YAML if run_yamltests_with_chip_repl else TestRunTime.CHIP_TOOL_BUILTIN,
+                             runtime=runtime,
                              include_tags=include_tags,
                              exclude_tags=exclude_tags)
 
@@ -263,6 +269,9 @@ def cmd_list(context):
     '--chip-repl-yaml-tester',
     help='what python script to use for running yaml tests using chip-repl as controller')
 @click.option(
+    '--chip-tool-with-python',
+    help='what python script to use for running yaml tests using chip-tool as controller')
+@click.option(
     '--pics-file',
     type=click.Path(exists=True),
     default="src/app/tests/suites/certification/ci-pics-values",
@@ -280,7 +289,7 @@ def cmd_list(context):
     type=int,
     help='If provided, fail if a test runs for longer than this time')
 @click.pass_context
-def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, bridge_app, chip_repl_yaml_tester, pics_file, keep_going, test_timeout_seconds):
+def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, bridge_app, chip_repl_yaml_tester, chip_tool_with_python, pics_file, keep_going, test_timeout_seconds):
     runner = chiptest.runner.Runner()
 
     if all_clusters_app is None:
@@ -304,6 +313,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     if chip_repl_yaml_tester is None:
         chip_repl_yaml_tester = FindBinaryPath('yamltest_with_chip_repl_tester.py')
 
+    if chip_tool_with_python is None:
+        chip_tool_with_python = FindBinaryPath('chiptool.py')
+
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
         chip_tool=[context.obj.chip_tool],
@@ -313,7 +325,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         ota_requestor_app=[ota_requestor_app],
         tv_app=[tv_app],
         bridge_app=[bridge_app],
-        chip_repl_yaml_tester_cmd=['python3'] + [chip_repl_yaml_tester]
+        chip_repl_yaml_tester_cmd=['python3'] + [chip_repl_yaml_tester],
+        chip_tool_with_python_cmd=['python3'] + [chip_tool_with_python],
     )
 
     if sys.platform == 'linux':

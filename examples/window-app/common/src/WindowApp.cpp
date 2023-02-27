@@ -427,8 +427,9 @@ void WindowApp::Cover::Init(chip::EndpointId endpoint)
     chip::BitMask<ConfigStatus> configStatus = ConfigStatusGet(endpoint);
     configStatus.Set(ConfigStatus::kLiftEncoderControlled);
     configStatus.Set(ConfigStatus::kTiltEncoderControlled);
-    configStatus.Set(ConfigStatus::kOnlineReserved);
     ConfigStatusSet(endpoint, configStatus);
+
+    chip::app::Clusters::WindowCovering::ConfigStatusUpdateFeatures(endpoint);
 
     // Attribute: Id 13 EndProductType
     EndProductTypeSet(endpoint, EndProductType::kInteriorBlind);

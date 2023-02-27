@@ -206,14 +206,16 @@ tests:
               - name: "ms"
                 value: 10000
 
+    #Tolerance to be computed from the range
+    #Start value 120, expected value 20, 120 - 20 = 100, 100 % 15 = 15 , So 20+/-15
     - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              minValue: 17
-              maxValue: 23
+              minValue: 5
+              maxValue: 35
 
     - label: "Wait 10s"
       PICS: CC.S.F00

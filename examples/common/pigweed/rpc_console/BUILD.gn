@@ -32,10 +32,11 @@ group("default") {
 pw_python_distribution("chip_rpc_distribution") {
   packages = [ "py:chip_rpc" ]
   generate_setup_cfg = {
-    common_config_file = "common_setup.cfg"
+    name = "chip_rpc"
+    version = "0.0.1"
+    include_default_pyproject_file = true
     append_date_to_version = true
   }
-  extra_files = [ "py/pyproject.toml > pyproject.toml" ]
 }
 
 pw_internal_pip_install("pip_install_editable_chip_rpc") {

@@ -20,6 +20,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
 #include <credentials/GroupDataProviderImpl.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
@@ -48,6 +49,7 @@ constexpr uint16_t kMaxGroupsPerFabric           = 5;
 constexpr uint16_t kMaxGroupKeysPerFabric        = 8;
 
 chip::TestPersistentStorageDelegate gTestStorage;
+chip::Crypto::DefaultSessionKeystore gSessionKeystore;
 chip::Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
 
 } // namespace
@@ -1042,6 +1044,7 @@ int Test_Setup(void * inContext)
     TestContext & ctx = *static_cast<TestContext *>(inContext);
     gTestStorage.ClearStorage();
     gGroupsProvider.SetStorageDelegate(&gTestStorage);
+    gGroupsProvider.SetSessionKeystore(&gSessionKeystore);
     VerifyOrReturnError(CHIP_NO_ERROR == gGroupsProvider.Init(), FAILURE);
     chip::Credentials::SetGroupDataProvider(&gGroupsProvider);
 

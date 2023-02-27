@@ -2,19 +2,17 @@
 
 import logging
 import os
-import traceback
 import xml.etree.ElementTree
-from dataclasses import dataclass, field
-from typing import List, Mapping, Optional
+from dataclasses import dataclass
+from typing import List, Mapping
 
-import stringcase
 from lark import Lark
 from lark.visitors import Discard, Transformer, v_args
 
 try:
     from .types import (AttributeRequirement, ClusterCommandRequirement, ClusterRequirement, RequiredAttributesRule,
                         RequiredCommandsRule)
-except:
+except ImportError:
     import sys
 
     sys.path.append(os.path.join(os.path.abspath(
@@ -102,7 +100,7 @@ def DecodeClusterFromXml(element: xml.etree.ElementTree.Element):
             required_attributes=required_attributes,
             required_commands=required_commands
         )
-    except Exception as e:
+    except Exception:
         logging.exception("Failed to decode cluster %r" % element)
         return None
 
@@ -204,7 +202,7 @@ class LintRulesTransformer(Transformer):
         """Numbers in the grammar are integers or hex numbers.
         """
         if len(tokens) != 1:
-            raise Error("Unexpected argument counts")
+            raise Exception("Unexpected argument counts")
 
         return parseNumberString(tokens[0].value)
 
@@ -220,7 +218,7 @@ class LintRulesTransformer(Transformer):
         """An id is a string containing an identifier
         """
         if len(tokens) != 1:
-            raise Error("Unexpected argument counts")
+            raise Exception("Unexpected argument counts")
         return tokens[0].value
 
     def ESCAPED_STRING(self, s):
@@ -279,7 +277,8 @@ def CreateParser(file_name: str):
     """
     Generates a parser that will process a ".matter" file into a IDL
     """
-    return Parser(Lark.open('lint_rules_grammar.lark', rel_to=__file__, parser='lalr', propagate_positions=True), file_name=file_name)
+    return Parser(
+        Lark.open('lint_rules_grammar.lark', rel_to=__file__, parser='lalr', propagate_positions=True), file_name=file_name)
 
 
 if __name__ == '__main__':

@@ -28,7 +28,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 
@@ -141,7 +140,8 @@ void StopSignalHandler(int signal)
     }
     else
     {
-        Server::GetInstance().DispatchShutDownAndStopEventLoop();
+        Server::GetInstance().GenerateShutDownEvent();
+        PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
     }
 }
 #endif // !defined(ENABLE_CHIP_SHELL)
@@ -402,7 +402,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ChipLogProgress(AppServer, "Starting commissioner");
-    VerifyOrReturn(InitCommissioner(LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10,
+    VerifyOrReturn(InitCommissioner(LinuxDeviceOptions::GetInstance().securedCommissionerPort,
                                     LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort,
                                     LinuxDeviceOptions::GetInstance().commissionerFabricId) == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Started commissioner");

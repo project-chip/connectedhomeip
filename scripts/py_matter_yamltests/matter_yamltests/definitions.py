@@ -109,6 +109,18 @@ class SpecDefinitions:
         event = self.__get_by_id(cluster_id, event_id, _ItemType.Event)
         return event.name if event else None
 
+    def get_cluster_id_by_name(self, cluster_name: str) -> int:
+        if cluster_name is None:
+            return None
+
+        # The idl parser remove spaces
+        cluster_name = cluster_name.replace(' ', '')
+        return self.__clusters_by_name.get(cluster_name)
+
+    def has_cluster_by_name(self, cluster_name: str) -> bool:
+        cluster_id = self.get_cluster_id_by_name(cluster_name)
+        return cluster_id is not None
+
     def get_command_by_name(self, cluster_name: str, command_name: str) -> Command:
         return self.__get_by_name(cluster_name, command_name, _ItemType.Request)
 
@@ -149,6 +161,21 @@ class SpecDefinitions:
 
         return None
 
+    def get_command_names(self, cluster_name: str) -> list[str]:
+        targets = self.__get_targets_by_cluster_name(
+            cluster_name, _ItemType.Request)
+        return [] if targets is None else [name for name in targets]
+
+    def get_event_names(self, cluster_name: str) -> list[str]:
+        targets = self.__get_targets_by_cluster_name(
+            cluster_name, _ItemType.Event)
+        return [] if targets is None else [name for name in targets]
+
+    def get_attribute_names(self, cluster_name: str) -> list[str]:
+        targets = self.__get_targets_by_cluster_name(
+            cluster_name, _ItemType.Attribute)
+        return [] if targets is None else [name for name in targets]
+
     def is_fabric_scoped(self, target) -> bool:
         if isinstance(target, Event):
             return bool(target.is_fabric_sensitive)
@@ -164,82 +191,71 @@ class SpecDefinitions:
         return False
 
     def __get_by_name(self, cluster_name: str, target_name: str, target_type: _ItemType):
-        if not cluster_name or not target_name:
+        if target_name is None:
             return None
 
-        # The idl parser remove spaces
-        cluster_name = cluster_name.replace(' ', '')
-
-        cluster_id = self.__clusters_by_name.get(cluster_name)
+        cluster_id = self.get_cluster_id_by_name(cluster_name)
         if cluster_id is None:
+            return None
+
+        targets = self.__get_targets_by_cluster_name(cluster_name, target_type)
+        if targets is None:
             return None
 
         target = None
 
         if target_type == _ItemType.Request:
-            self.__enforce_casing(
-                target_name, self.__commands_by_name.get(cluster_name))
-            target_id = self.__commands_by_name.get(
-                cluster_name).get(target_name)
+            target_id = targets.get(target_name)
             target = self.__get_by_id(cluster_id, target_id, target_type)
         elif target_type == _ItemType.Response:
-            self.__enforce_casing(
-                target_name, self.__responses_by_name.get(cluster_name))
-            target_id = self.__responses_by_name.get(
-                cluster_name).get(target_name)
+            target_id = targets.get(target_name)
             target = self.__get_by_id(cluster_id, target_id, target_type)
         elif target_type == _ItemType.Event:
-            self.__enforce_casing(
-                target_name, self.__events_by_name.get(cluster_name))
-            target_id = self.__events_by_name.get(
-                cluster_name).get(target_name)
+            target_id = targets.get(target_name)
             target = self.__get_by_id(cluster_id, target_id, target_type)
         elif target_type == _ItemType.Attribute:
-            self.__enforce_casing(
-                target_name, self.__attributes_by_name.get(cluster_name))
-            target_id = self.__attributes_by_name.get(
-                cluster_name).get(target_name)
+            target_id = targets.get(target_name)
             target = self.__get_by_id(cluster_id, target_id, target_type)
         elif target_type == _ItemType.Bitmap:
-            self.__enforce_casing(
-                target_name, self.__bitmaps_by_name.get(cluster_name))
-            target = self.__bitmaps_by_name.get(cluster_name).get(target_name)
+            target = targets.get(target_name)
         elif target_type == _ItemType.Enum:
-            self.__enforce_casing(
-                target_name, self.__enums_by_name.get(cluster_name))
-            target = self.__enums_by_name.get(cluster_name).get(target_name)
+            target = targets.get(target_name)
         elif target_type == _ItemType.Struct:
-            self.__enforce_casing(
-                target_name, self.__structs_by_name.get(cluster_name))
-            target = self.__structs_by_name.get(cluster_name).get(target_name)
+            target = targets.get(target_name)
 
         return target
 
     def __get_by_id(self, cluster_id: int, target_id: int, target_type: str):
-        targets = None
+        target_mapping = {
+            _ItemType.Request: self.__commands_by_id,
+            _ItemType.Response: self.__responses_by_id,
+            _ItemType.Attribute: self.__attributes_by_id,
+            _ItemType.Event: self.__events_by_id,
+        }
 
-        if target_type == _ItemType.Request:
-            targets = self.__commands_by_id.get(cluster_id)
-        elif target_type == _ItemType.Response:
-            targets = self.__responses_by_id.get(cluster_id)
-        elif target_type == _ItemType.Event:
-            targets = self.__events_by_id.get(cluster_id)
-        elif target_type == _ItemType.Attribute:
-            targets = self.__attributes_by_id.get(cluster_id)
-
+        targets = target_mapping[target_type].get(cluster_id)
         if targets is None:
             return None
 
         return targets.get(target_id)
 
-    def __enforce_casing(self, target_name: str, targets: list):
-        if targets.get(target_name) is not None:
-            return
+    def __get_targets_by_cluster_name(self, cluster_name: str, target_type: _ItemType):
+        if not cluster_name:
+            return None
 
-        for name in targets:
-            if name.lower() == target_name.lower():
-                raise KeyError(
-                    f'Unknown target {target_name}. Did you mean {name} ?')
+        target_mapping = {
+            _ItemType.Request: self.__commands_by_name,
+            _ItemType.Response: self.__responses_by_name,
+            _ItemType.Attribute: self.__attributes_by_name,
+            _ItemType.Event: self.__events_by_name,
+            _ItemType.Bitmap: self.__bitmaps_by_name,
+            _ItemType.Enum: self.__enums_by_name,
+            _ItemType.Struct: self.__structs_by_name,
+        }
+
+        # The idl parser remove spaces
+        cluster_name = cluster_name.replace(' ', '')
+        return target_mapping[target_type].get(cluster_name)
 
 
 def SpecDefinitionsFromPaths(paths: str, pseudo_clusters: Optional[PseudoClusters] = PseudoClusters([])):

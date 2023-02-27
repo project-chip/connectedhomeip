@@ -44,8 +44,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * retrieved when performing actions using a combination of MTRBaseDevice
  * and MTRAsyncCallbackQueue.
  */
-+ (instancetype)deviceWithNodeID:(NSNumber *)nodeID
-                      controller:(MTRDeviceController *)controller API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
++ (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID
+                     controller:(MTRDeviceController *)controller API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The current state of the device.
@@ -146,7 +146,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param timeout   timeout in milliseconds for timed invoke, or nil. This value must be within [1, UINT16_MAX], and will be clamped
  * to this range.
  *
- * @param completion  response handler will receive either values or error.
+ * @param completion  response handler will receive either values or error.  A
+ *                    path-specific error status from the command invocation
+ *                    will result in an error being passed to the completion, so
+ *                    values will only be passed in when the command succeeds.
  */
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID
@@ -238,8 +241,8 @@ extern NSString * const MTREventTimestampDateKey MTR_NEWLY_AVAILABLE;
 /**
  * Deprecated MTRDevice APIs.
  */
-+ (instancetype)deviceWithNodeID:(uint64_t)nodeID
-                deviceController:(MTRDeviceController *)deviceController
++ (MTRDevice *)deviceWithNodeID:(uint64_t)nodeID
+               deviceController:(MTRDeviceController *)deviceController
     API_DEPRECATED(
         "Please use deviceWithNodeID:controller:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 

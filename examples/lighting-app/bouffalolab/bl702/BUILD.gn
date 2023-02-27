@@ -80,6 +80,10 @@ bl_iot_sdk("sdk") {
     defines += [ "CFG_USE_PSRAM=1" ]
   }
 
+  if (defined(enable_cdc_module) && enable_cdc_module) {
+    defines += [ "CFG_USB_CDC_ENABLE" ]
+  }
+
   if (chip_enable_pw_rpc) {
     include_dirs += [ "${examples_plat_common_dir}/rpc" ]
     defines += [ "PW_RPC_ENABLED=1" ]
@@ -114,6 +118,10 @@ bouffalolab_executable("lighting_app") {
     defines += [ "BL706_NIGHT_LIGHT" ]
   } else if ("BL702-IoT-DVK" == board || "BL706-IoT-DVK" == board) {
     defines += [ "BL706_IOT_DVK" ]
+  }
+
+  if (defined(enable_cdc_module) && enable_cdc_module) {
+    defines += [ "CFG_USB_CDC_ENABLE" ]
   }
 
   sources = [

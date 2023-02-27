@@ -144,25 +144,6 @@ class ZAPGenerateTarget:
         generate_end = time.time()
 
         if "chef" in self.zap_config:
-            if self.output_dir:
-                af_gen_event = os.path.join(self.output_dir, "af-gen-event.h")
-            else:
-                # location of file is based on zap file, we update a default here.
-                # This is because matter idl codegen does NOT require an output directory.
-                #
-                # a file of:
-                #    examples/chef/devices/rootnode_heatingcoolingunit_ncdGai1E5a.zap
-                # would get:
-                #    zzz_generated/chef-rootnode_heatingcoolingunit_ncdGai1E5a/zap-generated/af-gen-event.h
-                #
-                af_gen_event = os.path.join(
-                    CHIP_ROOT_DIR, 'zzz_generated',
-                    'chef-' + os.path.splitext(os.path.basename(self.zap_config))[0],
-                    'zap-generated', 'af-gen-event.h'
-                )
-
-            with open(af_gen_event, "w+"):  # Empty file needed for linux
-                pass
             idl_path = self.zap_config.replace(".zap", ".matter")
             target_path = os.path.join("examples",
                                        "chef",

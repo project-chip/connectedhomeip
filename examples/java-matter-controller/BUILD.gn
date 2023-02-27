@@ -42,6 +42,7 @@ java_binary("java-matter-controller") {
     "java/src/com/matter/controller/commands/discover/DiscoverCommissionersCommand.java",
     "java/src/com/matter/controller/commands/pairing/CloseSessionCommand.java",
     "java/src/com/matter/controller/commands/pairing/DiscoveryFilterType.java",
+    "java/src/com/matter/controller/commands/pairing/PairAddressPaseCommand.java",
     "java/src/com/matter/controller/commands/pairing/PairAlreadyDiscoveredCommand.java",
     "java/src/com/matter/controller/commands/pairing/PairCodeCommand.java",
     "java/src/com/matter/controller/commands/pairing/PairCodePaseCommand.java",

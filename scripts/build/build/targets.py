@@ -18,7 +18,7 @@ from itertools import combinations
 from typing import Any, List, Optional
 
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
-from builders.android import AndroidApp, AndroidBoard, AndroidBuilder
+from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
 from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
 from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
 from builders.cc32xx import cc32xxApp, cc32xxBuilder
@@ -118,6 +118,7 @@ def BuildHostTarget():
         TargetPart('tests', app=HostApp.TESTS),
         TargetPart('chip-cert', app=HostApp.CERT_TOOL),
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
+        TargetPart('contact-sensor', app=HostApp.CONTACT_SENSOR),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -192,6 +193,7 @@ def BuildEfr32Target():
     target.AppendFixedTargets([
         TargetPart('brd4161a', board=Efr32Board.BRD4161A),
         TargetPart('brd4187c', board=Efr32Board.BRD4187C),
+        TargetPart('brd4186c', board=Efr32Board.BRD4186C),
         TargetPart('brd4163a', board=Efr32Board.BRD4163A),
         TargetPart('brd4164a', board=Efr32Board.BRD4164A),
         TargetPart('brd4166a', board=Efr32Board.BRD4166A),
@@ -208,6 +210,7 @@ def BuildEfr32Target():
         TargetPart('unit-test', app=Efr32App.UNIT_TEST),
         TargetPart('light', app=Efr32App.LIGHT),
         TargetPart('lock', app=Efr32App.LOCK),
+        TargetPart('thermostat', app=Efr32App.THERMOSTAT)
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
@@ -293,6 +296,9 @@ def BuildAndroidTarget():
         TargetPart('tv-casting-app', app=AndroidApp.TV_CASTING_APP),
         TargetPart('java-matter-controller', app=AndroidApp.JAVA_MATTER_CONTROLLER),
     ])
+
+    # Modifiers
+    target.AppendModifier('no-debug', profile=AndroidProfile.RELEASE)
 
     return target
 
@@ -491,7 +497,7 @@ def BuildBouffalolabTarget():
         TargetPart('BL602-NIGHT-LIGHT', board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
         TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit, module_type="BL706C-22"),
         TargetPart('BL706-IoT-DVK', board=BouffalolabBoard.BL706_IoT_DVK, module_type="BL706C-22"),
-        TargetPart('BL706-NIGHT-LIGHT', board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL702"),
+        TargetPart('BL706-NIGHT-LIGHT', board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
     ])
 
     # Apps
@@ -502,6 +508,7 @@ def BuildBouffalolabTarget():
     target.AppendModifier('shell', enable_shell=True)
     target.AppendModifier('115200', baudrate=115200)
     target.AppendModifier('rpc', enable_rpcs=True)
+    target.AppendModifier('cdc', enable_cdc=True)
 
     return target
 
@@ -545,9 +552,14 @@ def BuildTelinkTarget():
         TargetPart('contact-sensor', app=TelinkApp.CONTACT_SENSOR),
         TargetPart('light', app=TelinkApp.LIGHT),
         TargetPart('light-switch', app=TelinkApp.SWITCH),
+        TargetPart('lock', app=TelinkApp.LOCK),
         TargetPart('ota-requestor', app=TelinkApp.OTA_REQUESTOR),
+        TargetPart('pump', app=TelinkApp.PUMP),
+        TargetPart('pump-controller', app=TelinkApp.PUMP_CONTROLLER),
         TargetPart('thermostat', app=TelinkApp.THERMOSTAT),
     ])
+
+    target.AppendModifier('rpc', enable_rpcs=True)
 
     return target
 

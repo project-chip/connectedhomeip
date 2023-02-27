@@ -894,6 +894,18 @@ class ChipDeviceController():
             ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
         return await future
 
+    def SendGroupCommand(self, groupid: int, payload: ClusterObjects.ClusterCommand, busyWaitMs: typing.Union[None, int] = None):
+        '''
+        Send a group cluster-object encapsulated command to a group_id and get returned a future that can be awaited upon to get confirmation command was sent.
+        '''
+        self.CheckIsActive()
+
+        ClusterCommand.SendGroupCommand(
+            groupid, self.devCtrl, payload, busyWaitMs=busyWaitMs).raise_on_error()
+
+        # None is the expected return for sending group commands.
+        return None
+
     async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor, int]], timedRequestTimeoutMs: typing.Union[None, int] = None, interactionTimeoutMs: typing.Union[None, int] = None, busyWaitMs: typing.Union[None, int] = None):
         '''
         Write a list of attributes on a target node.
@@ -926,6 +938,34 @@ class ChipDeviceController():
         ClusterAttribute.WriteAttributes(
             future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs, interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs).raise_on_error()
         return await future
+
+    def WriteGroupAttribute(self, groupid: int, attributes: typing.List[typing.Tuple[ClusterObjects.ClusterAttributeDescriptor, int]], busyWaitMs: typing.Union[None, int] = None):
+        '''
+        Write a list of attributes on a target group.
+
+        groupid: Group ID to send write attribute to.
+        attributes: A list of tuples of type (cluster-object, data-version). The data-version can be omitted.
+
+        E.g
+            (Clusters.UnitTesting.Attributes.XYZAttribute('hello'), 1) -- Group Write 'hello' with data version 1
+        '''
+        self.CheckIsActive()
+
+        attrs = []
+        invalid_endpoint = 0xFFFF
+        for v in attributes:
+            if len(v) == 2:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    invalid_endpoint, v[0], v[1], 1, v[0].value))
+            else:
+                attrs.append(ClusterAttribute.AttributeWriteRequest(
+                    invalid_endpoint, v[0], 0, 0, v[0].value))
+
+        ClusterAttribute.WriteGroupAttributes(
+            groupid, self.devCtrl, attrs, busyWaitMs=busyWaitMs).raise_on_error()
+
+        # An empty list is the expected return for sending group write attribute.
+        return []
 
     def _parseAttributePathTuple(self, pathTuple: typing.Union[
         None,  # Empty tuple, all wildcard
@@ -1289,6 +1329,15 @@ class ChipDeviceController():
                 self.devCtrl, py_object(self), csr.NOCSRElements, len(csr.NOCSRElements), nodeId)
         )
 
+    def InitGroupTestingData(self):
+        """Populates the Device Controller's GroupDataProvider with known test group info and keys."""
+        self.CheckIsActive()
+
+        self._ChipStack.Call(
+            lambda: self._dmLib.pychip_OpCreds_InitGroupTestingData(
+                self.devCtrl)
+        ).raise_on_error()
+
     # ----- Private Members -----
     def _InitLib(self):
         if self._dmLib is None:
@@ -1454,6 +1503,10 @@ class ChipDeviceController():
                 c_void_p, py_object, c_char_p, c_size_t, c_uint64
             ]
             self._dmLib.pychip_DeviceController_IssueNOCChain.restype = PyChipError
+
+            self._dmLib.pychip_OpCreds_InitGroupTestingData.argtypes = [
+                c_void_p]
+            self._dmLib.pychip_OpCreds_InitGroupTestingData.restype = PyChipError
 
             self._dmLib.pychip_DeviceController_SetIssueNOCChainCallbackPythonCallback.argtypes = [
                 _IssueNOCChainCallbackPythonCallbackFunct]

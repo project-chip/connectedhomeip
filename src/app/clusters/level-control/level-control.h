@@ -27,6 +27,7 @@
 #include <stdint.h>
 
 #include <app-common/zap-generated/cluster-enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
 
 /** @brief Level Control Cluster Server Post Init
@@ -44,3 +45,11 @@ void emberAfPluginLevelControlClusterServerPostInitCallback(chip::EndpointId end
  * fact an instance of Level Control on the given endpoint.
  */
 bool LevelControlHasFeature(chip::EndpointId endpoint, chip::app::Clusters::LevelControl::LevelControlFeature feature);
+
+namespace LevelControlServer {
+
+chip::Protocols::InteractionModel::Status
+MoveToLevel(chip::EndpointId endpointId,
+            const chip::app::Clusters::LevelControl::Commands::MoveToLevel::DecodableType & commandData);
+
+} // namespace LevelControlServer
