@@ -81,7 +81,9 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
             env->ExceptionDescribe();
             env->ExceptionClear();
             FormatResponseData(handlerContext, "{\"value\":{}}");
-        } else {
+        }
+        else
+        {
             JniUtfString respStr(env, resp);
             ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand got response %s", respStr.c_str());
             FormatResponseData(handlerContext, respStr.c_str());
