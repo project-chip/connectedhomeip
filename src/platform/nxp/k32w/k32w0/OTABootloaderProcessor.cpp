@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
+#include <lib/core/TLV.h>
+#include <lib/support/BufferReader.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/nxp/k32w/k32w0/CHIPDevicePlatformConfig.h>
 #include <platform/nxp/k32w/k32w0/OTABootloaderProcessor.h>
-#include <lib/core/TLV.h>
-#include <lib/support/BufferReader.h>
 
 #include "OtaSupport.h"
 #include "OtaUtils.h"

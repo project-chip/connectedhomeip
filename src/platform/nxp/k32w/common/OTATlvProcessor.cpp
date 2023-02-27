@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BufferReader.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 #include <platform/nxp/k32w/common/OTATlvProcessor.h>
@@ -27,8 +27,8 @@ namespace chip {
 
 CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
 {
-    CHIP_ERROR status = CHIP_NO_ERROR;
-    uint32_t bytes = chip::min(mLength - mProcessedLength, static_cast<uint32_t>(block.size()));
+    CHIP_ERROR status     = CHIP_NO_ERROR;
+    uint32_t bytes        = chip::min(mLength - mProcessedLength, static_cast<uint32_t>(block.size()));
     ByteSpan relevantData = block.SubSpan(0, bytes);
 
     status = ProcessInternal(relevantData);
@@ -50,21 +50,19 @@ CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
 
 bool OTATlvProcessor::IsError(CHIP_ERROR & status)
 {
-    return status != CHIP_NO_ERROR &&
-           status != CHIP_ERROR_BUFFER_TOO_SMALL &&
-           status != CHIP_OTA_FETCH_ALREADY_SCHEDULED;
+    return status != CHIP_NO_ERROR && status != CHIP_ERROR_BUFFER_TOO_SMALL && status != CHIP_OTA_FETCH_ALREADY_SCHEDULED;
 }
 
 void OTADataAccumulator::Init(uint32_t threshold)
 {
-    mThreshold = threshold;
+    mThreshold    = threshold;
     mBufferOffset = 0;
     mBuffer.Alloc(mThreshold);
 }
 
 void OTADataAccumulator::Clear()
 {
-    mThreshold = 0;
+    mThreshold    = 0;
     mBufferOffset = 0;
     mBuffer.Free();
 }

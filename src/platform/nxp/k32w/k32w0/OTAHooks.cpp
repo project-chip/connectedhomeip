@@ -16,9 +16,8 @@
  *    limitations under the License.
  */
 
-
-#include <src/include/platform/CHIPDeviceLayer.h>
 #include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
+#include <src/include/platform/CHIPDeviceLayer.h>
 
 #include <platform/nxp/k32w/k32w0/CHIPDevicePlatformConfig.h>
 #include <platform/nxp/k32w/k32w0/OTAApplicationProcessor.h>
@@ -32,14 +31,14 @@
 extern "C" void ResetMCU(void);
 
 static chip::OTAApplicationProcessor sApplicationProcessor;
-static chip::OTABootloaderProcessor  sBootloaderProcessor;
+static chip::OTABootloaderProcessor sBootloaderProcessor;
 #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
 static chip::OTAFactoryDataProcessor sFactoryDataProcessor;
 #endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
 
 extern "C" WEAK CHIP_ERROR OtaHookInit()
 {
-    auto& imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
+    auto & imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(1, &sApplicationProcessor));
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(2, &sBootloaderProcessor));
 #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA

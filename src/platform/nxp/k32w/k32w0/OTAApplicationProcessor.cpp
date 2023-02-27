@@ -17,8 +17,8 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/nxp/k32w/k32w0/CHIPDevicePlatformConfig.h>
 #include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
+#include <platform/nxp/k32w/k32w0/CHIPDevicePlatformConfig.h>
 #include <platform/nxp/k32w/k32w0/OTAApplicationProcessor.h>
 
 #include "OtaSupport.h"
@@ -39,9 +39,9 @@ CHIP_ERROR OTAApplicationProcessor::Init()
 CHIP_ERROR OTAApplicationProcessor::Clear()
 {
     mAccumulator.Clear();
-    mLength = 0;
-    mProcessedLength = 0;
-    mWasSelected = false;
+    mLength              = 0;
+    mProcessedLength     = 0;
+    mWasSelected         = false;
     mDescriptorProcessed = false;
 
     return CHIP_NO_ERROR;
@@ -61,7 +61,7 @@ CHIP_ERROR OTAApplicationProcessor::ProcessInternal(ByteSpan & block)
         return CHIP_OTA_PROCESSOR_MAKE_ROOM;
     }
 
-    status = OTA_PushImageChunk((uint8_t*) block.data(), (uint16_t) block.size(), NULL, NULL);
+    status = OTA_PushImageChunk((uint8_t *) block.data(), (uint16_t) block.size(), NULL, NULL);
     if (gOtaSuccess_c != status)
     {
         ChipLogError(SoftwareUpdate, "Failed to write image block. Status: %d", status);

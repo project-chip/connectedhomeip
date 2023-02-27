@@ -129,6 +129,6 @@
  * PDM ID used for factory data backup in K32W0FactoryDataProvider.
  */
 #ifndef kNvmId_FactoryDataBackup
-#define kNvmId_FactoryDataBackup (uint16_t)0x7000
+#define kNvmId_FactoryDataBackup (uint16_t) 0x7000
 #endif
 #endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA

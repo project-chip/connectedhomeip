@@ -19,11 +19,11 @@
 #pragma once
 
 #include <lib/core/OTAImageHeader.h>
+#include <map>
+#include <platform/nxp/k32w/common/OTATlvProcessor.h>
 #include <src/app/clusters/ota-requestor/OTADownloader.h>
 #include <src/include/platform/CHIPDeviceLayer.h>
 #include <src/include/platform/OTAImageProcessor.h>
-#include <platform/nxp/k32w/common/OTATlvProcessor.h>
-#include <map>
 
 /*
  * OTA hooks that can be overwritten by application.
@@ -56,7 +56,7 @@ public:
     CHIP_ERROR RegisterProcessor(uint32_t tag, OTATlvProcessor * processor);
 
     static void FetchNextData(uint32_t context);
-    static OTAImageProcessorImpl& GetDefaultInstance();
+    static OTAImageProcessorImpl & GetDefaultInstance();
 
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
@@ -78,11 +78,11 @@ private:
      */
     CHIP_ERROR ReleaseBlock();
 
-    MutableByteSpan      mBlock;
-    OTADownloader *      mDownloader;
+    MutableByteSpan mBlock;
+    OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
-    OTATlvProcessor *    mCurrentProcessor = nullptr;
-    OTADataAccumulator   mAccumulator;
+    OTATlvProcessor * mCurrentProcessor = nullptr;
+    OTADataAccumulator mAccumulator;
     std::map<uint32_t, OTATlvProcessor *> mProcessorMap;
 };
 

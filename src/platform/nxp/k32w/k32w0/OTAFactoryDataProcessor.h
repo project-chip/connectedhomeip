@@ -27,7 +27,7 @@
 namespace chip {
 
 using FactoryProvider = DeviceLayer::K32W0FactoryDataProvider;
-using Tags = FactoryProvider::FactoryDataId;
+using Tags            = FactoryProvider::FactoryDataId;
 
 /**
  * OTA custom payload that uses Matter TLVs.
@@ -64,7 +64,7 @@ public:
 private:
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;
     CHIP_ERROR DecodeTlv();
-    CHIP_ERROR Update(uint8_t tag, Optional<ByteSpan>& optional);
+    CHIP_ERROR Update(uint8_t tag, Optional<ByteSpan> & optional);
 
     CHIP_ERROR Read();
     CHIP_ERROR Backup();
@@ -74,7 +74,7 @@ private:
 
     OTAFactoryPayload mPayload;
     OTADataAccumulator mAccumulator;
-    uint8_t* mFactoryData = nullptr;
+    uint8_t * mFactoryData = nullptr;
 };
 
 } // namespace chip

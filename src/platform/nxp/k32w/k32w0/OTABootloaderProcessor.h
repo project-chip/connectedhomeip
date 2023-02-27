@@ -26,8 +26,8 @@ namespace chip {
 struct BootLoaderDescriptor
 {
     uint32_t version;
-    char     versionString[kVersionStringSize];
-    char     buildDate[kBuildDateSize];
+    char versionString[kVersionStringSize];
+    char buildDate[kBuildDateSize];
     uint32_t loadAddress;
 };
 

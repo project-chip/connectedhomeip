@@ -39,12 +39,12 @@
 
 /* OTA related includes */
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-#include <src/platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 #include "OtaSupport.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
+#include <src/platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 #endif
 
 #include "Keyboard.h"
@@ -253,7 +253,7 @@ void AppTask::InitOTA(intptr_t arg)
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gRequestorUser.SetMaxDownloadBlockSize(requestedOtaBlockSize);
-    auto& imageProcessor = OTAImageProcessorImpl::GetDefaultInstance();
+    auto & imageProcessor = OTAImageProcessorImpl::GetDefaultInstance();
     gRequestorUser.Init(&gRequestorCore, &imageProcessor);
     CHIP_ERROR err = imageProcessor.Init(&gDownloader);
     if (err != CHIP_NO_ERROR)

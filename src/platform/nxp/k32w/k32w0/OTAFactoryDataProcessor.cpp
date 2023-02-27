@@ -16,18 +16,18 @@
  *    limitations under the License.
  */
 
+#include <lib/core/TLV.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/nxp/k32w/common/CHIPDevicePlatformRamStorageConfig.h>
 #include <platform/nxp/k32w/k32w0/CHIPDevicePlatformConfig.h>
 #include <platform/nxp/k32w/k32w0/OTAFactoryDataProcessor.h>
-#include <platform/nxp/k32w/common/CHIPDevicePlatformRamStorageConfig.h>
-#include <lib/core/TLV.h>
 
-#include "fsl_flash.h"
 #include "PDM.h"
+#include "fsl_flash.h"
 
 namespace chip {
 
-static OtaUtils_EEPROM_ReadData pFunctionEepromRead = (OtaUtils_EEPROM_ReadData)FactoryProvider::ReadDataMemcpy;
+static OtaUtils_EEPROM_ReadData pFunctionEepromRead = (OtaUtils_EEPROM_ReadData) FactoryProvider::ReadDataMemcpy;
 
 CHIP_ERROR OTAFactoryDataProcessor::Init()
 {
@@ -75,10 +75,10 @@ CHIP_ERROR OTAFactoryDataProcessor::ApplyAction()
     ReturnErrorOnFailure(Read());
     ReturnErrorOnFailure(Backup());
 
-    SuccessOrExit(error = Update((uint8_t)Tags::kDacPrivateKeyId, mPayload.mCertDacKey));
-    SuccessOrExit(error = Update((uint8_t)Tags::kDacCertificateId, mPayload.mCertDac));
-    SuccessOrExit(error = Update((uint8_t)Tags::kPaiCertificateId, mPayload.mCertPai));
-    SuccessOrExit(error = Update((uint8_t)Tags::kCertDeclarationId, mPayload.mCertDeclaration));
+    SuccessOrExit(error = Update((uint8_t) Tags::kDacPrivateKeyId, mPayload.mCertDacKey));
+    SuccessOrExit(error = Update((uint8_t) Tags::kDacCertificateId, mPayload.mCertDac));
+    SuccessOrExit(error = Update((uint8_t) Tags::kPaiCertificateId, mPayload.mCertPai));
+    SuccessOrExit(error = Update((uint8_t) Tags::kCertDeclarationId, mPayload.mCertDeclaration));
 
     error = FactoryProvider::GetDefaultInstance().UpdateData(mFactoryData);
 
@@ -117,25 +117,25 @@ CHIP_ERROR OTAFactoryDataProcessor::DecodeTlv()
     ReturnErrorOnFailure(tlvReader.EnterContainer(outerType));
     ReturnErrorOnFailure(tlvReader.Next());
 
-    if (tlvReader.GetTag() == TLV::ContextTag((uint8_t)Tags::kDacPrivateKeyId))
+    if (tlvReader.GetTag() == TLV::ContextTag((uint8_t) Tags::kDacPrivateKeyId))
     {
         ReturnErrorOnFailure(tlvReader.Get(mPayload.mCertDacKey.Emplace()));
         ReturnErrorOnFailure(tlvReader.Next());
     }
 
-    if (tlvReader.GetTag() == TLV::ContextTag((uint8_t)Tags::kDacCertificateId))
+    if (tlvReader.GetTag() == TLV::ContextTag((uint8_t) Tags::kDacCertificateId))
     {
         ReturnErrorOnFailure(tlvReader.Get(mPayload.mCertDac.Emplace()));
         ReturnErrorOnFailure(tlvReader.Next());
     }
 
-    if (tlvReader.GetTag() == TLV::ContextTag((uint8_t)Tags::kPaiCertificateId))
+    if (tlvReader.GetTag() == TLV::ContextTag((uint8_t) Tags::kPaiCertificateId))
     {
         ReturnErrorOnFailure(tlvReader.Get(mPayload.mCertPai.Emplace()));
         ReturnErrorOnFailure(tlvReader.Next());
     }
 
-    if (tlvReader.GetTag() == TLV::ContextTag((uint8_t)Tags::kCertDeclarationId))
+    if (tlvReader.GetTag() == TLV::ContextTag((uint8_t) Tags::kCertDeclarationId))
     {
         ReturnErrorOnFailure(tlvReader.Get(mPayload.mCertDeclaration.Emplace()));
     }
@@ -145,7 +145,7 @@ CHIP_ERROR OTAFactoryDataProcessor::DecodeTlv()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAFactoryDataProcessor::Update(uint8_t tag, Optional<ByteSpan>& optional)
+CHIP_ERROR OTAFactoryDataProcessor::Update(uint8_t tag, Optional<ByteSpan> & optional)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     if (optional.HasValue())
@@ -159,15 +159,15 @@ CHIP_ERROR OTAFactoryDataProcessor::Update(uint8_t tag, Optional<ByteSpan>& opti
 CHIP_ERROR OTAFactoryDataProcessor::Read()
 {
     FactoryProvider::Header header;
-    auto status =
-        OtaUtils_ReadFromInternalFlash(sizeof(FactoryProvider::Header), FactoryProvider::kFactoryDataStart, (uint8_t*)&header, NULL, pFunctionEepromRead);
+    auto status = OtaUtils_ReadFromInternalFlash(sizeof(FactoryProvider::Header), FactoryProvider::kFactoryDataStart,
+                                                 (uint8_t *) &header, NULL, pFunctionEepromRead);
 
     mFactoryData = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(FactoryProvider::kFactoryDataSize));
     ReturnErrorCodeIf(mFactoryData == nullptr, CHIP_FACTORY_DATA_NULL);
     memset(mFactoryData, 0, FactoryProvider::kFactoryDataSize);
 
-    status =
-        OtaUtils_ReadFromInternalFlash(sizeof(FactoryProvider::Header) + header.size, FactoryProvider::kFactoryDataStart, mFactoryData, NULL, pFunctionEepromRead);
+    status = OtaUtils_ReadFromInternalFlash(sizeof(FactoryProvider::Header) + header.size, FactoryProvider::kFactoryDataStart,
+                                            mFactoryData, NULL, pFunctionEepromRead);
     if (status != gOtaUtilsSuccess_c)
     {
         ClearBuffer();
@@ -181,7 +181,7 @@ CHIP_ERROR OTAFactoryDataProcessor::Backup()
 {
     ReturnErrorCodeIf(mFactoryData == nullptr, CHIP_FACTORY_DATA_NULL);
 
-    auto status = PDM_eSaveRecordData(kNvmId_FactoryDataBackup, (void*)mFactoryData, FactoryProvider::kFactoryDataSize);
+    auto status = PDM_eSaveRecordData(kNvmId_FactoryDataBackup, (void *) mFactoryData, FactoryProvider::kFactoryDataSize);
     ReturnErrorCodeIf(status != PDM_E_STATUS_OK, CHIP_FACTORY_DATA_PDM_SAVE_RECORD);
     // PDM save will do an encryption in place, so a restore is neeeded in order
     // to have the decrypted data back in the mFactoryData buffer.
@@ -197,7 +197,7 @@ CHIP_ERROR OTAFactoryDataProcessor::Restore()
     uint16_t bytesRead = 0;
 
     auto status =
-        PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void*)mFactoryData, FactoryProvider::kFactoryDataSize, &bytesRead);
+        PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void *) mFactoryData, FactoryProvider::kFactoryDataSize, &bytesRead);
     ReturnErrorCodeIf(status != PDM_E_STATUS_OK, CHIP_FACTORY_DATA_PDM_READ_RECORD);
 
     return CHIP_NO_ERROR;
@@ -216,11 +216,11 @@ void OTAFactoryDataProcessor::ClearBuffer()
 
 CHIP_ERROR OTAFactoryDataProcessor::UpdateValue(uint8_t tag, ByteSpan & newValue)
 {
-    uint16_t oldLength = 0;
-    uint16_t newLength = newValue.size();
-    uint32_t offset = 0;
-    FactoryProvider::Header* header = (FactoryProvider::Header*)mFactoryData;
-    uint8_t* data = mFactoryData + sizeof(FactoryProvider::Header);
+    uint16_t oldLength               = 0;
+    uint16_t newLength               = newValue.size();
+    uint32_t offset                  = 0;
+    FactoryProvider::Header * header = (FactoryProvider::Header *) mFactoryData;
+    uint8_t * data                   = mFactoryData + sizeof(FactoryProvider::Header);
 
     while (offset < header->size)
     {
@@ -247,7 +247,7 @@ CHIP_ERROR OTAFactoryDataProcessor::UpdateValue(uint8_t tag, ByteSpan & newValue
 
         header->size = header->size - oldLength + newLength;
 
-        uint8_t sha256Output[SHA256_HASH_SIZE] = {0};
+        uint8_t sha256Output[SHA256_HASH_SIZE] = { 0 };
         SHA256_Hash(data, header->size, sha256Output);
         memcpy(header->hash, sha256Output, sizeof(header->hash));
 

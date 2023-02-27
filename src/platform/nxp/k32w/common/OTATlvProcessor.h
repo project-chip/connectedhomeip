@@ -24,18 +24,19 @@
 
 namespace chip {
 
-#define CHIP_ERROR_TLV_PROCESSOR(e) ChipError(ChipError::Range::kLastRange, ((uint8_t)ChipError::Range::kLastRange << 3) | e, __FILE__, __LINE__)
+#define CHIP_ERROR_TLV_PROCESSOR(e)                                                                                                \
+    ChipError(ChipError::Range::kLastRange, ((uint8_t) ChipError::Range::kLastRange << 3) | e, __FILE__, __LINE__)
 
-#define CHIP_OTA_TLV_CONTINUE_PROCESSING       CHIP_ERROR_TLV_PROCESSOR(0x01)
-#define CHIP_OTA_CHANGE_PROCESSOR              CHIP_ERROR_TLV_PROCESSOR(0x02)
-#define CHIP_OTA_PROCESSOR_NOT_REGISTERED      CHIP_ERROR_TLV_PROCESSOR(0x03)
-#define CHIP_OTA_PROCESSOR_ALREADY_REGISTERED  CHIP_ERROR_TLV_PROCESSOR(0x04)
-#define CHIP_OTA_PROCESSOR_CLIENT_INIT         CHIP_ERROR_TLV_PROCESSOR(0x05)
-#define CHIP_OTA_PROCESSOR_MAKE_ROOM           CHIP_ERROR_TLV_PROCESSOR(0x06)
-#define CHIP_OTA_PROCESSOR_PUSH_CHUNK          CHIP_ERROR_TLV_PROCESSOR(0x07)
-#define CHIP_OTA_PROCESSOR_IMG_AUTH            CHIP_ERROR_TLV_PROCESSOR(0x08)
-#define CHIP_OTA_FETCH_ALREADY_SCHEDULED       CHIP_ERROR_TLV_PROCESSOR(0x09)
-#define CHIP_OTA_PROCESSOR_IMG_COMMIT          CHIP_ERROR_TLV_PROCESSOR(0x0a)
+#define CHIP_OTA_TLV_CONTINUE_PROCESSING CHIP_ERROR_TLV_PROCESSOR(0x01)
+#define CHIP_OTA_CHANGE_PROCESSOR CHIP_ERROR_TLV_PROCESSOR(0x02)
+#define CHIP_OTA_PROCESSOR_NOT_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x03)
+#define CHIP_OTA_PROCESSOR_ALREADY_REGISTERED CHIP_ERROR_TLV_PROCESSOR(0x04)
+#define CHIP_OTA_PROCESSOR_CLIENT_INIT CHIP_ERROR_TLV_PROCESSOR(0x05)
+#define CHIP_OTA_PROCESSOR_MAKE_ROOM CHIP_ERROR_TLV_PROCESSOR(0x06)
+#define CHIP_OTA_PROCESSOR_PUSH_CHUNK CHIP_ERROR_TLV_PROCESSOR(0x07)
+#define CHIP_OTA_PROCESSOR_IMG_AUTH CHIP_ERROR_TLV_PROCESSOR(0x08)
+#define CHIP_OTA_FETCH_ALREADY_SCHEDULED CHIP_ERROR_TLV_PROCESSOR(0x09)
+#define CHIP_OTA_PROCESSOR_IMG_COMMIT CHIP_ERROR_TLV_PROCESSOR(0x0a)
 
 // Descriptor constants
 constexpr size_t kVersionStringSize = 64;
@@ -65,10 +66,10 @@ struct OTATlvHeader
 class OTATlvProcessor
 {
 public:
-    virtual ~OTATlvProcessor() { }
+    virtual ~OTATlvProcessor() {}
 
-    virtual CHIP_ERROR Init() = 0;
-    virtual CHIP_ERROR Clear() = 0;
+    virtual CHIP_ERROR Init()        = 0;
+    virtual CHIP_ERROR Clear()       = 0;
     virtual CHIP_ERROR ApplyAction() = 0;
     virtual CHIP_ERROR AbortAction() = 0;
 
@@ -105,9 +106,9 @@ protected:
 
     bool IsError(CHIP_ERROR & status);
 
-    uint32_t mLength = 0;
+    uint32_t mLength          = 0;
     uint32_t mProcessedLength = 0;
-    bool mWasSelected = false;
+    bool mWasSelected         = false;
 };
 
 /**
@@ -122,7 +123,7 @@ public:
     void Clear();
     CHIP_ERROR Accumulate(ByteSpan & block);
 
-    inline uint8_t* data() { return mBuffer.Get(); }
+    inline uint8_t * data() { return mBuffer.Get(); }
 
 private:
     uint32_t mThreshold;

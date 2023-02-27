@@ -21,11 +21,6 @@
 #include <credentials/examples/ExamplePAI.h>
 #endif
 
-#include <crypto/CHIPCryptoPAL.h>
-#include <lib/core/CHIPError.h>
-#include <lib/core/TLV.h>
-#include <lib/support/Base64.h>
-#include <lib/support/Span.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -47,15 +42,13 @@ namespace DeviceLayer {
 
 static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
     BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
-static constexpr size_t kSpake2pSalt_MaxBase64Len =
-    BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
-static constexpr size_t kMaxKeyLen = 32;
+static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
+static constexpr size_t kMaxKeyLen                = 32;
 
+OtaUtils_EEPROM_ReadData pFunctionEepromRead = (OtaUtils_EEPROM_ReadData) K32W0FactoryDataProvider::ReadDataMemcpy;
 
-OtaUtils_EEPROM_ReadData pFunctionEepromRead = (OtaUtils_EEPROM_ReadData)K32W0FactoryDataProvider::ReadDataMemcpy;
-
-uint32_t K32W0FactoryDataProvider::kFactoryDataStart = (uint32_t)__FACTORY_DATA_START;
-uint32_t K32W0FactoryDataProvider::kFactoryDataSize = (uint32_t)__FACTORY_DATA_SIZE;
+uint32_t K32W0FactoryDataProvider::kFactoryDataStart        = (uint32_t) __FACTORY_DATA_START;
+uint32_t K32W0FactoryDataProvider::kFactoryDataSize         = (uint32_t) __FACTORY_DATA_SIZE;
 uint32_t K32W0FactoryDataProvider::kFactoryDataPayloadStart = kFactoryDataStart + sizeof(K32W0FactoryDataProvider::Header);
 
 uint8_t K32W0FactoryDataProvider::ReadDataMemcpy(uint16_t num, uint32_t src, uint8_t * dst)
@@ -98,7 +91,7 @@ K32W0FactoryDataProvider::K32W0FactoryDataProvider()
 CHIP_ERROR K32W0FactoryDataProvider::Init()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    uint32_t sum = 0;
+    uint32_t sum     = 0;
 
     ReturnErrorOnFailure(SetCustomIds());
 
@@ -107,12 +100,10 @@ CHIP_ERROR K32W0FactoryDataProvider::Init()
         sum += maxLengths[i];
     }
 
-    if(sum > kFactoryDataSize)
+    if (sum > kFactoryDataSize)
     {
-        ChipLogError(DeviceLayer,
-            "Max size of factory data: %" PRIu32 " is bigger than reserved factory data size: %" PRIu32,
-            sum, kFactoryDataSize
-        );
+        ChipLogError(DeviceLayer, "Max size of factory data: %" PRIu32 " is bigger than reserved factory data size: %" PRIu32, sum,
+                     kFactoryDataSize);
     }
 
     error = Validate();
@@ -131,12 +122,12 @@ CHIP_ERROR K32W0FactoryDataProvider::Validate()
 
     ReturnErrorOnFailure(Restore());
 
-    auto status =
-        OtaUtils_ReadFromInternalFlash((uint16_t)sizeof(Header), kFactoryDataStart, (uint8_t *)&mHeader, NULL, pFunctionEepromRead);
+    auto status = OtaUtils_ReadFromInternalFlash((uint16_t) sizeof(Header), kFactoryDataStart, (uint8_t *) &mHeader, NULL,
+                                                 pFunctionEepromRead);
     ReturnErrorCodeIf(gOtaUtilsSuccess_c != status, CHIP_FACTORY_DATA_HEADER_READ);
     ReturnErrorCodeIf(mHeader.hashId != kHashId, CHIP_FACTORY_DATA_HASH_ID);
 
-    SHA256_Hash((uint8_t *)kFactoryDataPayloadStart, mHeader.size, sha256Output);
+    SHA256_Hash((uint8_t *) kFactoryDataPayloadStart, mHeader.size, sha256Output);
     ReturnErrorCodeIf(memcmp(sha256Output, mHeader.hash, kHashLen) != 0, CHIP_FACTORY_DATA_SHA_CHECK);
 
     return CHIP_NO_ERROR;
@@ -144,7 +135,7 @@ CHIP_ERROR K32W0FactoryDataProvider::Validate()
 
 CHIP_ERROR K32W0FactoryDataProvider::Restore()
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    CHIP_ERROR error      = CHIP_NO_ERROR;
     uint16_t backupLength = 0;
 
     // Check if PDM id related to factory data backup exists.
@@ -157,8 +148,7 @@ CHIP_ERROR K32W0FactoryDataProvider::Restore()
         buffer.Calloc(kFactoryDataSize);
         ReturnErrorCodeIf(buffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
 
-        auto status =
-            PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void*)buffer.Get(), kFactoryDataSize, &backupLength);
+        auto status = PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void *) buffer.Get(), kFactoryDataSize, &backupLength);
         ReturnErrorCodeIf(PDM_E_STATUS_OK != status, CHIP_FACTORY_DATA_PDM_RESTORE);
 
         error = UpdateData(buffer.Get());
@@ -173,21 +163,22 @@ CHIP_ERROR K32W0FactoryDataProvider::Restore()
     return error;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::UpdateData(uint8_t* pBuf)
+CHIP_ERROR K32W0FactoryDataProvider::UpdateData(uint8_t * pBuf)
 {
     NV_Init();
 
     auto status = NV_FlashEraseSector(kFactoryDataStart, kFactoryDataSize);
     ReturnErrorCodeIf(status != kStatus_FLASH_Success, CHIP_FACTORY_DATA_FLASH_ERASE);
 
-    Header* header = (Header*)pBuf;
-    status = NV_FlashProgramUnaligned(kFactoryDataStart, sizeof(Header) + header->size, pBuf);
+    Header * header = (Header *) pBuf;
+    status          = NV_FlashProgramUnaligned(kFactoryDataStart, sizeof(Header) + header->size, pBuf);
     ReturnErrorCodeIf(status != kStatus_FLASH_Success, CHIP_FACTORY_DATA_FLASH_PROGRAM);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t & length, uint32_t * offset)
+CHIP_ERROR K32W0FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
+                                                 uint32_t * offset)
 {
     CHIP_ERROR err = CHIP_ERROR_NOT_FOUND;
     uint32_t addr  = kFactoryDataPayloadStart;
@@ -214,7 +205,8 @@ CHIP_ERROR K32W0FactoryDataProvider::SearchForId(uint8_t searchedType, uint8_t *
             }
             else
             {
-                if (gOtaUtilsSuccess_c != OtaUtils_ReadFromInternalFlash(length, addr + kValueOffset, pBuf, NULL, pFunctionEepromRead))
+                if (gOtaUtilsSuccess_c !=
+                    OtaUtils_ReadFromInternalFlash(length, addr + kValueOffset, pBuf, NULL, pFunctionEepromRead))
                     break;
 
                 if (offset)
@@ -399,7 +391,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetProductId(uint16_t & productId)
 CHIP_ERROR K32W0FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
 {
     uint16_t length = 0;
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kPartNumber, (uint8_t *)buf, bufSize, length));
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kPartNumber, (uint8_t *) buf, bufSize, length));
     buf[length] = '\0';
 
     return CHIP_NO_ERROR;
@@ -408,7 +400,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
 CHIP_ERROR K32W0FactoryDataProvider::GetProductURL(char * buf, size_t bufSize)
 {
     uint16_t length = 0;
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kProductURL, (uint8_t *)buf, bufSize, length));
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kProductURL, (uint8_t *) buf, bufSize, length));
     buf[length] = '\0';
 
     return CHIP_NO_ERROR;
@@ -417,7 +409,7 @@ CHIP_ERROR K32W0FactoryDataProvider::GetProductURL(char * buf, size_t bufSize)
 CHIP_ERROR K32W0FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
 {
     uint16_t length = 0;
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kProductLabel, (uint8_t *)buf, bufSize, length));
+    ReturnErrorOnFailure(SearchForId(FactoryDataId::kProductLabel, (uint8_t *) buf, bufSize, length));
     buf[length] = '\0';
 
     return CHIP_NO_ERROR;

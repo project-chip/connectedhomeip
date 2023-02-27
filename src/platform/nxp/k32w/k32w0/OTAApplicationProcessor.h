@@ -26,8 +26,8 @@ namespace chip {
 struct AppDescriptor
 {
     uint32_t version;
-    char     versionString[kVersionStringSize];
-    char     buildDate[kBuildDateSize];
+    char versionString[kVersionStringSize];
+    char buildDate[kBuildDateSize];
 };
 
 class OTAApplicationProcessor : public OTATlvProcessor
