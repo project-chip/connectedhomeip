@@ -143,8 +143,10 @@ class InvokeAction(BaseAction):
           'cluster': Name of cluster which to invoke action is targeting.
           'context': Contains test-wide common objects such as DataModelLookup instance.
         Raises:
-          ActionCreationError: Raised if there is a benign error, and there is currently no
-            action to perform for this write attribute.
+          ActionCreationError: Raised if there is a benign error. This occurs when we
+            cannot find the action to invoke for the provided cluster. When this happens
+            it is expected that the action to invoke and the provided cluster is an action
+            to be invoked on a pseudo cluster.
           UnexpectedActionCreationError: Raised if there is an unexpected parsing error.
         '''
         super().__init__(test_step)
