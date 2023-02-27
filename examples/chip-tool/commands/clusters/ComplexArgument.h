@@ -369,6 +369,8 @@ public:
     virtual ~ComplexArgument() {}
 
     virtual CHIP_ERROR Parse(const char * label, const char * json) = 0;
+
+    virtual void Reset() = 0;
 };
 
 template <typename T>
@@ -401,6 +403,8 @@ public:
 
         return ComplexArgumentParser::Setup(label, *mRequest, value);
     }
+
+    void Reset() { *mRequest = T(); }
 
 private:
     T * mRequest;
