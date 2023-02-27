@@ -2,10 +2,6 @@
 
 #include <platform_stdlib.h>
 
-#define AMEBA_LOGLEVEL_ERROR 1
-#define AMEBA_LOGLEVEL_PROGRESS 2
-#define AMEBA_LOGLEVEL_DETAIL 3
-
 namespace chip {
 namespace Logging {
 namespace Platform {
