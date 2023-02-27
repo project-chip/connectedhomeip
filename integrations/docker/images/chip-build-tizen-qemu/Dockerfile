@@ -83,6 +83,8 @@ RUN set -x \
     && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda glob copy-in \
     $TIZEN_SDK_TOOLCHAIN/arm-tizen-linux-gnueabi/lib/libasan.so.* \
     $TIZEN_SDK_TOOLCHAIN/arm-tizen-linux-gnueabi/lib/libubsan.so.* \
+    $TIZEN_SDK_SYSROOT/usr/lib/libbluetooth-api.so.* \
+    $TIZEN_SDK_SYSROOT/usr/lib/libcapi-network-bluetooth.so.* \
     $TIZEN_SDK_SYSROOT/usr/lib/libcapi-network-thread.so.* \
     $TIZEN_SDK_SYSROOT/usr/lib/libnsd-dns-sd.so.* \
     /usr/lib/ \

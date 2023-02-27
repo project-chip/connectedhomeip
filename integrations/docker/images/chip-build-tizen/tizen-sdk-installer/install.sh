@@ -197,7 +197,6 @@ function install_tizen_sdk() {
         'bundle-0*.armv7l.rpm'
         'bundle-devel-*.armv7l.rpm'
         'buxton2-*.armv7l.rpm'
-        'capi-system-resource-1*.armv7l.rpm'
         'cynara-devel-*.armv7l.rpm'
         'dbus-1*.armv7l.rpm'
         'dbus-devel-*.armv7l.rpm'
@@ -223,10 +222,14 @@ function install_tizen_sdk() {
     download "$URL" "${PKG_ARR[@]}"
 
     # Unified packages (snapshots)
-    URL="http://download.tizen.org/snapshots/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/packages/armv7l/"
+    URL="http://download.tizen.org/snapshots/TIZEN/Tizen/Tizen-Unified/latest/repos/standard/packages/armv7l/"
     PKG_ARR=(
+        'bluetooth-frwk-0*.armv7l.rpm'
+        'capi-network-bluetooth-0*.armv7l.rpm'
+        'capi-network-bluetooth-devel-*.armv7l.rpm'
         'capi-network-nsd-*.armv7l.rpm'
         'capi-network-thread-*.armv7l.rpm'
+        'capi-system-resource-1*.armv7l.rpm'
         'libnsd-dns-sd-*.armv7l.rpm')
     download "$URL" "${PKG_ARR[@]}"
 
