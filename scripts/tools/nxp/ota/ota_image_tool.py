@@ -29,6 +29,11 @@ Currently, this script only supports Certification Declaration update,
 but it could be modified to support all factory data fields.
 '''
 
+import ota_image_tool
+from chip.tlv import TLVReader, TLVWriter, uint
+from generate import set_logger
+from default import InputArgument
+from custom import CertDeclaration, DacCert, DacPKey, PaiCert
 import argparse
 import logging
 import os
@@ -42,25 +47,22 @@ sys.path.insert(0, os.path.join(
 sys.path.insert(0, os.path.join(
     os.path.dirname(__file__), '../../../../src/app/'))
 
-from custom import CertDeclaration, DacCert, DacPKey, PaiCert
-from default import InputArgument
-from generate import set_logger
-
-from chip.tlv import TLVReader, TLVWriter, uint
-import ota_image_tool
 
 OTA_FACTORY_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_factory_tlv_temp.bin")
 OTA_APP_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_app_tlv_temp.bin")
 
+
 class TAG:
-    APPLICATION  = 1
-    BOOTLOADER   = 2
+    APPLICATION = 1
+    BOOTLOADER = 2
     FACTORY_DATA = 3
+
 
 def generate_header(tag: int, length: int):
     header = bytearray(tag.to_bytes(4, "little"))
     header += bytearray(length.to_bytes(4, "little"))
     return header
+
 
 def generate_factory_data(args: object):
     """
@@ -87,6 +89,7 @@ def generate_factory_data(args: object):
 
     logging.info(f"Factory data payload size: {len(payload)}")
 
+
 def generate_app(args: object):
     version = args.app_version.to_bytes(4, "little")
     versionStr = bytearray(args.app_version_str, "ascii") + bytearray(64 - len(args.app_version_str))
@@ -100,9 +103,11 @@ def generate_app(args: object):
 
     logging.info(f"Application payload size: {len(payload)}")
 
+
 def generate_bootloader(args: object):
     # TODO
     pass
+
 
 def show_payload(args: object):
     """
@@ -110,6 +115,7 @@ def show_payload(args: object):
     """
     # TODO: implement to show current TLVs
     pass
+
 
 def create_image(args: object):
     ota_image_tool.validate_header_attributes(args)
@@ -130,6 +136,7 @@ def create_image(args: object):
         os.remove(OTA_FACTORY_TLV_TEMP)
     if args.app_input_file is not None:
         os.remove(OTA_APP_TLV_TEMP)
+
 
 def main():
     """
@@ -241,6 +248,7 @@ def main():
         ota_image_tool.remove_header(args)
     elif args.subcommand == 'change_header':
         ota_image_tool.update_header_args(args)
+
 
 if __name__ == "__main__":
     main()
