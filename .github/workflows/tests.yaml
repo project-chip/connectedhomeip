@@ -549,12 +549,14 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |
                       .environment
                       build_overrides/pigweed_environment.gni
             - name: Bootstrap
+              timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v3
@@ -566,6 +568,7 @@ jobs:
                       .environment/pigweed-venv/*.log
 
             - name: Build Java Matter Controller and all clusters app
+              timeout-minutes: 50
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
                   ./scripts/run_in_build_env.sh \
@@ -575,6 +578,7 @@ jobs:
                       build \
                    "
             - name: Run Discover Commissionables Test
+              timeout-minutes: 10
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -586,6 +590,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing Onnetwork Test
+              timeout-minutes: 10
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -597,6 +602,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing AlreadyDiscovered Test
+              timeout-minutes: 10
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -608,6 +614,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing Address-PaseOnly Test
+              timeout-minutes: 10
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
