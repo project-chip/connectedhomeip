@@ -977,8 +977,8 @@ def WriteGroupAttributes(groupId: int, devCtrl: c_void_p, attributes: List[Attri
 
 # This struct matches the PyReadAttributeParams in attribute.cpp, for passing various params together.
 _ReadParams = construct.Struct(
-    "MinInterval" / construct.Int32ul,
-    "MaxInterval" / construct.Int32ul,
+    "MinInterval" / construct.Int16ul,
+    "MaxInterval" / construct.Int16ul,
     "IsSubscription" / construct.Flag,
     "IsFabricFiltered" / construct.Flag,
     "KeepSubscriptions" / construct.Flag,

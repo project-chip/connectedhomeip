@@ -24,6 +24,7 @@
 
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -39,7 +40,13 @@ CHIP_ERROR PythonPersistentStorageDelegate::SyncGetKeyValue(const char * key, vo
         return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 
-    uint16_t neededSize = val->second.size();
+    if (!CanCastTo<uint16_t>(val->second.size()))
+    {
+        size = 0;
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    uint16_t neededSize = static_cast<uint16_t>(val->second.size());
     ReturnErrorCodeIf(size == 0 && neededSize == 0, CHIP_NO_ERROR);
     ReturnErrorCodeIf(value == nullptr, CHIP_ERROR_BUFFER_TOO_SMALL);
 
