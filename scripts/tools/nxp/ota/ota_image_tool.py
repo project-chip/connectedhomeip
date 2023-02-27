@@ -32,11 +32,10 @@ but it could be modified to support all factory data fields.
 import argparse
 import logging
 import os
-import struct
 import sys
 
 import ota_image_tool
-from chip.tlv import TLVReader, TLVWriter, uint
+from chip.tlv import TLVWriter
 from custom import CertDeclaration, DacCert, DacPKey, PaiCert
 from default import InputArgument
 from generate import set_logger

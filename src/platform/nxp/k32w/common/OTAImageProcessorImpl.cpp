@@ -343,7 +343,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
             error = pair.second->ApplyAction();
             if (error != CHIP_NO_ERROR)
             {
-                ChipLogError(SoftwareUpdate, "Apply action for tag %" PRIu8 " processor failed.", (uint8_t) pair.first);
+                ChipLogError(SoftwareUpdate, "Apply action for tag %d processor failed.", (uint8_t) pair.first);
                 imageProcessor->Clear();
                 GetRequestorInstance()->Reset();
                 return;

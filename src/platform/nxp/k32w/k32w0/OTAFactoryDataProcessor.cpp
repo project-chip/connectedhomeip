@@ -251,11 +251,11 @@ CHIP_ERROR OTAFactoryDataProcessor::UpdateValue(uint8_t tag, ByteSpan & newValue
         SHA256_Hash(data, header->size, sha256Output);
         memcpy(header->hash, sha256Output, sizeof(header->hash));
 
-        ChipLogProgress(DeviceLayer, "Value at tag %" PRIu8 " updated successfully.", tag);
+        ChipLogProgress(DeviceLayer, "Value at tag %d updated successfully.", tag);
         return CHIP_NO_ERROR;
     }
 
-    ChipLogError(DeviceLayer, "Failed to find tag %" PRIu8 ".", tag);
+    ChipLogError(DeviceLayer, "Failed to find tag %d.", tag);
     return CHIP_ERROR_NOT_FOUND;
 }
 
