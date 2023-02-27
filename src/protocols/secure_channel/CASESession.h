@@ -223,11 +223,15 @@ private:
     CHIP_ERROR HandleSigma2(System::PacketBufferHandle && msg);
     CHIP_ERROR HandleSigma2Resume(System::PacketBufferHandle && msg);
 
-    CHIP_ERROR SendSigma3();
-    struct Sigma3Work;
+    struct SendSigma3Work;
+    CHIP_ERROR SendSigma3a();
+    static void SendSigma3b(SendSigma3Work & work);
+    CHIP_ERROR SendSigma3c(SendSigma3Work & work);
+
+    struct HandleSigma3Work;
     CHIP_ERROR HandleSigma3a(System::PacketBufferHandle && msg);
-    static void HandleSigma3b(Sigma3Work & work);
-    CHIP_ERROR HandleSigma3c(Sigma3Work & work);
+    static void HandleSigma3b(HandleSigma3Work & work);
+    CHIP_ERROR HandleSigma3c(HandleSigma3Work & work);
 
     CHIP_ERROR SendSigma2Resume();
 
