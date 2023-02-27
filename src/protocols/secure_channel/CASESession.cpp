@@ -96,31 +96,6 @@ enum
 
 namespace chip {
 
-// Simple timing system
-const char* label = nullptr;
-System::Clock::Timestamp start;
-void StartTiming(const char* s) {
-    System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
-    if (label) {
-        uint32_t deltaMs = System::Clock::Milliseconds32(now - start).count();
-        ChipLogError(DeviceLayer, "Timing '%s' --> %" PRIu32 " ms", label, deltaMs);
-    }
-    label = s;
-    start = now;
-}
-void EndTiming() {
-    System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
-    if (label) {
-        uint32_t deltaMs = System::Clock::Milliseconds32(now - start).count();
-        ChipLogError(DeviceLayer, "Timing '%s' --> %" PRIu32 " ms", label, deltaMs);
-    }
-    label = nullptr;
-}
-
-}
-
-namespace chip {
-
 using namespace Crypto;
 using namespace Credentials;
 using namespace Messaging;
@@ -1207,10 +1182,7 @@ CHIP_ERROR CASESession::SendSigma3a()
                 [](intptr_t arg) { SendSigma3b(*reinterpret_cast<SendSigma3Work *>(arg)); }, reinterpret_cast<intptr_t>(&work)));
         workPtr = nullptr; // scheduling succeeded, so don't delete
         mExchangeCtxt->WillSendMessage();
-        mState = State::kBackgroundPending;
-
-        // TODO decide if State::kBackgroundPending is sufficient
-        // or should have another state
+        mState = State::kSendSigma3BackgroundPending;
     }
 
 exit:
@@ -1297,14 +1269,14 @@ CHIP_ERROR CASESession::SendSigma3c(SendSigma3Work & work)
 
     AutoReleaseSessionKey sr3k(*mSessionManager->GetSessionKeystore());
 
-    ChipLogError(DeviceLayer, "@@@@@@@@@@ SendSigma3c");
+    ChipLogError(DeviceLayer, "@@@@@@@@@@ SendSigma3c %d", (int)work.status.AsInteger());
 
     // TODO add checks here (ignoreFailure?)
 
     // Special case: if for whatever reason not in expected state or sequence,
     // don't do anything, including sending a status report or aborting the
     // pending establish.
-    VerifyOrExit(mState == State::kBackgroundPending, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::kSendSigma3BackgroundPending, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mSequence == work.sequence, err = CHIP_ERROR_INCORRECT_STATE);
 
     SuccessOrExit(err = work.status);
@@ -1364,6 +1336,8 @@ exit:
     Platform::Delete(&work);
 
     // TODO might need ignoreFailure to handle some paths
+
+    ChipLogError(DeviceLayer, "@@@@@@@@@@ SendSigma3c DONE %d", (int)err.AsInteger());
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1550,7 +1524,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
                 [](intptr_t arg) { HandleSigma3b(*reinterpret_cast<HandleSigma3Work *>(arg)); }, reinterpret_cast<intptr_t>(&work)));
         workPtr = nullptr; // scheduling succeeded, so don't delete
         mExchangeCtxt->WillSendMessage();
-        mState = State::kBackgroundPending;
+        mState = State::kHandleSigma3BackgroundPending;
     }
 
 exit:
@@ -1620,7 +1594,7 @@ CHIP_ERROR CASESession::HandleSigma3c(HandleSigma3Work & work)
     // Special case: if for whatever reason not in expected state or sequence,
     // don't do anything, including sending a status report or aborting the
     // pending establish.
-    VerifyOrExit(mState == State::kBackgroundPending, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::kHandleSigma3BackgroundPending, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mSequence == work.sequence, err = CHIP_ERROR_INCORRECT_STATE);
 
     ignoreFailure = false;

@@ -184,15 +184,16 @@ private:
     friend class TestCASESession;
     enum class State : uint8_t
     {
-        kInitialized       = 0,
-        kSentSigma1        = 1,
-        kSentSigma2        = 2,
-        kSentSigma3        = 3,
-        kSentSigma1Resume  = 4,
-        kSentSigma2Resume  = 5,
-        kFinished          = 6,
-        kFinishedViaResume = 7,
-        kBackgroundPending = 8,
+        kInitialized                   = 0,
+        kSentSigma1                    = 1,
+        kSentSigma2                    = 2,
+        kSentSigma3                    = 3,
+        kSentSigma1Resume              = 4,
+        kSentSigma2Resume              = 5,
+        kFinished                      = 6,
+        kFinishedViaResume             = 7,
+        kSendSigma3BackgroundPending   = 8,
+        kHandleSigma3BackgroundPending = 9,
     };
 
     /*
