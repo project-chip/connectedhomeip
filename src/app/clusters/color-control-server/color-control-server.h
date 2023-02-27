@@ -216,8 +216,8 @@ private:
     uint16_t addEnhancedHue(uint16_t hue1, uint16_t hue2);
     uint16_t subtractEnhancedHue(uint16_t hue1, uint16_t hue2);
     void startColorLoop(chip::EndpointId endpoint, uint8_t startFromStartHue);
-    void initHueSat(chip::EndpointId endpoint, ColorHueTransitionState * colorHueTransitionState,
-                    Color16uTransitionState * colorSatTransitionState);
+    void initHueTransitionState(chip::EndpointId endpoint, ColorHueTransitionState * colorHueTransitionState, bool isEnhancedHue);
+    void initSaturationTransitionState(chip::EndpointId endpoint, Color16uTransitionState * colorSatTransitionState);
     bool computeNewHueValue(ColorHueTransitionState * p);
     EmberEventControl * configureHSVEventControl(chip::EndpointId);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
