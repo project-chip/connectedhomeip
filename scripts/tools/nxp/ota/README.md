@@ -1,3 +1,7 @@
+---
+orphan: true
+---
+
 # NXP OTA image tool
 ## Overview
 This tool can generate an OTA image in the `|OTA standard header|TLV1|...|TLVn|` format.
