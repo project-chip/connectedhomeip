@@ -48,7 +48,6 @@ var AESCTRDRBG1 = AESCTRDRBG.addInstance();
 var ECDH1       = ECDH.addInstance();
 
 AESCTRDRBG1.$name              = "CONFIG_AESCTRDRBG_0";
-AESCTRDRBG1.aesctrObject.$name = "CONFIG_AESCTR_0";
 
 AESCCM1.$name = "CONFIG_AESCCM0";
 

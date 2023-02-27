@@ -129,7 +129,10 @@ extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
 
 extern "C" void otPlatFree(void * aPtr)
 {
-    chip::Platform::MemoryFree(aPtr);
+    if (aPtr != nullptr)
+    {
+        chip::Platform::MemoryFree(aPtr);
+    }
 }
 
 void ThreadStackManagerImpl::_ProcMessage(otInstance * aInstance)

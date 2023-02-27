@@ -22,6 +22,8 @@
  */
 
 STACKSIZE = 0x800;
+RESERVED_RAM_SIZE_BLE_ROM = 0x00000FDF;
+
 
 MEMORY
 {
@@ -29,9 +31,9 @@ MEMORY
     /* FLASH (RX)      : ORIGIN = 0x00000000, LENGTH = 0x000affa8 */
     /* FLASH_CCFG (RX) : ORIGIN = 0x000affa8, LENGTH = 0x00000058 */
     FLASH (RX)      : ORIGIN = 0x00000000, LENGTH = 0x000ae000
-    /* BLE ROM reserves RAM at the beginning of the ram image */
+    /* BLE ROM reserves RAM at the beginning of the ram image, size RESERVED_RAM_SIZE_BLE_ROM */
     /* SRAM (RWX)      : ORIGIN = 0x20000000, LENGTH = 0x00024000 */
-    SRAM (RWX)      : ORIGIN = 0x20000fdf, LENGTH = 0x00023021
+    SRAM (RWX)      : ORIGIN = 0x20000FDF, LENGTH = 0x00023021
     GPRAM (RWX)     : ORIGIN = 0x11000000, LENGTH = 0x00002000
     /* Explicitly placed off target for the storage of logging data.
      * The data placed here is NOT loaded onto the target device.
@@ -69,9 +71,9 @@ SECTIONS {
     } > REGION_TEXT
 
     PROVIDE (_vtable_base_address =
-        DEFINED(_vtable_base_address) ? _vtable_base_address : 0x20000000);
+        DEFINED(_vtable_base_address) ? _vtable_base_address : 0x20000000 + RESERVED_RAM_SIZE_BLE_ROM);
 
-    .vtable (_vtable_base_address) (NOLOAD) : {
+    .ramVecs (_vtable_base_address) (NOLOAD) : {
         KEEP (*(.ramVecs))
     } > REGION_DATA
 

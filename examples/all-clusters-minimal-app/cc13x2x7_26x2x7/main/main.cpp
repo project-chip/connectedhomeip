@@ -57,6 +57,17 @@ extern "C" void vApplicationStackOverflowHook(void)
     }
 }
 
+/* Wrapper functions for using the queue registry regardless of whether it is enabled or disabled */
+extern "C" void vQueueAddToRegistryWrapper(QueueHandle_t xQueue, const char * pcQueueName)
+{
+    /* This function is intentionally left empty as the Queue Registry is disabled */
+}
+
+extern "C" void vQueueUnregisterQueueWrapper(QueueHandle_t xQueue)
+{
+    /* This function is intentionally left empty as the Queue Registry is disabled */
+}
+
 // ================================================================================
 // Main Code
 // ================================================================================
