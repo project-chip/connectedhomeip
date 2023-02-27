@@ -497,12 +497,12 @@ user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examp
 
 Build OTA image:
 
-In order to build an OTA image, use NXP's wrapper over the standard tool
+In order to build an OTA image, use NXP wrapper over the standard tool
 `src/app/ota_image_tool.py`:
 
 -   `scripts/tools/nxp/factory_data_generator/ota_image_tool.py`. The tool can
     be used to generate an OTA image with the following format:
-    `| OTA image header | TLV1 | TLV2 | ... | TLVn |` where TLVx is in the form
+    `| OTA image header | TLV1 | TLV2 | ... | TLVn |` where each TLV is in the form
     `|tag|length|value|`
 
 Note that "standard" TLV format is used. Matter TLV format is only used for
@@ -510,7 +510,7 @@ factory data TLV value. A user can enable the default processors by specifying
 `chip_enable_ota_default_processors=1` in the build command. Please see more in
 the [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
 
-Here is an example that generate an OTA image with factory data and app TLVs:
+Here is an example that generate an OTA image with factory data and app TLV:
 `user@computer1:~/connectedhomeip$ : ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 -fd --cert_declaration ~/manufacturing/Chip-Test-CD-1037-a220.der -app chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.ota`
 
 Start the OTA Provider Application:

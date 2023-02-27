@@ -8,10 +8,10 @@ orphan: true
 
 This tool can generate an OTA image in the `|OTA standard header|TLV1|...|TLVn|`
 format. The payload contains data in standard TLV format (not Matter TLV format.
-During OTA transfer, these TLVs can span across multiple BDX blocks, thus the
+During OTA transfer, these TLV can span across multiple BDX blocks, thus the
 `OTAImageProcessorImpl` instance should take this into account.
 
-Each TLV will be processed by its associated processor, pre-registerd in
+Each TLV will be processed by its associated processor, pre-registered in
 `OTAImageProcessorImpl` and identified by the TLV tag. If a processor cannot be
 found for current decoded tag, the OTA transfer will be canceled.
 
@@ -70,7 +70,7 @@ Note that `ProcessInternal` should return:
 
 -   `CHIP_NO_ERROR` if block was processed successfully.
 -   `CHIP_ERROR_BUFFER_TOO_SMALL` if current block doesn't contain all necessary
-    data. This can happen when a TLV's value field has a header, but it is split
+    data. This can happen when a TLV value field has a header, but it is split
     across two blocks.
 -   `CHIP_OTA_FETCH_ALREADY_SCHEDULED` if block was processed successfully and
     the fetching is already scheduled by the processor. This happens in the
@@ -120,7 +120,7 @@ certificates using the new `PAA` (which is only used by the controller, e.g.
 for generating new certificates.
 
 Example of OTA image generation with factory data and application update (using
-env variables set in the prerequisities of manufacturing flow):
+env variables set in the prerequisites of manufacturing flow):
 
 ```
 python3 ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 50000 -vs "1.0" -da sha256 -fd --cert_declaration $FACTORY_DATA_DEST/Chip-Test-CD-$VID-$PID.der --dac_cert $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Cert.der --dac_key $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Key.der --pai_cert $FACTORY_DATA_DEST/Chip-PAI-NXP-$VID-$PID-Cert.der -app $FACTORY_DATA_DEST/chip-k32w0x-light-example-50000.bin --app-version 50000 --app-version-str "50000_test" --app-build-date "$DATE" $FACTORY_DATA_DEST/chip-k32w0x-light-example-50000.bin $FACTORY_DATA_DEST/chip-k32w0x-light-example-50000.ota
