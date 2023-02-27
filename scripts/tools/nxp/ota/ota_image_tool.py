@@ -29,16 +29,17 @@ Currently, this script only supports Certification Declaration update,
 but it could be modified to support all factory data fields.
 '''
 
-import ota_image_tool
-from chip.tlv import TLVReader, TLVWriter, uint
-from generate import set_logger
-from default import InputArgument
-from custom import CertDeclaration, DacCert, DacPKey, PaiCert
 import argparse
 import logging
 import os
 import struct
 import sys
+
+import ota_image_tool
+from chip.tlv import TLVReader, TLVWriter, uint
+from custom import CertDeclaration, DacCert, DacPKey, PaiCert
+from default import InputArgument
+from generate import set_logger
 
 sys.path.insert(0, os.path.join(
     os.path.dirname(__file__), '../factory_data_generator'))
