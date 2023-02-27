@@ -1242,6 +1242,15 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES
+ *
+ * Maximum number of IP Addresses stored for a discovered node
+ */
+#ifndef CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES
+#define CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES 5
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_TYPE
  *
  * Enable or disable including device type in commissionable node discovery.
