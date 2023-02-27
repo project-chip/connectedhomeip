@@ -134,8 +134,10 @@ static CHIP_ERROR EncodeASN1TestData(ASN1Writer & writer)
         ASN1_ENCODE_OCTET_STRING(kTestVal_20_OctetString, 1);
         ASN1_ENCODE_OCTET_STRING(kTestVal_20_OctetString, 0);
         ASN1_ENCODE_STRING(kASN1UniversalTag_GeneralString, "", 0);
-        ASN1_ENCODE_STRING(kASN1UniversalTag_PrintableString, kTestVal_21_PrintableString, strlen(kTestVal_21_PrintableString));
-        ASN1_ENCODE_STRING(kASN1UniversalTag_UTF8String, kTestVal_22_UTFString, strlen(kTestVal_22_UTFString));
+        ASN1_ENCODE_STRING(kASN1UniversalTag_PrintableString, kTestVal_21_PrintableString,
+                           static_cast<uint16_t>(strlen(kTestVal_21_PrintableString)));
+        ASN1_ENCODE_STRING(kASN1UniversalTag_UTF8String, kTestVal_22_UTFString,
+                           static_cast<uint16_t>(strlen(kTestVal_22_UTFString)));
         ASN1_START_OCTET_STRING_ENCAPSULATED
         {
             ASN1_START_SEQUENCE
@@ -159,7 +161,7 @@ static void TestASN1_Encode(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err;
     static uint8_t buf[2048];
     ASN1Writer writer;
-    uint16_t encodedLen;
+    size_t encodedLen;
 
     writer.Init(buf);
 
@@ -290,7 +292,7 @@ static void TestASN1_NullWriter(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
     ASN1Writer writer;
-    uint16_t encodedLen;
+    size_t encodedLen;
 
     writer.InitNullWriter();
 
@@ -380,7 +382,7 @@ static void TestASN1_ObjectID(nlTestSuite * inSuite, void * inContext)
     static uint8_t buf[2048];
     ASN1Writer writer;
     ASN1Reader reader;
-    uint16_t encodedLen;
+    size_t encodedLen;
 
     writer.Init(buf, sizeof(buf));
 
@@ -486,7 +488,8 @@ static void TestASN1_FromTLVReader(nlTestSuite * inSuite, void * inContext)
         ASN1_ENCODE_BIT_STRING(kTestVal_09_BitString);
 
         err = writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_PrintableString, false,
-                              reinterpret_cast<const uint8_t *>(kTestVal_21_PrintableString), strlen(kTestVal_21_PrintableString));
+                              reinterpret_cast<const uint8_t *>(kTestVal_21_PrintableString),
+                              static_cast<uint16_t>(strlen(kTestVal_21_PrintableString)));
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     }
     ASN1_END_SEQUENCE;

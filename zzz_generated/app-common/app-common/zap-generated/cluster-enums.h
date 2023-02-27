@@ -507,8 +507,8 @@ enum class HourFormat : uint8_t
 
 namespace UnitLocalization {
 
-// Enum for TempUnit
-enum class TempUnit : uint8_t
+// Enum for TempUnitEnum
+enum class TempUnitEnum : uint8_t
 {
     kFahrenheit = 0x00,
     kCelsius    = 0x01,

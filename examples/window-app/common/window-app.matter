@@ -555,7 +555,7 @@ server cluster TimeFormatLocalization = 44 {
 }
 
 server cluster UnitLocalization = 45 {
-  enum TempUnit : ENUM8 {
+  enum TempUnitEnum : ENUM8 {
     kFahrenheit = 0;
     kCelsius = 1;
     kKelvin = 2;

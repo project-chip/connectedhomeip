@@ -5245,7 +5245,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case UnitLocalization::Attributes::TemperatureUnit::Id: {
-            chip::app::Clusters::UnitLocalization::TempUnit value;
+            chip::app::Clusters::UnitLocalization::TempUnitEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TemperatureUnit", 1, value);
         }

@@ -53,7 +53,7 @@ tests:
               maxValue: 65535
 
     - label: "TH reads AccessControlEntriesPerFabric attribute from DUT"
-      PICS: ACL.S.A0002
+      PICS: ACL.S.A0004
       command: "readAttribute"
       attribute: "AccessControlEntriesPerFabric"
       response:

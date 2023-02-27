@@ -53,4 +53,7 @@ declare_args() {
 
   # Enable address sanitizer
   is_asan = false
+
+  # Debug prefix mapping (values for -fdebug-prefix-map=).
+  prefix_mappings = []
 }

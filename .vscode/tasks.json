@@ -641,7 +641,10 @@
                 "telink-tlsr9518adk80d-contact-sensor",
                 "telink-tlsr9518adk80d-light",
                 "telink-tlsr9518adk80d-light-switch",
+                "telink-tlsr9518adk80d-lock-app",
                 "telink-tlsr9518adk80d-ota-requestor",
+                "telink-tlsr9518adk80d-pump-app",
+                "telink-tlsr9518adk80d-pump-controller-app",
                 "telink-tlsr9518adk80d-thermostat",
                 "tizen-arm-light"
             ]

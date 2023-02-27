@@ -7,6 +7,9 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
     {{#zcl_struct_items}}
     {{#unless isOptional}}
     {{~! Fabric index fields are not sent on writes, so don't force people to
@@ -33,9 +36,11 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters:
     {{else if (is_num_equal fieldIdentifier 254)}}
     }
     {{/if}}
+    valueCopy.removeMember("{{asLowerCamelCase label}}");
 
     {{/zcl_struct_items}}
-    return CHIP_NO_ERROR;
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::{{#unless (is_number_greater_than structClusterCount 1)}}{{as_camel_cased clusterName false}}{{else}}detail{{/unless}}::Structs::{{name}}::Type & request)

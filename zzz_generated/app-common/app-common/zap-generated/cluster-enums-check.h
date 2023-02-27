@@ -409,9 +409,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TimeFormatLocalization:
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(UnitLocalization::TempUnit val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(UnitLocalization::TempUnitEnum val)
 {
-    using EnumType = UnitLocalization::TempUnit;
+    using EnumType = UnitLocalization::TempUnitEnum;
     switch (val)
     {
     case EnumType::kFahrenheit:
