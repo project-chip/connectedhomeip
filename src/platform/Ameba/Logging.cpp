@@ -30,15 +30,11 @@
 #include "Logging.h"
 #include <stdio.h>
 
-#ifdef LOG_LOCAL_LEVEL
-#undef LOG_LOCAL_LEVEL
-#endif
-
 namespace chip {
 namespace Logging {
 namespace Platform {
 
-static uint8_t LogLevel = AMEBA_LOGLEVEL_DETAIL;
+static uint8_t LogLevel = AmebaLogLevel::ameba_loglevel_detail;
 
 void LogSetLevel(uint8_t level)
 {
@@ -63,16 +59,16 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     switch (category)
     {
     case kLogCategory_Error:
-        if (LogLevel >= AMEBA_LOGLEVEL_ERROR)
+        if (LogLevel >= AmebaLogLevel::ameba_loglevel_error)
             printf("%s %s\r\n", tag, formattedMsg);
         break;
     case kLogCategory_Progress:
     default:
-        if (LogLevel >= AMEBA_LOGLEVEL_PROGRESS)
+        if (LogLevel >= AmebaLogLevel::ameba_loglevel_progress)
             printf("%s %s\r\n", tag, formattedMsg);
         break;
     case kLogCategory_Detail:
-        if (LogLevel >= AMEBA_LOGLEVEL_DETAIL)
+        if (LogLevel >= AmebaLogLevel::ameba_loglevel_detail)
             printf("%s %s\r\n", tag, formattedMsg);
         break;
     }
