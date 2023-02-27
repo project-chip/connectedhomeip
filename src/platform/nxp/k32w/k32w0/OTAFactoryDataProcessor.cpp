@@ -20,7 +20,7 @@
 #include <platform/nxp/k32w/k32w0/CHIPDevicePlatformConfig.h>
 #include <platform/nxp/k32w/k32w0/OTAFactoryDataProcessor.h>
 #include <platform/nxp/k32w/common/CHIPDevicePlatformRamStorageConfig.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 
 #include "fsl_flash.h"
 #include "PDM.h"

@@ -17,7 +17,7 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/BufferReader.h>
 
 #include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
