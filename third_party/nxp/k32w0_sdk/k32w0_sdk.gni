@@ -78,8 +78,8 @@ template("k32w0_sdk") {
       "Please disable low power if expansion board, openthread CLI or SE is needed!")
 
   assert(
-    use_custom_factory_provider == 0 || chip_with_factory_data == 1,
-    "Please set chip_with_factory_data=1 if using custom factory provider.")
+      use_custom_factory_provider == 0 || chip_with_factory_data == 1,
+      "Please set chip_with_factory_data=1 if using custom factory provider.")
 
   if (build_for_k32w041am == 1 || build_for_k32w041a == 1 ||
       build_for_k32w041 == 1) {
@@ -128,7 +128,8 @@ template("k32w0_sdk") {
   print("OTA default processors: ", chip_enable_ota_default_processors)
 
   if (chip_with_low_power == 1 && chip_logging == true) {
-    print("WARNING: enabling logs in low power might break the LP timings. Use at your own risk!")
+    print(
+        "WARNING: enabling logs in low power might break the LP timings. Use at your own risk!")
     print("WARNING: set chip_logging=false to disable logging.")
   }
 
@@ -301,7 +302,7 @@ template("k32w0_sdk") {
       "gLogRingPlacementOffset_c=0xF000",
       "gSecLibUseSha256Alt_d=1",
       "gOTA_UseSecLibAes=1",
-      "gResetSystemReset_d=1"
+      "gResetSystemReset_d=1",
     ]
 
     if (chip_crypto == "platform" &&
@@ -373,18 +374,18 @@ template("k32w0_sdk") {
         "DBG_PostStepTickAssess=0",
         "gPWR_FreqScalingWFI=0",
         "mAppUseTickLessMode_c=1",
-        "cPWR_DiscardRunningTimerForPowerDown=1"
+        "cPWR_DiscardRunningTimerForPowerDown=1",
       ]
 
       if (chip_logging == false) {
         defines += [
           "K32W_LOG_ENABLED=0",
-          "gUartDebugConsole_d=0"
+          "gUartDebugConsole_d=0",
         ]
       } else {
         defines += [
           "K32W_LOG_ENABLED=1",
-          "gUartDebugConsole_d=1"
+          "gUartDebugConsole_d=1",
         ]
       }
     } else {
