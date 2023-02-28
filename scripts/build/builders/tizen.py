@@ -29,7 +29,6 @@ TestDriver = namedtuple('TestDriver', ['name', 'source'])
 class TizenBoard(Enum):
 
     ARM = Board('arm')
-    QEMU = Board('arm')
 
 
 class TizenApp(Enum):

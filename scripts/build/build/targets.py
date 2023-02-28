@@ -464,7 +464,6 @@ def BuildTizenTarget():
     # board
     target.AppendFixedTargets([
         TargetPart('arm', board=TizenBoard.ARM),
-        TargetPart('qemu', board=TizenBoard.QEMU),
     ])
 
     # apps
@@ -473,8 +472,7 @@ def BuildTizenTarget():
         TargetPart('all-clusters-minimal', app=TizenApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('chip-tool', app=TizenApp.CHIP_TOOL),
         TargetPart('light', app=TizenApp.LIGHT),
-        # test driver app
-        TargetPart('tests', app=TizenApp.TESTS).OnlyIfRe("-qemu"),
+        TargetPart('tests', app=TizenApp.TESTS),
     ])
 
     target.AppendModifier(name="no-ble", enable_ble=False)
