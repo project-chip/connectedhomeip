@@ -171,8 +171,11 @@ CHIP_ERROR AttributePathIB::Parser::GetListIndex(DataModel::Nullable<ListIndex> 
     return GetNullableUnsignedInteger(to_underlying(Tag::kListIndex), apListIndex);
 }
 
-CHIP_ERROR AttributePathIB::Parser::GetListIndex(ConcreteDataAttributePath & aAttributePath) const
+CHIP_ERROR AttributePathIB::Parser::GetGroupAttributePath(ConcreteDataAttributePath & aAttributePath) const
 {
+    ReturnErrorOnFailure(GetCluster(&aAttributePath.mClusterId));
+    ReturnErrorOnFailure(GetAttribute(&aAttributePath.mAttributeId));
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     DataModel::Nullable<ListIndex> listIndex;
     err = GetListIndex(&(listIndex));
@@ -196,6 +199,14 @@ CHIP_ERROR AttributePathIB::Parser::GetListIndex(ConcreteDataAttributePath & aAt
         err                    = CHIP_NO_ERROR;
     }
     return err;
+}
+
+CHIP_ERROR AttributePathIB::Parser::GetConcreteAttributePath(ConcreteDataAttributePath & aAttributePath) const
+{
+    ReturnErrorOnFailure(GetGroupAttributePath(aAttributePath));
+
+    // And now read our endpoint.
+    return GetEndpoint(&aAttributePath.mEndpointId);
 }
 
 CHIP_ERROR AttributePathIB::Parser::ParsePath(AttributePathParams & aAttribute) const
