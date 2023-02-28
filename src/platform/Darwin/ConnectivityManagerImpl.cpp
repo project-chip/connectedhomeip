@@ -24,6 +24,7 @@
 #include <new>
 
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
@@ -80,6 +81,10 @@ CHIP_ERROR ConnectivityManagerImpl::GetEthernetInterfaceName(char * outName, siz
 {
     CHIP_ERROR err = CHIP_ERROR_NOT_IMPLEMENTED;
 #if TARGET_OS_OSX
+    if (!CanCastTo<CFIndex>(maxLen))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     CFArrayRef interfaces = SCNetworkInterfaceCopyAll();
     VerifyOrReturnError(interfaces != nullptr, CHIP_ERROR_INTERNAL);
 
@@ -102,7 +107,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetEthernetInterfaceName(char * outName, siz
             continue;
         }
 
-        if (!CFStringGetCString(interfaceName, outName, maxLen, kCFStringEncodingUTF8))
+        if (!CFStringGetCString(interfaceName, outName, static_cast<CFIndex>(maxLen), kCFStringEncodingUTF8))
         {
             continue;
         }

@@ -37,7 +37,7 @@ public:
     bool IsInitialized() { return mInitialized; }
     uint16_t GetVendorId() const { return mVendorId; }
     uint16_t GetProductId() const { return mProductId; }
-    uint16_t GetDeviceType() const { return mDeviceType; }
+    chip::DeviceTypeId GetDeviceType() const { return mDeviceType; }
     chip::NodeId GetNodeId() const { return mNodeId; }
     chip::FabricIndex GetFabricIndex() const { return mFabricIndex; }
     const char * GetDeviceName() const { return mDeviceName; }
@@ -58,7 +58,7 @@ public:
     CHIP_ERROR Initialize(chip::NodeId nodeId, chip::FabricIndex fabricIndex,
                           std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                           std::function<void(CHIP_ERROR)> onConnectionFailure, uint16_t vendorId = 0, uint16_t productId = 0,
-                          uint16_t deviceType = 0, const char * deviceName = {}, size_t numIPs = 0,
+                          chip::DeviceTypeId deviceType = 0, const char * deviceName = {}, size_t numIPs = 0,
                           chip::Inet::IPAddress * ipAddressList = nullptr);
     CHIP_ERROR FindOrEstablishCASESession(std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                                           std::function<void(CHIP_ERROR)> onConnectionFailure);
@@ -108,7 +108,7 @@ private:
     chip::OperationalDeviceProxy mDeviceProxy;
     uint16_t mVendorId                                   = 0;
     uint16_t mProductId                                  = 0;
-    uint16_t mDeviceType                                 = 0;
+    chip::DeviceTypeId mDeviceType                       = 0;
     char mDeviceName[chip::Dnssd::kMaxDeviceNameLen + 1] = {};
     size_t mNumIPs                                       = 0; // number of valid IP addresses
     chip::Inet::IPAddress mIpAddress[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];

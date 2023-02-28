@@ -19,6 +19,7 @@
 #include "ToCertificateString.h"
 
 #include <lib/support/Base64.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
 
 namespace {
@@ -40,6 +41,12 @@ const char * ToCertificate(const chip::ByteSpan & source, chip::MutableCharSpan 
         return destination.data();
     }
 
+    if (!chip::CanCastTo<uint16_t>(source.size()))
+    {
+        ChipLogError(DataManagement, "The certificate is too large to do base64 conversion on");
+        return destination.data();
+    }
+
     size_t base64DataLen = BASE64_ENCODED_LEN(source.size());
     size_t bufferLen     = base64DataLen + 1; // add one character for null-terminator
     if (bufferLen + strlen(header) + strlen(footer) > destination.size())
@@ -51,7 +58,7 @@ const char * ToCertificate(const chip::ByteSpan & source, chip::MutableCharSpan 
     chip::Platform::ScopedMemoryBuffer<char> str;
     str.Alloc(bufferLen);
 
-    auto encodedLen       = chip::Base64Encode(source.data(), source.size(), str.Get());
+    auto encodedLen       = chip::Base64Encode(source.data(), static_cast<uint16_t>(source.size()), str.Get());
     str.Get()[encodedLen] = '\0';
 
     if (IsChipCertificate(source))
@@ -79,7 +86,8 @@ const char * ToCertificate(const chip::ByteSpan & source, chip::MutableCharSpan 
         snprintf(destination.data(), destination.size(), "%s\n", header);
         for (; inIndex < base64DataLen; inIndex += 64)
         {
-            outIndex += snprintf(&destination.data()[outIndex], destination.size() - outIndex, "%.64s\n", &str[inIndex]);
+            auto charsPrinted = snprintf(&destination.data()[outIndex], destination.size() - outIndex, "%.64s\n", &str[inIndex]);
+            outIndex += static_cast<size_t>(charsPrinted);
         }
         snprintf(&destination.data()[outIndex], destination.size() - outIndex, "%s", footer);
     }

@@ -175,7 +175,8 @@ namespace DeviceLayer {
 {
     auto timeout =
         [self hasDiscriminator] ? kScanningWithDiscriminatorTimeoutInSeconds : kScanningWithoutDiscriminatorTimeoutInSeconds;
-    dispatch_source_set_timer(_timer, dispatch_walltime(nullptr, timeout * NSEC_PER_SEC), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
+    dispatch_source_set_timer(
+        _timer, dispatch_walltime(nullptr, static_cast<int64_t>(timeout * NSEC_PER_SEC)), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
 }
 
 // All our callback dispatch must happen on _chipWorkQueue
