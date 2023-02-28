@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-import builtins
 import ctypes
 
 import chip.native

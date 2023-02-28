@@ -17,8 +17,7 @@
 
 import abc
 import hashlib
-from ctypes import *
-from typing import *
+from ctypes import CFUNCTYPE, POINTER, c_bool, c_char, c_size_t, c_uint8, c_uint32, c_void_p, memmove, py_object, string_at
 
 from chip import native
 from ecdsa import ECDH, NIST256p, SigningKey

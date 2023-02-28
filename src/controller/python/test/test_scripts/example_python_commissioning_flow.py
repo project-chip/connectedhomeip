@@ -15,11 +15,9 @@
 #    limitations under the License.
 #
 
-import dataclasses
 import logging
 import os
 import random
-from typing import *
 
 from chip import ChipDeviceCtrl
 from chip import clusters as Clusters
@@ -50,7 +48,7 @@ class ExampleCustomMatterCommissioningFlow(commissioning_flow_blocks.Commissioni
                 self._logger.info("Network Commissioning")
                 await self.network_commissioning(parameter=parameter, node_id=node_id)
             else:
-                self._logger.info(f"Device is an ethernet device, network commissioning not required.")
+                self._logger.info("Device is an ethernet device, network commissioning not required.")
 
         self._logger.info("Completing Commissioning")
         await self.complete_commission(case_nodeid)

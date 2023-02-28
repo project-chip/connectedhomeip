@@ -16,18 +16,15 @@
 #
 
 import base64
-import builtins
 import logging
 
 import chip.credentials.cert
 import chip.crypto.fabric
 from chip import ChipDeviceCtrl
 from chip import clusters as Clusters
-from chip import commissioning, tlv
+from chip import commissioning
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
-
-from . import pase
 
 
 class CommissioningFlowBlocks:
@@ -135,7 +132,7 @@ class CommissioningFlowBlocks:
 
             compressed_fabric_id = chip.crypto.fabric.generate_compressed_fabric_id(root_public_key, cert_fabric_id)
 
-        except:
+        except Exception:
             self._logger.exception("The certificate should be a valid CHIP Certificate, but failed to parse it")
             raise
 
@@ -185,7 +182,7 @@ class CommissioningFlowBlocks:
         if response.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise commissioning.CommissionFailure(f"Unexpected result for enabling network: {response.networkingStatus}")
 
-        self._logger.info(f"Thread network commissioning finished")
+        self._logger.info("Thread network commissioning finished")
 
     async def network_commissioning_wifi(self, parameter: commissioning.Parameters, node_id: int):
         if not parameter.wifi_credentials:
@@ -204,7 +201,7 @@ class CommissioningFlowBlocks:
         if response.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
             raise commissioning.CommissionFailure(f"Unexpected result for enabling network: {response.networkingStatus}")
 
-        self._logger.info(f"WiFi network commissioning finished")
+        self._logger.info("WiFi network commissioning finished")
 
     async def network_commissioning(self, parameter: commissioning.Parameters, node_id: int):
         clusters = await self._devCtrl.ReadAttribute(nodeid=node_id, attributes=[(Clusters.Descriptor.Attributes.ServerList)], returnClusterObject=True)

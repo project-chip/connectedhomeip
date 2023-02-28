@@ -19,10 +19,7 @@ import abc
 import dataclasses
 import enum
 import os
-from typing import *
-
-from chip import clusters as Clusters
-from chip import discovery
+from typing import Set, Tuple, Union
 
 ROOT_ENDPOINT_ID = 0
 

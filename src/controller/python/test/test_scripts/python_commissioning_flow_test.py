@@ -25,13 +25,11 @@ import sys
 from optparse import OptionParser
 
 import example_python_commissioning_flow
-from base import BaseTestHelper, FailIfNot, TestFail, TestTimeout, logger
+from base import BaseTestHelper, TestFail, TestTimeout, logger
 from chip import ChipDeviceCtrl
 from chip import clusters as Clusters
-from chip import commissioning, discovery
+from chip import commissioning
 from chip.crypto import p256keypair
-from cluster_objects import NODE_ID, ClusterObjectTests
-from network_commissioning import NetworkCommissioningTests
 
 # The thread network dataset tlv for testing, splited into T-L-V.
 
