@@ -240,6 +240,7 @@ config("strict_warnings") {
     "-Wformat",
     "-Wformat-nonliteral",
     "-Wformat-security",
+    "-Wconversion",
   ]
 
   if (current_os == "webos") {

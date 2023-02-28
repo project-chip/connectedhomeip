@@ -60,4 +60,6 @@ static_library("BL602") {
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
   ]
+
+  cflags_c = [ "-Wno-conversion" ]
 }

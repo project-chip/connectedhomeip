@@ -27,4 +27,7 @@ gdbus_library("wpa") {
   c_namespace = "Wpa"
   c_generate_object_manager = false
   dbus_out_dir = "platform/Linux/dbus/wpa"
+
+  # The generated code here is not -Wconversion-clean.
+  no_wconversion = true
 }

@@ -449,6 +449,7 @@ template("efr32_sdk") {
     cflags += [
       "-Wno-maybe-uninitialized",
       "-Wno-shadow",
+      "-Wno-conversion",
     ]
 
     if (silabs_family == "efr32mg24" || silabs_family == "mgm24") {

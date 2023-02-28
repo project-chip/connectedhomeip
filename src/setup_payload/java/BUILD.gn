@@ -21,6 +21,10 @@ if (!build_java_matter_controller) {
   import("${build_root}/config/android_abi.gni")
 }
 
+config("jni_no_conversion_config") {
+  cflags = [ "-Wno-conversion" ]
+}
+
 shared_library("jni") {
   output_name = "libSetupPayloadParser"
   if (build_java_matter_controller) {
@@ -36,6 +40,8 @@ shared_library("jni") {
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]
+
+  configs += [ ":jni_no_conversion_config" ]
 }
 
 android_library("java") {

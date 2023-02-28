@@ -35,6 +35,9 @@ if (current_os == "android" || build_java_matter_controller) {
     if (build_java_matter_controller) {
       include_dirs = java_matter_controller_dependent_paths
     }
+
+    # The generated jni bits don't compile with -Wconversion
+    cflags = [ "-Wno-conversion" ]
   }
 
   chip_codegen("java-jni-generate") {
