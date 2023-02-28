@@ -17,8 +17,6 @@ exclude = third_party
           build/config/linux/*
           credentials/fetch-paa-certs-from-dcl.py
           docs/_extensions/external_content.py
-          examples/chef/chef.py
-          examples/chef/sample_app_util/zap_file_parser.py
           examples/common/pigweed/rpc_console/py/chip_rpc/console.py
           examples/lighting-app/python/lighting.py
           examples/platform/mbed/ota/generate_ota_list_image.py
