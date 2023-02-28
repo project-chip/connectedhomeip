@@ -84,3 +84,4 @@ tornado
 
 # YAML test harness
 diskcache
+websockets

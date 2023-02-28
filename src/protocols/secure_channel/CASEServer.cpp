@@ -73,7 +73,14 @@ CHIP_ERROR CASEServer::OnUnsolicitedMessageReceived(const PayloadHeader & payloa
 CHIP_ERROR CASEServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                          System::PacketBufferHandle && payload)
 {
-    ChipLogProgress(Inet, "CASE Server received Sigma1 message. Starting handshake. EC %p", ec);
+    if (!ec->GetSessionHandle()->IsUnauthenticatedSession())
+    {
+        ChipLogError(Inet, "CASE Server received Sigma1 message %s EC %p", "over encrypted session. Ignoring.", ec);
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    ChipLogProgress(Inet, "CASE Server received Sigma1 message %s EC %p", ". Starting handshake.", ec);
+
     CHIP_ERROR err = InitCASEHandshake(ec);
     SuccessOrExit(err);
 

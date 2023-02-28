@@ -1018,6 +1018,11 @@ void Command::ResetArguments()
                 }
                 vectorArgument->clear();
             }
+            else if (type == ArgumentType::Complex)
+            {
+                auto argument = static_cast<ComplexArgument *>(arg.value);
+                argument->Reset();
+            }
         }
     }
 }

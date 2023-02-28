@@ -69,4 +69,6 @@ static_library("dnssd") {
   } else {
     assert(false, "Unknown Dnssd advertiser implementation.")
   }
+
+  cflags = [ "-Wconversion" ]
 }

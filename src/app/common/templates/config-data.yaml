@@ -7,8 +7,6 @@ WeakEnums:
     - ColorLoopAction
     - ColorLoopDirection
     - ColorMode
-    - ContentLaunchStatus
-    - ContentLaunchStreamingType
     - EnhancedColorMode
     - HardwareFaultEnum
     - HueDirection
@@ -18,7 +16,6 @@ WeakEnums:
     - IdentifyEffectVariant
     - IdentifyIdentifyType
     - InterfaceTypeEnum
-    - LevelControlOptions
     - MoveMode
     - NetworkFaultEnum
     - PHYRateEnum
