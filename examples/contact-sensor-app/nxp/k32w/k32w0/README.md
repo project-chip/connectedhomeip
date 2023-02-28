@@ -502,8 +502,8 @@ In order to build an OTA image, use NXP wrapper over the standard tool
 
 -   `scripts/tools/nxp/factory_data_generator/ota_image_tool.py`. The tool can
     be used to generate an OTA image with the following format:
-    `| OTA image header | TLV1 | TLV2 | ... | TLVn |` where each TLV is in the form
-    `|tag|length|value|`
+    `| OTA image header | TLV1 | TLV2 | ... | TLVn |` where each TLV is in the
+    form `|tag|length|value|`
 
 Note that "standard" TLV format is used. Matter TLV format is only used for
 factory data TLV value. A user can enable the default processors by specifying
