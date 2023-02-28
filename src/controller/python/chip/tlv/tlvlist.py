@@ -20,7 +20,7 @@
 
 import dataclasses
 import enum
-from typing import *
+from typing import Any, Iterator, List, Tuple, Union
 
 
 class TLVList:
