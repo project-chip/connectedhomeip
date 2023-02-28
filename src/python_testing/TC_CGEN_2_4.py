@@ -15,19 +15,13 @@
 #    limitations under the License.
 #
 
-import asyncio
 import logging
-import queue
 import time
-from threading import Event
 
 import chip.CertificateAuthority
 import chip.clusters as Clusters
 import chip.FabricAdmin
 from chip import ChipDeviceCtrl
-from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
-from chip.interaction_model import InteractionModelError
-from chip.utils import CommissioningBuildingBlocks
 from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -45,15 +39,18 @@ class TC_CGEN_2_4(MatterBaseTest):
             logging.exception('Error running OpenCommissioningWindow %s', e)
             asserts.assert_true(False, 'Failed to open commissioning window')
 
-    async def CommissionToStageSendCompleteAndCleanup(self, stage: int, expectedErrorPart: chip.native.ErrorSDKPart, expectedErrCode: int):
+    async def CommissionToStageSendCompleteAndCleanup(
+            self, stage: int, expectedErrorPart: chip.native.ErrorSDKPart, expectedErrCode: int):
 
         logging.info("-----------------Fail on step {}-------------------------".format(stage))
         pin, code = self.OpenCommissioningWindow()
         self.th2.ResetTestCommissioner()
-        # This will run the commissioning up to the point where stage x is run and the response is sent before the test commissioner simulates a failure
+        # This will run the commissioning up to the point where stage x is run and the
+        # response is sent before the test commissioner simulates a failure
         self.th2.SetTestCommissionerPrematureCompleteAfter(stage)
         success, errcode = self.th2.CommissionOnNetwork(
-            nodeId=self.dut_node_id, setupPinCode=pin, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminator)
+            nodeId=self.dut_node_id, setupPinCode=pin,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminator)
         logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(success, errcode))
         asserts.assert_false(success, 'Commissioning complete did not error as expected')
         asserts.assert_true(errcode.sdk_part == expectedErrorPart, 'Unexpected error type returned from CommissioningComplete')
@@ -92,7 +89,8 @@ class TC_CGEN_2_4(MatterBaseTest):
         logging.info('Step 16 - TH2 fully commissions the DUT')
         self.th2.ResetTestCommissioner()
         success, errcode = self.th2.CommissionOnNetwork(
-            nodeId=self.dut_node_id, setupPinCode=pin, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminator)
+            nodeId=self.dut_node_id, setupPinCode=pin,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=self.matter_test_config.discriminator)
         logging.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(success, errcode))
 
         logging.info('Step 17 - TH1 sends an arm failsafe')
@@ -109,11 +107,15 @@ class TC_CGEN_2_4(MatterBaseTest):
             newloc = Clusters.GeneralCommissioning.Enums.RegulatoryLocationType.kIndoor
         else:
             # TODO: figure out how to use the extender
-            #newloc = MatterIntEnum.extend_enum_if_value_doesnt_exist(Clusters.GeneralCommissioning.Enums.RegulatoryLocationType, 3)
-            newlog = cap
+            # newloc = MatterIntEnum.extend_enum_if_value_doesnt_exist(
+            #     Clusters.GeneralCommissioning.Enums.RegulatoryLocationType, 3)
+            newloc = cap
+
+        _ = newloc
 
         logging.info('Step 19 Send SetRgulatoryConfig with incorrect location')
-        #cmd = Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(newRegulatoryConfig=newloc, countryCode="XX", breadcrumb=0)
+        # cmd = Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(
+        #     newRegulatoryConfig=newloc, countryCode="XX", breadcrumb=0)
         # try:
         #    await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
         # except InteractionModelError as ex:

@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipDeviceController
@@ -114,7 +115,7 @@ class WildcardFragment : Fragment() {
     return stringBuilder.toString()
   }
 
-  private suspend fun subscribe(type: Int, minInterval: Int, maxInterval: Int, keepSubscriptions: Boolean, isFabricFiltered: Boolean) {
+  private suspend fun subscribe(type: Int, minInterval: Int, maxInterval: Int, keepSubscriptions: Boolean, isFabricFiltered: Boolean, isUrgent: Boolean) {
     val subscriptionEstablishedCallback =
       SubscriptionEstablishedCallback { Log.i(TAG, "Subscription to device established") }
 
@@ -141,7 +142,7 @@ class WildcardFragment : Fragment() {
                                        keepSubscriptions,
                                        isFabricFiltered)
     } else if (type == EVENT) {
-      val eventPath = ChipEventPath.newInstance(endpointId, clusterId, eventId)
+      val eventPath = ChipEventPath.newInstance(endpointId, clusterId, eventId, isUrgent)
       deviceController.subscribeToPath(subscriptionEstablishedCallback,
                                       resubscriptionAttemptCallback,
                                       reportCallback,
@@ -199,6 +200,15 @@ class WildcardFragment : Fragment() {
 
   private fun showSubscribeDialog(type: Int) {
     val dialogView = requireActivity().layoutInflater.inflate(R.layout.subscribe_dialog, null)
+    val isUrgentTv = dialogView.findViewById<TextView>(R.id.titleisUrgent)
+    val isUrgentSp = dialogView.findViewById<Spinner>(R.id.isUrgentSp)
+    if (type == EVENT) {
+      isUrgentTv.visibility = View.VISIBLE
+      isUrgentSp.visibility = View.VISIBLE
+    } else {
+      isUrgentTv.visibility = View.GONE
+      isUrgentSp.visibility = View.GONE
+    }
     val dialog = AlertDialog.Builder(requireContext()).apply {
       setView(dialogView)
     }.create()
@@ -215,7 +225,8 @@ class WildcardFragment : Fragment() {
             minIntervalEd.text.toString().toInt(),
             maxIntervalEd.text.toString().toInt(),
             keepSubscriptionsSp.selectedItem.toString().toBoolean(),
-            isFabricFilteredSp.selectedItem.toString().toBoolean()
+            isFabricFilteredSp.selectedItem.toString().toBoolean(),
+            isUrgentSp.selectedItem.toString().toBoolean(),
           )
         } else {
           Log.e(TAG, "minInterval or maxInterval is empty!" )

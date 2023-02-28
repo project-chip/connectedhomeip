@@ -19,11 +19,12 @@
 import argparse
 import hashlib
 import logging
-import os
 import subprocess
 import sys
 
-from custom import *
+from custom import (CertDeclaration, DacCert, DacPKey, Discriminator, HardwareVersion, HardwareVersionStr, IterationCount,
+                    ManufacturingDate, PaiCert, PartNumber, ProductId, ProductLabel, ProductName, ProductURL, Salt, SerialNum,
+                    SetupPasscode, StrArgument, UniqueId, VendorId, VendorName, Verifier)
 from default import InputArgument
 
 

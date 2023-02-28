@@ -20,8 +20,8 @@ set -e
 
 # Default settings options
 TIZEN_SDK_ROOT=/opt/tizen-sdk
-TIZEN_SDK_DATA_PATH=~/tizen-sdk-data
-TIZEN_VERSION=6.0
+TIZEN_SDK_DATA_PATH=$HOME/tizen-sdk-data
+TIZEN_VERSION=7.0
 SECRET_TOOL=false
 
 SCRIPT_NAME=$(basename -- "$(readlink -f "${BASH_SOURCE:?}")")
@@ -41,7 +41,7 @@ fi
 # Help display function
 function show_help() {
     echo "Usage: $SCRIPT_NAME [ options .. ]"
-    echo "Example: $SCRIPT_NAME --tizen-sdk-path ~/tizen-sdk --tizen-version 6.0 --install-dependencies"
+    echo "Example: $SCRIPT_NAME --tizen-sdk-path ~/tizen-sdk --tizen-version 7.0 --install-dependencies"
     echo
     echo "Options:"
     echo "  -h, --help                 Display this information"
@@ -92,7 +92,7 @@ function download() {
     for PKG in "${@:2}"; do
         PKGS+=("-A" "$PKG")
     done
-    wget -r -nd --no-parent --progress=dot:mega "${PKGS[@]}" "$1"
+    wget -r -nd --no-parent -e robots=off --progress=dot:mega "${PKGS[@]}" "$1"
 
     # Check if the files have been downloaded
     for PKG in "${@:2}"; do
@@ -143,10 +143,10 @@ function install_tizen_sdk() {
     # Download
     URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
     PKG_ARR=(
-        'certificate-encryptor_1.0.7_ubuntu-64.zip'
+        'certificate-encryptor_1.0.10_ubuntu-64.zip'
         'certificate-generator_0.1.3_ubuntu-64.zip'
-        'new-common-cli_2.5.7_ubuntu-64.zip'
-        'new-native-cli_2.5.7_ubuntu-64.zip'
+        'new-common-cli_2.5.64_ubuntu-64.zip'
+        'new-native-cli_2.5.64_ubuntu-64.zip'
         'sdb_4.2.23_ubuntu-64.zip')
     download "$URL" "${PKG_ARR[@]}"
 
@@ -172,7 +172,7 @@ function install_tizen_sdk() {
     download "$URL" "${PKG_ARR[@]}"
 
     # Base packages
-    URL="http://download.tizen.org/releases/milestone/tizen/base/latest/repos/standard/packages/armv7l/"
+    URL="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/armv7l/"
     PKG_ARR=(
         'iniparser-*.armv7l.rpm'
         'libblkid-devel-*.armv7l.rpm'
@@ -189,8 +189,9 @@ function install_tizen_sdk() {
     download "$URL" "${PKG_ARR[@]}"
 
     # Unified packages
-    URL="http://download.tizen.org/releases/milestone/tizen/unified/latest/repos/standard/packages/armv7l/"
+    URL="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/packages/armv7l/"
     PKG_ARR=(
+        'app-core-common-*.rpm'
         'aul-0*.armv7l.rpm'
         'aul-devel-*.armv7l.rpm'
         'bundle-0*.armv7l.rpm'
@@ -201,6 +202,8 @@ function install_tizen_sdk() {
         'dbus-devel-*.armv7l.rpm'
         'dbus-libs-1*.armv7l.rpm'
         'glib2-devel-2*.armv7l.rpm'
+        'hal-api-common-*.armv7l.rpm'
+        'hal-api-sensor-*.armv7l.rpm'
         'json-glib-devel-*.armv7l.rpm'
         'libcynara-client-*.armv7l.rpm'
         'libcynara-commons-*.armv7l.rpm'
@@ -212,15 +215,21 @@ function install_tizen_sdk() {
         'parcel-0*.armv7l.rpm'
         'parcel-devel-*.armv7l.rpm'
         'pkgmgr-info-*.armv7l.rpm'
+        'sensord-devel-*.armv7l.rpm'
+        'sensord-dummy-*.armv7l.rpm'
         'vconf-compat-*.armv7l.rpm'
         'vconf-internal-keys-devel-*.armv7l.rpm')
     download "$URL" "${PKG_ARR[@]}"
 
     # Unified packages (snapshots)
-    URL="http://download.tizen.org/snapshots/tizen/unified/latest/repos/standard/packages/armv7l/"
+    URL="http://download.tizen.org/snapshots/TIZEN/Tizen/Tizen-Unified/latest/repos/standard/packages/armv7l/"
     PKG_ARR=(
+        'bluetooth-frwk-0*.armv7l.rpm'
+        'capi-network-bluetooth-0*.armv7l.rpm'
+        'capi-network-bluetooth-devel-*.armv7l.rpm'
         'capi-network-nsd-*.armv7l.rpm'
         'capi-network-thread-*.armv7l.rpm'
+        'capi-system-resource-1*.armv7l.rpm'
         'libnsd-dns-sd-*.armv7l.rpm')
     download "$URL" "${PKG_ARR[@]}"
 
@@ -258,7 +267,7 @@ function install_tizen_sdk() {
     # Information on necessary environment variables
     warning "Before proceeding with Matter export environment variables as follows:"
     echo -n "$COLOR_YELLOW"
-    echo "export TIZEN_VESRSION=\"$TIZEN_VERSION\""
+    echo "export TIZEN_VERSION=\"$TIZEN_VERSION\""
     echo "export TIZEN_SDK_ROOT=\"$(realpath "$TIZEN_SDK_ROOT")\""
     echo "export TIZEN_SDK_TOOLCHAIN=\"\$TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2\""
     echo "export TIZEN_SDK_SYSROOT=\"\$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/mobile/rootstraps/mobile-$TIZEN_VERSION-device.core\""

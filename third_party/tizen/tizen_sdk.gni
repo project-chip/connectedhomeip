@@ -110,19 +110,21 @@ template("tizen_sdk_package") {
          "It is required to specify a `sign_security_profile` which " +
              "should be used for signing TPK package.")
 
-  # Output directory where packaging will occur. We need a separate directory
-  # for this, because Tizen Studio CLI scans "res" (resources), "shared" and
-  # "lib" directories for items to pack. In our case it could include in the
-  # TPK package libraries available in ${root_out_dir}/lib directory.
-  tizen_package_dir = "${root_build_dir}/package"
-  tizen_package_out_dir = "${tizen_package_dir}/out"
-
   # Extract data from Tizen XML manifest.
   manifest = exec_script(tizen_manifest_parser,
                          [ rebase_path(invoker.manifest, root_build_dir) ],
                          "json")
   manifest_package = manifest["package"]
+  manifest_package_name = manifest_package["name"]
+  manifest_package_version = manifest_package["version"]
   manifest_apps = manifest["apps"]
+
+  # Output directory where packaging will occur. We need a separate directory
+  # for this, because Tizen Studio CLI scans "res" (resources), "shared" and
+  # "lib" directories for items to pack. In our case it could include in the
+  # TPK package libraries available in ${root_out_dir}/lib directory.
+  tizen_package_dir = "${root_build_dir}/${manifest_package_name}"
+  tizen_package_out_dir = "${tizen_package_dir}/out"
 
   # Copy Tizen manifest from the source directory.
   copy("${target_name}:manifest") {
@@ -146,10 +148,10 @@ template("tizen_sdk_package") {
     }
   }
 
-  tpk = manifest_package["name"] + "-" + manifest_package["version"] + ".tpk"
+  tpk = "${manifest_package_name}-${manifest_package_version}.tpk"
   tizen_sdk(target_name) {
     deps = invoker.deps + dependencies
-    outputs = [ "${tizen_package_out_dir}/" + tpk ]
+    outputs = [ "${tizen_package_out_dir}/${tpk}" ]
     project_build_dir = tizen_package_dir
     args = [
       "package",
@@ -225,7 +227,7 @@ template("tizen_qemu_run") {
       "--image-iso=" + invoker.iso_image,
       "--output=" + rebase_path(output_log_file),
     ]
-    if (defined(invoker.virtio_net)) {
+    if (defined(invoker.virtio_net) && invoker.virtio_net) {
       args += [ "--virtio-net" ]
     }
 

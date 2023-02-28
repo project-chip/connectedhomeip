@@ -53,7 +53,7 @@ def decode_string(tstr, detok):
         if s.find('$') == 0:
             return None
         return s
-    except:
+    except ValueError:
         return None
 
 
@@ -88,7 +88,7 @@ def decode_serial(serialport, outfile, database):
                     print(line, file=sys.stdout)
                     if output:
                         print(line, file=output)
-        except:
+        except Exception:
             print("Serial error or program closed", file=sys.stderr)
 
         if output:
@@ -120,7 +120,7 @@ def decode_file(infile, outfile, database):
                     # ascii decode line
                     # serial terminals may include non ascii characters
                     line = line.decode('ascii').strip()
-                except:
+                except Exception:
                     continue
                 # find token start and detokenize
                 idx = line.rfind(']')
