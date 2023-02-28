@@ -11,7 +11,6 @@ exclude = third_party
           src/test_driver/openiotsdk/*
           src/test_driver/mbed/*
           src/test_driver/linux-cirque/*
-          src/test_driver/esp32/*
           build/chip/java/tests/*
           build/chip/linux/*
           build/config/linux/*
@@ -25,7 +24,6 @@ exclude = third_party
           scripts/build/builders/android.py
           scripts/build/builders/bouffalolab.py
           scripts/build/builders/cc13x2x7_26x2x7.py
-          scripts/build/builders/esp32.py
           scripts/build/builders/genio.py
           scripts/build/builders/gn.py
           scripts/build/builders/imx.py
@@ -58,7 +56,6 @@ exclude = third_party
           scripts/tests/chiptest/yamltest_with_chip_repl_tester.py
           scripts/tools/check_zcl_file_sync.py
           scripts/tools/convert_ini.py
-          scripts/tools/generate_esp32_chip_factory_bin.py
           scripts/tools/memory/memdf/__init__.py
           scripts/tools/memory/report_summary.py
           scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py
