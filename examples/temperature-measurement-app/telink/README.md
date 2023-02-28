@@ -1,9 +1,10 @@
 # Matter Telink Temperature Measurement Example Application
 
-The Telink Temperature Measurement Example demonstrates getting simulated data from temperature sensor.
-In further releases the real sensor handling will be implemented along. It uses buttons to test changing the device
-states and LEDs to show the state of these changes. You can use this example as
-a reference for creating your own application.
+The Telink Temperature Measurement Example demonstrates getting simulated data
+from temperature sensor. In further releases the real sensor handling will be
+implemented along. It uses buttons to test changing the device states and LEDs
+to show the state of these changes. You can use this example as a reference for
+creating your own application.
 
 ![Telink B91 EVK](http://wiki.telink-semi.cn/wiki/assets/Hardware/B91_Generic_Starter_Kit_Hardware_Guide/connection_chart.png)
 
@@ -61,6 +62,7 @@ The following buttons are available on **tlsr9518adk80d** board:
 | Name     | Function               | Description                                                                                            |
 | :------- | :--------------------- | :----------------------------------------------------------------------------------------------------- |
 | Button 1 | Factory reset          | Perform factory reset to forget currently commissioned Thread network and back to uncommissioned state |
+| Button 2 | NA                     | NA                                                                                                     |
 | Button 3 | Thread start           | Commission thread with static credentials and enables the Thread on device                             |
 | Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE                           |
 
@@ -174,15 +176,3 @@ Usage of OTA:
 Once the transfer is complete, OTA requestor sends ApplyUpdateRequest command to
 OTA provider for applying the image. Device will restart on successful
 application of OTA image.
-
-### Building with Pigweed RPCs
-
-The RPCs in `lighting-common/lighting_service/lighting_service.proto` can be
-used to control various functionalities of the lighting app from a USB-connected
-host computer. To build the example with the RPC server, run the following
-command with _build-target_ replaced with the build target name of the Nordic
-Semiconductor's kit you own:
-
-    ```
-    $ west build -b tlsr9518adk80d -- -DOVERLAY_CONFIG=rpc.overlay
-    ```

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,12 +21,7 @@
 #include "AppEvent.h"
 #include "AppTask.h"
 
-#ifdef SENSOR_IS_USED
-// Provide REAL sensor implementation
-// #include "SomeTemperatureSensor.h"
-#else
 #define TEMPERATURE_SIMULATION_IS_USED
-#endif
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -77,7 +72,7 @@ int16_t SensorManager::SensorEventHandler()
     }
 #else
     // TODO: provide REAL sensor implementation
-    // sSensorManager.mMeasuredTempCelsius = (int16_t) 100 * GetRealSensorTemperature();
+    sSensorManager.mMeasuredTempCelsius = (int16_t) 100 * GetRealSensorTemperature();
 #endif // TEMPERATURE_SIMULATION_IS_USED
     return sSensorManager.mMeasuredTempCelsius;
 }

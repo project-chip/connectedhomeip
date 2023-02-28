@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -116,18 +116,18 @@ bool sHaveBLEConnections  = false;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
-// void OnIdentifyTriggerEffect(Identify * identify)
-// {
-//     AppTask::IdentifyEffectHandler(identify->mCurrentEffectIdentifier);
-// }
+void OnIdentifyTriggerEffect(Identify * identify)
+{
+    AppTask::IdentifyEffectHandler(identify->mCurrentEffectIdentifier);
+}
 
-// Identify sIdentify = {
-//     kEndpointId,
-//     [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStart"); },
-//     [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStop"); },
-//     EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
-//     OnIdentifyTriggerEffect,
-// };
+Identify sIdentify = {
+    kEndpointId,
+    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStart"); },
+    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStop"); },
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    OnIdentifyTriggerEffect,
+};
 
 } // namespace
 
@@ -229,7 +229,7 @@ CHIP_ERROR AppTask::Init(void)
     app::Clusters::TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(kEndpointId, SensorMgr().GetMaxMeasuredValue());
     PlatformMgr().UnlockChipStack();
 
-    err = ConnectivityMgr().SetBLEDeviceName("TelinkTemperature");
+    err = ConnectivityMgr().SetBLEDeviceName("TelinkTerm");
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("SetBLEDeviceName fail");
