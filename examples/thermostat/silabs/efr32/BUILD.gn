@@ -114,8 +114,6 @@ efr32_executable("thermostat_app") {
 
   if (use_temp_sensor) {
     sources += [
-      "${efr32_sdk_root}/app/bluetooth/common/sensor_rht/sl_sensor_rht.c",
-      "${efr32_sdk_root}/app/bluetooth/common/sensor_select/sl_sensor_select.c",
       "${efr32_sdk_root}/hardware/driver/si70xx/src/sl_si70xx.c",
       "${efr32_sdk_root}/platform/common/src/sl_status.c",
       "${efr32_sdk_root}/platform/driver/i2cspm/src/sl_i2cspm.c",
