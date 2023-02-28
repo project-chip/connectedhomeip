@@ -12,10 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Location of Tizen SDK
-  tizen_sdk_root = getenv("TIZEN_SDK_ROOT")
+import("//build_overrides/build.gni")
 
-  # Location of Tizen SDK sysroot
-  tizen_sdk_sysroot = getenv("TIZEN_SDK_SYSROOT")
+# The location of the build configuration file.
+buildconfig = "${build_root}/config/BUILDCONFIG.gn"
+
+# CHIP uses angle bracket includes.
+check_system_includes = true
+
+default_args = {
+  target_os = "tizen"
 }
