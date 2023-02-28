@@ -33,17 +33,14 @@ exclude = third_party
           scripts/build/builders/imx.py
           scripts/build/builders/infineon.py
           scripts/build/builders/nrf.py
-          scripts/build/test.py
           scripts/codegen.py
           scripts/codepregen.py
           scripts/error_table.py
           scripts/examples/gn_to_cmakelists.py
-          scripts/examples/tests/test.py
           scripts/flashing/bouffalolab_firmware_utils.py
           scripts/flashing/cyw30739_firmware_utils.py
           scripts/flashing/nrfconnect_firmware_utils.py
           scripts/gen_chip_version.py
-          scripts/gen_test_driver.py
           scripts/helpers/bloat_check.py
           scripts/pregenerate/using_codegen.py
           scripts/pregenerate/using_zap.py
@@ -60,16 +57,7 @@ exclude = third_party
           scripts/py_matter_yamltests/test_yaml_parser.py
           scripts/run-clang-tidy-on-compile-commands.py
           scripts/setup/nrfconnect/update_ncs.py
-          scripts/tests/chiptest/__init__.py
-          scripts/tests/chiptest/runner.py
-          scripts/tests/chiptest/test_definition.py
           scripts/tests/chiptest/yamltest_with_chip_repl_tester.py
-          scripts/tests/java/base.py
-          scripts/tests/java/commissioning_test.py
-          scripts/tests/java/discover_test.py
-          scripts/tests/run_java_test.py
-          scripts/tests/run_python_test.py
-          scripts/tests/run_test_suite.py
           scripts/tools/check_zcl_file_sync.py
           scripts/tools/convert_ini.py
           scripts/tools/generate_esp32_chip_factory_bin.py
@@ -82,12 +70,10 @@ exclude = third_party
           scripts/tools/telink/mfg_tool.py
           scripts/tools/zap/generate.py
           scripts/tools/zap/prune_outputs.py
-          scripts/tools/zap/test_generate.py
           scripts/tools/zap/version_update.py
           scripts/tools/zap/zap_download.py
           scripts/tools/zap_convert_all.py
           src/app/ota_image_tool.py
-          src/app/tests/suites/certification/information.py
           src/app/zap_cluster_list.py
           src/controller/python/build-chip-wheel.py
           src/controller/python/chip-device-ctrl.py
@@ -117,23 +103,7 @@ exclude = third_party
           src/controller/python/chip/yaml/__init__.py
           src/controller/python/chip/yaml/format_converter.py
           src/controller/python/chip/yaml/runner.py
-          src/controller/python/test/test_scripts/base.py
-          src/controller/python/test/test_scripts/cluster_objects.py
-          src/controller/python/test/test_scripts/mobile-device-test.py
-          src/controller/python/test/test_scripts/network_commissioning.py
-          src/controller/python/test/unit_tests/test_cluster_objects.py
-          src/controller/python/test/unit_tests/test_tlv.py
           src/lib/asn1/gen_asn1oid.py
           src/pybindings/pycontroller/build-chip-wheel.py
           src/pybindings/pycontroller/pychip/__init__.py
-          src/python_testing/TC_ACE_1_3.py
-          src/python_testing/TC_ACE_1_4.py
-          src/python_testing/TC_CGEN_2_4.py
-          src/python_testing/TC_DA_1_7.py
-          src/python_testing/TC_RR_1_1.py
-          src/python_testing/TC_SC_3_6.py
-          src/python_testing/TC_TestEventTrigger.py
-          src/python_testing/hello_test.py
-          src/python_testing/matter_testing_support.py
           src/setup_payload/python/generate_setup_payload.py
-          src/setup_payload/tests/run_python_setup_payload_gen_test.py
