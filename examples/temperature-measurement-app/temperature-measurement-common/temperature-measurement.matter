@@ -6,84 +6,6 @@ struct LabelStruct {
     char_string<16> value = 1;
 }
 
-client cluster Identify = 3 {
-  enum IdentifyEffectIdentifier : ENUM8 {
-    kBlink = 0;
-    kBreathe = 1;
-    kOkay = 2;
-    kChannelChange = 11;
-    kFinishEffect = 254;
-    kStopEffect = 255;
-  }
-
-  enum IdentifyEffectVariant : ENUM8 {
-    kDefault = 0;
-  }
-
-  enum IdentifyIdentifyType : ENUM8 {
-    kNone = 0;
-    kVisibleLight = 1;
-    kVisibleLED = 2;
-    kAudibleBeep = 3;
-    kDisplay = 4;
-    kActuator = 5;
-  }
-
-  attribute int16u identifyTime = 0;
-  readonly attribute enum8 identifyType = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct IdentifyRequest {
-    INT16U identifyTime = 0;
-  }
-
-  command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
-}
-
-server cluster Identify = 3 {
-  enum IdentifyEffectIdentifier : ENUM8 {
-    kBlink = 0;
-    kBreathe = 1;
-    kOkay = 2;
-    kChannelChange = 11;
-    kFinishEffect = 254;
-    kStopEffect = 255;
-  }
-
-  enum IdentifyEffectVariant : ENUM8 {
-    kDefault = 0;
-  }
-
-  enum IdentifyIdentifyType : ENUM8 {
-    kNone = 0;
-    kVisibleLight = 1;
-    kVisibleLED = 2;
-    kAudibleBeep = 3;
-    kDisplay = 4;
-    kActuator = 5;
-  }
-
-  attribute int16u identifyTime = 0;
-  readonly attribute enum8 identifyType = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-
-  request struct IdentifyRequest {
-    INT16U identifyTime = 0;
-  }
-
-  command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
-}
-
 server cluster Descriptor = 29 {
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
@@ -1007,12 +929,6 @@ server cluster TemperatureMeasurement = 1026 {
 endpoint 0 {
   device type rootdevice = 22, version 1;
 
-  server cluster Identify {
-    ram      attribute identifyTime;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 4;
-  }
-
   server cluster Descriptor {
     callback attribute deviceTypeList;
     callback attribute serverList;
@@ -1210,14 +1126,6 @@ endpoint 0 {
 }
 endpoint 1 {
   device type tempsensor = 770, version 1;
-  binding cluster Identify;
-
-  server cluster Identify {
-    ram      attribute identifyTime;
-    ram      attribute identifyType;
-    ram      attribute featureMap;
-    ram      attribute clusterRevision default = 4;
-  }
 
   server cluster Descriptor {
     callback attribute deviceTypeList;
@@ -1236,5 +1144,3 @@ endpoint 1 {
     ram      attribute clusterRevision default = 4;
   }
 }
-
-

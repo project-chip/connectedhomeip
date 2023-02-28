@@ -27,7 +27,6 @@
 
 #include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -70,23 +69,14 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 namespace {
-constexpr int kFactoryResetCalcTimeout          = 3000;
-constexpr int kFactoryResetTriggerCntr          = 3;
-constexpr int kAppEventQueueSize                = 10;
-constexpr uint8_t kButtonPushEvent              = 1;
-constexpr uint8_t kButtonReleaseEvent           = 0;
-constexpr EndpointId kEndpointId                = 1;
-constexpr uint8_t kDefaultMinLevel              = 0;
-constexpr uint8_t kDefaultMaxLevel              = 254;
-constexpr uint32_t kIdentifyBlinkRateMs         = 200;
-constexpr uint32_t kIdentifyOkayOnRateMs        = 50;
-constexpr uint32_t kIdentifyOkayOffRateMs       = 950;
-constexpr uint32_t kIdentifyFinishOnRateMs      = 950;
-constexpr uint32_t kIdentifyFinishOffRateMs     = 50;
-constexpr uint32_t kIdentifyChannelChangeRateMs = 1000;
-constexpr uint32_t kIdentifyBreatheRateMs       = 1000;
-
-const struct pwm_dt_spec sPwmIdentifySpecGreenLed = LIGHTING_PWM_SPEC_IDENTIFY_GREEN;
+constexpr int kFactoryResetCalcTimeout = 3000;
+constexpr int kFactoryResetTriggerCntr = 3;
+constexpr int kAppEventQueueSize       = 10;
+constexpr uint8_t kButtonPushEvent     = 1;
+constexpr uint8_t kButtonReleaseEvent  = 0;
+constexpr EndpointId kEndpointId       = 1;
+constexpr uint8_t kDefaultMinLevel     = 0;
+constexpr uint8_t kDefaultMaxLevel     = 254;
 
 #if CONFIG_CHIP_FACTORY_DATA
 // NOTE! This key is for test/certification only and should not be available in production devices!
@@ -115,19 +105,6 @@ bool sIsThreadAttached    = false;
 bool sHaveBLEConnections  = false;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
-
-void OnIdentifyTriggerEffect(Identify * identify)
-{
-    AppTask::IdentifyEffectHandler(identify->mCurrentEffectIdentifier);
-}
-
-Identify sIdentify = {
-    kEndpointId,
-    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStop"); },
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
-    OnIdentifyTriggerEffect,
-};
 
 } // namespace
 
@@ -169,16 +146,6 @@ CHIP_ERROR AppTask::Init(void)
     k_timer_user_data_set(&sTemperatureMeasurementTimer, this);
     k_timer_start(&sTemperatureMeasurementTimer, K_MSEC(kSensorTimerPeriodMs), K_NO_WAIT);
 
-    // Initialize PWM LEDs
-    CHIP_ERROR err = sAppTask.mPwmIdentifyLed.Init(&sPwmIdentifySpecGreenLed, kDefaultMinLevel, kDefaultMaxLevel, kDefaultMaxLevel);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("Green IDENTIFY PWM Device Init fail");
-        return err;
-    }
-
-    sAppTask.mPwmIdentifyLed.SetCallbacks(nullptr, nullptr, ActionIdentifyStateUpdateHandler);
-
     // Initialize CHIP server
 #if CONFIG_CHIP_FACTORY_DATA
     ReturnErrorOnFailure(mFactoryDataProvider.Init());
@@ -217,7 +184,7 @@ CHIP_ERROR AppTask::Init(void)
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
     // Init Temperature Sensor
-    err = SensorMgr().Init();
+    CHIP_ERROR err = SensorMgr().Init();
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("SensorMgr Init fail");
@@ -263,56 +230,6 @@ CHIP_ERROR AppTask::StartApp(void)
         k_msgq_get(&sAppEventQueue, &event, K_FOREVER);
         DispatchEvent(&event);
     }
-}
-
-void AppTask::IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect)
-{
-    AppEvent event;
-    event.Type = AppEvent::kEventType_IdentifyStart;
-
-    switch (aEffect)
-    {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
-        event.Handler = [](AppEvent *) {
-            sAppTask.mPwmIdentifyLed.InitiateBlinkAction(kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
-        };
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
-        event.Handler = [](AppEvent *) {
-            sAppTask.mPwmIdentifyLed.InitiateBreatheAction(PWMDevice::kBreatheType_Both, kIdentifyBreatheRateMs);
-        };
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
-        event.Handler = [](AppEvent *) {
-            sAppTask.mPwmIdentifyLed.InitiateBlinkAction(kIdentifyOkayOnRateMs, kIdentifyOkayOffRateMs);
-        };
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
-        event.Handler = [](AppEvent *) {
-            sAppTask.mPwmIdentifyLed.InitiateBlinkAction(kIdentifyChannelChangeRateMs, kIdentifyChannelChangeRateMs);
-        };
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT");
-        event.Handler = [](AppEvent *) {
-            sAppTask.mPwmIdentifyLed.InitiateBlinkAction(kIdentifyFinishOnRateMs, kIdentifyFinishOffRateMs);
-        };
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
-        ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT");
-        event.Handler = [](AppEvent *) { sAppTask.mPwmIdentifyLed.StopAction(); };
-        event.Type    = AppEvent::kEventType_IdentifyStop;
-        break;
-    default:
-        ChipLogProgress(Zcl, "No identifier effect");
-        return;
-    }
-
-    sAppTask.PostEvent(&event);
 }
 
 void AppTask::FactoryResetButtonEventHandler(void)
@@ -470,19 +387,6 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
     default:
         break;
     }
-}
-
-void AppTask::ActionIdentifyStateUpdateHandler(k_timer * timer)
-{
-    AppEvent event;
-    event.Type    = AppEvent::kEventType_UpdateLedState;
-    event.Handler = UpdateIdentifyStateEventHandler;
-    sAppTask.PostEvent(&event);
-}
-
-void AppTask::UpdateIdentifyStateEventHandler(AppEvent * aEvent)
-{
-    sAppTask.mPwmIdentifyLed.UpdateAction();
 }
 
 void AppTask::PostEvent(AppEvent * aEvent)
