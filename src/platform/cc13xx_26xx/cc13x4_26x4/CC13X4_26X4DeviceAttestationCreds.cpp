@@ -24,13 +24,11 @@ extern uint32_t __attestation_credentials_base;
 
 namespace chip {
 namespace Credentials {
-namespace CC13X2_26X2 {
+namespace CC13X4_26X4 {
 
 namespace {
 
 extern "C" {
-
-extern void cc13xx_26x2Log(const char * aFormat, ...);
 
 typedef struct
 {
@@ -140,7 +138,7 @@ CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto:
     return keypair.Deserialize(serialized_keypair);
 }
 
-class DeviceAttestationCredsCC13X2_26X2 : public DeviceAttestationCredentialsProvider
+class DeviceAttestationCredsCC13X4_26X4 : public DeviceAttestationCredentialsProvider
 {
 
 public:
@@ -154,7 +152,7 @@ private:
     factoryData const * mFactoryData = &gFactoryData;
 };
 
-CHIP_ERROR DeviceAttestationCredsCC13X2_26X2::GetCertificationDeclaration(MutableByteSpan & out_buffer)
+CHIP_ERROR DeviceAttestationCredsCC13X4_26X4::GetCertificationDeclaration(MutableByteSpan & out_buffer)
 {
     //-> format_version = 1
     //-> vendor_id = 0xFFF1
@@ -207,14 +205,14 @@ CHIP_ERROR DeviceAttestationCredsCC13X2_26X2::GetCertificationDeclaration(Mutabl
     return CopySpanToMutableSpan(ByteSpan{ kCdForAllExamples }, out_buffer);
 }
 
-CHIP_ERROR DeviceAttestationCredsCC13X2_26X2::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
+CHIP_ERROR DeviceAttestationCredsCC13X4_26X4::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
 {
     out_firmware_info_buffer.reduce_size(0);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceAttestationCredsCC13X2_26X2::GetDeviceAttestationCert(MutableByteSpan & out_buffer)
+CHIP_ERROR DeviceAttestationCredsCC13X4_26X4::GetDeviceAttestationCert(MutableByteSpan & out_buffer)
 {
     ReturnErrorCodeIf(out_buffer.size() < mFactoryData->dac_cert.len, CHIP_ERROR_BUFFER_TOO_SMALL);
     ReturnErrorCodeIf(!mFactoryData->dac_cert.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
@@ -223,7 +221,7 @@ CHIP_ERROR DeviceAttestationCredsCC13X2_26X2::GetDeviceAttestationCert(MutableBy
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceAttestationCredsCC13X2_26X2::GetProductAttestationIntermediateCert(MutableByteSpan & out_buffer)
+CHIP_ERROR DeviceAttestationCredsCC13X4_26X4::GetProductAttestationIntermediateCert(MutableByteSpan & out_buffer)
 {
     ReturnErrorCodeIf(out_buffer.size() < mFactoryData->pai_cert.len, CHIP_ERROR_BUFFER_TOO_SMALL);
     ReturnErrorCodeIf(!mFactoryData->pai_cert.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
@@ -231,7 +229,7 @@ CHIP_ERROR DeviceAttestationCredsCC13X2_26X2::GetProductAttestationIntermediateC
     return CopySpanToMutableSpan(ByteSpan{ mFactoryData->pai_cert.data, mFactoryData->pai_cert.len }, out_buffer);
 }
 
-CHIP_ERROR DeviceAttestationCredsCC13X2_26X2::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign,
+CHIP_ERROR DeviceAttestationCredsCC13X4_26X4::SignWithDeviceAttestationKey(const ByteSpan & message_to_sign,
                                                                            MutableByteSpan & out_buffer)
 {
     Crypto::P256ECDSASignature signature;
@@ -252,12 +250,12 @@ CHIP_ERROR DeviceAttestationCredsCC13X2_26X2::SignWithDeviceAttestationKey(const
 
 } // namespace
 
-DeviceAttestationCredentialsProvider * GetCC13X2_26X2DacProvider()
+DeviceAttestationCredentialsProvider * GetCC13X4_26X4DacProvider()
 {
-    static DeviceAttestationCredsCC13X2_26X2 dac_provider;
+    static DeviceAttestationCredsCC13X4_26X4 dac_provider;
     return &dac_provider;
 }
 
-} // namespace CC13X2_26X2
+} // namespace CC13X4_26X4
 } // namespace Credentials
 } // namespace chip

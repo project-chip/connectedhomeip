@@ -20,7 +20,7 @@
 
 namespace chip {
 namespace Credentials {
-namespace CC13X2_26X2 {
+namespace CC13X4_26X4 {
 
 /**
  * @brief Get implementation of a sample DAC provider to validate device
@@ -31,6 +31,6 @@ namespace CC13X2_26X2 {
  */
 DeviceAttestationCredentialsProvider * GetCC13X4_26X4DacProvider();
 
-} // namespace CC13X2_26X2
+} // namespace CC13X4_26X4
 } // namespace Credentials
 } // namespace chip
