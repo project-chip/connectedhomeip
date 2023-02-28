@@ -33,12 +33,6 @@ declare_args() {
   # Argument to force enable WPA3 security on rs91x
   rs91x_wpa3_only = false
 
-  #default WiFi SSID
-  chip_default_wifi_ssid = ""
-
-  #default Wifi Password
-  chip_default_wifi_psk = ""
-
   # Use default handler to negotiate subscription max interval
   chip_config_use_icd_subscription_callbacks = enable_sleepy_device
 }
@@ -206,18 +200,6 @@ config("efr32-common-config") {
 config("silabs-wifi-config") {
   defines = []
   include_dirs = []
-
-  if (chip_default_wifi_ssid != "") {
-    defines += [
-      "CHIP_ONNETWORK_PAIRING=1",
-      "CHIP_WIFI_SSID=\"${chip_default_wifi_ssid}\"",
-    ]
-  }
-  if (chip_default_wifi_psk != "") {
-    assert(chip_default_wifi_ssid != "",
-           "ssid can't be null if psk is provided")
-    defines += [ "CHIP_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
-  }
 
   if (sl_wfx_config_softap) {
     defines += [ "SL_WFX_CONFIG_SOFTAP" ]
