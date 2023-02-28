@@ -25,6 +25,8 @@
 #pragma once
 
 #include <cstdint>
+#include <lib/support/TypeTraits.h>
+#include <type_traits>
 
 namespace chip {
 namespace TLV {
@@ -161,6 +163,17 @@ constexpr Tag ProfileTag(uint16_t vendorId, uint16_t profileNum, uint32_t tagNum
 constexpr Tag ContextTag(uint8_t tagNum)
 {
     return ProfileTag(Tag::kSpecialTagProfileId, tagNum);
+}
+
+/**
+ * Also allow using enum class values as context tags.  Just using is_enum would
+ * fail for enums that are not enum classes because to_underlying would produce
+ * the underlying type, which might be wider than uint8_t.
+ */
+template <typename T, std::enable_if_t<std::is_enum<T>::value && !std::is_convertible<T, uint8_t>::value, int> = 0>
+constexpr Tag ContextTag(T tagNum)
+{
+    return ContextTag(to_underlying(tagNum));
 }
 
 /**
