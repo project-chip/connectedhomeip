@@ -546,9 +546,8 @@ CHIP_ERROR ThreadStackManagerImpl::_AddSrpService(const char * aInstanceName, co
 
     threadErr =
         thread_srp_client_register_service_full(mThreadInstance, aInstanceName, aName, aPort, 0, 0, entries.data(), entries.size());
-    VerifyOrReturnError(
-        threadErr == THREAD_ERROR_NONE || threadErr == THREAD_ERROR_ALREADY_DONE,
-        (ChipLogError(DeviceLayer, "thread_srp_client_register_service() failed. ret: %d", threadErr), CHIP_ERROR_INTERNAL));
+    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE || threadErr == THREAD_ERROR_ALREADY_DONE, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "thread_srp_client_register_service() failed. ret: %d", threadErr));
 
     SrpClientService service;
     Platform::CopyString(service.mInstanceName, aInstanceName);
@@ -568,9 +567,8 @@ CHIP_ERROR ThreadStackManagerImpl::_RemoveSrpService(const char * aInstanceName,
     int threadErr;
 
     threadErr = thread_srp_client_remove_service(mThreadInstance, aInstanceName, aName);
-    VerifyOrReturnError(
-        threadErr == THREAD_ERROR_NONE,
-        (ChipLogError(DeviceLayer, "thread_srp_client_remove_service() failed. ret: %d", threadErr), CHIP_ERROR_INTERNAL));
+    VerifyOrReturnError(threadErr == THREAD_ERROR_NONE, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "thread_srp_client_remove_service() failed. ret: %d", threadErr));
 
     return CHIP_NO_ERROR;
 }
