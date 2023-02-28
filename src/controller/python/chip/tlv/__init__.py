@@ -32,7 +32,7 @@ from collections import OrderedDict
 from collections.abc import Mapping, Sequence
 from enum import Enum
 
-from .list import TLVList
+from .tlvlist import TLVList
 
 TLV_TYPE_SIGNED_INTEGER = 0x00
 TLV_TYPE_UNSIGNED_INTEGER = 0x04
