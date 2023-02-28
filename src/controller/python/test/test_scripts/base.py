@@ -37,7 +37,6 @@ import chip.FabricAdmin
 import chip.interaction_model as IM
 import chip.native
 from chip import ChipDeviceCtrl
-
 from chip.ChipStack import *
 from chip.crypto import p256keypair
 from chip.utils import CommissioningBuildingBlocks
