@@ -608,7 +608,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "included": 1
+              "included": 0
             }
           ]
         },
@@ -1458,7 +1458,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "TempUnit",
+              "type": "TempUnitEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 1,

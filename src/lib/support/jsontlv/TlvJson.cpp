@@ -156,11 +156,11 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & 
         byteString.Alloc(kBase64HeaderLen + BASE64_ENCODED_LEN(span.size()) + 1);
         VerifyOrReturnError(byteString.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        auto encodedLen = Base64Encode(span.data(), span.size(), byteString.Get() + kBase64HeaderLen);
+        auto encodedLen = Base64Encode(span.data(), static_cast<uint16_t>(span.size()), byteString.Get() + kBase64HeaderLen);
         if (encodedLen)
         {
             memcpy(byteString.Get(), kBase64Header, kBase64HeaderLen);
-            encodedLen += kBase64HeaderLen;
+            encodedLen = static_cast<uint16_t>(encodedLen + kBase64HeaderLen);
         }
         byteString.Get()[encodedLen] = '\0';
 

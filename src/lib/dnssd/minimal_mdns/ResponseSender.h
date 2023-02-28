@@ -53,7 +53,7 @@ class ResponseSendingState
 public:
     ResponseSendingState() {}
 
-    void Reset(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * packet)
+    void Reset(uint16_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * packet)
     {
         mMessageId    = messageId;
         mQuery        = &query;
@@ -72,7 +72,7 @@ public:
     }
     CHIP_ERROR GetError() const { return mSendError; }
 
-    uint32_t GetMessageId() const { return mMessageId; }
+    uint16_t GetMessageId() const { return mMessageId; }
 
     const QueryData * GetQuery() const { return mQuery; }
 
@@ -91,7 +91,7 @@ public:
 private:
     const QueryData * mQuery                 = nullptr;               // query being replied to
     const chip::Inet::IPPacketInfo * mSource = nullptr;               // Where to send the reply (if unicast)
-    uint32_t mMessageId                      = 0;                     // message id for the reply
+    uint16_t mMessageId                      = 0;                     // message id for the reply
     ResourceType mResourceType               = ResourceType::kAnswer; // what is being sent right now
     CHIP_ERROR mSendError                    = CHIP_NO_ERROR;
 };
@@ -112,7 +112,7 @@ public:
     bool HasQueryResponders() const;
 
     /// Send back the response to a particular query
-    CHIP_ERROR Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource,
+    CHIP_ERROR Respond(uint16_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource,
                        const ResponseConfiguration & configuration);
 
     // Implementation of ResponderDelegate

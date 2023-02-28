@@ -2958,12 +2958,12 @@ public:
         mLastError                      = CHIP_NO_ERROR;
     }
 
-    int32_t mAttributeCount                 = 0;
-    int32_t mOnReportEnd                    = 0;
-    int32_t mOnSubscriptionEstablishedCount = 0;
-    int32_t mOnDone                         = 0;
-    int32_t mOnError                        = 0;
-    CHIP_ERROR mLastError                   = CHIP_NO_ERROR;
+    uint32_t mAttributeCount                 = 0;
+    uint32_t mOnReportEnd                    = 0;
+    uint32_t mOnSubscriptionEstablishedCount = 0;
+    uint32_t mOnDone                         = 0;
+    uint32_t mOnError                        = 0;
+    CHIP_ERROR mLastError                    = CHIP_NO_ERROR;
 };
 
 class TestPerpetualListReadCallback : public app::ReadClient::Callback
@@ -2991,7 +2991,7 @@ public:
     int32_t reportsReceived = 0;
 };
 
-void EstablishReadOrSubscriptions(nlTestSuite * apSuite, const SessionHandle & sessionHandle, int32_t numSubs, int32_t pathPerSub,
+void EstablishReadOrSubscriptions(nlTestSuite * apSuite, const SessionHandle & sessionHandle, size_t numSubs, size_t pathPerSub,
                                   app::AttributePathParams path, app::ReadClient::InteractionType type,
                                   app::ReadClient::Callback * callback, std::vector<std::unique_ptr<app::ReadClient>> & readClients)
 {
@@ -3006,7 +3006,7 @@ void EstablishReadOrSubscriptions(nlTestSuite * apSuite, const SessionHandle & s
         readParams.mKeepSubscriptions         = true;
     }
 
-    for (int32_t i = 0; i < numSubs; i++)
+    for (uint32_t i = 0; i < numSubs; i++)
     {
         std::unique_ptr<app::ReadClient> readClient =
             std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(),
@@ -3066,9 +3066,9 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     TestContext & ctx  = *static_cast<TestContext *>(apContext);
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
-    const int32_t kExpectedParallelSubs =
+    const auto kExpectedParallelSubs =
         app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric * ctx.GetFabricTable().FabricCount();
-    const int32_t kExpectedParallelPaths = kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
+    const auto kExpectedParallelPaths = kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
 
     app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
 
@@ -3117,14 +3117,14 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
         return readCallback.mOnSubscriptionEstablishedCount == kExpectedParallelSubs + 1 &&
             readCallback.mAttributeCount ==
-            static_cast<int32_t>(kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription +
-                                 app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1);
+            kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription +
+                app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1;
     });
 
     NL_TEST_ASSERT(apSuite,
                    readCallback.mAttributeCount ==
-                       static_cast<int32_t>(kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription +
-                                            app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1));
+                       kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription +
+                           app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1);
     NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablishedCount == kExpectedParallelSubs + 1);
 
     // We have set up the environment for testing the evicting logic.
@@ -3132,8 +3132,8 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     // subscriptions will require the eviction of existing subscriptions, OR potential rejection of the subscription if it exceeds
     // minimas.
     app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(kExpectedParallelSubs);
-    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(kExpectedParallelPaths);
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(static_cast<int32_t>(kExpectedParallelSubs));
+    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(static_cast<int32_t>(kExpectedParallelPaths));
 
     // Part 1: Test per subscription minimas.
     // Rejection of the subscription that exceeds minimas.
@@ -3291,9 +3291,9 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
     TestContext & ctx  = *static_cast<TestContext *>(apContext);
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
-    const int32_t kExpectedParallelSubs =
+    const auto kExpectedParallelSubs =
         app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric * ctx.GetFabricTable().FabricCount();
-    const int32_t kExpectedParallelPaths = kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
+    const auto kExpectedParallelPaths = kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
 
     app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
 
@@ -3301,8 +3301,8 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
     std::vector<std::unique_ptr<app::ReadClient>> readClients;
 
     app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(kExpectedParallelSubs);
-    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(kExpectedParallelPaths);
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(static_cast<int32_t>(kExpectedParallelSubs));
+    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(static_cast<int32_t>(kExpectedParallelPaths));
 
     // This should just use all availbale resources.
     EstablishReadOrSubscriptions(
@@ -3314,12 +3314,9 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
 
     NL_TEST_ASSERT(apSuite,
                    readCallback.mAttributeCount ==
-                       kExpectedParallelSubs *
-                           static_cast<int32_t>(app::InteractionModelEngine::kMinSupportedPathsPerSubscription));
+                       kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription);
     NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablishedCount == kExpectedParallelSubs);
-    NL_TEST_ASSERT(apSuite,
-                   app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() ==
-                       static_cast<size_t>(kExpectedParallelSubs));
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == kExpectedParallelSubs);
 
     // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
     {

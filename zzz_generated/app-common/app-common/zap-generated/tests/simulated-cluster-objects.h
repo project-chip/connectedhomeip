@@ -748,7 +748,7 @@ struct DiscoveryCommandResponse
     uint16_t vendorId;
     uint16_t productId;
     uint8_t commissioningMode;
-    uint16_t deviceType;
+    uint32_t deviceType;
     chip::CharSpan deviceName;
     chip::ByteSpan rotatingId;
     uint64_t rotatingIdLen;
