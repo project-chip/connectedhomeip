@@ -30,4 +30,6 @@ chip_test_suite("tests") {
     "${chip_root}/src/platform",
     "${nlunit_test_root}:nlunit-test",
   ]
+
+  cflags = [ "-Wconversion" ]
 }

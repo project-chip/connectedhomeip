@@ -28,9 +28,9 @@
 // Example of __TIME__ string: "21:06:19"
 
 #define COMPUTE_BUILD_YEAR(_date)                                                                                                  \
-    (((_date)[7] - '0') * 1000 + ((_date)[8] - '0') * 100 + ((_date)[9] - '0') * 10 + ((_date)[10] - '0'))
+    static_cast<uint16_t>(((_date)[7] - '0') * 1000 + ((_date)[8] - '0') * 100 + ((_date)[9] - '0') * 10 + ((_date)[10] - '0'))
 
-#define COMPUTE_BUILD_DAY(_date) ((((_date)[4] >= '0') ? ((_date)[4] - '0') * 10 : 0) + ((_date)[5] - '0'))
+#define COMPUTE_BUILD_DAY(_date) static_cast<uint8_t>((((_date)[4] >= '0') ? ((_date)[4] - '0') * 10 : 0) + ((_date)[5] - '0'))
 
 #define BUILD_MONTH_IS_JAN(_date) ((_date)[0] == 'J' && (_date)[1] == 'a')
 #define BUILD_MONTH_IS_FEB(_date) ((_date)[0] == 'F')
@@ -63,9 +63,9 @@
                                                  ? 11                                                                              \
                                                  : (BUILD_MONTH_IS_DEC(_date)) ? 12 : /* error default */ 99)
 
-#define COMPUTE_BUILD_HOUR(_time) (((_time)[0] - '0') * 10 + (_time)[1] - '0')
-#define COMPUTE_BUILD_MIN(_time) (((_time)[3] - '0') * 10 + (_time)[4] - '0')
-#define COMPUTE_BUILD_SEC(_time) (((_time)[6] - '0') * 10 + (_time)[7] - '0')
+#define COMPUTE_BUILD_HOUR(_time) static_cast<uint8_t>(((_time)[0] - '0') * 10 + (_time)[1] - '0')
+#define COMPUTE_BUILD_MIN(_time) static_cast<uint8_t>(((_time)[3] - '0') * 10 + (_time)[4] - '0')
+#define COMPUTE_BUILD_SEC(_time) static_cast<uint8_t>(((_time)[6] - '0') * 10 + (_time)[7] - '0')
 
 #define BUILD_DATE_IS_BAD(_date) ((_date) == nullptr || strlen(_date) < strlen("Jan 01 2000") || (_date)[0] == '?')
 #define BUILD_TIME_IS_BAD(_time) ((_time) == nullptr || strlen(_time) < strlen("00:00:00") || (_time)[0] == '?')

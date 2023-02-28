@@ -97,10 +97,12 @@ class TelinkBuilder(Builder):
                  root,
                  runner,
                  app: TelinkApp = TelinkApp,
-                 board: TelinkBoard = TelinkBoard.TLSR9518ADK80D):
+                 board: TelinkBoard = TelinkBoard.TLSR9518ADK80D,
+                 enable_rpcs: bool = False):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board
+        self.enable_rpcs = enable_rpcs
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -121,6 +123,9 @@ class TelinkBuilder(Builder):
             return
 
         flags = []
+        if self.enable_rpcs:
+            flags.append("-DOVERLAY_CONFIG=rpc.overlay")
+
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
 

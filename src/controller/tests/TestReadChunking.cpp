@@ -25,6 +25,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/BufferedReadCallback.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/GlobalAttributes.h>
 #include <app/InteractionModelEngine.h>
 #include <app/data-model/Decode.h>
 #include <app/tests/AppTestContext.h>
@@ -174,10 +175,12 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(gSuite, arraySize == 0);
     }
+#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     else if (aPath.mAttributeId == Globals::Attributes::EventList::Id)
     {
         // Nothing to check for this one; depends on the endpoint.
     }
+#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     else if (aPath.mAttributeId == Globals::Attributes::AttributeList::Id)
     {
         // Nothing to check for this one; depends on the endpoint.
@@ -407,11 +410,9 @@ void TestReadChunking::TestChunking(nlTestSuite * apSuite, void * apContext)
         NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
 
         //
-        // Always returns the same number of attributes read (5 + revision +
-        // AttributeList + EventList + AcceptedCommandList +
-        // GeneratedCommandList = 10).
+        // Always returns the same number of attributes read (5 + revision + GlobalAttributesNotInMetadata).
         //
-        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 10);
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 6 + ArraySize(GlobalAttributesNotInMetadata));
         readCallback.mAttributeCount = 0;
 
         NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -585,9 +586,10 @@ void TestReadChunking::TestDynamicEndpoint(nlTestSuite * apSuite, void * apConte
         ctx.DrainAndServiceIO();
 
         // Ensure we have received the report, we do not care about the initial report here.
-        // AcceptedCommandList / GeneratedCommandList / EventList / AttributeList attribute are not included in
-        // testClusterAttrsOnEndpoint4.
-        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == ArraySize(testClusterAttrsOnEndpoint4) + 4);
+        // GlobalAttributesNotInMetadata attributes are not included in testClusterAttrsOnEndpoint4.
+        NL_TEST_ASSERT(apSuite,
+                       readCallback.mAttributeCount ==
+                           ArraySize(testClusterAttrsOnEndpoint4) + ArraySize(GlobalAttributesNotInMetadata));
 
         // We have received all report data.
         NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);
@@ -611,9 +613,10 @@ void TestReadChunking::TestDynamicEndpoint(nlTestSuite * apSuite, void * apConte
         ctx.DrainAndServiceIO();
 
         // Ensure we have received the report, we do not care about the initial report here.
-        // AcceptedCommandList / GeneratedCommandList / EventList / AttributeList attribute are not included in
-        // testClusterAttrsOnEndpoint4.
-        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == ArraySize(testClusterAttrsOnEndpoint4) + 4);
+        // GlobalAttributesNotInMetadata attributes are not included in testClusterAttrsOnEndpoint4.
+        NL_TEST_ASSERT(apSuite,
+                       readCallback.mAttributeCount ==
+                           ArraySize(testClusterAttrsOnEndpoint4) + ArraySize(GlobalAttributesNotInMetadata));
 
         // We have received all report data.
         NL_TEST_ASSERT(apSuite, readCallback.mOnReportEnd);

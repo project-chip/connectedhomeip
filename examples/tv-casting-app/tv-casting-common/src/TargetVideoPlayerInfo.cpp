@@ -26,7 +26,7 @@ CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> gCASEClientPool;
 CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIndex,
                                              std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                                              std::function<void(CHIP_ERROR)> onConnectionFailure, uint16_t vendorId,
-                                             uint16_t productId, uint16_t deviceType, const char * deviceName, size_t numIPs,
+                                             uint16_t productId, DeviceTypeId deviceType, const char * deviceName, size_t numIPs,
                                              chip::Inet::IPAddress * ipAddress)
 {
     ChipLogProgress(NotSpecified, "TargetVideoPlayerInfo nodeId=0x" ChipLogFormatX64 " fabricIndex=%d", ChipLogValueX64(nodeId),

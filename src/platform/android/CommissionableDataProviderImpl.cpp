@@ -34,6 +34,10 @@ using namespace chip::Crypto;
 
 namespace {
 
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+#define CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT 1000
+#endif
+
 CHIP_ERROR GeneratePaseSalt(std::vector<uint8_t> & spake2pSaltVector)
 {
     constexpr size_t kSaltLen = kSpake2p_Max_PBKDF_Salt_Length;

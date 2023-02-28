@@ -36,6 +36,9 @@ public:
     /////////// CHIPCommand Interface /////////
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(30); }
 
+protected:
+    chip::Controller::DeviceCommissioner * mCommissioner;
+
 private:
     chip::Optional<bool> mDiscoverOnce;
 };
