@@ -12,7 +12,6 @@ exclude = third_party
           src/test_driver/mbed/*
           src/test_driver/linux-cirque/*
           src/test_driver/esp32/*
-          src/test_driver/efr32/*
           build/chip/java/tests/*
           build/chip/linux/*
           build/config/linux/*
@@ -28,7 +27,6 @@ exclude = third_party
           scripts/build/builders/android.py
           scripts/build/builders/bouffalolab.py
           scripts/build/builders/cc13x2x7_26x2x7.py
-          scripts/build/builders/efr32.py
           scripts/build/builders/esp32.py
           scripts/build/builders/genio.py
           scripts/build/builders/gn.py
