@@ -52,7 +52,6 @@ def FindBinaryPath(name: str):
         else:
             del cache[name]
 
-    start = time.time()
     for path in Path(DEFAULT_CHIP_ROOT).rglob(name):
         if not path.is_file():
             continue
@@ -289,7 +288,8 @@ def cmd_list(context):
     type=int,
     help='If provided, fail if a test runs for longer than this time')
 @click.pass_context
-def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app, tv_app, bridge_app, chip_repl_yaml_tester, chip_tool_with_python, pics_file, keep_going, test_timeout_seconds):
+def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
+            tv_app, bridge_app, chip_repl_yaml_tester, chip_tool_with_python, pics_file, keep_going, test_timeout_seconds):
     runner = chiptest.runner.Runner()
 
     if all_clusters_app is None:

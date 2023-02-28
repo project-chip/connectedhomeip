@@ -142,6 +142,7 @@
     <string name="subscribe_dialog_subscribe_btn_text">Subscribe</string>
     <string name="subscribe_dialog_min_interval_hint">Minimum interval (seconds)</string>
     <string name="subscribe_dialog_max_interval_hint">Maximum interval (seconds)</string>
+    <string name="subscribe_dialog_is_urgent_hint">is Urgent Event (bool)</string>
     <string name="subscribe_dialog_keep_subscriptions_hint">keep subscriptions (bool)</string>
     <string name="subscribe_dialog_is_fabric_filtered_hint">is Fabric Filtered (bool)</string>
 

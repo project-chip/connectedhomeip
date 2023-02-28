@@ -143,6 +143,8 @@ private:
     friend class TestReportingEngine;
     friend class ::chip::app::TestReadInteraction;
 
+    bool IsRunScheduled() const { return mRunScheduled; }
+
     struct AttributePathParamsWithGeneration : public AttributePathParams
     {
         AttributePathParamsWithGeneration() {}

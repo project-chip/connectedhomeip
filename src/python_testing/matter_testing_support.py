@@ -40,11 +40,10 @@ import chip.CertificateAuthority
 import chip.clusters as Clusters
 import chip.logging
 import chip.native
-from chip.ChipStack import *
+from chip.ChipStack import ChipStack
 from chip.interaction_model import InteractionModelError, Status
 from chip.storage import PersistentStorage
-from chip.utils import CommissioningBuildingBlocks
-from mobly import asserts, base_test, logger, signals, utils
+from mobly import asserts, base_test, signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 
@@ -180,7 +179,9 @@ class MatterStackState:
         if already_initialized:
             self._chip_stack = builtins.chipStack
             self._logger.warn(
-                "Re-using existing ChipStack object found in current interpreter: storage path %s will be ignored!" % (self._config.storage_path))
+                "Re-using existing ChipStack object found in current interpreter: "
+                "storage path %s will be ignored!" % (self._config.storage_path)
+            )
             # TODO: Warn that storage will not follow what we set in config
         else:
             self._chip_stack = ChipStack(**kwargs)
@@ -265,12 +266,15 @@ class MatterBaseTest(base_test.BaseTestClass):
     def dut_node_id(self) -> int:
         return self.matter_test_config.dut_node_id
 
-    async def read_single_attribute(self, dev_ctrl: ChipDeviceCtrl, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
+    async def read_single_attribute(
+            self, dev_ctrl: ChipDeviceCtrl, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
         data = result[endpoint]
         return list(data.values())[0][attribute]
 
-    async def read_single_attribute_check_success(self, cluster: object, attribute: object, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = 0) -> object:
+    async def read_single_attribute_check_success(
+            self, cluster: object, attribute: object,
+            dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = 0) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -283,7 +287,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         asserts.assert_false(isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure), err_msg)
         return attr_ret
 
-    async def read_single_attribute_expect_error(self, cluster: object, attribute: object, error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = 0) -> object:
+    async def read_single_attribute_expect_error(
+            self, cluster: object, attribute: object,
+            error: Status, dev_ctrl: ChipDeviceCtrl = None, node_id: int = None, endpoint: int = 0) -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -586,7 +592,8 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
                              help='NodeID to use for initial/default controller (default: %d)' % _DEFAULT_CONTROLLER_NODE_ID)
     basic_group.add_argument('-n', '--dut-node-id', type=int_decimal_or_hex,
                              metavar='NODE_ID', default=_DEFAULT_DUT_NODE_ID,
-                             help='Node ID for primary DUT communication, and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID)
+                             help='Node ID for primary DUT communication, '
+                             'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID)
 
     commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
 
@@ -616,9 +623,11 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
                                   help='Thread operational dataset as a hex string for ble-thread commissioning')
 
     commission_group.add_argument('--admin-vendor-id', action="store", type=int_decimal_or_hex, default=_DEFAULT_ADMIN_VENDOR_ID,
-                                  metavar="VENDOR_ID", help="VendorID to use during commissioning (default 0x%04X)" % _DEFAULT_ADMIN_VENDOR_ID)
+                                  metavar="VENDOR_ID",
+                                  help="VendorID to use during commissioning (default 0x%04X)" % _DEFAULT_ADMIN_VENDOR_ID)
     commission_group.add_argument('--case-admin-subject', action="store", type=int_decimal_or_hex,
-                                  metavar="CASE_ADMIN_SUBJECT", help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")
+                                  metavar="CASE_ADMIN_SUBJECT",
+                                  help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")
 
     commission_group.add_argument('--commission-only', action="store_true", default=False,
                                   help="If true, test exits after commissioning without running subsequent tests")
@@ -638,7 +647,8 @@ def parse_matter_test_args(argv: List[str]) -> MatterTestConfig:
 
     fabric_group.add_argument('-r', '--root-index', type=root_index,
                               metavar='ROOT_INDEX_OR_NAME', default=_DEFAULT_TRUST_ROOT_INDEX,
-                              help='Root of trust under which to operate/commission for single-fabric basic usage. alpha/beta/gamma are aliases for 1/2/3. Default (%d)' % _DEFAULT_TRUST_ROOT_INDEX)
+                              help='Root of trust under which to operate/commission for single-fabric basic usage. '
+                              'alpha/beta/gamma are aliases for 1/2/3. Default (%d)' % _DEFAULT_TRUST_ROOT_INDEX)
 
     fabric_group.add_argument('-c', '--chip-tool-credentials-path', type=pathlib.Path,
                               metavar='PATH',
@@ -696,14 +706,33 @@ class CommissionDeviceTest(MatterBaseTest):
         # TODO: support by manual code and QR
 
         if conf.commissioning_method == "on-network":
-            return dev_ctrl.CommissionOnNetwork(nodeId=conf.dut_node_id, setupPinCode=conf.setup_passcode, filterType=DiscoveryFilterType.LONG_DISCRIMINATOR, filter=conf.discriminator)
+            return dev_ctrl.CommissionOnNetwork(
+                nodeId=conf.dut_node_id,
+                setupPinCode=conf.setup_passcode,
+                filterType=DiscoveryFilterType.LONG_DISCRIMINATOR,
+                filter=conf.discriminator
+            )
         elif conf.commissioning_method == "ble-wifi":
-            return dev_ctrl.CommissionWiFi(conf.discriminator, conf.setup_passcode, conf.dut_node_id, conf.wifi_ssid, conf.wifi_passphrase)
+            return dev_ctrl.CommissionWiFi(
+                conf.discriminator,
+                conf.setup_passcode,
+                conf.dut_node_id,
+                conf.wifi_ssid,
+                conf.wifi_passphrase
+            )
         elif conf.commissioning_method == "ble-thread":
-            return dev_ctrl.CommissionThread(conf.discriminator, conf.setup_passcode, conf.dut_node_id, conf.thread_operational_dataset)
+            return dev_ctrl.CommissionThread(
+                conf.discriminator,
+                conf.setup_passcode,
+                conf.dut_node_id,
+                conf.thread_operational_dataset
+            )
         elif conf.commissioning_method == "on-network-ip":
             logging.warning("==== USING A DIRECT IP COMMISSIONING METHOD NOT SUPPORTED IN THE LONG TERM ====")
-            return dev_ctrl.CommissionIP(ipaddr=conf.commissionee_ip_address_just_for_testing, setupPinCode=conf.setup_passcode, nodeid=conf.dut_node_id)
+            return dev_ctrl.CommissionIP(
+                ipaddr=conf.commissionee_ip_address_just_for_testing,
+                setupPinCode=conf.setup_passcode, nodeid=conf.dut_node_id
+            )
         else:
             raise ValueError("Invalid commissioning method %s!" % conf.commissioning_method)
 
@@ -751,8 +780,11 @@ def default_matter_test_main(argv=None, **kwargs):
     # TODO: Steer to right FabricAdmin!
     # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
 
-    default_controller = stack.certificate_authorities[0].adminList[0].NewController(nodeId=matter_test_config.controller_node_id,
-                                                                                     paaTrustStorePath=str(matter_test_config.paa_trust_store_path), catTags=matter_test_config.controller_cat_tags)
+    default_controller = stack.certificate_authorities[0].adminList[0].NewController(
+        nodeId=matter_test_config.controller_node_id,
+        paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
+        catTags=matter_test_config.controller_cat_tags
+    )
     test_config.user_params["default_controller"] = stash_globally(default_controller)
 
     test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
