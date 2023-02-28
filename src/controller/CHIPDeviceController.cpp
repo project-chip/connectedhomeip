@@ -704,6 +704,16 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         {
             SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetConnectionObject()));
         }
+        else if (params.HasDiscoveredObject())
+        {
+            // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
+            // for later.
+            mRendezvousParametersForDeviceDiscoveredOverBle = params;
+            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetDiscoveredObject(), this,
+                                                                                   OnDiscoveredDeviceOverBleSuccess,
+                                                                                   OnDiscoveredDeviceOverBleError));
+            ExitNow(CHIP_NO_ERROR);
+        }
         else if (params.HasDiscriminator())
         {
             // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
