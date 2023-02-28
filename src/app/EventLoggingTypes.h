@@ -95,7 +95,7 @@ static_assert(sizeof(std::underlying_type_t<PriorityLevel>) <= sizeof(unsigned),
  */
 struct Timestamp
 {
-    enum class Type
+    enum class Type : uint8_t
     {
         kSystem = 0,
         kEpoch

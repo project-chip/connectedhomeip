@@ -39,7 +39,9 @@
 //    WARNING: This option makes it possible to circumvent basic chip security functionality.
 //    Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
 //
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS
 #define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 1
+#endif
 
 // Enable reading DRBG seed data from /dev/(u)random.
 // This is needed for test applications and the CHIP device manager to function

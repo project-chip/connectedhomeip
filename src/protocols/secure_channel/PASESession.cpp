@@ -794,6 +794,13 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
     {
         mExchangeCtxt = exchange;
     }
+
+    if (!mExchangeCtxt->GetSessionHandle()->IsUnauthenticatedSession())
+    {
+        ChipLogError(SecureChannel, "PASESession received PBKDFParamRequest over encrypted session.  Ignoring.");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
     mExchangeCtxt->UseSuggestedResponseTimeout(kExpectedHighProcessingTime);
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
