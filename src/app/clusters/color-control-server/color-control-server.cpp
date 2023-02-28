@@ -108,9 +108,9 @@ bool ColorControlServer::stopMoveStepCommand(app::CommandHandler * commandObj, c
         status = stopAllColorTransitions(endpoint);
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
-        // Because Hue and Saturation have separate transitions and can be kicked separately
-        // a new command specific to Hue could resume an old unfinised Saturation transition. Or vice versa
-        // init both transition state on stop command to prevent that
+        // Because Hue and Saturation have separate transitions and can be kicked separately,
+        // a new command specific to Hue could resume an old unfinished Saturation transition. Or vice versa.
+        // Init both transition states on stop command to prevent that.
         if (status == Status::Success)
         {
             ColorHueTransitionState * hueState        = getColorHueTransitionState(endpoint);
@@ -615,8 +615,7 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
  * @brief Initialise Hue and EnhancedHue TransitionState structure to begin a new transition
  *
  */
-void ColorControlServer::initHueTransitionState(EndpointId endpoint,
-                                                ColorControlServer::ColorHueTransitionState * colorHueTransitionState,
+void ColorControlServer::initHueTransitionState(EndpointId endpoint, ColorHueTransitionState * colorHueTransitionState,
                                                 bool isEnhancedHue)
 {
     colorHueTransitionState->stepsRemaining = 0;
@@ -645,6 +644,19 @@ void ColorControlServer::initSaturationTransitionState(chip::EndpointId endpoint
     colorSatTransitionState->endpoint       = endpoint;
 
     colorSatTransitionState->initialValue = colorSatTransitionState->currentValue = getSaturation(endpoint);
+}
+
+void ColorControlServer::SetHSVRemainingTime(chip::EndpointId endpoint)
+{
+    ColorHueTransitionState * hueTransitionState        = getColorHueTransitionState(endpoint);
+    Color16uTransitionState * saturationTransitionState = getSaturationTransitionState(endpoint);
+
+    // When the hue transition is loop, RemainingTime stays at MAX_INT16
+    if (hueTransitionState->repeat == false)
+    {
+        Attributes::RemainingTime::Set(endpoint,
+                                       max(hueTransitionState->stepsRemaining, saturationTransitionState->stepsRemaining));
+    }
 }
 
 /**
@@ -823,7 +835,7 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
 
     if (moveMode == EMBER_ZCL_HUE_MOVE_MODE_STOP)
     {
-        // Per spec any staturation transition must also be cancelled.
+        // Per spec any saturation transition must also be cancelled.
         Color16uTransitionState * saturationState = getSaturationTransitionState(endpoint);
         initSaturationTransitionState(endpoint, saturationState);
         commandObj->AddStatus(commandPath, Status::Success);
@@ -1015,7 +1027,7 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
     colorHueTransitionState->up             = (direction == MOVE_MODE_UP);
     colorHueTransitionState->repeat         = false;
 
-    Attributes::RemainingTime::Set(endpoint, transitionTime);
+    SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
@@ -1127,7 +1139,7 @@ bool ColorControlServer::moveToHueAndSaturationCommand(app::CommandHandler * com
     colorSaturationTransitionState->lowLimit       = MIN_SATURATION_VALUE;
     colorSaturationTransitionState->highLimit      = MAX_SATURATION_VALUE;
 
-    Attributes::RemainingTime::Set(endpoint, transitionTime);
+    SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
@@ -1228,7 +1240,7 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
     colorHueTransitionState->endpoint       = endpoint;
     colorHueTransitionState->repeat         = false;
 
-    Attributes::RemainingTime::Set(endpoint, transitionTime);
+    SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
@@ -1294,7 +1306,7 @@ bool ColorControlServer::moveSaturationCommand(app::CommandHandler * commandObj,
     colorSaturationTransitionState->lowLimit       = MIN_SATURATION_VALUE;
     colorSaturationTransitionState->highLimit      = MAX_SATURATION_VALUE;
 
-    Attributes::RemainingTime::Set(endpoint, transitionTime);
+    SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
@@ -1361,7 +1373,7 @@ bool ColorControlServer::moveToSaturationCommand(app::CommandHandler * commandOb
     colorSaturationTransitionState->lowLimit       = MIN_SATURATION_VALUE;
     colorSaturationTransitionState->highLimit      = MAX_SATURATION_VALUE;
 
-    Attributes::RemainingTime::Set(endpoint, transitionTime);
+    SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
@@ -1427,7 +1439,7 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
     colorSaturationTransitionState->lowLimit       = MIN_SATURATION_VALUE;
     colorSaturationTransitionState->highLimit      = MAX_SATURATION_VALUE;
 
-    Attributes::RemainingTime::Set(endpoint, transitionTime);
+    SetHSVRemainingTime(endpoint);
 
     // kick off the state machine:
     scheduleTimerCallbackMs(configureHSVEventControl(endpoint), UPDATE_TIME_MS);
@@ -1571,12 +1583,7 @@ void ColorControlServer::updateHueSatCommand(EndpointId endpoint)
     bool isHueTansitionDone         = computeNewHueValue(colorHueTransitionState);
     bool isSaturationTransitionDone = computeNewColor16uValue(colorSaturationTransitionState);
 
-    // When the hue transition is loop, RemainingTime stays at MAX_INT16
-    if (colorHueTransitionState->repeat == false)
-    {
-        Attributes::RemainingTime::Set(
-            endpoint, max(colorHueTransitionState->stepsRemaining, colorSaturationTransitionState->stepsRemaining));
-    }
+    SetHSVRemainingTime(endpoint);
 
     if (isHueTansitionDone && isSaturationTransitionDone)
     {

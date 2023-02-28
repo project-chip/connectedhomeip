@@ -218,6 +218,7 @@ private:
     void startColorLoop(chip::EndpointId endpoint, uint8_t startFromStartHue);
     void initHueTransitionState(chip::EndpointId endpoint, ColorHueTransitionState * colorHueTransitionState, bool isEnhancedHue);
     void initSaturationTransitionState(chip::EndpointId endpoint, Color16uTransitionState * colorSatTransitionState);
+    void SetHSVRemainingTime(chip::EndpointId endpoint);
     bool computeNewHueValue(ColorHueTransitionState * p);
     EmberEventControl * configureHSVEventControl(chip::EndpointId);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
