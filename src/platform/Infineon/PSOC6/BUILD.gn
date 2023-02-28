@@ -22,6 +22,10 @@ if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 }
 
+config("psoc6_platform_no_conversion_config") {
+  cflags = [ "-Wno-conversion" ]
+}
+
 static_library("PSOC6") {
   sources = [
     "../../FreeRTOS/SystemTimeSupport.cpp",
@@ -76,6 +80,8 @@ static_library("PSOC6") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
+
+  configs += [ ":psoc6_platform_no_conversion_config" ]
 }
 
 source_set("logging") {

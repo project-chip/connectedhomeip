@@ -18,6 +18,11 @@ import("${chip_root}/src/platform/device.gni")
 
 assert(chip_device_platform == "ameba")
 
+config("ameba_no_conversion_config") {
+  # See https://github.com/project-chip/connectedhomeip/issues/25507
+  cflags = [ "-Wno-conversion" ]
+}
+
 static_library("Ameba") {
   sources = [
     "../SingletonConfigurationManager.cpp",
@@ -65,6 +70,8 @@ static_library("Ameba") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
+
+  configs += [ ":ameba_no_conversion_config" ]
 
   if (chip_enable_ota_requestor) {
     sources += [

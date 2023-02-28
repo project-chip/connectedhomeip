@@ -87,7 +87,10 @@ template("bl_iot_sdk") {
 
     libs = [ "${bl_iot_sdk_root}/components/platform/soc/bl702/bl702_rf/lib/libbl702_rf.a" ]
 
-    cflags_c = [ "-Wno-format-truncation" ]
+    cflags_c = [
+      "-Wno-format-truncation",
+      "-Wno-conversion",
+    ]
 
     configs += [
       ":${sdk_target_name}_config",
@@ -326,6 +329,7 @@ template("bl_iot_sdk") {
       "-Wno-shadow",
       "-Wno-incompatible-pointer-types",
       "-Wno-array-bounds",
+      "-Wno-conversion",
     ]
 
     configs += [
@@ -368,6 +372,7 @@ template("bl_iot_sdk") {
     cflags_c = [
       "-Wno-sign-compare",
       "-Wno-builtin-declaration-mismatch",
+      "-Wno-conversion",
     ]
     configs += [
       ":${sdk_target_name}_config_hosal",
@@ -388,7 +393,10 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/libc/newlibc/stdatomic.c",
       "${bl_iot_sdk_root}/components/libc/newlibc/syscalls.c",
     ]
-    cflags_c = [ "-Wno-builtin-declaration-mismatch" ]
+    cflags_c = [
+      "-Wno-builtin-declaration-mismatch",
+      "-Wno-conversion",
+    ]
     configs += [ ":${sdk_target_name}_config_freertos" ]
     public_configs = [ ":${sdk_target_name}_config" ]
   }
@@ -441,7 +449,11 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/stage/yloop/src/yloop.c",
     ]
 
-    cflags_c = [ "-Wno-sign-compare" ]
+    cflags_c = [
+      "-Wno-sign-compare",
+      "-Wno-conversion",
+    ]
+
     configs += [
       ":${sdk_target_name}_config",
       ":${sdk_target_name}_config_BSP_Driver",
@@ -491,6 +503,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/sys/blmtd/bl_mtd.c",
       "${bl_iot_sdk_root}/components/sys/bltime/bl_sys_time.c",
     ]
+    cflags_c = [ "-Wno-conversion" ]
     configs += [
       ":${sdk_target_name}_config_BSP_Driver",
       ":${sdk_target_name}_config_hosal",
@@ -533,6 +546,7 @@ template("bl_iot_sdk") {
       "-Wno-shadow",
       "-Wno-sign-compare",
       "-Wno-incompatible-pointer-types",
+      "-Wno-conversion",
     ]
     configs += [
       ":${sdk_target_name}_config_hosal",
@@ -624,6 +638,7 @@ template("bl_iot_sdk") {
     cflags_c = [
       "-Wno-sign-compare",
       "-Wno-implicit-function-declaration",
+      "-Wno-conversion",
     ]
     configs += [
       ":${sdk_target_name}_config_BSP_Driver",
@@ -738,6 +753,7 @@ template("bl_iot_sdk") {
       "-Wno-unused-function",
       "-Wno-incompatible-pointer-types",
       "-Wno-discarded-qualifiers",
+      "-Wno-conversion",
     ]
   }
 
