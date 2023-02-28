@@ -15,17 +15,8 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/src/app/chip_data_model.gni")
-
 declare_args() {
   chip_tests_zap_config = "none"
-}
-
-chip_data_model("configuration") {
-  zap_file = "apps/${chip_tests_zap_config}/config.zap"
-
-  zap_pregenerated_dir = "${chip_root}/zzz_generated/placeholder/${chip_tests_zap_config}/zap-generated"
-  is_server = true
 }
 
 config("includes") {
@@ -41,13 +32,11 @@ executable("chip-${chip_tests_zap_config}") {
     "AppOptions.cpp",
     "InteractiveServer.cpp",
     "main.cpp",
-    "src/bridged-actions-stub.cpp",
-    "static-supported-modes-manager.cpp",
   ]
 
   deps = [
-    ":configuration",
     "${chip_root}/examples/common/websocket-server",
+    "${chip_root}/examples/placeholder/linux/apps/${chip_tests_zap_config}:${chip_tests_zap_config}",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/app/tests/suites/commands/delay",
     "${chip_root}/src/app/tests/suites/commands/discovery",

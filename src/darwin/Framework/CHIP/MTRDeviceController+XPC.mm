@@ -29,6 +29,16 @@ static NSString * const kAutoResubscribeKey = @"autoResubscribe";
 static NSString * const kMinIntervalKey = @"minInterval";
 static NSString * const kMaxIntervalKey = @"maxInterval";
 
+// Classes that are used by MTRDevice responses.  In particular, needs to
+// include NSError.
+static NSSet * GetXPCAllowedClasses()
+{
+    static NSSet * const sXPCAllowedClasses = [NSSet setWithArray:@[
+        [NSString class], [NSNumber class], [NSData class], [NSArray class], [NSDictionary class], [NSError class]
+    ]];
+    return sXPCAllowedClasses;
+}
+
 static NSArray * _Nullable encodeAttributePath(MTRAttributePath * _Nullable path)
 {
     if (!path) {
@@ -188,6 +198,41 @@ static void decodeReadParams(NSDictionary<NSString *, id> * inParams, MTRReadPar
     }
 
     return result;
+}
+
++ (NSXPCInterface *)xpcInterfaceForServerProtocol
+{
+    auto * xpcInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRDeviceControllerServerProtocol)];
+    [xpcInterface setClasses:GetXPCAllowedClasses()
+                 forSelector:@selector(readAttributeWithController:nodeId:endpointId:clusterId:attributeId:params:completion:)
+               argumentIndex:0
+                     ofReply:YES];
+    [xpcInterface setClasses:GetXPCAllowedClasses()
+                 forSelector:@selector
+                 (writeAttributeWithController:nodeId:endpointId:clusterId:attributeId:value:timedWriteTimeout:completion:)
+               argumentIndex:0
+                     ofReply:YES];
+    [xpcInterface setClasses:GetXPCAllowedClasses()
+                 forSelector:@selector
+                 (invokeCommandWithController:nodeId:endpointId:clusterId:commandId:fields:timedInvokeTimeout:completion:)
+               argumentIndex:0
+                     ofReply:YES];
+
+    [xpcInterface setClasses:GetXPCAllowedClasses()
+                 forSelector:@selector(readAttributeCacheWithController:nodeId:endpointId:clusterId:attributeId:completion:)
+               argumentIndex:0
+                     ofReply:YES];
+    return xpcInterface;
+}
+
++ (NSXPCInterface *)xpcInterfaceForClientProtocol
+{
+    auto * xpcInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRDeviceControllerClientProtocol)];
+    [xpcInterface setClasses:GetXPCAllowedClasses()
+                 forSelector:@selector(handleReportWithController:nodeId:values:error:)
+               argumentIndex:2
+                     ofReply:NO];
+    return xpcInterface;
 }
 
 @end

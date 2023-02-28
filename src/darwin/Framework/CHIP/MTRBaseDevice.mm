@@ -847,22 +847,22 @@ private:
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
             MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+            // interactionStatus tracks whether the whole read interaction has failed.
+            //
+            // Make sure interactionStatus survives even if this block scope is destroyed.
+            auto interactionStatus = std::make_shared<CHIP_ERROR>(CHIP_NO_ERROR);
+
             auto resultArray = [[NSMutableArray alloc] init];
-            auto resultSuccess = [[NSMutableArray alloc] init];
-            auto resultFailure = [[NSMutableArray alloc] init];
-            auto onSuccessCb = [resultArray, resultSuccess](const app::ConcreteClusterPath & clusterPath, const uint32_t aValueId,
+            auto onSuccessCb = [resultArray](const app::ConcreteClusterPath & clusterPath, const uint32_t aValueId,
                                    const MTRDataValueDictionaryDecodableType & aData) {
                 app::ConcreteAttributePath attribPath(clusterPath.mEndpointId, clusterPath.mClusterId, aValueId);
                 [resultArray addObject:@ {
                     MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath],
                     MTRDataKey : aData.GetDecodedObject()
                 }];
-                if ([resultSuccess count] == 0) {
-                    [resultSuccess addObject:[NSNumber numberWithBool:YES]];
-                }
             };
 
-            auto onFailureCb = [resultArray, resultFailure](
+            auto onFailureCb = [resultArray, interactionStatus](
                                    const app::ConcreteClusterPath * clusterPath, const uint32_t aValueId, CHIP_ERROR aError) {
                 if (clusterPath) {
                     app::ConcreteAttributePath attribPath(clusterPath->mEndpointId, clusterPath->mClusterId, aValueId);
@@ -870,8 +870,11 @@ private:
                         MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath],
                         MTRErrorKey : [MTRError errorForCHIPErrorCode:aError]
                     }];
-                } else if ([resultFailure count] == 0) {
-                    [resultFailure addObject:[MTRError errorForCHIPErrorCode:aError]];
+                } else {
+                    // This will only happen once per read interaction, and
+                    // after that there will be no more calls to onFailureCb or
+                    // onSuccessCb.
+                    *interactionStatus = aError;
                 }
             };
 
@@ -893,24 +896,14 @@ private:
             readParams.mpAttributePathParamsList = &attributePath;
             readParams.mAttributePathParamsListSize = 1;
 
-            auto onDone = [resultArray, resultSuccess, resultFailure, bridge, successCb, failureCb](
+            auto onDone = [resultArray, interactionStatus, bridge, successCb, failureCb](
                               BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
-                if ([resultFailure count] > 0 || [resultSuccess count] == 0) {
+                if (*interactionStatus != CHIP_NO_ERROR) {
                     // Failure
-                    if (failureCb) {
-                        if ([resultFailure count] > 0) {
-                            failureCb(bridge, [MTRError errorToCHIPErrorCode:resultFailure[0]]);
-                        } else if ([resultArray count] > 0) {
-                            failureCb(bridge, [MTRError errorToCHIPErrorCode:resultArray[0][MTRErrorKey]]);
-                        } else {
-                            failureCb(bridge, CHIP_ERROR_READ_FAILED);
-                        }
-                    }
+                    failureCb(bridge, *interactionStatus);
                 } else {
                     // Success
-                    if (successCb) {
-                        successCb(bridge, resultArray);
-                    }
+                    successCb(bridge, resultArray);
                 }
                 chip::Platform::Delete(callback);
             };
@@ -1483,22 +1476,22 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
             MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+            // interactionStatus tracks whether the whole read interaction has failed.
+            //
+            // Make sure interactionStatus survives even if this block scope is destroyed.
+            auto interactionStatus = std::make_shared<CHIP_ERROR>(CHIP_NO_ERROR);
+
             auto resultArray = [[NSMutableArray alloc] init];
-            auto resultSuccess = [[NSMutableArray alloc] init];
-            auto resultFailure = [[NSMutableArray alloc] init];
-            auto onSuccessCb = [resultArray, resultSuccess](const app::ConcreteClusterPath & clusterPath, const uint32_t aValueId,
+            auto onSuccessCb = [resultArray](const app::ConcreteClusterPath & clusterPath, const uint32_t aValueId,
                                    const MTRDataValueDictionaryDecodableType & aData) {
                 app::ConcreteEventPath eventPath(clusterPath.mEndpointId, clusterPath.mClusterId, aValueId);
                 [resultArray addObject:@ {
                     MTREventPathKey : [[MTREventPath alloc] initWithPath:eventPath],
                     MTRDataKey : aData.GetDecodedObject()
                 }];
-                if ([resultSuccess count] == 0) {
-                    [resultSuccess addObject:[NSNumber numberWithBool:YES]];
-                }
             };
 
-            auto onFailureCb = [resultArray, resultFailure](
+            auto onFailureCb = [resultArray, interactionStatus](
                                    const app::ConcreteClusterPath * clusterPath, const uint32_t aValueId, CHIP_ERROR aError) {
                 if (clusterPath) {
                     app::ConcreteEventPath eventPath(clusterPath->mEndpointId, clusterPath->mClusterId, aValueId);
@@ -1506,8 +1499,11 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                         MTREventPathKey : [[MTREventPath alloc] initWithPath:eventPath],
                         MTRErrorKey : [MTRError errorForCHIPErrorCode:aError]
                     }];
-                } else if ([resultFailure count] == 0) {
-                    [resultFailure addObject:[MTRError errorForCHIPErrorCode:aError]];
+                } else {
+                    // This will only happen once per read interaction, and
+                    // after that there will be no more calls to onFailureCb or
+                    // onSuccessCb.
+                    *interactionStatus = aError;
                 }
             };
 
@@ -1529,24 +1525,13 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
             readParams.mpEventPathParamsList = &eventPath;
             readParams.mEventPathParamsListSize = 1;
 
-            auto onDone = [resultArray, resultSuccess, resultFailure, bridge, successCb, failureCb](
+            auto onDone = [resultArray, interactionStatus, bridge, successCb, failureCb](
                               BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
-                if ([resultFailure count] > 0 || [resultSuccess count] == 0) {
+                if (*interactionStatus != CHIP_NO_ERROR) {
                     // Failure
-                    if (failureCb) {
-                        if ([resultFailure count] > 0) {
-                            failureCb(bridge, [MTRError errorToCHIPErrorCode:resultFailure[0]]);
-                        } else if ([resultArray count] > 0) {
-                            failureCb(bridge, [MTRError errorToCHIPErrorCode:resultArray[0][MTRErrorKey]]);
-                        } else {
-                            failureCb(bridge, CHIP_ERROR_READ_FAILED);
-                        }
-                    }
+                    failureCb(bridge, *interactionStatus);
                 } else {
-                    // Success
-                    if (successCb) {
-                        successCb(bridge, resultArray);
-                    }
+                    successCb(bridge, resultArray);
                 }
                 chip::Platform::Delete(callback);
             };

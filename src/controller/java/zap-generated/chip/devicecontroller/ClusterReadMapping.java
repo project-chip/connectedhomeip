@@ -2924,9 +2924,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatCommonDesignationAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readBatCommonDesignationAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPowerSourceBatCommonDesignationCommandParams);
     readPowerSourceInteractionInfo.put(
         "readBatCommonDesignationAttribute",
@@ -2964,9 +2965,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatApprovedChemistryAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readBatApprovedChemistryAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPowerSourceBatApprovedChemistryCommandParams);
     readPowerSourceInteractionInfo.put(
         "readBatApprovedChemistryAttribute",

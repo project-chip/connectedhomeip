@@ -72,7 +72,20 @@ private:
         mOnError(aError);
     }
 
-    void OnDone(app::CommandSender * apCommandSender) override { mOnDone(apCommandSender); }
+    void OnDone(app::CommandSender * apCommandSender) override
+    {
+        if (!mCalledCallback)
+        {
+            // This can happen if the server sends a response with an empty
+            // InvokeResponses list.  Since we are not sending wildcard command
+            // paths, that's not a valid response and we should treat it as an
+            // error.  Use the error we would have gotten if we in fact expected
+            // a nonempty list.
+            OnError(apCommandSender, CHIP_END_OF_TLV);
+        }
+
+        mOnDone(apCommandSender);
+    }
 
     OnSuccessCallbackType mOnSuccess;
     OnErrorCallbackType mOnError;

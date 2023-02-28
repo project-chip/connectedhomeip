@@ -51,7 +51,8 @@ namespace Dnssd {
                 auto interfaceAddress = static_cast<const void *>(&interface.second);
                 auto interfaceAddressLen = sizeof(interface.second);
 
-                LogErrorOnFailure(RegisterInterface(interfaceId, type, interfaceAddress, interfaceAddressLen));
+                LogErrorOnFailure(
+                    RegisterInterface(interfaceId, type, interfaceAddress, static_cast<uint16_t>(interfaceAddressLen)));
             }
         }
 

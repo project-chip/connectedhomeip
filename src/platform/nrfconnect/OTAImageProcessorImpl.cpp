@@ -38,15 +38,28 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/pm/device.h>
 
+namespace chip {
+namespace {
 #if CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
 // Cd globals are needed to be accessed from dfu image writer lambdas
-namespace {
 uint8_t sCdBuf[chip::Credentials::kMaxCMSSignedCDMessage] = { 0 };
 size_t sCdSavedBytes                                      = 0;
-} // namespace
 #endif
 
-namespace chip {
+void PostOTAStateChangeEvent(DeviceLayer::OtaState newState)
+{
+    DeviceLayer::ChipDeviceEvent otaChange;
+    otaChange.Type                     = DeviceLayer::DeviceEventType::kOtaStateChanged;
+    otaChange.OtaStateChanged.newState = newState;
+    CHIP_ERROR error                   = DeviceLayer::PlatformMgr().PostEvent(&otaChange);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Error while posting OtaChange event %" CHIP_ERROR_FORMAT, error.Format());
+    }
+}
+} // namespace
+
 namespace DeviceLayer {
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
@@ -92,11 +105,13 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
     ReturnErrorOnFailure(System::MapErrorZephyr(dfu_multi_image_register_writer(&cdWriter)));
 #endif
 
+    PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadInProgress);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
+    PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadComplete);
     return System::MapErrorZephyr(dfu_multi_image_done(true));
 }
 
@@ -105,12 +120,14 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
     CHIP_ERROR error = System::MapErrorZephyr(dfu_multi_image_done(false));
 
     TriggerFlashAction(ExternalFlashManager::Action::SLEEP);
+    PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadAborted);
 
     return error;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
+    PostOTAStateChangeEvent(DeviceLayer::kOtaApplyInProgress);
     // Schedule update of all images
     int err = dfu_target_schedule_update(-1);
 
@@ -130,6 +147,7 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
     }
     else
     {
+        PostOTAStateChangeEvent(DeviceLayer::kOtaApplyFailed);
         return System::MapErrorZephyr(err);
     }
 #else
@@ -161,6 +179,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
         else
         {
             mDownloader->EndDownload(error);
+            PostOTAStateChangeEvent(DeviceLayer::kOtaDownloadFailed);
         }
     });
 }
@@ -179,6 +198,7 @@ bool OTAImageProcessorImpl::IsFirstImageRun()
 
 CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 {
+    PostOTAStateChangeEvent(DeviceLayer::kOtaApplyComplete);
     return System::MapErrorZephyr(boot_write_img_confirmed());
 }
 

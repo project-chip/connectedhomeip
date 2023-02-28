@@ -1428,6 +1428,11 @@ server cluster DoorLock = 257 {
     kHolidaySchedules = 0x800;
   }
 
+  struct CredentialStruct {
+    CredentialTypeEnum credentialType = 0;
+    int16u credentialIndex = 1;
+  }
+
   critical event DoorLockAlarm = 0 {
     AlarmCodeEnum alarmCode = 0;
   }
@@ -1468,9 +1473,11 @@ server cluster DoorLock = 257 {
   readonly attribute nullable DlLockState lockState = 0;
   readonly attribute DlLockType lockType = 1;
   readonly attribute boolean actuatorEnabled = 2;
+  readonly attribute int16u numberOfTotalUsersSupported = 17;
   readonly attribute int16u numberOfPINUsersSupported = 18;
   readonly attribute int8u maxPINCodeLength = 23;
   readonly attribute int8u minPINCodeLength = 24;
+  readonly attribute int8u numberOfCredentialsSupportedPerUser = 28;
   attribute access(write: manage) int32u autoRelockTime = 35;
   attribute access(write: manage) OperatingModeEnum operatingMode = 37;
   readonly attribute DlSupportedOperatingModes supportedOperatingModes = 38;
@@ -1493,8 +1500,82 @@ server cluster DoorLock = 257 {
     optional OCTET_STRING PINCode = 0;
   }
 
+  request struct UnlockWithTimeoutRequest {
+    INT16U timeout = 0;
+    optional OCTET_STRING PINCode = 1;
+  }
+
+  request struct SetUserRequest {
+    DataOperationTypeEnum operationType = 0;
+    INT16U userIndex = 1;
+    nullable CHAR_STRING userName = 2;
+    nullable INT32U userUniqueID = 3;
+    nullable UserStatusEnum userStatus = 4;
+    nullable UserTypeEnum userType = 5;
+    nullable CredentialRuleEnum credentialRule = 6;
+  }
+
+  request struct GetUserRequest {
+    INT16U userIndex = 0;
+  }
+
+  request struct ClearUserRequest {
+    INT16U userIndex = 0;
+  }
+
+  request struct SetCredentialRequest {
+    DataOperationTypeEnum operationType = 0;
+    CredentialStruct credential = 1;
+    LONG_OCTET_STRING credentialData = 2;
+    nullable INT16U userIndex = 3;
+    nullable UserStatusEnum userStatus = 4;
+    nullable UserTypeEnum userType = 5;
+  }
+
+  request struct GetCredentialStatusRequest {
+    CredentialStruct credential = 0;
+  }
+
+  request struct ClearCredentialRequest {
+    nullable CredentialStruct credential = 0;
+  }
+
+  response struct GetUserResponse = 28 {
+    INT16U userIndex = 0;
+    nullable CHAR_STRING userName = 1;
+    nullable INT32U userUniqueID = 2;
+    nullable UserStatusEnum userStatus = 3;
+    nullable UserTypeEnum userType = 4;
+    nullable CredentialRuleEnum credentialRule = 5;
+    nullable CredentialStruct credentials[] = 6;
+    nullable fabric_idx creatorFabricIndex = 7;
+    nullable fabric_idx lastModifiedFabricIndex = 8;
+    nullable INT16U nextUserIndex = 9;
+  }
+
+  response struct SetCredentialResponse = 35 {
+    DlStatus status = 0;
+    nullable INT16U userIndex = 1;
+    nullable INT16U nextCredentialIndex = 2;
+  }
+
+  response struct GetCredentialStatusResponse = 37 {
+    boolean credentialExists = 0;
+    nullable INT16U userIndex = 1;
+    nullable fabric_idx creatorFabricIndex = 2;
+    nullable fabric_idx lastModifiedFabricIndex = 3;
+    nullable INT16U nextCredentialIndex = 4;
+  }
+
   timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
   timed command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
+  timed command UnlockWithTimeout(UnlockWithTimeoutRequest): DefaultSuccess = 3;
+  timed command access(invoke: administer) SetUser(SetUserRequest): DefaultSuccess = 26;
+  command access(invoke: administer) GetUser(GetUserRequest): GetUserResponse = 27;
+  timed command access(invoke: administer) ClearUser(ClearUserRequest): DefaultSuccess = 29;
+  timed command access(invoke: administer) SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
+  command access(invoke: administer) GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
+  timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
 }
 
 endpoint 0 {
@@ -1711,9 +1792,11 @@ endpoint 1 {
     ram      attribute lockState default = 1;
     ram      attribute lockType;
     ram      attribute actuatorEnabled;
+    ram      attribute numberOfTotalUsersSupported default = 2;
     ram      attribute numberOfPINUsersSupported default = 2;
     ram      attribute maxPINCodeLength default = 10;
     ram      attribute minPINCodeLength default = 5;
+    ram      attribute numberOfCredentialsSupportedPerUser default = 5;
     ram      attribute autoRelockTime;
     ram      attribute operatingMode;
     ram      attribute supportedOperatingModes default = 0xFFF6;
@@ -1724,7 +1807,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0081;
+    ram      attribute featureMap default = 0x0181;
     ram      attribute clusterRevision default = 6;
   }
 }

@@ -123,7 +123,8 @@ CERT_STRUCT_TEST_CASES = [
         "is_success_case": 'false',
     },
     {
-        "description": "Certificate Basic Constraint extension PathLen field presence is wrong (present for DAC not present for PAI)",
+        "description": "Certificate Basic Constraint extension PathLen field presence is wrong "
+        "(present for DAC not present for PAI)",
         "test_folder": 'ext_basic_pathlen_presence_wrong',
         "error_flag": 'ext-basic-pathlen-presence-wrong',
         "is_success_case": 'false',
@@ -165,7 +166,8 @@ CERT_STRUCT_TEST_CASES = [
         "is_success_case": 'false',
     },
     {
-        "description": "Certificate Key Usage extension diginalSignature field is wrong (not present for DAC and present for PAI, which is OK as optional)",
+        "description": "Certificate Key Usage extension diginalSignature field is wrong "
+        "(not present for DAC and present for PAI, which is OK as optional)",
         "test_folder": 'ext_key_usage_dig_sig_wrong',
         "error_flag": 'ext-key-usage-dig-sig',
         "is_success_case": 'false',
@@ -229,7 +231,8 @@ VIDPID_FALLBACK_ENCODING_TEST_CASES = [
         "is_success_case": 'true',
     },
     {
-        "description": 'Fallback VID and PID encoding example from spec: valid example showing that order or separators are not considered at all for the overall validity of the embedded fields',
+        "description": 'Fallback VID and PID encoding example from spec: valid example showing that '
+        'order or separators are not considered at all for the overall validity of the embedded fields',
         "common_name": 'Mpid:00B1,ACME Matter Devel DAC 5CDA9899,Mvid:FFF1',
         "test_folder": 'vidpid_fallback_encoding_03',
         "is_success_case": 'true',
@@ -241,31 +244,36 @@ VIDPID_FALLBACK_ENCODING_TEST_CASES = [
         "is_success_case": 'true',
     },
     {
-        "description": 'Fallback VID and PID encoding example from spec: valid, but highly discouraged, since embedding of substrings within other substrings may be confusing to human readers',
+        "description": 'Fallback VID and PID encoding example from spec: valid, but highly discouraged, '
+        'since embedding of substrings within other substrings may be confusing to human readers',
         "common_name": 'Mvid:FFF1ACME Matter Devel DAC 5CDAMpid:00B19899',
         "test_folder": 'vidpid_fallback_encoding_05',
         "is_success_case": 'true',
     },
     {
-        "description": 'Fallback VID and PID encoding example from spec: invalid, since substring following Mvid: is not exactly 4 uppercase hexadecimal digits',
+        "description": 'Fallback VID and PID encoding example from spec: invalid, '
+        'since substring following Mvid: is not exactly 4 uppercase hexadecimal digits',
         "common_name": 'ACME Matter Devel DAC 5CDA9899 Mvid:FF1 Mpid:00B1',
         "test_folder": 'vidpid_fallback_encoding_06',
         "is_success_case": 'false',
     },
     {
-        "description": 'Fallback VID and PID encoding example from spec: invalid, since substring following Mvid: is not exactly 4 uppercase hexadecimal digits',
+        "description": 'Fallback VID and PID encoding example from spec: invalid, '
+        'since substring following Mvid: is not exactly 4 uppercase hexadecimal digits',
         "common_name": 'ACME Matter Devel DAC 5CDA9899 Mvid:fff1 Mpid:00B1',
         "test_folder": 'vidpid_fallback_encoding_07',
         "is_success_case": 'false',
     },
     {
-        "description": 'Fallback VID and PID encoding example from spec: invalid, since substring following Mpid: is not exactly 4 uppercase hexadecimal digits',
+        "description": 'Fallback VID and PID encoding example from spec: invalid, '
+        'since substring following Mpid: is not exactly 4 uppercase hexadecimal digits',
         "common_name": 'ACME Matter Devel DAC 5CDA9899 Mvid:FFF1 Mpid:B1',
         "test_folder": 'vidpid_fallback_encoding_08',
         "is_success_case": 'false',
     },
     {
-        "description": 'Fallback VID and PID encoding example from spec: invalid, since substring following Mpid: is not exactly 4 uppercase hexadecimal digits',
+        "description": 'Fallback VID and PID encoding example from spec: invalid, '
+        'since substring following Mpid: is not exactly 4 uppercase hexadecimal digits',
         "common_name": 'ACME Matter Devel DAC 5CDA9899 Mpid: Mvid:FFF1',
         "test_folder": 'vidpid_fallback_encoding_09',
         "is_success_case": 'false',
@@ -303,7 +311,8 @@ VIDPID_FALLBACK_ENCODING_TEST_CASES = [
     },
     # Examples with both fallback encoding in the common name and using Matter specific OIDs
     {
-        "description": 'Mix of Fallback and Matter OID encoding for VID and PID: valid, Matter OIDs are used and wrong values in the common-name are ignored',
+        "description": 'Mix of Fallback and Matter OID encoding for VID and PID: valid, '
+        'Matter OIDs are used and wrong values in the common-name are ignored',
         "common_name": 'ACME Matter Devel DAC 5CDA9899 Mvid:FFF2 Mpid:00B2',
         "vid": 0xFFF1,
         "pid": 0x00B1,
@@ -311,7 +320,8 @@ VIDPID_FALLBACK_ENCODING_TEST_CASES = [
         "is_success_case": 'true',
     },
     {
-        "description": 'Mix of Fallback and Matter OID encoding for VID and PID: wrong, Correct values encoded in the common-name are ignored',
+        "description": 'Mix of Fallback and Matter OID encoding for VID and PID: wrong, '
+        'Correct values encoded in the common-name are ignored',
         "common_name": 'ACME Matter Devel DAC 5CDA9899 Mvid:FFF1 Mpid:00B1',
         "vid": 0xFFF2,
         "pid": 0x00B2,
@@ -319,7 +329,8 @@ VIDPID_FALLBACK_ENCODING_TEST_CASES = [
         "is_success_case": 'false',
     },
     {
-        "description": 'Mix of Fallback and Matter OID encoding for VID and PID: invalid, PID is using Matter OID then VID must also use Matter OID',
+        "description": 'Mix of Fallback and Matter OID encoding for VID and PID: invalid, '
+        'PID is using Matter OID then VID must also use Matter OID',
         "common_name": 'Mvid:FFF1',
         "pid": 0x00B1,
         "test_folder": 'vidpid_fallback_encoding_17',
@@ -413,7 +424,8 @@ CD_STRUCT_TEST_CASES = [
         "is_success_case": 'false',
     },
     {
-        "description": "The device_type_id field doesn't match the device_type_id value in the DCL entries associated with the VID and PID.",
+        "description": "The device_type_id field doesn't match the device_type_id value in the DCL entries "
+        "associated with the VID and PID.",
         "test_folder": 'device_type_id_mismatch',
         "error_flag": 'device-type-id-mismatch',
         "is_success_case": 'false',
@@ -467,13 +479,15 @@ CD_STRUCT_TEST_CASES = [
         "is_success_case": 'false',
     },
     {
-        "description": 'The version_number field matches the VID and PID used in a DeviceSoftwareVersionModel entry in the DCL matching the certification record associated with the product presenting this CD.',
+        "description": 'The version_number field matches the VID and PID used in a DeviceSoftwareVersionModel '
+        'entry in the DCL matching the certification record associated with the product presenting this CD.',
         "test_folder": 'version_number_match',
         "error_flag": 'no-error',
         "is_success_case": 'true',
     },
     {
-        "description": "The version_number field doesn't match the VID and PID used in a DeviceSoftwareVersionModel entry in the DCL matching the certification record associated with the product presenting this CD.",
+        "description": "The version_number field doesn't match the VID and PID used in a DeviceSoftwareVersionModel "
+        "entry in the DCL matching the certification record associated with the product presenting this CD.",
         "test_folder": 'version_number_wrong',
         "error_flag": 'version-number-wrong',
         "is_success_case": 'false',
@@ -509,19 +523,22 @@ CD_STRUCT_TEST_CASES = [
         "is_success_case": 'false',
     },
     {
-        "description": 'The dac_origin_vendor_id and dac_origin_product_id fields present and contain the VID and PID values that match the VID and PID found in the DAC Subject DN.',
+        "description": 'The dac_origin_vendor_id and dac_origin_product_id fields present and contain '
+        'the VID and PID values that match the VID and PID found in the DAC Subject DN.',
         "test_folder": 'dac_origin_vid_pid_present_match',
         "error_flag": 'dac-origin-vid-pid-present',
         "is_success_case": 'true',
     },
     {
-        "description": "The dac_origin_vendor_id and dac_origin_product_id fields present and the VID value doesn't match the VID found in the DAC Subject DN.",
+        "description": "The dac_origin_vendor_id and dac_origin_product_id fields present and the VID value "
+        "doesn't match the VID found in the DAC Subject DN.",
         "test_folder": 'dac_origin_vid_pid_present_vid_mismatch',
         "error_flag": 'dac-origin-vid-mismatch',
         "is_success_case": 'false',
     },
     {
-        "description": "The dac_origin_vendor_id and dac_origin_product_id fields present and the PID value doesn't match the PID found in the DAC Subject DN.",
+        "description": "The dac_origin_vendor_id and dac_origin_product_id fields present and the PID value "
+        "doesn't match the PID found in the DAC Subject DN.",
         "test_folder": 'dac_origin_vid_pid_present_pid_mismatch',
         "error_flag": 'dac-origin-pid-mismatch',
         "is_success_case": 'false',
@@ -663,7 +680,8 @@ class Names:
 
 
 class DevCertBuilder:
-    def __init__(self, cert_type: CertType, error_type: str, paa_path: str, test_case_out_dir: str, chip_cert: str, vid: int, pid: int, custom_cn_attribute: str, valid_from: str):
+    def __init__(self, cert_type: CertType, error_type: str, paa_path: str, test_case_out_dir: str, chip_cert: str, vid: int,
+                 pid: int, custom_cn_attribute: str, valid_from: str):
         self.vid = vid
         self.pid = pid
         self.cert_type = cert_type
@@ -710,8 +728,9 @@ class DevCertBuilder:
         else:
             return
 
-        cmd = self.chipcert + ' gen-att-cert ' + type_flag + error_type_flag + ' -c "' + subject_name + '" -C ' + self.signer.cert_pem + ' -K ' + \
-            self.signer.key_pem + vid_flag + pid_flag + validity_flags + ' -o ' + self.own.cert_pem + ' -O ' + self.own.key_pem
+        cmd = self.chipcert + ' gen-att-cert ' + type_flag + error_type_flag + ' -c "' + subject_name + '" -C ' + \
+            self.signer.cert_pem + ' -K ' + self.signer.key_pem + vid_flag + pid_flag + \
+            validity_flags + ' -o ' + self.own.cert_pem + ' -O ' + self.own.key_pem
         subprocess.run(cmd, shell=True)
         cmd = 'openssl x509 -inform pem -in ' + self.own.cert_pem + \
             ' -out ' + self.own.cert_der + ' -outform DER'
@@ -762,7 +781,11 @@ def generate_test_case_vector_json(test_case_out_dir: str, test_cert: str, test_
         json_dict["description"] = test_cert.upper() + " Test Vector: " + test_case["description"]
     if "is_success_case" in test_case:
         # These test cases are expected to fail when error injected in DAC but expected to pass when error injected in PAI
-        if (test_cert == 'pai') and (test_case["test_folder"] in ['ext_basic_pathlen0', 'vidpid_fallback_encoding_08', 'vidpid_fallback_encoding_09', 'ext_key_usage_dig_sig_wrong']):
+        if (test_cert == 'pai') and (test_case["test_folder"] in ['ext_basic_pathlen0',
+                                                                  'vidpid_fallback_encoding_08',
+                                                                  'vidpid_fallback_encoding_09',
+                                                                  'ext_key_usage_dig_sig_wrong'
+                                                                  ]):
             json_dict["is_success_case"] = "true"
         else:
             json_dict["is_success_case"] = test_case["is_success_case"]
@@ -944,13 +967,18 @@ def main():
         if test_case["error_flag"] == 'dac-origin-pid-present' or test_case["error_flag"] == 'dac-origin-vid-pid-present':
             dac_origin_flag += ' -r 0x{:X}'.format(pid)
 
-        if test_case["error_flag"] == 'authorized-paa-list-count0' or test_case["error_flag"] == 'authorized-paa-list-count1-valid' or test_case["error_flag"] == 'authorized-paa-list-count2-valid' or test_case["error_flag"] == 'authorized-paa-list-count3-invalid' or test_case["error_flag"] == 'authorized-paa-list-count10-valid' or test_case["error_flag"] == 'authorized-paa-list-count10-invalid':
+        if test_case["error_flag"] == 'authorized-paa-list-count0' or test_case["error_flag"] == 'authorized-paa-list-count1-valid'\
+                or test_case["error_flag"] == 'authorized-paa-list-count2-valid'\
+                or test_case["error_flag"] == 'authorized-paa-list-count3-invalid'\
+                or test_case["error_flag"] == 'authorized-paa-list-count10-valid'\
+                or test_case["error_flag"] == 'authorized-paa-list-count10-invalid':
             authorized_paa_flag = ' -a ' + args.paapath + 'Cert.pem'
         else:
             authorized_paa_flag = ''
 
-        cmd = chipcert + ' gen-cd -I -E ' + test_case["error_flag"] + ' -K ' + cd_key + ' -C ' + cd_cert + ' -O ' + test_case_out_dir + '/cd.der' + \
-            ' -f 1 ' + vid_flag + pid_flag + dac_origin_flag + authorized_paa_flag + ' -d 0x1234 -c "ZIG20141ZB330001-24" -l 0 -i 0 -n 9876 -t 0'
+        cmd = chipcert + ' gen-cd -I -E ' + test_case["error_flag"] + ' -K ' + cd_key + ' -C ' + cd_cert + ' -O ' + \
+            test_case_out_dir + '/cd.der' + ' -f 1 ' + vid_flag + pid_flag + dac_origin_flag + authorized_paa_flag + \
+            ' -d 0x1234 -c "ZIG20141ZB330001-24" -l 0 -i 0 -n 9876 -t 0'
         subprocess.run(cmd, shell=True)
 
         # Generate Test Case Data Container in JSON Format

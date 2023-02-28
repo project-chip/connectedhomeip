@@ -93,7 +93,6 @@
 #define CHIP_CONFIG_LOG_MODULE_AppServer_DETAIL 0
 #define CHIP_CONFIG_LOG_MODULE_Support_DETAIL 0
 #define CHIP_CONFIG_LOG_MODULE_Support_PROGRESS 0
-#define CHIP_CONFIG_LOG_MODULE_DeviceLayer_DETAIL 0
 #endif
 
 // Set MRP retry intervals for Thread and Wi-Fi to test-proven values.
