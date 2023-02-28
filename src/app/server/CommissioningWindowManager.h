@@ -24,6 +24,7 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/DataModelTypes.h>
 #include <lib/dnssd/Advertiser.h>
+#include <messaging/ExchangeDelegate.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <system/SystemClock.h>
@@ -38,7 +39,8 @@ enum class CommissioningWindowAdvertisement
 
 class Server;
 
-class CommissioningWindowManager : public SessionEstablishmentDelegate,
+class CommissioningWindowManager : public Messaging::UnsolicitedMessageHandler,
+                                   public SessionEstablishmentDelegate,
                                    public app::CommissioningModeProvider,
                                    public SessionDelegate
 {
@@ -103,6 +105,11 @@ public:
 
     // CommissioningModeProvider implementation.
     Dnssd::CommissioningMode GetCommissioningMode() const override;
+
+    //// UnsolicitedMessageHandler Implementation ////
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
+                                            Messaging::ExchangeDelegate *& newDelegate) override;
+    void OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate) override;
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -195,7 +202,8 @@ private:
     Spake2pVerifier mECMPASEVerifier;
     uint16_t mECMDiscriminator = 0;
     // mListeningForPASE is true only when we are listening for
-    // PBKDFParamRequest messages.
+    // PBKDFParamRequest messages or when we're in the middle of a PASE
+    // handshake.
     bool mListeningForPASE = false;
     // Boolean that tracks whether we have a live commissioning timeout timer.
     bool mCommissioningTimeoutTimerArmed = false;
