@@ -23,7 +23,6 @@ exclude = third_party
           examples/common/pigweed/rpc_console/py/chip_rpc/console.py
           examples/lighting-app/python/lighting.py
           examples/platform/mbed/ota/generate_ota_list_image.py
-          examples/platform/nxp/k32w/k32w0/scripts/detokenizer.py
           scripts/build/build/target.py
           scripts/build/build/targets.py
           scripts/build/builders/android.py
@@ -81,9 +80,6 @@ exclude = third_party
           scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py
           scripts/tools/nrfconnect/nrfconnect_generate_partition.py
           scripts/tools/nrfconnect/tests/test_generate_factory_data.py
-          scripts/tools/nxp/factory_data_generator/custom.py
-          scripts/tools/nxp/factory_data_generator/default.py
-          scripts/tools/nxp/factory_data_generator/generate.py
           scripts/tools/silabs/FactoryDataProvider.py
           scripts/tools/telink/mfg_tool.py
           scripts/tools/zap/generate.py
