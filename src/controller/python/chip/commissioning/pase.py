@@ -49,7 +49,7 @@ def establish_session(devCtrl: ChipDeviceCtrl.ChipDeviceControllerBase, paramete
         devCtrl.EstablishPASESessionBLE(parameter.setup_pin, parameter.discriminator, parameter.temporary_nodeid)
     elif isinstance(parameter, commissioning.PaseOverIPParameters):
         device = devCtrl.DiscoverCommissionableNodes(filterType=discovery.FilterType.LONG_DISCRIMINATOR,
-                                                     filter=parameter.discriminator, stopOnFirst=True)
+                                                     filter=parameter.long_discriminator, stopOnFirst=True)
         if not device:
             raise ValueError("No commissionable device found")
         selected_address = None

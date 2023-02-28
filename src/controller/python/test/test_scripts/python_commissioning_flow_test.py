@@ -77,7 +77,7 @@ def main():
         dest="discriminator",
         default='',
         type='str',
-        help="Address of the device",
+        help="The long discriminator of the device",
         metavar="<device-addr>",
     )
     optParser.add_option(
@@ -147,7 +147,7 @@ def main():
     try:
         asyncio.run(flow.commission(commissioning.Parameters(
             pase_param=commissioning.PaseOverIPParameters(
-                discriminator=options.discriminator,
+                long_discriminator=options.discriminator,
                 setup_pin=20202021, temporary_nodeid=options.nodeid
             ),
             regulatory_config=commissioning.RegulatoryConfig(

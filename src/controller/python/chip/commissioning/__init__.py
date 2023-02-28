@@ -60,10 +60,10 @@ class PaseOverBLEParameters(PaseParameters):
 
 @dataclasses.dataclass
 class PaseOverIPParameters(PaseParameters):
-    discriminator: int
+    long_discriminator: int
 
     def __str__(self):
-        return f"Discriminator:0x{self.discriminator:03x}"
+        return f"Discriminator:0x{self.long_discriminator:03x}"
 
 
 @dataclasses.dataclass
