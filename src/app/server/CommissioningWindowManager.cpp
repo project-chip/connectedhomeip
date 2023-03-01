@@ -570,7 +570,6 @@ void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnu
         MatterReportingAttributeChangeCallback(kRootEndpointId, AdministratorCommissioning::Id,
                                                AdministratorCommissioning::Attributes::WindowStatus::Id);
     }
-
 }
 
 void CommissioningWindowManager::UpdateOpenerVendorId(Nullable<VendorId> aNewOpenerVendorId)
