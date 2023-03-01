@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-import asyncio as asyncio
 import logging
 import queue
 from abc import ABC, abstractmethod
@@ -116,7 +115,7 @@ class BaseAction(ABC):
         return self._pics_enabled
 
     @abstractmethod
-    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
+    async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         pass
 
 
@@ -127,8 +126,8 @@ class DefaultPseudoCluster(BaseAction):
         if not _PSEUDO_CLUSTERS.supports(test_step):
             raise ActionCreationError(f'Default cluster {test_step.cluster} {test_step.command}, not supported')
 
-    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
-        resp = asyncio.run(_PSEUDO_CLUSTERS.execute(self._test_step))
+    async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
+        resp = await _PSEUDO_CLUSTERS.execute(self._test_step)
         return _ActionResult(status=_ActionStatus.SUCCESS, response=None)
 
 
@@ -186,17 +185,17 @@ class InvokeAction(BaseAction):
         else:
             self._request_object = command_object
 
-    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
+    async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
             if self._group_id:
                 resp = dev_ctrl.SendGroupCommand(
                     self._group_id, self._request_object,
                     busyWaitMs=self._busy_wait_ms)
             else:
-                resp = asyncio.run(dev_ctrl.SendCommand(
+                resp = await dev_ctrl.SendCommand(
                     self._node_id, self._endpoint, self._request_object,
                     timedRequestTimeoutMs=self._interation_timeout_ms,
-                    busyWaitMs=self._busy_wait_ms))
+                    busyWaitMs=self._busy_wait_ms)
         except chip.interaction_model.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
 
@@ -249,11 +248,11 @@ class ReadAttributeAction(BaseAction):
             raise UnexpectedActionCreationError(
                 f'ReadAttribute doesnt have valid attribute_type. {self.label}')
 
-    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
+    async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
-            raw_resp = asyncio.run(dev_ctrl.ReadAttribute(self._node_id,
-                                                          [(self._endpoint, self._request_object)],
-                                                          fabricFiltered=self._fabric_filtered))
+            raw_resp = await dev_ctrl.ReadAttribute(self._node_id,
+                                                    [(self._endpoint, self._request_object)],
+                                                    fabricFiltered=self._fabric_filtered)
         except chip.interaction_model.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
         except ChipStackError as error:
@@ -317,12 +316,12 @@ class ReadEventAction(BaseAction):
             raise UnexpectedActionCreationError(
                 f'ReadEvent should not contain arguments. {self.label}')
 
-    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
+    async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
             urgent = 0
             request = [(self._endpoint, self._request_object, urgent)]
-            resp = asyncio.run(dev_ctrl.ReadEvent(self._node_id, events=request, eventNumberFilter=self._event_number_filter,
-                                                  fabricFiltered=self._fabric_filtered))
+            resp = await dev_ctrl.ReadEvent(self._node_id, events=request, eventNumberFilter=self._event_number_filter,
+                                            fabricFiltered=self._fabric_filtered)
         except chip.interaction_model.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
 
@@ -358,7 +357,7 @@ class WaitForCommissioneeAction(BaseAction):
             # Timeout is provided in seconds we need to conver to milliseconds.
             self._timeout_ms = request_data_as_dict['timeout'] * 1000
 
-    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
+    async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
             if self._expire_existing_session:
                 dev_ctrl.ExpireSessions(self._node_id)
@@ -437,12 +436,11 @@ class SubscribeAttributeAction(ReadAttributeAction):
                 f'SubscribeAttribute action does not have max_interval {self.label}')
         self._max_interval = test_step.max_interval
 
-    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
+    async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
-            subscription = asyncio.run(
-                dev_ctrl.ReadAttribute(self._node_id, [(self._endpoint, self._request_object)],
-                                       reportInterval=(self._min_interval, self._max_interval),
-                                       keepSubscriptions=False))
+            subscription = await dev_ctrl.ReadAttribute(self._node_id, [(self._endpoint, self._request_object)],
+                                                        reportInterval=(self._min_interval, self._max_interval),
+                                                        keepSubscriptions=False)
         except chip.interaction_model.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
 
@@ -490,14 +488,13 @@ class SubscribeEventAction(ReadEventAction):
                 f'SubscribeEvent action does not have max_interval {self.label}')
         self._max_interval = test_step.max_interval
 
-    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
+    async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
             urgent = 0
             request = [(self._endpoint, self._request_object, urgent)]
-            subscription = asyncio.run(
-                dev_ctrl.ReadEvent(self._node_id, events=request, eventNumberFilter=self._event_number_filter,
-                                   reportInterval=(self._min_interval, self._max_interval),
-                                   keepSubscriptions=False))
+            subscription = await dev_ctrl.ReadEvent(self._node_id, events=request, eventNumberFilter=self._event_number_filter,
+                                                    reportInterval=(self._min_interval, self._max_interval),
+                                                    keepSubscriptions=False)
         except chip.interaction_model.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
 
@@ -571,16 +568,15 @@ class WriteAttributeAction(BaseAction):
         # Create a cluster object for the request from the provided YAML data.
         self._request_object = attribute(request_data)
 
-    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
+    async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
             if self._group_id:
                 resp = dev_ctrl.WriteGroupAttribute(self._group_id, [(self._request_object,)],
                                                     busyWaitMs=self._busy_wait_ms)
             else:
-                resp = asyncio.run(
-                    dev_ctrl.WriteAttribute(self._node_id, [(self._endpoint, self._request_object)],
-                                            timedRequestTimeoutMs=self._interation_timeout_ms,
-                                            busyWaitMs=self._busy_wait_ms))
+                resp = await dev_ctrl.WriteAttribute(self._node_id, [(self._endpoint, self._request_object)],
+                                                     timedRequestTimeoutMs=self._interation_timeout_ms,
+                                                     busyWaitMs=self._busy_wait_ms)
         except chip.interaction_model.InteractionModelError as error:
             return _ActionResult(status=_ActionStatus.ERROR, response=error)
 
@@ -624,7 +620,7 @@ class WaitForReportAction(BaseAction):
         if self._output_queue is None:
             raise UnexpectedActionCreationError(f'Could not find output queue')
 
-    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
+    async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         try:
             # While there should be a timeout here provided by the test, the current codegen version
             # of YAML tests doesn't have a per test step timeout, only a global timeout for the
@@ -662,7 +658,7 @@ class CommissionerCommandAction(BaseAction):
         else:
             raise UnexpectedActionCreationError(f'Unexpected CommisionerCommand {test_step.command}')
 
-    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
+    async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         if self._command == 'GetCommissionerNodeId':
             return _ActionResult(status=_ActionStatus.SUCCESS, response=_GetCommissionerNodeIdResult(dev_ctrl.nodeId))
 
@@ -713,7 +709,7 @@ class DiscoveryCommandAction(BaseAction):
         super().__init__(test_step)
         self.filterType, self.filter = DiscoveryCommandAction._filter_for_step(test_step)
 
-    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
+    async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         devices = dev_ctrl.DiscoverCommissionableNodes(
             filterType=self.filterType, filter=self.filter, stopOnFirst=True, timeoutSecond=5)
 
@@ -737,7 +733,7 @@ class NotImplementedAction(BaseAction):
         self.cluster = cluster
         self.command = command
 
-    def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
+    async def run_action(self, dev_ctrl: ChipDeviceController) -> _ActionResult:
         raise Exception(f"NOT YET IMPLEMENTED: {self.cluster}::{self.command}")
 
 
@@ -753,7 +749,8 @@ class ReplTestRunner:
         self._certificate_authority_manager = certificate_authority_manager
         self._dev_ctrls = {}
 
-        alpha_dev_ctrl.InitGroupTestingData()
+        if alpha_dev_ctrl is not None:
+            alpha_dev_ctrl.InitGroupTestingData()
         self._dev_ctrls['alpha'] = alpha_dev_ctrl
 
     def _invoke_action_factory(self, test_step, cluster: str):
@@ -1012,9 +1009,9 @@ class ReplTestRunner:
 
         return dev_ctrl
 
-    def execute(self, action: BaseAction):
+    async def execute(self, action: BaseAction):
         dev_ctrl = self._get_dev_ctrl(action)
-        return action.run_action(dev_ctrl)
+        return await action.run_action(dev_ctrl)
 
     def shutdown(self):
         for subscription in self._context.subscriptions:
