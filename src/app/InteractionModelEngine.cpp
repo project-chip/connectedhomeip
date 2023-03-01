@@ -1592,6 +1592,37 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
     ReturnErrorCodeIf(!mpSubscriptionResumptionStorage, CHIP_NO_ERROR);
 
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
+    auto * iterator           = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    int subscriptionsToResume = 0;
+    uint16_t minInterval      = 0;
+    while (iterator->Next(subscriptionInfo))
+    {
+        subscriptionsToResume++;
+        minInterval = std::max(minInterval, subscriptionInfo.mMinInterval);
+    }
+    iterator->Release();
+
+    if (subscriptionsToResume)
+    {
+        ChipLogProgress(InteractionModel, "Resuming %d subscriptions in %u seconds", subscriptionsToResume, minInterval);
+        ReturnErrorOnFailure(mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(
+            System::Clock::Seconds16(minInterval),
+            [](System::Layer *, void * me) { static_cast<InteractionModelEngine *>(me)->ResumeSubscriptionsTimerCallback(); },
+            this));
+    }
+    else
+    {
+        ChipLogProgress(InteractionModel, "No subscriptions to resume");
+    }
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR InteractionModelEngine::ResumeSubscriptionsTimerCallback()
+{
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
     auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
     while (iterator->Next(subscriptionInfo))
     {
