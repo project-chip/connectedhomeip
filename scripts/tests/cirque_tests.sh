@@ -44,6 +44,7 @@ CIRQUE_TESTS=(
     "SplitCommissioningTest"
     "CommissioningFailureTest"
     "CommissioningFailureOnReportTest"
+    "PythonCommissioningTest"
     "CommissioningWindowTest"
 )
 

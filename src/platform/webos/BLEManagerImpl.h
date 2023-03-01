@@ -135,10 +135,9 @@ private:
     CHIP_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
-    void OnScanComplete() override;
     void OnChipDeviceScanned(char * address) override;
-    void OnChipScanComplete() override;
-
+    void OnScanComplete() override;
+    void OnScanError(CHIP_ERROR err) override;
     // ===== Members for internal use by the following friends.
 
     friend BLEManager & BLEMgr();

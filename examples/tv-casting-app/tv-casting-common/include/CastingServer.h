@@ -97,6 +97,7 @@ public:
                                            std::function<void(CHIP_ERROR)> onConnectionFailure,
                                            std::function<void(TargetEndpointInfo *)> onNewOrUpdatedEndpoint);
 
+    void LogCachedVideoPlayers();
     CHIP_ERROR PurgeVideoPlayerCache();
 
     /**
@@ -438,6 +439,7 @@ private:
     uint16_t mTargetVideoPlayerProductId                                  = 0;
     chip::DeviceTypeId mTargetVideoPlayerDeviceType                       = 0;
     char mTargetVideoPlayerDeviceName[chip::Dnssd::kMaxDeviceNameLen + 1] = {};
+    char mTargetVideoPlayerHostName[chip::Dnssd::kHostNameMaxLength + 1]  = {};
     size_t mTargetVideoPlayerNumIPs                                       = 0; // number of valid IP addresses
     chip::Inet::IPAddress mTargetVideoPlayerIpAddress[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
 

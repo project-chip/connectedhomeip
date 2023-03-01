@@ -49,7 +49,7 @@ option:
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import load_der_private_key
-from default import *
+from default import Base64Argument, FileArgument, IntArgument, StrArgument
 
 
 class Verifier(Base64Argument):

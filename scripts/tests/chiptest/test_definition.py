@@ -15,14 +15,12 @@
 
 import logging
 import os
-import sys
 import threading
 import time
 import typing
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, auto
-from random import randrange
 
 TEST_NODE_ID = '0x12344321'
 
@@ -94,7 +92,7 @@ class App:
             if self.killed:
                 return 0
             # If the App was never started, wait cannot be called on the process
-            if self.process == None:
+            if self.process is None:
                 time.sleep(0.1)
                 continue
             code = self.process.wait(timeout)
@@ -169,7 +167,8 @@ class ApplicationPaths:
     chip_tool_with_python_cmd: typing.List[str]
 
     def items(self):
-        return [self.chip_tool, self.all_clusters_app, self.lock_app, self.ota_provider_app, self.ota_requestor_app, self.tv_app, self.bridge_app, self.chip_repl_yaml_tester_cmd, self.chip_tool_with_python_cmd]
+        return [self.chip_tool, self.all_clusters_app, self.lock_app, self.ota_provider_app, self.ota_requestor_app,
+                self.tv_app, self.bridge_app, self.chip_repl_yaml_tester_cmd, self.chip_tool_with_python_cmd]
 
 
 @dataclass
@@ -253,7 +252,8 @@ class TestDefinition:
         """Get a human readable list of tags applied to this test"""
         return ", ".join([t.to_s() for t in self.tags])
 
-    def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str, timeout_seconds: typing.Optional[int], dry_run=False, test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_BUILTIN):
+    def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str,
+            timeout_seconds: typing.Optional[int], dry_run=False, test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_BUILTIN):
         """
         Executes the given test case using the provided runner for execution.
         """

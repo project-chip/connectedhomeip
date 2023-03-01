@@ -5751,9 +5751,9 @@ namespace Attributes {
 namespace HourFormat {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::TimeFormatLocalization::HourFormat;
-    using DecodableType    = chip::app::Clusters::TimeFormatLocalization::HourFormat;
-    using DecodableArgType = chip::app::Clusters::TimeFormatLocalization::HourFormat;
+    using Type             = chip::app::Clusters::TimeFormatLocalization::HourFormatEnum;
+    using DecodableType    = chip::app::Clusters::TimeFormatLocalization::HourFormatEnum;
+    using DecodableArgType = chip::app::Clusters::TimeFormatLocalization::HourFormatEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HourFormat::Id; }
@@ -5763,9 +5763,9 @@ struct TypeInfo
 namespace ActiveCalendarType {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::TimeFormatLocalization::CalendarType;
-    using DecodableType    = chip::app::Clusters::TimeFormatLocalization::CalendarType;
-    using DecodableArgType = chip::app::Clusters::TimeFormatLocalization::CalendarType;
+    using Type             = chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum;
+    using DecodableType    = chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum;
+    using DecodableArgType = chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveCalendarType::Id; }
@@ -5775,9 +5775,10 @@ struct TypeInfo
 namespace SupportedCalendarTypes {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::app::Clusters::TimeFormatLocalization::CalendarType>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> &;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedCalendarTypes::Id; }
@@ -5830,9 +5831,9 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::HourFormat::TypeInfo::DecodableType hourFormat =
-            static_cast<chip::app::Clusters::TimeFormatLocalization::HourFormat>(0);
+            static_cast<chip::app::Clusters::TimeFormatLocalization::HourFormatEnum>(0);
         Attributes::ActiveCalendarType::TypeInfo::DecodableType activeCalendarType =
-            static_cast<chip::app::Clusters::TimeFormatLocalization::CalendarType>(0);
+            static_cast<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum>(0);
         Attributes::SupportedCalendarTypes::TypeInfo::DecodableType supportedCalendarTypes;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;

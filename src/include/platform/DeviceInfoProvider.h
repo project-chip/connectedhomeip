@@ -67,7 +67,7 @@ public:
 
     using FixedLabelType = app::Clusters::FixedLabel::Structs::LabelStruct::Type;
     using UserLabelType  = app::Clusters::UserLabel::Structs::LabelStruct::Type;
-    using CalendarType   = app::Clusters::TimeFormatLocalization::CalendarType;
+    using CalendarType   = app::Clusters::TimeFormatLocalization::CalendarTypeEnum;
 
     using FixedLabelIterator             = Iterator<FixedLabelType>;
     using UserLabelIterator              = Iterator<UserLabelType>;

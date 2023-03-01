@@ -17,11 +17,8 @@
 #    limitations under the License.
 #
 
-import asyncio
 import datetime
 # Commissioning test.
-import logging
-import os
 import queue
 import subprocess
 import sys
@@ -39,7 +36,7 @@ def EnqueueLogOutput(fp, tag, q):
             try:
                 timestamp = float(line[1:18].decode())
                 line = line[19:]
-            except Exception as ex:
+            except Exception:
                 pass
         sys.stdout.buffer.write(
             (f"[{datetime.datetime.fromtimestamp(timestamp).isoformat(sep=' ')}]").encode() + tag + line)

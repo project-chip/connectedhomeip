@@ -131,14 +131,27 @@ public:
     CHIP_ERROR GetListIndex(DataModel::Nullable<ListIndex> * const apListIndex) const;
 
     /**
-     * @brief Get the ListIndex, and set the mListIndex and mListOp fields in the ConcreteDataAttributePath accordingly. It will set
-     * ListOp to NotList when the list index is missing, users should interpret it as ReplaceAll according to the context.
+     * @brief Get the concrete attribute path.  This will set the ListOp to
+     *        NotList when there is no ListIndex.  Consumers should interpret NotList
+     *        as ReplaceAll if that's appropriate to their context.
      *
-     *  @param [in] aAttributePath    The attribute path object for setting list index and list op.
+     *  @param [in] aAttributePath    The attribute path object to write to.
      *
      *  @return #CHIP_NO_ERROR on success
      */
-    CHIP_ERROR GetListIndex(ConcreteDataAttributePath & aAttributePath) const;
+    CHIP_ERROR GetConcreteAttributePath(ConcreteDataAttributePath & aAttributePath) const;
+
+    /**
+     * @brief Get a group attribute path.  This will set the ListOp to
+     *        NotList when there is no ListIndex.  Consumers should interpret NotList
+     *        as ReplaceAll if that's appropriate to their context.  The
+     *        endpoint id of the resulting path might have any value.
+     *
+     *  @param [in] aAttributePath    The attribute path object to write to.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     */
+    CHIP_ERROR GetGroupAttributePath(ConcreteDataAttributePath & aAttributePath) const;
 
     // TODO(#14934) Add a function to get ConcreteDataAttributePath from AttributePathIB::Parser directly.
 
