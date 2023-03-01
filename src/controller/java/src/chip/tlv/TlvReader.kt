@@ -23,9 +23,7 @@ import java.lang.Double.longBitsToDouble
 import java.lang.Float.intBitsToFloat
 
 /**
- * Implements Weave/Matter TLV reader that supports all values and tags as defined in the Spec.
- *
- * See go/weave-tlv-format and go/chip-specs#tlv for specification.
+ * Implements Matter TLV reader that supports all values and tags as defined in the Spec.
  *
  * @param bytes the bytes to interpret
  */
@@ -382,6 +380,6 @@ class TlvReader(bytes: ByteArray) : Iterable<Element> {
   }
 }
 
-/** Exception thrown if there was an issue decoding the Weave TLV data. */
+/** Exception thrown if there was an issue decoding the Matter TLV data. */
 class TlvParsingException internal constructor(msg: String, cause: Throwable? = null) :
   RuntimeException(msg, cause)

@@ -22,9 +22,7 @@ import com.google.protobuf.ByteString
 import java.io.ByteArrayOutputStream
 
 /**
- * Implements Weave/Matter TLV writer that supports all values and tags as defined in the Spec.
- *
- * See go/weave-tlv-format and go/chip-specs#tlv for specification.
+ * Implements Matter TLV writer that supports all values and tags as defined in the Spec.
  *
  * @param bytes the bytes to interpret
  */
