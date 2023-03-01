@@ -70,4 +70,6 @@ static_library("Ameba") {
       "AmebaOTAImageProcessor.h",
     ]
   }
+
+  cflags = [ "-Wconversion" ]
 }

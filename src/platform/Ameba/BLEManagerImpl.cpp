@@ -187,7 +187,7 @@ void BLEManagerImpl::HandleTXCharCCCDRead(void * param)
     ChipLogError(DeviceLayer, "BLEManagerImpl::HandleTXCharCCCDRead() not supported");
 }
 
-void BLEManagerImpl::HandleTXCharCCCDWrite(int conn_id, int indicationsEnabled, int notificationsEnabled)
+void BLEManagerImpl::HandleTXCharCCCDWrite(uint16_t conn_id, uint8_t indicationsEnabled, uint8_t notificationsEnabled)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -232,7 +232,7 @@ exit:
     return;
 }
 
-CHIP_ERROR BLEManagerImpl::HandleTXComplete(int conn_id)
+CHIP_ERROR BLEManagerImpl::HandleTXComplete(uint16_t conn_id)
 {
     // Post an event to the Chip queue to process the indicate confirmation.
     ChipDeviceEvent event;
@@ -529,10 +529,12 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
     ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %u)", conId);
 
     // Ameba Ble close function
+    // TODO: Should we actually have BLE_CONNECTION_OBJECT defined as uint8_t on
+    // Ameba?
 #if defined(CONFIG_MATTER_BLEMGR_ADAPTER) && CONFIG_MATTER_BLEMGR_ADAPTER
-    err = MapBLEError(matter_blemgr_disconnect(conId));
+    err = MapBLEError(matter_blemgr_disconnect(static_cast<uint8_t>(conId)));
 #else
-    err = MapBLEError(le_disconnect(conId));
+    err = MapBLEError(le_disconnect(static_cast<uint8_t>(conId)));
 #endif
     if (err != CHIP_NO_ERROR)
     {
@@ -554,7 +556,11 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 #else
     mtu = ble_att_mtu_z2(conId);
 #endif
-    return mtu;
+    if (mtu > UINT16_MAX)
+    {
+        mtu = UINT16_MAX;
+    }
+    return static_cast<uint16_t>(mtu);
 }
 
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
@@ -589,11 +595,13 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(IsSubscribed(conId), err = CHIP_ERROR_INVALID_ARGUMENT);
+    // TODO: Sould BLE_CONNECTION_OBJECT actually be uint8_t on Ameba?
 #if defined(CONFIG_MATTER_BLEMGR_ADAPTER) && CONFIG_MATTER_BLEMGR_ADAPTER
-    matter_blemgr_send_indication(conId, data->Start(), data->DataLength());
+    matter_blemgr_send_indication(static_cast<uint8_t>(conId), data->Start(), data->DataLength());
 #else
-    server_send_data(conId, bt_matter_adapter_service_id, BT_MATTER_ADAPTER_SERVICE_CHAR_INDICATE_CCCD_INDEX - 1, data->Start(),
-                     data->DataLength(), GATT_PDU_TYPE_INDICATION);
+    server_send_data(static_cast<uint8_t>(conId), bt_matter_adapter_service_id,
+                     BT_MATTER_ADAPTER_SERVICE_CHAR_INDICATE_CCCD_INDEX - 1, data->Start(), data->DataLength(),
+                     GATT_PDU_TYPE_INDICATION);
 #endif
 
 exit:
@@ -945,8 +953,7 @@ void BLEManagerImpl::matter_blemgr_rx_char_write_cb(uint8_t conn_id, uint8_t * p
 
 void BLEManagerImpl::matter_blemgr_tx_char_cccd_write_cb(uint8_t conn_id, uint8_t indicationsEnabled, uint8_t notificationsEnabled)
 {
-    sInstance.HandleTXCharCCCDWrite(static_cast<int>(conn_id), static_cast<int>(indicationsEnabled),
-                                    static_cast<int>(notificationsEnabled));
+    sInstance.HandleTXCharCCCDWrite(conn_id, indicationsEnabled, notificationsEnabled);
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
@@ -955,7 +962,7 @@ CHIP_ERROR BLEManagerImpl::matter_blemgr_tx_complete_cb(uint8_t conn_id)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = sInstance.HandleTXComplete(static_cast<int>(conn_id));
+    err = sInstance.HandleTXComplete(conn_id);
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
@@ -1194,7 +1201,7 @@ int BLEManagerImpl::ble_callback_dispatcher(void * param, void * p_cb_data, int 
     switch (callback_type)
     {
     case CB_PROFILE_CALLBACK:
-        blemgr->gatt_svr_chr_access(param, type, (TBTCONFIG_CALLBACK_DATA *) p_cb_data);
+        blemgr->gatt_svr_chr_access(param, static_cast<T_SERVER_ID>(type), (TBTCONFIG_CALLBACK_DATA *) p_cb_data);
         break;
     case CB_GAP_CALLBACK:
         blemgr->ble_svr_gap_event(param, type, p_cb_data);

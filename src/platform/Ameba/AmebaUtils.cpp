@@ -107,8 +107,11 @@ CHIP_ERROR AmebaUtils::GetWiFiConfig(rtw_wifi_config_t * config)
                                                    &credentialsLen);
     SuccessOrExit(err);
 
-    config->ssid_len     = ssidLen;
-    config->password_len = credentialsLen;
+    static_assert(sizeof(config->ssid) <= UINT8_MAX, "Length might not fit in config->ssid_len");
+    config->ssid_len = static_cast<uint8_t>(ssidLen);
+
+    static_assert(sizeof(config->password) <= UINT8_MAX, "Length might not fit in config->password_len");
+    config->password_len = static_cast<uint8_t>(credentialsLen);
 
 exit:
     return err;
