@@ -240,16 +240,20 @@ tests:
 
       # We get an acknowledgment that the command off above is received, but it takes
       # a few milliseconds for the off command to actually turn it off. Without this
-      # delay the preceding reboot command might happen before the command is fully
-      # processed resulting in flaky test failure that comes from the readAddribute
-      # verification after the reboot.
-    - label: "Wait for send Off command to take affect"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 10
+      # the preceding reboot command might happen before the command off above is
+      # fully processed resulting in flaky test failure that comes from the
+      # readAddribute verification after the reboot.
+    - label: "TH reads the OnOff attribute from the DUT"
+      # TODO once https://github.com/CHIP-Specifications/chip-test-plans/pull/2464 is
+      # merged, change this PICS code to OO.S.A0000. PR is blocked from being merged
+      # at this time due to freeze for SVE. Likely after March 17th, 2023 this can be
+      # changed from being a CI only command to actually being in the spec to prevent
+      # possible flake in this certification test.
+      PICS: PICS_SDK_CI_ONLY
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 0
 
     - label: "Reboot target device"
       PICS: PICS_SDK_CI_ONLY
