@@ -24,6 +24,8 @@ import traceback
 
 # isort: off
 
+# F401 is "Module imported but unused" line will be ignored by linter
+# ChipDeviceCtrl is not used directly in this file but it is needed
 from chip import ChipDeviceCtrl  # noqa: F401 # Needed before chip.FabricAdmin
 import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 
