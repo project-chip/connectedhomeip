@@ -166,11 +166,9 @@ constexpr Tag ContextTag(uint8_t tagNum)
 }
 
 /**
- * Also allow using enum class values as context tags.  Just using is_enum would
- * fail for enums that are not enum classes because to_underlying would produce
- * the underlying type, which might be wider than uint8_t.
+ * Also allow using enum class values as context tags, if they are the right width.
  */
-template <typename T, std::enable_if_t<std::is_enum<T>::value && !std::is_convertible<T, uint8_t>::value, int> = 0>
+template <typename T, std::enable_if_t<std::is_enum<T>::value && std::is_same<std::underlying_type_t<T>, uint8_t>::value, int> = 0>
 constexpr Tag ContextTag(T tagNum)
 {
     return ContextTag(to_underlying(tagNum));
