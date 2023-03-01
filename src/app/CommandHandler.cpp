@@ -93,6 +93,8 @@ void CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, con
         StatusResponse::Send(status, mExchangeCtx.Get(), false /*aExpectResponse*/);
         mSentStatusResponse = true;
     }
+
+    mGoneAsync = true;
 }
 
 Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke)
@@ -577,6 +579,7 @@ TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
 
 FabricIndex CommandHandler::GetAccessingFabricIndex() const
 {
+    VerifyOrDie(!mGoneAsync);
     return mExchangeCtx->GetSessionHandle()->GetFabricIndex();
 }
 
