@@ -94,7 +94,7 @@ CHIP_ERROR AttributeDataIB::Parser::PrettyPrint() const
 CHIP_ERROR AttributeDataIB::Parser::GetPath(AttributePathIB::Parser * const apPath) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kPath)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kPath), reader));
     return apPath->Init(reader);
 }
 
@@ -105,7 +105,7 @@ CHIP_ERROR AttributeDataIB::Parser::GetDataVersion(chip::DataVersion * const apV
 
 CHIP_ERROR AttributeDataIB::Parser::GetData(TLV::TLVReader * const apReader) const
 {
-    return mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kData)), *apReader);
+    return mReader.FindElementWithTag(TLV::ContextTag(Tag::kData), *apReader);
 }
 
 AttributePathIB::Builder & AttributeDataIB::Builder::CreatePath()
@@ -122,7 +122,7 @@ AttributeDataIB::Builder & AttributeDataIB::Builder::DataVersion(const chip::Dat
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kDataVersion)), aDataVersion);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kDataVersion), aDataVersion);
     }
     return *this;
 }

@@ -44,19 +44,19 @@ struct GroupTableCodec
 {
     static constexpr TLV::Tag TagFabric()
     {
-        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kFabricIndex));
+        return TLV::ContextTag(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kFabricIndex);
     }
     static constexpr TLV::Tag TagGroup()
     {
-        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kGroupId));
+        return TLV::ContextTag(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kGroupId);
     }
     static constexpr TLV::Tag TagEndpoints()
     {
-        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kEndpoints));
+        return TLV::ContextTag(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kEndpoints);
     }
     static constexpr TLV::Tag TagGroupName()
     {
-        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kGroupName));
+        return TLV::ContextTag(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kGroupName);
     }
 
     GroupDataProvider * mProvider = nullptr;
@@ -494,7 +494,7 @@ struct KeySetReadAllIndicesResponse
 
         TLV::TLVType array;
         ReturnErrorOnFailure(writer.StartContainer(
-            TLV::ContextTag(to_underlying(GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Fields::kGroupKeySetIDs)),
+            TLV::ContextTag(GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Fields::kGroupKeySetIDs),
             TLV::kTLVType_Array, array));
 
         GroupDataProvider::KeySet keyset;
