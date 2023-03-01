@@ -236,7 +236,18 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
                 ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
             }
-            ipv6_addr_count = esp_netif_get_all_ip6(ifa, ip6_addr);
+
+            static_assert(kMaxIPv6AddrCount <= UINT8_MAX, "Count might not fit in ipv6_addr_count");
+            static_assert(ArraySize(ip6_addr) >= LWIP_IPV6_NUM_ADDRESSES, "Not enough space for our addresses.");
+            auto addr_count = esp_netif_get_all_ip6(ifa, ip6_addr);
+            if (addr_count < 0)
+            {
+                ipv6_addr_count = 0;
+            }
+            else
+            {
+                ipv6_addr_count = static_cast<uint8_t>(min(addr_count, static_cast<int>(kMaxIPv6AddrCount)));
+            }
             for (uint8_t idx = 0; idx < ipv6_addr_count; ++idx)
             {
                 memcpy(ifp->Ipv6AddressesBuffer[idx], ip6_addr[idx].addr, kMaxIPv6AddrSize);
