@@ -32,9 +32,9 @@
 
 namespace chip {
 namespace Logging {
-namespace Platform {
+namespace Ameba {
 
-static uint8_t LogLevel = AmebaLogLevel::ameba_loglevel_detail;
+static AmebaLogLevel LogLevel = AmebaLogLevel::kDetail;
 
 void LogSetLevel(uint8_t level)
 {
@@ -59,21 +59,21 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     switch (category)
     {
     case kLogCategory_Error:
-        if (LogLevel >= AmebaLogLevel::ameba_loglevel_error)
+        if (LogLevel >= AmebaLogLevel::kError)
             printf("%s %s\r\n", tag, formattedMsg);
         break;
     case kLogCategory_Progress:
     default:
-        if (LogLevel >= AmebaLogLevel::ameba_loglevel_progress)
+        if (LogLevel >= AmebaLogLevel::kProgress)
             printf("%s %s\r\n", tag, formattedMsg);
         break;
     case kLogCategory_Detail:
-        if (LogLevel >= AmebaLogLevel::ameba_loglevel_detail)
+        if (LogLevel >= AmebaLogLevel::kDetail)
             printf("%s %s\r\n", tag, formattedMsg);
         break;
     }
 }
 
-} // namespace Platform
+} // namespace Ameba
 } // namespace Logging
 } // namespace chip

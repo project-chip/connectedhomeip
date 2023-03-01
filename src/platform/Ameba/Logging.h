@@ -4,18 +4,18 @@
 
 namespace chip {
 namespace Logging {
-namespace Platform {
+namespace Ameba {
 
-enum AmebaLogLevel
+enum class AmebaLogLevel
 {
-    ameba_loglevel_error = 0,
-    ameba_loglevel_progress,
-    ameba_loglevel_detail,
+    kError,
+    kProgress,
+    kDetail,
 };
 
 void LogSetLevel(uint8_t level);
 uint8_t LogGetLevel();
 
-} // namespace Platform
+} // namespace Ameba
 } // namespace Logging
 } // namespace chip
