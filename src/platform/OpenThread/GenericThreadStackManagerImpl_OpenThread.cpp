@@ -1697,12 +1697,14 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPollPeriod(u
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetRouterPromotion(bool val)
 {
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
     Impl()->LockThreadStack();
     if (otThreadGetDeviceRole(DeviceLayer::ThreadStackMgrImpl().OTInstance()) != OT_DEVICE_ROLE_ROUTER)
     {
         otThreadSetRouterEligible(DeviceLayer::ThreadStackMgrImpl().OTInstance(), val);
     }
     Impl()->UnlockThreadStack();
+#endif
 }
 
 template <class ImplClass>
