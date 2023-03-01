@@ -25,6 +25,11 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceControlServer.h>
 
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+#include <openthread/thread_ftd.h>
+using namespace chip::DeviceLayer;
+#endif
+
 using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
 
@@ -547,6 +552,23 @@ void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnu
         MatterReportingAttributeChangeCallback(kRootEndpointId, AdministratorCommissioning::Id,
                                                AdministratorCommissioning::Attributes::WindowStatus::Id);
     }
+
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+    // Block device role changing into Router if commissioning window opened and device not yet Router.
+    if (mWindowStatus == CommissioningWindowStatusEnum::kEnhancedWindowOpen &&
+        ConnectivityManagerImpl().GetThreadDeviceType() == ConnectivityManager::kThreadDeviceType_Router &&
+        otThreadGetDeviceRole(DeviceLayer::ThreadStackMgrImpl().OTInstance()) != OT_DEVICE_ROLE_ROUTER)
+    {
+        otThreadSetRouterEligible(DeviceLayer::ThreadStackMgrImpl().OTInstance(), false);
+        mRecoverRouterDeviceRole = true;
+    }
+    // Recover Router device role.
+    else if (mWindowStatus == CommissioningWindowStatusEnum::kWindowNotOpen && mRecoverRouterDeviceRole)
+    {
+        otThreadSetRouterEligible(DeviceLayer::ThreadStackMgrImpl().OTInstance(), true);
+        mRecoverRouterDeviceRole = false;
+    }
+#endif
 }
 
 void CommissioningWindowManager::UpdateOpenerVendorId(Nullable<VendorId> aNewOpenerVendorId)
