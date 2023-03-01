@@ -60,7 +60,7 @@ tests:
       arguments:
           value: 0
 
-    #NOTE - fix/workaround for #2176
+    #NOTE - fix/workaround for https://github.com/CHIP-Specifications/chip-test-plans/issues/2176
     - label: "TH writes NULL to the OnLevel attribute"
       PICS: LVL.S.A0011
       command: "writeAttribute"
