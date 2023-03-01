@@ -18,8 +18,8 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/tools.gni")
 
-java_binary("java-matter-controller") {
-  output_name = "java-matter-controller"
+java_library("java") {
+  output_name = "JavaMatterController.jar"
   deps = [
     "${chip_root}/src/controller/java",
     "${chip_root}/src/setup_payload/java",
@@ -27,7 +27,6 @@ java_binary("java-matter-controller") {
   ]
 
   sources = [
-    "java/src/com/matter/controller/Main.java",
     "java/src/com/matter/controller/commands/common/Argument.java",
     "java/src/com/matter/controller/commands/common/ArgumentType.java",
     "java/src/com/matter/controller/commands/common/Command.java",
@@ -37,9 +36,6 @@ java_binary("java-matter-controller") {
     "java/src/com/matter/controller/commands/common/IPAddress.java",
     "java/src/com/matter/controller/commands/common/MatterCommand.java",
     "java/src/com/matter/controller/commands/common/RealResult.java",
-    "java/src/com/matter/controller/commands/discover/DiscoverCommand.java",
-    "java/src/com/matter/controller/commands/discover/DiscoverCommissionablesCommand.java",
-    "java/src/com/matter/controller/commands/discover/DiscoverCommissionersCommand.java",
     "java/src/com/matter/controller/commands/pairing/CloseSessionCommand.java",
     "java/src/com/matter/controller/commands/pairing/DiscoveryFilterType.java",
     "java/src/com/matter/controller/commands/pairing/PairAddressPaseCommand.java",
@@ -64,6 +60,23 @@ java_binary("java-matter-controller") {
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
+}
+
+kotlin_binary("java-matter-controller") {
+  output_name = "java-matter-controller"
+  deps = [
+    ":java",
+    "${chip_root}/third_party/java_deps:kotlin-stdlib",
+  ]
+
+  sources = [
+    "java/src/com/matter/controller/Main.kt",
+    "java/src/com/matter/controller/commands/discover/DiscoverCommand.kt",
+    "java/src/com/matter/controller/commands/discover/DiscoverCommissionablesCommand.kt",
+    "java/src/com/matter/controller/commands/discover/DiscoverCommissionersCommand.kt",
+  ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
 }
 
 group("default") {
