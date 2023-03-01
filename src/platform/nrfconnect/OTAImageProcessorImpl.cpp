@@ -164,8 +164,16 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & aBlock)
     if (error == CHIP_NO_ERROR)
     {
         // DFU target library buffers data internally, so do not clone the block data.
-        error = System::MapErrorZephyr(dfu_multi_image_write(mParams.downloadedBytes, aBlock.data(), aBlock.size()));
-        mParams.downloadedBytes += aBlock.size();
+        if (mParams.downloadedBytes > std::numeric_limits<size_t>::max())
+        {
+            error = CHIP_ERROR_BUFFER_TOO_SMALL;
+        }
+        else
+        {
+            error = System::MapErrorZephyr(
+                dfu_multi_image_write(static_cast<size_t>(mParams.downloadedBytes), aBlock.data(), aBlock.size()));
+            mParams.downloadedBytes += aBlock.size();
+        }
     }
 
     // Report the result back to the downloader asynchronously.
