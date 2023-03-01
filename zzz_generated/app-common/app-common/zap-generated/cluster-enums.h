@@ -470,8 +470,8 @@ namespace LocalizationConfiguration {} // namespace LocalizationConfiguration
 
 namespace TimeFormatLocalization {
 
-// Enum for CalendarType
-enum class CalendarType : uint8_t
+// Enum for CalendarTypeEnum
+enum class CalendarTypeEnum : uint8_t
 {
     kBuddhist  = 0x00,
     kChinese   = 0x01,
@@ -492,8 +492,8 @@ enum class CalendarType : uint8_t
     kUnknownEnumValue = 12,
 };
 
-// Enum for HourFormat
-enum class HourFormat : uint8_t
+// Enum for HourFormatEnum
+enum class HourFormatEnum : uint8_t
 {
     k12hr = 0x00,
     k24hr = 0x01,

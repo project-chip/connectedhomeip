@@ -3063,8 +3063,12 @@
               - OTAChangeReasonEnum
               - OTAUpdateStateEnum
           TimeFormatLocalization:
-              - CalendarType
-              - HourFormat
+              # CalendarTypeEnum and HourFormatEnum were originally just named
+              # CalendarType and HourFormat, but we generate the same API for
+              # the names with/without "Enum" at the end, so the name can just
+              # change here.
+              - CalendarTypeEnum
+              - HourFormatEnum
           UnitLocalization:
               # TempUnitEnum was originally just named TempUnit, but
               # we generate the same API for both of those names, so the name
@@ -3324,7 +3328,11 @@
                   - RollingBack
                   - DelayedOnUserConsent
           TimeFormatLocalization:
-              CalendarType:
+              # CalendarTypeEnum and HourFormatEnum were originally just named
+              # CalendarType and HourFormat, but we generate the same API for
+              # the names with/without "Enum" at the end, so the name can just
+              # change here.
+              CalendarTypeEnum:
                   - Buddhist
                   - Chinese
                   - Coptic
@@ -3337,7 +3345,7 @@
                   - Korean
                   - Persian
                   - Taiwanese
-              HourFormat:
+              HourFormatEnum:
                   - 12hr
                   - 24hr
           UnitLocalization:

@@ -23,6 +23,7 @@
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "ChipDeviceController-StorageDelegate.h"
 
+#include "controller/python/chip/crypto/p256keypair.h"
 #include "controller/python/chip/interaction_model/Delegate.h"
 
 #include <controller/CHIPDeviceController.h>
@@ -36,6 +37,7 @@
 #include <lib/support/TestGroupData.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <controller/python/chip/commissioning/PlaceholderOperationalCredentialsIssuer.h>
 #include <controller/python/chip/native/PyChipError.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
@@ -57,6 +59,8 @@ const chip::Credentials::AttestationTrustStore * GetTestFileAttestationTrustStor
 
     return &attestationTrustStore;
 }
+
+chip::Python::PlaceholderOperationalCredentialsIssuer sPlaceholderOperationalCredentialsIssuer;
 } // namespace
 
 namespace chip {
@@ -369,11 +373,74 @@ void pychip_OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::C
     return sTestCommissioner.OnCommissioningStatusUpdate(peerId, stageCompleted, err);
 }
 
+/**
+ * Allocates a controller that does not use auto-commisioning.
+ *
+ * TODO(#25214): Need clean up API
+ *
+ */
+PyChipError pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(chip::Controller::DeviceCommissioner ** outDevCtrl,
+                                                                        chip::python::pychip_P256Keypair * operationalKey,
+                                                                        uint8_t * noc, uint32_t nocLen, uint8_t * icac,
+                                                                        uint32_t icacLen, uint8_t * rcac, uint32_t rcacLen,
+                                                                        const uint8_t * ipk, uint32_t ipkLen,
+                                                                        chip::VendorId adminVendorId, bool enableServerInteractions)
+{
+    ReturnErrorCodeIf(nocLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    ReturnErrorCodeIf(icacLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+    ReturnErrorCodeIf(rcacLen > Controller::kMaxCHIPDERCertLength, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+
+    ChipLogDetail(Controller, "Creating New Device Controller");
+
+    auto devCtrl = std::make_unique<chip::Controller::DeviceCommissioner>();
+    VerifyOrReturnError(devCtrl != nullptr, ToPyChipError(CHIP_ERROR_NO_MEMORY));
+
+    Controller::SetupParams initParams;
+    initParams.pairingDelegate                      = &sPairingDelegate;
+    initParams.operationalCredentialsDelegate       = &sPlaceholderOperationalCredentialsIssuer;
+    initParams.operationalKeypair                   = operationalKey;
+    initParams.controllerRCAC                       = ByteSpan(rcac, rcacLen);
+    initParams.controllerICAC                       = ByteSpan(icac, icacLen);
+    initParams.controllerNOC                        = ByteSpan(noc, nocLen);
+    initParams.enableServerInteractions             = enableServerInteractions;
+    initParams.controllerVendorId                   = adminVendorId;
+    initParams.permitMultiControllerFabrics         = true;
+    initParams.hasExternallyOwnedOperationalKeypair = true;
+
+    CHIP_ERROR err = Controller::DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, *devCtrl);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+
+    // Setup IPK in Group Data Provider for controller after Commissioner init which sets-up the fabric table entry
+    uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
+    chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
+
+    err = devCtrl->GetCompressedFabricIdBytes(compressedFabricIdSpan);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+
+    ChipLogProgress(Support, "Setting up group data for Fabric Index %u with Compressed Fabric ID:",
+                    static_cast<unsigned>(devCtrl->GetFabricIndex()));
+    ChipLogByteSpan(Support, compressedFabricIdSpan);
+
+    chip::ByteSpan fabricIpk =
+        (ipk == nullptr) ? chip::GroupTesting::DefaultIpkValue::GetDefaultIpk() : chip::ByteSpan(ipk, ipkLen);
+    err =
+        chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), fabricIpk, compressedFabricIdSpan);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+
+    *outDevCtrl = devCtrl.release();
+
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
+// TODO(#25214): Need clean up API
 PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Controller::DeviceCommissioner ** outDevCtrl,
                                               FabricId fabricId, chip::NodeId nodeId, chip::VendorId adminVendorId,
                                               const char * paaTrustStorePath, bool useTestCommissioner,
-                                              bool enableServerInteractions, CASEAuthTag * caseAuthTags, uint32_t caseAuthTagLen)
+                                              bool enableServerInteractions, CASEAuthTag * caseAuthTags, uint32_t caseAuthTagLen,
+                                              chip::python::pychip_P256Keypair * operationalKey)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     ChipLogDetail(Controller, "Creating New Device Controller");
 
     VerifyOrReturnError(context != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
@@ -393,8 +460,18 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
     SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
 
     chip::Crypto::P256Keypair ephemeralKey;
-    CHIP_ERROR err = ephemeralKey.Initialize(chip::Crypto::ECPKeyTarget::ECDSA);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+    chip::Crypto::P256Keypair * controllerKeyPair;
+
+    if (operationalKey == nullptr)
+    {
+        err = ephemeralKey.Initialize(chip::Crypto::ECPKeyTarget::ECDSA);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+        controllerKeyPair = &ephemeralKey;
+    }
+    else
+    {
+        controllerKeyPair = operationalKey;
+    }
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
     ReturnErrorCodeIf(!noc.Alloc(Controller::kMaxCHIPDERCertLength), ToPyChipError(CHIP_ERROR_NO_MEMORY));
@@ -419,19 +496,21 @@ PyChipError pychip_OpCreds_AllocateController(OpCredsContext * context, chip::Co
 
     memcpy(catValues.values.data(), caseAuthTags, caseAuthTagLen * sizeof(CASEAuthTag));
 
-    err = context->mAdapter->GenerateNOCChain(nodeId, fabricId, catValues, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
+    err =
+        context->mAdapter->GenerateNOCChain(nodeId, fabricId, catValues, controllerKeyPair->Pubkey(), rcacSpan, icacSpan, nocSpan);
     VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
 
     Controller::SetupParams initParams;
-    initParams.pairingDelegate                = &sPairingDelegate;
-    initParams.operationalCredentialsDelegate = context->mAdapter.get();
-    initParams.operationalKeypair             = &ephemeralKey;
-    initParams.controllerRCAC                 = rcacSpan;
-    initParams.controllerICAC                 = icacSpan;
-    initParams.controllerNOC                  = nocSpan;
-    initParams.enableServerInteractions       = enableServerInteractions;
-    initParams.controllerVendorId             = adminVendorId;
-    initParams.permitMultiControllerFabrics   = true;
+    initParams.pairingDelegate                      = &sPairingDelegate;
+    initParams.operationalCredentialsDelegate       = context->mAdapter.get();
+    initParams.operationalKeypair                   = controllerKeyPair;
+    initParams.controllerRCAC                       = rcacSpan;
+    initParams.controllerICAC                       = icacSpan;
+    initParams.controllerNOC                        = nocSpan;
+    initParams.enableServerInteractions             = enableServerInteractions;
+    initParams.controllerVendorId                   = adminVendorId;
+    initParams.permitMultiControllerFabrics         = true;
+    initParams.hasExternallyOwnedOperationalKeypair = operationalKey != nullptr;
 
     if (useTestCommissioner)
     {
@@ -503,6 +582,22 @@ PyChipError pychip_DeviceController_DeleteDeviceController(chip::Controller::Dev
     }
 
     return ToPyChipError(CHIP_NO_ERROR);
+}
+
+PyChipError pychip_DeviceController_SetIpk(chip::Controller::DeviceCommissioner * devCtrl, const uint8_t * ipk, size_t ipkLen)
+{
+    VerifyOrReturnError(ipk != nullptr, ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
+
+    uint8_t compressedFabricId[sizeof(uint64_t)] = { 0 };
+    chip::MutableByteSpan compressedFabricIdSpan(compressedFabricId);
+
+    CHIP_ERROR err = devCtrl->GetCompressedFabricIdBytes(compressedFabricIdSpan);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, ToPyChipError(err));
+
+    err = chip::Credentials::SetSingleIpkEpochKey(&sGroupDataProvider, devCtrl->GetFabricIndex(), ByteSpan(ipk, ipkLen),
+                                                  compressedFabricIdSpan);
+
+    return ToPyChipError(err);
 }
 
 bool pychip_TestCommissionerUsed()

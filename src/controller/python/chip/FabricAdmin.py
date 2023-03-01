@@ -23,6 +23,7 @@ from ctypes import *
 from typing import *
 
 from chip import CertificateAuthority, ChipDeviceCtrl
+from chip.crypto import p256keypair
 from chip.native import GetLibraryHandle
 
 
@@ -65,7 +66,7 @@ class FabricAdmin:
         self._isActive = True
         self._activeControllers = []
 
-    def NewController(self, nodeId: int = None, paaTrustStorePath: str = "", useTestCommissioner: bool = False, catTags: List[int] = []):
+    def NewController(self, nodeId: int = None, paaTrustStorePath: str = "", useTestCommissioner: bool = False, catTags: List[int] = [], keypair: p256keypair.P256Keypair = None):
         ''' Create a new chip.ChipDeviceCtrl.ChipDeviceController instance on this fabric.
 
             When vending ChipDeviceController instances on a given fabric, each controller instance
@@ -104,7 +105,8 @@ class FabricAdmin:
             paaTrustStorePath=paaTrustStorePath,
             useTestCommissioner=useTestCommissioner,
             fabricAdmin=self,
-            catTags=catTags)
+            catTags=catTags,
+            keypair=keypair)
 
         self._activeControllers.append(controller)
         return controller

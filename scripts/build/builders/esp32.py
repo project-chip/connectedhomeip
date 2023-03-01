@@ -100,7 +100,8 @@ class Esp32App(Enum):
         if board == Esp32Board.QEMU:
             return self == Esp32App.TESTS
         elif board == Esp32Board.M5Stack:
-            return self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL or self == Esp32App.OTA_REQUESTOR or self == Esp32App.OTA_PROVIDER
+            return (self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL or
+                    self == Esp32App.OTA_REQUESTOR or self == Esp32App.OTA_PROVIDER)
         elif board == Esp32Board.C3DevKit:
             return self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL
         else:
@@ -244,5 +245,5 @@ class Esp32Builder(Builder):
 
         with open(os.path.join(self.output_dir, self.app.FlashBundleName), 'r') as fp:
             return {
-                l.strip(): os.path.join(self.output_dir, l.strip()) for l in fp.readlines() if l.strip()
+                line.strip(): os.path.join(self.output_dir, line.strip()) for line in fp.readlines() if line.strip()
             }

@@ -254,6 +254,17 @@ private:
     os_unfair_lock_unlock(&self->_lock);
 }
 
+- (void)nodeMayBeAdvertisingOperational
+{
+    // TODO: Figure out what to do with that information.  If we're not waiting
+    // to subscribe/resubscribe, do nothing, otherwise perhaps trigger the
+    // subscribe/resubscribe immediately?  We need to have much better tracking
+    // of our internal state for that, and may need to add something on
+    // ReadClient to cancel its outstanding timer and try to resubscribe
+    // immediately....
+    MTR_LOG_DEFAULT("%@ saw new operational advertisement", self);
+}
+
 // assume lock is held
 - (void)_changeState:(MTRDeviceState)state
 {

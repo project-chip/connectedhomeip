@@ -18,11 +18,9 @@ import enum
 import logging
 import os
 import sys
-import tempfile
 import time
 import typing
 from dataclasses import dataclass, field
-from pathlib import Path
 
 import chiptest
 import click
@@ -30,9 +28,7 @@ import coloredlogs
 from chiptest.accessories import AppsRegister
 from chiptest.glob_matcher import GlobMatcher
 from chiptest.test_definition import TestRunTime, TestTag
-from diskcache import Cache
-
-cache = Cache(os.path.join(tempfile.gettempdir(), 'yaml_runner_cache'))
+from yaml.paths_finder import PathsFinder
 
 DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -42,25 +38,6 @@ class ManualHandling(enum.Enum):
     INCLUDE = enum.auto()
     SKIP = enum.auto()
     ONLY = enum.auto()
-
-
-def FindBinaryPath(name: str):
-    binary_path = cache.get(name)
-    if binary_path:
-        if Path(binary_path).is_file():
-            return binary_path
-        else:
-            del cache[name]
-
-    for path in Path(DEFAULT_CHIP_ROOT).rglob(name):
-        if not path.is_file():
-            continue
-        if path.name != name:
-            continue
-        cache[name] = str(path)
-        return str(path)
-
-    return 'NOT_FOUND_IN_OUTPUT_' + name
 
 
 # Supported log levels, mapping string values required for argument
@@ -169,7 +146,8 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
 
     if chip_tool is None and not runtime == TestRunTime.CHIP_REPL_PYTHON:
         # non yaml tests REQUIRE chip-tool. Yaml tests should not require chip-tool
-        chip_tool = FindBinaryPath('chip-tool')
+        paths_finder = PathsFinder()
+        chip_tool = paths_finder.get('chip-tool')
 
     if include_tags:
         include_tags = set([TestTag.__members__[t] for t in include_tags])
@@ -292,29 +270,31 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             tv_app, bridge_app, chip_repl_yaml_tester, chip_tool_with_python, pics_file, keep_going, test_timeout_seconds):
     runner = chiptest.runner.Runner()
 
+    paths_finder = PathsFinder()
+
     if all_clusters_app is None:
-        all_clusters_app = FindBinaryPath('chip-all-clusters-app')
+        all_clusters_app = paths_finder.get('chip-all-clusters-app')
 
     if lock_app is None:
-        lock_app = FindBinaryPath('chip-lock-app')
+        lock_app = paths_finder.get('chip-lock-app')
 
     if ota_provider_app is None:
-        ota_provider_app = FindBinaryPath('chip-ota-provider-app')
+        ota_provider_app = paths_finder.get('chip-ota-provider-app')
 
     if ota_requestor_app is None:
-        ota_requestor_app = FindBinaryPath('chip-ota-requestor-app')
+        ota_requestor_app = paths_finder.get('chip-ota-requestor-app')
 
     if tv_app is None:
-        tv_app = FindBinaryPath('chip-tv-app')
+        tv_app = paths_finder.get('chip-tv-app')
 
     if bridge_app is None:
-        bridge_app = FindBinaryPath('chip-bridge-app')
+        bridge_app = paths_finder.get('chip-bridge-app')
 
     if chip_repl_yaml_tester is None:
-        chip_repl_yaml_tester = FindBinaryPath('yamltest_with_chip_repl_tester.py')
+        chip_repl_yaml_tester = paths_finder.get('yamltest_with_chip_repl_tester.py')
 
     if chip_tool_with_python is None:
-        chip_tool_with_python = FindBinaryPath('chiptool.py')
+        chip_tool_with_python = paths_finder.get('chiptool.py')
 
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(

@@ -28,6 +28,7 @@
 #import "MTRFramework.h"
 #import "MTRLogging_Internal.h"
 #import "MTROTAProviderDelegateBridge.h"
+#import "MTROperationalBrowser.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "NSDataSpanConversion.h"
@@ -81,6 +82,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 @property (readonly) NSMutableArray<MTRDeviceController *> * controllers;
 @property (readonly) PersistentStorageOperationalKeystore * keystore;
 @property (readonly) Credentials::PersistentStorageOpCertStore * opCertStore;
+@property (readonly) MTROperationalBrowser * operationalBrowser;
 @property () chip::Credentials::DeviceAttestationVerifier * deviceAttestationVerifier;
 
 - (BOOL)findMatchingFabric:(FabricTable &)fabricTable
@@ -643,6 +645,9 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         // Bringing up the first controller.  Start the event loop now.  If we
         // fail to bring it up, its cleanup will stop the event loop again.
         chip::DeviceLayer::PlatformMgrImpl().StartEventLoopTask();
+        dispatch_sync(_chipWorkQueue, ^{
+            self->_operationalBrowser = new MTROperationalBrowser(self, self->_chipWorkQueue);
+        });
     }
 
     // Add the controller to _controllers now, so if we fail partway through its
@@ -742,6 +747,10 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     [_controllers removeObject:controller];
 
     if ([_controllers count] == 0) {
+        dispatch_sync(_chipWorkQueue, ^{
+            delete self->_operationalBrowser;
+            self->_operationalBrowser = nullptr;
+        });
         // That was our last controller.  Stop the event loop before it
         // shuts down, because shutdown of the last controller will tear
         // down most of the world.
@@ -775,6 +784,21 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
     }
 
     return nil;
+}
+
+- (void)operationalInstanceAdded:(chip::PeerId &)operationalID
+{
+    for (MTRDeviceController * controller in _controllers) {
+        auto * compressedFabricId = controller.compressedFabricID;
+        if (compressedFabricId != nil && compressedFabricId.unsignedLongLongValue == operationalID.GetCompressedFabricId()) {
+            ChipLogProgress(Controller, "Notifying controller at fabric index %u about new operational node 0x" ChipLogFormatX64,
+                controller.fabricIndex, ChipLogValueX64(operationalID.GetNodeId()));
+            [controller operationalInstanceAdded:operationalID.GetNodeId()];
+        }
+
+        // Keep going: more than one controller might match a given compressed
+        // fabric id, though the chances are low.
+    }
 }
 
 - (MTRPersistentStorageDelegateBridge *)storageDelegateBridge
