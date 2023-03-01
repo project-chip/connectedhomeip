@@ -20,7 +20,10 @@ import("BUILD.generated.gni")
 config("boringssl_config") {
   include_dirs = [ "src/include" ]
 
-  cflags = [ "-Wno-unused-variable" ]
+  cflags = [
+    "-Wno-unused-variable",
+    "-Wno-conversion",
+  ]
 
   if (is_clang) {
     cflags += [ "-Wno-shorten-64-to-32" ]
