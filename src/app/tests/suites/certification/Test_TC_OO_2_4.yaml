@@ -255,7 +255,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 10          
+                value: 10
 
     - label: "Reboot target device"
       PICS: PICS_SDK_CI_ONLY
