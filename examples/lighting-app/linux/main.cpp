@@ -89,7 +89,11 @@ int main(int argc, char * argv[])
         return -1;
     }
 
-    LightingMgr().Init();
+    if (LightingMgr().Init() != CHIP_NO_ERROR)
+    {
+        chip::DeviceLayer::PlatformMgr().Shutdown();
+        return -1;
+    }
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
     example::Ui::ImguiUi ui;
