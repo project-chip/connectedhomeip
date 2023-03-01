@@ -183,13 +183,13 @@ class BarcodeFragment : Fragment() {
 
     private fun handleInputQrCode(qrCode: String) {
         lateinit var payload: SetupPayload
-        var isManualPairingCode = false
+        var isShortDiscriminator = false
         try {
             payload = SetupPayloadParser().parseQrCode(qrCode)
         } catch (ex: SetupPayloadException) {
             try {
                 payload = SetupPayloadParser().parseManualEntryCode(qrCode)
-                isManualPairingCode = true
+                isShortDiscriminator = true
             } catch (ex: Exception) {
                 Log.e(TAG, "Unrecognized Manual Pairing Code", ex)
                 Toast.makeText(requireContext(), "Unrecognized Manual Pairing Code", Toast.LENGTH_SHORT).show()
@@ -199,7 +199,7 @@ class BarcodeFragment : Fragment() {
             Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
         }
         FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
-            ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
+            ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload, isShortDiscriminator))
     }
 
     private fun handleScannedQrCode(barcode: Barcode) {
