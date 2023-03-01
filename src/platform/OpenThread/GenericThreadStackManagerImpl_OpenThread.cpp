@@ -1695,6 +1695,14 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPollPeriod(u
 }
 
 template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetRouterPromotion(bool val)
+{
+    Impl()->LockThreadStack();
+    otThreadSetRouterEligible(DeviceLayer::ThreadStackMgrImpl().OTInstance(), val);
+    Impl()->UnlockThreadStack();
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
