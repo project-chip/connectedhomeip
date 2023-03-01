@@ -979,14 +979,14 @@ def WriteAttributes(future: Future, eventLoop, device,
     for attr in attributes:
         if attr.Attribute.must_use_timed_write and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
             raise chip.interaction_model.InteractionModelError(chip.interaction_model.Status.NeedsTimedInteraction)
-        path = chip.interaction_model.delegate.AttributePathIBstruct.parse(
-            b'\x00' * chip.interaction_model.delegate.AttributePathIBstruct.sizeof())
+        path = chip.interaction_model.AttributePathIBstruct.parse(
+            b'\x00' * chip.interaction_model.AttributePathIBstruct.sizeof())
         path.EndpointId = attr.EndpointId
         path.ClusterId = attr.Attribute.cluster_id
         path.AttributeId = attr.Attribute.attribute_id
         path.DataVersion = attr.DataVersion
         path.HasDataVersion = attr.HasDataVersion
-        path = chip.interaction_model.delegate.AttributePathIBstruct.build(path)
+        path = chip.interaction_model.AttributePathIBstruct.build(path)
         tlv = attr.Attribute.ToTLV(None, attr.Data)
         writeargs.append(ctypes.c_char_p(path))
         writeargs.append(ctypes.c_char_p(bytes(tlv)))
@@ -1060,21 +1060,21 @@ def Read(future: Future, eventLoop, device, devCtrl,
 
     if attributes is not None:
         for attr in attributes:
-            path = chip.interaction_model.delegate.AttributePathIBstruct.parse(
-                b'\xff' * chip.interaction_model.delegate.AttributePathIBstruct.sizeof())
+            path = chip.interaction_model.AttributePathIBstruct.parse(
+                b'\xff' * chip.interaction_model.AttributePathIBstruct.sizeof())
             if attr.EndpointId is not None:
                 path.EndpointId = attr.EndpointId
             if attr.ClusterId is not None:
                 path.ClusterId = attr.ClusterId
             if attr.AttributeId is not None:
                 path.AttributeId = attr.AttributeId
-            path = chip.interaction_model.delegate.AttributePathIBstruct.build(path)
+            path = chip.interaction_model.AttributePathIBstruct.build(path)
             readargs.append(ctypes.c_char_p(path))
 
     if dataVersionFilters is not None:
         for f in dataVersionFilters:
-            filter = chip.interaction_model.delegate.DataVersionFilterIBstruct.parse(
-                b'\xff' * chip.interaction_model.delegate.DataVersionFilterIBstruct.sizeof())
+            filter = chip.interaction_model.DataVersionFilterIBstruct.parse(
+                b'\xff' * chip.interaction_model.DataVersionFilterIBstruct.sizeof())
             if f.EndpointId is not None:
                 filter.EndpointId = f.EndpointId
             else:
@@ -1090,14 +1090,14 @@ def Read(future: Future, eventLoop, device, devCtrl,
             else:
                 raise ValueError(
                     "DataVersionFilter must provide DataVersion.")
-            filter = chip.interaction_model.delegate.DataVersionFilterIBstruct.build(
+            filter = chip.interaction_model.DataVersionFilterIBstruct.build(
                 filter)
             readargs.append(ctypes.c_char_p(filter))
 
     if events is not None:
         for event in events:
-            path = chip.interaction_model.delegate.EventPathIBstruct.parse(
-                b'\xff' * chip.interaction_model.delegate.EventPathIBstruct.sizeof())
+            path = chip.interaction_model.EventPathIBstruct.parse(
+                b'\xff' * chip.interaction_model.EventPathIBstruct.sizeof())
             if event.EndpointId is not None:
                 path.EndpointId = event.EndpointId
             if event.ClusterId is not None:
@@ -1108,7 +1108,7 @@ def Read(future: Future, eventLoop, device, devCtrl,
                 path.Urgent = event.Urgent
             else:
                 path.Urgent = 0
-            path = chip.interaction_model.delegate.EventPathIBstruct.build(path)
+            path = chip.interaction_model.EventPathIBstruct.build(path)
             readargs.append(ctypes.c_char_p(path))
 
     readClientObj = ctypes.POINTER(c_void_p)()
