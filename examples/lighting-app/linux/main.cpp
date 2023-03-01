@@ -89,8 +89,10 @@ int main(int argc, char * argv[])
         return -1;
     }
 
-    if (LightingMgr().Init() != CHIP_NO_ERROR)
+    CHIP_ERROR err = LightingMgr().Init();
+    if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(AppServer, "Failed to initialize lighting manager: %s", chip::ErrorStr(err));
         chip::DeviceLayer::PlatformMgr().Shutdown();
         return -1;
     }
