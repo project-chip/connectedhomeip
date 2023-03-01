@@ -2235,7 +2235,6 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
         return true;
     }
 
-
     if (colorTemperatureMinimum < tempPhysicalMin)
     {
         colorTemperatureMinimum = tempPhysicalMin;
