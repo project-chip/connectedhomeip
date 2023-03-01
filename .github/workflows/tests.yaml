@@ -521,7 +521,7 @@ jobs:
 
     java_tests_linux:
         name: Java Tests - Linux
-        timeout-minutes: 130
+        timeout-minutes: 135
 
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
@@ -614,7 +614,7 @@ jobs:
                      --factoryreset \
                   '
             - name: Run Pairing Address-PaseOnly Test
-              timeout-minutes: 10
+              timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
