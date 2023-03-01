@@ -222,6 +222,8 @@ public:
 
     bool IsSecureSession() const { return GetSessionType() == SessionType::kSecure; }
 
+    bool IsUnauthenticatedSession() const { return GetSessionType() == SessionType::kUnauthenticated; }
+
     void DispatchSessionEvent(SessionDelegate::Event event)
     {
         // Holders might remove themselves when notified.

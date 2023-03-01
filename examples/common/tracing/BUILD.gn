@@ -26,6 +26,8 @@ source_set("trace_handlers") {
   deps = [ "${chip_root}/src/lib" ]
 
   public_configs = [ ":default_config" ]
+
+  cflags = [ "-Wconversion" ]
 }
 
 source_set("trace_handlers_decoder") {
@@ -47,6 +49,8 @@ source_set("trace_handlers_decoder") {
 
   deps = [ "${chip_root}/src/lib" ]
   public_deps = [ "${chip_root}/third_party/jsoncpp" ]
+
+  cflags = [ "-Wconversion" ]
 }
 
 executable("chip-trace-decoder") {
@@ -73,4 +77,6 @@ executable("chip-trace-decoder") {
     "${chip_root}/src/lib",
     "${chip_root}/third_party/jsoncpp",
   ]
+
+  cflags = [ "-Wconversion" ]
 }

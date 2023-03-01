@@ -167,16 +167,16 @@ class Efr32Builder(GnBuilder):
         if chip_build_libshell:
             self.extra_gn_options.append('chip_build_libshell=true')
 
-        if chip_logging == False:
+        if chip_logging is False:
             self.extra_gn_options.append('chip_logging=false')
 
-        if chip_openthread_ftd == False:
+        if chip_openthread_ftd is False:
             self.extra_gn_options.append('chip_openthread_ftd=false')
 
         if enable_heap_monitoring:
             self.extra_gn_options.append('enable_heap_monitoring=true')
 
-        if enable_openthread_cli == False:
+        if enable_openthread_cli is False:
             self.extra_gn_options.append('enable_openthread_cli=false')
 
         if show_qr_code:
@@ -208,7 +208,8 @@ class Efr32Builder(GnBuilder):
 
         if enable_ot_coap_lib:
             self.extra_gn_options.append(
-                'use_silabs_thread_lib=true chip_openthread_target="../silabs:ot-efr32-cert" use_thread_coap_lib=true openthread_external_platform=""')
+                'use_silabs_thread_lib=true chip_openthread_target="../silabs:ot-efr32-cert" '
+                'use_thread_coap_lib=true openthread_external_platform=""')
 
         if not no_version:
             shortCommitSha = subprocess.check_output(

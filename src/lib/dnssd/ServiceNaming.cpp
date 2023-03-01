@@ -84,7 +84,7 @@ CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, const chip::ByteSpan & 
 {
     ReturnErrorCodeIf(bufferLen < macOrEui64.size() * 2 + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    size_t idx = 0;
+    int idx = 0;
     for (size_t i = 0; i < macOrEui64.size(); ++i)
     {
         idx += snprintf(buffer + idx, 3, "%02X", macOrEui64.data()[i]);
@@ -94,7 +94,7 @@ CHIP_ERROR MakeHostName(char * buffer, size_t bufferLen, const chip::ByteSpan & 
 
 CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter subtype)
 {
-    size_t requiredSize;
+    int requiredSize;
     switch (subtype.type)
     {
     case DiscoveryFilterType::kShortDiscriminator:
@@ -135,7 +135,7 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         break;
     case DiscoveryFilterType::kCompressedFabricId:
         requiredSize = snprintf(buffer, bufferLen, "_I");
-        return Encoding::Uint64ToHex(subtype.code, &buffer[requiredSize], bufferLen - requiredSize,
+        return Encoding::Uint64ToHex(subtype.code, &buffer[requiredSize], bufferLen - static_cast<size_t>(requiredSize),
                                      Encoding::HexFlags::kUppercaseAndNullTerminate);
         break;
     case DiscoveryFilterType::kInstanceName:
@@ -146,12 +146,12 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         buffer[0]    = '\0';
         break;
     }
-    return (requiredSize <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+    return (static_cast<size_t>(requiredSize) <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
 CHIP_ERROR MakeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter nameDesc, DiscoveryType type)
 {
-    size_t requiredSize;
+    int requiredSize;
     if (nameDesc.type == DiscoveryFilterType::kNone)
     {
         if (type == DiscoveryType::kCommissionableNode)
@@ -192,7 +192,7 @@ CHIP_ERROR MakeServiceTypeName(char * buffer, size_t bufferLen, DiscoveryFilter 
         }
     }
 
-    return (requiredSize <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
+    return (static_cast<size_t>(requiredSize) <= (bufferLen - 1)) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
 } // namespace Dnssd

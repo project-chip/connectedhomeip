@@ -18,7 +18,7 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../../src/app/zap-templates/zcl/zcl.json",
+      "path": "../../../src/app/zap-templates/zcl/zcl.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
@@ -26,7 +26,7 @@
     },
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../../src/app/zap-templates/app-templates.json",
+      "path": "../../../src/app/zap-templates/app-templates.json",
       "type": "gen-templates-json",
       "version": "chip-v1"
     }
@@ -1076,7 +1076,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "HourFormat",
+              "type": "HourFormatEnum",
               "included": 1,
               "storageOption": "NVM",
               "singleton": 0,
@@ -1092,7 +1092,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "CalendarType",
+              "type": "CalendarTypeEnum",
               "included": 1,
               "storageOption": "NVM",
               "singleton": 0,

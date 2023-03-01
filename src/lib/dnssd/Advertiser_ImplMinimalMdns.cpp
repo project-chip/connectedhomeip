@@ -236,8 +236,9 @@ private:
                                     "MRP retry interval idle value exceeds allowed range of 1 hour, using maximum available");
                     mrp.mIdleRetransTimeout = kMaxRetryInterval;
                 }
-                size_t writtenCharactersNumber = snprintf(storage.sleepyIdleIntervalBuf, sizeof(storage.sleepyIdleIntervalBuf),
-                                                          "SII=%" PRIu32, mrp.mIdleRetransTimeout.count());
+                size_t writtenCharactersNumber =
+                    static_cast<size_t>(snprintf(storage.sleepyIdleIntervalBuf, sizeof(storage.sleepyIdleIntervalBuf),
+                                                 "SII=%" PRIu32, mrp.mIdleRetransTimeout.count()));
                 VerifyOrReturnError((writtenCharactersNumber > 0) &&
                                         (writtenCharactersNumber < sizeof(storage.sleepyIdleIntervalBuf)),
                                     CHIP_ERROR_INVALID_STRING_LENGTH);
@@ -252,8 +253,9 @@ private:
                                     "MRP retry interval active value exceeds allowed range of 1 hour, using maximum available");
                     mrp.mActiveRetransTimeout = kMaxRetryInterval;
                 }
-                size_t writtenCharactersNumber = snprintf(storage.sleepyActiveIntervalBuf, sizeof(storage.sleepyActiveIntervalBuf),
-                                                          "SAI=%" PRIu32, mrp.mActiveRetransTimeout.count());
+                size_t writtenCharactersNumber =
+                    static_cast<size_t>(snprintf(storage.sleepyActiveIntervalBuf, sizeof(storage.sleepyActiveIntervalBuf),
+                                                 "SAI=%" PRIu32, mrp.mActiveRetransTimeout.count()));
                 VerifyOrReturnError((writtenCharactersNumber > 0) &&
                                         (writtenCharactersNumber < sizeof(storage.sleepyActiveIntervalBuf)),
                                     CHIP_ERROR_INVALID_STRING_LENGTH);
@@ -262,8 +264,8 @@ private:
         }
         if (params.GetTcpSupported().HasValue())
         {
-            size_t writtenCharactersNumber =
-                snprintf(storage.tcpSupportedBuf, sizeof(storage.tcpSupportedBuf), "T=%d", params.GetTcpSupported().Value());
+            size_t writtenCharactersNumber = static_cast<size_t>(
+                snprintf(storage.tcpSupportedBuf, sizeof(storage.tcpSupportedBuf), "T=%d", params.GetTcpSupported().Value()));
             VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber < sizeof(storage.tcpSupportedBuf)),
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtFields[numTxtFields++] = storage.tcpSupportedBuf;
@@ -290,7 +292,7 @@ private:
 
     // current request handling
     const chip::Inet::IPPacketInfo * mCurrentSource = nullptr;
-    uint32_t mMessageId                             = 0;
+    uint16_t mMessageId                             = 0;
 
     const char * mEmptyTextEntries[1] = {
         "=",

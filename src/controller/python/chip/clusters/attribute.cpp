@@ -238,8 +238,8 @@ extern "C" {
 
 struct __attribute__((packed)) PyReadAttributeParams
 {
-    uint32_t minInterval; // MinInterval in subscription request
-    uint32_t maxInterval; // MaxInterval in subscription request
+    uint16_t minInterval; // MinInterval in subscription request
+    uint16_t maxInterval; // MaxInterval in subscription request
     bool isSubscription;
     bool isFabricFiltered;
     bool keepSubscriptions;

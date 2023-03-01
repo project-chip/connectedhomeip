@@ -6750,7 +6750,7 @@ CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback::
 }
 
 void CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;

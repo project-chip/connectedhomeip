@@ -374,9 +374,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateReques
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(TimeFormatLocalization::CalendarType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TimeFormatLocalization::CalendarTypeEnum val)
 {
-    using EnumType = TimeFormatLocalization::CalendarType;
+    using EnumType = TimeFormatLocalization::CalendarTypeEnum;
     switch (val)
     {
     case EnumType::kBuddhist:
@@ -396,9 +396,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TimeFormatLocalization:
         return static_cast<EnumType>(12);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(TimeFormatLocalization::HourFormat val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TimeFormatLocalization::HourFormatEnum val)
 {
-    using EnumType = TimeFormatLocalization::HourFormat;
+    using EnumType = TimeFormatLocalization::HourFormatEnum;
     switch (val)
     {
     case EnumType::k12hr:

@@ -28,6 +28,7 @@ template("mbedtls_target") {
       "-Wno-string-concatenation",
       "-Wno-unused-but-set-parameter",
       "-Wno-format-nonliteral",  # Because of mbedtls_debug_print_msg
+      "-Wno-conversion",  # Lots of -Wconversion warnings, sadly.
     ]
 
     if (is_clang) {

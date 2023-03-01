@@ -12,11 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import re
-from itertools import combinations
-from typing import Any, List, Optional
-
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
 from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
@@ -477,6 +472,7 @@ def BuildTizenTarget():
         TargetPart('all-clusters-minimal', app=TizenApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('chip-tool', app=TizenApp.CHIP_TOOL),
         TargetPart('light', app=TizenApp.LIGHT),
+        TargetPart('tests', app=TizenApp.TESTS),
     ])
 
     target.AppendModifier(name="no-ble", enable_ble=False)
@@ -556,6 +552,7 @@ def BuildTelinkTarget():
         TargetPart('ota-requestor', app=TelinkApp.OTA_REQUESTOR),
         TargetPart('pump', app=TelinkApp.PUMP),
         TargetPart('pump-controller', app=TelinkApp.PUMP_CONTROLLER),
+        TargetPart('temperature-measurement', app=TelinkApp.TEMPERATURE_MEASUREMENT),
         TargetPart('thermostat', app=TelinkApp.THERMOSTAT),
     ])
 
