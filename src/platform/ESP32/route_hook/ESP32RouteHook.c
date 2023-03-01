@@ -101,7 +101,7 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
             }
         }
         icmp_payload += opt_len;
-        payload_len = (uint8_t)(payload_len - opt_len);
+        payload_len = (uint16_t)(payload_len - opt_len);
     }
 }
 
