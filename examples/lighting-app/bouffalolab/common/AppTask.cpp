@@ -644,7 +644,6 @@ void AppTask::ButtonEventHandler(void * arg)
     uint32_t presstime;
     if (ButtonPressed())
     {
-        // hosal_gpio_irq_set(&gpio_key, HOSAL_IRQ_TRIG_NEG_LEVEL, GetAppTask().ButtonEventHandler, NULL);
         bl_set_gpio_intmod(gpio_key.port, 1, HOSAL_IRQ_TRIG_NEG_LEVEL);
 
         GetAppTask().mButtonPressedTime = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
@@ -652,7 +651,6 @@ void AppTask::ButtonEventHandler(void * arg)
     }
     else
     {
-        // hosal_gpio_irq_set(&gpio_key, HOSAL_IRQ_TRIG_POS_PULSE, GetAppTask().ButtonEventHandler, NULL);
         bl_set_gpio_intmod(gpio_key.port, 1, HOSAL_IRQ_TRIG_POS_PULSE);
 
         if (GetAppTask().mButtonPressedTime)
