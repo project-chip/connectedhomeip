@@ -54,16 +54,22 @@
     outDiscoveredNodeData.commissionData.longDiscriminator = objCDiscoveredNodeData.longDiscriminator;
     outDiscoveredNodeData.commissionData.commissioningMode = objCDiscoveredNodeData.commissioningMode;
     outDiscoveredNodeData.commissionData.pairingHint = objCDiscoveredNodeData.pairingHint;
-    chip::Platform::CopyString(outDiscoveredNodeData.commissionData.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
-        [objCDiscoveredNodeData.deviceName UTF8String]);
+    memset(outDiscoveredNodeData.commissionData.deviceName, '\0', sizeof(outDiscoveredNodeData.commissionData.deviceName));
+    if (objCDiscoveredNodeData.deviceName != nullptr) {
+        chip::Platform::CopyString(outDiscoveredNodeData.commissionData.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
+            [objCDiscoveredNodeData.deviceName UTF8String]);
+    }
     outDiscoveredNodeData.commissionData.rotatingIdLen = objCDiscoveredNodeData.rotatingIdLen;
     memcpy(
         outDiscoveredNodeData.commissionData.rotatingId, objCDiscoveredNodeData.rotatingId, objCDiscoveredNodeData.rotatingIdLen);
 
     // setting CommonResolutionData
     outDiscoveredNodeData.resolutionData.port = objCDiscoveredNodeData.port;
-    chip::Platform::CopyString(outDiscoveredNodeData.resolutionData.hostName, chip::Dnssd::kHostNameMaxLength + 1,
-        [objCDiscoveredNodeData.hostName UTF8String]);
+    memset(outDiscoveredNodeData.resolutionData.hostName, '\0', sizeof(outDiscoveredNodeData.resolutionData.hostName));
+    if (objCDiscoveredNodeData.hostName != nullptr) {
+        chip::Platform::CopyString(outDiscoveredNodeData.resolutionData.hostName, chip::Dnssd::kHostNameMaxLength + 1,
+            [objCDiscoveredNodeData.hostName UTF8String]);
+    }
     outDiscoveredNodeData.resolutionData.interfaceId = chip::Inet::InterfaceId(objCDiscoveredNodeData.platformInterface);
     outDiscoveredNodeData.resolutionData.numIPs = objCDiscoveredNodeData.numIPs;
     for (size_t i = 0; i < objCDiscoveredNodeData.numIPs; i++) {

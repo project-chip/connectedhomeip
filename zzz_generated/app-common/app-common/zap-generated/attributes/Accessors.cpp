@@ -3357,9 +3357,9 @@ namespace Attributes {
 
 namespace HourFormat {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::HourFormat * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::HourFormatEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TimeFormatLocalization::HourFormat>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TimeFormatLocalization::HourFormatEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, readable, sizeof(temp));
@@ -3371,9 +3371,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLoca
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::HourFormat value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::HourFormatEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TimeFormatLocalization::HourFormat>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TimeFormatLocalization::HourFormatEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -3388,9 +3388,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLoca
 
 namespace ActiveCalendarType {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::CalendarType * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TimeFormatLocalization::CalendarType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::TimeFormatLocalization::Id, Id, readable, sizeof(temp));
@@ -3402,9 +3402,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLoca
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::CalendarType value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TimeFormatLocalization::CalendarType>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
