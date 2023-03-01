@@ -438,17 +438,17 @@ CHIP_ERROR DefaultSceneTableImpl::RegisterHandler(SceneHandler * handler)
     return err;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::UnregisterHandler(uint8_t position)
+CHIP_ERROR DefaultSceneTableImpl::UnregisterHandler(uint8_t pos)
 {
-    VerifyOrReturnError(position < kMaxSceneHandlers, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnValue(!this->HandlerListEmpty() && !(this->mHandlers[position] == nullptr), CHIP_NO_ERROR);
+    VerifyOrReturnError(pos < kMaxSceneHandlers, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnValue(!this->HandlerListEmpty() && !(this->mHandlers[pos] == nullptr), CHIP_NO_ERROR);
 
-    uint8_t next    = position + 1;
-    uint8_t moveNum = kMaxSceneHandlers - next;
+    uint8_t nextPos = pos++;
+    uint8_t moveNum = kMaxSceneHandlers - nextPos;
 
     // TODO: Implement general array management methods
     // Compress array after removal
-    memmove(&this->mHandlers[position], &this->mHandlers[next], sizeof(SceneHandler *) * moveNum);
+    memmove(&this->mHandlers[pos], &this->mHandlers[nextPos], sizeof(SceneHandler *) * moveNum);
 
     this->handlerNum--;
     // Clear last occupied position
