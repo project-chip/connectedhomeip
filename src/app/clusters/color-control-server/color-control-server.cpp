@@ -828,6 +828,12 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
         return true;
     }
 
+    if (rate == 0 && moveMode != EMBER_ZCL_HUE_MOVE_MODE_STOP)
+    {
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return true;
+    }
+
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
     // now, kick off the state machine.
@@ -1263,6 +1269,12 @@ bool ColorControlServer::moveSaturationCommand(app::CommandHandler * commandObj,
     Color16uTransitionState * colorSaturationTransitionState = getSaturationTransitionState(endpoint);
     VerifyOrExit(colorSaturationTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
+    if (rate == 0 && moveMode != EMBER_ZCL_SATURATION_MOVE_MODE_STOP)
+    {
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return true;
+    }
+
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
         commandObj->AddStatus(commandPath, Status::Success);
@@ -1277,7 +1289,7 @@ bool ColorControlServer::moveSaturationCommand(app::CommandHandler * commandObj,
     // now, kick off the state machine.
     initSaturationTransitionState(endpoint, colorSaturationTransitionState);
 
-    if (moveMode == EMBER_ZCL_SATURATION_MOVE_MODE_STOP || rate == 0)
+    if (moveMode == EMBER_ZCL_SATURATION_MOVE_MODE_STOP)
     {
         // Per spec any hue transition must also be cancelled.
         ColorHueTransitionState * hueState = getColorHueTransitionState(endpoint);
@@ -2208,6 +2220,12 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
     Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
     Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
 
+    if (rate == 0 && moveMode != MOVE_MODE_STOP)
+    {
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        return true;
+    }
+
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
 
@@ -2217,11 +2235,6 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
         return true;
     }
 
-    if (rate == 0)
-    {
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
-        return true;
-    }
 
     if (colorTemperatureMinimum < tempPhysicalMin)
     {
