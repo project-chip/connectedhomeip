@@ -36,6 +36,11 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 // called by controller to clean up and shutdown
 - (void)invalidate;
 
+// Called by controller when a new operational advertisement for what we think
+// is this device's identity has been observed.  This could have
+// false-positives, for example due to compressed fabric id collisions.
+- (void)nodeMayBeAdvertisingOperational;
+
 @property (nonatomic, readonly) MTRDeviceController * deviceController;
 @property (nonatomic, readonly, copy) NSNumber * nodeID;
 // Queue used for various internal bookkeeping work.  In general endWork calls

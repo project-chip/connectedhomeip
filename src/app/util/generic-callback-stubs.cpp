@@ -55,13 +55,6 @@ emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId, 
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
-void __attribute__((weak)) emberAfRegistrationAbortCallback() {}
-
-bool __attribute__((weak)) emberAfStartMoveCallback()
-{
-    return false;
-}
-
 chip::Protocols::InteractionModel::Status __attribute__((weak))
 MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                  uint8_t * value)

@@ -29,7 +29,6 @@ from one of the default classes.
 
 import base64
 import logging
-import sys
 
 
 class InputArgument:

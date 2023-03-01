@@ -30,7 +30,7 @@ RUN set -x \
 
 # ------------------------------------------------------------------------------
 # Install tizen
-ENV TIZEN_VERSION 6.0
+ENV TIZEN_VERSION 7.0
 ENV TIZEN_SDK_ROOT /opt/tizen-sdk
 
 COPY tizen-sdk-installer $TIZEN_SDK_ROOT/files/installer

@@ -33,6 +33,14 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>
 
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
+#endif
+
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+#endif
+
 @interface CastingServerBridge ()
 
 @property AppParameters * appParameters;
@@ -614,7 +622,8 @@
             self->_previouslyConnectedVideoPlayer->Initialize(currentTargetVideoPlayerInfo->GetNodeId(),
                 currentTargetVideoPlayerInfo->GetFabricIndex(), nullptr, nullptr, currentTargetVideoPlayerInfo->GetVendorId(),
                 currentTargetVideoPlayerInfo->GetProductId(), currentTargetVideoPlayerInfo->GetDeviceType(),
-                currentTargetVideoPlayerInfo->GetDeviceName(), currentTargetVideoPlayerInfo->GetNumIPs(),
+                currentTargetVideoPlayerInfo->GetDeviceName(), currentTargetVideoPlayerInfo->GetHostName(),
+                currentTargetVideoPlayerInfo->GetNumIPs(),
                 const_cast<chip::Inet::IPAddress *>(currentTargetVideoPlayerInfo->GetIpAddresses()));
 
             TargetEndpointInfo * prevEndpoints = self->_previouslyConnectedVideoPlayer->GetEndpoints();

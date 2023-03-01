@@ -16,8 +16,6 @@
 
 import logging
 import os
-import pathlib
-import pty
 import queue
 import re
 import shlex
@@ -34,12 +32,18 @@ from java.discover_test import DiscoverTest
 
 
 @click.command()
-@click.option("--app", type=click.Path(exists=True), default=None, help='Path to local application to use, omit to use external apps.')
-@click.option("--app-args", type=str, default='', help='The extra arguments passed to the device.')
-@click.option("--tool-path", type=click.Path(exists=True), default=None, help='Path to java-matter-controller.')
-@click.option("--tool-cluster", type=str, default='pairing', help='The cluster name passed to the java-matter-controller.')
-@click.option("--tool-args", type=str, default='', help='The arguments passed to the java-matter-controller.')
-@click.option("--factoryreset", is_flag=True, help='Remove app configs (/tmp/chip*) before running the tests.')
+@click.option("--app", type=click.Path(exists=True), default=None,
+              help='Path to local application to use, omit to use external apps.')
+@click.option("--app-args", type=str, default='',
+              help='The extra arguments passed to the device.')
+@click.option("--tool-path", type=click.Path(exists=True), default=None,
+              help='Path to java-matter-controller.')
+@click.option("--tool-cluster", type=str, default='pairing',
+              help='The cluster name passed to the java-matter-controller.')
+@click.option("--tool-args", type=str, default='',
+              help='The arguments passed to the java-matter-controller.')
+@click.option("--factoryreset", is_flag=True,
+              help='Remove app configs (/tmp/chip*) before running the tests.')
 def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: str, factoryreset: bool):
     logging.info("Execute: {script_command}")
 

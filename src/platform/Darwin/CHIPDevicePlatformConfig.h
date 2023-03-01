@@ -39,26 +39,6 @@
 // These are configuration options that are unique to Darwin platforms.
 // These can be overridden by the application as needed.
 
-/**
- * @def CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
- *
- * The priority of the SoftDevice observer event handler registered by the
- * CHIP BleLayer.
- */
-#ifndef CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
-#define CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY 3
-#endif // CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
-
-/**
- * @def CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
- *
- * The SoftDevice BLE connection configuration tag used by the CHIP
- * BleLayer.
- */
-#ifndef CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
-#define CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG 1
-#endif // CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
-
 // ========== Platform-specific Configuration Overrides =========
 
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE

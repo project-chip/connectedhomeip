@@ -159,22 +159,6 @@ EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, ch
 EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                     const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
 
-/** @brief Registration Abort
- *
- * This callback is called when the device should abort the registration
- * process.
- *
- */
-void emberAfRegistrationAbortCallback();
-
-/** @brief Start Move
- *
- * This function is called to initiate the process for a device to move (rejoin)
- * to a new parent.
- *
- */
-bool emberAfStartMoveCallback();
-
 /** @brief Pre Attribute Change
  *
  * This function is called by the application framework before it changes an

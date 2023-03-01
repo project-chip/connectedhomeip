@@ -175,13 +175,6 @@
 #define CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD 1
 
 /**
- * CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
- *
- * Enable recording UTC timestamps.
- */
-#define CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
-
-/**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
  *
  * A size, in bytes, of the individual debug event logging buffer.

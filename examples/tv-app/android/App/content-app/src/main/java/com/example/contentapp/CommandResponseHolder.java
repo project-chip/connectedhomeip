@@ -30,7 +30,7 @@ public class CommandResponseHolder {
     setResponseValue(
         Clusters.AccountLogin.Id,
         Clusters.AccountLogin.Commands.GetSetupPIN.ID,
-        "{\"0\":\"12345678\"}");
+        "{\"0\":\"20202021\"}");
   };
 
   public static CommandResponseHolder getInstance() {

@@ -60,16 +60,6 @@
 #endif
 
 /**
- * @def CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
- *
- * @brief
- *   By default, don't record UTC timestamps.
- */
-#ifndef CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
-#define CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 0
-#endif
-
-/**
  * @def CHIP_CONFIG_EVENT_LOGGING_EXTERNAL_EVENT_SUPPORT
  *
  * @brief

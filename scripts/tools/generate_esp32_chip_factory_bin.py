@@ -21,8 +21,6 @@ import base64
 import enum
 import logging
 import os
-import shutil
-import subprocess
 import sys
 from types import SimpleNamespace
 
@@ -198,7 +196,7 @@ def calendar_types_to_uint32(calendar_types):
 
 def ishex(s):
     try:
-        n = int(s, 16)
+        _ = int(s, 16)
         return True
     except ValueError:
         return False
@@ -464,11 +462,13 @@ def main():
     parser.add_argument('--mfg-date', help='Manufacturing date in format YYYY-MM-DD')
     parser.add_argument('--serial-num', help='Serial number')
     parser.add_argument('--rd-id-uid',
-                        help='128-bit unique identifier for generating rotating device identifier, provide 32-byte hex string, e.g. "1234567890abcdef1234567890abcdef"')
+                        help=('128-bit unique identifier for generating rotating device identifier, '
+                              'provide 32-byte hex string, e.g. "1234567890abcdef1234567890abcdef"'))
 
     # These will be used by DeviceInfoProvider
     parser.add_argument('--calendar-types', nargs='+',
-                        help='List of supported calendar types.\nSupported Calendar Types: Buddhist, Chinese, Coptic, Ethiopian, Gregorian, Hebrew, Indian, Islamic, Japanese, Korean, Persian, Taiwanese')
+                        help=('List of supported calendar types.\nSupported Calendar Types: Buddhist, Chinese, Coptic, Ethiopian, '
+                              'Gregorian, Hebrew, Indian, Islamic, Japanese, Korean, Persian, Taiwanese'))
     parser.add_argument('--locales', nargs='+', help='List of supported locales, Language Tag as defined by BCP47, eg. en-US en-GB')
     parser.add_argument('--fixed-labels', nargs='+',
                         help='List of fixed labels, eg: "0/orientation/up" "1/orientation/down" "2/orientation/down"')
