@@ -35,7 +35,7 @@ import hashlib
 import json
 import os
 import re
-from typing import Dict, List, Literal, Optional, Sequence, TypedDict, Union
+from typing import Dict, List, Optional, Sequence, TypedDict, Union
 
 try:
     import yaml
@@ -154,7 +154,8 @@ def _convert_metadata_to_hashable_digest(metadata_input: Sequence[Dict[str, Endp
         for cluster_type in ["client_clusters", "server_clusters"]:
             for cluster_key in list(endpoint_obj[cluster_type].keys()):
                 cluster_id = _get_id(cluster_key)
-                endpoint_obj[cluster_type][cluster_id] = endpoint_obj[cluster_type].pop(cluster_key)
+                endpoint_obj[cluster_type][cluster_id] = endpoint_obj[cluster_type].pop(
+                    cluster_key)
                 cluster_obj = endpoint_obj[cluster_type][cluster_id]
 
                 # Replace attribute names
@@ -162,12 +163,14 @@ def _convert_metadata_to_hashable_digest(metadata_input: Sequence[Dict[str, Endp
                 attribute_keys = list(cluster_obj["attributes"])
                 for attribute_key in attribute_keys:
                     attribute_id = _get_id(attribute_key)
-                    attribute_obj[attribute_id] = attribute_obj.pop(attribute_key)
+                    attribute_obj[attribute_id] = attribute_obj.pop(
+                        attribute_key)
 
                 # Replace command names
                 if "commands" in cluster_obj:
                     command_keys = cluster_obj["commands"]
-                    cluster_obj["commands"] = [_get_id(x) for x in command_keys]
+                    cluster_obj["commands"] = [
+                        _get_id(x) for x in command_keys]
                     cluster_obj["commands"].sort()
 
     return json.dumps(metadata, sort_keys=True)
@@ -277,7 +280,8 @@ def generate_metadata(
             if not cluster["enabled"]:
                 continue
 
-            cluster_ref = _convert_metadata_name(cluster["name"], cluster["code"])
+            cluster_ref = _convert_metadata_name(
+                cluster["name"], cluster["code"])
 
             if include_commands:
                 cluster_obj: ClusterType = {"attributes": {}, "commands": []}
@@ -288,7 +292,8 @@ def generate_metadata(
                 attribute_allowed = (
                     attribute_allow_list is None or str(attribute["code"]) in attribute_allow_list)
                 if attribute["included"] and attribute_allowed:
-                    attribute_ref = _convert_metadata_name(attribute["name"], attribute["code"])
+                    attribute_ref = _convert_metadata_name(
+                        attribute["name"], attribute["code"])
                     value = _read_value(attribute["defaultValue"])
                     cluster_obj["attributes"][attribute_ref] = value
 
@@ -298,7 +303,8 @@ def generate_metadata(
 
             if include_commands:
                 for command in cluster["commands"]:
-                    command_ref = _convert_metadata_name(command["name"], command["code"])
+                    command_ref = _convert_metadata_name(
+                        command["name"], command["code"])
                     if cluster["side"] == "client" and command["outgoing"] == 1:
                         cluster_obj["commands"].append(command_ref)
                     elif cluster["side"] == "server" and command["incoming"] == 1:

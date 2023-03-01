@@ -64,7 +64,7 @@ RUN set -x \
 # Download and install kotlin compiler
 RUN set -x \
     && cd /usr/lib \
-    && wget -q https://github.com/JetBrains/kotlin/releases/download/v1.3.31/kotlin-compiler-1.3.31.zip \
+    && wget -q https://github.com/JetBrains/kotlin/releases/download/v1.8.10/kotlin-compiler-1.8.10.zip \
     && unzip kotlin-compiler-*.zip \
     && rm kotlin-compiler-*.zip \
     && rm -f kotlinc/bin/*.bat \
@@ -118,7 +118,7 @@ ENV TI_SYSCONFIG_ROOT=/opt/ti/sysconfig_1.13.0
 ENV ZEPHYR_BASE=/opt/NordicSemiconductor/nrfconnect/zephyr
 ENV ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 
-ENV TIZEN_VERSION 6.0
+ENV TIZEN_VERSION 7.0
 ENV TIZEN_SDK_ROOT /opt/tizen-sdk
 ENV TIZEN_SDK_TOOLCHAIN $TIZEN_SDK_ROOT/tools/arm-linux-gnueabi-gcc-9.2
 ENV TIZEN_SDK_SYSROOT $TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/mobile/rootstraps/mobile-$TIZEN_VERSION-device.core

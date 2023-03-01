@@ -83,7 +83,8 @@ static CHIP_ERROR ParseAttributePathList(jobject attributePathList,
 static CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId, ClusterId & outClusterId,
                                      AttributeId & outAttributeId);
 static CHIP_ERROR ParseEventPathList(jobject eventPathList, std::vector<app::EventPathParams> & outEventPathParamsList);
-static CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId);
+static CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId,
+                                 bool & outIsUrgent);
 static CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard);
 static CHIP_ERROR CreateDeviceAttestationDelegateBridge(JNIEnv * env, jlong handle, jobject deviceAttestationDelegate,
                                                         jint failSafeExpiryTimeoutSecs,
@@ -1436,20 +1437,23 @@ CHIP_ERROR ParseEventPathList(jobject eventPathList, std::vector<app::EventPathP
         EndpointId endpointId;
         ClusterId clusterId;
         EventId eventId;
-        ReturnErrorOnFailure(ParseEventPath(eventPathItem, endpointId, clusterId, eventId));
-        outEventPathParamsList.push_back(app::EventPathParams(endpointId, clusterId, eventId));
+        bool isUrgent;
+        ReturnErrorOnFailure(ParseEventPath(eventPathItem, endpointId, clusterId, eventId, isUrgent));
+        outEventPathParamsList.push_back(app::EventPathParams(endpointId, clusterId, eventId, isUrgent));
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId)
+CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId,
+                          bool & outIsUrgent)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jmethodID getEndpointIdMethod = nullptr;
     jmethodID getClusterIdMethod  = nullptr;
     jmethodID getEventIdMethod    = nullptr;
+    jmethodID isUrgentMethod      = nullptr;
 
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
         env, eventPath, "getEndpointId", "()Lchip/devicecontroller/model/ChipPathId;", &getEndpointIdMethod));
@@ -1457,6 +1461,7 @@ CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, Cluster
         env, eventPath, "getClusterId", "()Lchip/devicecontroller/model/ChipPathId;", &getClusterIdMethod));
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, eventPath, "getEventId",
                                                                  "()Lchip/devicecontroller/model/ChipPathId;", &getEventIdMethod));
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, eventPath, "isUrgent", "()Z", &isUrgentMethod));
 
     jobject endpointIdObj = env->CallObjectMethod(eventPath, getEndpointIdMethod);
     VerifyOrReturnError(endpointIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1464,6 +1469,7 @@ CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, Cluster
     VerifyOrReturnError(clusterIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
     jobject eventIdObj = env->CallObjectMethod(eventPath, getEventIdMethod);
     VerifyOrReturnError(eventIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    jboolean isUrgent = env->CallBooleanMethod(eventPath, isUrgentMethod);
 
     uint32_t endpointId = 0;
     ReturnErrorOnFailure(GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
@@ -1475,6 +1481,7 @@ CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, Cluster
     outEndpointId = static_cast<EndpointId>(endpointId);
     outClusterId  = static_cast<ClusterId>(clusterId);
     outEventId    = static_cast<EventId>(eventId);
+    outIsUrgent   = (isUrgent == JNI_TRUE);
 
     return CHIP_NO_ERROR;
 }

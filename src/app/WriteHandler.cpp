@@ -292,16 +292,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         err = element.GetPath(&attributePath);
         SuccessOrExit(err);
 
-        err = attributePath.GetEndpoint(&(dataAttributePath.mEndpointId));
-        SuccessOrExit(err);
-
-        err = attributePath.GetCluster(&(dataAttributePath.mClusterId));
-        SuccessOrExit(err);
-
-        err = attributePath.GetAttribute(&(dataAttributePath.mAttributeId));
-        SuccessOrExit(err);
-
-        err = attributePath.GetListIndex(dataAttributePath);
+        err = attributePath.GetConcreteAttributePath(dataAttributePath);
         SuccessOrExit(err);
 
         err = element.GetData(&dataReader);
@@ -407,13 +398,7 @@ CHIP_ERROR WriteHandler::ProcessGroupAttributeDataIBs(TLV::TLVReader & aAttribut
         err = element.GetPath(&attributePath);
         SuccessOrExit(err);
 
-        err = attributePath.GetCluster(&(dataAttributePath.mClusterId));
-        SuccessOrExit(err);
-
-        err = attributePath.GetAttribute(&(dataAttributePath.mAttributeId));
-        SuccessOrExit(err);
-
-        err = attributePath.GetListIndex(dataAttributePath);
+        err = attributePath.GetGroupAttributePath(dataAttributePath);
         SuccessOrExit(err);
 
         err = element.GetData(&dataReader);

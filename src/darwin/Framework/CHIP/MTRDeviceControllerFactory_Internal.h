@@ -24,6 +24,7 @@
 #import "MTRDeviceControllerFactory.h"
 
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/PeerId.h>
 
 class MTRPersistentStorageDelegateBridge;
 
@@ -46,6 +47,12 @@ NS_ASSUME_NONNULL_BEGIN
  * Find a running controller, if any, for the given fabric index.
  */
 - (nullable MTRDeviceController *)runningControllerForFabricIndex:(chip::FabricIndex)fabricIndex;
+
+/**
+ * Notify the controller factory that a new operational instance with the given
+ * compressed fabric id and node id has been observed.
+ */
+- (void)operationalInstanceAdded:(chip::PeerId &)operationalID;
 
 @property (readonly) MTRPersistentStorageDelegateBridge * storageDelegateBridge;
 @property (readonly) chip::Credentials::GroupDataProvider * groupData;
