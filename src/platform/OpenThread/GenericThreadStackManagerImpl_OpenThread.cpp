@@ -1698,7 +1698,10 @@ template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetRouterPromotion(bool val)
 {
     Impl()->LockThreadStack();
-    otThreadSetRouterEligible(DeviceLayer::ThreadStackMgrImpl().OTInstance(), val);
+    if (otThreadGetDeviceRole(DeviceLayer::ThreadStackMgrImpl().OTInstance()) != OT_DEVICE_ROLE_ROUTER)
+    {
+        otThreadSetRouterEligible(DeviceLayer::ThreadStackMgrImpl().OTInstance(), val);
+    }
     Impl()->UnlockThreadStack();
 }
 
