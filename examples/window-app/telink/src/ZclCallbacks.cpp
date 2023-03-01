@@ -25,7 +25,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/clusters/window-covering-server/window-covering-server.h>
+#include <app/clusters/window-covering-server/window-covering-delegate.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -59,16 +59,16 @@ void MatterWindowCoveringClusterServerAttributeChangedCallback(const app::Concre
         switch (attributePath.mAttributeId)
         {
         case Attributes::TargetPositionLiftPercent100ths::Id:
-            WindowCovering::Instance().StartMove(WindowCovering::MoveType::LIFT);
+            WindowCovering::Instance().StartMove(WindowCoveringType::Lift);
             break;
         case Attributes::TargetPositionTiltPercent100ths::Id:
-            WindowCovering::Instance().StartMove(WindowCovering::MoveType::TILT);
+            WindowCovering::Instance().StartMove(WindowCoveringType::Tilt);
             break;
         case Attributes::CurrentPositionLiftPercent100ths::Id:
-            WindowCovering::Instance().PositionLEDUpdate(WindowCovering::MoveType::LIFT);
+            WindowCovering::Instance().PositionLEDUpdate(WindowCoveringType::Lift);
             break;
         case Attributes::CurrentPositionTiltPercent100ths::Id:
-            WindowCovering::Instance().PositionLEDUpdate(WindowCovering::MoveType::TILT);
+            WindowCovering::Instance().PositionLEDUpdate(WindowCoveringType::Tilt);
             break;
         default:
             WindowCovering::Instance().SchedulePostAttributeChange(attributePath.mEndpointId, attributePath.mAttributeId);
