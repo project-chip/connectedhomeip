@@ -199,7 +199,11 @@ if (current_os == "android" || build_java_matter_controller) {
     ]
 
     if (build_java_matter_controller) {
-      deps += [ "${chip_root}/src/platform/Linux" ]
+      if (current_os == "mac") {
+        deps += [ "${chip_root}/src/platform/Darwin" ]
+      } else {
+        deps += [ "${chip_root}/src/platform/Linux" ]
+      }
     } else {
       deps += [ "${chip_root}/src/platform/android" ]
     }

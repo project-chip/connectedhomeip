@@ -26,47 +26,59 @@ void DiscoverCommissionablesCommandBase::OnDiscoveredDevice(const chip::Dnssd::D
 {
     nodeData.LogDetail();
     LogErrorOnFailure(RemoteDataModelLogger::LogDiscoveredNodeData(nodeData));
-    SetCommandExitStatus(CHIP_NO_ERROR);
+
+    if (mDiscoverOnce.ValueOr(true))
+    {
+        mCommissioner->RegisterDeviceDiscoveryDelegate(nullptr);
+        mCommissioner->StopCommissionableDiscovery();
+        SetCommandExitStatus(CHIP_NO_ERROR);
+    }
 }
 
 CHIP_ERROR DiscoverCommissionablesCommand::RunCommand()
 {
-    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+    mCommissioner = &CurrentCommissioner();
+    mCommissioner->RegisterDeviceDiscoveryDelegate(this);
     Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kNone, (uint64_t) 0);
-    return CurrentCommissioner().DiscoverCommissionableNodes(filter);
+    return mCommissioner->DiscoverCommissionableNodes(filter);
 }
 
 CHIP_ERROR DiscoverCommissionableByShortDiscriminatorCommand::RunCommand()
 {
-    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+    mCommissioner = &CurrentCommissioner();
+    mCommissioner->RegisterDeviceDiscoveryDelegate(this);
     chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kShortDiscriminator, mDiscriminator);
-    return CurrentCommissioner().DiscoverCommissionableNodes(filter);
+    return mCommissioner->DiscoverCommissionableNodes(filter);
 }
 
 CHIP_ERROR DiscoverCommissionableByLongDiscriminatorCommand::RunCommand()
 {
-    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+    mCommissioner = &CurrentCommissioner();
+    mCommissioner->RegisterDeviceDiscoveryDelegate(this);
     chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kLongDiscriminator, mDiscriminator);
-    return CurrentCommissioner().DiscoverCommissionableNodes(filter);
+    return mCommissioner->DiscoverCommissionableNodes(filter);
 }
 
 CHIP_ERROR DiscoverCommissionableByCommissioningModeCommand::RunCommand()
 {
-    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+    mCommissioner = &CurrentCommissioner();
+    mCommissioner->RegisterDeviceDiscoveryDelegate(this);
     chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kCommissioningMode);
-    return CurrentCommissioner().DiscoverCommissionableNodes(filter);
+    return mCommissioner->DiscoverCommissionableNodes(filter);
 }
 
 CHIP_ERROR DiscoverCommissionableByVendorIdCommand::RunCommand()
 {
-    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+    mCommissioner = &CurrentCommissioner();
+    mCommissioner->RegisterDeviceDiscoveryDelegate(this);
     chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kVendorId, mVendorId);
-    return CurrentCommissioner().DiscoverCommissionableNodes(filter);
+    return mCommissioner->DiscoverCommissionableNodes(filter);
 }
 
 CHIP_ERROR DiscoverCommissionableByDeviceTypeCommand::RunCommand()
 {
-    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+    mCommissioner = &CurrentCommissioner();
+    mCommissioner->RegisterDeviceDiscoveryDelegate(this);
     chip::Dnssd::DiscoveryFilter filter(chip::Dnssd::DiscoveryFilterType::kDeviceType, mDeviceType);
-    return CurrentCommissioner().DiscoverCommissionableNodes(filter);
+    return mCommissioner->DiscoverCommissionableNodes(filter);
 }

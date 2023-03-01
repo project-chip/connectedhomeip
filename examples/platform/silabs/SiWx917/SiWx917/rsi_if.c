@@ -69,7 +69,7 @@ bool hasNotifiedIPV4 = false;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 bool hasNotifiedWifiConnectivity = false;
 
-extern rsi_semaphore_handle_t sl_ble_init_sem;
+extern rsi_semaphore_handle_t sl_rs_ble_init_sem;
 /*
  * This file implements the interface to the RSI SAPIs
  */
@@ -340,7 +340,7 @@ static int32_t wfx_rsi_init(void)
     }
 #endif
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
-    rsi_semaphore_post(&sl_ble_init_sem);
+    rsi_semaphore_post(&sl_rs_ble_init_sem);
     WFX_RSI_LOG("%s: RSI: OK", __func__);
     return RSI_SUCCESS;
 }

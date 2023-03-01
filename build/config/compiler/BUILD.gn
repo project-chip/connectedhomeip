@@ -249,6 +249,10 @@ config("strict_warnings") {
     ]
   }
 
+  if (current_os == "mac" || current_os == "ios") {
+    cflags += [ "-Wconversion" ]
+  }
+
   if (build_java_matter_controller) {
     cflags -= [ "-Wshadow" ]
   }
@@ -535,6 +539,13 @@ config("size_default") {
 
 config("stack_protector_default") {
   cflags = [ "-fno-stack-protector" ]
+}
+
+config("prefix_mappings_default") {
+  cflags = []
+  foreach(prefix_mapping, prefix_mappings) {
+    cflags += [ "-fdebug-prefix-map=${prefix_mapping}" ]
+  }
 }
 
 config("pic_default") {

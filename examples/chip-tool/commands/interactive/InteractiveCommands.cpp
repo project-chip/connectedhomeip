@@ -43,6 +43,17 @@ void ENFORCE_FORMAT(3, 0) LoggingCallback(const char * module, uint8_t category,
     ClearLine();
 }
 
+class ScopedLock
+{
+public:
+    ScopedLock(std::mutex & mutex) : mMutex(mutex) { mMutex.lock(); }
+
+    ~ScopedLock() { mMutex.unlock(); }
+
+private:
+    std::mutex & mMutex;
+};
+
 struct InteractiveServerResultLog
 {
     std::string module;
@@ -58,14 +69,39 @@ struct InteractiveServerResult
     std::vector<std::string> mResults;
     std::vector<InteractiveServerResultLog> mLogs;
 
+    // The InteractiveServerResult instance (gInteractiveServerResult) is initially
+    // accessed on the main thread in InteractiveServerCommand::RunCommand, which is
+    // when chip-tool starts in 'interactive server' mode.
+    //
+    // Then command results are normally sent over the wire onto the main thread too
+    // when a command is received over WebSocket in InteractiveServerCommand::OnWebSocketMessageReceived
+    // which for most cases runs a command onto the chip thread and block until
+    // it is resolved (or until it timeouts).
+    //
+    // But in the meantime, when some parts of the command result happens, it is appended
+    // to the mResults vector onto the chip thread.
+    //
+    // For empty commands, which means that the test suite is *waiting* for some events
+    // (e.g a subscription report), the command results are sent over the chip thread
+    // (this is the isAsyncReport use case).
+    //
+    // Finally, logs can be appended from either the chip thread or the main thread.
+    //
+    // This class should be refactored to abstract that properly and reduce the scope of
+    // of the mutex, but in the meantime, the access to the members of this class are
+    // protected by a mutex.
+    std::mutex mMutex;
+
     void Setup(bool isAsyncReport)
     {
+        auto lock      = ScopedLock(mMutex);
         mEnabled       = true;
         mIsAsyncReport = isAsyncReport;
     }
 
     void Reset()
     {
+        auto lock      = ScopedLock(mMutex);
         mEnabled       = false;
         mIsAsyncReport = false;
         mStatus        = EXIT_SUCCESS;
@@ -73,10 +109,15 @@ struct InteractiveServerResult
         mLogs.clear();
     }
 
-    bool IsAsyncReport() const { return mIsAsyncReport; }
+    bool IsAsyncReport()
+    {
+        auto lock = ScopedLock(mMutex);
+        return mIsAsyncReport;
+    }
 
     void MaybeAddLog(const char * module, uint8_t category, const char * base64Message)
     {
+        auto lock = ScopedLock(mMutex);
         VerifyOrReturn(mEnabled);
 
         const char * messageType = nullptr;
@@ -98,12 +139,16 @@ struct InteractiveServerResult
 
     void MaybeAddResult(const char * result)
     {
+        auto lock = ScopedLock(mMutex);
         VerifyOrReturn(mEnabled);
+
         mResults.push_back(result);
     }
 
-    std::string AsJsonString() const
+    std::string AsJsonString()
     {
+        auto lock = ScopedLock(mMutex);
+
         std::string resultsStr;
         if (mResults.size())
         {
@@ -205,13 +250,6 @@ CHIP_ERROR InteractiveServerCommand::RunCommand()
     return CHIP_NO_ERROR;
 }
 
-void SendOverWebSocket(intptr_t context)
-{
-    auto server = reinterpret_cast<WebSocketServer *>(context);
-    server->Send(gInteractiveServerResult.AsJsonString().c_str());
-    gInteractiveServerResult.Reset();
-}
-
 bool InteractiveServerCommand::OnWebSocketMessageReceived(char * msg)
 {
     bool isAsyncReport = strlen(msg) == 0;
@@ -219,7 +257,8 @@ bool InteractiveServerCommand::OnWebSocketMessageReceived(char * msg)
     VerifyOrReturnValue(!isAsyncReport, true);
 
     auto shouldStop = ParseCommand(msg, &gInteractiveServerResult.mStatus);
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(SendOverWebSocket, reinterpret_cast<intptr_t>(&mWebSocketServer));
+    mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str());
+    gInteractiveServerResult.Reset();
     return shouldStop;
 }
 
@@ -228,7 +267,8 @@ CHIP_ERROR InteractiveServerCommand::LogJSON(const char * json)
     gInteractiveServerResult.MaybeAddResult(json);
     if (gInteractiveServerResult.IsAsyncReport())
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(SendOverWebSocket, reinterpret_cast<intptr_t>(&mWebSocketServer));
+        mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str());
+        gInteractiveServerResult.Reset();
     }
     return CHIP_NO_ERROR;
 }

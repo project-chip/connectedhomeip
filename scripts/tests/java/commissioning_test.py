@@ -18,12 +18,9 @@
 #
 
 import argparse
-import asyncio
 import logging
-import os
 import queue
 import subprocess
-import sys
 import threading
 import typing
 
@@ -46,7 +43,8 @@ class CommissioningTest:
         parser.add_argument('-s', '--setup-payload', dest='setup_payload',
                             help="Setup Payload (manual pairing code or QR code content)")
         parser.add_argument('-c', '--setup-pin-code', dest='setup_pin_code',
-                            help="Setup PIN code which can be used for password-authenticated session establishment (PASE) with the Commissionee")
+                            help=("Setup PIN code which can be used for password-authenticated "
+                                  "session establishment (PASE) with the Commissionee"))
         parser.add_argument('-n', '--nodeid', help="The Node ID issued to the device", default='1')
         parser.add_argument('-d', '--discriminator', help="Discriminator of the device", default='3840')
         parser.add_argument('-u', '--paa-trust-store-path', dest='paa_trust_store_path',
@@ -81,6 +79,14 @@ class CommissioningTest:
         DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
         return java_process.wait()
 
+    def TestCmdAddressPaseOnly(self, nodeid, setuppin, address, port, timeout):
+        java_command = self.command + ['pairing', 'address-paseonly', nodeid, setuppin, address, port, timeout]
+        logging.info(f"Execute: {java_command}")
+        java_process = subprocess.Popen(
+            java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
+        return java_process.wait()
+
     def RunTest(self):
         if self.command_name == 'onnetwork-long':
             logging.info("Testing pairing onnetwork-long")
@@ -92,5 +98,10 @@ class CommissioningTest:
             code = self.TestCmdAlreadyDiscovered(self.nodeid, self.setup_pin_code, self.address, self.port, self.timeout)
             if code != 0:
                 raise Exception(f"Testing pairing already-discovered failed with error {code}")
+        elif self.command_name == 'address-paseonly':
+            logging.info("Testing pairing address-paseonly")
+            code = self.TestCmdAddressPaseOnly(self.nodeid, self.setup_pin_code, self.address, self.port, self.timeout)
+            if code != 0:
+                raise Exception(f"Testing pairing address-paseonly failed with error {code}")
         else:
             raise Exception(f"Unsupported command {self.command_name}")

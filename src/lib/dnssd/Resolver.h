@@ -149,13 +149,12 @@ struct CommissionNodeData
     uint16_t vendorId                                         = 0;
     uint16_t productId                                        = 0;
     uint8_t commissioningMode                                 = 0;
-    // TODO: possibly 32-bit - see spec issue #3226
-    uint16_t deviceType                                    = 0;
-    char deviceName[kMaxDeviceNameLen + 1]                 = {};
-    uint8_t rotatingId[kMaxRotatingIdLen]                  = {};
-    size_t rotatingIdLen                                   = 0;
-    uint16_t pairingHint                                   = 0;
-    char pairingInstruction[kMaxPairingInstructionLen + 1] = {};
+    uint32_t deviceType                                       = 0;
+    char deviceName[kMaxDeviceNameLen + 1]                    = {};
+    uint8_t rotatingId[kMaxRotatingIdLen]                     = {};
+    size_t rotatingIdLen                                      = 0;
+    uint16_t pairingHint                                      = 0;
+    char pairingInstruction[kMaxPairingInstructionLen + 1]    = {};
 
     CommissionNodeData() {}
 
@@ -190,7 +189,7 @@ struct CommissionNodeData
         }
         if (deviceType > 0)
         {
-            ChipLogDetail(Discovery, "\tDevice Type: %u", deviceType);
+            ChipLogDetail(Discovery, "\tDevice Type: %" PRIu32, deviceType);
         }
         if (longDiscriminator > 0)
         {

@@ -44,11 +44,11 @@ void ENFORCE_FORMAT(1, 2) TLVPrettyPrinter(const char * aFormat, ...)
 namespace chip {
 namespace trace {
 
-const char * ToProtocolName(uint16_t protocolId)
+const char * ToProtocolName(uint16_t vendorId, uint16_t protocolId)
 {
     const char * name = nullptr;
 
-    auto protocol = Protocols::Id(VendorId::Common, protocolId);
+    auto protocol = Protocols::Id(static_cast<VendorId>(vendorId), protocolId);
     if (protocol == Protocols::SecureChannel::Id)
     {
         name = secure_channel::ToProtocolName();
@@ -77,11 +77,11 @@ const char * ToProtocolName(uint16_t protocolId)
     return name;
 }
 
-const char * ToProtocolMessageTypeName(uint16_t protocolId, uint8_t protocolCode)
+const char * ToProtocolMessageTypeName(uint16_t vendorId, uint16_t protocolId, uint8_t protocolCode)
 {
     const char * name = nullptr;
 
-    auto protocol = Protocols::Id(VendorId::Common, protocolId);
+    auto protocol = Protocols::Id(static_cast<VendorId>(vendorId), protocolId);
     if (protocol == Protocols::SecureChannel::Id)
     {
         name = secure_channel::ToProtocolMessageTypeName(protocolCode);
@@ -110,7 +110,7 @@ const char * ToProtocolMessageTypeName(uint16_t protocolId, uint8_t protocolCode
     return name;
 }
 
-CHIP_ERROR LogAsProtocolMessage(uint16_t protocolId, uint8_t protocolCode, const char * payload, size_t len,
+CHIP_ERROR LogAsProtocolMessage(uint16_t vendorId, uint16_t protocolId, uint8_t protocolCode, const char * payload, size_t len,
                                 bool interactionModelResponse)
 {
     constexpr uint16_t kMaxPayloadLen = 2048;
@@ -120,7 +120,7 @@ CHIP_ERROR LogAsProtocolMessage(uint16_t protocolId, uint8_t protocolCode, const
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    auto protocol = Protocols::Id(VendorId::Common, protocolId);
+    auto protocol = Protocols::Id(static_cast<VendorId>(vendorId), protocolId);
     if (protocol == Protocols::SecureChannel::Id)
     {
         err = secure_channel::LogAsProtocolMessage(protocolCode, data, dataLen);

@@ -24,6 +24,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/util/config.h>
 #include <jni.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPJNIError.h>
@@ -80,11 +81,13 @@ void ContentAppCommandDelegate::InvokeCommand(CommandHandlerInterface::HandlerCo
             env->ExceptionDescribe();
             env->ExceptionClear();
             FormatResponseData(handlerContext, "{\"value\":{}}");
-            return;
         }
-        JniUtfString respStr(env, resp);
-        ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand got response %s", respStr.c_str());
-        FormatResponseData(handlerContext, respStr.c_str());
+        else
+        {
+            JniUtfString respStr(env, resp);
+            ChipLogProgress(Zcl, "ContentAppCommandDelegate::InvokeCommand got response %s", respStr.c_str());
+            FormatResponseData(handlerContext, respStr.c_str());
+        }
         env->DeleteLocalRef(resp);
     }
     else

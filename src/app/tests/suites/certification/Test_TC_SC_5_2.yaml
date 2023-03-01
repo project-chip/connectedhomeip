@@ -135,6 +135,17 @@ tests:
               - name: "ms"
                 value: 1000
 
+    - label: "Verify there is no response from DUT"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: "!PICS_SDK_CI_ONLY"
+      arguments:
+          values:
+              - name: "message"
+                value: "Verify that there is no response from DUT"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH sends ViewGroup command"
       PICS: G.S.F00
       command: "ViewGroup"

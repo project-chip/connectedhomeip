@@ -31,7 +31,7 @@ config:
         defaultValue: 32769
     deviceType:
         type: int16u
-        defaultValue: 5
+        defaultValue: 65535
 
 tests:
     - label: "Stop target device"
@@ -105,8 +105,6 @@ tests:
 
     - label: "Check Hostname"
       PICS: "(MCORE.COM.WIFI || MCORE.COM.ETH) && !MCORE.COM.THR"
-      # On macOS the hostname is the device name and because of it this test is disabled for now.
-      disabled: true
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -114,14 +112,12 @@ tests:
               - name: "hostName"
                 constraints:
                     minLength: 12
-                    maxLength: 12
+                    maxLength: 16
                     isUpperCase: true
                     isHexString: true
 
     - label: "Check Hostname"
       PICS: "(!MCORE.COM.WIFI && !MCORE.COM.ETH) && MCORE.COM.THR"
-      # On macOS the hostname is the device name and because of it this test is disabled for now.
-      disabled: true
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:
@@ -165,8 +161,6 @@ tests:
                 value: vendorId
 
     - label: "Check Device Type ID (_T)"
-      # The device type is not broadcasted by the accessory under CI.
-      disabled: true
       PICS: MCORE.SC.DEVTYPE_SUBTYPE
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByDeviceType"
@@ -217,6 +211,7 @@ tests:
           values:
               - name: "mrpRetryIntervalIdle"
                 constraints:
+                    minValue: 0
                     maxValue: 3600000
 
     - label: "Optional TXT key for MRP Sleepy Active Interval (SAI)"
@@ -227,6 +222,7 @@ tests:
           values:
               - name: "mrpRetryIntervalActive"
                 constraints:
+                    minValue: 0
                     maxValue: 3600000
 
     - label: "TXT key for commissioning mode (CM)"
@@ -238,7 +234,6 @@ tests:
                 value: 1
 
     - label: "Optional TXT key for device type (DT)"
-      disabled: true
       PICS: MCORE.SC.DT_KEY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
@@ -246,10 +241,6 @@ tests:
           values:
               - name: "deviceType"
                 value: deviceType
-                constraints:
-                    # The specification says this is a number expressed as <ddd>, but it seems like it can goes
-                    # up to 0xBFFF (49151).
-                    maxValue: 999
 
     - label: "Optional TXT key for device name (DN)"
       PICS: MCORE.SC.DN_KEY

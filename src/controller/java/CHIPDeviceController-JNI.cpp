@@ -32,7 +32,6 @@
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
-#include <app/chip-zcl-zpro-codec.h>
 #include <app/util/error-mapping.h>
 #include <atomic>
 #include <ble/BleUUID.h>
@@ -84,7 +83,8 @@ static CHIP_ERROR ParseAttributePathList(jobject attributePathList,
 static CHIP_ERROR ParseAttributePath(jobject attributePath, EndpointId & outEndpointId, ClusterId & outClusterId,
                                      AttributeId & outAttributeId);
 static CHIP_ERROR ParseEventPathList(jobject eventPathList, std::vector<app::EventPathParams> & outEventPathParamsList);
-static CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId);
+static CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId,
+                                 bool & outIsUrgent);
 static CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard);
 static CHIP_ERROR CreateDeviceAttestationDelegateBridge(JNIEnv * env, jlong handle, jobject deviceAttestationDelegate,
                                                         jint failSafeExpiryTimeoutSecs,
@@ -304,6 +304,16 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
                                                         &getSkipCommissioningComplete);
     SuccessOrExit(err);
 
+    jmethodID getCountryCode;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getCountryCode", "()Ljava/util/Optional;",
+                                                        &getCountryCode);
+    SuccessOrExit(err);
+
+    jmethodID getRegulatoryLocation;
+    err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getRegulatoryLocation", "()Ljava/util/Optional;",
+                                                        &getRegulatoryLocation);
+    SuccessOrExit(err);
+
     jmethodID getKeypairDelegate;
     err = chip::JniReferences::GetInstance().FindMethod(env, controllerParams, "getKeypairDelegate",
                                                         "()Lchip/devicecontroller/KeypairDelegate;", &getKeypairDelegate);
@@ -346,6 +356,8 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
         bool attemptNetworkScanThread      = env->CallBooleanMethod(controllerParams, getAttemptNetworkScanThread);
         bool skipCommissioningComplete     = env->CallBooleanMethod(controllerParams, getSkipCommissioningComplete);
         uint64_t adminSubject              = env->CallLongMethod(controllerParams, getAdminSubject);
+        jobject countryCodeOptional        = env->CallObjectMethod(controllerParams, getCountryCode);
+        jobject regulatoryLocationOptional = env->CallObjectMethod(controllerParams, getRegulatoryLocation);
 
 #ifdef JAVA_MATTER_CONTROLLER_TEST
         std::unique_ptr<chip::Controller::ExampleOperationalCredentialsIssuer> opCredsIssuer(
@@ -378,6 +390,54 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self, jobject contr
             // if there is a valid adminSubject in the ControllerParams, then remember it
             CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
             commissioningParams.SetAdminSubject(adminSubject);
+            err = wrapper->UpdateCommissioningParameters(commissioningParams);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+                SuccessOrExit(err);
+            }
+        }
+
+        jobject countryCode;
+        err = chip::JniReferences::GetInstance().GetOptionalValue(countryCodeOptional, countryCode);
+        SuccessOrExit(err);
+
+        if (countryCode != nullptr)
+        {
+            jstring countryCodeStr = static_cast<jstring>(countryCode);
+            JniUtfString countryCodeJniString(env, countryCodeStr);
+
+            VerifyOrExit(countryCodeJniString.size() == 2, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+            chip::Controller::CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
+            commissioningParams.SetCountryCode(countryCodeJniString.charSpan());
+
+            // The wrapper internally has reserved storage for the country code and will copy the value.
+            err = wrapper->UpdateCommissioningParameters(commissioningParams);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
+                SuccessOrExit(err);
+            }
+        }
+
+        jobject regulatoryLocation;
+        err = chip::JniReferences::GetInstance().GetOptionalValue(regulatoryLocationOptional, regulatoryLocation);
+        SuccessOrExit(err);
+
+        if (regulatoryLocation != nullptr)
+        {
+            using namespace app::Clusters::GeneralCommissioning;
+
+            jint regulatoryLocationJint = chip::JniReferences::GetInstance().IntegerToPrimitive(regulatoryLocation);
+            VerifyOrExit(chip::CanCastTo<RegulatoryLocationType>(regulatoryLocationJint), err = CHIP_ERROR_INVALID_ARGUMENT);
+
+            RegulatoryLocationType regulatoryLocationType = static_cast<RegulatoryLocationType>(regulatoryLocationJint);
+            VerifyOrExit(regulatoryLocationType >= RegulatoryLocationType::kIndoor, err = CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrExit(regulatoryLocationType <= RegulatoryLocationType::kIndoorOutdoor, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+            chip::Controller::CommissioningParameters commissioningParams = wrapper->GetCommissioningParameters();
+            commissioningParams.SetDeviceRegulatoryLocation(regulatoryLocationType);
             err = wrapper->UpdateCommissioningParameters(commissioningParams);
             if (err != CHIP_NO_ERROR)
             {
@@ -1387,20 +1447,23 @@ CHIP_ERROR ParseEventPathList(jobject eventPathList, std::vector<app::EventPathP
         EndpointId endpointId;
         ClusterId clusterId;
         EventId eventId;
-        ReturnErrorOnFailure(ParseEventPath(eventPathItem, endpointId, clusterId, eventId));
-        outEventPathParamsList.push_back(app::EventPathParams(endpointId, clusterId, eventId));
+        bool isUrgent;
+        ReturnErrorOnFailure(ParseEventPath(eventPathItem, endpointId, clusterId, eventId, isUrgent));
+        outEventPathParamsList.push_back(app::EventPathParams(endpointId, clusterId, eventId, isUrgent));
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId)
+CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, ClusterId & outClusterId, EventId & outEventId,
+                          bool & outIsUrgent)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jmethodID getEndpointIdMethod = nullptr;
     jmethodID getClusterIdMethod  = nullptr;
     jmethodID getEventIdMethod    = nullptr;
+    jmethodID isUrgentMethod      = nullptr;
 
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(
         env, eventPath, "getEndpointId", "()Lchip/devicecontroller/model/ChipPathId;", &getEndpointIdMethod));
@@ -1408,6 +1471,7 @@ CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, Cluster
         env, eventPath, "getClusterId", "()Lchip/devicecontroller/model/ChipPathId;", &getClusterIdMethod));
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, eventPath, "getEventId",
                                                                  "()Lchip/devicecontroller/model/ChipPathId;", &getEventIdMethod));
+    ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, eventPath, "isUrgent", "()Z", &isUrgentMethod));
 
     jobject endpointIdObj = env->CallObjectMethod(eventPath, getEndpointIdMethod);
     VerifyOrReturnError(endpointIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1415,6 +1479,7 @@ CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, Cluster
     VerifyOrReturnError(clusterIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
     jobject eventIdObj = env->CallObjectMethod(eventPath, getEventIdMethod);
     VerifyOrReturnError(eventIdObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    jboolean isUrgent = env->CallBooleanMethod(eventPath, isUrgentMethod);
 
     uint32_t endpointId = 0;
     ReturnErrorOnFailure(GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
@@ -1426,6 +1491,7 @@ CHIP_ERROR ParseEventPath(jobject eventPath, EndpointId & outEndpointId, Cluster
     outEndpointId = static_cast<EndpointId>(endpointId);
     outClusterId  = static_cast<ClusterId>(clusterId);
     outEventId    = static_cast<EventId>(eventId);
+    outIsUrgent   = (isUrgent == JNI_TRUE);
 
     return CHIP_NO_ERROR;
 }

@@ -231,6 +231,7 @@ private:
 
     CHIP_ERROR SendSigma2Resume();
 
+    CHIP_ERROR DeriveSigmaKey(const ByteSpan & salt, const ByteSpan & info, Crypto::AutoReleaseSessionKey & key) const;
     CHIP_ERROR ConstructSaltSigma2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                    MutableByteSpan & salt);
     CHIP_ERROR ConstructTBSData(const ByteSpan & senderNOC, const ByteSpan & senderICAC, const ByteSpan & senderPubKey,
@@ -238,7 +239,7 @@ private:
     CHIP_ERROR ConstructSaltSigma3(const ByteSpan & ipk, MutableByteSpan & salt);
 
     CHIP_ERROR ConstructSigmaResumeKey(const ByteSpan & initiatorRandom, const ByteSpan & resumptionID, const ByteSpan & skInfo,
-                                       const ByteSpan & nonce, MutableByteSpan & resumeKey);
+                                       const ByteSpan & nonce, Crypto::AutoReleaseSessionKey & resumeKey);
 
     CHIP_ERROR GenerateSigmaResumeMIC(const ByteSpan & initiatorRandom, const ByteSpan & resumptionID, const ByteSpan & skInfo,
                                       const ByteSpan & nonce, MutableByteSpan & resumeMIC);

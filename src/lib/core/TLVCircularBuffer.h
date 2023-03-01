@@ -128,6 +128,17 @@ public:
                                    circular buffer.  See the ProcessEvictedElementFunct type definition on additional information on
                                    implementing the mProcessEvictedElement function. */
 
+protected:
+    /**
+     * @brief
+     *   returns the actual state of what our current available buffer space is
+     *
+     * @param[out] outBufStart The pointer to the current buffer
+     *
+     * @param[out] outBufLen   The available length for writing
+     */
+    void GetCurrentWritableBuffer(uint8_t *& outBufStart, uint32_t & outBufLen) const;
+
 private:
     uint8_t * mQueue;
     uint32_t mQueueSize;

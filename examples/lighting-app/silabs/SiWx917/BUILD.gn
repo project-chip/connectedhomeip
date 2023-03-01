@@ -58,6 +58,9 @@ declare_args() {
   # Argument to force enable WPA3 security on rs91x
   rs91x_wpa3_only = false
 
+  # use commissionable data for SiWx917
+  siwx917_commissionable_data = false
+
   #default WiFi SSID
   chip_default_wifi_ssid = ""
 
@@ -156,6 +159,10 @@ efr32_sdk("sdk") {
       "HAL_VCOM_ENABLE=1",
       "PW_RPC_ENABLED",
     ]
+  }
+
+  if (siwx917_commissionable_data) {
+    defines += [ "SIWX917_USE_COMISSIONABLE_DATA=1" ]
   }
 
   # WiFi Settings

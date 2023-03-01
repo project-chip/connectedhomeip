@@ -24,3 +24,7 @@ java_prebuilt("annotation") {
 java_prebuilt("json") {
   jar_path = "artifacts/json-20220924.jar"
 }
+
+java_prebuilt("kotlin-stdlib") {
+  jar_path = "artifacts/kotlin-stdlib-1.8.10.jar"
+}

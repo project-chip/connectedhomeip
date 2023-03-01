@@ -297,6 +297,22 @@ public:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
+    static CHIP_ERROR EnsureNoMembersRemaining(const char * label, const Json::Value & value)
+    {
+        auto remainingFields = value.getMemberNames();
+        if (remainingFields.size() == 0)
+        {
+            return CHIP_NO_ERROR;
+        }
+#if CHIP_ERROR_LOGGING
+        for (auto & field : remainingFields)
+        {
+            ChipLogError(chipTool, "Unexpected field name: '%s.%s'", label, field.c_str());
+        }
+#endif // CHIP_ERROR_LOGGING
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     template <typename T>
     static void Finalize(T & request)
     {
@@ -353,6 +369,8 @@ public:
     virtual ~ComplexArgument() {}
 
     virtual CHIP_ERROR Parse(const char * label, const char * json) = 0;
+
+    virtual void Reset() = 0;
 };
 
 template <typename T>
@@ -385,6 +403,8 @@ public:
 
         return ComplexArgumentParser::Setup(label, *mRequest, value);
     }
+
+    void Reset() { *mRequest = T(); }
 
 private:
     T * mRequest;

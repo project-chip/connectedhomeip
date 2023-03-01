@@ -196,10 +196,12 @@ using namespace chip::Credentials;
     chip::MutableByteSpan chipCertBytes(chipCertBuffer);
 
     CHIP_ERROR errorCode = chip::Credentials::ConvertX509CertToChipCert(x509CertBytes, chipCertBytes);
-    MTR_LOG_ERROR("convertX509Certificate: %s", chip::ErrorStr(errorCode));
-
-    if (errorCode != CHIP_NO_ERROR)
+    if (errorCode != CHIP_NO_ERROR) {
+        MTR_LOG_ERROR("convertX509Certificate: %s", errorCode.AsString());
         return nil;
+    }
+
+    MTR_LOG_INFO("convertX509Certificate: Success");
 
     return AsData(chipCertBytes);
 }

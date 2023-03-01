@@ -45,7 +45,4 @@ public:
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
-
-private:
-    chip::Optional<bool> mDiscoverOnce;
 };

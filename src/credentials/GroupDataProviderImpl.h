@@ -17,6 +17,7 @@
 #pragma once
 
 #include <credentials/GroupDataProvider.h>
+#include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/Pool.h>
 
@@ -41,6 +42,9 @@ public:
      * @param storage Pointer to storage instance to set. Cannot be nullptr, will assert.
      */
     void SetStorageDelegate(PersistentStorageDelegate * storage);
+
+    void SetSessionKeystore(Crypto::SessionKeystore * keystore) { mSessionKeystore = keystore; }
+    Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
 
     CHIP_ERROR Init() override;
     void Finish() override;
@@ -152,23 +156,35 @@ protected:
     public:
         GroupKeyContext(GroupDataProviderImpl & provider) : mProvider(provider) {}
 
-        GroupKeyContext(GroupDataProviderImpl & provider, const ByteSpan & encryptionKey, uint16_t hash,
-                        const ByteSpan & privacyKey) :
+        GroupKeyContext(GroupDataProviderImpl & provider, const Crypto::Aes128KeyByteArray & encryptionKey, uint16_t hash,
+                        const Crypto::Aes128KeyByteArray & privacyKey) :
             mProvider(provider)
+
         {
-            SetKey(encryptionKey, hash);
-            SetPrivacyKey(privacyKey);
+            Initialize(encryptionKey, hash, privacyKey);
         }
 
-        void SetKey(const ByteSpan & encryptionKey, uint16_t hash)
+        void Initialize(const Crypto::Aes128KeyByteArray & encryptionKey, uint16_t hash,
+                        const Crypto::Aes128KeyByteArray & privacyKey)
         {
+            ReleaseKeys();
             mKeyHash = hash;
-            memcpy(mEncryptionKey, encryptionKey.data(), std::min(encryptionKey.size(), sizeof(mEncryptionKey)));
+            // TODO: Load group keys to the session keystore upon loading from persistent storage
+            //
+            // Group keys should be transformed into a key handle as soon as possible or even
+            // the key storage should be taken over by SessionKeystore interface, but this looks
+            // like more work, so let's use the transitional code below for now.
+
+            Crypto::SessionKeystore * keystore = mProvider.GetSessionKeystore();
+            keystore->CreateKey(encryptionKey, mEncryptionKey);
+            keystore->CreateKey(privacyKey, mPrivacyKey);
         }
 
-        void SetPrivacyKey(const ByteSpan & privacyKey)
+        void ReleaseKeys()
         {
-            memcpy(mPrivacyKey, privacyKey.data(), std::min(privacyKey.size(), sizeof(mPrivacyKey)));
+            Crypto::SessionKeystore * keystore = mProvider.GetSessionKeystore();
+            keystore->DestroyKey(mEncryptionKey);
+            keystore->DestroyKey(mPrivacyKey);
         }
 
         uint16_t GetKeyHash() override { return mKeyHash; }
@@ -184,9 +200,9 @@ protected:
 
     protected:
         GroupDataProviderImpl & mProvider;
-        uint16_t mKeyHash                                                      = 0;
-        uint8_t mEncryptionKey[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES] = { 0 };
-        uint8_t mPrivacyKey[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES]    = { 0 };
+        uint16_t mKeyHash = 0;
+        Crypto::Aes128KeyHandle mEncryptionKey;
+        Crypto::Aes128KeyHandle mPrivacyKey;
     };
 
     class KeySetIteratorImpl : public KeySetIterator
@@ -230,7 +246,8 @@ protected:
     bool IsInitialized() { return (mStorage != nullptr); }
     CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id);
 
-    chip::PersistentStorageDelegate * mStorage = nullptr;
+    PersistentStorageDelegate * mStorage       = nullptr;
+    Crypto::SessionKeystore * mSessionKeystore = nullptr;
     ObjectPool<GroupInfoIteratorImpl, kIteratorsMax> mGroupInfoIterators;
     ObjectPool<GroupKeyIteratorImpl, kIteratorsMax> mGroupKeyIterators;
     ObjectPool<EndpointIteratorImpl, kIteratorsMax> mEndpointIterators;

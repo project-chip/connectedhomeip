@@ -21,6 +21,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <app/util/generic-callbacks.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -38,6 +39,7 @@
 #include <app-common/zap-generated/callback.h>
 
 using namespace chip;
+using namespace chip::app;
 
 //------------------------------------------------------------------------------
 // Globals
@@ -68,10 +70,18 @@ uint16_t emberEndpointCount = 0;
 // we need this data block for the defaults
 #if (defined(GENERATED_DEFAULTS) && GENERATED_DEFAULTS_COUNT)
 constexpr const uint8_t generatedDefaults[] = GENERATED_DEFAULTS;
+#define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
+    {                                                                                                                              \
+        &generatedDefaults[index]                                                                                                  \
+    }
 #endif // GENERATED_DEFAULTS
 
 #if (defined(GENERATED_MIN_MAX_DEFAULTS) && GENERATED_MIN_MAX_DEFAULT_COUNT)
 constexpr const EmberAfAttributeMinMaxValue minMaxDefaults[] = GENERATED_MIN_MAX_DEFAULTS;
+#define ZAP_MIN_MAX_DEFAULTS_INDEX(index)                                                                                          \
+    {                                                                                                                              \
+        &minMaxDefaults[index]                                                                                                     \
+    }
 #endif // GENERATED_MIN_MAX_DEFAULTS
 
 #ifdef GENERATED_FUNCTION_ARRAYS
@@ -80,14 +90,20 @@ GENERATED_FUNCTION_ARRAYS
 
 #ifdef GENERATED_COMMANDS
 constexpr const chip::CommandId generatedCommands[] = GENERATED_COMMANDS;
+#define ZAP_GENERATED_COMMANDS_INDEX(index) (&generatedCommands[index])
 #endif // GENERATED_COMMANDS
 
 #if (defined(GENERATED_EVENTS) && (GENERATED_EVENT_COUNT > 0))
 constexpr const chip::EventId generatedEvents[] = GENERATED_EVENTS;
+#define ZAP_GENERATED_EVENTS_INDEX(index) (&generatedEvents[index])
 #endif // GENERATED_EVENTS
 
-constexpr const EmberAfAttributeMetadata generatedAttributes[]      = GENERATED_ATTRIBUTES;
-constexpr const EmberAfCluster generatedClusters[]                  = GENERATED_CLUSTERS;
+constexpr const EmberAfAttributeMetadata generatedAttributes[] = GENERATED_ATTRIBUTES;
+#define ZAP_ATTRIBUTE_INDEX(index) (&generatedAttributes[index])
+
+constexpr const EmberAfCluster generatedClusters[] = GENERATED_CLUSTERS;
+#define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
+
 constexpr const EmberAfEndpointType generatedEmberAfEndpointTypes[] = GENERATED_ENDPOINT_TYPES;
 constexpr const EmberAfDeviceType fixedDeviceTypeList[]             = FIXED_DEVICE_TYPES;
 
@@ -359,6 +375,56 @@ static void initializeEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
         {
             ((EmberAfInitFunction) f)(definedEndpoint->endpoint);
         }
+    }
+}
+
+static void shutdownEndpoint(EmberAfDefinedEndpoint * definedEndpoint)
+{
+    // Call shutdown callbacks from clusters, mainly for canceling pending timers
+    uint8_t clusterIndex;
+    const EmberAfEndpointType * epType = definedEndpoint->endpointType;
+    for (clusterIndex = 0; clusterIndex < epType->clusterCount; clusterIndex++)
+    {
+        const EmberAfCluster * cluster  = &(epType->cluster[clusterIndex]);
+        EmberAfGenericClusterFunction f = emberAfFindClusterFunction(cluster, CLUSTER_MASK_SHUTDOWN_FUNCTION);
+        if (f != nullptr)
+        {
+            ((EmberAfShutdownFunction) f)(definedEndpoint->endpoint);
+        }
+    }
+
+    // Clear out any command handler overrides registered for this
+    // endpoint.
+    chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandlers(definedEndpoint->endpoint);
+
+    // Clear out any attribute access overrides registered for this
+    // endpoint.
+    app::AttributeAccessInterface * prev = nullptr;
+    app::AttributeAccessInterface * cur  = gAttributeAccessOverrides;
+    while (cur)
+    {
+        app::AttributeAccessInterface * next = cur->GetNext();
+        if (cur->MatchesEndpoint(definedEndpoint->endpoint))
+        {
+            // Remove it from the list
+            if (prev)
+            {
+                prev->SetNext(next);
+            }
+            else
+            {
+                gAttributeAccessOverrides = next;
+            }
+
+            cur->SetNext(nullptr);
+
+            // Do not change prev in this case.
+        }
+        else
+        {
+            prev = cur;
+        }
+        cur = next;
     }
 }
 
@@ -852,10 +918,6 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
     {
         emAfEndpoints[index].bitmask |= EMBER_AF_ENDPOINT_ENABLED;
     }
-    else
-    {
-        emAfEndpoints[index].bitmask &= EMBER_AF_ENDPOINT_DISABLED;
-    }
 
 #if defined(EZSP_HOST)
     ezspSetEndpointFlags(endpoint, (enable ? EZSP_ENDPOINT_ENABLED : EZSP_ENDPOINT_DISABLED));
@@ -870,55 +932,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
         }
         else
         {
-            uint8_t i;
-            for (i = 0; i < emAfEndpoints[index].endpointType->clusterCount; i++)
-            {
-                const EmberAfCluster * cluster = &((emAfEndpoints[index].endpointType->cluster)[i]);
-                //        emberAfCorePrintln("Disabling cluster tick for ep:%d, cluster:0x%2X, %p",
-                //                           endpoint,
-                //                           cluster->clusterId,
-                //                           ((cluster->mask & CLUSTER_MASK_CLIENT)
-                //                            ? "client"
-                //                            : "server"));
-                //        emberAfCoreFlush();
-                emberAfDeactivateClusterTick(
-                    endpoint, cluster->clusterId,
-                    (cluster->mask & CLUSTER_MASK_CLIENT ? EMBER_AF_CLIENT_CLUSTER_TICK : EMBER_AF_SERVER_CLUSTER_TICK));
-            }
-
-            // Clear out any command handler overrides registered for this
-            // endpoint.
-            chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandlers(endpoint);
-
-            // Clear out any attribute access overrides registered for this
-            // endpoint.
-            app::AttributeAccessInterface * prev = nullptr;
-            app::AttributeAccessInterface * cur  = gAttributeAccessOverrides;
-            while (cur)
-            {
-                app::AttributeAccessInterface * next = cur->GetNext();
-                if (cur->MatchesEndpoint(endpoint))
-                {
-                    // Remove it from the list
-                    if (prev)
-                    {
-                        prev->SetNext(next);
-                    }
-                    else
-                    {
-                        gAttributeAccessOverrides = next;
-                    }
-
-                    cur->SetNext(nullptr);
-
-                    // Do not change prev in this case.
-                }
-                else
-                {
-                    prev = cur;
-                }
-                cur = next;
-            }
+            shutdownEndpoint(&(emAfEndpoints[index]));
         }
 
         EndpointId parentEndpointId = emberAfParentEndpointFromIndex(index);
@@ -937,6 +951,11 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
 
         MatterReportingAttributeChangeCallback(/* endpoint = */ 0, app::Clusters::Descriptor::Id,
                                                app::Clusters::Descriptor::Attributes::PartsList::Id);
+    }
+
+    if (!enable)
+    {
+        emAfEndpoints[index].bitmask &= EMBER_AF_ENDPOINT_DISABLED;
     }
 
     return true;

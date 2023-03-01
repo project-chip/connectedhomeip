@@ -33,6 +33,9 @@ config:
     PakeVerifier:
         type: octet_string
         defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
 
 tests:
     - label: "Precondition: Reset Devices to factory defaults"
@@ -79,6 +82,14 @@ tests:
                 value: 1000
               - name: "Salt"
                 value: "SPAKE2P Key Salt"
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     #Check for DNS-SD advertisement CM is not possible in YAML
     - label: "Verify that the DNS-SD advertisement shows CM=2"
@@ -305,6 +316,14 @@ tests:
                 value: 1000
               - name: "Salt"
                 value: "SPAKE2P Key Salt"
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     - label:
           "TH_CR1 starts a commissioning process with DUT_CE before the timeout
