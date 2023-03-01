@@ -57,12 +57,12 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
         return;
     }
     icmp_payload += sizeof(struct ra_header);
-    payload_len -= sizeof(struct ra_header);
+    payload_len = (uint16_t)(payload_len - sizeof(struct ra_header));
 
     while (payload_len >= 2)
     {
         uint8_t opt_type = icmp_payload[0];
-        uint8_t opt_len  = icmp_payload[1] << 3;
+        uint8_t opt_len  = (uint8_t)(icmp_payload[1] << 3);
 
         if (opt_type == ND6_OPTION_TYPE_ROUTE_INFO && opt_len >= sizeof(route_option_t) - sizeof(ip6_addr_p_t) &&
             !is_self_address(netif, src_addr) && payload_len >= opt_len)
@@ -75,9 +75,9 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
             {
                 break;
             }
-            uint8_t prefix_len_bytes = (route_option.prefix_length + 7) / 8;
-            int8_t preference        = -2 * ((route_option.preference >> 4) & 1) + (((route_option.preference) >> 3) & 1);
-            uint8_t rio_data_len     = opt_len - sizeof(route_option) + sizeof(ip6_addr_p_t);
+            uint8_t prefix_len_bytes = (uint8_t)((route_option.prefix_length + 7) / 8);
+            int8_t preference        = (int8_t)(-2 * ((route_option.preference >> 4) & 1) + (((route_option.preference) >> 3) & 1));
+            uint8_t rio_data_len     = (uint8_t)(opt_len - sizeof(route_option) + sizeof(ip6_addr_p_t));
 
             ESP_LOGI(TAG, "Received RIO");
             if (rio_data_len >= prefix_len_bytes)
@@ -101,7 +101,7 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
             }
         }
         icmp_payload += opt_len;
-        payload_len -= opt_len;
+        payload_len = (uint16_t)(payload_len - opt_len);
     }
 }
 
@@ -136,7 +136,7 @@ static uint8_t icmp6_raw_recv_handler(void * arg, struct raw_pcb * pcb, struct p
         return 0;
     }
 
-    icmp_payload_len = p->tot_len - sizeof(struct ip6_hdr);
+    icmp_payload_len = (uint16_t)(p->tot_len - sizeof(struct ip6_hdr));
     icmp_payload     = p->payload + sizeof(struct ip6_hdr);
 
     icmp6_header = (struct icmp6_hdr *) icmp_payload;
@@ -155,7 +155,12 @@ esp_err_t esp_route_hook_init(esp_netif_t * netif)
     esp_err_t ret           = ESP_OK;
 
     ESP_RETURN_ON_FALSE(netif != NULL, ESP_ERR_INVALID_ARG, TAG, "Invalid network interface");
-    lwip_netif = netif_get_by_index(esp_netif_get_netif_impl_index(netif));
+    int netif_idx = esp_netif_get_netif_impl_index(netif);
+    if (netif_idx < 0 || netif_idx > UINT8_MAX)
+    {
+        return ESP_ERR_INVALID_SIZE;
+    }
+    lwip_netif = netif_get_by_index((uint8_t) netif_idx);
     ESP_RETURN_ON_FALSE(lwip_netif != NULL, ESP_ERR_INVALID_ARG, TAG, "Invalid network interface");
 
     for (esp_route_hook_t * iter = s_hooks; iter != NULL; iter++)
