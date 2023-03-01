@@ -215,7 +215,7 @@ private:
     bool mSEDActiveModeEnabled = false;
 #endif
 
-#if CHIP_DEVICE_CONFIG_THREAD_FTD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_THREAD_FTD
     bool mRecoverRouterDeviceRole = false;
 #endif
 
