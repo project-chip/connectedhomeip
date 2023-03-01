@@ -52,6 +52,9 @@ public class DiscoveredNodeData {
   public DiscoveredNodeData(NsdServiceInfo serviceInfo) {
     Map<String, byte[]> attributes = serviceInfo.getAttributes();
     this.deviceName = new String(attributes.get(KEY_DEVICE_NAME), StandardCharsets.UTF_8);
+    if (serviceInfo.getHost() != null) {
+      this.hostName = serviceInfo.getHost().getHostName();
+    }
     this.deviceType =
         Long.parseLong(new String(attributes.get(KEY_DEVICE_TYPE), StandardCharsets.UTF_8));
 

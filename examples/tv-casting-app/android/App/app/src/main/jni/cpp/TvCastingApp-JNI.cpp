@@ -209,7 +209,7 @@ JNI_METHOD(jboolean, verifyOrEstablishConnection)
         [](CHIP_ERROR err) { TvCastingAppJNIMgr().getOnConnectionFailureHandler(true).Handle(err); },
         [](TargetEndpointInfo * endpoint) { TvCastingAppJNIMgr().getOnNewOrUpdatedEndpointHandler(true).Handle(endpoint); });
     VerifyOrExit(CHIP_NO_ERROR == err,
-                 ChipLogError(AppServer, "CastingServer::OpenBasicCommissioningWindow failed: %" CHIP_ERROR_FORMAT, err.Format()));
+                 ChipLogError(AppServer, "CastingServer::verifyOrEstablishConnection failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
 exit:
     return (err == CHIP_NO_ERROR);

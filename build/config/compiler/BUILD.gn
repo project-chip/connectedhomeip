@@ -249,6 +249,10 @@ config("strict_warnings") {
     ]
   }
 
+  if (current_os == "mac" || current_os == "ios") {
+    cflags += [ "-Wconversion" ]
+  }
+
   if (build_java_matter_controller) {
     cflags -= [ "-Wshadow" ]
   }
