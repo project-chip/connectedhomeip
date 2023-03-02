@@ -110,7 +110,7 @@ zap project [Releases](https://github.com/project-chip/zap/releases)
 ### Linux ARM
 
 Zap does not provide binary releases for arm. Rosetta solves this for Darwin,
-however for linux arm you will have to use a local ZAP, generall through
+however for linux arm you will have to use a local ZAP, generally through
 setting `$ZAP_DEVELOPMENT_PATH` (see the section `Which zap to use` below).
 
 The file `scripts/setup/zap.json` contains the version that CIPD would download,
