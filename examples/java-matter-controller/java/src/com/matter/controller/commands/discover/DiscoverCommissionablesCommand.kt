@@ -23,11 +23,12 @@ import com.matter.controller.commands.common.CredentialsIssuer
 import com.matter.controller.commands.common.MatterCommand
 import java.util.concurrent.TimeUnit
 
+private const val MAX_DISCOVERED_DEVICES = 10
+private const val TIME_TO_WAIT_FOR_RESULTS_SECONDS = 7L
+
 class DiscoverCommissionablesCommand(
   controller: ChipDeviceController, credsIssuer: CredentialsIssuer?
 ) : MatterCommand(controller, "commissionables", credsIssuer) {
-  private val MAX_DISCOVERED_DEVICES = 10
-  private val TIME_TO_WAIT_FOR_RESULTS_SECONDS: Long = 7
 
   override fun runCommand() {
     currentCommissioner().discoverCommissionableNodes()
@@ -38,10 +39,10 @@ class DiscoverCommissionablesCommand(
       throw RuntimeException(e)
     }
 
-    getDiscoveredDevice()
+    logDiscoveredDevice()
   }
 
-  private fun getDiscoveredDevice() {
+  private fun logDiscoveredDevice() {
     // Log at most MAX_DISCOVERED_DEVICES discovered devices
     for (i in 0 until MAX_DISCOVERED_DEVICES) {
       val device: DiscoveredDevice = currentCommissioner().getDiscoveredDevice(i) ?: break
