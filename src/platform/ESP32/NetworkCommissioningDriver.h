@@ -41,8 +41,9 @@ public:
         }
 
         item.security.SetRaw(mpScanResults[mIternum].authmode);
-        item.ssidLen =
-            strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
+        static_assert(chip::DeviceLayer::Internal::kMaxWiFiSSIDLength <= UINT8_MAX, "SSID length might not fit in item.ssidLen");
+        item.ssidLen = static_cast<uint8_t>(
+            strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
         item.channel  = mpScanResults[mIternum].primary;
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
         item.rssi     = mpScanResults[mIternum].rssi;
@@ -115,7 +116,7 @@ public:
     void OnNetworkStatusChange();
 
     CHIP_ERROR SetLastDisconnectReason(const ChipDeviceEvent * event);
-    int32_t GetLastDisconnectReason();
+    uint16_t GetLastDisconnectReason();
 
     static ESPWiFiDriver & GetInstance()
     {
@@ -132,7 +133,7 @@ private:
     ScanCallback * mpScanCallback;
     ConnectCallback * mpConnectCallback;
     NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
-    int32_t mLastDisconnectedReason;
+    uint16_t mLastDisconnectedReason;
 };
 
 } // namespace NetworkCommissioning

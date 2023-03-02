@@ -154,7 +154,7 @@ CHIP_ERROR attributeBufferToNumericTlvData(TLV::TLVWriter & writer, bool isNulla
 {
     typename NumericAttributeTraits<T>::StorageType value;
     memcpy(&value, attributeData, sizeof(value));
-    TLV::Tag tag = TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData));
+    TLV::Tag tag = TLV::ContextTag(AttributeDataIB::Tag::kData);
     if (isNullable && NumericAttributeTraits<T>::IsNullValue(value))
     {
         return writer.PutNull(tag);
@@ -610,7 +610,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         bool isNullable                    = attributeMetadata->IsNullable();
         TLV::TLVWriter * writer            = attributeDataIBBuilder.GetWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
-        TLV::Tag tag = TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData));
+        TLV::Tag tag = TLV::ContextTag(AttributeDataIB::Tag::kData);
         switch (BaseType(attributeType))
         {
         case ZCL_NO_DATA_ATTRIBUTE_TYPE: // No data

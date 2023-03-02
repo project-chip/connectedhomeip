@@ -93,7 +93,7 @@ SubscribeResponseMessage::Builder & SubscribeResponseMessage::Builder::Subscript
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kSubscriptionId)), aSubscribeId);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kSubscriptionId), aSubscribeId);
     }
     return *this;
 }
@@ -102,7 +102,7 @@ SubscribeResponseMessage::Builder & SubscribeResponseMessage::Builder::MaxInterv
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kMaxInterval)), aMaxInterval);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kMaxInterval), aMaxInterval);
     }
     return *this;
 }

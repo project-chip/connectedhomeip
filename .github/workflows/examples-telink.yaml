@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-telink:0.6.40
+            image: connectedhomeip/chip-build-telink:0.6.44
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -158,6 +158,15 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d pump-controller-app \
                     out/telink-tlsr9518adk80d-pump-controller/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: Build example Telink Temperature Measurement App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-temperature-measurement' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d temperature-measurement-app \
+                    out/telink-tlsr9518adk80d-temperature-measurement/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: Build example Telink Thermostat App

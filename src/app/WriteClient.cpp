@@ -225,7 +225,7 @@ CHIP_ERROR WriteClient::TryPutSinglePreencodedAttributeWritePayload(const Concre
 
     ReturnErrorOnFailure(PrepareAttributeIB(attributePath));
     VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(writer->CopyElement(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), dataToWrite));
+    ReturnErrorOnFailure(writer->CopyElement(TLV::ContextTag(AttributeDataIB::Tag::kData), dataToWrite));
     ReturnErrorOnFailure(FinishAttributeIB());
     return CHIP_NO_ERROR;
 }
