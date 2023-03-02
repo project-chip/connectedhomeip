@@ -734,12 +734,14 @@ JNI_METHOD(void, updateCommissioningNetworkCredentials)
     {
         ChipLogError(Controller, "ApplyNetworkCredentials failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        return;
     }
     err = wrapper->UpdateCommissioningParameters(commissioningParams);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "UpdateCommissioningParameters failed. Err = %" CHIP_ERROR_FORMAT, err.Format());
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        return;
     }
 
     // Only invoke NetworkCredentialsReady when called in response to NetworkScan result
@@ -919,6 +921,7 @@ JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlon
     {
         ChipLogError(Controller, "Failed to get device address.");
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        return nullptr;
     }
 
     addr.ToString(addrStr);
@@ -962,6 +965,7 @@ JNI_METHOD(jobject, getNetworkLocation)(JNIEnv * env, jobject self, jlong handle
     {
         ChipLogError(Controller, "Failed to get device address.");
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        return nullptr;
     }
 
     addr.GetIPAddress().ToString(addrStr);
@@ -1176,6 +1180,7 @@ JNI_METHOD(jbyteArray, getAttestationChallenge)
     {
         ChipLogProgress(Controller, "Could not cast device pointer to Device object");
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INCORRECT_STATE);
+        return nullptr;
     }
 
     err = chipDevice->GetAttestationChallenge(attestationChallenge);
@@ -1260,6 +1265,7 @@ JNI_METHOD(void, subscribe)
     {
         ChipLogError(Controller, "No device found");
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INCORRECT_STATE);
+        return;
     }
 
     std::vector<app::AttributePathParams> attributePathParamsList;
@@ -1311,6 +1317,7 @@ JNI_METHOD(void, read)
     {
         ChipLogError(Controller, "No device found");
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INCORRECT_STATE);
+        return;
     }
 
     std::vector<app::AttributePathParams> attributePathParamsList;
