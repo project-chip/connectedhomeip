@@ -3,7 +3,7 @@
 
 # You can set these variables from the command line, and also
 # from the environment for the first two.
-SPHINXOPTS    ?= -W --keep-going -c . -d _build/doctrees
+SPHINXOPTS    ?= -W --keep-going -T -c . -d _build/doctrees
 SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = _build/src
 BUILDDIR      = _build
@@ -18,4 +18,4 @@ help:
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile
 	mkdir -p "$(SOURCEDIR)"
-	@$(SPHINXBUILD) -T -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
