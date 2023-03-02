@@ -87,34 +87,52 @@ CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiRssi(int8_t & rssi)
     return err;
 }
 
-// below will be implemented when the WiFi driver exposes Zephyr NET_STATISTICS API
 CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err = WiFiManager::Instance().GetNetworkStatistics(stats);
+    beaconLostCount = stats.mBeaconsLostCount;
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err = WiFiManager::Instance().GetNetworkStatistics(stats);
+    beaconRxCount = stats.mBeaconsSuccessCount;
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err = WiFiManager::Instance().GetNetworkStatistics(stats);
+    packetMulticastRxCount = stats.mPacketMulticastRxCount;
+    return err;
 }
+
 CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err = WiFiManager::Instance().GetNetworkStatistics(stats);
+    packetMulticastTxCount = stats.mPacketMulticastTxCount;
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err = WiFiManager::Instance().GetNetworkStatistics(stats);
+    packetUnicastRxCount = stats.mPacketUnicastRxCount;
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    WiFiManager::NetworkStatistics stats;
+    CHIP_ERROR err = WiFiManager::Instance().GetNetworkStatistics(stats);
+    packetUnicastTxCount = stats.mPacketUnicastTxCount;
+    return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
