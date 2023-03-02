@@ -116,9 +116,6 @@ static uint8_t CC_buffer[scenes::kMaxFieldsPerCluster] = { 0 };
 class TestSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
-    static constexpr uint8_t kMaxValueSize = 4;
-    static constexpr uint8_t kMaxAvPair    = 15;
-
     TestSceneHandler() = default;
     ~TestSceneHandler() override {}
 
