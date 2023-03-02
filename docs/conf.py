@@ -30,6 +30,7 @@ exclude_patterns = [
     "**/android/App/app/libs*",
     "examples/providers/README.md",
     "examples/thermostat/nxp/linux-se05x/README.md",
+    "examples/common/m5stack-tft/repo",
 ]
 
 
@@ -40,18 +41,21 @@ html_logo = "_static/images/logo.png"
 html_favicon = "_static/images/favicon.ico"
 html_static_path = ["_static"]
 html_theme_options = {
-    "logo_only": True,
     "github_url": "https://github.com/project-chip/connectedhomeip",
     "repository_url": "https://github.com/project-chip/connectedhomeip",
     "use_edit_page_button": True,
     "repository_branch": "master",
     "path_to_docs": "docs",
+    "icon_links": [],
 }
 
 # -- Options for MyST --------------------------------------------------------
 
 myst_heading_anchors = 6
-suppress_warnings = ["myst.header", "myst.anchor"]
+suppress_warnings = [
+    "myst.header",
+    "myst.anchor",
+]
 myst_enable_extensions = ["html_image"]
 
 
@@ -66,6 +70,7 @@ external_content_contents = [
     (MATTER_BASE, "examples/**/*.JPG"),
 ]
 external_content_link_prefixes = [
+    ".",
     "src/",
     r"\.vscode/",
     "CONTRIBUTING",
