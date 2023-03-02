@@ -114,12 +114,11 @@ however for linux arm you will have to use a local ZAP, generally through
 setting `$ZAP_DEVELOPMENT_PATH` (see the section `Which zap to use` below).
 
 The file `scripts/setup/zap.json` contains the version that CIPD would download,
-so you can download a compatible version from 
+so you can download a compatible version from
 https://github.com/project-chip/zap/releases. To checkout as source code the
 corresponding tag should exist at https://github.com/project-chip/zap/tags.
 
 Example commands:
-
 
 ```sh
 RUN set -x \
