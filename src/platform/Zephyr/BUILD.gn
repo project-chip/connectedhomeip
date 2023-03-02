@@ -76,4 +76,6 @@ static_library("Zephyr") {
   if (chip_malloc_sys_heap) {
     sources += [ "SysHeapMalloc.cpp" ]
   }
+
+  cflags = [ "-Wconversion" ]
 }

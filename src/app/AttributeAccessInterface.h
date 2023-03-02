@@ -80,7 +80,7 @@ public:
     CHIP_ERROR EncodeValue(AttributeReportIBs::Builder & aAttributeReportIBs, T && item, Ts &&... aArgs)
     {
         return DataModel::Encode(*(aAttributeReportIBs.GetAttributeReport().GetAttributeData().GetWriter()),
-                                 TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), item, std::forward<Ts>(aArgs)...);
+                                 TLV::ContextTag(AttributeDataIB::Tag::kData), item, std::forward<Ts>(aArgs)...);
     }
 
     template <typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true, typename... Ts>
@@ -88,7 +88,7 @@ public:
                            Ts &&... aArgs)
     {
         return DataModel::EncodeForRead(*(aAttributeReportIBs.GetAttributeReport().GetAttributeData().GetWriter()),
-                                        TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), accessingFabricIndex, item);
+                                        TLV::ContextTag(AttributeDataIB::Tag::kData), accessingFabricIndex, item);
     }
 };
 
