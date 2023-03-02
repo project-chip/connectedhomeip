@@ -78,20 +78,22 @@ NetworkCommissioning::WiFiScanResponse ToScanResponse(const wifi_scan_result * r
 // to the ones defined in the Matter spec (11.14.3.2. WiFiVersion enum)
 uint8_t MapToMatterWiFiVersionCode(wifi_link_mode wifiVersion)
 {
+    using app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum;
+
     if (wifiVersion < WIFI_1 || wifiVersion > WIFI_6E)
     {
         ChipLogError(DeviceLayer, "Unsupported Wi-Fi version detected");
-        return EMBER_ZCL_WI_FI_VERSION_TYPE_802__11A; // let's return 'a' by default
+        return static_cast<uint8_t>(WiFiVersionEnum::kA); // let's return 'a' by default
     }
 
     switch (wifiVersion)
     {
     case WIFI_1:
-        return EMBER_ZCL_WI_FI_VERSION_TYPE_802__11B;
+        return static_cast<uint8_t>(WiFiVersionEnum::kB);
     case WIFI_2:
-        return EMBER_ZCL_WI_FI_VERSION_TYPE_802__11A;
+        return static_cast<uint8_t>(WiFiVersionEnum::kA);
     case WIFI_6E:
-        return EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AX; // treat as 802.11ax
+        return static_cast<uint8_t>(WiFiVersionEnum::kAx); // treat as 802.11ax
     default:
         break;
     }
@@ -104,20 +106,22 @@ uint8_t MapToMatterWiFiVersionCode(wifi_link_mode wifiVersion)
 // to the ones defined in the Matter spec (11.14.3.1. SecurityType enum)
 uint8_t MapToMatterSecurityType(wifi_security_type securityType)
 {
+    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
+
     switch (securityType)
     {
     case WIFI_SECURITY_TYPE_NONE:
-        return EMBER_ZCL_SECURITY_TYPE_NONE;
+        return static_cast<uint8_t>(SecurityTypeEnum::kNone);
     case WIFI_SECURITY_TYPE_PSK:
     case WIFI_SECURITY_TYPE_PSK_SHA256:
-        return EMBER_ZCL_SECURITY_TYPE_WPA2;
+        return static_cast<uint8_t>(SecurityTypeEnum::kWpa2);
     case WIFI_SECURITY_TYPE_SAE:
-        return EMBER_ZCL_SECURITY_TYPE_WPA3;
+        return static_cast<uint8_t>(SecurityTypeEnum::kWpa3);
     default:
         break;
     }
 
-    return EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED;
+    return static_cast<uint8_t>(SecurityTypeEnum::kUnspecified);
 }
 
 } // namespace
