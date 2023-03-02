@@ -115,8 +115,9 @@ setting `$ZAP_DEVELOPMENT_PATH` (see the section `Which zap to use` below).
 
 The file `scripts/setup/zap.json` contains the version that CIPD would download,
 so you can download a compatible version from the zap project
-[Releases](https://github.com/project-chip/zap/releases). To checkout as source code the corresponding tag should exist in
-the zap [repository tags](https://github.com/project-chip/zap/tags) list.
+[Releases](https://github.com/project-chip/zap/releases). To checkout as source
+code the corresponding tag should exist in the zap
+[repository tags](https://github.com/project-chip/zap/tags) list.
 
 Example commands:
 
