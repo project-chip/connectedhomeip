@@ -120,12 +120,12 @@ CHIP_ERROR StatusIB::Parser::PrettyPrint() const
 
 StatusIB::Builder & StatusIB::Builder::EncodeStatusIB(const StatusIB & aStatusIB)
 {
-    mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kStatus)), aStatusIB.mStatus);
+    mError = mpWriter->Put(TLV::ContextTag(Tag::kStatus), aStatusIB.mStatus);
     SuccessOrExit(mError);
 
     if (aStatusIB.mClusterStatus.HasValue())
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kClusterStatus)), aStatusIB.mClusterStatus.Value());
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kClusterStatus), aStatusIB.mClusterStatus.Value());
         SuccessOrExit(mError);
     }
 

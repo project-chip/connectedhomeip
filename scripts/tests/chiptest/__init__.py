@@ -84,10 +84,12 @@ def _GetManualTests() -> Set[str]:
 
 
 def _GetFlakyTests() -> Set[str]:
-    """List of flaky tests, ideally this list should become empty."""
-    return {
-        "Test_TC_OO_2_4.yaml"
-    }
+    """List of flaky tests.
+
+    While this list is empty, it remains here in case we need to quickly add a new test
+    that is flaky.
+    """
+    return set()
 
 
 def _GetSlowTests() -> Set[str]:
