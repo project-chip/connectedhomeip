@@ -71,10 +71,5 @@ external_content_contents = [
 ]
 external_content_link_prefixes = [
     ".",
-    "src/",
-    r"\.vscode/",
-    "CONTRIBUTING",
-    "scripts/",
-    "examples/android/",
 ]
 external_content_link_extensions = [".md", ".png", ".jpg", ".svg"]
