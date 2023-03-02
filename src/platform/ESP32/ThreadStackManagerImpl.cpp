@@ -52,13 +52,13 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
-    openthread_launch_task();
+    openthread_init_stack();
     return GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(esp_openthread_get_instance());
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
 {
-    // Intentionally empty.
+    openthread_launch_task();
     return CHIP_NO_ERROR;
 }
 
