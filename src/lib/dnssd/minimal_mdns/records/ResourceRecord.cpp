@@ -56,13 +56,13 @@ bool ResourceRecord::Append(HeaderRef & hdr, ResourceType asType, RecordWriter &
         switch (asType)
         {
         case ResourceType::kAdditional:
-            hdr.SetAdditionalCount(hdr.GetAdditionalCount() + 1);
+            hdr.SetAdditionalCount(static_cast<uint16_t>(hdr.GetAdditionalCount() + 1));
             break;
         case ResourceType::kAuthority:
-            hdr.SetAuthorityCount(hdr.GetAuthorityCount() + 1);
+            hdr.SetAuthorityCount(static_cast<uint16_t>(hdr.GetAuthorityCount() + 1));
             break;
         case ResourceType::kAnswer:
-            hdr.SetAnswerCount(hdr.GetAnswerCount() + 1);
+            hdr.SetAnswerCount(static_cast<uint16_t>(hdr.GetAnswerCount() + 1));
             break;
         }
     }

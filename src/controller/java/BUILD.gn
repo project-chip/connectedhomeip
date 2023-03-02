@@ -138,10 +138,31 @@ if (chip_link_tests) {
   }
 }
 
+kotlin_library("tlv") {
+  output_name = "libCHIPTlv.jar"
+
+  deps = [ "${chip_root}/third_party/java_deps:protobuf-java" ]
+
+  sources = [
+    "src/chip/tlv/Element.kt",
+    "src/chip/tlv/TlvReader.kt",
+    "src/chip/tlv/TlvWriter.kt",
+    "src/chip/tlv/tags.kt",
+    "src/chip/tlv/types.kt",
+    "src/chip/tlv/utils.kt",
+    "src/chip/tlv/values.kt",
+  ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
 android_library("java") {
   output_name = "CHIPController.jar"
 
-  deps = [ "${chip_root}/third_party/java_deps:annotation" ]
+  deps = [
+    ":tlv",
+    "${chip_root}/third_party/java_deps:annotation",
+  ]
 
   data_deps = [ ":jni" ]
 
