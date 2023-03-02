@@ -46,6 +46,7 @@ html_theme_options = {
     "use_edit_page_button": True,
     "repository_branch": "master",
     "path_to_docs": "docs",
+    "icon_links": [],
 }
 
 # -- Options for MyST --------------------------------------------------------
