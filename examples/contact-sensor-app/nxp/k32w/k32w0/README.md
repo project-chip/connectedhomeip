@@ -38,6 +38,7 @@ network.
     -   [OTA Testing](#ota-testing)
     -   [Known issues ota](#known-issues-ota)
 -   [Low power](#low-power)
+
     -   [Known issues power](#known-issues-low-power)
 
 -   [Removing SSBL Upgrade region](#removing-ssbl-upgrade-region)

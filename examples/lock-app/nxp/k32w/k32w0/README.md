@@ -34,6 +34,7 @@ network.
 -   [Tinycrypt ECC library](#tinycrypt-ecc-library)
     -   [Building steps](#building-steps-1)
 -   [Low power](#low-power)
+
     -   [Known issues](#known-issues-low-power)
 
     </hr>
