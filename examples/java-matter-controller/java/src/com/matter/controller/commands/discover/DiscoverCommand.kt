@@ -24,12 +24,12 @@ import java.util.concurrent.atomic.AtomicLong
 
 class DiscoverCommand(controller: ChipDeviceController, credsIssuer: CredentialsIssuer?) :
   MatterCommand(controller, "resolve", credsIssuer) {
-  private val mNodeId: AtomicLong = AtomicLong()
-  private val mFabricId: AtomicLong = AtomicLong()
+  private val nodeId: AtomicLong = AtomicLong()
+  private val fabricId: AtomicLong = AtomicLong()
 
   init {
-    addArgument("nodeid", 0, Long.MAX_VALUE, mNodeId, null, false)
-    addArgument("fabricid", 0, Long.MAX_VALUE, mFabricId, null, false)
+    addArgument("nodeid", 0, Long.MAX_VALUE, nodeId, null, false)
+    addArgument("fabricid", 0, Long.MAX_VALUE, fabricId, null, false)
   }
 
   override fun runCommand() {}

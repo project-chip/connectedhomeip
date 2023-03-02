@@ -22,60 +22,39 @@ import chip.devicecontroller.ControllerParams
 import com.matter.controller.commands.common.*
 import com.matter.controller.commands.discover.*
 import com.matter.controller.commands.pairing.*
-import java.util.ArrayList
 
-private fun registerCommandsDiscover(
+private fun getDiscoveryCommands(
   controller: ChipDeviceController,
-  commandManager: CommandManager,
   credentialsIssuer: CredentialsIssuer
-) {
-  val clusterCommands: ArrayList<Command> = ArrayList<Command>()
-  val discoverCommand = DiscoverCommand(controller, credentialsIssuer)
-  val discoverCommissionablesCommand = DiscoverCommissionablesCommand(controller, credentialsIssuer)
-  val discoverCommissionersCommand = DiscoverCommissionersCommand(controller, credentialsIssuer)
-  clusterCommands.add(discoverCommand)
-  clusterCommands.add(discoverCommissionablesCommand)
-  clusterCommands.add(discoverCommissionersCommand)
-  commandManager.register("discover", clusterCommands)
+): List<Command> {
+  return listOf(
+    DiscoverCommand(controller, credentialsIssuer),
+    DiscoverCommissionablesCommand(controller, credentialsIssuer),
+    DiscoverCommissionersCommand(controller, credentialsIssuer),
+  )
 }
 
-private fun registerCommandsPairing(
+private fun getPairingCommands(
   controller: ChipDeviceController,
-  commandManager: CommandManager,
   credentialsIssuer: CredentialsIssuer
-) {
-  val clusterCommands: ArrayList<Command> = ArrayList<Command>()
-  val unpairCommand = UnpairCommand(controller, credentialsIssuer)
-  val pairCodeCommand = PairCodeCommand(controller, credentialsIssuer)
-  val pairCodePaseCommand = PairCodePaseCommand(controller, credentialsIssuer)
-  val pairCodeWifiCommand = PairCodeWifiCommand(controller, credentialsIssuer)
-  val pairCodeThreadCommand = PairCodeThreadCommand(controller, credentialsIssuer)
-  val pairAddressPaseCommand = PairAddressPaseCommand(controller, credentialsIssuer)
-  val pairAlreadyDiscoveredCommand = PairAlreadyDiscoveredCommand(controller, credentialsIssuer)
-  val pairOnNetworkCommand = PairOnNetworkCommand(controller, credentialsIssuer)
-  val pairOnNetworkShortCommand = PairOnNetworkShortCommand(controller, credentialsIssuer)
-  val pairOnNetworkLongCommand = PairOnNetworkLongCommand(controller, credentialsIssuer)
-  val pairOnNetworkVendorCommand = PairOnNetworkVendorCommand(controller, credentialsIssuer)
-  val pairOnNetworkCommissioningModeCommand = PairOnNetworkCommissioningModeCommand(controller, credentialsIssuer)
-  val pairOnNetworkCommissionerCommand = PairOnNetworkCommissionerCommand(controller, credentialsIssuer)
-  val pairOnNetworkDeviceTypeCommand = PairOnNetworkDeviceTypeCommand(controller, credentialsIssuer)
-  val pairOnNetworkInstanceNameCommand = PairOnNetworkInstanceNameCommand(controller, credentialsIssuer)
-  clusterCommands.add(unpairCommand)
-  clusterCommands.add(pairCodeCommand)
-  clusterCommands.add(pairCodePaseCommand)
-  clusterCommands.add(pairCodeWifiCommand)
-  clusterCommands.add(pairCodeThreadCommand)
-  clusterCommands.add(pairAddressPaseCommand)
-  clusterCommands.add(pairAlreadyDiscoveredCommand)
-  clusterCommands.add(pairOnNetworkCommand)
-  clusterCommands.add(pairOnNetworkShortCommand)
-  clusterCommands.add(pairOnNetworkLongCommand)
-  clusterCommands.add(pairOnNetworkVendorCommand)
-  clusterCommands.add(pairOnNetworkCommissioningModeCommand)
-  clusterCommands.add(pairOnNetworkCommissionerCommand)
-  clusterCommands.add(pairOnNetworkDeviceTypeCommand)
-  clusterCommands.add(pairOnNetworkInstanceNameCommand)
-  commandManager.register("pairing", clusterCommands)
+): List<Command> {
+  return listOf(
+    UnpairCommand(controller, credentialsIssuer),
+    PairCodeCommand(controller, credentialsIssuer),
+    PairCodePaseCommand(controller, credentialsIssuer),
+    PairCodeWifiCommand(controller, credentialsIssuer),
+    PairCodeThreadCommand(controller, credentialsIssuer),
+    PairAddressPaseCommand(controller, credentialsIssuer),
+    PairAlreadyDiscoveredCommand(controller, credentialsIssuer),
+    PairOnNetworkCommand(controller, credentialsIssuer),
+    PairOnNetworkShortCommand(controller, credentialsIssuer),
+    PairOnNetworkLongCommand(controller, credentialsIssuer),
+    PairOnNetworkVendorCommand(controller, credentialsIssuer),
+    PairOnNetworkCommissioningModeCommand(controller, credentialsIssuer),
+    PairOnNetworkCommissionerCommand(controller, credentialsIssuer),
+    PairOnNetworkDeviceTypeCommand(controller, credentialsIssuer),
+    PairOnNetworkInstanceNameCommand(controller, credentialsIssuer),
+  )
 }
 
 fun main(args: Array<String>) {
@@ -88,8 +67,10 @@ fun main(args: Array<String>) {
   )
   val credentialsIssuer = CredentialsIssuer()
   val commandManager = CommandManager()
-  registerCommandsDiscover(controller, commandManager, credentialsIssuer)
-  registerCommandsPairing(controller, commandManager, credentialsIssuer)
+
+  commandManager.register("discover", getDiscoveryCommands(controller, credentialsIssuer))
+  commandManager.register("pairing", getPairingCommands(controller, credentialsIssuer))
+
   try {
     commandManager.run(args)
   } catch (e: Exception) {

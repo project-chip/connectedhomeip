@@ -68,11 +68,12 @@ run the following command:
 sudo apt-get purge kotlin
 ```
 
-Install kotlin compiler 1.8.10
+Install kotlin compiler 1.8.10 or above, such as
+[kotlin-compiler-1.8.10-url](https://github.com/JetBrains/kotlin/releases/download/v1.8.10/kotlin-compiler-1.8.10.zip)
 
 ```shell
 cd /usr/lib \
-&& sudo wget -q https://github.com/JetBrains/kotlin/releases/download/v1.8.10/kotlin-compiler-1.8.10.zip \
+&& sudo wget -q [kotlin-compiler-1.8.10-url] \
 && sudo unzip kotlin-compiler-*.zip \
 && sudo rm kotlin-compiler-*.zip \
 && sudo rm -f kotlinc/bin/*.bat

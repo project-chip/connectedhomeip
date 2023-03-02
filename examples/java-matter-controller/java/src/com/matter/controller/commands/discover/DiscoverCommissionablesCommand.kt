@@ -21,18 +21,19 @@ import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.DiscoveredDevice
 import com.matter.controller.commands.common.CredentialsIssuer
 import com.matter.controller.commands.common.MatterCommand
+import java.util.concurrent.TimeUnit
 
 class DiscoverCommissionablesCommand(
   controller: ChipDeviceController, credsIssuer: CredentialsIssuer?
 ) : MatterCommand(controller, "commissionables", credsIssuer) {
   private val MAX_DISCOVERED_DEVICES = 10
+  private val TIME_TO_WAIT_FOR_RESULTS_SECONDS: Long = 7
 
   override fun runCommand() {
     currentCommissioner().discoverCommissionableNodes()
 
-    // Pause for 7 seconds
     try {
-      Thread.sleep(7000)
+      TimeUnit.SECONDS.sleep(TIME_TO_WAIT_FOR_RESULTS_SECONDS)
     } catch (e: InterruptedException) {
       throw RuntimeException(e)
     }
