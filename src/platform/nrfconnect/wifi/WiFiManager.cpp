@@ -477,7 +477,7 @@ void WiFiManager::ConnectHandler(Platform::UniquePtr<uint8_t> data)
 
             // Workaround needed to re-initialize mDNS server after Wi-Fi interface is operative
             chip::DeviceLayer::ChipDeviceEvent event;
-            event.Type = chip::DeviceLayer::DeviceEventType::kDnssdPlatformInitialized;
+            event.Type = chip::DeviceLayer::DeviceEventType::kDnssdInitialized;
 
             CHIP_ERROR error = chip::DeviceLayer::PlatformMgr().PostEvent(&event);
             if (error != CHIP_NO_ERROR)
