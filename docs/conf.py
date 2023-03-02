@@ -55,12 +55,6 @@ myst_heading_anchors = 6
 suppress_warnings = [
     "myst.header",
     "myst.anchor",
-    # TODO: temporary disable because of .md being stipped for "README.md" in
-    # various files:
-    #    README.md (top level)
-    #    examples/light-switch-app/nrfconnect/README.md
-    "myst.xref_missing",
-
 ]
 myst_enable_extensions = ["html_image"]
 
@@ -76,6 +70,7 @@ external_content_contents = [
     (MATTER_BASE, "examples/**/*.JPG"),
 ]
 external_content_link_prefixes = [
+    ".",
     "src/",
     r"\.vscode/",
     "CONTRIBUTING",
