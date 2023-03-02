@@ -20,8 +20,8 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app/ConcreteAttributePath.h>
-#include <lib/support/logging/CHIPLogging.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 
 #include <lib/shell/Engine.h>
@@ -31,7 +31,6 @@
 using namespace chip;
 using namespace chip::Shell;
 using namespace chip::app;
-using namespace chip::app::Clusters;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 namespace {
