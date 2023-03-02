@@ -72,8 +72,8 @@ external_content_contents = [
 external_content_link_prefixes = [
     "src/",
     r"\.vscode/",
-    "CONTRIBUTING", # cannot detect CONTRIBUTING.md
-    "README", # cannot detect README.md
+    "CONTRIBUTING",  # cannot detect CONTRIBUTING.md
+    "README",  # cannot detect README.md
     "scripts/",
     "examples/android/",
 ]
