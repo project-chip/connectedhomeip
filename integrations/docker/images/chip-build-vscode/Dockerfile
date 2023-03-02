@@ -28,6 +28,7 @@ COPY --from=nrf /opt/NordicSemiconductor/nrfconnect /opt/NordicSemiconductor/nrf
 
 COPY --from=android /opt/android/sdk /opt/android/sdk
 COPY --from=android /opt/android/android-ndk-r21b /opt/android/android-ndk-r21b
+COPY --from=android /usr/lib/kotlinc/bin /usr/lib/kotlinc/bin
 
 COPY --from=mbedos /opt/openocd/ /opt/openocd/
 
@@ -86,6 +87,7 @@ RUN set -x \
     && pip3 install bflb-iot-tool \
     && : # last line
 
+ENV PATH $PATH:/usr/lib/kotlinc/bin
 ENV AMEBA_PATH=/opt/ameba/ambd_sdk_with_chip_non_NDA
 ENV ANDROID_HOME=/opt/android/sdk
 ENV ANDROID_NDK_HOME=/opt/android/android-ndk-r21b
