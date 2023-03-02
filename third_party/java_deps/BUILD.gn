@@ -28,3 +28,7 @@ java_prebuilt("json") {
 java_prebuilt("kotlin-stdlib") {
   jar_path = "artifacts/kotlin-stdlib-1.8.10.jar"
 }
+
+java_prebuilt("protobuf-java") {
+  jar_path = "artifacts/protobuf-java-3.22.0.jar"
+}
