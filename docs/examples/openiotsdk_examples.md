@@ -241,7 +241,7 @@ ${MATTER_ROOT}/scripts/run_in_ns.sh ARMns ${MATTER_ROOT}/scripts/examples/openio
 ### Commissioning
 
 Once booted the application can be commissioned, please refer to
-[docs/guides/openiotsdk_commissioning.md](/../guides/openiotsdk_commissioning.md)
+[docs/guides/openiotsdk_commissioning.md](../guides/openiotsdk_commissioning.md)
 for further instructions.
 
 ## Testing
