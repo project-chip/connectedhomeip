@@ -86,13 +86,13 @@ CHIP_ERROR CommandDataIB::Parser::PrettyPrint() const
 CHIP_ERROR CommandDataIB::Parser::GetPath(CommandPathIB::Parser * const apPath) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kPath)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kPath), reader));
     return apPath->Init(reader);
 }
 
 CHIP_ERROR CommandDataIB::Parser::GetFields(TLV::TLVReader * const apReader) const
 {
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kFields)), *apReader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kFields), *apReader));
     return CHIP_NO_ERROR;
 }
 

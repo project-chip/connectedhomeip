@@ -27,6 +27,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/PlatformManager.h>
 #include <platform/Zephyr/DiagnosticDataProviderImpl.h>
@@ -48,11 +49,20 @@ static k_timer sOperationalHoursSavingTimer;
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
     const struct device * entropy = DEVICE_DT_GET(DT_CHOSEN(zephyr_entropy));
-    int ret                       = entropy_get_entropy(entropy, output, len);
+    uint16_t clampedLen;
+    if (CanCastTo<uint16_t>(len))
+    {
+        clampedLen = static_cast<uint16_t>(len);
+    }
+    else
+    {
+        clampedLen = UINT16_MAX;
+    }
+    int ret = entropy_get_entropy(entropy, output, clampedLen);
 
     if (ret == 0)
     {
-        *olen = len;
+        *olen = clampedLen;
     }
     else
     {
@@ -85,7 +95,7 @@ void PlatformManagerImpl::UpdateOperationalHours(intptr_t arg)
     if (ConfigurationMgr().GetTotalOperationalHours(reinterpret_cast<uint32_t &>(totalOperationalHours)) == CHIP_NO_ERROR)
     {
         ConfigurationMgr().StoreTotalOperationalHours(
-            totalOperationalHours + deltaTime < UINT32_MAX ? totalOperationalHours + deltaTime : UINT32_MAX);
+            static_cast<uint32_t>(totalOperationalHours + deltaTime < UINT32_MAX ? totalOperationalHours + deltaTime : UINT32_MAX));
         sInstance.mSavedOperationalHoursSinceBoot = upTimeH;
     }
     else

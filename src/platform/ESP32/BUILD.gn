@@ -123,4 +123,6 @@ static_library("ESP32") {
       "ESP32DeviceInfoProvider.h",
     ]
   }
+
+  cflags = [ "-Wconversion" ]
 }

@@ -39,7 +39,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32-qemu:0.6.40
+            image: connectedhomeip/chip-build-esp32-qemu:0.6.44
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -103,7 +103,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-tizen-qemu:0.6.39
+            image: connectedhomeip/chip-build-tizen-qemu:0.6.44
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 

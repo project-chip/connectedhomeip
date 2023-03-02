@@ -30,6 +30,7 @@ class TelinkApp(Enum):
     OTA_REQUESTOR = auto()
     PUMP = auto()
     PUMP_CONTROLLER = auto()
+    TEMPERATURE_MEASUREMENT = auto()
     THERMOSTAT = auto()
 
     def ExampleName(self):
@@ -51,6 +52,8 @@ class TelinkApp(Enum):
             return 'pump-app'
         elif self == TelinkApp.PUMP_CONTROLLER:
             return 'pump-controller-app'
+        elif self == TelinkApp.TEMPERATURE_MEASUREMENT:
+            return 'temperature-measurement-app'
         elif self == TelinkApp.THERMOSTAT:
             return 'thermostat'
         else:
@@ -75,6 +78,8 @@ class TelinkApp(Enum):
             return 'chip-telink-pump-example'
         elif self == TelinkApp.PUMP_CONTROLLER:
             return 'chip-telink-pump-controller-example'
+        elif self == TelinkApp.TEMPERATURE_MEASUREMENT:
+            return 'chip-telink-temperature-measurement-example'
         elif self == TelinkApp.THERMOSTAT:
             return 'chip-telink-thermostat-example'
         else:
