@@ -3,14 +3,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
+    <Button
         android:id="@+id/commissionable_player_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:text="blah"
-        android:textAlignment="center"
-        android:textColor="@android:color/black"
-        android:textSize="20dp" />
+        android:padding="10dp" />
 
 </LinearLayout>

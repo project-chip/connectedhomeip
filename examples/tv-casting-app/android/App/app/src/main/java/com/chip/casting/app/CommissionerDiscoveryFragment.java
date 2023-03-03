@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.chip.casting.DiscoveredNodeData;
@@ -76,18 +75,11 @@ public class CommissionerDiscoveryFragment extends Fragment {
     View.OnClickListener manualCommissioningButtonOnClickListener =
         v -> callback.handleCommissioningButtonClicked(null);
     manualCommissioningButton.setOnClickListener(manualCommissioningButtonOnClickListener);
+
     ArrayAdapter<DiscoveredNodeData> arrayAdapter =
         new VideoPlayerCommissionerAdapter(getActivity(), commissionerVideoPlayerList);
     final ListView list = getActivity().findViewById(R.id.commissionerList);
     list.setAdapter(arrayAdapter);
-    list.setOnItemClickListener(
-        (parent, view1, position, id) -> {
-          DiscoveredNodeData discoveredNodeData =
-              (DiscoveredNodeData) parent.getItemAtPosition(position);
-          Log.d(TAG, "OnItemClickListener.onClick called for " + discoveredNodeData);
-          Callback callback1 = (Callback) getActivity();
-          callback1.handleCommissioningButtonClicked(discoveredNodeData);
-        });
 
     this.successCallback =
         new SuccessCallback<DiscoveredNodeData>() {
@@ -157,21 +149,32 @@ public class CommissionerDiscoveryFragment extends Fragment {
 
 class VideoPlayerCommissionerAdapter extends ArrayAdapter<DiscoveredNodeData> {
   private final List<DiscoveredNodeData> playerList;
+  private final Context context;
   private LayoutInflater inflater;
+  private static final String TAG = VideoPlayerCommissionerAdapter.class.getSimpleName();
 
-  public VideoPlayerCommissionerAdapter(
-      Context applicationContext, List<DiscoveredNodeData> playerList) {
-    super(applicationContext, 0, playerList);
+  public VideoPlayerCommissionerAdapter(Context context, List<DiscoveredNodeData> playerList) {
+    super(context, 0, playerList);
+    this.context = context;
     this.playerList = playerList;
-    inflater = (LayoutInflater.from(applicationContext));
+    inflater = (LayoutInflater.from(context));
   }
 
   @Override
   public View getView(int i, View view, ViewGroup viewGroup) {
     view = inflater.inflate(R.layout.commissionable_player_list_item, null);
     String buttonText = getCommissionerButtonText(playerList.get(i));
-    TextView playerDescription = view.findViewById(R.id.commissionable_player_description);
+    Button playerDescription = view.findViewById(R.id.commissionable_player_description);
     playerDescription.setText(buttonText);
+    View.OnClickListener clickListener =
+        v -> {
+          DiscoveredNodeData discoveredNodeData = playerList.get(i);
+          Log.d(TAG, "OnItemClickListener.onClick called for " + discoveredNodeData);
+          CommissionerDiscoveryFragment.Callback callback1 =
+              (CommissionerDiscoveryFragment.Callback) context;
+          callback1.handleCommissioningButtonClicked(discoveredNodeData);
+        };
+    playerDescription.setOnClickListener(clickListener);
     return view;
   }
 
