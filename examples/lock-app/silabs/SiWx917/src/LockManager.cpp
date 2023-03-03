@@ -684,7 +684,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
     // Check the PIN code
     for (uint8_t i = 0; i < kMaxCredentialsPerUser; i++)
     {
-        
+
         if (mLockCredentials[i].credentialType != CredentialTypeEnum::kPin ||
             mLockCredentials[i].status == DlCredentialStatus::kAvailable)
         {
