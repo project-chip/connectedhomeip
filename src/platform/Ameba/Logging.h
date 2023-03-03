@@ -4,7 +4,7 @@
 
 namespace chip {
 namespace Logging {
-namespace Ameba {
+namespace Platform {
 
 enum class LogLevel
 {
@@ -14,8 +14,8 @@ enum class LogLevel
 };
 
 void LogSetLevel(LogLevel level);
-uint8_t LogGetLevel();
+LogLevel LogGetLevel();
 
-} // namespace Ameba
+} // namespace Platform
 } // namespace Logging
 } // namespace chip

@@ -25,7 +25,7 @@
 #include <platform/logging/LogV.h>
 
 #include <core/CHIPConfig.h>
-#include <support/TypeTraits.h>.h>
+#include <support/TypeTraits.h>
 #include <support/logging/Constants.h>
 
 #include "Logging.h"
@@ -33,20 +33,20 @@
 
 namespace chip {
 namespace Logging {
-namespace Ameba {
+namespace Platform {
 
 namespace {
-LogLevel LogLevel = LogLevel::kDetail;
+LogLevel log_level = LogLevel::kDetail;
 }
 
-void LogSetLevel(uint8_t level)
+void LogSetLevel(LogLevel level)
 {
-    LogLevel = level;
+    log_level = level;
 }
 
-uint8_t LogGetLevel()
+LogLevel LogGetLevel()
 {
-    return LogLevel;
+    return log_level;
 }
 
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
@@ -62,21 +62,21 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     switch (category)
     {
     case kLogCategory_Error:
-        if (to_underlying(LogLevel) >= LogLevel::kError)
+        if (to_underlying(log_level) >= to_underlying(LogLevel::kError))
             printf("%s %s\r\n", tag, formattedMsg);
         break;
     case kLogCategory_Progress:
     default:
-        if (to_underlying(LogLevel) >= LogLevel::kProgress)
+        if (to_underlying(log_level) >= to_underlying(LogLevel::kProgress))
             printf("%s %s\r\n", tag, formattedMsg);
         break;
     case kLogCategory_Detail:
-        if (to_underlying(LogLevel) >= LogLevel::kDetail)
+        if (to_underlying(log_level) >= to_underlying(LogLevel::kDetail))
             printf("%s %s\r\n", tag, formattedMsg);
         break;
     }
 }
 
-} // namespace Ameba
+} // namespace Platform
 } // namespace Logging
 } // namespace chip
