@@ -476,6 +476,7 @@ static void wfx_rsi_save_ap_info() // transalation
         break;
     default:
         wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
+        break;
     }
 
     WFX_RSI_LOG("%s: WLAN: connecting to %s==%s, sec=%d, status=%02x", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0],
