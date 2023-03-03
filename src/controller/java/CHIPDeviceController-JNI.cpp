@@ -1295,8 +1295,7 @@ JNI_METHOD(void, subscribe)
     err = readClient->SendRequest(params);
     if (err != CHIP_NO_ERROR)
     {
-        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback->mReportCallbackRef, ErrorStr(err),
-                                                                                  err);
+        callback->OnError(err);
         delete readClient;
         delete callback;
         return;
@@ -1347,8 +1346,7 @@ JNI_METHOD(void, read)
     err = readClient->SendRequest(params);
     if (err != CHIP_NO_ERROR)
     {
-        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback->mReportCallbackRef, ErrorStr(err),
-                                                                                  err);
+        callback->OnError(err);
         delete readClient;
         delete callback;
         return;
