@@ -21,9 +21,9 @@
 
 #include <platform/nxp/k32w/k32w0/CHIPDevicePlatformConfig.h>
 #include <platform/nxp/k32w/k32w0/OTAFirmwareProcessor.h>
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
 #include <platform/nxp/k32w/k32w0/OTAFactoryDataProcessor.h>
-#endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#endif // CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
 
 #include "OtaSupport.h"
 
@@ -45,9 +45,9 @@ extern "C" WEAK CHIP_ERROR OtaHookInit()
 {
     static chip::OTAFirmwareProcessor sApplicationProcessor;
     static chip::OTAFirmwareProcessor sBootloaderProcessor;
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
     static chip::OTAFactoryDataProcessor sFactoryDataProcessor;
-#endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#endif // CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
 #if CONFIG_CHIP_K32W0_MAX_ENTRIES_TEST
     static chip::OTAFirmwareProcessor processors[8];
 #endif
@@ -58,9 +58,9 @@ extern "C" WEAK CHIP_ERROR OtaHookInit()
     auto& imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(1, &sApplicationProcessor));
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(2, &sBootloaderProcessor));
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(3, &sFactoryDataProcessor));
-#endif // CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#endif // CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
 #if CONFIG_CHIP_K32W0_MAX_ENTRIES_TEST
     for (auto i = 0; i < 8; i++)
     {

@@ -500,10 +500,14 @@ Build OTA image:
 In order to build an OTA image, use NXP wrapper over the standard tool
 `src/app/ota_image_tool.py`:
 
--   `scripts/tools/nxp/factory_data_generator/ota_image_tool.py`. The tool can
-    be used to generate an OTA image with the following format:
-    `| OTA image header | TLV1 | TLV2 | ... | TLVn |` where each TLV is in the
-    form `|tag|length|value|`
+Note that "standard" TLV format is used. Matter TLV format is only used for factory data TLV value.
+
+A user can select which default processors to enable:
+-    `chip_enable_ota_firmware_processor=1` to enable default firmware (app/SSBL) update processor (enabled by default).
+-    `chip_enable_ota_factory_data_processor=1` to enable default factory data update processor (disabled by default).
+
+Please see more in the [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
+
 
 Note that "standard" TLV format is used. Matter TLV format is only used for
 factory data TLV value. A user can enable the default processors by specifying

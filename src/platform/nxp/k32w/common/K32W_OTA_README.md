@@ -3,7 +3,7 @@
 The OTA processing is now delegated to instances of `OTATlvProcessor` derived classes.
 These instances are registered with the `OTAImageProcessorImpl` instance, which manages the selection of processors that should process the next blocks, until a full TLV block was transferred.
 
-The application is able to define its own processors, thus enabling extending the default OTA functionality. The application can also opt to disable the default processors (application, SSBL and factory data) by setting `chip_enable_ota_default_processors=0`.
+The application is able to define its own processors, thus extending the default OTA functionality. The application can also opt to disable the default processors (application, SSBL and factory data).
 
 Please note that if an OTA image containing multiple TLVs is transferred, then the action for each TLV is applied sequentially,
 If one of the actions fails, the remaining actions will not be applied and OTA abort is called.
@@ -11,10 +11,13 @@ TBD: should all actions be applied only if there is no error? Or should each act
 
 ## Default processors
 The default processors for K32W0 are already implemented in:
-* `OTAFirmwareProcessor` for application/SSBL update.
-* `OTAFactoryDataProcessor` for factory data update.
+* `OTAFirmwareProcessor` for application/SSBL update. Enabled by default.
+* `OTAFactoryDataProcessor` for factory data update. Disabled by default, user has to specify `chip_ota_enable_factory_data_processor=1` in the build args.
 
-These are enabled by default (`chip_enable_ota_default_processors=1`) and imply setting some SDK OTA-related flags to support additional features.
+Some SDK OTA-related flags are defined to support additional features:
+- `gOTAAllowCustomStartAddress=1`
+- `gOTAUseCustomOtaEntry=1`
+- `gOTACustomOtaEntryMemory=1`
 
 ## Implementing custom processors
 A custom processor should implement the abstract interface defined in `OTATlvProcessor.h`. Below is a compact version:
