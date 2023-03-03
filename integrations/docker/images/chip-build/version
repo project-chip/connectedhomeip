@@ -1,1 +1,1 @@
-0.6.47 Version bump reason: [nrfconnect] Update nRF Connect SDK version.
+0.6.48 Version bump reason: [android] Correct kotlinc path for vscode image
