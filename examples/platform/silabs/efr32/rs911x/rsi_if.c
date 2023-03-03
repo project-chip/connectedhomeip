@@ -492,7 +492,7 @@ static void wfx_rsi_save_ap_info() // transalation
 static void wfx_rsi_do_join(void)
 {
     int32_t status;
-    rsi_security_mode_t connect_security_mode;
+    rsi_security_mode_t connect_security_mode = RSI_OPEN;
 
     if (wfx_rsi.dev_state & (WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED))
     {
