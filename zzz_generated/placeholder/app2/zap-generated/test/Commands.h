@@ -997,18 +997,22 @@ private:
         {
         case 0: {
             LogStep(0, "Read attribute: IdentifyTime");
+            VerifyOrDo(!ShouldSkip("I.C.AM-READ"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(1), Identify::Id, Identify::Attributes::IdentifyTime::Id);
         }
         case 1: {
             LogStep(1, "write attribute: IdentifyTime");
+            VerifyOrDo(!ShouldSkip("I.C.AM-WRITE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(1), Identify::Id, Identify::Attributes::IdentifyTime::Id);
         }
         case 2: {
             LogStep(2, "Readback attribute: IdentifyTime");
+            VerifyOrDo(!ShouldSkip("I.C.AM-READ"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(1), Identify::Id, Identify::Attributes::IdentifyTime::Id);
         }
         case 3: {
             LogStep(3, "Read attribute: identifytype");
+            VerifyOrDo(!ShouldSkip("I.C.AM-READ"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(1), Identify::Id, Identify::Attributes::IdentifyType::Id);
         }
         case 4: {
@@ -1026,7 +1030,7 @@ private:
         }
         case 5: {
             LogStep(5, "DUT reads all supported optional attributes from TH one at a time in a manufacturer specific order");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && I.C.AO-READ"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
@@ -1038,7 +1042,7 @@ private:
             LogStep(6,
                     "DUT writes a suitable value to all supported optional attributes on the TH one at a time in a manufacturer "
                     "specific order");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && I.C.AO-WRITE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
@@ -1111,38 +1115,47 @@ private:
         {
         case 0: {
             LogStep(0, "Read attribute: MeasuredValue");
+            VerifyOrDo(!ShouldSkip("PRS.C.AM-READ"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::MeasuredValue::Id);
         }
         case 1: {
             LogStep(1, "Read attribute: MinMeasuredValue");
+            VerifyOrDo(!ShouldSkip("PRS.C.AM-READ"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::MinMeasuredValue::Id);
         }
         case 2: {
             LogStep(2, "Read attribute: MaxMeasuredValue");
+            VerifyOrDo(!ShouldSkip("PRS.C.AM-READ"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::MaxMeasuredValue::Id);
         }
         case 3: {
             LogStep(3, "Read attribute: Tolerance");
+            VerifyOrDo(!ShouldSkip("PRS.C.AO-READ"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::Tolerance::Id);
         }
         case 4: {
             LogStep(4, "Read attribute: ScaledValue");
+            VerifyOrDo(!ShouldSkip("PRS.C.AM-READ"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::ScaledValue::Id);
         }
         case 5: {
             LogStep(5, "Read attribute: MinScaledValue");
+            VerifyOrDo(!ShouldSkip("PRS.C.AM-READ"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::MinScaledValue::Id);
         }
         case 6: {
             LogStep(6, "Read attribute: MaxScaledValue");
+            VerifyOrDo(!ShouldSkip("PRS.C.AM-READ"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::MaxScaledValue::Id);
         }
         case 7: {
             LogStep(7, "Read attribute: ScaledTolerance");
+            VerifyOrDo(!ShouldSkip("PRS.C.AO-READ"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::ScaledTolerance::Id);
         }
         case 8: {
             LogStep(8, "Read attribute: Scale");
+            VerifyOrDo(!ShouldSkip("PRS.C.AM-READ"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), PressureMeasurement::Id, PressureMeasurement::Attributes::Scale::Id);
         }
         case 9: {
@@ -1160,7 +1173,7 @@ private:
         }
         case 10: {
             LogStep(10, "DUT reads all supported optional attributes from TH one at a time in a manufacturer specific order");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PRS.C.AO-READ"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
@@ -1172,7 +1185,7 @@ private:
             LogStep(11,
                     "DUT writes a suitable value to all supported optional attributes on the TH one at a time in a manufacturer "
                     "specific order");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP && PRS.C.AO-WRITE"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             ListFreer listFreer;
             chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
             value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
@@ -1188,7 +1201,7 @@ private:
 class Test_TC_PS_3_1_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_PS_3_1_SimulatedSuite() : TestCommand("Test_TC_PS_3_1_Simulated", 31)
+    Test_TC_PS_3_1_SimulatedSuite() : TestCommand("Test_TC_PS_3_1_Simulated", 34)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -1216,6 +1229,18 @@ private:
 
         switch (mTestIndex - 1)
         {
+        case 31:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 32:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
+        case 33:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
         default:
             LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
         }
@@ -1354,6 +1379,41 @@ private:
         case 30: {
             LogStep(30, "Read attribute: ActiveBatChargeFaults");
             return WaitAttribute(GetEndpoint(0), PowerSource::Id, PowerSource::Attributes::ActiveBatChargeFaults::Id);
+        }
+        case 31: {
+            LogStep(31,
+                    "Configure TH such that it implements mandatory and none of the optional attributes of the server-side of the "
+                    "cluster, and that it also reflects this in global attributes such as FeatureMap and AttributeList. Commission "
+                    "DUT to TH again");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 32: {
+            LogStep(32, "DUT reads all supported optional attributes from TH one at a time in a manufacturer specific order");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
+        }
+        case 33: {
+            LogStep(33,
+                    "DUT writes a suitable value to all supported optional attributes on the TH one at a time in a manufacturer "
+                    "specific order");
+            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            ListFreer listFreer;
+            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
+            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
+            value.expectedValue.Emplace();
+            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
+            return UserPrompt(kIdentityAlpha, value);
         }
         }
         return CHIP_NO_ERROR;
@@ -2139,12 +2199,12 @@ private:
         {
         case 0: {
             LogStep(0, "TH reads OccupancySensorType attribute from DUT");
-            VerifyOrDo(!ShouldSkip("OCC.S.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OCC.C.A0001"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), OccupancySensing::Id, OccupancySensing::Attributes::OccupancySensorType::Id);
         }
         case 1: {
             LogStep(1, "TH reads OccupancySensorTypeBitmap attribute from DUT");
-            VerifyOrDo(!ShouldSkip("OCC.S.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("OCC.C.A0002"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), OccupancySensing::Id, OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id);
         }
         }
