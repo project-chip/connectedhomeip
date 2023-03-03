@@ -6,14 +6,14 @@ namespace chip {
 namespace Logging {
 namespace Ameba {
 
-enum class AmebaLogLevel
+enum class LogLevel
 {
     kError,
     kProgress,
     kDetail,
 };
 
-void LogSetLevel(uint8_t level);
+void LogSetLevel(LogLevel level);
 uint8_t LogGetLevel();
 
 } // namespace Ameba

@@ -25,6 +25,7 @@
 #include <platform/logging/LogV.h>
 
 #include <core/CHIPConfig.h>
+#include <support/TypeTraits.h>.h>
 #include <support/logging/Constants.h>
 
 #include "Logging.h"
@@ -34,7 +35,9 @@ namespace chip {
 namespace Logging {
 namespace Ameba {
 
-static AmebaLogLevel LogLevel = AmebaLogLevel::kDetail;
+namespace {
+LogLevel LogLevel = LogLevel::kDetail;
+}
 
 void LogSetLevel(uint8_t level)
 {
@@ -59,16 +62,16 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     switch (category)
     {
     case kLogCategory_Error:
-        if (LogLevel >= AmebaLogLevel::kError)
+        if (to_underlying(LogLevel) >= LogLevel::kError)
             printf("%s %s\r\n", tag, formattedMsg);
         break;
     case kLogCategory_Progress:
     default:
-        if (LogLevel >= AmebaLogLevel::kProgress)
+        if (to_underlying(LogLevel) >= LogLevel::kProgress)
             printf("%s %s\r\n", tag, formattedMsg);
         break;
     case kLogCategory_Detail:
-        if (LogLevel >= AmebaLogLevel::kDetail)
+        if (to_underlying(LogLevel) >= LogLevel::kDetail)
             printf("%s %s\r\n", tag, formattedMsg);
         break;
     }
