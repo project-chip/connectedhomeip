@@ -32,6 +32,7 @@
 #include <app/AttributePathParams.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
+#include <app/WriteClient.h>
 #include <app/util/error-mapping.h>
 #include <atomic>
 #include <ble/BleUUID.h>
@@ -1355,6 +1356,131 @@ JNI_METHOD(void, read)
     callback->mReadClient = readClient;
 }
 
+JNI_METHOD(void, write)
+(JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributeList, jint timedRequestTimeoutMs,
+ jint imTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    jint listSize  = 0;
+    auto callback  = reinterpret_cast<WriteAttributesCallback *>(callbackHandle);
+    app::WriteClient * writeClient;
+
+    ChipLogDetail(Controller, "IM write() called");
+
+    DeviceProxy * device = reinterpret_cast<DeviceProxy *>(devicePtr);
+    VerifyOrExit(device != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(device->GetSecureSession().HasValue(), err = CHIP_ERROR_MISSING_SECURE_SESSION);
+    VerifyOrExit(attributeList != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    SuccessOrExit(JniReferences::GetInstance().GetListSize(attributeList, listSize));
+
+    writeClient = Platform::New<app::WriteClient>(device->GetExchangeManager(), callback->GetChunkedWriteCallback(),
+                                                  timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)
+                                                                             : Optional<uint16_t>::Missing());
+
+    for (uint8_t i = 0; i < listSize; i++)
+    {
+        jobject attributeItem             = nullptr;
+        uint32_t endpointId               = 0;
+        uint32_t clusterId                = 0;
+        uint32_t attributeId              = 0;
+        jmethodID getEndpointIdMethod     = nullptr;
+        jmethodID getClusterIdMethod      = nullptr;
+        jmethodID getAttributeIdMethod    = nullptr;
+        jmethodID hasDataVersionMethod    = nullptr;
+        jmethodID getDataVersionMethod    = nullptr;
+        jmethodID getTlvByteArrayMethod   = nullptr;
+        jobject endpointIdObj             = nullptr;
+        jobject clusterIdObj              = nullptr;
+        jobject attributeIdObj            = nullptr;
+        jbyteArray tlvBytesObj            = nullptr;
+        bool hasDataVersion               = false;
+        Optional<DataVersion> dataVersion = Optional<DataVersion>();
+        ;
+        jbyte * tlvBytesObjBytes = nullptr;
+        jsize length             = 0;
+        TLV::TLVReader reader;
+
+        SuccessOrExit(JniReferences::GetInstance().GetListItem(attributeList, i, attributeItem));
+        SuccessOrExit(JniReferences::GetInstance().FindMethod(env, attributeItem, "getEndpointId",
+                                                              "()Lchip/devicecontroller/model/ChipPathId;", &getEndpointIdMethod));
+        SuccessOrExit(JniReferences::GetInstance().FindMethod(env, attributeItem, "getClusterId",
+                                                              "()Lchip/devicecontroller/model/ChipPathId;", &getClusterIdMethod));
+        SuccessOrExit(JniReferences::GetInstance().FindMethod(env, attributeItem, "getAttributeId",
+                                                              "()Lchip/devicecontroller/model/ChipPathId;", &getAttributeIdMethod));
+        SuccessOrExit(JniReferences::GetInstance().FindMethod(env, attributeItem, "hasDataVersion", "()Z", &hasDataVersionMethod));
+        SuccessOrExit(JniReferences::GetInstance().FindMethod(env, attributeItem, "getDataVersion", "()I", &getDataVersionMethod));
+        SuccessOrExit(
+            JniReferences::GetInstance().FindMethod(env, attributeItem, "getTlvByteArray", "()[B", &getTlvByteArrayMethod));
+
+        endpointIdObj = env->CallObjectMethod(attributeItem, getEndpointIdMethod);
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        VerifyOrExit(endpointIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+        clusterIdObj = env->CallObjectMethod(attributeItem, getClusterIdMethod);
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        VerifyOrExit(clusterIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+        attributeIdObj = env->CallObjectMethod(attributeItem, getAttributeIdMethod);
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        VerifyOrExit(attributeIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+        SuccessOrExit(GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
+        SuccessOrExit(GetChipPathIdValue(clusterIdObj, kInvalidClusterId, clusterId));
+        SuccessOrExit(GetChipPathIdValue(attributeIdObj, kInvalidAttributeId, attributeId));
+
+        hasDataVersion = static_cast<bool>(env->CallBooleanMethod(attributeItem, hasDataVersionMethod));
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        if (hasDataVersion)
+        {
+            DataVersion dataVersionVal = static_cast<DataVersion>(env->CallIntMethod(attributeItem, getDataVersionMethod));
+            VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+            dataVersion.SetValue(dataVersionVal);
+        }
+
+        tlvBytesObj = static_cast<jbyteArray>(env->CallObjectMethod(attributeItem, getTlvByteArrayMethod));
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        VerifyOrExit(tlvBytesObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+        tlvBytesObjBytes = env->GetByteArrayElements(tlvBytesObj, nullptr);
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        length = env->GetArrayLength(tlvBytesObj);
+        VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+        reader.Init(reinterpret_cast<const uint8_t *>(tlvBytesObjBytes), static_cast<size_t>(length));
+        reader.Next();
+        SuccessOrExit(
+            err = writeClient->PutPreencodedAttribute(
+                chip::app::ConcreteDataAttributePath(static_cast<EndpointId>(endpointId), static_cast<ClusterId>(clusterId),
+                                                     static_cast<AttributeId>(attributeId), dataVersion),
+                reader));
+    }
+
+    err = writeClient->SendWriteRequest(device->GetSecureSession().Value(),
+                                        imTimeoutMs != 0 ? System::Clock::Milliseconds32(imTimeoutMs) : System::Clock::kZero);
+    if (err != CHIP_NO_ERROR)
+    {
+        callback->OnError(writeClient, err);
+        delete writeClient;
+        delete callback;
+        return;
+    }
+
+    callback->mWriteClient = writeClient;
+
+exit:
+    if (err == CHIP_JNI_ERROR_EXCEPTION_THROWN)
+    {
+        ChipLogError(DeviceLayer, "Java exception in IM Write JNI");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+    }
+    if (err != CHIP_NO_ERROR)
+    {
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+
 /**
  * Takes objects in attributePathList, converts them to app:AttributePathParams, and appends them to outAttributePathParamsList.
  */
@@ -1520,13 +1646,16 @@ CHIP_ERROR IsWildcardChipPathId(jobject chipPathId, bool & isWildcard)
         env, chipPathId, "getType", "()Lchip/devicecontroller/model/ChipPathId$IdType;", &getTypeMethod));
 
     jobject idType = env->CallObjectMethod(chipPathId, getTypeMethod);
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
     VerifyOrReturnError(idType != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
     jmethodID nameMethod = nullptr;
     ReturnErrorOnFailure(JniReferences::GetInstance().FindMethod(env, idType, "name", "()Ljava/lang/String;", &nameMethod));
 
     jstring typeNameString = static_cast<jstring>(env->CallObjectMethod(idType, nameMethod));
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
     VerifyOrReturnError(typeNameString != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+
     JniUtfString typeNameJniString(env, typeNameString);
 
     isWildcard = strncmp(typeNameJniString.c_str(), "WILDCARD", 8) == 0;

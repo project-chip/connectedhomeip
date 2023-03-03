@@ -57,6 +57,15 @@ private fun getPairingCommands(
   )
 }
 
+private fun getImCommands(
+  controller: ChipDeviceController,
+  credentialsIssuer: CredentialsIssuer
+): List<Command> {
+  return listOf(
+    PairOnNetworkLongImWriteCommand(controller, credentialsIssuer),
+  )
+}
+
 fun main(args: Array<String>) {
   val controller = ChipDeviceController(
     ControllerParams.newBuilder()
@@ -70,7 +79,7 @@ fun main(args: Array<String>) {
 
   commandManager.register("discover", getDiscoveryCommands(controller, credentialsIssuer))
   commandManager.register("pairing", getPairingCommands(controller, credentialsIssuer))
-
+  commandManager.register("im", getImCommands(controller, credentialsIssuer))
   try {
     commandManager.run(args)
   } catch (e: Exception) {
