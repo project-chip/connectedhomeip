@@ -103,6 +103,20 @@
       android:text="@string/wildcard_read_btn_text"
       android:textSize="16sp"
       app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toStartOf="@id/writeBtn"
+      app:layout_constraintTop_toBottomOf="@id/flow"/>
+
+  <Button
+      android:id="@+id/writeBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="16dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginBottom="8dp"
+      android:layout_gravity="center"
+      android:text="@string/wildcard_write_btn_text"
+      android:textSize="16sp"
+      app:layout_constraintStart_toEndOf="@id/readBtn"
       app:layout_constraintEnd_toStartOf="@id/subscribeBtn"
       app:layout_constraintTop_toBottomOf="@id/flow"/>
 
@@ -116,7 +130,7 @@
       android:layout_gravity="center"
       android:text="@string/wildcard_subscribe_btn_text"
       android:textSize="16sp"
-      app:layout_constraintStart_toEndOf="@id/readBtn"
+      app:layout_constraintStart_toEndOf="@id/writeBtn"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintTop_toBottomOf="@id/flow"/>
 

@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
@@ -17,14 +18,19 @@ import chip.devicecontroller.ChipIdLookup
 import chip.devicecontroller.ReportCallback
 import chip.devicecontroller.ResubscriptionAttemptCallback
 import chip.devicecontroller.SubscriptionEstablishedCallback
+import chip.devicecontroller.WriteAttributesCallback
+import chip.devicecontroller.model.AttributeWriteRequest
 import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.ChipPathId
 import chip.devicecontroller.model.NodeState
+import chip.tlv.AnonymousTag
+import chip.tlv.TlvWriter
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.WildcardFragmentBinding
 import java.lang.StringBuilder
+import java.util.Optional
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -64,6 +70,24 @@ class WildcardFragment : Fragment() {
     }
   }
 
+  private val writeAttributeCallback = object : WriteAttributesCallback {
+    override fun onError(attributePath: ChipAttributePath?, ex: Exception?) {
+      if (attributePath != null)
+      {
+        Log.e(TAG, "Report error for $attributePath: $ex")
+      }
+    }
+
+    override fun OnResponse(attributePath: ChipAttributePath?) {
+      val text = "$attributePath : Write Success"
+      requireActivity().runOnUiThread { binding.outputTv.text = text }
+    }
+
+    override fun onDone() {
+      Log.i(TAG, "write attribute Done")
+    }
+  }
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -73,6 +97,7 @@ class WildcardFragment : Fragment() {
     scope = viewLifecycleOwner.lifecycleScope
     binding.subscribeBtn.setOnClickListener { scope.launch { showSubscribeDialog(ATTRIBUTE) } }
     binding.readBtn.setOnClickListener { scope.launch { showReadDialog(ATTRIBUTE) } }
+    binding.writeBtn.setOnClickListener { scope.launch { showWriteDialog() } }
     binding.subscribeEventBtn.setOnClickListener { scope.launch { showSubscribeDialog(EVENT) } }
     binding.readEventBtn.setOnClickListener { scope.launch { showReadDialog(EVENT) } }
 
@@ -182,6 +207,28 @@ class WildcardFragment : Fragment() {
     }
   }
 
+  private suspend fun write(writeValueType: String, writeValue: String, dataVersion: Int?, timedRequestTimeoutMs: Int, imTimeoutMs: Int) {
+    val endpointId = getChipPathIdForText(binding.endpointIdEd.text.toString())
+    val clusterId = getChipPathIdForText(binding.clusterIdEd.text.toString())
+    val attributeId = getChipPathIdForText(binding.attributeIdEd.text.toString())
+    var tlv : ByteArray? = null
+    try {
+      tlv = TLV_MAP[writeValueType]?.generate(writeValue)
+    } catch (ex: Exception) {
+      Log.e(TAG, "Invalid Data Type")
+      return
+    }
+    val version = if (dataVersion == null) { Optional.empty() } else { Optional.of(dataVersion) }
+
+    val writeRequest = AttributeWriteRequest.newInstance(endpointId, clusterId, attributeId, tlv, version)
+    deviceController.write(writeAttributeCallback,
+                      ChipClient.getConnectedDevicePointer(requireContext(),
+                      addressUpdateFragment.deviceId),
+                      listOf(writeRequest),
+                      timedRequestTimeoutMs,
+                      imTimeoutMs)
+  }
+
   private fun showReadDialog(type: Int) {
     val dialogView = requireActivity().layoutInflater.inflate(R.layout.read_dialog, null)
     val dialog = AlertDialog.Builder(requireContext()).apply {
@@ -192,6 +239,33 @@ class WildcardFragment : Fragment() {
     dialogView.findViewById<Button>(R.id.readBtn).setOnClickListener {
       scope.launch {
         read(type, isFabricFilteredEd.text.toString().toBoolean())
+        requireActivity().runOnUiThread { dialog.dismiss() }
+      }
+    }
+    dialog.show()
+  }
+
+  private fun showWriteDialog() {
+    binding.outputTv.text = ""
+    val dialogView = requireActivity().layoutInflater.inflate(R.layout.write_dialog, null)
+    val writeValueTypeSp = dialogView.findViewById<Spinner>(R.id.writeValueTypeSp)
+    val spinnerAdapter = ArrayAdapter(requireActivity(), android.R.layout.simple_spinner_item, TLV_MAP.keys.toList())
+    writeValueTypeSp.adapter = spinnerAdapter
+    val dialog = AlertDialog.Builder(requireContext()).apply {
+      setView(dialogView)
+    }.create()
+
+    dialogView.findViewById<Button>(R.id.writeBtn).setOnClickListener {
+      val writeValue = dialogView.findViewById<EditText>(R.id.writeValueEd).text.toString()
+      val dataVersion = dialogView.findViewById<EditText>(R.id.dataVersionEd).text.toString()
+      val timedRequestTimeoutMs = dialogView.findViewById<EditText>(R.id.timedRequestTimeoutEd).text.toString()
+      val imTimeout = dialogView.findViewById<EditText>(R.id.imTimeoutEd).text.toString()
+      scope.launch {
+        write(  writeValueTypeSp.selectedItem.toString(),
+                writeValue,
+                if (dataVersion.isEmpty()) { null } else { dataVersion.toInt() },
+                if (timedRequestTimeoutMs.isEmpty()) { 0 } else { timedRequestTimeoutMs.toInt() },
+                if (imTimeout.isEmpty()) { 0 } else { imTimeout.toInt() } )
         requireActivity().runOnUiThread { dialog.dismiss() }
       }
     }
@@ -241,10 +315,47 @@ class WildcardFragment : Fragment() {
     return if (text.isEmpty()) ChipPathId.forWildcard() else ChipPathId.forId(text.toLong())
   }
 
+  interface TlvWriterInterface {
+    fun generate(value: String) : ByteArray
+  }
+
   companion object {
     private const val TAG = "WildcardFragment"
     private const val ATTRIBUTE = 1
     private const val EVENT = 2
     fun newInstance(): WildcardFragment = WildcardFragment()
+
+    private val TLV_MAP = mapOf(
+            "UnsignedInt" to object:TlvWriterInterface {
+                override fun generate(value: String): ByteArray {
+                  return TlvWriter().put(AnonymousTag, value.toUInt()).getEncoded()
+                }
+            },
+            "Int" to object:TlvWriterInterface {
+              override fun generate(value: String): ByteArray {
+                return TlvWriter().put(AnonymousTag, value.toInt()).getEncoded()
+              }
+            },
+            "Boolean" to object:TlvWriterInterface {
+              override fun generate(value: String): ByteArray {
+                return TlvWriter().put(AnonymousTag, value.toBoolean()).getEncoded()
+              }
+            },
+            "Float" to object:TlvWriterInterface {
+              override fun generate(value: String): ByteArray {
+                return TlvWriter().put(AnonymousTag, value.toFloat()).getEncoded()
+              }
+            },
+            "Double" to object:TlvWriterInterface {
+              override fun generate(value: String): ByteArray {
+                return TlvWriter().put(AnonymousTag, value.toDouble()).getEncoded()
+              }
+            },
+            "String" to object:TlvWriterInterface {
+              override fun generate(value: String): ByteArray {
+                return TlvWriter().put(AnonymousTag, value).getEncoded()
+              }
+            },
+    )
   }
 }
