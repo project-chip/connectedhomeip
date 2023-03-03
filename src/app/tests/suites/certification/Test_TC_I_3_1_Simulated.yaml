@@ -16,6 +16,10 @@ name: 59.3.1. [TC-I-3.1] Attributes with Client as DUT
 
 PICS:
     - I.C
+    - I.C.AM-READ
+    - I.C.AO-READ
+    - I.C.AM-WRITE
+    - I.C.AO-WRITE
 
 config:
     nodeId: 0x12344321
@@ -28,20 +32,24 @@ tests:
     #  command: "WaitForCommissioning"
 
     - label: "Read attribute: IdentifyTime"
+      PICS: I.C.AM-READ
       wait: "readAttribute"
       attribute: "IdentifyTime"
 
     - label: "write attribute: IdentifyTime"
+      PICS: I.C.AM-WRITE
       wait: "writeAttribute"
       attribute: "IdentifyTime"
       arguments:
           value:
 
     - label: "Readback attribute: IdentifyTime"
+      PICS: I.C.AM-READ
       wait: "readAttribute"
       attribute: "IdentifyTime"
 
     - label: "Read attribute: identifytype"
+      PICS: I.C.AM-READ
       wait: "readAttribute"
       attribute: "IdentifyType"
 
@@ -491,7 +499,7 @@ tests:
           There is no optional attribute for this cluster
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && I.C.AO-READ
       arguments:
           values:
               - name: "message"
@@ -506,7 +514,7 @@ tests:
           This cluster doesn't have any writable attributes
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && I.C.AO-WRITE
       arguments:
           values:
               - name: "message"

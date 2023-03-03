@@ -14,6 +14,13 @@
 
 name: 34.3.1. [TC-PRS-3.1] Attributes with Client as DUT
 
+PICS:
+    - PRS.C
+    - PRS.C.AM-READ
+    - PRS.C.AO-READ
+    - PRS.C.AM-WRITE
+    - PRS.C.AO-WRITE
+
 config:
     nodeId: 0x12344321
     cluster: "Pressure Measurement"
@@ -25,38 +32,47 @@ tests:
     #  command: "WaitForCommissioning"
 
     - label: "Read attribute: MeasuredValue"
+      PICS: PRS.C.AM-READ
       wait: "readAttribute"
       attribute: "MeasuredValue"
 
     - label: "Read attribute: MinMeasuredValue"
+      PICS: PRS.C.AM-READ
       wait: "readAttribute"
       attribute: "MinMeasuredValue"
 
     - label: "Read attribute: MaxMeasuredValue"
+      PICS: PRS.C.AM-READ
       wait: "readAttribute"
       attribute: "MaxMeasuredValue"
 
     - label: "Read attribute: Tolerance"
+      PICS: PRS.C.AO-READ
       wait: "readAttribute"
       attribute: "Tolerance"
 
     - label: "Read attribute: ScaledValue"
+      PICS: PRS.C.AM-READ
       wait: "readAttribute"
       attribute: "ScaledValue"
 
     - label: "Read attribute: MinScaledValue"
+      PICS: PRS.C.AM-READ
       wait: "readAttribute"
       attribute: "MinScaledValue"
 
     - label: "Read attribute: MaxScaledValue"
+      PICS: PRS.C.AM-READ
       wait: "readAttribute"
       attribute: "MaxScaledValue"
 
     - label: "Read attribute: ScaledTolerance"
+      PICS: PRS.C.AO-READ
       wait: "readAttribute"
       attribute: "ScaledTolerance"
 
     - label: "Read attribute: Scale"
+      PICS: PRS.C.AM-READ
       wait: "readAttribute"
       attribute: "Scale"
 
@@ -198,7 +214,7 @@ tests:
           ./chip-tool pressuremeasurement read scale 1 1
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PRS.C.AO-READ
       arguments:
           values:
               - name: "message"
@@ -213,7 +229,7 @@ tests:
           This cluster doesn't have any writable attributes
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
+      PICS: PICS_SKIP_SAMPLE_APP && PRS.C.AO-WRITE
       arguments:
           values:
               - name: "message"

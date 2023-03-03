@@ -327,6 +327,7 @@ tests:
     - label:
           "DUT reads GroupKeyMap Attribute from the GroupKeyManagement cluster
           from TH"
+      PICS: GRPKEY.C.A0000
       verification: |
           ./chip-tool groupkeymanagement read group-key-map 1 0
 
@@ -362,6 +363,7 @@ tests:
 
     - label:
           "DUT reads GroupTable attribute from GroupKeyManagement cluster on TH"
+      PICS: GRPKEY.C.A0001
       verification: |
           ./chip-tool groupkeymanagement read group-table 1 0
 
