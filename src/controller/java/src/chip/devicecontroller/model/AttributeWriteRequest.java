@@ -40,33 +40,33 @@ public final class AttributeWriteRequest {
     this.dataVersion = dataVersion;
   }
 
-  public final ChipPathId getEndpointId() {
+  public ChipPathId getEndpointId() {
     return endpointId;
   }
 
-  public final ChipPathId getClusterId() {
+  public ChipPathId getClusterId() {
     return clusterId;
   }
 
-  public final ChipPathId getAttributeId() {
+  public ChipPathId getAttributeId() {
     return attributeId;
   }
 
-  public final int getDataVersion() {
+  public int getDataVersion() {
     return dataVersion.orElse(0);
   }
 
-  public final boolean hasDataVersion() {
+  public boolean hasDataVersion() {
     return dataVersion.isPresent();
   }
 
-  public final byte[] getTlvByteArray() {
+  public byte[] getTlvByteArray() {
     return tlv.clone();
   }
 
   // check whether the current AttributeWriteRequest has same path as others.
   @Override
-  public final boolean equals(Object object) {
+  public boolean equals(Object object) {
     if (object instanceof AttributeWriteRequest) {
       AttributeWriteRequest that = (AttributeWriteRequest) object;
       return Objects.equals(this.endpointId, that.endpointId)
@@ -77,12 +77,12 @@ public final class AttributeWriteRequest {
   }
 
   @Override
-  public final int hashCode() {
+  public int hashCode() {
     return Objects.hash(endpointId, clusterId, attributeId);
   }
 
   @Override
-  public final String toString() {
+  public String toString() {
     return String.format(
         Locale.ENGLISH,
         "Endpoint %s, cluster %s, attribute %s",

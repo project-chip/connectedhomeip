@@ -11,13 +11,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nullable;
 
-public final class PairOnNetworkLongImWriteCommand extends PairingCommand
-    implements GetConnectedDeviceCallback {
+public final class PairOnNetworkLongImWriteCommand extends PairingCommand {
   private static final int MATTER_PORT = 5540;
   private long devicePointer;
   private static final int CLUSTER_ID_BASIC = 0x0028;
   private static final int ATTR_ID_LOCAL_CONFIG_DISABLED = 16;
   private static Logger logger = Logger.getLogger(PairOnNetworkLongImWriteCommand.class.getName());
+
+  private void setDevicePointer(long devicePointer) {
+    this.devicePointer = devicePointer;
+  }
 
   private class InternalWriteAttributesCallback implements WriteAttributesCallback {
     @Override
@@ -37,6 +40,19 @@ public final class PairOnNetworkLongImWriteCommand extends PairingCommand
         logger.log(Level.INFO, attributePath.toString());
       }
       setSuccess();
+    }
+  }
+
+  private class InternalGetConnectedDeviceCallback implements GetConnectedDeviceCallback {
+    @Override
+    public void onDeviceConnected(long devicePointer) {
+      setDevicePointer(devicePointer);
+      logger.log(Level.INFO, "onDeviceConnected");
+    }
+
+    @Override
+    public void onConnectionFailure(long nodeId, Exception error) {
+      logger.log(Level.INFO, "onConnectionFailure");
     }
   }
 
@@ -71,23 +87,13 @@ public final class PairOnNetworkLongImWriteCommand extends PairingCommand
             null);
     currentCommissioner().setCompletionListener(this);
     waitCompleteMs(getTimeoutMillis());
-    currentCommissioner().getConnectedDevicePointer(getNodeId(), this);
+    currentCommissioner()
+        .getConnectedDevicePointer(getNodeId(), new InternalGetConnectedDeviceCallback());
     clear();
 
     currentCommissioner()
         .write(new InternalWriteAttributesCallback(), devicePointer, attributeList, 0, 0);
 
     waitCompleteMs(getTimeoutMillis());
-  }
-
-  @Override
-  public void onDeviceConnected(long devicePointer) {
-    this.devicePointer = devicePointer;
-    logger.log(Level.INFO, "onDeviceConnected");
-  }
-
-  @Override
-  public void onConnectionFailure(long nodeId, Exception error) {
-    logger.log(Level.INFO, "onConnectionFailure");
   }
 }

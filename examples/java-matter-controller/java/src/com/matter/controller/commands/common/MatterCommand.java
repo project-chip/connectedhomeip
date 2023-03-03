@@ -22,7 +22,6 @@ import chip.devicecontroller.ChipDeviceController;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class MatterCommand extends Command {
@@ -112,7 +111,6 @@ public abstract class MatterCommand extends Command {
   }
 
   public final void waitCompleteMs(long timeoutMs) {
-    logger.log(Level.INFO, "waitCompleteMs is called ");
     mFutureResult.setTimeoutMs(timeoutMs);
     mFutureResult.waitResult();
   }
