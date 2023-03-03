@@ -225,9 +225,6 @@ config MBEDTLS_PSA_CRYPTO_EXTERNAL_RNG
 config SYSTEM_WORKQUEUE_STACK_SIZE
     default 2048
 
-config NET_MGMT_EVENT_STACK_SIZE
-    default 4096
-
 # align these numbers to match the OpenThread config
 config NET_IF_UNICAST_IPV6_ADDR_COUNT
     default 6

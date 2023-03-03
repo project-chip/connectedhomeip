@@ -104,24 +104,24 @@ uint8_t MapToMatterWiFiVersionCode(wifi_link_mode wifiVersion)
 // Matter expectations towards Wi-Fi security type codes are unaligned with
 // what wpa_supplicant provides. This function maps supplicant codes
 // to the ones defined in the Matter spec (11.14.3.1. SecurityType enum)
-uint8_t MapToMatterSecurityType(wifi_security_type securityType)
+app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum MapToMatterSecurityType(wifi_security_type securityType)
 {
     using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
 
     switch (securityType)
     {
     case WIFI_SECURITY_TYPE_NONE:
-        return static_cast<uint8_t>(SecurityTypeEnum::kNone);
+        return SecurityTypeEnum::kNone;
     case WIFI_SECURITY_TYPE_PSK:
     case WIFI_SECURITY_TYPE_PSK_SHA256:
-        return static_cast<uint8_t>(SecurityTypeEnum::kWpa2);
+        return SecurityTypeEnum::kWpa2;
     case WIFI_SECURITY_TYPE_SAE:
-        return static_cast<uint8_t>(SecurityTypeEnum::kWpa3);
+        return SecurityTypeEnum::kWpa3;
     default:
         break;
     }
 
-    return static_cast<uint8_t>(SecurityTypeEnum::kUnspecified);
+    return SecurityTypeEnum::kUnspecified;
 }
 
 } // namespace

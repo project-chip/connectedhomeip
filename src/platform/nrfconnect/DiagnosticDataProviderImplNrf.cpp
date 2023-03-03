@@ -57,9 +57,7 @@ DiagnosticDataProviderImplNrf::GetWiFiSecurityType(app::Clusters::WiFiNetworkDia
 
     WiFiManager::WiFiInfo info;
     CHIP_ERROR err = WiFiManager::Instance().GetWiFiInfo(info);
-    // TODO: The values here are probably wrong.  See
-    // https://github.com/project-chip/connectedhomeip/issues/25096
-    securityType = static_cast<SecurityTypeEnum>(info.mSecurityType);
+    securityType   = info.mSecurityType;
     return err;
 }
 
