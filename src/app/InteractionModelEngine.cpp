@@ -1591,6 +1591,16 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     ReturnErrorCodeIf(!mpSubscriptionResumptionStorage, CHIP_NO_ERROR);
 
+    // To avoid the case of a reboot loop causing rapid traffic generation / power consumption, subscription resumption should make
+    // use of the persisted min-interval values, and wait before resumption. Ideally, each persisted subscription should wait their
+    // own min-interval value before resumption, but that both A) potentially runs into a timer resource issue, and B) having a
+    // low-powered device wake many times also has energy use implications. The logic below waits the largest of the persisted
+    // min-interval values before resuming subscriptions.
+
+    // Even though this causes subscription-to-subscription interaction by linking the min-interval values, this is the right thing
+    // to do for now because it's both simple and avoids the timer resource and multiple-wake problems. This issue is to track
+    // future improvements: https://github.com/project-chip/connectedhomeip/issues/25439
+
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
     auto * iterator           = mpSubscriptionResumptionStorage->IterateSubscriptions();
     int subscriptionsToResume = 0;
