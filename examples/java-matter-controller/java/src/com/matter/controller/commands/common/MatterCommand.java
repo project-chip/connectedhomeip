@@ -103,21 +103,21 @@ public abstract class MatterCommand extends Command {
 
   protected abstract void runCommand();
 
-  public void setSuccess() {
+  public final void setSuccess() {
     mFutureResult.setRealResult(RealResult.Success());
   }
 
-  public void setFailure(String error) {
+  public final void setFailure(String error) {
     mFutureResult.setRealResult(RealResult.Error(error));
   }
 
-  public void waitCompleteMs(long timeoutMs) {
+  public final void waitCompleteMs(long timeoutMs) {
     logger.log(Level.INFO, "waitCompleteMs is called ");
     mFutureResult.setTimeoutMs(timeoutMs);
     mFutureResult.waitResult();
   }
 
-  public void clear() {
+  public final void clear() {
     mFutureResult.clear();
   }
 }

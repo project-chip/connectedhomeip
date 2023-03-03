@@ -812,7 +812,7 @@ void WriteAttributesCallback::OnResponse(const app::WriteClient * apWriteClient,
     }
 
     jmethodID onResponseMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mJavaCallbackRef, "OnResponse",
+    err = JniReferences::GetInstance().FindMethod(env, mJavaCallbackRef, "onResponse",
                                                   "(Lchip/devicecontroller/model/ChipAttributePath;)V", &onResponseMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
 

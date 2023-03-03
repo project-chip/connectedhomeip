@@ -79,7 +79,7 @@ fun main(args: Array<String>) {
 
   commandManager.register("discover", getDiscoveryCommands(controller, credentialsIssuer))
   commandManager.register("pairing", getPairingCommands(controller, credentialsIssuer))
-  commandManager.register("pairing", getImCommands(controller, credentialsIssuer))
+  commandManager.register("im", getImCommands(controller, credentialsIssuer))
   try {
     commandManager.run(args)
   } catch (e: Exception) {

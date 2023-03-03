@@ -1397,9 +1397,10 @@ JNI_METHOD(void, write)
         jobject attributeIdObj            = nullptr;
         jbyteArray tlvBytesObj            = nullptr;
         bool hasDataVersion               = false;
-        Optional<DataVersion> dataVersion = Optional.Empty();
-        jbyte * tlvBytesObjBytes          = nullptr;
-        jsize length                      = 0;
+        Optional<DataVersion> dataVersion = Optional<DataVersion>();
+        ;
+        jbyte * tlvBytesObjBytes = nullptr;
+        jsize length             = 0;
         TLV::TLVReader reader;
 
         SuccessOrExit(JniReferences::GetInstance().GetListItem(attributeList, i, attributeItem));
@@ -1416,15 +1417,15 @@ JNI_METHOD(void, write)
 
         endpointIdObj = env->CallObjectMethod(attributeItem, getEndpointIdMethod);
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        VerifyOrExit(endpointIdObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrExit(endpointIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         clusterIdObj = env->CallObjectMethod(attributeItem, getClusterIdMethod);
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        VerifyOrExit(clusterIdObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrExit(clusterIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         attributeIdObj = env->CallObjectMethod(attributeItem, getAttributeIdMethod);
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        VerifyOrExit(attributeIdObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrExit(attributeIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         SuccessOrExit(GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
         SuccessOrExit(GetChipPathIdValue(clusterIdObj, kInvalidClusterId, clusterId));
@@ -1441,7 +1442,7 @@ JNI_METHOD(void, write)
 
         tlvBytesObj = static_cast<jbyteArray>(env->CallObjectMethod(attributeItem, getTlvByteArrayMethod));
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-        VerifyOrExit(tlvBytesObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrExit(tlvBytesObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         tlvBytesObjBytes = env->GetByteArrayElements(tlvBytesObj, nullptr);
         VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);

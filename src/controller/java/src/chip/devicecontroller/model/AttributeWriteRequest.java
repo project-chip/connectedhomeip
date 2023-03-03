@@ -21,11 +21,11 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
-/** An attirbute write request that should be used for interaction model write interactio. */
-public class AttributeWriteRequest {
-  private ChipPathId endpointId, clusterId, attributeId;
-  private Optional<Integer> dataVersion = Optional.empty();
-  private byte[] tlv;
+/** An attribute write request that should be used for interaction model write interaction. */
+public final class AttributeWriteRequest {
+  private final ChipPathId endpointId, clusterId, attributeId;
+  private final Optional<Integer> dataVersion;
+  private final byte[] tlv;
 
   private AttributeWriteRequest(
       ChipPathId endpointId,
@@ -36,36 +36,37 @@ public class AttributeWriteRequest {
     this.endpointId = endpointId;
     this.clusterId = clusterId;
     this.attributeId = attributeId;
-    this.tlv = tlv;
+    this.tlv = tlv.clone();
     this.dataVersion = dataVersion;
   }
 
-  public ChipPathId getEndpointId() {
+  public final ChipPathId getEndpointId() {
     return endpointId;
   }
 
-  public ChipPathId getClusterId() {
+  public final ChipPathId getClusterId() {
     return clusterId;
   }
 
-  public ChipPathId getAttributeId() {
+  public final ChipPathId getAttributeId() {
     return attributeId;
   }
 
-  public int getDataVersion() {
+  public final int getDataVersion() {
     return dataVersion.orElse(0);
   }
 
-  public boolean hasDataVersion() {
+  public final boolean hasDataVersion() {
     return dataVersion.isPresent();
   }
 
-  public byte[] getTlvByteArray() {
-    return tlv;
+  public final byte[] getTlvByteArray() {
+    return tlv.clone();
   }
 
+  // check whether the current AttributeWriteRequest has same path as others.
   @Override
-  public boolean equals(Object object) {
+  public final boolean equals(Object object) {
     if (object instanceof AttributeWriteRequest) {
       AttributeWriteRequest that = (AttributeWriteRequest) object;
       return Objects.equals(this.endpointId, that.endpointId)
@@ -76,12 +77,12 @@ public class AttributeWriteRequest {
   }
 
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     return Objects.hash(endpointId, clusterId, attributeId);
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return String.format(
         Locale.ENGLISH,
         "Endpoint %s, cluster %s, attribute %s",

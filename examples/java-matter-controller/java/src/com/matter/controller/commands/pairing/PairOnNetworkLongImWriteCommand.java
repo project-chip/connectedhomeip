@@ -8,11 +8,37 @@ import chip.devicecontroller.model.ChipAttributePath;
 import com.matter.controller.commands.common.CredentialsIssuer;
 import java.util.ArrayList;
 import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.Nullable;
 
 public final class PairOnNetworkLongImWriteCommand extends PairingCommand
-    implements WriteAttributesCallback, GetConnectedDeviceCallback {
+    implements GetConnectedDeviceCallback {
   private static final int MATTER_PORT = 5540;
   private long devicePointer;
+  private static final int CLUSTER_ID_BASIC = 0x0028;
+  private static final int ATTR_ID_LOCAL_CONFIG_DISABLED = 16;
+  private static Logger logger = Logger.getLogger(PairOnNetworkLongImWriteCommand.class.getName());
+
+  private class InternalWriteAttributesCallback implements WriteAttributesCallback {
+    @Override
+    public void onError(@Nullable ChipAttributePath attributePath, Exception e) {
+      logger.log(Level.INFO, "Write receive onError on ");
+      if (attributePath != null) {
+        logger.log(Level.INFO, attributePath.toString());
+      }
+
+      setFailure("write failure");
+    }
+
+    @Override
+    public void onResponse(ChipAttributePath attributePath) {
+      logger.log(Level.INFO, "Write receve OnResponse on ");
+      if (attributePath != null) {
+        logger.log(Level.INFO, attributePath.toString());
+      }
+      setSuccess();
+    }
+  }
 
   public PairOnNetworkLongImWriteCommand(
       ChipDeviceController controller, CredentialsIssuer credsIssue) {
@@ -29,7 +55,9 @@ public final class PairOnNetworkLongImWriteCommand extends PairingCommand
   protected void runCommand() {
     // boolean true for tlv
     byte[] booleanTLV = {0x09};
-    AttributeWriteRequest attribute = AttributeWriteRequest.newInstance(0, 0x0028, 16, booleanTLV);
+    AttributeWriteRequest attribute =
+        AttributeWriteRequest.newInstance(
+            /* endpointId= */ 0, CLUSTER_ID_BASIC, ATTR_ID_LOCAL_CONFIG_DISABLED, booleanTLV);
     ArrayList<AttributeWriteRequest> attributeList = new ArrayList<>();
     attributeList.add(attribute);
 
@@ -46,33 +74,19 @@ public final class PairOnNetworkLongImWriteCommand extends PairingCommand
     currentCommissioner().getConnectedDevicePointer(getNodeId(), this);
     clear();
 
-    currentCommissioner().write(this, devicePointer, attributeList, 0, 0);
+    currentCommissioner()
+        .write(new InternalWriteAttributesCallback(), devicePointer, attributeList, 0, 0);
 
     waitCompleteMs(getTimeoutMillis());
   }
 
-  public void onError(ChipAttributePath attributePath, Exception e) {
-    logger.log(Level.INFO, "Write receive onError on ");
-    if (attributePath != null) {
-      logger.log(Level.INFO, attributePath.toString());
-    }
-
-    setFailure("write failure");
-  }
-
-  public void OnResponse(ChipAttributePath attributePath) {
-    logger.log(Level.INFO, "Write receve OnResponse on ");
-    if (attributePath != null) {
-      logger.log(Level.INFO, attributePath.toString());
-    }
-    setSuccess();
-  }
-
+  @Override
   public void onDeviceConnected(long devicePointer) {
     this.devicePointer = devicePointer;
     logger.log(Level.INFO, "onDeviceConnected");
   }
 
+  @Override
   public void onConnectionFailure(long nodeId, Exception error) {
     logger.log(Level.INFO, "onConnectionFailure");
   }

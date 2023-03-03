@@ -600,7 +600,16 @@ public class ChipDeviceController {
         isFabricFiltered);
   }
 
-  /** Read the given attribute/event path with isFabricFiltered flag. */
+  /**
+   * @brief Write a list of attributes into target device
+   * @param WriteAttributesCallback Callback when a write response has been received and processed
+   *     for the given path.
+   * @param devicePtr connected device pointer
+   * @param attributeList a list of attributes
+   * @param timedRequestTimeoutMs this is timed request if this value is larger than 0
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
   public void write(
       WriteAttributesCallback callback,
       long devicePtr,

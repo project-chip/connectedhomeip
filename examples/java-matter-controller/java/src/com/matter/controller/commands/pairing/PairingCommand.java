@@ -49,7 +49,7 @@ public abstract class PairingCommand extends MatterCommand
   private final StringBuffer mPassword = new StringBuffer();
   private final StringBuffer mOnboardingPayload = new StringBuffer();
   private final StringBuffer mDiscoveryFilterInstanceName = new StringBuffer();
-  protected static Logger logger = Logger.getLogger(PairingCommand.class.getName());
+  private static Logger logger = Logger.getLogger(PairingCommand.class.getName());
 
   @Override
   public void onConnectDeviceComplete() {
