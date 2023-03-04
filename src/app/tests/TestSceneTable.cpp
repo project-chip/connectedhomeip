@@ -24,6 +24,8 @@
 #include <nlunit-test.h>
 
 using namespace chip;
+
+using SceneTable         = scenes::SceneTable;
 using SceneTableEntry    = scenes::DefaultSceneTableImpl::SceneTableEntry;
 using SceneTableImpl     = scenes::DefaultSceneTableImpl;
 using SceneStorageId     = scenes::DefaultSceneTableImpl::SceneStorageId;
@@ -119,6 +121,24 @@ public:
     TestSceneHandler() = default;
     ~TestSceneHandler() override {}
 
+    // Fills in cluster buffer and adjusts its size to lower than the maximum number of cluster per scenes
+    virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
+    {
+        ClusterId * buffer = clusterBuffer.data();
+        if (endpoint == TEST_ENDPOINT1)
+        {
+            buffer[0] = ON_OFF_CID;
+            buffer[1] = LV_CTR_CID;
+            clusterBuffer.reduce_size(2);
+        }
+        else if (endpoint == TEST_ENDPOINT2)
+        {
+            buffer[0] = ON_OFF_CID;
+            buffer[1] = CC_CTR_CID;
+            clusterBuffer.reduce_size(2);
+        }
+    }
+
     // Default function only checks if endpoint and clusters are valid
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
     {
@@ -145,9 +165,9 @@ public:
     /// @brief Simulates save from cluster, data is already in an EFS struct but this isn't mandatory
     /// @param endpoint target endpoint
     /// @param cluster  target cluster
-    /// @param serialyzedBytes data to serialize into EFS
+    /// @param serialisedBytes data to serialize into EFS
     /// @return success if successfully serialized the data, CHIP_ERROR_INVALID_ARGUMENT if endpoint or cluster not supported
-    CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serialyzedBytes) override
+    CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serialisedBytes) override
     {
         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
@@ -157,13 +177,13 @@ public:
             {
             case ON_OFF_CID:
                 err = CHIP_NO_ERROR;
-                memcpy(serialyzedBytes.data(), OO_buffer, scenes::kMaxFieldsPerCluster);
-                serialyzedBytes.reduce_size(15); // Used memory for OnOff TLV
+                memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldsPerCluster);
+                serialisedBytes.reduce_size(15); // Used memory for OnOff TLV
                 break;
             case LV_CTR_CID:
                 err = CHIP_NO_ERROR;
-                memcpy(serialyzedBytes.data(), LC_buffer, scenes::kMaxFieldsPerCluster);
-                serialyzedBytes.reduce_size(27); // Used memory for Level Control TLV
+                memcpy(serialisedBytes.data(), LC_buffer, scenes::kMaxFieldsPerCluster);
+                serialisedBytes.reduce_size(27); // Used memory for Level Control TLV
                 break;
             default:
                 break;
@@ -175,13 +195,13 @@ public:
             {
             case ON_OFF_CID:
                 err = CHIP_NO_ERROR;
-                memcpy(serialyzedBytes.data(), OO_buffer, scenes::kMaxFieldsPerCluster);
-                serialyzedBytes.reduce_size(15); // Used memory for Color Control TLV
+                memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldsPerCluster);
+                serialisedBytes.reduce_size(15); // Used memory for OnOff TLV
                 break;
             case CC_CTR_CID:
                 err = CHIP_NO_ERROR;
-                memcpy(serialyzedBytes.data(), CC_buffer, scenes::kMaxFieldsPerCluster);
-                serialyzedBytes.reduce_size(99); // Used memory for Color Control TLV
+                memcpy(serialisedBytes.data(), CC_buffer, scenes::kMaxFieldsPerCluster);
+                serialisedBytes.reduce_size(99); // Used memory for Color Control TLV
                 break;
             default:
                 break;
@@ -194,11 +214,11 @@ public:
     /// "cluster"
     /// @param endpoint target endpoint
     /// @param cluster  target cluster
-    /// @param serialyzedBytes Data from nvm
+    /// @param serialisedBytes Data from nvm
     /// @param timeMs transition time in ms
     /// @return CHIP_NO_ERROR if value as expected, CHIP_ERROR_INVALID_ARGUMENT otherwise
     CHIP_ERROR
-    ApplyScene(EndpointId endpoint, ClusterId cluster, ByteSpan & serialyzedBytes, TransitionTimeMs timeMs) override
+    ApplyScene(EndpointId endpoint, ClusterId cluster, ByteSpan & serialisedBytes, TransitionTimeMs timeMs) override
     {
         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
@@ -208,13 +228,13 @@ public:
             switch (cluster)
             {
             case ON_OFF_CID:
-                if (!memcmp(serialyzedBytes.data(), OO_buffer, serialyzedBytes.size()))
+                if (!memcmp(serialisedBytes.data(), OO_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
                 }
                 break;
             case LV_CTR_CID:
-                if (!memcmp(serialyzedBytes.data(), LC_buffer, serialyzedBytes.size()))
+                if (!memcmp(serialisedBytes.data(), LC_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
                 }
@@ -230,13 +250,13 @@ public:
             switch (cluster)
             {
             case ON_OFF_CID:
-                if (!memcmp(serialyzedBytes.data(), OO_buffer, serialyzedBytes.size()))
+                if (!memcmp(serialisedBytes.data(), OO_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
                 }
                 break;
             case CC_CTR_CID:
-                if (!memcmp(serialyzedBytes.data(), CC_buffer, serialyzedBytes.size()))
+                if (!memcmp(serialisedBytes.data(), CC_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
                 }
@@ -254,16 +274,61 @@ static chip::TestPersistentStorageDelegate testStorage;
 static SceneTableImpl sSceneTable;
 static TestSceneHandler sHandler;
 
-void ResetSceneTable(SceneTableImpl * sceneTable)
+void ResetSceneTable(SceneTable * sceneTable)
 {
     sceneTable->RemoveFabric(kFabric1);
     sceneTable->RemoveFabric(kFabric2);
 }
 
+void TestHandlerRegistration(nlTestSuite * aSuite, void * aContext)
+{
+    SceneTable * sceneTable = scenes::GetSceneTable();
+    TestSceneHandler tmpHandler[scenes::kMaxSceneHandlers];
+
+    for (uint8_t i = 0; i < scenes::kMaxSceneHandlers; i++)
+    {
+        NL_TEST_ASSERT(aSuite, sceneTable->handlerNum == i);
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RegisterHandler(&tmpHandler[i]));
+    }
+
+    NL_TEST_ASSERT(aSuite, sceneTable->handlerNum == scenes::kMaxSceneHandlers);
+    // Removal at begining
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(0));
+    NL_TEST_ASSERT(aSuite, sceneTable->handlerNum == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 1));
+    // Confirm array was compressed and last position is now null
+    NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[scenes::kMaxSceneHandlers - 1]);
+
+    // Removal at the middle
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(3));
+    NL_TEST_ASSERT(aSuite, sceneTable->handlerNum == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 2));
+    // Confirm array was compressed and last position is now null
+    NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[scenes::kMaxSceneHandlers - 2]);
+
+    // Removal at the middle
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(scenes::kMaxSceneHandlers - 3));
+    NL_TEST_ASSERT(aSuite, sceneTable->handlerNum == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 3));
+    NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[scenes::kMaxSceneHandlers - 3]);
+
+    // Emptying Handler array
+    for (uint8_t i = 0; i < scenes::kMaxSceneHandlers; i++)
+    {
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(0));
+    }
+
+    // Verify the handler num has been updated properly
+    NL_TEST_ASSERT(aSuite, sceneTable->handlerNum == 0);
+
+    // Verify all array is empty
+    for (uint8_t i = 0; i < scenes::kMaxSceneHandlers; i++)
+    {
+        NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[i]);
+    }
+}
+
 void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
 {
-    SceneTableImpl * sceneTable = chip::scenes::GetSceneTable();
-    ClusterId tempCluster       = 0;
+    SceneTable * sceneTable = chip::scenes::GetSceneTable();
+    ClusterId tempCluster   = 0;
 
     app::Clusters::Scenes::Structs::ExtensionFieldSet::Type extensionFieldSetOut;
     app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType extensionFieldSetIn;
@@ -409,7 +474,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     // Verify Deserializing is properly filling out output extension field set for on off
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.Deserialize(TEST_ENDPOINT1, ON_OFF_CID, OO_list, extensionFieldSetOut));
 
-    // Verify Encoding the Extension field set returns the same data as
+    // Verify Encoding the Extension field set returns the same data as the one serialized for on off previously
     writer.Init(buff_span);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
     NL_TEST_ASSERT(aSuite,
@@ -425,7 +490,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     // Verify Deserializing is properly filling out output extension field set for level control
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.Deserialize(TEST_ENDPOINT1, LV_CTR_CID, LC_list, extensionFieldSetOut));
 
-    // Verify Encoding the Extension field set returns the same data as
+    // Verify Encoding the Extension field set returns the same data as the one serialized for level control previously
     writer.Init(buff_span);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
     NL_TEST_ASSERT(aSuite,
@@ -441,7 +506,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     // Verify Deserializing is properly filling out output extension field set for color control
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.Deserialize(TEST_ENDPOINT2, CC_CTR_CID, CC_list, extensionFieldSetOut));
 
-    // Verify Encoding the Extension field set returns the same data as
+    // Verify Encoding the Extension field set returns the same data as the one serialized for color control previously
     writer.Init(buff_span);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
     NL_TEST_ASSERT(aSuite,
@@ -457,31 +522,23 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
 
 void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
 {
-    SceneTableImpl * sceneTable = chip::scenes::GetSceneTable();
+    SceneTable * sceneTable = chip::scenes::GetSceneTable();
     NL_TEST_ASSERT(aSuite, sceneTable);
 
     // Reset test
     ResetSceneTable(sceneTable);
 
     // Populate scene1's EFS (Endpoint1)
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneSaveEFS(scene1, ON_OFF_CID));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneSaveEFS(scene1, LV_CTR_CID));
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == sceneTable->SceneSaveEFS(scene1, CC_CTR_CID));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneSaveEFS(scene1));
 
     // Populate scene2's EFS (Endpoint1)
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneSaveEFS(scene2, ON_OFF_CID));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneSaveEFS(scene2, LV_CTR_CID));
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == sceneTable->SceneSaveEFS(scene2, CC_CTR_CID));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneSaveEFS(scene2));
 
     // Populate scene3's EFS (Endpoint2)
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneSaveEFS(scene3, ON_OFF_CID));
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == sceneTable->SceneSaveEFS(scene3, LV_CTR_CID));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneSaveEFS(scene3, CC_CTR_CID));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneSaveEFS(scene3));
 
     // Populate scene3's EFS (Endpoint2)
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneSaveEFS(scene4, ON_OFF_CID));
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == sceneTable->SceneSaveEFS(scene4, LV_CTR_CID));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneSaveEFS(scene4, CC_CTR_CID));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneSaveEFS(scene4));
 
     SceneTableEntry scene;
 
@@ -495,7 +552,7 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene7));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene8));
 
-    // Too many scenes 1 fabric
+    // Too many scenes for 1 fabric
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_LIST_LENGTH == sceneTable->SetSceneTableEntry(kFabric1, scene9));
 
     // Not Found
@@ -530,7 +587,7 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
 
 void TestOverwriteScenes(nlTestSuite * aSuite, void * aContext)
 {
-    SceneTableImpl * sceneTable = chip::scenes::GetSceneTable();
+    SceneTable * sceneTable = chip::scenes::GetSceneTable();
     NL_TEST_ASSERT(aSuite, sceneTable);
 
     SceneTableEntry scene;
@@ -554,7 +611,7 @@ void TestOverwriteScenes(nlTestSuite * aSuite, void * aContext)
 
 void TestIterateScenes(nlTestSuite * aSuite, void * aContext)
 {
-    SceneTableImpl * sceneTable = chip::scenes::GetSceneTable();
+    SceneTable * sceneTable = chip::scenes::GetSceneTable();
     NL_TEST_ASSERT(aSuite, sceneTable);
 
     SceneTableEntry scene;
@@ -590,7 +647,7 @@ void TestIterateScenes(nlTestSuite * aSuite, void * aContext)
 
 void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
 {
-    SceneTableImpl * sceneTable = chip::scenes::GetSceneTable();
+    SceneTable * sceneTable = chip::scenes::GetSceneTable();
     NL_TEST_ASSERT(aSuite, sceneTable);
 
     SceneTableEntry scene;
@@ -681,7 +738,7 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
 
 void TestFabricScenes(nlTestSuite * aSuite, void * aContext)
 {
-    SceneTableImpl * sceneTable = chip::scenes::GetSceneTable();
+    SceneTable * sceneTable = chip::scenes::GetSceneTable();
     NL_TEST_ASSERT(aSuite, sceneTable);
 
     // Reset test
@@ -757,7 +814,7 @@ int TestSetup(void * inContext)
  */
 int TestTeardown(void * inContext)
 {
-    SceneTableImpl * sceneTable = chip::scenes::GetSceneTable();
+    SceneTable * sceneTable = chip::scenes::GetSceneTable();
     if (nullptr != sceneTable)
     {
         sceneTable->Finish();
@@ -767,12 +824,14 @@ int TestTeardown(void * inContext)
 }
 int TestSceneTable()
 {
-    static nlTest sTests[] = { NL_TEST_DEF("TestStoreScenes", TestHandlerFunctions),
+    static nlTest sTests[] = { NL_TEST_DEF("TestHandlerRegistration", TestHandlerRegistration),
+                               NL_TEST_DEF("TestHandlerFunctions", TestHandlerFunctions),
                                NL_TEST_DEF("TestStoreScenes", TestStoreScenes),
                                NL_TEST_DEF("TestOverwriteScenes", TestOverwriteScenes),
                                NL_TEST_DEF("TestIterateScenes", TestIterateScenes),
                                NL_TEST_DEF("TestRemoveScenes", TestRemoveScenes),
                                NL_TEST_DEF("TestFabricScenes", TestFabricScenes),
+
                                NL_TEST_SENTINEL() };
 
     nlTestSuite theSuite = {

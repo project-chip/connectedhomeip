@@ -56,40 +56,52 @@ public:
     SceneHandler(){};
     virtual ~SceneHandler() = default;
 
+    /// @brief Gets the list of supported clusters for an endpoint
+    /// @param endpoint target endpoint
+    /// @param clusterBuffer Buffer to hold the supported cluster IDs, cannot hold more than
+    /// CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES
+    virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) = 0;
+
+    /// @brief Returns whether or not a cluster is supported on an endpoint
+    /// @param endpoint Target Endpoint ID
+    /// @param cluster Target Cluster ID
+    /// @return true if supported, false if not supported
     virtual bool SupportsCluster(EndpointId endpoint, ClusterId cluster) = 0;
 
     /// @brief From command AddScene, allows handler to filter through clusters in command to serialize only the supported ones.
     /// @param endpoint Endpoint ID
     /// @param cluster  Cluster ID to fetch from command
-    /// @param serialysedBytes Buffer for ExtensionFieldSet in command
+    /// @param serialisedBytes Buffer for ExtensionFieldSet in command
     /// @param extensionFieldSet ExtensionFieldSets provided by the AddScene Command
-    /// @return
-    virtual CHIP_ERROR SerializeAdd(EndpointId endpoint, ClusterId & cluster, MutableByteSpan & serialysedBytes,
+    /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
+    virtual CHIP_ERROR SerializeAdd(EndpointId endpoint, ClusterId & cluster, MutableByteSpan & serialisedBytes,
                                     app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet) = 0;
 
-    /// @brief From command SaveScene, retrieves ExtensionField from nvm
-    /// @param endpoint
-    /// @param cluster
-    /// @param serialysedBytes
-    /// @return
-    virtual CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serialysedBytes) = 0;
+    /// @brief From command StoreScene, retrieves ExtensionField from nvm, it is the functions responsability to resize the mutable
+    /// span if necessary, a number of byte equal to the span will be stored in memory
+    /// @param endpoint Target Endpoint
+    /// @param cluster Target Cluster
+    /// @param serialisedBytes Output buffer, data needs to be writen in there and size adjusted if smaller than
+    /// kMaxFieldsPerCluster
+    /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
+    virtual CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serialisedBytes) = 0;
 
     /// @brief From stored scene (e.g. ViewScene), deserialize ExtensionFieldSet into a command object
     /// @param endpoint Endpoint ID
-    /// @param cluster Cluster ID to set in command
-    /// @param serialysedBytes ExtensionFieldSet stored in NVM
+    /// @param cluster Cluster ID to save
+    /// @param serialisedBytes ExtensionFieldSet stored in NVM
     /// @param extensionFieldSet ExtensionFieldSet in command format
-    /// @return
-    virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, ByteSpan & serialysedBytes,
+    /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
+    virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, ByteSpan & serialisedBytes,
                                    app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & extensionFieldSet) = 0;
 
     /// @brief From stored scene (e.g RecallScene), applies EFS values to cluster at transition time
     /// @param endpoint Endpoint ID
     /// @param cluster Cluster ID
-    /// @param serialysedBytes ExtensionFieldSet stored in NVM
+    /// @param serialisedBytes ExtensionFieldSet stored in NVM
     /// @param timeMs Transition time in ms to apply the scene
-    /// @return
-    virtual CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, ByteSpan & serialysedBytes, TransitionTimeMs timeMs) = 0;
+    /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
+    virtual CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, ByteSpan & serialisedBytes, TransitionTimeMs timeMs) = 0;
 };
 
 class SceneTable
@@ -318,21 +330,50 @@ public:
     virtual CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id)                       = 0;
     virtual CHIP_ERROR RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scened_idx)               = 0;
 
+    // SceneHandlers
+    virtual CHIP_ERROR RegisterHandler(SceneHandler * handler) = 0;
+    virtual CHIP_ERROR UnregisterHandler(uint8_t position)     = 0;
+
+    // Extension field sets operation
+    virtual CHIP_ERROR SceneSaveEFS(SceneTableEntry & scene)                                    = 0;
+    virtual CHIP_ERROR SceneApplyEFS(FabricIndex fabric_index, const SceneStorageId & scene_id) = 0;
+
+    // Fabrics
+    virtual CHIP_ERROR RemoveFabric(FabricIndex fabric_index) = 0;
+
     // Iterators
     using SceneEntryIterator = CommonIterator<SceneTableEntry>;
 
     virtual SceneEntryIterator * IterateSceneEntry(FabricIndex fabric_index) = 0;
 
-    // Fabrics
-    virtual CHIP_ERROR RemoveFabric(FabricIndex fabric_index) = 0;
-
     // Handlers
-    SceneHandler * mHandlers[CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES] = { nullptr };
-    uint8_t handlerNum                                                   = 0;
+    virtual bool HandlerListEmpty() { return (handlerNum == 0); }
+    virtual bool HandlerListFull() { return (handlerNum >= kMaxSceneHandlers); }
+    virtual uint8_t GetHandlerNum() { return this->handlerNum; }
 
-protected:
-    const uint8_t mMaxScenePerFabric = kMaxScenePerFabric;
+    SceneHandler * mHandlers[kMaxSceneHandlers] = { nullptr };
+    uint8_t handlerNum                          = 0;
 };
+
+/**
+ * Instance getter for the global SceneTable.
+ *
+ * Callers have to externally synchronize usage of this function.
+ *
+ * @return The global Scene Table
+ */
+SceneTable * GetSceneTable();
+
+/**
+ * Instance setter for the global Scene Table.
+ *
+ * Callers have to externally synchronize usage of this function.
+ *
+ * The `provider` can be set to nullptr if the owner is done with it fully.
+ *
+ * @param[in] provider pointer to the Scene Table global instance to use
+ */
+void SetSceneTable(SceneTable * provider);
 
 } // namespace scenes
 } // namespace chip
