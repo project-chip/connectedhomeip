@@ -443,12 +443,12 @@ CHIP_ERROR DefaultSceneTableImpl::UnregisterHandler(uint8_t position)
     VerifyOrReturnError(position < kMaxSceneHandlers, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnValue(!this->HandlerListEmpty() && !(this->mHandlers[position] == nullptr), CHIP_NO_ERROR);
 
-    uint8_t nextPos = position++;
+    uint8_t nextPos = static_cast<uint8_t>(position + 1);
     uint8_t moveNum = static_cast<uint8_t>(kMaxSceneHandlers - nextPos);
 
     // TODO: Implement general array management methods
     // Compress array after removal
-    memmove(&this->mHandlers[position], &this->mHandlers[nextPos], sizeof(SceneHandler *) * moveNum);
+    memmove(&this->mHandlers[position], &this->mHandlers[nextPos], sizeof(this->mHandlers[position]) * moveNum);
 
     this->handlerNum--;
     // Clear last occupied position
@@ -457,20 +457,27 @@ CHIP_ERROR DefaultSceneTableImpl::UnregisterHandler(uint8_t position)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene, clusterId cluster)
+CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 {
-    ExtensionFieldsSet EFS;
-    MutableByteSpan EFSSpan = MutableByteSpan(EFS.mBytesBuffer, kMaxFieldsPerCluster);
     if (!this->HandlerListEmpty())
     {
         for (uint8_t i = 0; i < this->handlerNum; i++)
         {
+            clusterId cArray[kMaxClusterPerScenes];
+            Span<clusterId> cSpan(cArray);
             if (this->mHandlers[i] != nullptr)
             {
-                EFS.mID = cluster;
-                ReturnErrorOnFailure(this->mHandlers[i]->SerializeSave(scene.mStorageId.mEndpointId, cluster, EFSSpan));
-                EFS.mUsedBytes = (uint8_t) EFSSpan.size();
-                ReturnErrorOnFailure(scene.mStorageData.mExtensionFieldsSets.InsertFieldSet(EFS));
+                this->mHandlers[i]->GetSupportedClusters(scene.mStorageId.mEndpointId, cSpan);
+                for (uint8_t j = 0; j < cSpan.size(); j++)
+                {
+                    ExtensionFieldsSet EFS;
+                    MutableByteSpan EFSSpan = MutableByteSpan(EFS.mBytesBuffer, kMaxFieldsPerCluster);
+
+                    EFS.mID = cArray[j];
+                    ReturnErrorOnFailure(this->mHandlers[i]->SerializeSave(scene.mStorageId.mEndpointId, EFS.mID, EFSSpan));
+                    EFS.mUsedBytes = (uint8_t) EFSSpan.size();
+                    ReturnErrorOnFailure(scene.mStorageData.mExtensionFieldsSets.InsertFieldSet(EFS));
+                }
             }
         }
     }
@@ -585,16 +592,16 @@ void DefaultSceneTableImpl::SceneEntryIteratorImpl::Release()
 
 namespace {
 
-DefaultSceneTableImpl * gSceneTable = nullptr;
+SceneTable * gSceneTable = nullptr;
 
 } // namespace
 
-DefaultSceneTableImpl * GetSceneTable()
+SceneTable * GetSceneTable()
 {
     return gSceneTable;
 }
 
-void SetSceneTable(DefaultSceneTableImpl * provider)
+void SetSceneTable(SceneTable * provider)
 {
     gSceneTable = provider;
 }

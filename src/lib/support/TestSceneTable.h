@@ -26,6 +26,7 @@ namespace SceneTesting {
 
 using FabricIndex        = chip::FabricIndex;
 using SceneTableEntry    = chip::scenes::DefaultSceneTableImpl::SceneTableEntry;
+using SceneTable         = chip::scenes::SceneTable;
 using SceneTableImpl     = chip::scenes::DefaultSceneTableImpl;
 using SceneStorageId     = chip::scenes::DefaultSceneTableImpl::SceneStorageId;
 using SceneData          = chip::scenes::DefaultSceneTableImpl::SceneData;
@@ -72,11 +73,26 @@ static uint8_t CC_buffer[scenes::kMaxFieldsPerCluster] = { 0 };
 class TestSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
 public:
-    static constexpr uint8_t kMaxValueSize = 4;
-    static constexpr uint8_t kMaxAvPair    = 15;
-
     TestSceneHandler() = default;
     ~TestSceneHandler() override {}
+
+    // Fills in cluster buffer and adjusts its size to lower than the maximum number of cluster per scenes
+    virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
+    {
+        ClusterId * buffer = clusterBuffer.data();
+        if (endpoint == TEST_ENDPOINT1)
+        {
+            buffer[0] = ON_OFF_CID;
+            buffer[1] = LV_CTR_CID;
+            clusterBuffer.reduce_size(2);
+        }
+        else if (endpoint == TEST_ENDPOINT2)
+        {
+            buffer[0] = ON_OFF_CID;
+            buffer[1] = CC_CTR_CID;
+            clusterBuffer.reduce_size(2);
+        }
+    }
 
     // Default function only checks if endpoint and clusters are valid
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
@@ -104,9 +120,9 @@ public:
     /// @brief Simulates save from cluster, data is already in an EFS struct but this isn't mandatory
     /// @param endpoint target endpoint
     /// @param cluster  target cluster
-    /// @param serialyzedBytes data to serialize into EFS
+    /// @param serialisedBytes data to serialize into EFS
     /// @return success if successfully serialized the data, CHIP_ERROR_INVALID_ARGUMENT if endpoint or cluster not supported
-    CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serialyzedBytes) override
+    CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serialisedBytes) override
     {
         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
@@ -116,13 +132,13 @@ public:
             {
             case ON_OFF_CID:
                 err = CHIP_NO_ERROR;
-                memcpy(serialyzedBytes.data(), OO_buffer, scenes::kMaxFieldsPerCluster);
-                serialyzedBytes.reduce_size(15); // Used memory for OnOff TLV
+                memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldsPerCluster);
+                serialisedBytes.reduce_size(15); // Used memory for OnOff TLV
                 break;
             case LV_CTR_CID:
                 err = CHIP_NO_ERROR;
-                memcpy(serialyzedBytes.data(), LC_buffer, scenes::kMaxFieldsPerCluster);
-                serialyzedBytes.reduce_size(27); // Used memory for Level Control TLV
+                memcpy(serialisedBytes.data(), LC_buffer, scenes::kMaxFieldsPerCluster);
+                serialisedBytes.reduce_size(27); // Used memory for Level Control TLV
                 break;
             default:
                 break;
@@ -134,13 +150,13 @@ public:
             {
             case ON_OFF_CID:
                 err = CHIP_NO_ERROR;
-                memcpy(serialyzedBytes.data(), OO_buffer, scenes::kMaxFieldsPerCluster);
-                serialyzedBytes.reduce_size(15); // Used memory for Color Control TLV
+                memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldsPerCluster);
+                serialisedBytes.reduce_size(15); // Used memory for OnOff TLV
                 break;
             case CC_CTR_CID:
                 err = CHIP_NO_ERROR;
-                memcpy(serialyzedBytes.data(), CC_buffer, scenes::kMaxFieldsPerCluster);
-                serialyzedBytes.reduce_size(99); // Used memory for Color Control TLV
+                memcpy(serialisedBytes.data(), CC_buffer, scenes::kMaxFieldsPerCluster);
+                serialisedBytes.reduce_size(99); // Used memory for Color Control TLV
                 break;
             default:
                 break;
@@ -153,11 +169,11 @@ public:
     /// "cluster"
     /// @param endpoint target endpoint
     /// @param cluster  target cluster
-    /// @param serialyzedBytes Data from nvm
+    /// @param serialisedBytes Data from nvm
     /// @param timeMs transition time in ms
     /// @return CHIP_NO_ERROR if value as expected, CHIP_ERROR_INVALID_ARGUMENT otherwise
     CHIP_ERROR
-    ApplyScene(EndpointId endpoint, ClusterId cluster, ByteSpan & serialyzedBytes, TransitionTimeMs timeMs) override
+    ApplyScene(EndpointId endpoint, ClusterId cluster, ByteSpan & serialisedBytes, TransitionTimeMs timeMs) override
     {
         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
@@ -167,13 +183,13 @@ public:
             switch (cluster)
             {
             case ON_OFF_CID:
-                if (!memcmp(serialyzedBytes.data(), OO_buffer, serialyzedBytes.size()))
+                if (!memcmp(serialisedBytes.data(), OO_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
                 }
                 break;
             case LV_CTR_CID:
-                if (!memcmp(serialyzedBytes.data(), LC_buffer, serialyzedBytes.size()))
+                if (!memcmp(serialisedBytes.data(), LC_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
                 }
@@ -189,13 +205,13 @@ public:
             switch (cluster)
             {
             case ON_OFF_CID:
-                if (!memcmp(serialyzedBytes.data(), OO_buffer, serialyzedBytes.size()))
+                if (!memcmp(serialisedBytes.data(), OO_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
                 }
                 break;
             case CC_CTR_CID:
-                if (!memcmp(serialyzedBytes.data(), CC_buffer, serialyzedBytes.size()))
+                if (!memcmp(serialisedBytes.data(), CC_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
                 }
@@ -211,7 +227,7 @@ public:
 
 static TestSceneHandler sHandler;
 
-CHIP_ERROR scene_handler_test(SceneTableImpl * provider)
+CHIP_ERROR scene_handler_test(SceneTable * provider)
 {
     ClusterId tempCluster = 0;
 
@@ -387,7 +403,7 @@ CHIP_ERROR scene_handler_test(SceneTableImpl * provider)
     return CHIP_NO_ERROR;
 };
 
-CHIP_ERROR scene_store_test(SceneTableImpl * provider, FabricIndex fabric_index, SceneTableEntry & entry)
+CHIP_ERROR scene_store_test(SceneTable * provider, FabricIndex fabric_index, SceneTableEntry & entry)
 {
     SceneTableEntry temp;
 
@@ -400,7 +416,7 @@ CHIP_ERROR scene_store_test(SceneTableImpl * provider, FabricIndex fabric_index,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR scene_iterator_test(SceneTableImpl * provider, FabricIndex fabric_index, const SceneTableEntry & entry1,
+CHIP_ERROR scene_iterator_test(SceneTable * provider, FabricIndex fabric_index, const SceneTableEntry & entry1,
                                const SceneTableEntry & entry2, const SceneTableEntry & entry3)
 {
     SceneTableEntry temp;
@@ -428,8 +444,8 @@ CHIP_ERROR scene_iterator_test(SceneTableImpl * provider, FabricIndex fabric_ind
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR scene_remove_test(SceneTableImpl * provider, FabricIndex fabric_index, SceneTableEntry & entry1,
-                             SceneTableEntry & entry2, SceneTableEntry & entry3)
+CHIP_ERROR scene_remove_test(SceneTable * provider, FabricIndex fabric_index, SceneTableEntry & entry1, SceneTableEntry & entry2,
+                             SceneTableEntry & entry3)
 {
     SceneTableEntry temp;
 
@@ -458,7 +474,7 @@ CHIP_ERROR scene_remove_test(SceneTableImpl * provider, FabricIndex fabric_index
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR TestSceneData(SceneTableImpl * provider, FabricIndex fabric_index)
+CHIP_ERROR TestSceneData(SceneTable * provider, FabricIndex fabric_index)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Scene storage ID
@@ -476,16 +492,13 @@ CHIP_ERROR TestSceneData(SceneTableImpl * provider, FabricIndex fabric_index)
     SceneTableEntry scene2(sceneId2, sceneData2);
     SceneTableEntry scene3(sceneId3, sceneData3);
 
-    LogErrorOnFailure(scene_handler_test(provider));
-
-    err = provider->SceneSaveEFS(scene1, ON_OFF_CID);
-    LogErrorOnFailure(err);
-    err = provider->SceneSaveEFS(scene1, LV_CTR_CID);
+    err = scene_handler_test(provider);
     LogErrorOnFailure(err);
 
-    err = provider->SceneSaveEFS(scene3, ON_OFF_CID);
+    err = provider->SceneSaveEFS(scene1);
     LogErrorOnFailure(err);
-    err = provider->SceneSaveEFS(scene3, CC_CTR_CID);
+
+    err = provider->SceneSaveEFS(scene3);
     LogErrorOnFailure(err);
 
     // Tests

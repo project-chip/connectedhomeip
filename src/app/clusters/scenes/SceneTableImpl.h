@@ -44,10 +44,10 @@ public:
     /// @brief Function to serialize data from an add scene command, assume the incoming extensionFieldSet is initialized
     /// @param endpoint Target Endpoint
     /// @param cluster Cluster in the Extension field set, filled by the function
-    /// @param serialyzedBytes Mutable Byte span to hold EFS data from command
+    /// @param serialisedBytes Mutable Byte span to hold EFS data from command
     /// @param extensionFieldSet Extension field set from commmand, pre initialized
     /// @return CHIP_NO_ERROR if success, specific CHIP_ERROR otherwise
-    virtual CHIP_ERROR SerializeAdd(EndpointId endpoint, ClusterId & cluster, MutableByteSpan & serialyzedBytes,
+    virtual CHIP_ERROR SerializeAdd(EndpointId endpoint, ClusterId & cluster, MutableByteSpan & serialisedBytes,
                                     app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet) override
     {
         app::DataModel::List<app::Clusters::Scenes::Structs::AttributeValuePair::Type> attributeValueList;
@@ -88,7 +88,7 @@ public:
         attributeValueList = mAVPairs;
         attributeValueList.reduce_size(pairCount);
 
-        writer.Init(serialyzedBytes);
+        writer.Init(serialisedBytes);
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
         ReturnErrorOnFailure(app::DataModel::Encode(
             writer, TLV::ContextTag(to_underlying(app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)),
@@ -101,9 +101,9 @@ public:
     /// @brief Simulates taking data from nvm and loading it in a command object if the cluster is supported by the endpoint
     /// @param endpoint target endpoint
     /// @param cluster  target cluster
-    /// @param serialyzedBytes data to deserialize into EFS
+    /// @param serialisedBytes data to deserialize into EFS
     /// @return CHIP_NO_ERROR if Extension Field Set was successfully populated, specific CHIP_ERROR otherwise
-    virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, ByteSpan & serialyzedBytes,
+    virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, ByteSpan & serialisedBytes,
                                    app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & extensionFieldSet) override
     {
         app::DataModel::DecodableList<app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType> attributeValueList;
@@ -117,7 +117,7 @@ public:
         VerifyOrReturnError(SupportsCluster(endpoint, cluster), CHIP_ERROR_INVALID_ARGUMENT);
 
         extensionFieldSet.clusterID = cluster;
-        reader.Init(serialyzedBytes);
+        reader.Init(serialisedBytes);
         ReturnErrorOnFailure(reader.Next());
         ReturnErrorOnFailure(reader.EnterContainer(outer));
         ReturnErrorOnFailure(reader.Next());
@@ -183,22 +183,18 @@ public:
     CHIP_ERROR RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scened_idx) override;
 
     // SceneHandlers
-    CHIP_ERROR RegisterHandler(SceneHandler * handler);
-    CHIP_ERROR UnregisterHandler(uint8_t position);
+    CHIP_ERROR RegisterHandler(SceneHandler * handler) override;
+    CHIP_ERROR UnregisterHandler(uint8_t position) override;
 
     // Extension field sets operation
-    CHIP_ERROR SceneSaveEFS(SceneTableEntry & scene, clusterId cluster);
-    CHIP_ERROR SceneApplyEFS(FabricIndex fabric_index, const SceneStorageId & scene_id);
+    CHIP_ERROR SceneSaveEFS(SceneTableEntry & scene) override;
+    CHIP_ERROR SceneApplyEFS(FabricIndex fabric_index, const SceneStorageId & scene_id) override;
 
     // Fabrics
     CHIP_ERROR RemoveFabric(FabricIndex fabric_index) override;
 
     // Iterators
     SceneEntryIterator * IterateSceneEntry(FabricIndex fabric_index) override;
-
-    bool HandlerListEmpty() { return (handlerNum == 0); }
-    bool HandlerListFull() { return (handlerNum >= CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES); }
-    uint8_t GetHandlerNum() { return this->handlerNum; }
 
 protected:
     class SceneEntryIteratorImpl : public SceneEntryIterator
@@ -222,24 +218,5 @@ protected:
     ObjectPool<SceneEntryIteratorImpl, kIteratorsMax> mSceneEntryIterators;
 }; // class DefaultSceneTableImpl
 
-/**
- * Instance getter for the global SceneTable.
- *
- * Callers have to externally synchronize usage of this function.
- *
- * @return The global Scene Table
- */
-DefaultSceneTableImpl * GetSceneTable();
-
-/**
- * Instance setter for the global Scene Table.
- *
- * Callers have to externally synchronize usage of this function.
- *
- * The `provider` can be set to nullptr if the owner is done with it fully.
- *
- * @param[in] provider pointer to the Scene Table global instance to use
- */
-void SetSceneTable(DefaultSceneTableImpl * provider);
 } // namespace scenes
 } // namespace chip
