@@ -434,7 +434,7 @@ void wfx_show_err(char * msg)
  * @return
  *       None
  *******************************************************************************************/
-static void wfx_rsi_save_ap_info() // transalation
+static void wfx_rsi_save_ap_info() // translation
 {
     int32_t status;
     rsi_rsp_scan_t rsp;
