@@ -737,6 +737,7 @@ void wfx_rsi_task(void * arg)
                             WFX_RSI_LOG("Inside else");
                             ap.security = scan->security_mode;
                             ap.rssi     = (-1) * scan->rssi_val;
+                            ap.chan     = scan->rf_channel;
                             memcpy(&ap.bssid[0], &scan->bssid[0], BSSID_MAX_STR_LEN);
                             (*wfx_rsi.scan_cb)(&ap);
                         }
