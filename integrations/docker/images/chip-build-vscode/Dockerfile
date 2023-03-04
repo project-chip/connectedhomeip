@@ -28,7 +28,7 @@ COPY --from=nrf /opt/NordicSemiconductor/nrfconnect /opt/NordicSemiconductor/nrf
 
 COPY --from=android /opt/android/sdk /opt/android/sdk
 COPY --from=android /opt/android/android-ndk-r21b /opt/android/android-ndk-r21b
-COPY --from=android /usr/lib/kotlinc/bin /usr/lib/kotlinc/bin
+COPY --from=android /usr/lib/kotlinc /usr/lib/kotlinc
 
 COPY --from=mbedos /opt/openocd/ /opt/openocd/
 
