@@ -20,12 +20,12 @@ package chip.devicecontroller.model;
 import java.util.Locale;
 import java.util.Objects;
 
-/** An invoke request that should be used for interaction model invoke command. */
-public final class InvokeRequest {
+/** An invoke element that should be used for interaction model invoke request and response. */
+public final class InvokeElement {
   private final ChipPathId endpointId, clusterId, commandId;
   private final byte[] tlv;
 
-  private InvokeRequest(
+  private InvokeElement(
       ChipPathId endpointId, ChipPathId clusterId, ChipPathId commandId, byte[] tlv) {
     this.endpointId = endpointId;
     this.clusterId = clusterId;
@@ -49,11 +49,11 @@ public final class InvokeRequest {
     return tlv.clone();
   }
 
-  // check whether the current InvokeRequest has same path as others.
+  // check whether the current InvokeElement has same path as others.
   @Override
   public boolean equals(Object object) {
-    if (object instanceof InvokeRequest) {
-      InvokeRequest that = (InvokeRequest) object;
+    if (object instanceof InvokeElement) {
+      InvokeElement that = (InvokeElement) object;
       return Objects.equals(this.endpointId, that.endpointId)
           && Objects.equals(this.clusterId, that.clusterId)
           && Objects.equals(this.commandId, that.commandId);
@@ -72,15 +72,15 @@ public final class InvokeRequest {
         Locale.ENGLISH, "Endpoint %s, cluster %s, command %s", endpointId, clusterId, commandId);
   }
 
-  public static InvokeRequest newInstance(
+  public static InvokeElement newInstance(
       ChipPathId endpointId, ChipPathId clusterId, ChipPathId commandId, byte[] tlv) {
-    return new InvokeRequest(endpointId, clusterId, commandId, tlv);
+    return new InvokeElement(endpointId, clusterId, commandId, tlv);
   }
 
-  /** Create a new {@link InvokeRequest} with only concrete ids. */
-  public static InvokeRequest newInstance(
+  /** Create a new {@link InvokeElement} with only concrete ids. */
+  public static InvokeElement newInstance(
       long endpointId, long clusterId, long commandId, byte[] tlv) {
-    return new InvokeRequest(
+    return new InvokeElement(
         ChipPathId.forId(endpointId),
         ChipPathId.forId(clusterId),
         ChipPathId.forId(commandId),
