@@ -51,6 +51,7 @@ java_library("java") {
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkFabricCommand.java",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkInstanceNameCommand.java",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongCommand.java",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImInvokeCommand.java",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImWriteCommand.java",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkShortCommand.java",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkVendorCommand.java",

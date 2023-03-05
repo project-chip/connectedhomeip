@@ -63,6 +63,7 @@ private fun getImCommands(
 ): List<Command> {
   return listOf(
     PairOnNetworkLongImWriteCommand(controller, credentialsIssuer),
+    PairOnNetworkLongImInvokeCommand(controller, credentialsIssuer),
   )
 }
 
