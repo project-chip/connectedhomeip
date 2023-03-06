@@ -177,7 +177,7 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",                  // Just a text name, not used by the RTOS kernel
-                                  pdMS_TO_TICKS(1),                        // == default timer period (mS)
+                                  pdMS_TO_TICKS(1),         // == default timer period (mS)
                                   false,                    // no timer reload (==one-shot)
                                   (void *) this,            // init timer id = app task obj context
                                   FunctionTimerEventHandler // timer callback handler
@@ -190,7 +190,7 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
 
     // Create FreeRTOS sw timer for LED Management.
     sLightTimer = xTimerCreate("LightTmr",            // Text Name
-                               pdMS_TO_TICKS(10),                    // Default timer period (mS)
+                               pdMS_TO_TICKS(10),     // Default timer period (mS)
                                true,                  // reload timer
                                (void *) this,         // Timer Id
                                LightTimerEventHandler // Timer callback handler

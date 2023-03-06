@@ -69,11 +69,11 @@ chip::app::Clusters::NetworkCommissioning::Instance
 WindowAppImpl::Timer::Timer(const char * name, uint32_t timeoutInMs, Callback callback, void * context) :
     WindowApp::Timer(name, timeoutInMs, callback, context)
 {
-    mHandler = xTimerCreate(name,          // Just a text name, not used by the RTOS kernel
-                            pdMS_TO_TICKS(timeoutInMs),   // == default timer period (mS)
-                            false,         // no timer reload (==one-shot)
-                            (void *) this, // init timer id = app task obj context
-                            TimerCallback  // timer callback handler
+    mHandler = xTimerCreate(name,                       // Just a text name, not used by the RTOS kernel
+                            pdMS_TO_TICKS(timeoutInMs), // == default timer period (mS)
+                            false,                      // no timer reload (==one-shot)
+                            (void *) this,              // init timer id = app task obj context
+                            TimerCallback               // timer callback handler
     );
     if (mHandler == NULL)
     {
