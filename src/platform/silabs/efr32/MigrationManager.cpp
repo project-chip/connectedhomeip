@@ -40,15 +40,15 @@ typedef struct
 static migrationData_t migrationTable[] = {
     { .migrationGroup = 1 , .migrationFunc = &KeyValueStoreMgrImpl().KvsMapMigration },
     // add any additional migration neccesary. migrationGroup should stay equal if done in the same commit or increment by 1 for each new entry.
-};  
+};
 
 } //namespace
 
 void EFR32Migration::applyMigrations()
-{   
-    uint32_t lastMigationGroupDone = 0; 
+{
+    uint32_t lastMigationGroupDone = 0;
     SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_MigrationCounter, lastMigationGroupDone);
-    
+
     uint32_t completedMigrationGroup = lastMigationGroupDone;
     for (uint32_t i = 0; i < COUNT_OF(migrationTable); i++)
     {

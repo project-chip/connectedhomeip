@@ -71,12 +71,12 @@ bool KeyValueStoreManagerImpl::IsValidKvsNvm3Key(uint32_t nvm3Key) const
 }
 
 uint16_t KeyValueStoreManagerImpl::hashKvsKeyString(const char * key) const
-{   
+{
     uint8_t hash256[Crypto::kSHA256_Hash_Length] = { 0 };
     Crypto::Hash_SHA256(reinterpret_cast<const uint8_t*>(key), strlen(key), hash256);
-    
+
     uint16_t hash16 ,i = 0;
-    
+
     while (!hash16 && (i < (Crypto::kSHA256_Hash_Length-1)))
     {
         hash16 = (hash256[i] | (hash256[i+1] <<8));
@@ -100,7 +100,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::MapKvsKeyToNvm3(const char * key, uint16_t 
             size_t readCount;
             size_t length = strlen(key);
             if (strPrefix == nullptr)
-            {   
+            {
                 // Use a calloc to initialize all bits to 0. alloc +1 for a null char
                 strPrefix = static_cast<char *>(Platform::MemoryCalloc(1,length+1));
                 VerifyOrDie(strPrefix != nullptr);
@@ -255,7 +255,7 @@ void KeyValueStoreManagerImpl::ErasePartition(void)
 }
 
 void KeyValueStoreManagerImpl::KvsMapMigration(void)
-{   
+{
     size_t readlen = 0;
     constexpr uint8_t oldMaxEntires = 120;
     char mKvsStoredKeyString[oldMaxEntires][PersistentStorageDelegate::kKeyLengthMax + 1] = {0};
@@ -272,7 +272,7 @@ void KeyValueStoreManagerImpl::KvsMapMigration(void)
                 uint32_t nvm3Key = CONVERT_KEYMAP_INDEX_TO_NVM3KEY(i);
 
                 if (SilabsConfig::ConfigValueExists(nvm3Key, dataLen))
-                {   
+                {
                     // Read old data and prefix it with the string Key for the collision prevention mechanism.
                     size_t keyStringLen = strlen(mKvsStoredKeyString[i]);
                     uint8_t* prefixedData = static_cast<uint8_t *>(Platform::MemoryAlloc(keyStringLen+dataLen));
@@ -290,7 +290,7 @@ void KeyValueStoreManagerImpl::KvsMapMigration(void)
     }
     else if (err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        // Error reading the old String Keymap. Cannot not resolve stored data for migration. 
+        // Error reading the old String Keymap. Cannot not resolve stored data for migration.
         ChipLogError(DeviceLayer, "Migration failed ! Kvs Key map could not be recovered %" CHIP_ERROR_FORMAT, err.Format());
         // start with a fresh kvs section.
         KeyValueStoreMgrImpl().ErasePartition();
