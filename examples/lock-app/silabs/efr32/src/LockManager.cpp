@@ -225,9 +225,9 @@ void LockManager::StartTimer(uint32_t aTimeoutMs)
     }
 
     // timer is not active, change its period to required value (== restart).
-    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
+    // FreeRTOS- Block for a maximum of 100 ms if the change period command
     // cannot immediately be sent to the timer command queue.
-    if (xTimerChangePeriod(sLockTimer, (aTimeoutMs / portTICK_PERIOD_MS), 100) != pdPASS)
+    if (xTimerChangePeriod(sLockTimer, pdMS_TO_TICKS(aTimeoutMs), pdMS_TO_TICKS(100)) != pdPASS)
     {
         SILABS_LOG("sLockTimer timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
@@ -236,7 +236,7 @@ void LockManager::StartTimer(uint32_t aTimeoutMs)
 
 void LockManager::CancelTimer(void)
 {
-    if (xTimerStop(sLockTimer, 0) == pdFAIL)
+    if (xTimerStop(sLockTimer, pdMS_TO_TICKS(0)) == pdFAIL)
     {
         SILABS_LOG("sLockTimer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);

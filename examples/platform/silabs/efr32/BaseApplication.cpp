@@ -463,7 +463,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
 #endif
 void BaseApplication::CancelFunctionTimer()
 {
-    if (xTimerStop(sFunctionTimer, 0) == pdFAIL)
+    if (xTimerStop(sFunctionTimer, pdMS_TO_TICKS(0)) == pdFAIL)
     {
         SILABS_LOG("app timer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
