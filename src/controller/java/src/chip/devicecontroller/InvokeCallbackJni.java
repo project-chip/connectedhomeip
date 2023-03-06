@@ -18,7 +18,7 @@
 package chip.devicecontroller;
 
 /** JNI wrapper callback class for {@link InvokeCallback}. */
-public class InvokeCallbackJni {
+public final class InvokeCallbackJni {
   private final InvokeCallback wrappedInvokeCallback;
   private long callbackHandle;
 

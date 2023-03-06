@@ -422,28 +422,6 @@ CHIP_ERROR CreateChipAttributePath(const app::ConcreteDataAttributePath & aPath,
     return err;
 }
 
-CHIP_ERROR InvokeCallback::CreateInvokeElement(const app::ConcreteCommandPath & aPath, jobject & outObj)
-{
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    jclass invokeElementCls = nullptr;
-    err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/model/InvokeElement", invokeElementCls);
-    ReturnErrorOnFailure(err);
-    JniClass invokeElementJniCls(invokeElementCls);
-
-    jmethodID invokeElementCtor =
-        env->GetStaticMethodID(invokeElementCls, "newInstance", "(JJJ)Lchip/devicecontroller/model/InvokeElement;");
-    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    VerifyOrReturnError(invokeElementCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
-
-    outObj =
-        env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, aPath.mEndpointId, aPath.mClusterId, aPath.mCommandId);
-    VerifyOrReturnError(outObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-
-    return err;
-}
-
 CHIP_ERROR InvokeCallback::CreateInvokeElement(const app::ConcreteCommandPath & aPath, TLV::TLVReader * apData, jobject & outObj)
 {
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -459,34 +437,41 @@ CHIP_ERROR InvokeCallback::CreateInvokeElement(const app::ConcreteCommandPath & 
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
     VerifyOrReturnError(invokeElementCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    TLV::TLVReader readerForJavaTLV;
-    TLV::TLVReader readerForJson;
-    readerForJavaTLV.Init(*apData);
-    readerForJson.Init(*apData);
+    if (apData != nullptr)
+    {
+        TLV::TLVReader readerForJavaTLV;
+        TLV::TLVReader readerForJson;
+        readerForJavaTLV.Init(*apData);
+        readerForJson.Init(*apData);
 
-    // Create TLV byte array to pass to Java layer
-    size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
-    std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen]);
-    uint32_t size                     = 0;
-    // The TLVReader's read head is not pointing to the first element in the container, instead of the container itself, use
-    // a TLVWriter to get a TLV with a normalized TLV buffer (Wrapped with an anonymous tag, no extra "end of container" tag
-    // at the end.)
-    TLV::TLVWriter writer;
-    writer.Init(buffer.get(), bufferLen);
-    err = writer.CopyElement(TLV::AnonymousTag(), readerForJavaTLV);
-    ReturnErrorOnFailure(err);
-    size = writer.GetLengthWritten();
-    chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), size);
+        // Create TLV byte array to pass to Java layer
+        size_t bufferLen                  = readerForJavaTLV.GetRemainingLength() + readerForJavaTLV.GetLengthRead();
+        std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen]);
+        uint32_t size                     = 0;
+        // The TLVReader's read head is not pointing to the first element in the container, instead of the container itself, use
+        // a TLVWriter to get a TLV with a normalized TLV buffer (Wrapped with an anonymous tag, no extra "end of container" tag
+        // at the end.)
+        TLV::TLVWriter writer;
+        writer.Init(buffer.get(), bufferLen);
+        err = writer.CopyElement(TLV::AnonymousTag(), readerForJavaTLV);
+        ReturnErrorOnFailure(err);
+        size = writer.GetLengthWritten();
+        chip::ByteArray jniByteArray(env, reinterpret_cast<jbyte *>(buffer.get()), size);
 
-    // Convert TLV to JSON
-    Json::Value json;
-    err = TlvToJson(readerForJson, json);
-    ReturnErrorOnFailure(err);
+        // Convert TLV to JSON
+        Json::Value json;
+        err = TlvToJson(readerForJson, json);
+        ReturnErrorOnFailure(err);
 
-    UtfString jsonString(env, JsonToString(json).c_str());
-
-    outObj = env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, aPath.mEndpointId, aPath.mClusterId, aPath.mCommandId,
-                                         jniByteArray.jniValue(), jsonString.jniValue());
+        UtfString jsonString(env, JsonToString(json).c_str());
+        outObj = env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, aPath.mEndpointId, aPath.mClusterId,
+                                             aPath.mCommandId, jniByteArray.jniValue(), jsonString.jniValue());
+    }
+    else
+    {
+        outObj = env->CallStaticObjectMethod(invokeElementCls, invokeElementCtor, aPath.mEndpointId, aPath.mClusterId,
+                                             aPath.mCommandId, nullptr, nullptr);
+    }
     VerifyOrReturnError(outObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
 
     return err;
@@ -980,15 +965,7 @@ void InvokeCallback::OnResponse(app::CommandSender * apCommandSender, const app:
     jobject invokeElementObj = nullptr;
     jmethodID onResponseMethod;
 
-    if (apData != nullptr)
-    {
-        err = CreateInvokeElement(aPath, apData, invokeElementObj);
-    }
-    else
-    {
-        err = CreateInvokeElement(aPath, invokeElementObj);
-    }
-
+    err = CreateInvokeElement(aPath, apData, invokeElementObj);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to create Java InvokeElement: %s", ErrorStr(err)));
     err = JniReferences::GetInstance().FindMethod(env, mJavaCallbackRef, "onResponse",
                                                   "(Lchip/devicecontroller/model/InvokeElement;J)V", &onResponseMethod);

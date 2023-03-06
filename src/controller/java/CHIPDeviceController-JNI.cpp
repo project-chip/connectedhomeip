@@ -1500,7 +1500,6 @@ JNI_METHOD(void, invoke)
     jmethodID getEndpointIdMethod   = nullptr;
     jmethodID getClusterIdMethod    = nullptr;
     jmethodID getCommandIdMethod    = nullptr;
-    jmethodID hasTlvMethod          = nullptr;
     jmethodID getTlvByteArrayMethod = nullptr;
     jobject endpointIdObj           = nullptr;
     jobject clusterIdObj            = nullptr;
@@ -1510,7 +1509,6 @@ JNI_METHOD(void, invoke)
     jsize length                    = 0;
     TLV::TLVReader reader;
     TLV::TLVWriter * writer = nullptr;
-    bool hasTlv             = false;
 
     ChipLogDetail(Controller, "IM invoke() called");
 
@@ -1526,7 +1524,6 @@ JNI_METHOD(void, invoke)
                                                                 "()Lchip/devicecontroller/model/ChipPathId;", &getClusterIdMethod));
     SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getCommandId",
                                                                 "()Lchip/devicecontroller/model/ChipPathId;", &getCommandIdMethod));
-    SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "hasTlv", "()Z", &hasTlvMethod));
     SuccessOrExit(JniReferences::GetInstance().FindMethod(env, invokeElement, "getTlvByteArray", "()[B", &getTlvByteArrayMethod));
 
     endpointIdObj = env->CallObjectMethod(invokeElement, getEndpointIdMethod);
@@ -1544,10 +1541,6 @@ JNI_METHOD(void, invoke)
     SuccessOrExit(err = GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
     SuccessOrExit(err = GetChipPathIdValue(clusterIdObj, kInvalidClusterId, clusterId));
     SuccessOrExit(err = GetChipPathIdValue(commandIdObj, kInvalidCommandId, commandId));
-
-    hasTlv = static_cast<bool>(env->CallBooleanMethod(invokeElement, hasTlvMethod));
-    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    VerifyOrExit(hasTlv, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     tlvBytesObj = static_cast<jbyteArray>(env->CallObjectMethod(invokeElement, getTlvByteArrayMethod));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);

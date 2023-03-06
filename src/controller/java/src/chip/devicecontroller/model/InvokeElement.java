@@ -19,45 +19,45 @@ package chip.devicecontroller.model;
 
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /** An invoke element that should be used for interaction model invoke request and response. */
 public final class InvokeElement {
+  private static final Logger logger = Logger.getLogger(InvokeElement.class.getName());
   private final ChipPathId endpointId, clusterId, commandId;
-  private final Optional<byte[]> tlv;
-  private final Optional<JSONObject> json;
-  private static Logger logger = Logger.getLogger(InvokeElement.class.getName());
+  @Nullable private final byte[] tlv;
+  @Nullable private final JSONObject json;
 
   private InvokeElement(
       ChipPathId endpointId,
       ChipPathId clusterId,
       ChipPathId commandId,
-      Optional<byte[]> tlv,
-      Optional<String> jsonString) {
+      @Nullable byte[] tlv,
+      @Nullable String jsonString) {
     this.endpointId = endpointId;
     this.clusterId = clusterId;
     this.commandId = commandId;
-    if (tlv.isPresent()) {
-      this.tlv = Optional.of(tlv.get().clone());
+
+    if (tlv != null) {
+      this.tlv = tlv.clone();
     } else {
-      this.tlv = Optional.empty();
+      this.tlv = null;
     }
 
     JSONObject jsonObject = null;
-    if (jsonString.isPresent()) {
+    if (jsonString != null) {
       try {
-        jsonObject = new JSONObject(jsonString.get());
+        jsonObject = new JSONObject(jsonString);
       } catch (JSONException ex) {
         logger.log(Level.SEVERE, "Error parsing JSON string", ex);
       }
     }
 
-    this.json = Optional.ofNullable(jsonObject);
-    ;
+    this.json = jsonObject;
   }
 
   public ChipPathId getEndpointId() {
@@ -72,20 +72,17 @@ public final class InvokeElement {
     return commandId;
   }
 
-  public boolean hasTlv() {
-    return tlv.isPresent();
-  }
-
-  public boolean hasJson() {
-    return json.isPresent();
-  }
-
+  @Nullable
   public byte[] getTlvByteArray() {
-    return tlv.get().clone();
+    if (tlv != null) {
+      return tlv.clone();
+    }
+    return null;
   }
 
+  @Nullable
   public JSONObject getJson() {
-    return json.get();
+    return json;
   }
 
   // check whether the current InvokeElement has same path as others.
@@ -115,68 +112,19 @@ public final class InvokeElement {
       ChipPathId endpointId,
       ChipPathId clusterId,
       ChipPathId commandId,
-      byte[] tlv,
-      String jsonString) {
-    return new InvokeElement(
-        endpointId, clusterId, commandId, Optional.of(tlv), Optional.of(jsonString));
+      @Nullable byte[] tlv,
+      @Nullable String jsonString) {
+    return new InvokeElement(endpointId, clusterId, commandId, tlv, jsonString);
   }
 
   /** Create a new {@link InvokeElement} with only concrete ids. */
   public static InvokeElement newInstance(
-      long endpointId, long clusterId, long commandId, byte[] tlv, String jsonString) {
+      long endpointId, long clusterId, long commandId, @Nullable byte[] tlv, @Nullable String jsonString) {
     return new InvokeElement(
         ChipPathId.forId(endpointId),
         ChipPathId.forId(clusterId),
         ChipPathId.forId(commandId),
-        Optional.of(tlv),
-        Optional.of(jsonString));
-  }
-
-  public static InvokeElement newInstance(
-      ChipPathId endpointId, ChipPathId clusterId, ChipPathId commandId, byte[] tlv) {
-    return new InvokeElement(endpointId, clusterId, commandId, Optional.of(tlv), Optional.empty());
-  }
-
-  /** Create a new {@link InvokeElement} with only concrete ids. */
-  public static InvokeElement newInstance(
-      long endpointId, long clusterId, long commandId, byte[] tlv) {
-    return new InvokeElement(
-        ChipPathId.forId(endpointId),
-        ChipPathId.forId(clusterId),
-        ChipPathId.forId(commandId),
-        Optional.of(tlv),
-        Optional.empty());
-  }
-
-  public static InvokeElement newInstance(
-      ChipPathId endpointId, ChipPathId clusterId, ChipPathId commandId, String jsonString) {
-    return new InvokeElement(
-        endpointId, clusterId, commandId, Optional.empty(), Optional.of(jsonString));
-  }
-
-  /** Create a new {@link InvokeElement} with only concrete ids. */
-  public static InvokeElement newInstance(
-      long endpointId, long clusterId, long commandId, String jsonString) {
-    return new InvokeElement(
-        ChipPathId.forId(endpointId),
-        ChipPathId.forId(clusterId),
-        ChipPathId.forId(commandId),
-        Optional.empty(),
-        Optional.of(jsonString));
-  }
-
-  public static InvokeElement newInstance(
-      ChipPathId endpointId, ChipPathId clusterId, ChipPathId commandId) {
-    return new InvokeElement(endpointId, clusterId, commandId, Optional.empty(), Optional.empty());
-  }
-
-  /** Create a new {@link InvokeElement} with only concrete ids. */
-  public static InvokeElement newInstance(long endpointId, long clusterId, long commandId) {
-    return new InvokeElement(
-        ChipPathId.forId(endpointId),
-        ChipPathId.forId(clusterId),
-        ChipPathId.forId(commandId),
-        Optional.empty(),
-        Optional.empty());
+        tlv,
+        jsonString);
   }
 }

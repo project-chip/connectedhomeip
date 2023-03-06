@@ -9,11 +9,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class PairOnNetworkLongImInvokeCommand extends PairingCommand {
+  private static final Logger logger =
+      Logger.getLogger(PairOnNetworkLongImInvokeCommand.class.getName());
   private static final int MATTER_PORT = 5540;
-  private long devicePointer;
   private static final int CLUSTER_ID_IDENTIFY = 0x0003;
   private static final int IDENTIFY_COMMAND = 0;
-  private static Logger logger = Logger.getLogger(PairOnNetworkLongImInvokeCommand.class.getName());
+  private long devicePointer;
 
   private void setDevicePointer(long devicePointer) {
     this.devicePointer = devicePointer;
@@ -67,7 +68,7 @@ public final class PairOnNetworkLongImInvokeCommand extends PairingCommand {
     byte[] intTLV = {0x15, 0x24, 0x00, 0x01, 0x18};
     InvokeElement element =
         InvokeElement.newInstance(
-            /* endpointId= */ 0, CLUSTER_ID_IDENTIFY, IDENTIFY_COMMAND, intTLV);
+            /* endpointId= */ 0, CLUSTER_ID_IDENTIFY, IDENTIFY_COMMAND, intTLV, null);
 
     currentCommissioner()
         .pairDeviceWithAddress(
