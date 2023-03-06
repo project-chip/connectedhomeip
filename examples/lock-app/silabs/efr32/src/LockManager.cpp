@@ -685,8 +685,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
     for (uint8_t i = 0; i < kMaxCredentialsPerUser; i++)
     {
 
-        if (mLockCredentials[i].credentialType != CredentialTypeEnum::kPin ||
-            mLockCredentials[i].status == DlCredentialStatus::kAvailable)
+        if (mLockCredentials[to_underlying(CredentialTypeEnum::kPin)][i].status == DlCredentialStatus::kAvailable)
         {
             continue;
         }
