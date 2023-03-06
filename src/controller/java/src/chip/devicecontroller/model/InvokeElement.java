@@ -119,7 +119,11 @@ public final class InvokeElement {
 
   /** Create a new {@link InvokeElement} with only concrete ids. */
   public static InvokeElement newInstance(
-      long endpointId, long clusterId, long commandId, @Nullable byte[] tlv, @Nullable String jsonString) {
+      long endpointId,
+      long clusterId,
+      long commandId,
+      @Nullable byte[] tlv,
+      @Nullable String jsonString) {
     return new InvokeElement(
         ChipPathId.forId(endpointId),
         ChipPathId.forId(clusterId),
