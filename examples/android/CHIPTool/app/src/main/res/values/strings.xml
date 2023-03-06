@@ -153,6 +153,7 @@
     <string name="write_dialog_data_version_hint">Data Version (Optional)</string>
     <string name="write_dialog_timed_request_timeout_hint">Timed Request Timeout</string>
     <string name="write_dialog_im_timeout_hint">Timeout</string>
+    <string name="write_dialog_user_guide_hint">Example:\nIdentiifyCluster, IdentifyTime - Type : UInt\nBasicInformationCluster, UserLabel - Type : String\nIf you want to enter an array, separate the value by \',\'.(abc,def)</string>
 
     <string name="endpoint_id_label">Endpoint ID</string>
     <string name="cluster_id_label">Cluster ID</string>

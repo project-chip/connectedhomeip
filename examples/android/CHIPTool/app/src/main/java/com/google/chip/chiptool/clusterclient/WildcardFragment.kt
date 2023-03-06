@@ -29,6 +29,7 @@ import chip.tlv.TlvWriter
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.WildcardFragmentBinding
+import com.google.protobuf.ByteString
 import java.lang.StringBuilder
 import java.util.Optional
 import kotlinx.coroutines.CoroutineScope
@@ -78,7 +79,7 @@ class WildcardFragment : Fragment() {
       }
     }
 
-    override fun OnResponse(attributePath: ChipAttributePath?) {
+    override fun onResponse(attributePath: ChipAttributePath?) {
       val text = "$attributePath : Write Success"
       requireActivity().runOnUiThread { binding.outputTv.text = text }
     }
@@ -211,16 +212,23 @@ class WildcardFragment : Fragment() {
     val endpointId = getChipPathIdForText(binding.endpointIdEd.text.toString())
     val clusterId = getChipPathIdForText(binding.clusterIdEd.text.toString())
     val attributeId = getChipPathIdForText(binding.attributeIdEd.text.toString())
-    var tlv : ByteArray? = null
-    try {
-      tlv = TLV_MAP[writeValueType]?.generate(writeValue)
-    } catch (ex: Exception) {
-      Log.e(TAG, "Invalid Data Type")
-      return
+    val tlvWriter = TlvWriter()
+    val values = writeValue.split(",")
+
+    if (values.size > 1) tlvWriter.startArray(AnonymousTag)
+    for (value in values) {
+      try {
+        TLV_MAP[writeValueType]?.generate(tlvWriter, value.trim())
+      } catch (ex: Exception) {
+        Log.e(TAG, "Invalid Data Type")
+        return
+      }
     }
+    if (values.size > 1) tlvWriter.endArray()
+
     val version = if (dataVersion == null) { Optional.empty() } else { Optional.of(dataVersion) }
 
-    val writeRequest = AttributeWriteRequest.newInstance(endpointId, clusterId, attributeId, tlv, version)
+    val writeRequest = AttributeWriteRequest.newInstance(endpointId, clusterId, attributeId, tlvWriter.getEncoded(), version)
     deviceController.write(writeAttributeCallback,
                       ChipClient.getConnectedDevicePointer(requireContext(),
                       addressUpdateFragment.deviceId),
@@ -316,7 +324,7 @@ class WildcardFragment : Fragment() {
   }
 
   interface TlvWriterInterface {
-    fun generate(value: String) : ByteArray
+    fun generate(writer : TlvWriter, value: String)
   }
 
   companion object {
@@ -327,33 +335,39 @@ class WildcardFragment : Fragment() {
 
     private val TLV_MAP = mapOf(
             "UnsignedInt" to object:TlvWriterInterface {
-                override fun generate(value: String): ByteArray {
-                  return TlvWriter().put(AnonymousTag, value.toUInt()).getEncoded()
-                }
+              override fun generate(writer : TlvWriter, value: String) {
+                writer.put(AnonymousTag, value.toUInt())
+              }
             },
             "Int" to object:TlvWriterInterface {
-              override fun generate(value: String): ByteArray {
-                return TlvWriter().put(AnonymousTag, value.toInt()).getEncoded()
+              override fun generate(writer : TlvWriter, value: String) {
+                writer.put(AnonymousTag, value.toInt())
               }
             },
             "Boolean" to object:TlvWriterInterface {
-              override fun generate(value: String): ByteArray {
-                return TlvWriter().put(AnonymousTag, value.toBoolean()).getEncoded()
+              override fun generate(writer : TlvWriter, value: String) {
+                writer.put(AnonymousTag, value.toBoolean())
               }
             },
             "Float" to object:TlvWriterInterface {
-              override fun generate(value: String): ByteArray {
-                return TlvWriter().put(AnonymousTag, value.toFloat()).getEncoded()
+              override fun generate(writer : TlvWriter, value: String) {
+                writer.put(AnonymousTag, value.toFloat())
               }
             },
             "Double" to object:TlvWriterInterface {
-              override fun generate(value: String): ByteArray {
-                return TlvWriter().put(AnonymousTag, value.toDouble()).getEncoded()
+              override fun generate(writer : TlvWriter, value: String) {
+                writer.put(AnonymousTag, value.toDouble())
               }
             },
             "String" to object:TlvWriterInterface {
-              override fun generate(value: String): ByteArray {
-                return TlvWriter().put(AnonymousTag, value).getEncoded()
+              override fun generate(writer : TlvWriter, value: String) {
+                writer.put(AnonymousTag, value)
+              }
+            },
+            "ByteArray(Hex)" to object:TlvWriterInterface {
+              override fun generate(writer : TlvWriter, value: String) {
+                val byteStringValue = ByteString.fromHex(value)
+                writer.put(AnonymousTag, byteStringValue)
               }
             },
     )

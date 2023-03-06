@@ -79,6 +79,15 @@
       android:layout_marginBottom="8dp"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/timedRequestTimeoutEd"
+      app:layout_constraintBottom_toTopOf="@id/exampleHint"/>
+  <TextView
+      android:id="@+id/exampleHint"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/write_dialog_user_guide_hint"
+      android:textSize="10sp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/imTimeoutEd"
       app:layout_constraintBottom_toTopOf="@id/writeBtn"/>
 
   <Button
