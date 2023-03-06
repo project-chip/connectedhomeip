@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -25,16 +25,18 @@ namespace EFR32 {
 class EFR32Migration
 {
     friend class KeyValueStoreManagerImpl;
+
 public:
     /**
      * The EFR32 migration manager is implemented as a singleton
      * User should get the object from this getter.
      */
-    static EFR32Migration&  GetMigrationManager();
+    static EFR32Migration & GetMigrationManager();
     static void applyMigrations();
+
 private:
-    EFR32Migration() {};
-    ~EFR32Migration() {};
+    EFR32Migration(){};
+    ~EFR32Migration(){};
 };
 
 } // namespace EFR32

@@ -30,10 +30,10 @@
 #include <platform/internal/testing/ConfigUnitTest.h>
 
 #include "FreeRTOS.h"
-#include <nvm3_lock.h>
 #include "nvm3.h"
 #include "nvm3_default.h"
 #include "nvm3_hal_flash.h"
+#include <nvm3_lock.h>
 
 // Substitute the GSDK weak nvm3_lockBegin and nvm3_lockEnd
 // for an application controlled re-entrance protection

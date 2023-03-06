@@ -217,7 +217,6 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
 
     ConfigurationMgr().LogDeviceConfig();
 
-
     // Create buffer for QR code that can fit max size and null terminator.
     char qrCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan QRCode(qrCodeBuffer);
@@ -311,8 +310,8 @@ void BaseApplication::LightEventHandler()
         sIsAttached    = ConnectivityMgr().IsWiFiStationConnected();
 #endif /* SL_WIFI */
 #if CHIP_ENABLE_OPENTHREAD
-        sIsEnabled     = ConnectivityMgr().IsThreadEnabled();
-        sIsAttached    = ConnectivityMgr().IsThreadAttached();
+        sIsEnabled  = ConnectivityMgr().IsThreadEnabled();
+        sIsAttached = ConnectivityMgr().IsThreadAttached();
 #endif /* CHIP_ENABLE_OPENTHREAD */
         sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
         PlatformMgr().UnlockChipStack();

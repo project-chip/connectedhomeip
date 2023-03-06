@@ -35,8 +35,8 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <ble/BLEEndPoint.h>
 #include <lib/core/CHIPError.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <platform/CHIPDeviceEvent.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #ifdef DISPLAY_ENABLED
 #include "demo-ui.h"

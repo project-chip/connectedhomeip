@@ -21,11 +21,11 @@
  *          Platform-specific key value storage implementation for SILABS
  */
 
+#include "MigrationManager.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 #include <platform/silabs/SilabsConfig.h>
-#include "MigrationManager.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -41,7 +41,7 @@ namespace DeviceLayer {
 namespace PersistedStorage {
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
-uint16_t mKvsKeyMap[KeyValueStoreManagerImpl::kMaxEntries] = {0};
+uint16_t mKvsKeyMap[KeyValueStoreManagerImpl::kMaxEntries] = { 0 };
 
 CHIP_ERROR KeyValueStoreManagerImpl::Init(void)
 {
@@ -53,8 +53,8 @@ CHIP_ERROR KeyValueStoreManagerImpl::Init(void)
 
     memset(mKvsKeyMap, 0, sizeof(mKvsKeyMap));
     size_t outLen;
-    err = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_KvsStringKeyMap,
-                                           reinterpret_cast<uint8_t *>(mKvsKeyMap), sizeof(mKvsKeyMap), outLen);
+    err = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_KvsStringKeyMap, reinterpret_cast<uint8_t *>(mKvsKeyMap),
+                                           sizeof(mKvsKeyMap), outLen);
 
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND) // Initial boot
     {
@@ -73,13 +73,13 @@ bool KeyValueStoreManagerImpl::IsValidKvsNvm3Key(uint32_t nvm3Key) const
 uint16_t KeyValueStoreManagerImpl::hashKvsKeyString(const char * key) const
 {
     uint8_t hash256[Crypto::kSHA256_Hash_Length] = { 0 };
-    Crypto::Hash_SHA256(reinterpret_cast<const uint8_t*>(key), strlen(key), hash256);
+    Crypto::Hash_SHA256(reinterpret_cast<const uint8_t *>(key), strlen(key), hash256);
 
-    uint16_t hash16 ,i = 0;
+    uint16_t hash16, i = 0;
 
-    while (!hash16 && (i < (Crypto::kSHA256_Hash_Length-1)))
+    while (!hash16 && (i < (Crypto::kSHA256_Hash_Length - 1)))
     {
-        hash16 = (hash256[i] | (hash256[i+1] <<8));
+        hash16 = (hash256[i] | (hash256[i + 1] << 8));
         i++;
     }
     return hash16;
@@ -88,7 +88,7 @@ uint16_t KeyValueStoreManagerImpl::hashKvsKeyString(const char * key) const
 CHIP_ERROR KeyValueStoreManagerImpl::MapKvsKeyToNvm3(const char * key, uint16_t hash, uint32_t & nvm3Key, bool isSlotNeeded) const
 {
     CHIP_ERROR err;
-    char * strPrefix = nullptr;
+    char * strPrefix          = nullptr;
     uint8_t firstEmptyKeySlot = kMaxEntries;
     for (uint8_t keyIndex = 0; keyIndex < kMaxEntries; keyIndex++)
     {
@@ -102,14 +102,14 @@ CHIP_ERROR KeyValueStoreManagerImpl::MapKvsKeyToNvm3(const char * key, uint16_t 
             if (strPrefix == nullptr)
             {
                 // Use a calloc to initialize all bits to 0. alloc +1 for a null char
-                strPrefix = static_cast<char *>(Platform::MemoryCalloc(1,length+1));
+                strPrefix = static_cast<char *>(Platform::MemoryCalloc(1, length + 1));
                 VerifyOrDie(strPrefix != nullptr);
             }
 
             // Collision prevention
             // Read the data from NVM3 it should be prefixed by the kvsString
             // else we will look for another matching hash in the map
-            SilabsConfig::ReadConfigValueBin(tempNvm3key, reinterpret_cast<uint8_t*>(strPrefix), length, readCount, 0);
+            SilabsConfig::ReadConfigValueBin(tempNvm3key, reinterpret_cast<uint8_t *>(strPrefix), length, readCount, 0);
             if (strcmp(key, strPrefix) == 0)
             {
                 // String matches we have confirmed the hash pointed us the right key data
@@ -154,8 +154,8 @@ void KeyValueStoreManagerImpl::ForceKeyMapSave()
 
 void KeyValueStoreManagerImpl::OnScheduledKeyMapSave(System::Layer * systemLayer, void * appState)
 {
-    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_KvsStringKeyMap,
-                                      reinterpret_cast<const uint8_t *>(mKvsKeyMap), sizeof(mKvsKeyMap));
+    SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_KvsStringKeyMap, reinterpret_cast<const uint8_t *>(mKvsKeyMap),
+                                      sizeof(mKvsKeyMap));
 }
 
 void KeyValueStoreManagerImpl::ScheduleKeyMapSave(void)
@@ -175,14 +175,15 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint32_t nvm3Key;
-    uint16_t hash = hashKvsKeyString(key);
+    uint16_t hash  = hashKvsKeyString(key);
     CHIP_ERROR err = MapKvsKeyToNvm3(key, hash, nvm3Key);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
     size_t outLen;
     // The user doesn't need the KeyString prefix, Read data after it
     size_t KeyStringLen = strlen(key);
-    err = SilabsConfig::ReadConfigValueBin(nvm3Key, reinterpret_cast<uint8_t *>(value), value_size, outLen, (offset_bytes + KeyStringLen));
+    err                 = SilabsConfig::ReadConfigValueBin(nvm3Key, reinterpret_cast<uint8_t *>(value), value_size, outLen,
+                                           (offset_bytes + KeyStringLen));
     if (read_bytes_size)
     {
         *read_bytes_size = outLen;
@@ -201,21 +202,21 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
     VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint32_t nvm3Key;
-    uint16_t hash = hashKvsKeyString(key);
+    uint16_t hash  = hashKvsKeyString(key);
     CHIP_ERROR err = MapKvsKeyToNvm3(key, hash, nvm3Key, /* isSlotNeeded */ true);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
     // add the string Key as prefix to the stored data as a collision prevention mechanism.
-    size_t keyStringLen = strlen(key);
-    uint8_t* prefixedData = static_cast<uint8_t *>(Platform::MemoryAlloc(keyStringLen+value_size));
+    size_t keyStringLen    = strlen(key);
+    uint8_t * prefixedData = static_cast<uint8_t *>(Platform::MemoryAlloc(keyStringLen + value_size));
     VerifyOrDie(prefixedData != nullptr);
     memcpy(prefixedData, key, keyStringLen);
-    memcpy(prefixedData+keyStringLen, value, value_size);
+    memcpy(prefixedData + keyStringLen, value, value_size);
 
-    err = SilabsConfig::WriteConfigValueBin(nvm3Key, prefixedData, keyStringLen+value_size);
+    err = SilabsConfig::WriteConfigValueBin(nvm3Key, prefixedData, keyStringLen + value_size);
     if (err == CHIP_NO_ERROR)
     {
-        uint32_t keyIndex = CONVERT_NVM3KEY_TO_KEYMAP_INDEX(nvm3Key);
+        uint32_t keyIndex    = CONVERT_NVM3KEY_TO_KEYMAP_INDEX(nvm3Key);
         mKvsKeyMap[keyIndex] = hash;
         ScheduleKeyMapSave();
     }
@@ -228,14 +229,14 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
     VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint32_t nvm3Key;
-    uint16_t hash = hashKvsKeyString(key);
+    uint16_t hash  = hashKvsKeyString(key);
     CHIP_ERROR err = MapKvsKeyToNvm3(key, hash, nvm3Key);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
 
     err = SilabsConfig::ClearConfigValue(nvm3Key);
     if (err == CHIP_NO_ERROR)
     {
-        uint32_t keyIndex = CONVERT_NVM3KEY_TO_KEYMAP_INDEX(nvm3Key);
+        uint32_t keyIndex    = CONVERT_NVM3KEY_TO_KEYMAP_INDEX(nvm3Key);
         mKvsKeyMap[keyIndex] = 0;
         ScheduleKeyMapSave();
     }
@@ -256,31 +257,32 @@ void KeyValueStoreManagerImpl::ErasePartition(void)
 
 void KeyValueStoreManagerImpl::KvsMapMigration(void)
 {
-    size_t readlen = 0;
-    constexpr uint8_t oldMaxEntires = 120;
-    char mKvsStoredKeyString[oldMaxEntires][PersistentStorageDelegate::kKeyLengthMax + 1] = {0};
-    CHIP_ERROR err = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_KvsStringKeyMap,
-                                           reinterpret_cast<uint8_t *>(mKvsStoredKeyString), sizeof(mKvsStoredKeyString), readlen);
+    size_t readlen                                                                        = 0;
+    constexpr uint8_t oldMaxEntires                                                       = 120;
+    char mKvsStoredKeyString[oldMaxEntires][PersistentStorageDelegate::kKeyLengthMax + 1] = { 0 };
+    CHIP_ERROR err =
+        SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_KvsStringKeyMap, reinterpret_cast<uint8_t *>(mKvsStoredKeyString),
+                                         sizeof(mKvsStoredKeyString), readlen);
 
     if (err == CHIP_NO_ERROR)
     {
-        for (uint8_t i=0; i < oldMaxEntires; i++)
+        for (uint8_t i = 0; i < oldMaxEntires; i++)
         {
             if (mKvsStoredKeyString[i][0] != 0)
             {
-                size_t dataLen = 0;
+                size_t dataLen   = 0;
                 uint32_t nvm3Key = CONVERT_KEYMAP_INDEX_TO_NVM3KEY(i);
 
                 if (SilabsConfig::ConfigValueExists(nvm3Key, dataLen))
                 {
                     // Read old data and prefix it with the string Key for the collision prevention mechanism.
-                    size_t keyStringLen = strlen(mKvsStoredKeyString[i]);
-                    uint8_t* prefixedData = static_cast<uint8_t *>(Platform::MemoryAlloc(keyStringLen+dataLen));
+                    size_t keyStringLen    = strlen(mKvsStoredKeyString[i]);
+                    uint8_t * prefixedData = static_cast<uint8_t *>(Platform::MemoryAlloc(keyStringLen + dataLen));
                     VerifyOrDie(prefixedData != nullptr);
                     memcpy(prefixedData, mKvsStoredKeyString[i], keyStringLen);
 
-                    SilabsConfig::ReadConfigValueBin(nvm3Key, prefixedData+keyStringLen, dataLen, readlen);
-                    SilabsConfig::WriteConfigValueBin(nvm3Key, prefixedData, keyStringLen+dataLen);
+                    SilabsConfig::ReadConfigValueBin(nvm3Key, prefixedData + keyStringLen, dataLen, readlen);
+                    SilabsConfig::WriteConfigValueBin(nvm3Key, prefixedData, keyStringLen + dataLen);
                     mKvsKeyMap[i] = KeyValueStoreMgrImpl().hashKvsKeyString(mKvsStoredKeyString[i]);
                     Platform::MemoryFree(prefixedData);
                 }

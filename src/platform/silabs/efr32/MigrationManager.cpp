@@ -34,15 +34,16 @@ typedef struct
 {
     uint32_t migrationGroup;
     func_ptr migrationFunc;
-}migrationData_t;
+} migrationData_t;
 
 #define COUNT_OF(A) (sizeof(A) / sizeof((A)[0]))
 static migrationData_t migrationTable[] = {
-    { .migrationGroup = 1 , .migrationFunc = &KeyValueStoreMgrImpl().KvsMapMigration },
-    // add any additional migration neccesary. migrationGroup should stay equal if done in the same commit or increment by 1 for each new entry.
+    { .migrationGroup = 1, .migrationFunc = &KeyValueStoreMgrImpl().KvsMapMigration },
+    // add any additional migration neccesary. migrationGroup should stay equal if done in the same commit or increment by 1 for
+    // each new entry.
 };
 
-} //namespace
+} // namespace
 
 void EFR32Migration::applyMigrations()
 {
@@ -55,19 +56,18 @@ void EFR32Migration::applyMigrations()
         if (lastMigationGroupDone < migrationTable[i].migrationGroup)
         {
             (*migrationTable[i].migrationFunc)();
-            completedMigrationGroup = max(migrationTable[i].migrationGroup,completedMigrationGroup);
+            completedMigrationGroup = max(migrationTable[i].migrationGroup, completedMigrationGroup);
         }
     }
     SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MigrationCounter, completedMigrationGroup);
 }
 
-
-EFR32Migration&  EFR32Migration::GetMigrationManager()
+EFR32Migration & EFR32Migration::GetMigrationManager()
 {
     static EFR32Migration sMigrationManager;
     return sMigrationManager;
 }
 
-} // nameplace EFR32
-} // nameplace DeviceLayer
-} // nameplace chip
+} // namespace EFR32
+} // namespace DeviceLayer
+} // namespace chip
