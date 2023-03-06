@@ -83,6 +83,7 @@ void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Messaging::
     OperationalDeviceProxy * device = new OperationalDeviceProxy(&exchangeMgr, sessionHandle);
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(javaCallback, successMethod, reinterpret_cast<jlong>(device));
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
 void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error)
@@ -118,6 +119,7 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, con
 
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(javaCallback, failureMethod, peerId.GetNodeId(), exception);
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
 ReportCallback::ReportCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback,
@@ -200,6 +202,7 @@ void ReportCallback::OnReportEnd()
 
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(mReportCallbackRef, onReportMethod, mNodeStateObj);
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
 void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
@@ -398,7 +401,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
-CHIP_ERROR ReportCallback::CreateChipAttributePath(const app::ConcreteDataAttributePath & aPath, jobject & outObj)
+CHIP_ERROR CreateChipAttributePath(const app::ConcreteDataAttributePath & aPath, jobject & outObj)
 {
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -455,7 +458,7 @@ void ReportCallback::OnDone(app::ReadClient *)
 
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(mReportCallbackRef, onDoneMethod);
-
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
     JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mWrapperCallbackRef);
 }
 
@@ -479,7 +482,7 @@ CHIP_ERROR ReportCallback::OnResubscriptionNeeded(app::ReadClient * apReadClient
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(mResubscriptionAttemptCallbackRef, onResubscriptionAttemptMethod, aTerminationCause.AsInteger(),
                         apReadClient->ComputeTimeTillNextSubscription());
-
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
     return CHIP_NO_ERROR;
 }
 
@@ -512,6 +515,7 @@ void ReportCallback::ReportError(jobject attributePath, jobject eventPath, const
 
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(mReportCallbackRef, onErrorMethod, attributePath, eventPath, exception);
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
 ReportEventCallback::ReportEventCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback,
@@ -760,6 +764,112 @@ void ReportEventCallback::ReportError(jobject eventPath, const char * message, C
 
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(mReportCallbackRef, onErrorMethod, eventPath, exception);
+}
+
+WriteAttributesCallback::WriteAttributesCallback(jobject wrapperCallback, jobject javaCallback) : mChunkedWriteCallback(this)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+
+    mWrapperCallbackRef = env->NewGlobalRef(wrapperCallback);
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+    if (mWrapperCallbackRef == nullptr)
+    {
+        ChipLogError(Controller, "Could not create global reference for Wrapper WriteAttributesCallback");
+    }
+    mJavaCallbackRef = env->NewGlobalRef(javaCallback);
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+    if (mJavaCallbackRef == nullptr)
+    {
+        ChipLogError(Controller, "Could not create global reference for Java WriteAttributesCallback");
+    }
+}
+
+WriteAttributesCallback::~WriteAttributesCallback()
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
+    env->DeleteGlobalRef(mJavaCallbackRef);
+    if (mWriteClient != nullptr)
+    {
+        Platform::Delete(mWriteClient);
+    }
+}
+
+void WriteAttributesCallback::OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteDataAttributePath & aPath,
+                                         app::StatusIB aStatus)
+{
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    JNIEnv * env             = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject attributePathObj = nullptr;
+    err                      = CreateChipAttributePath(aPath, attributePathObj);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to create Java ChipAttributePath: %s", ErrorStr(err)));
+
+    if (aStatus.mStatus != Protocols::InteractionModel::Status::Success)
+    {
+        ReportError(attributePathObj, aStatus.mStatus);
+        return;
+    }
+
+    jmethodID onResponseMethod;
+    err = JniReferences::GetInstance().FindMethod(env, mJavaCallbackRef, "onResponse",
+                                                  "(Lchip/devicecontroller/model/ChipAttributePath;)V", &onResponseMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
+
+    DeviceLayer::StackUnlock unlock;
+    env->CallVoidMethod(mJavaCallbackRef, onResponseMethod, attributePathObj);
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+}
+
+void WriteAttributesCallback::OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError)
+{
+    ReportError(nullptr, aError);
+}
+
+void WriteAttributesCallback::OnDone(app::WriteClient *)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    jmethodID onDoneMethod;
+    err = JniReferences::GetInstance().FindMethod(env, mJavaCallbackRef, "onDone", "()V", &onDoneMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onDone method"));
+
+    DeviceLayer::StackUnlock unlock;
+    env->CallVoidMethod(mJavaCallbackRef, onDoneMethod);
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
+    JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mWrapperCallbackRef);
+}
+
+void WriteAttributesCallback::ReportError(jobject attributePath, CHIP_ERROR err)
+{
+    ReportError(attributePath, ErrorStr(err), err.AsInteger());
+}
+
+void WriteAttributesCallback::ReportError(jobject attributePath, Protocols::InteractionModel::Status status)
+{
+    ReportError(attributePath, "IM Status", static_cast<std::underlying_type_t<Protocols::InteractionModel::Status>>(status));
+}
+
+void WriteAttributesCallback::ReportError(jobject attributePath, const char * message, ChipError::StorageType errorCode)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    ChipLogError(Controller, "ReportError is called");
+    jthrowable exception;
+    err = AndroidClusterExceptions::GetInstance().CreateIllegalStateException(env, message, errorCode, exception);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to create IllegalStateException: %s", ErrorStr(err)));
+
+    jmethodID onErrorMethod;
+    err = JniReferences::GetInstance().FindMethod(env, mJavaCallbackRef, "onError",
+                                                  "(Lchip/devicecontroller/model/ChipAttributePath;Ljava/lang/Exception;)V",
+                                                  &onErrorMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
+
+    DeviceLayer::StackUnlock unlock;
+    env->CallVoidMethod(mJavaCallbackRef, onErrorMethod, attributePath, exception);
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
 } // namespace Controller

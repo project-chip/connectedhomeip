@@ -18,6 +18,7 @@
 
 #include <app/BufferedReadCallback.h>
 #include <app/ReadClient.h>
+#include <app/WriteClient.h>
 #include <controller/CHIPDeviceController.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
@@ -26,6 +27,8 @@
 
 namespace chip {
 namespace Controller {
+
+CHIP_ERROR CreateChipAttributePath(const app::ConcreteDataAttributePath & aPath, jobject & outObj);
 
 // Callback for success and failure cases of GetConnectedDevice().
 struct GetConnectedDeviceCallback
@@ -69,8 +72,6 @@ struct ReportCallback : public app::ClusterStateCache::Callback
     void ReportError(jobject attributePath, jobject eventPath, CHIP_ERROR err);
     void ReportError(jobject attributePath, jobject eventPath, Protocols::InteractionModel::Status status);
     void ReportError(jobject attributePath, jobject eventPath, const char * message, ChipError::StorageType errorCode);
-
-    CHIP_ERROR CreateChipAttributePath(const app::ConcreteDataAttributePath & aPath, jobject & outObj);
 
     CHIP_ERROR CreateChipEventPath(const app::ConcreteEventPath & aPath, jobject & outObj);
 
@@ -126,6 +127,29 @@ struct ReportEventCallback : public app::ReadClient::Callback
     // NodeState Java object that will be returned to the application.
     jobject mNodeStateObj = nullptr;
     jclass mNodeStateCls  = nullptr;
+};
+
+struct WriteAttributesCallback : public app::WriteClient::Callback
+{
+    WriteAttributesCallback(jobject wrapperCallback, jobject javaCallback);
+    ~WriteAttributesCallback();
+    app::WriteClient::Callback * GetChunkedWriteCallback() { return &mChunkedWriteCallback; }
+
+    void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteDataAttributePath & aPath,
+                    app::StatusIB aStatus) override;
+    /** Report errors back to Java layer. attributePath may be nullptr for general errors. */
+    void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aProtocolError) override;
+
+    void OnDone(app::WriteClient * apWriteClient) override;
+
+    void ReportError(jobject attributePath, CHIP_ERROR err);
+    void ReportError(jobject attributePath, Protocols::InteractionModel::Status status);
+    void ReportError(jobject attributePath, const char * message, ChipError::StorageType errorCode);
+
+    app::WriteClient * mWriteClient = nullptr;
+    app::ChunkedWriteCallback mChunkedWriteCallback;
+    jobject mWrapperCallbackRef = nullptr;
+    jobject mJavaCallbackRef    = nullptr;
 };
 
 } // namespace Controller
