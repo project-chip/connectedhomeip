@@ -58,6 +58,8 @@ static constexpr uint8_t kMaxHolidaySchedules        = 10;
 static constexpr uint8_t kMaxCredentialSize          = 20;
 static constexpr uint8_t kNumCredentialTypes         = 6;
 
+static constexpr uint8_t kMaxCredentials = kMaxUsers * kMaxCredentialsPerUser;
+
 } // namespace ResourceRanges
 
 namespace LockInitParams {
@@ -175,6 +177,7 @@ public:
 
     bool IsValidUserIndex(uint16_t userIndex);
     bool IsValidCredentialIndex(uint16_t credentialIndex, CredentialTypeEnum type);
+    bool IsValidCredentialType(CredentialTypeEnum type);
     bool IsValidWeekdayScheduleIndex(uint8_t scheduleIndex);
     bool IsValidYeardayScheduleIndex(uint8_t scheduleIndex);
     bool IsValidHolidayScheduleIndex(uint8_t scheduleIndex);
@@ -200,14 +203,14 @@ private:
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 
     EmberAfPluginDoorLockUserInfo mLockUsers[kMaxUsers];
-    EmberAfPluginDoorLockCredentialInfo mLockCredentials[kNumCredentialTypes][kMaxCredentialsPerUser];
+    EmberAfPluginDoorLockCredentialInfo mLockCredentials[kNumCredentialTypes][kMaxCredentials];
     WeekDaysScheduleInfo mWeekdaySchedule[kMaxUsers][kMaxWeekdaySchedulesPerUser];
     YearDayScheduleInfo mYeardaySchedule[kMaxUsers][kMaxYeardaySchedulesPerUser];
     HolidayScheduleInfo mHolidaySchedule[kMaxHolidaySchedules];
 
     char mUserNames[ArraySize(mLockUsers)][DOOR_LOCK_MAX_USER_NAME_SIZE];
-    uint8_t mCredentialData[kNumCredentialTypes][kMaxCredentialsPerUser][kMaxCredentialSize];
-    CredentialStruct mCredentials[kMaxUsers][kMaxCredentialsPerUser];
+    uint8_t mCredentialData[kNumCredentialTypes][kMaxCredentials][kMaxCredentialSize];
+    CredentialStruct mCredentials[kMaxUsers][kMaxCredentials];
 
     static LockManager sLock;
     EFR32DoorLock::LockInitParams::LockParam LockParams;

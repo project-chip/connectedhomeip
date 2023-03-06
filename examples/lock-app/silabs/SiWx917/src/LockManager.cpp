@@ -113,6 +113,11 @@ bool LockManager::IsValidCredentialIndex(uint16_t credentialIndex, CredentialTyp
     return (credentialIndex < kMaxCredentialsPerUser);
 }
 
+bool LockManager::IsValidCredentialType(CredentialTypeEnum type)
+{
+    return (to_underlying(type) < kNumCredentialTypes);
+}
+
 bool LockManager::IsValidWeekdayScheduleIndex(uint8_t scheduleIndex)
 {
     return (scheduleIndex < kMaxWeekdaySchedulesPerUser);
@@ -405,6 +410,8 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
                                 EmberAfPluginDoorLockCredentialInfo & credential)
 {
 
+    VerifyOrReturnValue(IsValidCredentialType(credentialType), false);
+
     if (CredentialTypeEnum::kProgrammingPIN == credentialType)
     {
         VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType),
@@ -447,6 +454,8 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                                 chip::FabricIndex modifier, DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
                                 const chip::ByteSpan & credentialData)
 {
+
+    VerifyOrReturnValue(IsValidCredentialType(credentialType), false);
 
     if (CredentialTypeEnum::kProgrammingPIN == credentialType)
     {
