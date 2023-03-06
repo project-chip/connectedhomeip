@@ -73,10 +73,7 @@ class WildcardFragment : Fragment() {
 
   private val writeAttributeCallback = object : WriteAttributesCallback {
     override fun onError(attributePath: ChipAttributePath?, ex: Exception?) {
-      if (attributePath != null)
-      {
-        Log.e(TAG, "Report error for $attributePath: $ex")
-      }
+      Log.e(TAG, "Report error for $attributePath: $ex")
     }
 
     override fun onResponse(attributePath: ChipAttributePath?) {
@@ -220,7 +217,7 @@ class WildcardFragment : Fragment() {
       try {
         TLV_MAP[writeValueType]?.generate(tlvWriter, value.trim())
       } catch (ex: Exception) {
-        Log.e(TAG, "Invalid Data Type")
+        Log.e(TAG, "Invalid Data Type", ex)
         return
       }
     }
