@@ -11,14 +11,9 @@ class ExampleAttestationTrustStoreDelegate(val chipDeviceController: ChipDeviceC
   private val paaCerts = arrayListOf(TEST_PAA_FFF1_Cert, TEST_PAA_NOVID_CERT)
 
   override fun getProductAttestationAuthorityCert(skid: ByteArray): ByteArray? {
-    for (paaCert in paaCerts) {
-      val paaCertBytes = Base64.decode(paaCert, Base64.DEFAULT)
-      val skidFromPaaCert = chipDeviceController.extractSkidFromPaaCert(paaCertBytes)
-      if (Arrays.equals(skid, skidFromPaaCert)) {
-        return paaCertBytes
-      }
-    }
-    return null
+    return paaCerts
+      .map { Base64.decode(it, Base64.DEFAULT) }
+      .firstOrNull { cert -> chipDeviceController.extractSkidFromPaaCert(cert) == skid }
   }
 
   companion object {
