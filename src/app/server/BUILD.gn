@@ -27,6 +27,12 @@ static_library("server") {
   output_name = "libCHIPAppServer"
 
   sources = [
+    "../clusters/scenes/ExtensionFieldSets.h",
+    "../clusters/scenes/ExtensionFieldSetsImpl.cpp",
+    "../clusters/scenes/ExtensionFieldSetsImpl.h",
+    "../clusters/scenes/SceneTable.h",
+    "../clusters/scenes/SceneTableImpl.cpp",
+    "../clusters/scenes/SceneTableImpl.h",
     "AclStorage.cpp",
     "AclStorage.h",
     "CommissioningModeProvider.h",

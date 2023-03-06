@@ -184,7 +184,8 @@ public:
 
     // SceneHandlers
     CHIP_ERROR RegisterHandler(SceneHandler * handler) override;
-    CHIP_ERROR UnregisterHandler(uint8_t position) override;
+    CHIP_ERROR UnregisterHandler(SceneHandler * handler) override;
+    CHIP_ERROR UnregisterAllHandler() override;
 
     // Extension field sets operation
     CHIP_ERROR SceneSaveEFS(SceneTableEntry & scene) override;

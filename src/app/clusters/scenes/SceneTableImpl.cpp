@@ -431,17 +431,32 @@ CHIP_ERROR DefaultSceneTableImpl::RegisterHandler(SceneHandler * handler)
     else if (fisrtEmptyPosition < kMaxSceneHandlers)
     {
         this->mHandlers[fisrtEmptyPosition] = handler;
-        this->handlerNum++;
+        this->mNumHandlers++;
         err = CHIP_NO_ERROR;
     }
 
     return err;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::UnregisterHandler(uint8_t position)
+CHIP_ERROR DefaultSceneTableImpl::UnregisterHandler(SceneHandler * handler)
 {
-    VerifyOrReturnError(position < kMaxSceneHandlers, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnValue(!this->HandlerListEmpty() && !(this->mHandlers[position] == nullptr), CHIP_NO_ERROR);
+    uint8_t position = kInvalidPosition;
+
+    // Verify list is populated and handler is not null
+    VerifyOrReturnValue(!this->HandlerListEmpty() && !(handler == nullptr), CHIP_NO_ERROR);
+
+    // Finds the position of the Handler to unregister
+    for (uint8_t i = 0; i < this->mNumHandlers; i++)
+    {
+        if (this->mHandlers[i] == handler)
+        {
+            position = i;
+            break;
+        }
+    }
+
+    // Verify Handler was found
+    VerifyOrReturnValue(position < kMaxSceneHandlers, CHIP_NO_ERROR);
 
     uint8_t nextPos = static_cast<uint8_t>(position + 1);
     uint8_t moveNum = static_cast<uint8_t>(kMaxSceneHandlers - nextPos);
@@ -450,9 +465,19 @@ CHIP_ERROR DefaultSceneTableImpl::UnregisterHandler(uint8_t position)
     // Compress array after removal
     memmove(&this->mHandlers[position], &this->mHandlers[nextPos], sizeof(this->mHandlers[position]) * moveNum);
 
-    this->handlerNum--;
+    this->mNumHandlers--;
     // Clear last occupied position
-    this->mHandlers[handlerNum] = nullptr;
+    this->mHandlers[mNumHandlers] = nullptr;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DefaultSceneTableImpl::UnregisterAllHandler()
+{
+    for (uint8_t i = 0; i < this->mNumHandlers; i++)
+    {
+        ReturnErrorOnFailure(this->UnregisterHandler(this->mHandlers[0]));
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -461,7 +486,7 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 {
     if (!this->HandlerListEmpty())
     {
-        for (uint8_t i = 0; i < this->handlerNum; i++)
+        for (uint8_t i = 0; i < this->mNumHandlers; i++)
         {
             clusterId cArray[kMaxClusterPerScenes];
             Span<clusterId> cSpan(cArray);
@@ -476,7 +501,7 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
                     EFS.mID = cArray[j];
                     ReturnErrorOnFailure(this->mHandlers[i]->SerializeSave(scene.mStorageId.mEndpointId, EFS.mID, EFSSpan));
                     EFS.mUsedBytes = (uint8_t) EFSSpan.size();
-                    ReturnErrorOnFailure(scene.mStorageData.mExtensionFieldsSets.InsertFieldSet(EFS));
+                    ReturnErrorOnFailure(scene.mStorageData.mExtensionFieldSets.InsertFieldSet(EFS));
                 }
             }
         }
@@ -499,9 +524,9 @@ CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(FabricIndex fabric_index, const 
 
     if (!this->HandlerListEmpty())
     {
-        for (uint8_t i = 0; i < scene.mStorageData.mExtensionFieldsSets.GetFieldNum(); i++)
+        for (uint8_t i = 0; i < scene.mStorageData.mExtensionFieldSets.GetFieldNum(); i++)
         {
-            scene.mStorageData.mExtensionFieldsSets.GetFieldSetAtPosition(EFS, i);
+            scene.mStorageData.mExtensionFieldSets.GetFieldSetAtPosition(EFS, i);
             cluster = EFS.mID;
             time    = scene.mStorageData.mSceneTransitionTime * 1000 +
                 (scene.mStorageData.mTransitionTime100ms ? scene.mStorageData.mTransitionTime100ms * 10 : 0);
@@ -509,7 +534,7 @@ CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(FabricIndex fabric_index, const 
 
             if (!EFS.IsEmpty())
             {
-                for (uint8_t j = 0; j < this->handlerNum; j++)
+                for (uint8_t j = 0; j < this->mNumHandlers; j++)
                 {
                     ReturnErrorOnFailure(this->mHandlers[j]->ApplyScene(scene.mStorageId.mEndpointId, cluster, EFSSpan, time));
                 }
@@ -588,22 +613,6 @@ bool DefaultSceneTableImpl::SceneEntryIteratorImpl::Next(SceneTableEntry & outpu
 void DefaultSceneTableImpl::SceneEntryIteratorImpl::Release()
 {
     mProvider.mSceneEntryIterators.ReleaseObject(this);
-}
-
-namespace {
-
-SceneTable * gSceneTable = nullptr;
-
-} // namespace
-
-SceneTable * GetSceneTable()
-{
-    return gSceneTable;
-}
-
-void SetSceneTable(SceneTable * provider)
-{
-    gSceneTable = provider;
 }
 
 } // namespace scenes

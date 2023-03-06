@@ -17,7 +17,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/scenes/ExtensionFieldsSetsImpl.h>
+#include <app/clusters/scenes/ExtensionFieldSetsImpl.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/CommonPersistentData.h>
@@ -56,10 +56,12 @@ public:
     SceneHandler(){};
     virtual ~SceneHandler() = default;
 
-    /// @brief Gets the list of supported clusters for an endpoint
+    /// @brief Copies the list of supported clusters for an endpoint in a Span and resizes the span to fit the actual number of
+    /// supported clusters
     /// @param endpoint target endpoint
     /// @param clusterBuffer Buffer to hold the supported cluster IDs, cannot hold more than
-    /// CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES
+    /// CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES, the function shall use the reduce_size() method in the event it is supporting
+    /// less than CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES clusters
     virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) = 0;
 
     /// @brief Returns whether or not a cluster for scenes is supported on an endpoint
@@ -78,8 +80,8 @@ public:
     virtual CHIP_ERROR SerializeAdd(EndpointId endpoint, ClusterId & cluster, MutableByteSpan & serialisedBytes,
                                     app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet) = 0;
 
-    /// @brief From command StoreScene, retrieves ExtensionField from nvm, it is the functions responsability to resize the mutable
-    /// span if necessary, a number of byte equal to the span will be stored in memory
+    /// @brief From command StoreScene, retrieves ExtensionField from currently active values, it is the functions responsability to
+    /// resize the mutable span if necessary, a number of byte equal to the span will be stored in memory
     /// @param endpoint Target Endpoint
     /// @param cluster Target Cluster
     /// @param serialisedBytes Output buffer, data needs to be writen in there and size adjusted if smaller than
@@ -176,7 +178,7 @@ public:
         char mName[kSceneNameMax]                = { 0 };
         size_t mNameLength                       = 0;
         SceneTransitionTime mSceneTransitionTime = 0;
-        ExtensionFieldsSetsImpl mExtensionFieldsSets;
+        ExtensionFieldSetsImpl mExtensionFieldSets;
         TransitionTime100ms mTransitionTime100ms = 0;
         CharSpan mNameSpan;
 
@@ -185,19 +187,19 @@ public:
         {
             this->SetName(sceneName);
         }
-        SceneData(ExtensionFieldsSetsImpl fields, const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0,
+        SceneData(ExtensionFieldSetsImpl fields, const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0,
                   TransitionTime100ms time100ms = 0) :
             mSceneTransitionTime(time),
             mTransitionTime100ms(time100ms)
         {
             this->SetName(sceneName);
-            mExtensionFieldsSets = fields;
+            mExtensionFieldSets = fields;
         }
         SceneData(const SceneData & other) :
             mSceneTransitionTime(other.mSceneTransitionTime), mTransitionTime100ms(other.mTransitionTime100ms)
         {
             this->SetName(other.mNameSpan);
-            mExtensionFieldsSets = other.mExtensionFieldsSets;
+            mExtensionFieldSets = other.mExtensionFieldSets;
         }
         ~SceneData(){};
 
@@ -217,7 +219,7 @@ public:
                 writer.Put(TLV::ContextTag(kTagSceneDTransitionTime), static_cast<uint16_t>(this->mSceneTransitionTime)));
             ReturnErrorOnFailure(
                 writer.Put(TLV::ContextTag(kTagSceneDTransitionTime100), static_cast<uint8_t>(this->mTransitionTime100ms)));
-            ReturnErrorOnFailure(this->mExtensionFieldsSets.Serialize(writer));
+            ReturnErrorOnFailure(this->mExtensionFieldSets.Serialize(writer));
 
             return writer.EndContainer(container);
         }
@@ -243,7 +245,7 @@ public:
             ReturnErrorOnFailure(reader.Get(this->mSceneTransitionTime));
             ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagSceneDTransitionTime100)));
             ReturnErrorOnFailure(reader.Get(this->mTransitionTime100ms));
-            ReturnErrorOnFailure(this->mExtensionFieldsSets.Deserialize(reader));
+            ReturnErrorOnFailure(this->mExtensionFieldSets.Deserialize(reader));
 
             return reader.ExitContainer(container);
         }
@@ -269,20 +271,20 @@ public:
             this->SetName(CharSpan());
             mSceneTransitionTime = 0;
             mTransitionTime100ms = 0;
-            mExtensionFieldsSets.Clear();
+            mExtensionFieldSets.Clear();
         }
 
         bool operator==(const SceneData & other)
         {
             return (this->mNameSpan.data_equal(other.mNameSpan) && (this->mSceneTransitionTime == other.mSceneTransitionTime) &&
                     (this->mTransitionTime100ms == other.mTransitionTime100ms) &&
-                    (this->mExtensionFieldsSets == other.mExtensionFieldsSets));
+                    (this->mExtensionFieldSets == other.mExtensionFieldSets));
         }
 
         void operator=(const SceneData & other)
         {
             this->SetName(other.mNameSpan);
-            this->mExtensionFieldsSets = other.mExtensionFieldsSets;
+            this->mExtensionFieldSets  = other.mExtensionFieldSets;
             this->mSceneTransitionTime = other.mSceneTransitionTime;
             this->mTransitionTime100ms = other.mTransitionTime100ms;
         }
@@ -332,8 +334,9 @@ public:
     virtual CHIP_ERROR RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scened_idx)               = 0;
 
     // SceneHandlers
-    virtual CHIP_ERROR RegisterHandler(SceneHandler * handler) = 0;
-    virtual CHIP_ERROR UnregisterHandler(uint8_t position)     = 0;
+    virtual CHIP_ERROR RegisterHandler(SceneHandler * handler)   = 0;
+    virtual CHIP_ERROR UnregisterHandler(SceneHandler * handler) = 0;
+    virtual CHIP_ERROR UnregisterAllHandler()                    = 0;
 
     // Extension field sets operation
     virtual CHIP_ERROR SceneSaveEFS(SceneTableEntry & scene)                                    = 0;
@@ -348,33 +351,13 @@ public:
     virtual SceneEntryIterator * IterateSceneEntry(FabricIndex fabric_index) = 0;
 
     // Handlers
-    virtual bool HandlerListEmpty() { return (handlerNum == 0); }
-    virtual bool HandlerListFull() { return (handlerNum >= kMaxSceneHandlers); }
-    virtual uint8_t GetHandlerNum() { return this->handlerNum; }
+    virtual bool HandlerListEmpty() { return (mNumHandlers == 0); }
+    virtual bool HandlerListFull() { return (mNumHandlers >= kMaxSceneHandlers); }
+    virtual uint8_t GetHandlerNum() { return this->mNumHandlers; }
 
     SceneHandler * mHandlers[kMaxSceneHandlers] = { nullptr };
-    uint8_t handlerNum                          = 0;
+    uint8_t mNumHandlers                        = 0;
 };
-
-/**
- * Instance getter for the global SceneTable.
- *
- * Callers have to externally synchronize usage of this function.
- *
- * @return The global Scene Table
- */
-SceneTable * GetSceneTable();
-
-/**
- * Instance setter for the global Scene Table.
- *
- * Callers have to externally synchronize usage of this function.
- *
- * The `provider` can be set to nullptr if the owner is done with it fully.
- *
- * @param[in] provider pointer to the Scene Table global instance to use
- */
-void SetSceneTable(SceneTable * provider);
 
 } // namespace scenes
 } // namespace chip

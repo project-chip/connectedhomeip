@@ -127,15 +127,21 @@ public:
         ClusterId * buffer = clusterBuffer.data();
         if (endpoint == TEST_ENDPOINT1)
         {
-            buffer[0] = ON_OFF_CID;
-            buffer[1] = LV_CTR_CID;
-            clusterBuffer.reduce_size(2);
+            if (clusterBuffer.size() >= 2)
+            {
+                buffer[0] = ON_OFF_CID;
+                buffer[1] = LV_CTR_CID;
+                clusterBuffer.reduce_size(2);
+            }
         }
         else if (endpoint == TEST_ENDPOINT2)
         {
-            buffer[0] = ON_OFF_CID;
-            buffer[1] = CC_CTR_CID;
-            clusterBuffer.reduce_size(2);
+            if (clusterBuffer.size() >= 2)
+            {
+                buffer[0] = ON_OFF_CID;
+                buffer[1] = CC_CTR_CID;
+                clusterBuffer.reduce_size(2);
+            }
         }
     }
 
@@ -282,52 +288,55 @@ void ResetSceneTable(SceneTable * sceneTable)
 
 void TestHandlerRegistration(nlTestSuite * aSuite, void * aContext)
 {
-    SceneTable * sceneTable = scenes::GetSceneTable();
+    SceneTable * sceneTable = &sSceneTable;
     TestSceneHandler tmpHandler[scenes::kMaxSceneHandlers];
 
     for (uint8_t i = 0; i < scenes::kMaxSceneHandlers; i++)
     {
-        NL_TEST_ASSERT(aSuite, sceneTable->handlerNum == i);
+        NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == i);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RegisterHandler(&tmpHandler[i]));
+        printf("Handler : %d | Address : %p \n", i, &tmpHandler[i]);
     }
 
-    NL_TEST_ASSERT(aSuite, sceneTable->handlerNum == scenes::kMaxSceneHandlers);
+    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == scenes::kMaxSceneHandlers);
     // Removal at begining
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(0));
-    NL_TEST_ASSERT(aSuite, sceneTable->handlerNum == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 1));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(&tmpHandler[0]));
+    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 1));
     // Confirm array was compressed and last position is now null
     NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[scenes::kMaxSceneHandlers - 1]);
 
     // Removal at the middle
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(3));
-    NL_TEST_ASSERT(aSuite, sceneTable->handlerNum == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 2));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(&tmpHandler[3]));
+    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 2));
     // Confirm array was compressed and last position is now null
     NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[scenes::kMaxSceneHandlers - 2]);
 
-    // Removal at the middle
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(scenes::kMaxSceneHandlers - 3));
-    NL_TEST_ASSERT(aSuite, sceneTable->handlerNum == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 3));
+    // Removal at the end
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(&tmpHandler[scenes::kMaxSceneHandlers - 1]));
+    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 3));
     NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[scenes::kMaxSceneHandlers - 3]);
 
     // Emptying Handler array
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterAllHandler());
     for (uint8_t i = 0; i < scenes::kMaxSceneHandlers; i++)
     {
-        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(0));
+        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(&tmpHandler[i]));
     }
 
     // Verify the handler num has been updated properly
-    NL_TEST_ASSERT(aSuite, sceneTable->handlerNum == 0);
+    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == 0);
 
     // Verify all array is empty
     for (uint8_t i = 0; i < scenes::kMaxSceneHandlers; i++)
     {
+        printf("Handler : %d | Address : %p \n", i, sceneTable->mHandlers[i]);
         NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[i]);
     }
 }
 
 void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
 {
-    SceneTable * sceneTable = chip::scenes::GetSceneTable();
+    SceneTable * sceneTable = &sSceneTable;
     ClusterId tempCluster   = 0;
 
     app::Clusters::Scenes::Structs::ExtensionFieldSet::Type extensionFieldSetOut;
@@ -522,7 +531,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
 
 void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
 {
-    SceneTable * sceneTable = chip::scenes::GetSceneTable();
+    SceneTable * sceneTable = &sSceneTable;
     NL_TEST_ASSERT(aSuite, sceneTable);
 
     // Reset test
@@ -587,7 +596,7 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
 
 void TestOverwriteScenes(nlTestSuite * aSuite, void * aContext)
 {
-    SceneTable * sceneTable = chip::scenes::GetSceneTable();
+    SceneTable * sceneTable = &sSceneTable;
     NL_TEST_ASSERT(aSuite, sceneTable);
 
     SceneTableEntry scene;
@@ -611,7 +620,7 @@ void TestOverwriteScenes(nlTestSuite * aSuite, void * aContext)
 
 void TestIterateScenes(nlTestSuite * aSuite, void * aContext)
 {
-    SceneTable * sceneTable = chip::scenes::GetSceneTable();
+    SceneTable * sceneTable = &sSceneTable;
     NL_TEST_ASSERT(aSuite, sceneTable);
 
     SceneTableEntry scene;
@@ -647,7 +656,7 @@ void TestIterateScenes(nlTestSuite * aSuite, void * aContext)
 
 void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
 {
-    SceneTable * sceneTable = chip::scenes::GetSceneTable();
+    SceneTable * sceneTable = &sSceneTable;
     NL_TEST_ASSERT(aSuite, sceneTable);
 
     SceneTableEntry scene;
@@ -738,7 +747,7 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
 
 void TestFabricScenes(nlTestSuite * aSuite, void * aContext)
 {
-    SceneTable * sceneTable = chip::scenes::GetSceneTable();
+    SceneTable * sceneTable = &sSceneTable;
     NL_TEST_ASSERT(aSuite, sceneTable);
 
     // Reset test
@@ -804,8 +813,6 @@ int TestSetup(void * inContext)
     VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
     VerifyOrReturnError(CHIP_NO_ERROR == sSceneTable.Init(&testStorage), FAILURE);
 
-    SetSceneTable(&sSceneTable);
-
     return SUCCESS;
 }
 
@@ -814,12 +821,9 @@ int TestSetup(void * inContext)
  */
 int TestTeardown(void * inContext)
 {
-    SceneTable * sceneTable = chip::scenes::GetSceneTable();
-    if (nullptr != sceneTable)
-    {
-        sceneTable->Finish();
-    }
+    sSceneTable.Finish();
     chip::Platform::MemoryShutdown();
+
     return SUCCESS;
 }
 int TestSceneTable()
