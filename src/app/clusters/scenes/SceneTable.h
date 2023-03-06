@@ -62,7 +62,8 @@ public:
     /// CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES
     virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) = 0;
 
-    /// @brief Returns whether or not a cluster is supported on an endpoint
+    /// @brief Returns whether or not a cluster for scenes is supported on an endpoint
+
     /// @param endpoint Target Endpoint ID
     /// @param cluster Target Cluster ID
     /// @return true if supported, false if not supported
