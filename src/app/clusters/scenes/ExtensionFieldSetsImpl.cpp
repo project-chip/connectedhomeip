@@ -15,14 +15,14 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/scenes/ExtensionFieldsSetsImpl.h>
+#include <app/clusters/scenes/ExtensionFieldSetsImpl.h>
 
 namespace chip {
 namespace scenes {
 
-ExtensionFieldsSetsImpl::ExtensionFieldsSetsImpl() : ExtensionFieldsSets() {}
+ExtensionFieldSetsImpl::ExtensionFieldSetsImpl() : ExtensionFieldsSets() {}
 
-CHIP_ERROR ExtensionFieldsSetsImpl::Serialize(TLV::TLVWriter & writer) const
+CHIP_ERROR ExtensionFieldSetsImpl::Serialize(TLV::TLVWriter & writer) const
 {
     TLV::TLVType container;
     ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(kTagEFSArrayContainer), TLV::kTLVType_Structure, container));
@@ -41,7 +41,7 @@ CHIP_ERROR ExtensionFieldsSetsImpl::Serialize(TLV::TLVWriter & writer) const
     return writer.EndContainer(container);
 }
 
-CHIP_ERROR ExtensionFieldsSetsImpl::Deserialize(TLV::TLVReader & reader)
+CHIP_ERROR ExtensionFieldSetsImpl::Deserialize(TLV::TLVReader & reader)
 {
     TLV::TLVType container;
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(kTagEFSArrayContainer)));
@@ -61,7 +61,7 @@ CHIP_ERROR ExtensionFieldsSetsImpl::Deserialize(TLV::TLVReader & reader)
     return reader.ExitContainer(container);
 }
 
-void ExtensionFieldsSetsImpl::Clear()
+void ExtensionFieldSetsImpl::Clear()
 {
     if (!this->IsEmpty())
     {
@@ -77,7 +77,7 @@ void ExtensionFieldsSetsImpl::Clear()
 ///        If the same ID is present in the EFS array, it will overwrite it.
 /// @param fieldSet field set to be inserted
 /// @return CHIP_NO_ERROR if insertion worked, CHIP_ERROR_NO_MEMORY if the array is already full
-CHIP_ERROR ExtensionFieldsSetsImpl::InsertFieldSet(ExtensionFieldsSet & fieldSet)
+CHIP_ERROR ExtensionFieldSetsImpl::InsertFieldSet(ExtensionFieldsSet & fieldSet)
 {
     CHIP_ERROR err             = CHIP_ERROR_NO_MEMORY;
     uint8_t idPosition         = kInvalidPosition;
@@ -115,7 +115,7 @@ CHIP_ERROR ExtensionFieldsSetsImpl::InsertFieldSet(ExtensionFieldsSet & fieldSet
     return err;
 }
 
-CHIP_ERROR ExtensionFieldsSetsImpl::GetFieldSetAtPosition(ExtensionFieldsSet & fieldSet, uint8_t position)
+CHIP_ERROR ExtensionFieldSetsImpl::GetFieldSetAtPosition(ExtensionFieldsSet & fieldSet, uint8_t position)
 {
     VerifyOrReturnError(position < this->mFieldNum, CHIP_ERROR_BUFFER_TOO_SMALL);
 
@@ -124,7 +124,7 @@ CHIP_ERROR ExtensionFieldsSetsImpl::GetFieldSetAtPosition(ExtensionFieldsSet & f
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ExtensionFieldsSetsImpl::RemoveFieldAtPosition(uint8_t position)
+CHIP_ERROR ExtensionFieldSetsImpl::RemoveFieldAtPosition(uint8_t position)
 {
     VerifyOrReturnError(position < kMaxClusterPerScenes, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnValue(!this->IsEmpty() && !this->mEFS[position].IsEmpty(), CHIP_NO_ERROR);

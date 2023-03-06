@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <app/clusters/scenes/ExtensionFieldsSets.h>
+#include <app/clusters/scenes/ExtensionFieldSets.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
@@ -105,11 +105,11 @@ struct ExtensionFieldsSet
     }
 };
 
-class ExtensionFieldsSetsImpl : public ExtensionFieldsSets
+class ExtensionFieldSetsImpl : public ExtensionFieldsSets
 {
 public:
-    ExtensionFieldsSetsImpl();
-    ~ExtensionFieldsSetsImpl() override{};
+    ExtensionFieldSetsImpl();
+    ~ExtensionFieldSetsImpl() override{};
 
     // overrides
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override;
@@ -123,7 +123,7 @@ public:
     CHIP_ERROR GetFieldSetAtPosition(ExtensionFieldsSet & field, uint8_t position);
     CHIP_ERROR RemoveFieldAtPosition(uint8_t position);
 
-    bool operator==(const ExtensionFieldsSetsImpl & other)
+    bool operator==(const ExtensionFieldSetsImpl & other)
     {
         for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
         {
@@ -135,7 +135,7 @@ public:
         return true;
     }
 
-    ExtensionFieldsSetsImpl & operator=(const ExtensionFieldsSetsImpl & other)
+    ExtensionFieldSetsImpl & operator=(const ExtensionFieldSetsImpl & other)
     {
         for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
         {

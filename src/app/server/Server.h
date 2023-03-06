@@ -28,6 +28,8 @@
 #include <app/OperationalSessionSetupPool.h>
 #include <app/SimpleSubscriptionResumptionStorage.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/scenes/SceneTable.h>
+#include <app/clusters/scenes/SceneTableImpl.h>
 #include <app/server/AclStorage.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
@@ -89,7 +91,7 @@ struct ServerInitParams
     ServerInitParams() = default;
 
     // Not copyable
-    ServerInitParams(const ServerInitParams &) = delete;
+    ServerInitParams(const ServerInitParams &)             = delete;
     ServerInitParams & operator=(const ServerInitParams &) = delete;
 
     // Application delegate to handle some commissioning lifecycle events
@@ -116,6 +118,8 @@ struct ServerInitParams
     // Group data provider: MUST be injected. Used to maintain critical keys such as the Identity
     // Protection Key (IPK) for CASE. Must be initialized before being provided.
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
+    // Scene Table: optionnal, required if Scene Cluster implemented
+    scenes::SceneTable * sceneTable = nullptr;
     // Session keystore: MUST be injected. Used to derive and manage lifecycle of symmetric keys.
     Crypto::SessionKeystore * sessionKeystore = nullptr;
     // Access control delegate: MUST be injected. Used to look up access control rules. Must be
@@ -205,7 +209,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     CommonCaseDeviceServerInitParams() = default;
 
     // Not copyable
-    CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &) = delete;
+    CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &)             = delete;
     CommonCaseDeviceServerInitParams & operator=(const CommonCaseDeviceServerInitParams &) = delete;
 
     /**
@@ -256,6 +260,11 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         ReturnErrorOnFailure(sGroupDataProvider.Init());
         this->groupDataProvider = &sGroupDataProvider;
 
+        // TODO: complete scene cluster implementation before uncommenting
+        // Scene Table
+        // this->sceneTable = &sSceneTable;
+        // this->sceneTable->Init(this->persistentStorageDelegate);
+
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
         ReturnErrorOnFailure(sSessionResumptionStorage.Init(this->persistentStorageDelegate));
         this->sessionResumptionStorage = &sSessionResumptionStorage;
@@ -289,6 +298,8 @@ private:
     static PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
     static Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
     static Credentials::GroupDataProviderImpl sGroupDataProvider;
+    // TODO: complete scene cluster implementation before uncommenting
+    // static scenes::DefaultSceneTableImpl sSceneTable;
     static IgnoreCertificateValidityPolicy sDefaultCertValidityPolicy;
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
     static SimpleSessionResumptionStorage sSessionResumptionStorage;
@@ -333,41 +344,97 @@ public:
      */
     void RejoinExistingMulticastGroups();
 
-    FabricTable & GetFabricTable() { return mFabrics; }
+    FabricTable & GetFabricTable()
+    {
+        return mFabrics;
+    }
 
-    CASESessionManager * GetCASESessionManager() { return &mCASESessionManager; }
+    CASESessionManager * GetCASESessionManager()
+    {
+        return &mCASESessionManager;
+    }
 
-    Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
+    Messaging::ExchangeManager & GetExchangeManager()
+    {
+        return mExchangeMgr;
+    }
 
-    SessionManager & GetSecureSessionManager() { return mSessions; }
+    SessionManager & GetSecureSessionManager()
+    {
+        return mSessions;
+    }
 
-    SessionResumptionStorage * GetSessionResumptionStorage() { return mSessionResumptionStorage; }
+    SessionResumptionStorage * GetSessionResumptionStorage()
+    {
+        return mSessionResumptionStorage;
+    }
 
-    app::SubscriptionResumptionStorage * GetSubscriptionResumptionStorage() { return mSubscriptionResumptionStorage; }
+    app::SubscriptionResumptionStorage * GetSubscriptionResumptionStorage()
+    {
+        return mSubscriptionResumptionStorage;
+    }
 
-    TransportMgrBase & GetTransportManager() { return mTransports; }
+    TransportMgrBase & GetTransportManager()
+    {
+        return mTransports;
+    }
 
-    Credentials::GroupDataProvider * GetGroupDataProvider() { return mGroupsProvider; }
+    Credentials::GroupDataProvider * GetGroupDataProvider()
+    {
+        return mGroupsProvider;
+    }
 
-    Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
+    scenes::SceneTable * GetSceneTable()
+    {
+        return mSceneTable;
+    }
+
+    Crypto::SessionKeystore * GetSessionKeystore() const
+    {
+        return mSessionKeystore;
+    }
 
 #if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * GetBleLayerObject() { return mBleLayer; }
+    Ble::BleLayer * GetBleLayerObject()
+    {
+        return mBleLayer;
+    }
 #endif
 
-    CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
+    CommissioningWindowManager & GetCommissioningWindowManager()
+    {
+        return mCommissioningWindowManager;
+    }
 
-    PersistentStorageDelegate & GetPersistentStorage() { return *mDeviceStorage; }
+    PersistentStorageDelegate & GetPersistentStorage()
+    {
+        return *mDeviceStorage;
+    }
 
-    app::FailSafeContext & GetFailSafeContext() { return mFailSafeContext; }
+    app::FailSafeContext & GetFailSafeContext()
+    {
+        return mFailSafeContext;
+    }
 
-    TestEventTriggerDelegate * GetTestEventTriggerDelegate() { return mTestEventTriggerDelegate; }
+    TestEventTriggerDelegate * GetTestEventTriggerDelegate()
+    {
+        return mTestEventTriggerDelegate;
+    }
 
-    Crypto::OperationalKeystore * GetOperationalKeystore() { return mOperationalKeystore; }
+    Crypto::OperationalKeystore * GetOperationalKeystore()
+    {
+        return mOperationalKeystore;
+    }
 
-    Credentials::OperationalCertificateStore * GetOpCertStore() { return mOpCertStore; }
+    Credentials::OperationalCertificateStore * GetOpCertStore()
+    {
+        return mOpCertStore;
+    }
 
-    app::DefaultAttributePersistenceProvider & GetDefaultAttributePersister() { return mAttributePersister; }
+    app::DefaultAttributePersistenceProvider & GetDefaultAttributePersister()
+    {
+        return mAttributePersister;
+    }
 
     /**
      * This function causes the ShutDown event to be generated async on the
@@ -384,7 +451,10 @@ public:
         return System::SystemClock().GetMonotonicMicroseconds64() - mInitTimestamp;
     }
 
-    static Server & GetInstance() { return sServer; }
+    static Server & GetInstance()
+    {
+        return sServer;
+    }
 
 private:
     Server() = default;
@@ -565,6 +635,7 @@ private:
     app::SubscriptionResumptionStorage * mSubscriptionResumptionStorage;
     Credentials::CertificateValidityPolicy * mCertificateValidityPolicy;
     Credentials::GroupDataProvider * mGroupsProvider;
+    scenes::SceneTable * mSceneTable;
     Crypto::SessionKeystore * mSessionKeystore;
     app::DefaultAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;

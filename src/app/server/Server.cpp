@@ -162,6 +162,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mGroupsProvider = initParams.groupDataProvider;
     SetGroupDataProvider(mGroupsProvider);
 
+    mSceneTable = initParams.sceneTable;
+
     mTestEventTriggerDelegate = initParams.testEventTriggerDelegate;
 
     deviceInfoprovider = DeviceLayer::GetDeviceInfoProvider();
@@ -535,6 +537,8 @@ KvsPersistentStorageDelegate CommonCaseDeviceServerInitParams::sKvsPersistenStor
 PersistentStorageOperationalKeystore CommonCaseDeviceServerInitParams::sPersistentStorageOperationalKeystore;
 Credentials::PersistentStorageOpCertStore CommonCaseDeviceServerInitParams::sPersistentStorageOpCertStore;
 Credentials::GroupDataProviderImpl CommonCaseDeviceServerInitParams::sGroupDataProvider;
+// TODO: complete scene cluster implementation before uncommenting
+// scenes::DefaultSceneTableImpl CommonCaseDeviceServerInitParams::sSceneTable;
 IgnoreCertificateValidityPolicy CommonCaseDeviceServerInitParams::sDefaultCertValidityPolicy;
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
 SimpleSessionResumptionStorage CommonCaseDeviceServerInitParams::sSessionResumptionStorage;

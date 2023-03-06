@@ -82,15 +82,21 @@ public:
         ClusterId * buffer = clusterBuffer.data();
         if (endpoint == TEST_ENDPOINT1)
         {
-            buffer[0] = ON_OFF_CID;
-            buffer[1] = LV_CTR_CID;
-            clusterBuffer.reduce_size(2);
+            if (clusterBuffer.size() >= 2)
+            {
+                buffer[0] = ON_OFF_CID;
+                buffer[1] = LV_CTR_CID;
+                clusterBuffer.reduce_size(2);
+            }
         }
         else if (endpoint == TEST_ENDPOINT2)
         {
-            buffer[0] = ON_OFF_CID;
-            buffer[1] = CC_CTR_CID;
-            clusterBuffer.reduce_size(2);
+            if (clusterBuffer.size() >= 2)
+            {
+                buffer[0] = ON_OFF_CID;
+                buffer[1] = CC_CTR_CID;
+                clusterBuffer.reduce_size(2);
+            }
         }
     }
 
