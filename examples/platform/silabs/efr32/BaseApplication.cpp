@@ -183,7 +183,7 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",                  // Just a text name, not used by the RTOS kernel
-                                  1,                        // == default timer period (mS)
+                                  pdMS_TO_TICKS(1),         // == default timer period (mS)
                                   false,                    // no timer reload (==one-shot)
                                   (void *) this,            // init timer id = app task obj context
                                   FunctionTimerEventHandler // timer callback handler
@@ -196,7 +196,7 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
 
     // Create FreeRTOS sw timer for LED Management.
     sLightTimer = xTimerCreate("LightTmr",            // Text Name
-                               10,                    // Default timer period (mS)
+                               pdMS_TO_TICKS(10),     // Default timer period (mS)
                                true,                  // reload timer
                                (void *) this,         // Timer Id
                                LightTimerEventHandler // Timer callback handler
@@ -483,7 +483,7 @@ void BaseApplication::StartFunctionTimer(uint32_t aTimeoutInMs)
     // timer is not active, change its period to required value (== restart).
     // FreeRTOS- Block for a maximum of 100 ticks if the change period command
     // cannot immediately be sent to the timer command queue.
-    if (xTimerChangePeriod(sFunctionTimer, aTimeoutInMs / portTICK_PERIOD_MS, 100) != pdPASS)
+    if (xTimerChangePeriod(sFunctionTimer, pdMS_TO_TICKS(aTimeoutInMs), 100) != pdPASS)
     {
         SILABS_LOG("app timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
@@ -494,7 +494,7 @@ void BaseApplication::StartFunctionTimer(uint32_t aTimeoutInMs)
 
 void BaseApplication::StartStatusLEDTimer()
 {
-    if (pdPASS != xTimerStart(sLightTimer, 0))
+    if (pdPASS != xTimerStart(sLightTimer, pdMS_TO_TICKS(0)))
     {
         SILABS_LOG("Light Time start failed");
         appError(APP_ERROR_START_TIMER_FAILED);
@@ -507,7 +507,7 @@ void BaseApplication::StopStatusLEDTimer()
     sStatusLED.Set(false);
 #endif // ENABLE_WSTK_LEDS
 
-    if (xTimerStop(sLightTimer, 100) != pdPASS)
+    if (xTimerStop(sLightTimer, pdMS_TO_TICKS(100)) != pdPASS)
     {
         SILABS_LOG("Light Time start failed");
         appError(APP_ERROR_START_TIMER_FAILED);
