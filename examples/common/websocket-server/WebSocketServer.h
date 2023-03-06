@@ -29,7 +29,7 @@ class WebSocketServer : public WebSocketServerDelegate
 {
 public:
     CHIP_ERROR Run(chip::Optional<uint16_t> port, WebSocketServerDelegate * delegate);
-    CHIP_ERROR Send(const char * msg);
+    void Send(const char * msg);
 
     bool OnWebSocketMessageReceived(char * msg) override;
 

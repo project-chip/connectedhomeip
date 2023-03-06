@@ -306,7 +306,10 @@ bool InteractiveCommand::ParseCommand(char * command, int * status)
 {
     if (strcmp(command, kInteractiveModeStopCommand) == 0)
     {
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(ExecuteDeferredCleanups, 0);
+        // If scheduling the cleanup fails, there is not much we can do.
+        // But if something went wrong while the application is leaving it could be because things have
+        // not been cleaned up properly, so it is still useful to log the failure.
+        LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(ExecuteDeferredCleanups, 0));
         return false;
     }
 
