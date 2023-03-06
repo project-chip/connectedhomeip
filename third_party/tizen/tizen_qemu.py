@@ -32,7 +32,7 @@ parser = argparse.ArgumentParser(
     description="Run Tizen on QEMU.")
 parser.add_argument(
     '-i', '--interactive', action='store_true',
-    help="run QEMU in interactive mode (no output redirection)")
+    help="run QEMU in interactive mode (no output redirection, no runner)")
 parser.add_argument(
     '--smp', metavar='NUM', type=int, default=2,
     help=("the number of CPUs available in QEMU; default: %(default)s"))
@@ -102,9 +102,14 @@ qemu_args += [
     '-drive', 'file=%s,id=virtio-blk1,if=none,format=raw,readonly=on' % args.image_root,
 ]
 
+kernel_args = "console=ttyAMA0 earlyprintk earlycon root=/dev/vda"
+if args.interactive:
+    # Run root shell instead of the runner script.
+    kernel_args += " rootshell"
+
 qemu_args += [
     '-kernel', args.kernel,
-    '-append', "console=ttyAMA0 earlyprintk earlycon root=/dev/vda",
+    '-append', kernel_args,
 ]
 
 if args.interactive:

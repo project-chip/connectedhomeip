@@ -171,6 +171,7 @@ RUN set -x \
     # Launcher script
     && echo -n \
     "#!/bin/bash\n" \
+    "grep -q 'rootshell' /proc/cmdline && exit\n" \
     "if [[ -x /mnt/chip/runner.sh ]]; then\n" \
     "  echo '### RUNNER START ###'\n" \
     "  /mnt/chip/runner.sh\n" \
