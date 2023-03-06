@@ -220,7 +220,6 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
 #define BG_SCAN_RES_SIZE 500
 
 #define SPI_CONFIG_SUCESS 0
-#define WPA3_SECURITY 3
 
 typedef enum
 {
@@ -238,28 +237,19 @@ typedef enum
 /* Note that these are same as RSI_security */
 typedef enum
 {
-    WFX_SEC_NONE           = 0,
-    WFX_SEC_WPA            = 1,
-    WFX_SEC_WPA2           = 2,
-    WFX_SEC_WEP            = 3,
-    WFX_SEC_WPA_EAP        = 4,
-    WFX_SEC_WPA2_EAP       = 5,
-    WFX_SEC_WPA_WPA2_MIXED = 6,
-    WFX_SEC_WPA_PMK        = 7,
-    WFX_SEC_WPA2_PMK       = 8,
-    WFX_SEC_WPS_PIN        = 9,
-    WFX_SEC_GEN_WPS_PIN    = 10,
-    WFX_SEC_PUSH_BTN       = 11,
-    WFX_SEC_WPA3           = 11,
+    WFX_SEC_UNSPECIFIED = 0,
+    WFX_SEC_NONE        = 1,
+    WFX_SEC_WEP         = 2,
+    WFX_SEC_WPA         = 3,
+    WFX_SEC_WPA2        = 4,
+    WFX_SEC_WPA3        = 5
 } wfx_sec_t;
-
-#define WPA3_SECURITY 3
 
 typedef struct
 {
     char ssid[32 + 1];
     char passkey[64 + 1];
-    uint8_t security;
+    wfx_sec_t security;
 } wfx_wifi_provision_t;
 
 typedef enum
@@ -274,7 +264,7 @@ typedef enum
 typedef struct wfx_wifi_scan_result
 {
     char ssid[32 + 1];
-    uint8_t security;
+    wfx_sec_t security;
     uint8_t bssid[6];
     uint8_t chan;
     int16_t rssi; /* I suspect this is in dBm - so signed */
