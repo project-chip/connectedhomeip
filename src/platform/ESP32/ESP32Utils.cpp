@@ -332,7 +332,6 @@ CHIP_ERROR ESP32Utils::ClearWiFiStationProvision(void)
 
 CHIP_ERROR ESP32Utils::InitWiFiStack(void)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     wifi_init_config_t cfg;
     uint8_t ap_mac[6];
     wifi_mode_t mode;
@@ -381,9 +380,6 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
         return ESP32Utils::MapError(err);
     }
     return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 }
 
 CHIP_ERROR ESP32Utils::MapError(esp_err_t error)
