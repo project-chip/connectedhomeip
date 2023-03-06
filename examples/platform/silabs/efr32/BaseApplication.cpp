@@ -103,7 +103,7 @@ app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
 #endif /* SL_WIFI */
 
-bool sIsProvisioned      = false;
+bool sIsProvisioned = false;
 
 #if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 bool sIsEnabled          = false;
