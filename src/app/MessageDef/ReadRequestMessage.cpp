@@ -116,28 +116,28 @@ CHIP_ERROR ReadRequestMessage::Parser::PrettyPrint() const
 CHIP_ERROR ReadRequestMessage::Parser::GetAttributeRequests(AttributePathIBs::Parser * const apAttributeRequests) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kAttributeRequests)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kAttributeRequests), reader));
     return apAttributeRequests->Init(reader);
 }
 
 CHIP_ERROR ReadRequestMessage::Parser::GetDataVersionFilters(DataVersionFilterIBs::Parser * const apDataVersionFilters) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kDataVersionFilters)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kDataVersionFilters), reader));
     return apDataVersionFilters->Init(reader);
 }
 
 CHIP_ERROR ReadRequestMessage::Parser::GetEventRequests(EventPathIBs::Parser * const apEventRequests) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventRequests)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kEventRequests), reader));
     return apEventRequests->Init(reader);
 }
 
 CHIP_ERROR ReadRequestMessage::Parser::GetEventFilters(EventFilterIBs::Parser * const apEventFilters) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventFilters)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kEventFilters), reader));
     return apEventFilters->Init(reader);
 }
 
@@ -191,7 +191,7 @@ ReadRequestMessage::Builder & ReadRequestMessage::Builder::IsFabricFiltered(cons
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kIsFabricFiltered)), aIsFabricFiltered);
+        mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kIsFabricFiltered), aIsFabricFiltered);
     }
     return *this;
 }

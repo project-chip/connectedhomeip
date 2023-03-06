@@ -27,8 +27,6 @@
 
 #define CHIP_CONFIG_EVENT_LOGGING_NUM_EXTERNAL_CALLBACKS 2
 
-#define CHIP_CONFIG_EVENT_LOGGING_EXTERNAL_EVENT_SUPPORT 1
-
 // Uncomment this for a large Tunnel MTU.
 //#define CHIP_CONFIG_TUNNEL_INTERFACE_MTU                           (9000)
 

@@ -107,6 +107,31 @@ Finally, reboot your RPi.
 If you want to install/use a different version, you may download one from the
 zap project [Releases](https://github.com/project-chip/zap/releases)
 
+### Linux ARM
+
+Zap does not provide binary releases for arm. Rosetta solves this for Darwin,
+however for linux arm you will have to use a local ZAP, generally through
+setting `$ZAP_DEVELOPMENT_PATH` (see the section `Which zap to use` below).
+
+The file `scripts/setup/zap.json` contains the version that CIPD would download,
+so you can download a compatible version from the zap project
+[Releases](https://github.com/project-chip/zap/releases). To checkout as source
+code the corresponding tag should exist in the zap
+[repository tags](https://github.com/project-chip/zap/tags) list.
+
+Example commands:
+
+```sh
+RUN set -x \
+    && mkdir -p /opt/zap-${ZAP_VERSION} \
+    && git clone https://github.com/project-chip/zap.git /opt/zap-${ZAP_VERSION} \
+    && cd /opt/zap-${ZAP_VERSION} \
+    && git checkout ${ZAP_VERSION} \
+    && npm config set user 0 \
+    && npm ci
+ENV ZAP_DEVELOPMENT_PATH=/opt/zap-${ZAP_VERSION}
+```
+
 ### Which ZAP to use
 
 ZAP scripting uses the following detection, in order:
