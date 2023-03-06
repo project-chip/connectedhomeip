@@ -1379,7 +1379,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_SCENES_TABLE_UNUSED_ENDPOINT_ID 0x00
 #endif
 /**
- * @brief The maximum number of scenes according to spec
+ * @brief The minimum number of scenes to support according to spec
  */
 #ifndef CHIP_CONFIG_SCENES_MAX_NUMBER
 #define CHIP_CONFIG_SCENES_MAX_NUMBER 16

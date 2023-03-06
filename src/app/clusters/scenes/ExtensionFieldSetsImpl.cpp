@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/scenes/ExtensionFieldSetsImpl.h>
+#include "ExtensionFieldSetsImpl.h"
 
 namespace chip {
 namespace scenes {

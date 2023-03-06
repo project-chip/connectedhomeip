@@ -183,11 +183,13 @@ public:
             {
             case ON_OFF_CID:
                 err = CHIP_NO_ERROR;
+                // Warning: OO_buffer needs to be populated before calling this function
                 memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldsPerCluster);
                 serialisedBytes.reduce_size(15); // Used memory for OnOff TLV
                 break;
             case LV_CTR_CID:
                 err = CHIP_NO_ERROR;
+                // Warning: LC_buffer needs to be populated before calling this function
                 memcpy(serialisedBytes.data(), LC_buffer, scenes::kMaxFieldsPerCluster);
                 serialisedBytes.reduce_size(27); // Used memory for Level Control TLV
                 break;
@@ -201,11 +203,13 @@ public:
             {
             case ON_OFF_CID:
                 err = CHIP_NO_ERROR;
+                // Warning: OO_buffer needs to be populated before calling this function
                 memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldsPerCluster);
                 serialisedBytes.reduce_size(15); // Used memory for OnOff TLV
                 break;
             case CC_CTR_CID:
                 err = CHIP_NO_ERROR;
+                // Warning: CC_buffer needs to be populated before calling this function
                 memcpy(serialisedBytes.data(), CC_buffer, scenes::kMaxFieldsPerCluster);
                 serialisedBytes.reduce_size(99); // Used memory for Color Control TLV
                 break;
@@ -272,7 +276,7 @@ public:
             }
         }
 
-        return CHIP_NO_ERROR;
+        return err;
     }
 };
 
@@ -295,11 +299,10 @@ void TestHandlerRegistration(nlTestSuite * aSuite, void * aContext)
     {
         NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == i);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RegisterHandler(&tmpHandler[i]));
-        printf("Handler : %d | Address : %p \n", i, &tmpHandler[i]);
     }
 
     NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == scenes::kMaxSceneHandlers);
-    // Removal at begining
+    // Removal at beginning
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(&tmpHandler[0]));
     NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 1));
     // Confirm array was compressed and last position is now null
@@ -669,7 +672,7 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, scene == scene10);
     iterator->Release();
 
-    // Adde scene in middle, a spot should have been freed
+    // Add scene in middle, a spot should have been freed
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene9));
     iterator = sceneTable->IterateSceneEntry(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 8);
