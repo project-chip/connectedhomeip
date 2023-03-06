@@ -20,6 +20,7 @@ package chip.devicecontroller;
 import android.bluetooth.BluetoothGatt;
 import android.util.Log;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
+import chip.devicecontroller.model.AttributeWriteRequest;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
 import java.util.ArrayList;
@@ -600,6 +601,32 @@ public class ChipDeviceController {
   }
 
   /**
+   * @brief Write a list of attributes into target device
+   * @param WriteAttributesCallback Callback when a write response has been received and processed
+   *     for the given path.
+   * @param devicePtr connected device pointer
+   * @param attributeList a list of attributes
+   * @param timedRequestTimeoutMs this is timed request if this value is larger than 0
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
+  public void write(
+      WriteAttributesCallback callback,
+      long devicePtr,
+      List<AttributeWriteRequest> attributeList,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs) {
+    WriteAttributesCallbackJni jniCallback = new WriteAttributesCallbackJni(callback);
+    write(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        attributeList,
+        timedRequestTimeoutMs,
+        imTimeoutMs);
+  }
+
+  /**
    * Converts a given X.509v3 certificate into a Matter certificate.
    *
    * @throws ChipDeviceControllerException if there was an issue during encoding (e.g. out of
@@ -645,6 +672,14 @@ public class ChipDeviceController {
       List<ChipAttributePath> attributePaths,
       List<ChipEventPath> eventPaths,
       boolean isFabricFiltered);
+
+  private native void write(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      List<AttributeWriteRequest> attributeList,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs);
 
   private native long newDeviceController(ControllerParams params);
 

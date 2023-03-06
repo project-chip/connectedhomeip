@@ -36,6 +36,7 @@
 #include <lib/core/TLVCircularBuffer.h>
 #include <lib/support/CHIPCounter.h>
 #include <messaging/ExchangeMgr.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <system/SystemClock.h>
 
 /**
@@ -397,7 +398,11 @@ private:
 
         int mFieldsToRead = 0;
         /* PriorityLevel and DeltaTime are there if that is not first event when putting events in report*/
-        Timestamp mCurrentTime   = Timestamp::System(System::Clock::kZero);
+#if CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
+        Timestamp mCurrentTime = Timestamp::System(System::Clock::kZero);
+#else  // CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
+        Timestamp mCurrentTime = Timestamp::Epoch(System::Clock::kZero);
+#endif // CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
         PriorityLevel mPriority  = PriorityLevel::First;
         ClusterId mClusterId     = 0;
         EndpointId mEndpointId   = 0;

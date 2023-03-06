@@ -113,6 +113,13 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0
 
 /**
+ * CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
+ *
+ * Enable recording UTC timestamps.
+ */
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
+
+/**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
  *
  * A size, in bytes, of the individual debug event logging buffer.
