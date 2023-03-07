@@ -30,8 +30,6 @@
 #include "esp_log.h"
 #include "esp_system.h"
 
-static const char * TAG = "WifiWidget";
-
 void WiFiWidget::Init()
 {
 #if CONFIG_HAVE_DISPLAY
