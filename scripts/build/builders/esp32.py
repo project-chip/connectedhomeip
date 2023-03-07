@@ -99,22 +99,19 @@ class Esp32App(Enum):
     def IsCompatible(self, board: Esp32Board):
         if board == Esp32Board.QEMU:
             return self == Esp32App.TESTS
-        elif board == Esp32Board.M5Stack:
-            return (self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL or
-                    self == Esp32App.OTA_REQUESTOR or self == Esp32App.OTA_PROVIDER)
         elif board == Esp32Board.C3DevKit:
             return self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL
         else:
-            return (board == Esp32Board.DevKitC) and (self != Esp32App.TESTS)
+            return (board in {Esp32Board.M5Stack, Esp32Board.DevKitC}) and (self != Esp32App.TESTS)
 
 
 def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
-    rpc_enabled_apps = [Esp32App.ALL_CLUSTERS,
+    rpc_enabled_apps = {Esp32App.ALL_CLUSTERS,
                         Esp32App.ALL_CLUSTERS_MINIMAL,
                         Esp32App.LIGHT,
                         Esp32App.OTA_REQUESTOR,
                         Esp32App.OTA_PROVIDER,
-                        Esp32App.TEMPERATURE_MEASUREMENT]
+                        Esp32App.TEMPERATURE_MEASUREMENT}
     if app == Esp32App.TESTS:
         return 'sdkconfig_qemu.defaults'
     elif app not in rpc_enabled_apps:
@@ -124,7 +121,17 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
     if board == Esp32Board.DevKitC:
         return 'sdkconfig{}.defaults'.format(rpc)
     elif board == Esp32Board.M5Stack:
-        return 'sdkconfig_m5stack{}.defaults'.format(rpc)
+        # a subset of apps have m5stack specific configurations. However others
+        # just compile for the same devices as aDevKitC
+        specific_apps = {
+            Esp32App.ALL_CLUSTERS,
+            Esp32App.ALL_CLUSTERS_MINIMAL,
+            Esp32App.OTA_REQUESTOR,
+        }
+        if app in specific_apps:
+            return 'sdkconfig_m5stack{}.defaults'.format(rpc)
+        else:
+            return 'sdkconfig{}.defaults'.format(rpc)
     elif board == Esp32Board.C3DevKit:
         return 'sdkconfig_c3devkit{}.defaults'.format(rpc)
     else:
