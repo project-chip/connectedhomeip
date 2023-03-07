@@ -385,8 +385,6 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
     for (size_t i = 0; i < totalCredentials; ++i)
     {
         mCredentials[userIndex][i]                 = credentials[i];
-        mCredentials[userIndex][i].credentialType  = credentials[i].credentialType;
-        mCredentials[userIndex][i].credentialIndex = credentials[i].credentialIndex;
     }
 
     userInStorage.credentials = chip::Span<const CredentialStruct>(mCredentials[userIndex], totalCredentials);
@@ -691,15 +689,15 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
     }
 
     // Check the PIN code
-    for (uint8_t i = 0; i < kMaxCredentialsPerUser; i++)
+    for (const auto currentCredential & : mLockCredentials[to_underlying(CredentialTypeEnum::kPin)])
     {
 
-        if (mLockCredentials[to_underlying(CredentialTypeEnum::kPin)][i].status == DlCredentialStatus::kAvailable)
+        if (currentCredential.status == DlCredentialStatus::kAvailable)
         {
             continue;
         }
 
-        if (mLockCredentials[to_underlying(CredentialTypeEnum::kPin)][i].credentialData.data_equal(pin.Value()))
+        if (currentCredential.credentialData.data_equal(pin.Value()))
         {
             ChipLogDetail(Zcl,
                           "Lock App: specified PIN code was found in the database, setting lock state to \"%s\" [endpointId=%d]",
