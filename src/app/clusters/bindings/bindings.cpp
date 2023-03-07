@@ -117,7 +117,7 @@ CHIP_ERROR CheckValidBindingList(const EndpointId localEndpoint, const Decodable
     return CHIP_NO_ERROR;
 }
 
-void CreateBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
+CHIP_ERROR CreateBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
 {
     EmberBindingTableEntry bindingEntry;
 
@@ -131,7 +131,8 @@ void CreateBindingEntry(const TargetStructType & entry, EndpointId localEndpoint
                                                        entry.cluster);
     }
 
-    AddBindingEntry(bindingEntry);
+    CHIP_ERROR err = AddBindingEntry(bindingEntry);
+    return err;
 }
 
 CHIP_ERROR BindingTableAccess::Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder)
@@ -248,8 +249,9 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
-        CreateBindingEntry(target, path.mEndpointId);
-        return CHIP_NO_ERROR;
+        CHIP_ERROR err = CreateBindingEntry(target, path.mEndpointId);
+        
+        return err;
     }
     return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
 }
@@ -269,11 +271,12 @@ void MatterBindingPluginServerInitCallback()
     registerAttributeAccessOverride(&gAttrAccess);
 }
 
-void AddBindingEntry(const EmberBindingTableEntry & entry)
+CHIP_ERROR AddBindingEntry(const EmberBindingTableEntry & entry)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     if (entry.type == EMBER_UNICAST_BINDING)
     {
-        CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+        err = BindingManager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
         if (err != CHIP_NO_ERROR)
         {
             // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
@@ -283,5 +286,6 @@ void AddBindingEntry(const EmberBindingTableEntry & entry)
         }
     }
 
-    BindingTable::GetInstance().Add(entry);
+     err = BindingTable::GetInstance().Add(entry);
+     return err;
 }
