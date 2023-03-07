@@ -1067,7 +1067,7 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
 }
 
 JNI_METHOD(jboolean, openPairingWindowWithPIN)
-(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator, jlong setupPinCode)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator, jobject setupPinCode)
 {
     VerifyOrReturnValue(chip::CanCastTo<uint32_t>(iteration), false);
 
@@ -1083,10 +1083,16 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
+    Optional<uint32_t> pinCode = Optional<uint32_t>();
+    if (setupPinCode != nullptr) {
+        jlong jsetupPinCode = chip::JniReferences::GetInstance().LongToPrimitive(setupPinCode);
+        pinCode = MakeOptional(static_cast<uint32_t>(jsetupPinCode));
+    }
+
     chip::SetupPayload setupPayload;
     err = AutoCommissioningWindowOpener::OpenCommissioningWindow(
         wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), static_cast<uint32_t>(iteration),
-        discriminator, MakeOptional(static_cast<uint32_t>(setupPinCode)), NullOptional, setupPayload);
+        discriminator, pinCode, NullOptional, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1125,7 +1131,7 @@ JNI_METHOD(jboolean, openPairingWindowCallback)
 }
 
 JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
-(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator, jlong setupPinCode,
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator, jobject setupPinCode,
  jobject jcallback)
 {
     VerifyOrReturnValue(chip::CanCastTo<uint32_t>(iteration), false);
@@ -1142,10 +1148,16 @@ JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
+    Optional<uint32_t> pinCode = Optional<uint32_t>();
+    if (setupPinCode != nullptr) {
+        jlong jsetupPinCode = chip::JniReferences::GetInstance().LongToPrimitive(setupPinCode);
+        pinCode = MakeOptional(static_cast<uint32_t>(jsetupPinCode));
+    }
+
     chip::SetupPayload setupPayload;
     err = AndroidCommissioningWindowOpener::OpenCommissioningWindow(
         wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), static_cast<uint32_t>(iteration),
-        discriminator, MakeOptional(static_cast<uint32_t>(setupPinCode)), NullOptional, jcallback, setupPayload);
+        discriminator, pinCode, NullOptional, jcallback, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {

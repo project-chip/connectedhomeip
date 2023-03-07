@@ -453,7 +453,7 @@ public class ChipDeviceController {
   }
 
   public boolean openPairingWindowWithPIN(
-      long devicePtr, int duration, long iteration, int discriminator, long setupPinCode) {
+      long devicePtr, int duration, long iteration, int discriminator, Long setupPinCode) {
     return openPairingWindowWithPIN(
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode);
   }
@@ -468,7 +468,7 @@ public class ChipDeviceController {
       int duration,
       long iteration,
       int discriminator,
-      long setupPinCode,
+      Long setupPinCode,
       OpenCommissioningCallback callback) {
     return openPairingWindowWithPINCallback(
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode, callback);
@@ -750,7 +750,7 @@ public class ChipDeviceController {
       int duration,
       long iteration,
       int discriminator,
-      long setupPinCode);
+      Long setupPinCode);
 
   private native boolean openPairingWindowCallback(
       long deviceControllerPtr, long devicePtr, int duration, OpenCommissioningCallback callback);
@@ -761,7 +761,7 @@ public class ChipDeviceController {
       int duration,
       long iteration,
       int discriminator,
-      long setupPinCode,
+      Long setupPinCode,
       OpenCommissioningCallback callback);
 
   private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
