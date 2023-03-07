@@ -1639,17 +1639,15 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
     while (iterator->Next(subscriptionInfo))
     {
         // If subscription happens between reboot and this timer callback, it's already live and should skip resumption
-        bool subscriptionAlreadyLive = false;
-        imEngine->mReadHandlers.ForEachActiveObject([&](ReadHandler * handler) {
-            SubscriptionId subscriptionId;
-            handler->GetSubscriptionId(subscriptionId);
-            if (subscriptionId == subscriptionInfo.mSubscriptionId)
-            {
-                subscriptionAlreadyLive = true;
-            }
-            return Loop::Continue;
-        });
-        if (subscriptionAlreadyLive)
+        if (Loop::Break == imEngine->mReadHandlers.ForEachActiveObject([&](ReadHandler * handler) {
+                SubscriptionId subscriptionId;
+                handler->GetSubscriptionId(subscriptionId);
+                if (subscriptionId == subscriptionInfo.mSubscriptionId)
+                {
+                    return Loop::Break;
+                }
+                return Loop::Continue;
+            }))
         {
             ChipLogProgress(InteractionModel, "Skip resuming live subscriptionId %" PRIu32, subscriptionInfo.mSubscriptionId);
             continue;
