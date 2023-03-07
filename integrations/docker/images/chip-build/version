@@ -1,1 +1,1 @@
-0.6.48 Version bump reason: [android] Correct kotlinc path for vscode image
+0.6.49 Version bump reason: Fix systemd services run race in Tizen QEMU image
