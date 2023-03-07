@@ -43,7 +43,6 @@
 #define BUTTON_2_GPIO_NUM ((gpio_num_t) 38) // Middle button on M5Stack
 #define BUTTON_3_GPIO_NUM ((gpio_num_t) 37) // Right button on M5Stack
 
-void SetupPretendDevices();
 esp_err_t InitM5Stack(std::string qrCodeText);
 #endif
 

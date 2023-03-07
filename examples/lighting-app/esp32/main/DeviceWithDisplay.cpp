@@ -34,235 +34,6 @@ static const char * TAG = "DeviceWithDisplay";
 
 Button gButtons[BUTTON_NUMBER] = { Button(BUTTON_1_GPIO_NUM), Button(BUTTON_2_GPIO_NUM), Button(BUTTON_3_GPIO_NUM) };
 
-// Pretend these are devices with endpoints with clusters with attributes
-typedef std::tuple<std::string, std::string> Attribute;
-typedef std::vector<Attribute> Attributes;
-typedef std::tuple<std::string, Attributes> Cluster;
-typedef std::vector<Cluster> Clusters;
-typedef std::tuple<std::string, Clusters> Endpoint;
-typedef std::vector<Endpoint> Endpoints;
-typedef std::tuple<std::string, Endpoints> Device;
-typedef std::vector<Device> Devices;
-Devices devices;
-
-void AddAttribute(std::string name, std::string value)
-{
-    Attribute attribute = std::make_tuple(std::move(name), std::move(value));
-    std::get<1>(std::get<1>(std::get<1>(devices.back()).back()).back()).emplace_back(std::move(attribute));
-}
-
-void AddCluster(std::string name)
-{
-    Cluster cluster = std::make_tuple(std::move(name), std::move(Attributes()));
-    std::get<1>(std::get<1>(devices.back()).back()).emplace_back(std::move(cluster));
-}
-
-void AddEndpoint(std::string name)
-{
-    Endpoint endpoint = std::make_tuple(std::move(name), std::move(Clusters()));
-    std::get<1>(devices.back()).emplace_back(std::move(endpoint));
-}
-
-void AddDevice(std::string name)
-{
-    Device device = std::make_tuple(std::move(name), std::move(Endpoints()));
-    devices.emplace_back(std::move(device));
-}
-
-class TouchesMatterStackModel : public ListScreen::Model
-{
-    // We could override Action() and then hope focusIndex has not changed by
-    // the time our queued task runs, but it's cleaner to just capture its value
-    // now.
-    struct QueuedAction
-    {
-        QueuedAction(TouchesMatterStackModel * selfArg, int iArg) : self(selfArg), i(iArg) {}
-        TouchesMatterStackModel * self;
-        int i;
-    };
-
-    void ItemAction(int i) final
-    {
-        auto * action = chip::Platform::New<QueuedAction>(this, i);
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(QueuedActionHandler, reinterpret_cast<intptr_t>(action));
-    }
-
-    static void QueuedActionHandler(intptr_t closure)
-    {
-        auto * queuedAction = reinterpret_cast<QueuedAction *>(closure);
-        queuedAction->self->DoAction(queuedAction->i);
-        chip::Platform::Delete(queuedAction);
-    }
-
-    virtual void DoAction(int i) = 0;
-};
-
-class EditAttributeListModel : public TouchesMatterStackModel
-{
-    int deviceIndex;
-    int endpointIndex;
-    int clusterIndex;
-    int attributeIndex;
-
-public:
-    EditAttributeListModel(int deviceIndex, int endpointIndex, int clusterIndex, int attributeIndex) :
-        deviceIndex(deviceIndex), endpointIndex(endpointIndex), clusterIndex(clusterIndex), attributeIndex(attributeIndex)
-    {}
-    Attribute & attribute()
-    {
-        return std::get<1>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[clusterIndex])[attributeIndex];
-    }
-    bool IsBooleanAttribute()
-    {
-        auto & attribute = this->attribute();
-        auto & value     = std::get<1>(attribute);
-        return value == "On" || value == "Off" || value == "Yes" || value == "No";
-    }
-    virtual std::string GetTitle()
-    {
-        auto & attribute = this->attribute();
-        auto & name      = std::get<0>(attribute);
-        auto & value     = std::get<1>(attribute);
-        char buffer[64];
-        snprintf(buffer, sizeof(buffer), "%s : %s", name.c_str(), value.c_str());
-        return buffer;
-    }
-    virtual int GetItemCount() { return IsBooleanAttribute() ? 1 : 2; }
-    virtual std::string GetItemText(int i)
-    {
-        if (IsBooleanAttribute())
-        {
-            return "Toggle";
-        }
-        return i == 0 ? "+" : "-";
-    }
-
-    void DoAction(int i) override
-    {
-        auto & attribute = this->attribute();
-        auto & value     = std::get<1>(attribute);
-        int n;
-        if (sscanf(value.c_str(), "%d", &n) == 1)
-        {
-            auto & name = std::get<0>(attribute);
-
-            ESP_LOGI(TAG, "editing attribute as integer: %d (%s)", n, i == 0 ? "+" : "-");
-            n += (i == 0) ? 1 : -1;
-            char buffer[32];
-            sprintf(buffer, "%d", n);
-            if (name == "Color Current Level")
-            {
-                // update the current level here for hardcoded endpoint 1
-                ESP_LOGI(TAG, "Brightness changed to : %d", (n * 100 / 255));
-                app::Clusters::LevelControl::Attributes::CurrentLevel::Set(1, n);
-            }
-            else if (name == "Current Hue")
-            {
-                // update the current hue here for hardcoded endpoint 1
-                ESP_LOGI(TAG, "Hue changed to : %d", n * 360 / 254);
-                app::Clusters::ColorControl::Attributes::CurrentHue::Set(1, n);
-            }
-            else if (name == "Current Saturation")
-            {
-                // update the current saturation here for hardcoded endpoint 1
-                ESP_LOGI(TAG, "Saturation changed to : %d", n * 100 / 254);
-                app::Clusters::ColorControl::Attributes::CurrentSaturation::Set(1, n);
-            }
-            value = buffer;
-        }
-        else if (IsBooleanAttribute())
-        {
-            auto & name    = std::get<0>(attribute);
-            auto & cluster = std::get<0>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[i]);
-
-            if (name == "OnOff" && cluster == "OnOff")
-            {
-                value               = (value == "On") ? "Off" : "On";
-                bool attributeValue = (value == "On");
-                app::Clusters::OnOff::Attributes::OnOff::Set(endpointIndex + 1, attributeValue);
-            }
-        }
-    }
-};
-
-class AttributeListModel : public ListScreen::Model
-{
-    int deviceIndex;
-    int endpointIndex;
-    int clusterIndex;
-
-public:
-    AttributeListModel(int deviceIndex, int endpointIndex, int clusterIndex) :
-        deviceIndex(deviceIndex), endpointIndex(endpointIndex), clusterIndex(clusterIndex)
-    {}
-    virtual std::string GetTitle() { return "Attributes"; }
-    virtual int GetItemCount()
-    {
-        return std::get<1>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[clusterIndex]).size();
-    }
-    virtual std::string GetItemText(int i)
-    {
-        auto & attribute = std::get<1>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[clusterIndex])[i];
-        auto & name      = std::get<0>(attribute);
-        auto & value     = std::get<1>(attribute);
-        char buffer[64];
-        snprintf(buffer, sizeof(buffer), "%s : %s", name.c_str(), value.c_str());
-        return buffer;
-    }
-    virtual void ItemAction(int i)
-    {
-        ESP_LOGI(TAG, "Opening attribute %d", i);
-        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(
-            chip::Platform::New<EditAttributeListModel>(deviceIndex, endpointIndex, clusterIndex, i)));
-    }
-};
-class ClusterListModel : public ListScreen::Model
-{
-    int deviceIndex;
-    int endpointIndex;
-
-public:
-    ClusterListModel(int deviceIndex, int endpointIndex) : deviceIndex(deviceIndex), endpointIndex(endpointIndex) {}
-    virtual std::string GetTitle() { return "Clusters"; }
-    virtual int GetItemCount() { return std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex]).size(); }
-    virtual std::string GetItemText(int i) { return std::get<0>(std::get<1>(std::get<1>(devices[deviceIndex])[endpointIndex])[i]); }
-    virtual void ItemAction(int i)
-    {
-        ESP_LOGI(TAG, "Opening cluster %d", i);
-        ScreenManager::PushScreen(
-            chip::Platform::New<ListScreen>(chip::Platform::New<AttributeListModel>(deviceIndex, endpointIndex, i)));
-    }
-};
-
-class EndpointListModel : public ListScreen::Model
-{
-    int deviceIndex;
-
-public:
-    EndpointListModel(int deviceIndex) : deviceIndex(deviceIndex) {}
-    virtual std::string GetTitle() { return "Endpoints"; }
-    virtual int GetItemCount() { return std::get<1>(devices[deviceIndex]).size(); }
-    virtual std::string GetItemText(int i) { return std::get<0>(std::get<1>(devices[deviceIndex])[i]); }
-    virtual void ItemAction(int i)
-    {
-        ESP_LOGI(TAG, "Opening endpoint %d", i);
-        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<ClusterListModel>(deviceIndex, i)));
-    }
-};
-
-class DeviceListModel : public ListScreen::Model
-{
-public:
-    virtual std::string GetTitle() { return "Devices"; }
-    virtual int GetItemCount() { return devices.size(); }
-    virtual std::string GetItemText(int i) { return std::get<0>(devices[i]); }
-    virtual void ItemAction(int i)
-    {
-        ESP_LOGI(TAG, "Opening device %d", i);
-        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<EndpointListModel>(i)));
-    }
-};
-
 class ActionListModel : public ListScreen::Model
 {
     int GetItemCount() override { return static_cast<int>(mActions.size()); }
@@ -306,6 +77,34 @@ private:
     }
 };
 
+class TouchesMatterStackModel : public ListScreen::Model
+{
+    // We could override Action() and then hope focusIndex has not changed by
+    // the time our queued task runs, but it's cleaner to just capture its value
+    // now.
+    struct QueuedAction
+    {
+        QueuedAction(TouchesMatterStackModel * selfArg, int iArg) : self(selfArg), i(iArg) {}
+        TouchesMatterStackModel * self;
+        int i;
+    };
+
+    void ItemAction(int i) final
+    {
+        auto * action = chip::Platform::New<QueuedAction>(this, i);
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(QueuedActionHandler, reinterpret_cast<intptr_t>(action));
+    }
+
+    static void QueuedActionHandler(intptr_t closure)
+    {
+        auto * queuedAction = reinterpret_cast<QueuedAction *>(closure);
+        queuedAction->self->DoAction(queuedAction->i);
+        chip::Platform::Delete(queuedAction);
+    }
+
+    virtual void DoAction(int i) = 0;
+};
+
 class SetupListModel : public TouchesMatterStackModel
 {
 public:
@@ -347,30 +146,6 @@ private:
     std::vector<std::string> options;
 };
 
-void SetupPretendDevices()
-{
-    AddDevice("Light Bulb");
-    AddEndpoint("1");
-    AddCluster("OnOff");
-    AddAttribute("OnOff", "Off");
-    AddCluster("Level Control");
-    AddAttribute("Current Level", "255");
-
-    AddDevice("Color Light");
-    AddEndpoint("1");
-    AddCluster("OnOff");
-    AddAttribute("OnOff", "Off");
-    app::Clusters::OnOff::Attributes::OnOff::Set(1, false);
-    AddCluster("Level Control");
-    AddAttribute("Color Current Level", "255");
-    app::Clusters::LevelControl::Attributes::CurrentLevel::Set(1, 255);
-    AddCluster("Color Control");
-    AddAttribute("Current Hue", "200");
-    app::Clusters::ColorControl::Attributes::CurrentHue::Set(1, 200);
-    AddAttribute("Current Saturation\n", "150");
-    app::Clusters::ColorControl::Attributes::CurrentSaturation::Set(1, 150);
-}
-
 esp_err_t InitM5Stack(std::string qrCodeText)
 {
     esp_err_t err;
@@ -387,11 +162,6 @@ esp_err_t InitM5Stack(std::string qrCodeText)
         (chip::Platform::New<SimpleListModel>())
             ->Title("CHIP")
             ->Action([](int i) { ESP_LOGI(TAG, "action on item %d", i); })
-            ->Item("Devices",
-                   []() {
-                       ESP_LOGI(TAG, "Opening device list");
-                       ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<DeviceListModel>()));
-                   })
             ->Item("mDNS Debug",
                    []() {
                        ESP_LOGI(TAG, "Opening MDNS debug");
