@@ -457,7 +457,7 @@ KVBlockDeviceStoreKeyBuilder::KVBlockDeviceStoreKeyBuilder(const char * key)
         if (illegal_ptr)
         {
             *out++ = '!';
-            *out++ = 'A' + (int) (illegal_ptr - illegalCharacters);
+            *out++ = static_cast<char>('A' + (int) (illegal_ptr - illegalCharacters));
         }
         else
         {
