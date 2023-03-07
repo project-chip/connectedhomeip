@@ -74,8 +74,13 @@ static void InitOTARequestorHandler(System::Layer * systemLayer, void * appState
 
 void OTAHelpers::InitOTARequestor()
 {
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec), InitOTARequestorHandler,
-                                                nullptr);
+    static bool isOTAInitialized = false;
+    if (!isOTAInitialized)
+    {
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec), InitOTARequestorHandler,
+                                                  nullptr);
+        isOTAInitialized = true;
+    }
 }
 
 namespace chip {

@@ -114,8 +114,6 @@ static void InitServer(intptr_t context)
     // We only have network commissioning on endpoint 0.
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
-    InitBindingHandlers();
-
     CHIP_ERROR err = GetAppTask().LockInit();
     if (err != CHIP_NO_ERROR)
     {

@@ -55,6 +55,7 @@
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
+using namespace ::chip::DeviceLayer;
 
 namespace {
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
@@ -71,6 +72,7 @@ DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 static const char * TAG = "light-switch-app";
 
 static AppDeviceCallbacks EchoCallbacks;
+static AppDeviceCallbacksDelegate sAppDeviceCallbacksDelegate;
 
 static void InitServer(intptr_t context)
 {
@@ -79,7 +81,6 @@ static void InitServer(intptr_t context)
 
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 
-    InitBindingHandler();
 }
 
 extern "C" void app_main()
@@ -118,6 +119,7 @@ extern "C" void app_main()
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
     CHIP_ERROR error              = deviceMgr.Init(&EchoCallbacks);
+    DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
     if (error != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "device.Init() failed: %" CHIP_ERROR_FORMAT, error.Format());
