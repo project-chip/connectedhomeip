@@ -384,7 +384,7 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
 
     for (size_t i = 0; i < totalCredentials; ++i)
     {
-        mCredentials[userIndex][i]                 = credentials[i];
+        mCredentials[userIndex][i] = credentials[i];
     }
 
     userInStorage.credentials = chip::Span<const CredentialStruct>(mCredentials[userIndex], totalCredentials);
@@ -689,7 +689,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
     }
 
     // Check the PIN code
-    for (const auto currentCredential & : mLockCredentials[to_underlying(CredentialTypeEnum::kPin)])
+    for (const auto & currentCredential  : mLockCredentials[to_underlying(CredentialTypeEnum::kPin)])
     {
 
         if (currentCredential.status == DlCredentialStatus::kAvailable)
