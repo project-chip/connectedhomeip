@@ -20,17 +20,6 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-//#include "LEDWidget.h"
-#ifdef DISPLAY_ENABLED
-#include "lcd.h"
-#ifdef QR_CODE_ENABLED
-#include "qrcodegen.h"
-#endif // QR_CODE_ENABLED
-#endif // DISPLAY_ENABLED
-//#include "sl_simple_led_instances.h"
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -41,10 +30,6 @@
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
-
-// #ifndef RS91X_BLE_ENABLE
-// #include <platform/silabs/EFR32/freertos_bluetooth.h>
-// #endif
 
 #include <lib/support/CodeUtils.h>
 

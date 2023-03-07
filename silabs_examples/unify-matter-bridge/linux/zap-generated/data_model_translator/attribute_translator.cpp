@@ -6214,19 +6214,19 @@ OccupancySensingAttributeAccess::Read(const ConcreteReadAttributePath& aPath, At
 
     try {
         switch (aPath.mAttributeId) {
-        case MN::Occupancy::Id: { // type is bitmap8
+        case MN::Occupancy::Id: { // type is OccupancyBitmap
             MN::Occupancy::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
         }
-        case MN::OccupancySensorType::Id: { // type is enum8
+        case MN::OccupancySensorType::Id: { // type is OccupancySensorTypeEnum
             MN::OccupancySensorType::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
         }
-        case MN::OccupancySensorTypeBitmap::Id: { // type is bitmap8
+        case MN::OccupancySensorTypeBitmap::Id: { // type is OccupancySensorTypeBitmap
             MN::OccupancySensorTypeBitmap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -6434,7 +6434,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint* e
     chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
     ConcreteAttributePath attrpath = ConcreteAttributePath(node_matter_endpoint, Clusters::OccupancySensing::Id, attribute_id.value());
     switch (attribute_id.value()) {
-    // type is bitmap8
+    // type is OccupancyBitmap
     case MN::Occupancy::Id: {
         using T = MN::Occupancy::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -6446,7 +6446,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint* e
         }
         break;
     }
-        // type is enum8
+        // type is OccupancySensorTypeEnum
     case MN::OccupancySensorType::Id: {
         using T = MN::OccupancySensorType::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);
@@ -6459,7 +6459,7 @@ void OccupancySensingAttributeAccess::reported_updated(const bridged_endpoint* e
         }
         break;
     }
-        // type is bitmap8
+        // type is OccupancySensorTypeBitmap
     case MN::OccupancySensorTypeBitmap::Id: {
         using T = MN::OccupancySensorTypeBitmap::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);

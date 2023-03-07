@@ -158,8 +158,7 @@ void GroupsClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handler
     case Commands::RemoveAllGroups::Id: {
         Commands::RemoveAllGroups::DecodableType data;
         cmd = "RemoveAllGroups"; // "RemoveAllGroups";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-        }
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) { }
     } break;
     case Commands::AddGroupIfIdentifying::Id: {
         Commands::AddGroupIfIdentifying::DecodableType data;
@@ -444,20 +443,17 @@ void OnOffClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerC
     case Commands::Off::Id: {
         Commands::Off::DecodableType data;
         cmd = "Off"; // "Off";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-        }
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) { }
     } break;
     case Commands::On::Id: {
         Commands::On::DecodableType data;
         cmd = "On"; // "On";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-        }
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) { }
     } break;
     case Commands::Toggle::Id: {
         Commands::Toggle::DecodableType data;
         cmd = "Toggle"; // "Toggle";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-        }
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) { }
     } break;
     case Commands::OffWithEffect::Id: {
         Commands::OffWithEffect::DecodableType data;
@@ -478,8 +474,7 @@ void OnOffClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerC
     case Commands::OnWithRecallGlobalScene::Id: {
         Commands::OnWithRecallGlobalScene::DecodableType data;
         cmd = "OnWithRecallGlobalScene"; // "OnWithRecallGlobalScene";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-        }
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) { }
     } break;
     case Commands::OnWithTimedOff::Id: {
         Commands::OnWithTimedOff::DecodableType data;
@@ -1077,8 +1072,7 @@ void BarrierControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface:
     case Commands::BarrierControlStop::Id: {
         Commands::BarrierControlStop::DecodableType data;
         cmd = "Stop"; // "BarrierControlStop";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-        }
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) { }
     } break;
     }
 
@@ -1172,8 +1166,7 @@ void ThermostatClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
     case Commands::ClearWeeklySchedule::Id: {
         Commands::ClearWeeklySchedule::DecodableType data;
         cmd = "ClearWeeklySchedule"; // "ClearWeeklySchedule";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-        }
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) { }
     } break;
     }
 
@@ -2057,8 +2050,7 @@ void ElectricalMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInt
     case Commands::GetProfileInfoCommand::Id: {
         Commands::GetProfileInfoCommand::DecodableType data;
         cmd = "GetProfileInfoResponse"; // "GetProfileInfoCommand";
-        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
-        }
+        if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) { }
     } break;
     case Commands::GetMeasurementProfileCommand::Id: {
         Commands::GetMeasurementProfileCommand::DecodableType data;

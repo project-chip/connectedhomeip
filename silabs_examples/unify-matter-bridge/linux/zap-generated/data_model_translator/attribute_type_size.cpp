@@ -328,6 +328,14 @@ constexpr uint8_t ZCL_LIGHT_SENSOR_TYPE_ATTRIBUTE_TYPES_SIZE = ZCL_ENUM8_ATTRIBU
 constexpr uint8_t ZCL_PRESSURE_FEATURE_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
 constexpr uint8_t ZCL_PRESSURE_FEATURE_ATTRIBUTE_TYPES_SIZE = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
 
+constexpr uint8_t ZCL_OCCUPANCY_BITMAP_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_OCCUPANCY_BITMAP_ATTRIBUTE_TYPES_SIZE = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
+constexpr uint8_t ZCL_OCCUPANCY_SENSOR_TYPE_BITMAP_ATTRIBUTE_TYPES = ZCL_BITMAP32_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_OCCUPANCY_SENSOR_TYPE_BITMAP_ATTRIBUTE_TYPES_SIZE = ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE;
+
+constexpr uint8_t ZCL_OCCUPANCY_SENSOR_TYPE_ENUM_ATTRIBUTE_TYPES = ZCL_ENUM8_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_OCCUPANCY_SENSOR_TYPE_ENUM_ATTRIBUTE_TYPES_SIZE = ZCL_ENUM8_ATTRIBUTE_TYPES_SIZE;
+
 attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_id)
 {
     switch (cluster_id) {
@@ -1364,13 +1372,13 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
     case chip::app::Clusters::OccupancySensing::Id: {
         switch (attribute_id) {
         case OccupancySensing::Attributes::Occupancy::Id: {
-            return { ZCL_BITMAP8_ATTRIBUTE_TYPES, ZCL_BITMAP8_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_OCCUPANCY_BITMAP_ATTRIBUTE_TYPES, ZCL_OCCUPANCY_BITMAP_ATTRIBUTE_TYPES_SIZE };
         }
         case OccupancySensing::Attributes::OccupancySensorType::Id: {
-            return { ZCL_ENUM8_ATTRIBUTE_TYPES, ZCL_ENUM8_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_OCCUPANCY_SENSOR_TYPE_ENUM_ATTRIBUTE_TYPES, ZCL_OCCUPANCY_SENSOR_TYPE_ENUM_ATTRIBUTE_TYPES_SIZE };
         }
         case OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id: {
-            return { ZCL_BITMAP8_ATTRIBUTE_TYPES, ZCL_BITMAP8_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_OCCUPANCY_SENSOR_TYPE_BITMAP_ATTRIBUTE_TYPES, ZCL_OCCUPANCY_SENSOR_TYPE_BITMAP_ATTRIBUTE_TYPES_SIZE };
         }
         case OccupancySensing::Attributes::PIROccupiedToUnoccupiedDelay::Id: {
             return { ZCL_INT16U_ATTRIBUTE_TYPES, ZCL_INT16U_ATTRIBUTE_TYPES_SIZE };

@@ -194,7 +194,6 @@ efr32_executable("onoff_plug_app") {
     "${examples_common_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/BaseApplication.cpp",
     "${examples_plat_dir}/siwx917_utils.cpp",
-    "${examples_common_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_ccpPlatform.cpp",
     "${examples_plat_dir}/matter_config.cpp",
     "src/AppTask.cpp",

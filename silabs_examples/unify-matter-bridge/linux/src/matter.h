@@ -18,7 +18,6 @@
 #include <system/SystemBuildConfig.h>
 
 #include "app/util/attribute-metadata.h"
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/att-storage.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -29,7 +28,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
-#include <app/chip-zcl-zpro-codec.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>

@@ -757,6 +757,8 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::LockDataTypeE
         return "Fingerprint FIXME";
     case LockDataTypeEnum::kFingerVein:
         return "FingerVein FIXME";
+    case LockDataTypeEnum::kFace:
+        return "Face FIXME";
     default:
         return "{}";
     }
@@ -1285,4 +1287,40 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::PressureM
 
 /***************************** Bitmap Converter FIXME**************/
 
+template <>
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap>& value)
+{
+    using namespace chip::app::Clusters::OccupancySensing;
+    nlohmann::json obj;
+    obj["Occupied FIXME"] = static_cast<bool>(value.GetField(OccupancyBitmap::kOccupied));
+    return obj;
+}
+template <>
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap>& value)
+{
+    using namespace chip::app::Clusters::OccupancySensing;
+    nlohmann::json obj;
+    obj["PIR"] = static_cast<bool>(value.GetField(OccupancySensorTypeBitmap::kPir));
+    obj["Ultrasonic"] = static_cast<bool>(value.GetField(OccupancySensorTypeBitmap::kUltrasonic));
+    obj["PhysicalContact"] = static_cast<bool>(value.GetField(OccupancySensorTypeBitmap::kPhysicalContact));
+    return obj;
+}
+
+template <>
+nlohmann::json inline to_json(const chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum& value)
+{
+    using namespace chip::app::Clusters::OccupancySensing;
+    switch (value) {
+    case OccupancySensorTypeEnum::kPir:
+        return "PIR FIXME";
+    case OccupancySensorTypeEnum::kUltrasonic:
+        return "Ultrasonic FIXME";
+    case OccupancySensorTypeEnum::kPIRAndUltrasonic:
+        return "PIRAndUltrasonic FIXME";
+    case OccupancySensorTypeEnum::kPhysicalContact:
+        return "PhysicalContact FIXME";
+    default:
+        return "{}";
+    }
+}
 /***************************** Bitmap Converter FIXME**************/
