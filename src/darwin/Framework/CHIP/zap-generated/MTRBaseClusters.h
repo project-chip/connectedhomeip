@@ -15,12 +15,10 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-
-#import <Matter/MTRClusterStateCacheContainer.h>
-
 #import <Matter/MTRCluster.h>
+#import <Matter/MTRClusterStateCacheContainer.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
+#import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
