@@ -69,7 +69,7 @@ public:
     CHIP_ERROR GetWiFiOverrunCount(uint64_t & overrunCount) override;
     CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
 
-    CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion) override;
+    CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion) override;
     CHIP_ERROR GetWiFiBssId(ByteSpan & value) override;
     CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType) override;
 };

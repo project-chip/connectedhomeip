@@ -75,30 +75,30 @@ NetworkCommissioning::WiFiScanResponse ToScanResponse(const wifi_scan_result * r
 
 // Matter expectations towards Wi-Fi version codes are unaligned with
 // what wpa_supplicant provides. This function maps supplicant codes
-// to the ones defined in the Matter spec (11.14.3.2. WiFiVersion enum)
-uint8_t MapToMatterWiFiVersionCode(wifi_link_mode wifiVersion)
+// to the ones defined in the Matter spec (11.14.5.2. WiFiVersionEnum)
+app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum MapToMatterWiFiVersionCode(wifi_link_mode wifiVersion)
 {
     using app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum;
 
     if (wifiVersion < WIFI_1 || wifiVersion > WIFI_6E)
     {
         ChipLogError(DeviceLayer, "Unsupported Wi-Fi version detected");
-        return static_cast<uint8_t>(WiFiVersionEnum::kA); // let's return 'a' by default
+        return WiFiVersionEnum::kA; // let's return 'a' by default
     }
 
     switch (wifiVersion)
     {
     case WIFI_1:
-        return static_cast<uint8_t>(WiFiVersionEnum::kB);
+        return WiFiVersionEnum::kB;
     case WIFI_2:
-        return static_cast<uint8_t>(WiFiVersionEnum::kA);
+        return WiFiVersionEnum::kA;
     case WIFI_6E:
-        return static_cast<uint8_t>(WiFiVersionEnum::kAx); // treat as 802.11ax
+        return WiFiVersionEnum::kAx; // treat as 802.11ax
     default:
         break;
     }
 
-    return (static_cast<uint8_t>(wifiVersion) - 1);
+    return static_cast<WiFiVersionEnum>(wifiVersion - 1);
 }
 
 // Matter expectations towards Wi-Fi security type codes are unaligned with
