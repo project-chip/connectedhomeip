@@ -250,7 +250,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
         CHIP_ERROR err = CreateBindingEntry(target, path.mEndpointId);
-        
+
         return err;
     }
     return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
@@ -286,6 +286,6 @@ CHIP_ERROR AddBindingEntry(const EmberBindingTableEntry & entry)
         }
     }
 
-     err = BindingTable::GetInstance().Add(entry);
-     return err;
+    err = BindingTable::GetInstance().Add(entry);
+    return err;
 }
