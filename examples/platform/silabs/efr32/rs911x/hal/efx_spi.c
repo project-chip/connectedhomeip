@@ -52,6 +52,10 @@
 #include "sl_device_init_dpll.h"
 #include "sl_device_init_hfxo.h"
 
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+#include "sl_power_manager.h"
+#endif
+
 StaticSemaphore_t xEfxSpiIntfSemaBuffer;
 static SemaphoreHandle_t spi_sem;
 
@@ -184,6 +188,10 @@ static bool rx_dma_complete(unsigned int channel, unsigned int sequenceNo, void 
     xSemaphoreGiveFromISR(spi_sem, &xHigherPriorityTaskWoken);
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+    sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
+#endif
+
     return true;
 }
 
@@ -205,6 +213,9 @@ static void receiveDMA(uint8_t * rx_buf, uint16_t xlen)
      * The xmit can be dummy data (no src increment for tx)
      */
     dummy_data = 0;
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+    sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
+#endif
     DMADRV_PeripheralMemory(rx_dma_channel, MY_USART_RX_SIGNAL, (void *) rx_buf, (void *) &(MY_USART->RXDATA), true, xlen,
                             dmadrvDataSize1, rx_dma_complete, NULL);
 
@@ -248,6 +259,9 @@ static void transmitDMA(uint8_t * rx_buf, uint8_t * tx_buf, uint16_t xlen)
         /* DEBUG */ rx_buf[0] = 0xAA;
         rx_buf[1]             = 0x55;
     }
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+    sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
+#endif
     DMADRV_PeripheralMemory(rx_dma_channel, MY_USART_RX_SIGNAL, buf, (void *) &(MY_USART->RXDATA), srcinc, xlen, dmadrvDataSize1,
                             rx_dma_complete, buf);
     // Start transmit DMA.
