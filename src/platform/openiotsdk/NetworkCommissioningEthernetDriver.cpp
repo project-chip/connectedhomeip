@@ -41,7 +41,7 @@ NetworkIterator * OpenIoTSDKEthernetDriver::GetNetworks()
     char buf[NETIF_NAMESIZE];
     char * ifname = netif_index_to_name(0, buf);
 
-    ret->interfaceNameLen = strlen(ifname);
+    ret->interfaceNameLen = static_cast<uint8_t>(strlen(ifname));
     memcpy(ret->interfaceName, ifname, ret->interfaceNameLen);
 
     return ret;

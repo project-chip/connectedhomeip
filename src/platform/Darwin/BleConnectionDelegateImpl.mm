@@ -182,23 +182,19 @@ namespace DeviceLayer {
 // All our callback dispatch must happen on _chipWorkQueue
 - (void)dispatchConnectionError:(CHIP_ERROR)error
 {
-    if (self.onConnectionError == nil) {
-        return;
-    }
-
     dispatch_async(_chipWorkQueue, ^{
-        self.onConnectionError(self.appState, error);
+        if (self.onConnectionError != nil) {
+            self.onConnectionError(self.appState, error);
+        }
     });
 }
 
 - (void)dispatchConnectionComplete:(CBPeripheral *)peripheral
 {
-    if (self.onConnectionComplete == nil) {
-        return;
-    }
-
     dispatch_async(_chipWorkQueue, ^{
-        self.onConnectionComplete(self.appState, (__bridge void *) peripheral);
+        if (self.onConnectionComplete != nil) {
+            self.onConnectionComplete(self.appState, (__bridge void *) peripheral);
+        }
     });
 }
 

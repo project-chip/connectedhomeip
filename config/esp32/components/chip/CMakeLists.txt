@@ -33,7 +33,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/ota-image.cmake)
 
 set(CHIP_REQUIRE_COMPONENTS freertos lwip bt mbedtls fatfs app_update console openthread nvs_flash spi_flash)
 
-if((NOT "${IDF_TARGET}" STREQUAL "esp32h2") AND (NOT "${IDF_TARGET}" STREQUAL "esp32c2"))
+if(NOT "${IDF_TARGET}" STREQUAL "esp32h2")
     list(APPEND CHIP_REQUIRE_COMPONENTS mdns)
 endif()
 
@@ -314,8 +314,15 @@ if(CONFIG_OPENTHREAD_ENABLED)
     list(APPEND chip_libraries $<TARGET_FILE:${openthread_lib}>)
 endif()
 
-if((NOT CONFIG_USE_MINIMAL_MDNS) AND (NOT CONFIG_IDF_TARGET_ESP32H2) AND (NOT CONFIG_IDF_TARGET_ESP32C2))
-    idf_component_get_property(mdns_lib mdns COMPONENT_LIB)
+if((NOT CONFIG_USE_MINIMAL_MDNS) AND (NOT CONFIG_IDF_TARGET_ESP32H2))
+    idf_build_get_property(build_components BUILD_COMPONENTS)
+    # For IDF v5.x, the mdns component was moved to idf_managed_components.
+    # We should use 'espressif__mdns' for 'idf_component_get_property'.
+    if("espressif__mdns" IN_LIST build_components)
+        idf_component_get_property(mdns_lib espressif__mdns COMPONENT_LIB)
+    elseif("mdns" IN_LIST build_components)
+        idf_component_get_property(mdns_lib mdns COMPONENT_LIB)
+    endif()
     list(APPEND chip_libraries $<TARGET_FILE:${mdns_lib}>)
 endif()
 
