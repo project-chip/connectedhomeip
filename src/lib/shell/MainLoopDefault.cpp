@@ -196,6 +196,18 @@ void Engine::RunMainLoop()
     while (true)
     {
         char * line = static_cast<char *>(Platform::MemoryAlloc(CHIP_SHELL_MAX_LINE_SIZE));
+        if (line == nullptr)
+        {
+            CHIP_ERROR error = CHIP_ERROR_NO_MEMORY;
+            char errorStr[160];
+            bool errorStrFound = FormatCHIPError(errorStr, sizeof(errorStr), error);
+            if (!errorStrFound)
+            {
+                errorStr[0] = 0;
+            }
+            streamer_printf(streamer_get(), "Error: %s\r\n", errorStr);
+        }
+
         if (ReadLine(line, CHIP_SHELL_MAX_LINE_SIZE) == 0u)
         {
             // Stop loop in case of empty read (Ctrl-D).
