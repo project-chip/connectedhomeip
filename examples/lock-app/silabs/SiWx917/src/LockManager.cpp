@@ -689,7 +689,7 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
     }
 
     // Check the PIN code
-    for (const auto & currentCredential  : mLockCredentials[to_underlying(CredentialTypeEnum::kPin)])
+    for (const auto & currentCredential : mLockCredentials[to_underlying(CredentialTypeEnum::kPin)])
     {
 
         if (currentCredential.status == DlCredentialStatus::kAvailable)
