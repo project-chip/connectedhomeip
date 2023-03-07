@@ -33,7 +33,7 @@ namespace chip {
 class StorageKeyName
 {
 public:
-    StorageKeyName(const StorageKeyName & other) = default;
+    StorageKeyName(const StorageKeyName & other)             = default;
     StorageKeyName & operator=(const StorageKeyName & other) = default;
 
     ~StorageKeyName() { memset(mKeyNameBuffer, 0, sizeof(mKeyNameBuffer)); }
@@ -197,15 +197,11 @@ public:
         return StorageKeyName::Formatted("g/su/%x", static_cast<unsigned>(index));
     }
     static StorageKeyName SubscriptionResumptionMaxCount() { return StorageKeyName::Formatted("g/sum"); }
-    // Scene Storage
-    static StorageKeyName SceneFabricList()
-    {
-        return StorageKeyName::FromConst("g/gfl");
-    } // shares key with group fabric list to minimize flash usage
+
     static StorageKeyName FabricScenesKey(chip::FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/s", fabric); }
     static StorageKeyName FabricSceneKey(chip::FabricIndex fabric, uint8_t id)
     {
-        return StorageKeyName::Formatted("f/%x/s%x", fabric, id);
+        return StorageKeyName::Formatted("f/%x/s/%x", fabric, id);
     }
 };
 

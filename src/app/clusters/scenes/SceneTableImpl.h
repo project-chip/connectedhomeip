@@ -25,6 +25,18 @@
 namespace chip {
 namespace scenes {
 
+enum SceneTLVTag
+{
+    kTagSceneStorageIDContainer = 1,
+    kTagSceneEndpointID,
+    kTagSceneGroupID,
+    kTagSceneID,
+    kTagSceneDataContainer,
+    kTagSceneName,
+    kTagSceneDTransitionTime,
+    kTagSceneDTransitionTime100,
+};
+
 using clusterId = chip::ClusterId;
 
 /// @brief Default implementation of handler, handle EFS from add scene and view scene commands for any cluster
@@ -166,7 +178,7 @@ private:
  * It is meant to be used exclusively when the scene cluster is enable for at least one endpoint
  * on the device.
  */
-class DefaultSceneTableImpl : public SceneTable
+class DefaultSceneTableImpl : public SceneTable<scenes::ExtensionFieldSetsImpl>
 {
 public:
     DefaultSceneTableImpl() = default;

@@ -105,7 +105,7 @@ struct ExtensionFieldsSet
     }
 };
 
-class ExtensionFieldSetsImpl : public ExtensionFieldsSets
+class ExtensionFieldSetsImpl : public ExtensionFieldSets
 {
 public:
     ExtensionFieldSetsImpl();

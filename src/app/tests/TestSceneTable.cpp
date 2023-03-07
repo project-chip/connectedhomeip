@@ -25,7 +25,7 @@
 
 using namespace chip;
 
-using SceneTable         = scenes::SceneTable;
+using SceneTable         = scenes::SceneTable<scenes::ExtensionFieldSetsImpl>;
 using SceneTableEntry    = scenes::DefaultSceneTableImpl::SceneTableEntry;
 using SceneTableImpl     = scenes::DefaultSceneTableImpl;
 using SceneStorageId     = scenes::DefaultSceneTableImpl::SceneStorageId;
@@ -33,59 +33,60 @@ using SceneData          = scenes::DefaultSceneTableImpl::SceneData;
 using ExtensionFieldsSet = scenes::ExtensionFieldsSet;
 using TransitionTimeMs   = scenes::TransitionTimeMs;
 
-#define ON_OFF_CID 0x0006
-#define LV_CTR_CID 0x0008
-#define CC_CTR_CID 0x0300
-#define TEST_ENDPOINT1 0x0001
-#define TEST_ENDPOINT2 0x0099
-
-// ON OFF ATTRIBUTE IDs
-#define ON_OFF_ID 0x0000
-
-// LEVEL CONTROL ATTRIBUTE IDs
-#define CURRENT_LVL_ID 0x0000
-#define CURRENT_FRQ_ID 0x0004
-
-// COLOR CONTROL ATTRIBUTE IDs
-#define CURRENT_SAT_ID 0x0001
-#define CURRENT_X_ID 0x0003
-#define CURRENT_Y_ID 0x0004
-#define COLOR_TEMP_MIR_ID 00007
-#define EN_CURRENT_HUE_ID 0x4000
-#define C_LOOP_ACTIVE_ID 0x4002
-#define C_LOOP_DIR_ID 0x4003
-#define C_LOOP_TIME_ID 0x4004
-
 namespace {
+// Test Cluster ID
+constexpr chip::ClusterId kOnOffClusterId        = 0x0006;
+constexpr chip::ClusterId kLevelControlClusterId = 0x0008;
+constexpr chip::ClusterId kColorControlClusterId = 0x0300;
+
+// Test Endpoint ID
+constexpr chip::EndpointId kTestEndpoint1 = 0x0001;
+constexpr chip::EndpointId kTestEndpoint2 = 0x0099;
+constexpr chip::EndpointId kTestEndpoint3 = 0x0010;
+
+// Test Attribute ID
+constexpr uint32_t kOnOffAttId               = 0x0000;
+constexpr uint32_t kCurrentLevelId           = 0x0000;
+constexpr uint32_t kCurrentFrequencyId       = 0x0004;
+constexpr uint32_t kCurrentSaturationId      = 0x0001;
+constexpr uint32_t kCurrentXId               = 0x0003;
+constexpr uint32_t kCurrentYId               = 0x0004;
+constexpr uint32_t kColorTemperatureMiredsId = 0x0007;
+constexpr uint32_t kEnhancedCurrentHueId     = 0x4000;
+constexpr uint32_t kColorLoopActiveId        = 0x4002;
+constexpr uint32_t kColorLoopDirectionId     = 0x4003;
+constexpr uint32_t kColorLoopTimeId          = 0x4004;
 
 // Test fabrics, adding more requires to modify the "ResetSceneTable" function
 constexpr chip::FabricIndex kFabric1 = 1;
 constexpr chip::FabricIndex kFabric2 = 7;
 
 // Scene storage ID
-static const SceneStorageId sceneId1(TEST_ENDPOINT1, 0xAA, 0x101);
-static const SceneStorageId sceneId2(TEST_ENDPOINT1, 0xBB, 0x00);
-static const SceneStorageId sceneId3(TEST_ENDPOINT2, 0xCC, 0x102);
-static const SceneStorageId sceneId4(TEST_ENDPOINT2, 0xBE, 0x00);
-static const SceneStorageId sceneId5(TEST_ENDPOINT1, 0x45, 0x103);
-static const SceneStorageId sceneId6(TEST_ENDPOINT1, 0x65, 0x00);
-static const SceneStorageId sceneId7(TEST_ENDPOINT1, 0x77, 0x101);
-static const SceneStorageId sceneId8(TEST_ENDPOINT2, 0xEE, 0x101);
-static const SceneStorageId sceneId9(TEST_ENDPOINT2, 0xAB, 0x101);
+static const SceneStorageId sceneId1(kTestEndpoint1, 0xAA, 0x101);
+static const SceneStorageId sceneId2(kTestEndpoint1, 0xBB, 0x00);
+static const SceneStorageId sceneId3(kTestEndpoint2, 0xCC, 0x102);
+static const SceneStorageId sceneId4(kTestEndpoint2, 0xBE, 0x00);
+static const SceneStorageId sceneId5(kTestEndpoint1, 0x45, 0x103);
+static const SceneStorageId sceneId6(kTestEndpoint1, 0x65, 0x00);
+static const SceneStorageId sceneId7(kTestEndpoint1, 0x77, 0x101);
+static const SceneStorageId sceneId8(kTestEndpoint3, 0xEE, 0x101);
+static const SceneStorageId sceneId9(kTestEndpoint2, 0xAB, 0x101);
+
+CharSpan empty;
 
 // Scene data
-static const SceneData sceneData1(CharSpan("Scene #1", sizeof("Scene #1")));
-static const SceneData sceneData2(CharSpan("Scene #2", sizeof("Scene #2")), 2, 5);
-static const SceneData sceneData3(CharSpan("Scene #3", sizeof("Scene #3")), 25);
-static const SceneData sceneData4(CharSpan("Scene num4", sizeof("Scene num4")), 5);
-static const SceneData sceneData5(CharSpan(), 10);
-static const SceneData sceneData6(CharSpan("Scene #6", sizeof("Scene #6")), 3, 15);
-static const SceneData sceneData7(CharSpan("Scene #7", sizeof("Scene #7")), 20, 5);
-static const SceneData sceneData8(CharSpan("NAME TOO LOOONNG", sizeof("Scene num4")), 10);
-static const SceneData sceneData9(CharSpan("Scene #9", sizeof("Scene #9")), 30, 15);
-static const SceneData sceneData10(CharSpan("Scene #10", sizeof("Scene #10")), 10, 1);
-static const SceneData sceneData11(CharSpan("Scene #11", sizeof("Scene #11")), 20, 10);
-static const SceneData sceneData12(CharSpan("Scene #12", sizeof("Scene #12")), 30, 5);
+static const SceneData sceneData1(CharSpan("Scene #1"));
+static const SceneData sceneData2(CharSpan("Scene #2"), 2, 5);
+static const SceneData sceneData3(CharSpan("Scene #3"), 25);
+static const SceneData sceneData4(CharSpan("Scene num4"), 5);
+static const SceneData sceneData5(empty);
+static const SceneData sceneData6(CharSpan("Scene #6"), 3, 15);
+static const SceneData sceneData7(CharSpan("Scene #7"), 20, 5);
+static const SceneData sceneData8(CharSpan("NAME TOO LOOONNG!"), 1, 10);
+static const SceneData sceneData9(CharSpan("Scene #9"), 30, 15);
+static const SceneData sceneData10(CharSpan("Scene #10"), 10, 1);
+static const SceneData sceneData11(CharSpan("Scene #11"), 20, 10);
+static const SceneData sceneData12(CharSpan("Scene #12"), 30, 5);
 
 // Scenes
 SceneTableEntry scene1(sceneId1, sceneData1);
@@ -114,6 +115,10 @@ static uint8_t OO_buffer[scenes::kMaxFieldsPerCluster] = { 0 };
 static uint8_t LC_buffer[scenes::kMaxFieldsPerCluster] = { 0 };
 static uint8_t CC_buffer[scenes::kMaxFieldsPerCluster] = { 0 };
 
+static uint32_t OO_buffer_serialized_length = 0;
+static uint32_t LC_buffer_serialized_length = 0;
+static uint32_t CC_buffer_serialized_length = 0;
+
 /// @brief Simulates a Handler where Endpoint 1 supports onoff and level control and Endpoint 2 supports onoff and color control
 class TestSceneHandler : public scenes::DefaultSceneHandlerImpl
 {
@@ -125,22 +130,32 @@ public:
     virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) override
     {
         ClusterId * buffer = clusterBuffer.data();
-        if (endpoint == TEST_ENDPOINT1)
+        if (endpoint == kTestEndpoint1)
         {
             if (clusterBuffer.size() >= 2)
             {
-                buffer[0] = ON_OFF_CID;
-                buffer[1] = LV_CTR_CID;
+                buffer[0] = kOnOffClusterId;
+                buffer[1] = kLevelControlClusterId;
                 clusterBuffer.reduce_size(2);
             }
         }
-        else if (endpoint == TEST_ENDPOINT2)
+        else if (endpoint == kTestEndpoint2)
         {
             if (clusterBuffer.size() >= 2)
             {
-                buffer[0] = ON_OFF_CID;
-                buffer[1] = CC_CTR_CID;
+                buffer[0] = kOnOffClusterId;
+                buffer[1] = kColorControlClusterId;
                 clusterBuffer.reduce_size(2);
+            }
+        }
+        else if (endpoint == kTestEndpoint3)
+        {
+            if (clusterBuffer.size() >= 3)
+            {
+                buffer[0] = kOnOffClusterId;
+                buffer[1] = kLevelControlClusterId;
+                buffer[2] = kColorControlClusterId;
+                clusterBuffer.reduce_size(3);
             }
         }
     }
@@ -148,24 +163,31 @@ public:
     // Default function only checks if endpoint and clusters are valid
     bool SupportsCluster(EndpointId endpoint, ClusterId cluster) override
     {
-        bool ret = false;
-        if (endpoint == TEST_ENDPOINT1)
+        if (endpoint == kTestEndpoint1)
         {
-            if (cluster == ON_OFF_CID || cluster == LV_CTR_CID)
+            if (cluster == kOnOffClusterId || cluster == kLevelControlClusterId)
             {
-                ret = true;
+                return true;
             }
         }
 
-        if (endpoint == TEST_ENDPOINT2)
+        if (endpoint == kTestEndpoint2)
         {
-            if (cluster == ON_OFF_CID || cluster == CC_CTR_CID)
+            if (cluster == kOnOffClusterId || cluster == kColorControlClusterId)
             {
-                ret = true;
+                return true;
             }
         }
 
-        return ret;
+        if (endpoint == kTestEndpoint3)
+        {
+            if (cluster == kOnOffClusterId || cluster == kLevelControlClusterId || cluster == kColorControlClusterId)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// @brief Simulates save from cluster, data is already in an EFS struct but this isn't mandatory
@@ -177,41 +199,74 @@ public:
     {
         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
-        if (endpoint == TEST_ENDPOINT1)
+        if (endpoint == kTestEndpoint1)
         {
             switch (cluster)
             {
-            case ON_OFF_CID:
+            case kOnOffClusterId:
                 err = CHIP_NO_ERROR;
                 // Warning: OO_buffer needs to be populated before calling this function
                 memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldsPerCluster);
-                serialisedBytes.reduce_size(15); // Used memory for OnOff TLV
+                // Warning: serialized size of the buffer must also be computed before calling this function
+                serialisedBytes.reduce_size(OO_buffer_serialized_length); // Used memory for OnOff TLV
                 break;
-            case LV_CTR_CID:
+            case kLevelControlClusterId:
                 err = CHIP_NO_ERROR;
                 // Warning: LC_buffer needs to be populated before calling this function
                 memcpy(serialisedBytes.data(), LC_buffer, scenes::kMaxFieldsPerCluster);
-                serialisedBytes.reduce_size(27); // Used memory for Level Control TLV
+                // Warning: serialized size of the buffer must also be computed before calling this function
+                serialisedBytes.reduce_size(LC_buffer_serialized_length); // Used memory for Level Control TLV
                 break;
             default:
                 break;
             }
         }
-        if (endpoint == TEST_ENDPOINT2)
+        if (endpoint == kTestEndpoint2)
         {
             switch (cluster)
             {
-            case ON_OFF_CID:
+            case kOnOffClusterId:
                 err = CHIP_NO_ERROR;
                 // Warning: OO_buffer needs to be populated before calling this function
                 memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldsPerCluster);
-                serialisedBytes.reduce_size(15); // Used memory for OnOff TLV
+                // Warning: serialized size of the buffer must also be computed before calling this function
+                serialisedBytes.reduce_size(OO_buffer_serialized_length); // Used memory for OnOff TLV
                 break;
-            case CC_CTR_CID:
+            case kColorControlClusterId:
                 err = CHIP_NO_ERROR;
                 // Warning: CC_buffer needs to be populated before calling this function
                 memcpy(serialisedBytes.data(), CC_buffer, scenes::kMaxFieldsPerCluster);
-                serialisedBytes.reduce_size(99); // Used memory for Color Control TLV
+                // Warning: serialized size of the buffer must also be computed before calling this function
+                serialisedBytes.reduce_size(CC_buffer_serialized_length); // Used memory for Color Control TLV
+                break;
+            default:
+                break;
+            }
+        }
+        if (endpoint == kTestEndpoint3)
+        {
+            switch (cluster)
+            {
+            case kOnOffClusterId:
+                err = CHIP_NO_ERROR;
+                // Warning: OO_buffer needs to be populated before calling this function
+                memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldsPerCluster);
+                // Warning: serialized size of the buffer must also be computed before calling this function
+                serialisedBytes.reduce_size(OO_buffer_serialized_length); // Used memory for OnOff TLV
+                break;
+            case kLevelControlClusterId:
+                err = CHIP_NO_ERROR;
+                // Warning: LC_buffer needs to be populated before calling this function
+                memcpy(serialisedBytes.data(), LC_buffer, scenes::kMaxFieldsPerCluster);
+                // Warning: serialized size of the buffer must also be computed before calling this function
+                serialisedBytes.reduce_size(LC_buffer_serialized_length); // Used memory for Level Control TLV
+                break;
+            case kColorControlClusterId:
+                err = CHIP_NO_ERROR;
+                // Warning: CC_buffer needs to be populated before calling this function
+                memcpy(serialisedBytes.data(), CC_buffer, scenes::kMaxFieldsPerCluster);
+                // Warning: serialized size of the buffer must also be computed before calling this function
+                serialisedBytes.reduce_size(CC_buffer_serialized_length); // Used memory for Color Control TLV
                 break;
             default:
                 break;
@@ -233,17 +288,17 @@ public:
         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
         // Takes values from cluster in Endpoint 1
-        if (endpoint == TEST_ENDPOINT1)
+        if (endpoint == kTestEndpoint1)
         {
             switch (cluster)
             {
-            case ON_OFF_CID:
+            case kOnOffClusterId:
                 if (!memcmp(serialisedBytes.data(), OO_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
                 }
                 break;
-            case LV_CTR_CID:
+            case kLevelControlClusterId:
                 if (!memcmp(serialisedBytes.data(), LC_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
@@ -255,17 +310,44 @@ public:
         }
 
         // Takes values from cluster in Endpoint 2
-        if (endpoint == TEST_ENDPOINT2)
+        if (endpoint == kTestEndpoint2)
         {
             switch (cluster)
             {
-            case ON_OFF_CID:
+            case kOnOffClusterId:
                 if (!memcmp(serialisedBytes.data(), OO_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
                 }
                 break;
-            case CC_CTR_CID:
+            case kColorControlClusterId:
+                if (!memcmp(serialisedBytes.data(), CC_buffer, serialisedBytes.size()))
+                {
+                    err = CHIP_NO_ERROR;
+                }
+                break;
+            default:
+                break;
+            }
+        }
+
+        // Takes values from cluster in Endpoint 3
+        if (endpoint == kTestEndpoint3)
+        {
+            switch (cluster)
+            {
+            case kOnOffClusterId:
+                if (!memcmp(serialisedBytes.data(), OO_buffer, serialisedBytes.size()))
+                {
+                    err = CHIP_NO_ERROR;
+                }
+                break;
+            case kLevelControlClusterId:
+                if (!memcmp(serialisedBytes.data(), LC_buffer, serialisedBytes.size()))
+                {
+                    err = CHIP_NO_ERROR;
+                }
+            case kColorControlClusterId:
                 if (!memcmp(serialisedBytes.data(), CC_buffer, serialisedBytes.size()))
                 {
                     err = CHIP_NO_ERROR;
@@ -300,6 +382,7 @@ void TestHandlerRegistration(nlTestSuite * aSuite, void * aContext)
         NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == i);
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RegisterHandler(&tmpHandler[i]));
     }
+    // Hanlder order in table : [H0, H1, H2]
 
     NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == scenes::kMaxSceneHandlers);
     // Removal at beginning
@@ -307,17 +390,25 @@ void TestHandlerRegistration(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 1));
     // Confirm array was compressed and last position is now null
     NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[scenes::kMaxSceneHandlers - 1]);
+    // Re-insert
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RegisterHandler(&tmpHandler[0]));
+    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxSceneHandlers));
+    // Hanlder order in table : [H1, H2, H0]
 
     // Removal at the middle
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(&tmpHandler[3]));
-    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 2));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(&tmpHandler[2]));
+    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 1));
     // Confirm array was compressed and last position is now null
-    NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[scenes::kMaxSceneHandlers - 2]);
+    NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[scenes::kMaxSceneHandlers - 1]);
+    // Re-insert
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RegisterHandler(&tmpHandler[2]));
+    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxSceneHandlers));
+    // Hanlder order in table : [H1, H0, H2]
 
     // Removal at the end
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(&tmpHandler[scenes::kMaxSceneHandlers - 1]));
-    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 3));
-    NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[scenes::kMaxSceneHandlers - 3]);
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(&tmpHandler[2]));
+    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 1));
+    NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[scenes::kMaxSceneHandlers - 1]);
 
     // Emptying Handler array
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterAllHandler());
@@ -332,7 +423,6 @@ void TestHandlerRegistration(nlTestSuite * aSuite, void * aContext)
     // Verify all array is empty
     for (uint8_t i = 0; i < scenes::kMaxSceneHandlers; i++)
     {
-        printf("Handler : %d | Address : %p \n", i, sceneTable->mHandlers[i]);
         NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[i]);
     }
 }
@@ -356,41 +446,41 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     static const uint8_t CC_av_payload[8][2] = { { 0x00, 0x00 }, { 0x00, 0x00 }, { 0x00, 0x00 }, { 0x00, 0x00 },
                                                  { 0x00, 0x00 }, { 0x00, 0x00 }, { 0x00, 0x00 }, { 0x00, 0x00 } };
 
-    OOPairs[0].attributeID.SetValue(ON_OFF_ID);
+    OOPairs[0].attributeID.SetValue(kOnOffAttId);
     OOPairs[0].attributeValue = OO_av_payload;
 
-    LCPairs[0].attributeID.SetValue(CURRENT_LVL_ID);
+    LCPairs[0].attributeID.SetValue(kCurrentLevelId);
     LCPairs[0].attributeValue = LC_av_payload[0];
     LCPairs[0].attributeValue.reduce_size(1);
-    LCPairs[1].attributeID.SetValue(CURRENT_FRQ_ID);
+    LCPairs[1].attributeID.SetValue(kCurrentFrequencyId);
     LCPairs[1].attributeValue = LC_av_payload[1];
 
-    CCPairs[0].attributeID.SetValue(CURRENT_SAT_ID);
+    CCPairs[0].attributeID.SetValue(kCurrentSaturationId);
     CCPairs[0].attributeValue = CC_av_payload[0];
     CCPairs[0].attributeValue.reduce_size(1);
-    CCPairs[1].attributeID.SetValue(CURRENT_X_ID);
+    CCPairs[1].attributeID.SetValue(kCurrentXId);
     CCPairs[1].attributeValue = CC_av_payload[1];
-    CCPairs[2].attributeID.SetValue(CURRENT_Y_ID);
+    CCPairs[2].attributeID.SetValue(kCurrentYId);
     CCPairs[2].attributeValue = CC_av_payload[2];
-    CCPairs[3].attributeID.SetValue(COLOR_TEMP_MIR_ID);
+    CCPairs[3].attributeID.SetValue(kColorTemperatureMiredsId);
     CCPairs[3].attributeValue = CC_av_payload[3];
-    CCPairs[4].attributeID.SetValue(EN_CURRENT_HUE_ID);
+    CCPairs[4].attributeID.SetValue(kEnhancedCurrentHueId);
     CCPairs[4].attributeValue = CC_av_payload[4];
-    CCPairs[5].attributeID.SetValue(C_LOOP_ACTIVE_ID);
+    CCPairs[5].attributeID.SetValue(kColorLoopActiveId);
     CCPairs[5].attributeValue = CC_av_payload[5];
     CCPairs[5].attributeValue.reduce_size(1);
-    CCPairs[6].attributeID.SetValue(C_LOOP_DIR_ID);
+    CCPairs[6].attributeID.SetValue(kColorLoopDirectionId);
     CCPairs[6].attributeValue = CC_av_payload[6];
     CCPairs[6].attributeValue.reduce_size(1);
-    CCPairs[7].attributeID.SetValue(C_LOOP_TIME_ID);
+    CCPairs[7].attributeID.SetValue(kColorLoopTimeId);
     CCPairs[7].attributeValue = CC_av_payload[7];
 
     // Initialize Extension Field sets as if they were received by add commands
-    OOextensionFieldSet.clusterID          = ON_OFF_CID;
+    OOextensionFieldSet.clusterID          = kOnOffClusterId;
     OOextensionFieldSet.attributeValueList = OOPairs;
-    LCextensionFieldSet.clusterID          = LV_CTR_CID;
+    LCextensionFieldSet.clusterID          = kLevelControlClusterId;
     LCextensionFieldSet.attributeValueList = LCPairs;
-    CCextensionFieldSet.clusterID          = CC_CTR_CID;
+    CCextensionFieldSet.clusterID          = kColorControlClusterId;
     CCextensionFieldSet.attributeValueList = CCPairs;
 
     ByteSpan OO_list(OO_buffer);
@@ -410,6 +500,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
                                                   app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)),
                                               OOextensionFieldSet.attributeValueList));
     writer.EndContainer(outer);
+    OO_buffer_serialized_length = writer.GetLengthWritten();
 
     writer.Init(LC_buffer);
     writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer);
@@ -420,6 +511,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
                                                   app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)),
                                               LCextensionFieldSet.attributeValueList));
     writer.EndContainer(outer);
+    LC_buffer_serialized_length = writer.GetLengthWritten();
 
     writer.Init(CC_buffer);
     writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer);
@@ -430,6 +522,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
                                                   app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)),
                                               CCextensionFieldSet.attributeValueList));
     writer.EndContainer(outer);
+    CC_buffer_serialized_length = writer.GetLengthWritten();
 
     // Test Registering SceneHandler
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RegisterHandler(&sHandler));
@@ -437,54 +530,54 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
 
     // Setup the On Off Extension field set in the expected state from a command
     reader.Init(OO_list);
-    extensionFieldSetIn.clusterID = ON_OFF_CID;
+    extensionFieldSetIn.clusterID = kOnOffClusterId;
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.EnterContainer(outerRead));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == extensionFieldSetIn.attributeValueList.Decode(reader));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.ExitContainer(outerRead));
 
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(TEST_ENDPOINT1, tempCluster, buff_span, extensionFieldSetIn));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(kTestEndpoint1, tempCluster, buff_span, extensionFieldSetIn));
 
     // Verify the handler extracted buffer matches the initial field sets
     NL_TEST_ASSERT(aSuite, 0 == memcmp(OO_list.data(), buff_span.data(), buff_span.size()));
-    NL_TEST_ASSERT(aSuite, tempCluster == ON_OFF_CID);
+    NL_TEST_ASSERT(aSuite, tempCluster == kOnOffClusterId);
     memset(buffer, 0, buff_span.size());
 
     // Setup the Level Control Extension field set in the expected state from a command
     reader.Init(LC_list);
-    extensionFieldSetIn.clusterID = LV_CTR_CID;
+    extensionFieldSetIn.clusterID = kLevelControlClusterId;
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.EnterContainer(outerRead));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == extensionFieldSetIn.attributeValueList.Decode(reader));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.ExitContainer(outerRead));
 
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(TEST_ENDPOINT1, tempCluster, buff_span, extensionFieldSetIn));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(kTestEndpoint1, tempCluster, buff_span, extensionFieldSetIn));
 
     // Verify the handler extracted buffer matches the initial field sets
     NL_TEST_ASSERT(aSuite, 0 == memcmp(LC_list.data(), buff_span.data(), buff_span.size()));
-    NL_TEST_ASSERT(aSuite, tempCluster == LV_CTR_CID);
+    NL_TEST_ASSERT(aSuite, tempCluster == kLevelControlClusterId);
     memset(buffer, 0, buff_span.size());
 
     // Setup the Color control Extension field set in the expected state from a command
     reader.Init(CC_list);
-    extensionFieldSetIn.clusterID = CC_CTR_CID;
+    extensionFieldSetIn.clusterID = kColorControlClusterId;
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.EnterContainer(outerRead));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == extensionFieldSetIn.attributeValueList.Decode(reader));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.ExitContainer(outerRead));
 
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(TEST_ENDPOINT2, tempCluster, buff_span, extensionFieldSetIn));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(kTestEndpoint2, tempCluster, buff_span, extensionFieldSetIn));
 
     // Verify the handler extracted buffer matches the initial field sets
     NL_TEST_ASSERT(aSuite, 0 == memcmp(CC_list.data(), buff_span.data(), buff_span.size()));
-    NL_TEST_ASSERT(aSuite, tempCluster == CC_CTR_CID);
+    NL_TEST_ASSERT(aSuite, tempCluster == kColorControlClusterId);
     memset(buffer, 0, buff_span.size());
 
     // Verify Deserializing is properly filling out output extension field set for on off
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.Deserialize(TEST_ENDPOINT1, ON_OFF_CID, OO_list, extensionFieldSetOut));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.Deserialize(kTestEndpoint1, kOnOffClusterId, OO_list, extensionFieldSetOut));
 
     // Verify Encoding the Extension field set returns the same data as the one serialized for on off previously
     writer.Init(buff_span);
@@ -500,7 +593,8 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     memset(buffer, 0, buff_span.size());
 
     // Verify Deserializing is properly filling out output extension field set for level control
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.Deserialize(TEST_ENDPOINT1, LV_CTR_CID, LC_list, extensionFieldSetOut));
+    NL_TEST_ASSERT(aSuite,
+                   CHIP_NO_ERROR == sHandler.Deserialize(kTestEndpoint1, kLevelControlClusterId, LC_list, extensionFieldSetOut));
 
     // Verify Encoding the Extension field set returns the same data as the one serialized for level control previously
     writer.Init(buff_span);
@@ -516,7 +610,8 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     memset(buffer, 0, buff_span.size());
 
     // Verify Deserializing is properly filling out output extension field set for color control
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.Deserialize(TEST_ENDPOINT2, CC_CTR_CID, CC_list, extensionFieldSetOut));
+    NL_TEST_ASSERT(aSuite,
+                   CHIP_NO_ERROR == sHandler.Deserialize(kTestEndpoint2, kColorControlClusterId, CC_list, extensionFieldSetOut));
 
     // Verify Encoding the Extension field set returns the same data as the one serialized for color control previously
     writer.Init(buff_span);
@@ -549,11 +644,13 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
     // Populate scene3's EFS (Endpoint2)
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneSaveEFS(scene3));
 
-    // Populate scene3's EFS (Endpoint2)
+    // Populate scene4's EFS (Endpoint2)
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneSaveEFS(scene4));
 
-    SceneTableEntry scene;
+    // Populate scene8's EFS (Endpoint3)
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneSaveEFS(scene8));
 
+    SceneTableEntry scene;
     // Set test
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene1));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene2));
@@ -595,6 +692,7 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, scene == scene7);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId8, scene));
     NL_TEST_ASSERT(aSuite, scene == scene8);
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneApplyEFS(kFabric1, scene8.mStorageId));
 }
 
 void TestOverwriteScenes(nlTestSuite * aSuite, void * aContext)

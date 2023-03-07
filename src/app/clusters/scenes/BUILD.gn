@@ -25,6 +25,8 @@ static_library("scenes") {
     "SceneTableImpl.h",
   ]
 
+  deps = [ "${chip_root}/src/app" ]
+
   cflags = [
     "-Wconversion",
     "-Wshadow",
