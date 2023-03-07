@@ -63,11 +63,6 @@ constexpr EndpointId kRootEndpointId    = 0;
 constexpr ListIndex kInvalidListIndex   = 0xFFFF; // List index is a uint16 thus 0xFFFF is a invalid list index.
 constexpr KeysetId kInvalidKeysetId     = 0xFFFF;
 
-constexpr SceneGroupID kGlobalGroupSceneId = CHIP_CONFIG_SCENES_GLOBAL_SCENE_GROUP_ID;
-constexpr SceneIndex kUndefinedSceneIndex  = 0xff;
-constexpr SceneId kUndefinedSceneId        = CHIP_CONFIG_SCENES_TABLE_NULL_INDEX;
-constexpr SceneId kUnusedEndpointId        = CHIP_CONFIG_SCENES_TABLE_UNUSED_ENDPOINT_ID;
-
 // Invalid IC identifier is provisional. Value will most likely change when identifying token is defined
 // https://github.com/project-chip/connectedhomeip/issues/24251
 constexpr uint64_t kInvalidIcId = 0;

@@ -23,26 +23,37 @@
 #include <lib/support/CommonPersistentData.h>
 #include <lib/support/Span.h>
 
+/**
+ * @brief Indicates the absence of a Scene table entry.
+ */
+#ifndef CHIP_CONFIG_SCENES_TABLE_NULL_INDEX
+#define CHIP_CONFIG_SCENES_TABLE_NULL_INDEX 0xFF
+#endif
+
+/**
+ * @brief The group identifier for the global scene.
+ */
+#ifndef CHIP_CONFIG_SCENES_GLOBAL_SCENE_GROUP_ID
+#define CHIP_CONFIG_SCENES_GLOBAL_SCENE_GROUP_ID 0x0000
+#endif
+
+/**
+ * @brief The scene identifier for the global scene.
+ */
+#ifndef CHIP_CONFIG_SCENES_GLOBAL_SCENE_SCENE_ID
+#define CHIP_CONFIG_SCENES_GLOBAL_SCENE_SCENE_ID 0x00
+#endif
+
 namespace chip {
 namespace scenes {
-
-enum SceneTLVTag
-{
-    kTagSceneStorageIDContainer = 1,
-    kTagSceneEndpointID,
-    kTagSceneGroupID,
-    kTagSceneID,
-    kTagSceneDataContainer,
-    kTagSceneName,
-    kTagSceneDTransitionTime,
-    kTagSceneDTransitionTime100,
-};
 
 typedef uint32_t TransitionTimeMs;
 typedef uint16_t SceneTransitionTime;
 typedef uint8_t TransitionTime100ms;
 
-static constexpr uint8_t kEFSBufferSize     = 128;
+constexpr SceneGroupID kGlobalGroupSceneId  = CHIP_CONFIG_SCENES_GLOBAL_SCENE_GROUP_ID;
+constexpr SceneIndex kUndefinedSceneIndex   = 0xff;
+constexpr SceneId kUndefinedSceneId         = CHIP_CONFIG_SCENES_TABLE_NULL_INDEX;
 static constexpr uint8_t kMaxScenePerFabric = CHIP_CONFIG_SCENES_MAX_PER_FABRIC;
 static constexpr uint8_t kMaxSceneHandlers  = CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES;
 static constexpr size_t kIteratorsMax       = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
@@ -89,7 +100,7 @@ public:
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
     virtual CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serialisedBytes) = 0;
 
-    /// @brief From stored scene (e.g. ViewScene), deserialize ExtensionFieldSet into a command object
+    /// @brief From stored scene (e.g. ViewScene), deserialize ExtensionFieldSet into a cluster object
     /// @param endpoint Endpoint ID
     /// @param cluster Cluster ID to save
     /// @param serialisedBytes ExtensionFieldSet stored in NVM
@@ -107,6 +118,7 @@ public:
     virtual CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, ByteSpan & serialisedBytes, TransitionTimeMs timeMs) = 0;
 };
 
+template <class EFStype>
 class SceneTable
 {
 public:
@@ -123,36 +135,6 @@ public:
         SceneStorageId(EndpointId endpoint, SceneId id, SceneGroupID groupId = kGlobalGroupSceneId) :
             mEndpointId(endpoint), mGroupId(groupId), mSceneId(id)
         {}
-        SceneStorageId(const SceneStorageId & storageId) :
-            mEndpointId(storageId.mEndpointId), mGroupId(storageId.mGroupId), mSceneId(storageId.mSceneId)
-        {}
-        CHIP_ERROR Serialize(TLV::TLVWriter & writer) const
-        {
-            TLV::TLVType container;
-            ReturnErrorOnFailure(
-                writer.StartContainer(TLV::ContextTag(kTagSceneStorageIDContainer), TLV::kTLVType_Structure, container));
-
-            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagSceneEndpointID), static_cast<uint16_t>(this->mEndpointId)));
-            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagSceneGroupID), static_cast<uint16_t>(this->mGroupId)));
-            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagSceneID), static_cast<uint8_t>(this->mSceneId)));
-
-            return writer.EndContainer(container);
-        }
-        CHIP_ERROR Deserialize(TLV::TLVReader & reader)
-        {
-            TLV::TLVType container;
-            ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(kTagSceneStorageIDContainer)));
-            ReturnErrorOnFailure(reader.EnterContainer(container));
-
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagSceneEndpointID)));
-            ReturnErrorOnFailure(reader.Get(this->mEndpointId));
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagSceneGroupID)));
-            ReturnErrorOnFailure(reader.Get(this->mGroupId));
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagSceneID)));
-            ReturnErrorOnFailure(reader.Get(this->mSceneId));
-
-            return reader.ExitContainer(container);
-        }
 
         void Clear()
         {
@@ -160,95 +142,42 @@ public:
             mGroupId    = kGlobalGroupSceneId;
             mSceneId    = kUndefinedSceneId;
         }
+
         bool operator==(const SceneStorageId & other)
         {
             return (this->mEndpointId == other.mEndpointId && this->mGroupId == other.mGroupId && this->mSceneId == other.mSceneId);
-        }
-        void operator=(const SceneStorageId & other)
-        {
-            this->mEndpointId = other.mEndpointId;
-            this->mGroupId    = other.mGroupId;
-            this->mSceneId    = other.mSceneId;
         }
     };
 
     /// @brief struct used to store data held in a scene
     struct SceneData
     {
-        char mName[kSceneNameMax]                = { 0 };
-        size_t mNameLength                       = 0;
-        SceneTransitionTime mSceneTransitionTime = 0;
-        ExtensionFieldSetsImpl mExtensionFieldSets;
+        char mName[kSceneNameMax]                       = { 0 };
+        size_t mNameLength                              = 0;
+        SceneTransitionTime mSceneTransitionTimeSeconds = 0;
+        EFStype mExtensionFieldSets;
         TransitionTime100ms mTransitionTime100ms = 0;
-        CharSpan mNameSpan;
 
         SceneData(const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0, TransitionTime100ms time100ms = 0) :
-            mSceneTransitionTime(time), mTransitionTime100ms(time100ms)
+            mSceneTransitionTimeSeconds(time), mTransitionTime100ms(time100ms)
         {
             this->SetName(sceneName);
         }
-        SceneData(ExtensionFieldSetsImpl fields, const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0,
+        SceneData(EFStype fields, const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0,
                   TransitionTime100ms time100ms = 0) :
-            mSceneTransitionTime(time),
+            mSceneTransitionTimeSeconds(time),
             mTransitionTime100ms(time100ms)
         {
             this->SetName(sceneName);
             mExtensionFieldSets = fields;
         }
         SceneData(const SceneData & other) :
-            mSceneTransitionTime(other.mSceneTransitionTime), mTransitionTime100ms(other.mTransitionTime100ms)
+            mSceneTransitionTimeSeconds(other.mSceneTransitionTimeSeconds), mTransitionTime100ms(other.mTransitionTime100ms)
         {
-            this->SetName(other.mNameSpan);
+            this->SetName(CharSpan(other.mName, other.mNameLength));
             mExtensionFieldSets = other.mExtensionFieldSets;
         }
         ~SceneData(){};
-
-        CHIP_ERROR Serialize(TLV::TLVWriter & writer) const
-        {
-            TLV::TLVType container;
-            ReturnErrorOnFailure(
-                writer.StartContainer(TLV::ContextTag(kTagSceneDataContainer), TLV::kTLVType_Structure, container));
-
-            // A 0 size means the name wasn't used so it won't get stored
-            if (!this->mNameSpan.empty())
-            {
-                ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(kTagSceneName), this->mNameSpan));
-            }
-
-            ReturnErrorOnFailure(
-                writer.Put(TLV::ContextTag(kTagSceneDTransitionTime), static_cast<uint16_t>(this->mSceneTransitionTime)));
-            ReturnErrorOnFailure(
-                writer.Put(TLV::ContextTag(kTagSceneDTransitionTime100), static_cast<uint8_t>(this->mTransitionTime100ms)));
-            ReturnErrorOnFailure(this->mExtensionFieldSets.Serialize(writer));
-
-            return writer.EndContainer(container);
-        }
-        CHIP_ERROR Deserialize(TLV::TLVReader & reader)
-        {
-            TLV::TLVType container;
-            ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(kTagSceneDataContainer)));
-            ReturnErrorOnFailure(reader.EnterContainer(container));
-
-            ReturnErrorOnFailure(reader.Next());
-            TLV::Tag currTag = reader.GetTag();
-            VerifyOrReturnError(TLV::ContextTag(kTagSceneName) == currTag || TLV::ContextTag(kTagSceneDTransitionTime) == currTag,
-                                CHIP_ERROR_WRONG_TLV_TYPE);
-
-            // If there was no error, a name is expected from the storage, if there was an unexpectec TLV element,
-            if (currTag == TLV::ContextTag(kTagSceneName))
-            {
-                ReturnErrorOnFailure(reader.Get(this->mNameSpan));
-                this->SetName(this->mNameSpan);
-                ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagSceneDTransitionTime)));
-            }
-
-            ReturnErrorOnFailure(reader.Get(this->mSceneTransitionTime));
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagSceneDTransitionTime100)));
-            ReturnErrorOnFailure(reader.Get(this->mTransitionTime100ms));
-            ReturnErrorOnFailure(this->mExtensionFieldSets.Deserialize(reader));
-
-            return reader.ExitContainer(container);
-        }
 
         void SetName(const CharSpan & sceneName)
         {
@@ -263,30 +192,30 @@ public:
                 memcpy(mName, sceneName.data(), maxChars);
                 mNameLength = maxChars;
             }
-            mNameSpan = CharSpan(mName, mNameLength);
         }
 
         void Clear()
         {
             this->SetName(CharSpan());
-            mSceneTransitionTime = 0;
-            mTransitionTime100ms = 0;
+            mSceneTransitionTimeSeconds = 0;
+            mTransitionTime100ms        = 0;
             mExtensionFieldSets.Clear();
         }
 
         bool operator==(const SceneData & other)
         {
-            return (this->mNameSpan.data_equal(other.mNameSpan) && (this->mSceneTransitionTime == other.mSceneTransitionTime) &&
+            return (!memcmp(this->mName, other.mName, this->mNameLength) &&
+                    (this->mSceneTransitionTimeSeconds == other.mSceneTransitionTimeSeconds) &&
                     (this->mTransitionTime100ms == other.mTransitionTime100ms) &&
                     (this->mExtensionFieldSets == other.mExtensionFieldSets));
         }
 
         void operator=(const SceneData & other)
         {
-            this->SetName(other.mNameSpan);
-            this->mExtensionFieldSets  = other.mExtensionFieldSets;
-            this->mSceneTransitionTime = other.mSceneTransitionTime;
-            this->mTransitionTime100ms = other.mTransitionTime100ms;
+            this->SetName(CharSpan(other.mName, other.mNameLength));
+            this->mExtensionFieldSets         = other.mExtensionFieldSets;
+            this->mSceneTransitionTimeSeconds = other.mSceneTransitionTimeSeconds;
+            this->mTransitionTime100ms        = other.mTransitionTime100ms;
         }
     };
 
@@ -322,6 +251,7 @@ public:
 
     // Not copyable
     SceneTable(const SceneTable &) = delete;
+
     SceneTable & operator=(const SceneTable &) = delete;
 
     virtual CHIP_ERROR Init(PersistentStorageDelegate * storage) = 0;

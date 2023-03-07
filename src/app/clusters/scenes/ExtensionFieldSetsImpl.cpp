@@ -20,7 +20,7 @@
 namespace chip {
 namespace scenes {
 
-ExtensionFieldSetsImpl::ExtensionFieldSetsImpl() : ExtensionFieldsSets() {}
+ExtensionFieldSetsImpl::ExtensionFieldSetsImpl() : ExtensionFieldSets() {}
 
 CHIP_ERROR ExtensionFieldSetsImpl::Serialize(TLV::TLVWriter & writer) const
 {
