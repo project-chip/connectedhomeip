@@ -234,6 +234,15 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds16 commiss
 
     mCommissioningTimeoutTimerArmed = true;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_THREAD_FTD
+    // Block device role changing into Router if commissioning window opened and device not yet Router.
+    if (ConnectivityManagerImpl().GetThreadDeviceType() == ConnectivityManager::kThreadDeviceType_Router)
+    {
+        ThreadStackMgr().SetRouterPromotion(false);
+        mRecoverRouterDeviceRole = true;
+    }
+#endif
+
     return AdvertiseAndListenForPASE();
 }
 
@@ -469,15 +478,6 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
 
     // reset all advertising, switching to our new commissioning mode.
     app::DnssdServer::Instance().StartServer();
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_THREAD_FTD
-    // Block device role changing into Router if commissioning window opened and device not yet Router.
-    if (ConnectivityManagerImpl().GetThreadDeviceType() == ConnectivityManager::kThreadDeviceType_Router)
-    {
-        ThreadStackMgr().SetRouterPromotion(false);
-        mRecoverRouterDeviceRole = true;
-    }
-#endif
 
     return CHIP_NO_ERROR;
 }
