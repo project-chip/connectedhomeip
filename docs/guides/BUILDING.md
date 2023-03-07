@@ -33,7 +33,8 @@ git clone --recurse-submodules git@github.com:project-chip/connectedhomeip.git
 
 ## Synchronizing submodules
 
-If you already have the Matter code checked out, run the following command to synchronize submodules:
+If you already have the Matter code checked out, run the following command to
+synchronize submodules:
 
 ```
 git submodule update --init
@@ -63,12 +64,11 @@ On macOS, install Xcode from the Mac App Store.
 Complete the following steps:
 
 1. Using `rpi-imager`, install the Ubuntu _22.04_ 64-bit _server_ OS for arm64
-architectures on a micro SD card.
+   architectures on a micro SD card.
 1. Boot the SD card.
-1. Log in with the default user account "ubuntu" and password
-"ubuntu"
+1. Log in with the default user account "ubuntu" and password "ubuntu"
 1. Proceed with
-[Installing prerequisites on Linux](#installing-prerequisites-on-linux).
+   [Installing prerequisites on Linux](#installing-prerequisites-on-linux).
 1. Install some Raspberry Pi specific dependencies:
 
     ```
@@ -90,7 +90,8 @@ permanently, you need to make the following changes:
     sudo nano /etc/systemd/system/dbus-fi.w1.wpa_supplicant1.service
     ```
 
-1. Run the following command to change the wpa_supplicant start parameters to the provided values:
+1. Run the following command to change the wpa_supplicant start parameters to
+   the provided values:
 
     ```
     ExecStart=/sbin/wpa_supplicant -u -s -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf
@@ -113,9 +114,10 @@ permanently, you need to make the following changes:
 
 ## Installing ZAP tool
 
-`bootstrap.sh` will download a compatible ZAP tool version and set it up in `$PATH`.
-If you want to install or use a different version of the tool, you may download one from the
-ZAP project's [Releases](https://github.com/project-chip/zap/releases) page.
+`bootstrap.sh` will download a compatible ZAP tool version and set it up in
+`$PATH`. If you want to install or use a different version of the tool, you may
+download one from the ZAP project's
+[Releases](https://github.com/project-chip/zap/releases) page.
 
 ### Linux ARM
 
@@ -148,12 +150,14 @@ The ZAP tool scripting uses the following detection, in order of importance:
 
 -   `$ZAP_DEVELOPMENT_PATH` to point to a ZAP checkout.
 
-    - Use this if you are developing ZAP locally and would like to run ZAP with your changes.
+    -   Use this if you are developing ZAP locally and would like to run ZAP
+        with your changes.
 
 -   `$ZAP_INSTALL_PATH` to point to where `zap-linux.zip` or `zap-mac.zip` was
     unpacked.
 
-    - This allows you to not need to place `zap` or `zap-cli` (or both) in `$PATH`.
+    -   This allows you to not need to place `zap` or `zap-cli` (or both) in
+        `$PATH`.
 
 -   Otherwise, the scripts assume `zap-cli` or `zap` is available in `$PATH`.
 
@@ -172,8 +176,8 @@ source scripts/activate.sh
 
 ### Updating the environment
 
-If the script says the environment is out of date, you can update it by
-running the following command:
+If the script says the environment is out of date, you can update it by running
+the following command:
 
 ```
 source scripts/bootstrap.sh
@@ -184,7 +188,8 @@ is expensive, so avoid running it unless the environment is out of date.
 
 ## Build for the host OS (Linux or macOS)
 
-Run the following commands to build all sources, libraries, and tests for the host platform:
+Run the following commands to build all sources, libraries, and tests for the
+host platform:
 
 ```
 source scripts/activate.sh
@@ -194,7 +199,8 @@ gn gen out/host
 ninja -C out/host
 ```
 
-These commands generate a configuration suitable for debugging. To configure an optimized build, specify `is_debug=false`:
+These commands generate a configuration suitable for debugging. To configure an
+optimized build, specify `is_debug=false`:
 
 ```
 gn gen out/host --args='is_debug=false'
@@ -202,11 +208,11 @@ gn gen out/host --args='is_debug=false'
 ninja -C out/host
 ```
 
-> **Note:** The directory name `out/host` can be any directory, although it's conventional
-> to build within the `out` directory. This example uses `host` to emphasize
-> building for the host system. Different build directories can be used for
-> different configurations, or a single directory can be used and reconfigured as
-> necessary via `gn args`.
+> **Note:** The directory name `out/host` can be any directory, although it's
+> conventional to build within the `out` directory. This example uses `host` to
+> emphasize building for the host system. Different build directories can be
+> used for different configurations, or a single directory can be used and
+> reconfigured as necessary via `gn args`.
 
 To run all tests, run the following command:
 
@@ -220,7 +226,8 @@ To run only the tests in `src/inet/tests`, you can run the following command:
 ninja -C out/host src/inet/tests:tests_run
 ```
 
-> **Note:** The build system caches passing tests, so you may see the following message:
+> **Note:** The build system caches passing tests, so you may see the following
+> message:
 >
 > ```
 > ninja: no work to do
@@ -230,13 +237,15 @@ ninja -C out/host src/inet/tests:tests_run
 
 ## Build custom configuration
 
-The build is configured by setting build arguments. These you can set in one of the following manners:
+The build is configured by setting build arguments. These you can set in one of
+the following manners:
 
-- Passing the `--args` option to `gn gen`.
-- Running `gn args` on the output directory.
-- Editing `args.gn` in the output directory.
+-   Passing the `--args` option to `gn gen`.
+-   Running `gn args` on the output directory.
+-   Editing `args.gn` in the output directory.
 
-To configure a new build or edit the arguments to existing build, run the following command:
+To configure a new build or edit the arguments to existing build, run the
+following command:
 
 ```
 source scripts/activate.sh
@@ -262,7 +271,9 @@ You can build examples in two ways.
 
 ### Build examples as separate projects
 
-To build examples as separate projects that add Matter in the `third_party directory`, run the following command with the correct path to the example (here, `chip-shell`):
+To build examples as separate projects that add Matter in the
+`third_party directory`, run the following command with the correct path to the
+example (here, `chip-shell`):
 
 ```
 cd examples/shell
@@ -272,12 +283,13 @@ ninja -C out/debug
 
 ### Build examples at the top level
 
-You can build examples at the top level of the Matter project.
-See the following "Unified builds" section for details.
+You can build examples at the top level of the Matter project. See the following
+"Unified builds" section for details.
 
 ## Unified builds
 
-To build a unified configuration that approximates the set of continuous builds, run the following commands:
+To build a unified configuration that approximates the set of continuous builds,
+run the following commands:
 
 ```
 source scripts/activate.sh
@@ -287,7 +299,10 @@ gn gen out/unified --args='is_debug=true target_os="all"'
 ninja -C out/unified all
 ```
 
-You can use this set of commands before changing a submission to configure, build, and test the GCC, Clang, MbedTLS, and examples configurations all together in one parallel build. Each configuration has a separate subdirectory in the output directory.
+You can use this set of commands before changing a submission to configure,
+build, and test the GCC, Clang, MbedTLS, and examples configurations all
+together in one parallel build. Each configuration has a separate subdirectory
+in the output directory.
 
 This unified build can be used for day-to-day development, although it's more
 expensive to build everything for every edit. To save time, you can name the
@@ -301,8 +316,7 @@ ninja -C out/unified check_host_gcc
 Replace `host_gcc` with the name of the configuration, which is found in the
 root `BUILD.gn`.
 
-You can also fine tune the configurations generated with arguments.
-For example:
+You can also fine tune the configurations generated with arguments. For example:
 
 ```
 gn gen out/unified --args='is_debug=true target_os="all" enable_host_clang_build=false'
@@ -318,10 +332,10 @@ all of the target instances. For example:
 gn desc out/unified '//src/controller(//build/toolchain/host:linux_x64_clang)'
 ```
 
-> **Note:** Some platforms that can be built as part of the unified build require
-> downloading additional tools. To add these to the build, the location must be
-> provided as a build argument. For example, to add the Simplelink cc13x2_26x2
-> examples to the unified build, install
+> **Note:** Some platforms that can be built as part of the unified build
+> require downloading additional tools. To add these to the build, the location
+> must be provided as a build argument. For example, to add the Simplelink
+> cc13x2_26x2 examples to the unified build, install
 > [SysConfig](https://www.ti.com/tool/SYSCONFIG) and add the following build
 > arguments:
 >
@@ -331,7 +345,7 @@ gn desc out/unified '//src/controller(//build/toolchain/host:linux_x64_clang)'
 
 ## Getting help
 
-GN has integrated help that you can access with the ``gn help`` command.
+GN has integrated help that you can access with the `gn help` command.
 
 Make sure to check the following recommended topics:
 
@@ -349,43 +363,43 @@ Also see the
 GN has various introspection tools to help you examine the build configuration.
 The following examples use the `out/host` output directory as example:
 
-- Show all of the targets in an output directory:
+-   Show all of the targets in an output directory:
 
     ```
     gn ls out/host
     ```
 
-- Show all of the files that will be built:
+-   Show all of the files that will be built:
 
     ```
     gn outputs out/host '*'
     ```
 
-- Show the GN representation of a configured target:
+-   Show the GN representation of a configured target:
 
     ```
     gn desc out/host //src/inet --all
     ```
 
-- Dump the GN representation of the entire build as JSON:
+-   Dump the GN representation of the entire build as JSON:
 
     ```
     gn desc out/host/ '*' --all --format=json
     ```
 
-- Show the dependency tree:
+-   Show the dependency tree:
 
     ```
     gn desc out/host //:all deps --tree --all
     ```
 
-- Find dependency paths:
+-   Find dependency paths:
 
     ```
     gn path out/host //src/transport/tests:tests //src/system
     ```
 
-- List useful information for linking against `libCHIP`:
+-   List useful information for linking against `libCHIP`:
 
     ```
     gn desc out/host //src/lib include_dirs
@@ -398,10 +412,10 @@ The following examples use the `out/host` output directory as example:
 
 ## Coverage
 
-The code coverage script generates a report that details how much of the Matter SDK
-source code has been executed. It also provides information on how often the Matter
-SDK executes segments of the code and produces a copy of the source file, annotated
-with execution frequencies.
+The code coverage script generates a report that details how much of the Matter
+SDK source code has been executed. It also provides information on how often the
+Matter SDK executes segments of the code and produces a copy of the source file,
+annotated with execution frequencies.
 
 Run the following command to initiate the script:
 
@@ -409,8 +423,10 @@ Run the following command to initiate the script:
 ./scripts/build_coverage.sh
 ```
 
-By default, the code coverage script is performed at the unit testing level. Unit tests are
-created by developers, thus giving them the best overview of what tests to include in unit testing. You can extend the coverage test by scope and ways of execution with the following parameters:
+By default, the code coverage script is performed at the unit testing level.
+Unit tests are created by developers, thus giving them the best overview of what
+tests to include in unit testing. You can extend the coverage test by scope and
+ways of execution with the following parameters:
 
 ```
   -c, --code                Specify which scope to collect coverage data.
@@ -429,4 +445,5 @@ Also, see the up-to-date unit testing coverage report of the Matter SDK
 
 ## Maintaining Matter
 
-If you make any change to the GN build system, the next build will regenerate the ninja files automatically. No need to do anything.
+If you make any change to the GN build system, the next build will regenerate
+the ninja files automatically. No need to do anything.

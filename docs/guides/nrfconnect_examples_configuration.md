@@ -3,23 +3,30 @@
 The nRF Connect example applications all come with a default configuration for
 building.
 
-Check the information on this page if you want to modify the
-application configuration or add new functionalities to build your own
-application based on the provided example. This page also contains information
-about the configuration structure, which can be useful to better understand the
-building process.
+Check the information on this page if you want to modify the application
+configuration or add new functionalities to build your own application based on
+the provided example. This page also contains information about the
+configuration structure, which can be useful to better understand the building
+process.
 
 <hr>
 
 ## Configuring application
 
-Changing the default application configuration can be done either temporarily or permanently.
+Changing the default application configuration can be done either temporarily or
+permanently.
 
-- Changing configuration temporarily is useful for testing the impact
-of changes on the application behavior.
-- Making permanent changes is better if you want to develop your own application, as it helps avoid repeating the configuration process.
+-   Changing configuration temporarily is useful for testing the impact of
+    changes on the application behavior.
+-   Making permanent changes is better if you want to develop your own
+    application, as it helps avoid repeating the configuration process.
 
-Regardless of the option, you will need to rebuild your application. This will require you to provide the build target name of the kit you are using. You can find the build target names in the Requirements section of the example you are building or on the [Board support](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/app_dev/board_support/index.html) page in the nRF Connect SDK documentation.
+Regardless of the option, you will need to rebuild your application. This will
+require you to provide the build target name of the kit you are using. You can
+find the build target names in the Requirements section of the example you are
+building or on the
+[Board support](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/app_dev/board_support/index.html)
+page in the nRF Connect SDK documentation.
 
 ### Temporary changes to configuration
 
@@ -27,7 +34,9 @@ You can change the configuration temporarily by editing the `.config` file in
 the `build/zephyr/` directory, which stores all configuration options for the
 application generated as a result of the build process.
 
-As long as you do not remove the current build directory or delete this file, your changes will be kept. However, if you do a clean build, your changes are gone, so it is not possible to save changes permanently this way.
+As long as you do not remove the current build directory or delete this file,
+your changes will be kept. However, if you do a clean build, your changes are
+gone, so it is not possible to save changes permanently this way.
 
 Complete the following steps:
 
@@ -38,13 +47,18 @@ Complete the following steps:
     ```
     west build -b build-target
     ```
-2.  Run the terminal-based interface called menuconfig by typing the following command:
+
+2.  Run the terminal-based interface called menuconfig by typing the following
+    command:
 
     ```
     west build -t menuconfig
     ```
 
-    The menuconfig terminal window appears, in which you can navigate using arrow keys and other keys, based on the description at the bottom of the window.
+    The menuconfig terminal window appears, in which you can navigate using
+    arrow keys and other keys, based on the description at the bottom of the
+    window.
+
 3.  Make the desired changes by following the menuconfig terminal instructions.
 4.  Press `Q` to save and quit.
 5.  Rebuild the application.
@@ -54,16 +68,23 @@ can be flashed to the device.
 
 ### Permanent changes to configuration
 
-The permanent solution is based on modifying the Kconfig configuration files, which are used as components of the building process. This makes the changes persistent across builds.
+The permanent solution is based on modifying the Kconfig configuration files,
+which are used as components of the building process. This makes the changes
+persistent across builds.
 
-The best practice to make permanent changes is to edit the main application configuration file `prj.conf`, which is located in the example directory. This will result in overriding the existing configuration values.
+The best practice to make permanent changes is to edit the main application
+configuration file `prj.conf`, which is located in the example directory. This
+will result in overriding the existing configuration values.
 
-This method is valid for the majority of cases. If you are interested in understanding the big picture of the configuration process, read the [Configuration structure overview](#configuration-structure-overview) section
+This method is valid for the majority of cases. If you are interested in
+understanding the big picture of the configuration process, read the
+[Configuration structure overview](#configuration-structure-overview) section
 below.
 
 #### Assigning values to Kconfig options
 
-You can assigning a value to a configuration option by typing its full name preceded by the `CONFIG_` prefix, and adding the `=` mark and the value.
+You can assigning a value to a configuration option by typing its full name
+preceded by the `CONFIG_` prefix, and adding the `=` mark and the value.
 
 Configuration options have different types and it is only possible to assign
 them values of proper type. Few examples:
@@ -138,19 +159,21 @@ structure.
 
 ## Configuring Matter in nRF Connect platform
 
-When configuring Matter support using the nRF Connect platform, some configuration options are required, while other are optional and depend on what application behavior you want to achieve.
+When configuring Matter support using the nRF Connect platform, some
+configuration options are required, while other are optional and depend on what
+application behavior you want to achieve.
 
 ### Mandatory configuration
 
 To use the Matter protocol, complete the following steps:
 
-1. Set the `CONFIG_CHIP` Kconfig option.
-Setting this option enables the Matter protocol stack and other associated
-Kconfig options, including `CONFIG_CHIP_ENABLE_DNSSD_SRP` that is required for
-the Matter device to be discoverable using DNS-SD.
-2. Set the `CONFIG_CHIP_PROJECT_CONFIG` Kconfig option and
-define the path to the configuration file that specifies Vendor ID, Product ID,
-and other project-specific Matter settings.
+1. Set the `CONFIG_CHIP` Kconfig option. Setting this option enables the Matter
+   protocol stack and other associated Kconfig options, including
+   `CONFIG_CHIP_ENABLE_DNSSD_SRP` that is required for the Matter device to be
+   discoverable using DNS-SD.
+2. Set the `CONFIG_CHIP_PROJECT_CONFIG` Kconfig option and define the path to
+   the configuration file that specifies Vendor ID, Product ID, and other
+   project-specific Matter settings.
 
 ### Optional configuration
 
@@ -219,14 +242,15 @@ software version or related features).
 
 Only some part of these features can be configured using Kconfig options:
 
--   `CONFIG_CHIP_DEVICE_TYPE` - This option specifies the type of device that uses the Matter Device Type
-    Identifier, for example Door Lock (0x000A) or Dimmable Light Bulb (0x0101).
--   `CONFIG_CHIP_COMMISSIONABLE_DEVICE_TYPE` - This option enables including optional device
-    type subtype in the commissionable node discovery record, which allows
-    filtering of the discovery results to find the nodes that match the device
-    type.
--   `CONFIG_CHIP_ROTATING_DEVICE_ID` - This option enables the rotating device identifier, an
-    optional feature that provides an additional unique identifier for each
-    device. This identifier is similar to the serial number, but it additionally
-    changes at predefined times to protect against long-term tracking of the
-    device.
+-   `CONFIG_CHIP_DEVICE_TYPE` - This option specifies the type of device that
+    uses the Matter Device Type Identifier, for example Door Lock (0x000A) or
+    Dimmable Light Bulb (0x0101).
+-   `CONFIG_CHIP_COMMISSIONABLE_DEVICE_TYPE` - This option enables including
+    optional device type subtype in the commissionable node discovery record,
+    which allows filtering of the discovery results to find the nodes that match
+    the device type.
+-   `CONFIG_CHIP_ROTATING_DEVICE_ID` - This option enables the rotating device
+    identifier, an optional feature that provides an additional unique
+    identifier for each device. This identifier is similar to the serial number,
+    but it additionally changes at predefined times to protect against long-term
+    tracking of the device.

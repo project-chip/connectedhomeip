@@ -78,8 +78,8 @@ For more information about preparing a factory data accessor, see the section
 about
 [using own factory data implementation](#using-own-factory-data-implementation).
 
-> **Note:** Encryption and security of the factory data partition is not provided
-> yet for this feature.
+> **Note:** Encryption and security of the factory data partition is not
+> provided yet for this feature.
 
 ### Factory data component table
 
@@ -178,7 +178,8 @@ partition into the device's flash memory.
 
 You can use the second script without invoking the first one by providing a JSON
 file written in another way. To make sure that the JSON file is correct and the
-device is able to read out parameters, [verify the file using the JSON schema tool](#verifying-using-the-json-schema-tool).
+device is able to read out parameters,
+[verify the file using the JSON schema tool](#verifying-using-the-json-schema-tool).
 
 ### Creating the factory data JSON file with the first script
 
@@ -237,8 +238,9 @@ To use this script, complete the following steps:
         --chip_cert_path <path to chip-cert executable>
         ```
 
-    > **Note:** To generate new certificates, you need the `chip-cert` executable.
-    > See the note at the end of this section to learn how to get it.
+    > **Note:** To generate new certificates, you need the `chip-cert`
+    > executable. See the note at the end of this section to learn how to get
+    > it.
 
     - Manual:
 
@@ -322,9 +324,9 @@ If the script finishes successfully, go to the location you provided with the
 `-o` argument. Use the JSON file you find there when
 [generating factory data](#generating-factory-data).
 
-> **Note:** Generating new certificates is optional if default vendor and product
-> IDs are used and requires providing a path to the `chip-cert` executable. To
-> get it, complete the following steps:
+> **Note:** Generating new certificates is optional if default vendor and
+> product IDs are used and requires providing a path to the `chip-cert`
+> executable. To get it, complete the following steps:
 >
 > 1.  Navigate to the `connectedhomeip` root directory.
 > 2.  In a terminal, run the command:
@@ -333,8 +335,8 @@ If the script finishes successfully, go to the location you provided with the
 > 3.  Add the `connectedhomeip/src/tools/chip-cert/out/chip-cert` path as an
 >     argument of `--chip_cert_path` for the Python script.
 
-> **Note:** By default, overwriting the existing JSON file is disabled. This means
-> that you cannot create a new JSON file with the same name in the exact
+> **Note:** By default, overwriting the existing JSON file is disabled. This
+> means that you cannot create a new JSON file with the same name in the exact
 > location as an existing file. To allow overwriting, add the `--overwrite`
 > option to the argument list of the Python script.
 
@@ -587,16 +589,16 @@ to generate the factory data partition:
 
     In this command:
 
-    -   _<path_to_JSON_file>_ is a path to the JSON file containing appropriate
-        factory data.
-    -   _<path_to_output>_ is a path to an output file without any prefix. For
-        example, providing `/build/output` as an argument will result in creating
-        `/build/output.hex` and `/build/output.bin`.
-    -   _<partition_address_in_memory>_ is an address in the device's persistent
-        storage area where a partition data set is to be stored.
-    -   _<partition_size>_ is a size of partition in the device's persistent storage
-        area. New data is checked according to this value of the JSON data to see if
-        it fits the size.
+    - _<path_to_JSON_file>_ is a path to the JSON file containing appropriate
+      factory data.
+    - _<path_to_output>_ is a path to an output file without any prefix. For
+      example, providing `/build/output` as an argument will result in creating
+      `/build/output.hex` and `/build/output.bin`.
+    - _<partition_address_in_memory>_ is an address in the device's persistent
+      storage area where a partition data set is to be stored.
+    - _<partition_size>_ is a size of partition in the device's persistent
+      storage area. New data is checked according to this value of the JSON data
+      to see if it fits the size.
 
 To see the optional arguments for the script, use the following command:
 
@@ -763,12 +765,13 @@ $ west flash
 
 The [factory data generation process](#generating-factory-data) described above
 is only an example valid for the nRF Connect platform. You can also create a HEX
-file containing all components from the [factory data component table](#factory-data-component-table) in
-any format and then implement a parser to read out all parameters and pass them
-to a provider. Each manufacturer can implement a factory data set on its own by
-implementing a parser and a factory data accessor inside the Matter stack. Use
-the [nRF Connect Provider](../../src/platform/nrfconnect/FactoryDataProvider.h)
-and [FactoryDataParser](../../src/platform/nrfconnect/FactoryDataParser.h) as
+file containing all components from the
+[factory data component table](#factory-data-component-table) in any format and
+then implement a parser to read out all parameters and pass them to a provider.
+Each manufacturer can implement a factory data set on its own by implementing a
+parser and a factory data accessor inside the Matter stack. Use the
+[nRF Connect Provider](../../src/platform/nrfconnect/FactoryDataProvider.h) and
+[FactoryDataParser](../../src/platform/nrfconnect/FactoryDataParser.h) as
 examples.
 
 You can read the factory data set from the device's flash memory in different
@@ -825,10 +828,10 @@ override the inherited classes, complete the following steps:
    factory data providers to start using your own implementation of factory data
    parser and provider. This can be done in one of the following ways:
 
-    -   Add `CONFIG_FACTORY_DATA_CUSTOM_BACKEND=y` Kconfig setting to `prj.conf`
-        file.
-    -   Build an example with following option (replace _<build_target>_ with your
-        board name, for example `nrf52840dk_nrf52840`):
+    - Add `CONFIG_FACTORY_DATA_CUSTOM_BACKEND=y` Kconfig setting to `prj.conf`
+      file.
+    - Build an example with following option (replace _<build_target>_ with your
+      board name, for example `nrf52840dk_nrf52840`):
 
         ```
         $ west build -b <build_target> -- -DCONFIG_FACTORY_DATA_CUSTOM_BACKEND=y

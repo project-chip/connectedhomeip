@@ -80,8 +80,7 @@ available options for the given command.
 ## Using OpenThread commands
 
 [OpenThread commands](https://github.com/openthread/openthread/blob/master/src/cli/README.md)
-are accessible from the shell, but they must preceded by `ot`. For
-example:
+are accessible from the shell, but they must preceded by `ot`. For example:
 
 ```shell
 uart:~$ ot masterkey
@@ -142,6 +141,7 @@ QRCode:             MT:W0GU2OTB00KA0648G00
 QRCodeUrl:          https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3AW0GU2OTB00KA0648G00
 ManualPairingCode:  34970112332
 ```
+
 #### `none qrcode` subcommand
 
 Prints the device

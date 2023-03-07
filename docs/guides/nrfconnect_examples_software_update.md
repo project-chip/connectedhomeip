@@ -22,14 +22,15 @@ protocols:
 
 The DFU over Matter involves two kinds of nodes:
 
-- OTA Provider - This is a node that can respond to the OTA Requestors' queries about
-available software updates and share the update packages with them.
-- OTA Requestor - This is any node that needs to be updated and can communicate with the OTA
-Provider to fetch applicable software updates.
+-   OTA Provider - This is a node that can respond to the OTA Requestors'
+    queries about available software updates and share the update packages with
+    them.
+-   OTA Requestor - This is any node that needs to be updated and can
+    communicate with the OTA Provider to fetch applicable software updates.
 
-In the procedure described below,
-the OTA Provider will be a Linux application and the example running on the
-Nordic Semiconductor's board will work as the OTA Requestor.
+In the procedure described below, the OTA Provider will be a Linux application
+and the example running on the Nordic Semiconductor's board will work as the OTA
+Requestor.
 
 To test the DFU over Matter, you need to complete the following steps:
 
@@ -57,6 +58,7 @@ To test the DFU over Matter, you need to complete the following steps:
 
     Keep the application running and use another terminal for the remaining
     steps.
+
 5.  Commission the OTA Provider into the Matter network using Node ID 1:
 
     ```
@@ -113,14 +115,15 @@ To test the DFU over Matter, you need to complete the following steps:
         Once the device is made aware of the OTA Provider node, it automatically
         queries the OTA Provider for a new firmware image.
 
-When the firmware image download is complete, the device is automatically rebooted to apply the update.
+When the firmware image download is complete, the device is automatically
+rebooted to apply the update.
 
 <hr>
 
 ## Device Firmware Upgrade over Bluetooth LE using a smartphone
 
-To upgrade your device firmware over Bluetooth LE using a smartphone, complete the
-following steps:
+To upgrade your device firmware over Bluetooth LE using a smartphone, complete
+the following steps:
 
 1. Install _one_ of the following applications on your smartphone:
 

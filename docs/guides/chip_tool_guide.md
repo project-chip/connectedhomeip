@@ -164,8 +164,8 @@ I: 278 [DL] Manufacturing Date: (not set)
 I: 281 [DL] Device Type: 65535 (0xFFFF)
 ```
 
-In this printout, the _discriminator_ is `3840 (0xF00)` and the _setup PIN
-code_ is equal to `20202021`.
+In this printout, the _discriminator_ is `3840 (0xF00)` and the _setup PIN code_
+is equal to `20202021`.
 
 ### Step 6: Commission Matter device into an existing IP network
 
@@ -190,8 +190,8 @@ following log:
 Secure Session to Device Established
 ```
 
-This log message means that the PASE (Password-Authenticated Session Establishment)
-session using SPAKE2+ protocol has been established.
+This log message means that the PASE (Password-Authenticated Session
+Establishment) session using SPAKE2+ protocol has been established.
 
 ##### Commissioning into a Thread network over Bluetooth LE
 
