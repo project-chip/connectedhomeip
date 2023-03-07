@@ -46,8 +46,6 @@ public:
 
     virtual NodeId GetDeviceId() const = 0;
 
-    virtual void ShutdownSubscriptions() = 0;
-
     virtual CHIP_ERROR SendCommands(app::CommandSender * commandObj, chip::Optional<System::Clock::Timeout> timeout = NullOptional);
 
     virtual Messaging::ExchangeManager * GetExchangeManager() const = 0;

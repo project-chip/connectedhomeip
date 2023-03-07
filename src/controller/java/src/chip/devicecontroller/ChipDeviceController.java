@@ -488,9 +488,14 @@ public class ChipDeviceController {
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode, callback);
   }
 
-  /* Shutdown all cluster attribute subscriptions for a given device */
-  public void shutdownSubscriptions(long devicePtr) {
-    shutdownSubscriptions(deviceControllerPtr, devicePtr);
+  public int getFabricIndex() {
+    return getFabricIndex(deviceControllerPtr);
+  }
+
+  /* Shutdown the subscriptions based upon peerNodeId, fabricIndex, and subscriptionId */
+  public void shutdownSubscriptions(
+      @Nullable Integer fabricIndex, @Nullable Long peerNodeId, @Nullable Long subscriptionId) {
+    shutdownSubscriptions(deviceControllerPtr, fabricIndex, peerNodeId, subscriptionId);
   }
 
   /**
@@ -833,7 +838,13 @@ public class ChipDeviceController {
 
   private native int onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
 
-  private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
+  private native int getFabricIndex(long deviceControllerPtr);
+
+  private native void shutdownSubscriptions(
+      long deviceControllerPtr,
+      @Nullable Integer fabricIndex,
+      @Nullable Long peerNodeId,
+      @Nullable Long subscriptionId);
 
   private native void shutdownCommissioning(long deviceControllerPtr);
 
