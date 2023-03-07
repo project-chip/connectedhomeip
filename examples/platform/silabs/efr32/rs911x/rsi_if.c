@@ -657,7 +657,8 @@ void wfx_rsi_task(void * arg)
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
                     // enabling the power save mode for RS9116 if sleepy device is enabled
                     rsi_status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
-                    if (status != RSI_SUCCESS) {
+                    if (status != RSI_SUCCESS)
+                    {
                         WFX_RSI_LOG("Powersave Config Failed, Error Code : 0x%lX", status);
                         return status;
                     }
@@ -685,7 +686,8 @@ void wfx_rsi_task(void * arg)
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
                     // enabling the power save mode for RS9116 if sleepy device is enabled
                     rsi_status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
-                    if (rsi_status != RSI_SUCCESS) {
+                    if (rsi_status != RSI_SUCCESS)
+                    {
                         WFX_RSI_LOG("Powersave Config Failed, Error Code : 0x%lX", rsi_status);
                     }
                     WFX_RSI_LOG("Powersave Config Success");
