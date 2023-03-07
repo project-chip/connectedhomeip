@@ -192,13 +192,13 @@ In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
 -   Download
-    [K32W061DK6 SDK 2.6.9](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_9_K32W061DK6.zip).
+    [K32W061DK6 SDK 2.6.10](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_10_K32W061DK6.zip).
 
 -   Start building the application either with Secure Element or without
     -   without Secure Element
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_9_K32W061DK6/
+user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_10_K32W061DK6/
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/nxp/k32w/k32w0
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
@@ -217,7 +217,7 @@ Secure Element. These can be changed if building without Secure Element
 
     Exactly the same steps as above but set argument build_for_k32w041am=1 in
     the gn command and use
-    [K32W041AMDK6 SDK 2.6.9](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_9_K32W041AMDK6.zip).
+    [K32W041AMDK6 SDK 2.6.10](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_10_K32W041AMDK6.zip).
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
 build argument (chip_with_OM15082) inside the gn build instruction should be set
@@ -502,10 +502,33 @@ Build the Linux OTA provider application:
 user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota-provider-app chip_config_network_layer_ble=false
 ```
 
-Build OTA image and start the OTA Provider Application:
+Build Linux chip-tool:
 
 ```
-user@computer1:~/connectedhomeip$ : ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 chip-k32w0x-light-example.bin chip-k32w0x-light-example.ota
+user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/chip-tool out/chip-tool-app
+```
+
+Build OTA image:
+
+In order to build an OTA image, use NXP wrapper over the standard tool
+`src/app/ota_image_tool.py`:
+
+-   `scripts/tools/nxp/factory_data_generator/ota_image_tool.py` The tool can be
+    used to generate an OTA image with the following format:
+    `| OTA image header | TLV1 | TLV2 | ... | TLVn |` where each TLV is in the
+    form `|tag|length|value|`
+
+Note that "standard" TLV format is used. Matter TLV format is only used for
+factory data TLV value. A user can enable the default processors by specifying
+`chip_enable_ota_default_processors=1` in the build command. Please see more in
+the [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
+
+Here is an example that generate an OTA image with factory data and app TLV:
+`user@computer1:~/connectedhomeip$ : ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 -fd --cert_declaration ~/manufacturing/Chip-Test-CD-1037-a220.der -app chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.ota`
+
+Start the OTA Provider Application:
+
+```
 user@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
 user@computer1:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-k32w0x-light-example.ota
 ```
@@ -516,12 +539,6 @@ has its own software version (given by
 having a correct OTA process, the OTA header version should be the same as the
 binary embedded software version. A user can set a custom software version in
 the gn build args by setting `chip_software_version` to the wanted version.
-
-Build Linux chip-tool:
-
-```
-user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/chip-tool out/chip-tool-app
-```
 
 Provision the OTA provider application and assign node id _1_. Also, grant ACL
 entries to allow OTA requestors:
@@ -535,7 +552,7 @@ user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool accesscontrol 
 Provision the device and assign node id _2_:
 
 ```
-user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021   3840
+user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021 3840
 ```
 
 Start the OTA process:

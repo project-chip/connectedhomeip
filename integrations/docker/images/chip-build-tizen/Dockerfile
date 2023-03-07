@@ -19,6 +19,7 @@ RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
     cpio \
+    libncurses5 \
     obs-build \
     openjdk-8-jre-headless \
     wget \

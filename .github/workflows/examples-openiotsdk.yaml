@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-openiotsdk:0.6.44
+            image: connectedhomeip/chip-build-openiotsdk:0.6.47
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
             options: --privileged

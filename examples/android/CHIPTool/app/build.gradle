@@ -107,6 +107,8 @@ dependencies {
     implementation "androidx.camera:camera-camera2:${camerax_version}"
     implementation "androidx.camera:camera-lifecycle:${camerax_version}"
     implementation "androidx.camera:camera-view:${camerax_version}"
+
+    implementation 'com.google.protobuf:protobuf-java:3.22.0'
 }
 
 repositories {

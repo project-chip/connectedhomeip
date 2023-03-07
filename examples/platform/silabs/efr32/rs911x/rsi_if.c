@@ -82,7 +82,6 @@ extern rsi_semaphore_handle_t sl_rs_ble_init_sem;
  */
 static uint8_t wfx_rsi_drv_buf[WFX_RSI_BUF_SZ];
 wfx_wifi_scan_ext_t * temp_reset;
-uint8_t security;
 
 /******************************************************************
  * @fn   int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t *ap)
@@ -96,7 +95,7 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
     int32_t status;
     uint8_t rssi;
-    ap->security = security;
+    ap->security = wfx_rsi.sec.security;
     ap->chan     = wfx_rsi.ap_chan;
     memcpy(&ap->bssid[0], &wfx_rsi.ap_mac.octet[0], BSSID_MAX_STR_LEN);
     status = rsi_wlan_get(RSI_RSSI, &rssi, sizeof(rssi));
@@ -435,7 +434,7 @@ void wfx_show_err(char * msg)
  * @return
  *       None
  *******************************************************************************************/
-static void wfx_rsi_save_ap_info()
+static void wfx_rsi_save_ap_info() // translation
 {
     int32_t status;
     rsi_rsp_scan_t rsp;
@@ -450,22 +449,36 @@ static void wfx_rsi_save_ap_info()
     }
     else
     {
-        wfx_rsi.sec.security = rsp.scan_info->security_mode;
+        wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
         wfx_rsi.ap_chan      = rsp.scan_info->rf_channel;
         memcpy(&wfx_rsi.ap_mac.octet[0], &rsp.scan_info->bssid[0], BSSID_MAX_STR_LEN);
     }
-    if ((wfx_rsi.sec.security == RSI_WPA) || (wfx_rsi.sec.security == RSI_WPA2))
+
+    switch (rsp.scan_info->security_mode)
     {
-        // saving the security before changing into mixed mode
-        security             = wfx_rsi.sec.security;
-        wfx_rsi.sec.security = RSI_WPA_WPA2_MIXED;
+    case SME_OPEN:
+        wfx_rsi.sec.security = WFX_SEC_NONE;
+        break;
+    case SME_WPA:
+    case SME_WPA_ENTERPRISE:
+        wfx_rsi.sec.security = WFX_SEC_WPA;
+        break;
+    case SME_WPA2:
+    case SME_WPA2_ENTERPRISE:
+        wfx_rsi.sec.security = WFX_SEC_WPA2;
+        break;
+    case SME_WEP:
+        wfx_rsi.sec.security = WFX_SEC_WEP;
+        break;
+    case SME_WPA3:
+    case SME_WPA3_TRANSITION:
+        wfx_rsi.sec.security = WFX_SEC_WPA3;
+        break;
+    default:
+        wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
+        break;
     }
-    if (wfx_rsi.sec.security == SME_WPA3)
-    {
-        // returning 3 for WPA3 when DGWIFI read security-type is called
-        security             = WPA3_SECURITY;
-        wfx_rsi.sec.security = RSI_WPA3;
-    }
+
     WFX_RSI_LOG("%s: WLAN: connecting to %s==%s, sec=%d, status=%02x", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0],
                 wfx_rsi.sec.security, status);
 }
@@ -480,6 +493,7 @@ static void wfx_rsi_save_ap_info()
 static void wfx_rsi_do_join(void)
 {
     int32_t status;
+    rsi_security_mode_t connect_security_mode;
 
     if (wfx_rsi.dev_state & (WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED))
     {
@@ -487,6 +501,27 @@ static void wfx_rsi_do_join(void)
     }
     else
     {
+
+        switch (wfx_rsi.sec.security)
+        {
+        case WFX_SEC_WEP:
+            connect_security_mode = RSI_WEP;
+            break;
+        case WFX_SEC_WPA:
+        case WFX_SEC_WPA2:
+            connect_security_mode = RSI_WPA_WPA2_MIXED;
+            break;
+        case WFX_SEC_WPA3:
+            connect_security_mode = RSI_WPA3;
+            break;
+        case WFX_SEC_NONE:
+            connect_security_mode = RSI_OPEN;
+            break;
+        default:
+            WFX_RSI_LOG("%s: error: unknown security type.");
+            return;
+        }
+
         WFX_RSI_LOG("%s: WLAN: connecting to %s==%s, sec=%d", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0],
                     wfx_rsi.sec.security);
 
@@ -511,8 +546,8 @@ static void wfx_rsi_do_join(void)
             /* Call rsi connect call with given ssid and password
              * And check there is a success
              */
-            if ((status = rsi_wlan_connect_async((int8_t *) &wfx_rsi.sec.ssid[0], (rsi_security_mode_t) wfx_rsi.sec.security,
-                                                 &wfx_rsi.sec.passkey[0], wfx_rsi_join_cb)) != RSI_SUCCESS)
+            if ((status = rsi_wlan_connect_async((int8_t *) &wfx_rsi.sec.ssid[0], connect_security_mode, &wfx_rsi.sec.passkey[0],
+                                                 wfx_rsi_join_cb)) != RSI_SUCCESS)
             {
 
                 wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;

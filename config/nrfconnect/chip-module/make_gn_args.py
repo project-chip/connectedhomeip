@@ -29,7 +29,11 @@ GN_CFLAG_EXCLUDES = [
     '-fno-reorder-functions',
     '-ffunction-sections',
     '-fdata-sections',
-    '-g*',
+    '-g',
+    '-g0',
+    '-g1',
+    '-g2',
+    '-g3',
     '-O*',
     '-W*',
 ]

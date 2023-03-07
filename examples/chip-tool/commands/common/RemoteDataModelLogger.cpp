@@ -169,48 +169,51 @@ CHIP_ERROR LogDiscoveredNodeData(const chip::Dnssd::DiscoveredNodeData & nodeDat
 {
     VerifyOrReturnError(gDelegate != nullptr, CHIP_NO_ERROR);
 
-    if (!chip::CanCastTo<uint8_t>(nodeData.resolutionData.numIPs))
+    auto & resolutionData = nodeData.resolutionData;
+    auto & commissionData = nodeData.commissionData;
+
+    if (!chip::CanCastTo<uint8_t>(resolutionData.numIPs))
     {
         ChipLogError(chipTool, "Too many ips.");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (!chip::CanCastTo<uint64_t>(nodeData.commissionData.rotatingIdLen))
+    if (!chip::CanCastTo<uint64_t>(commissionData.rotatingIdLen))
     {
         ChipLogError(chipTool, "Can not convert rotatingId to json format.");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     char rotatingId[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
-    chip::Encoding::BytesToUppercaseHexString(nodeData.commissionData.rotatingId, nodeData.commissionData.rotatingIdLen, rotatingId,
-                                              sizeof(rotatingId));
+    ReturnErrorOnFailure(chip::Encoding::BytesToUppercaseHexString(commissionData.rotatingId, commissionData.rotatingIdLen,
+                                                                   rotatingId, sizeof(rotatingId)));
 
     Json::Value value;
-    value["hostName"]           = nodeData.resolutionData.hostName;
-    value["instanceName"]       = nodeData.commissionData.instanceName;
-    value["longDiscriminator"]  = nodeData.commissionData.longDiscriminator;
-    value["shortDiscriminator"] = ((nodeData.commissionData.longDiscriminator >> 8) & 0x0F);
-    value["vendorId"]           = nodeData.commissionData.vendorId;
-    value["productId"]          = nodeData.commissionData.productId;
-    value["commissioningMode"]  = nodeData.commissionData.commissioningMode;
-    value["deviceType"]         = nodeData.commissionData.deviceType;
-    value["deviceName"]         = nodeData.commissionData.deviceName;
+    value["hostName"]           = resolutionData.hostName;
+    value["instanceName"]       = commissionData.instanceName;
+    value["longDiscriminator"]  = commissionData.longDiscriminator;
+    value["shortDiscriminator"] = ((commissionData.longDiscriminator >> 8) & 0x0F);
+    value["vendorId"]           = commissionData.vendorId;
+    value["productId"]          = commissionData.productId;
+    value["commissioningMode"]  = commissionData.commissioningMode;
+    value["deviceType"]         = commissionData.deviceType;
+    value["deviceName"]         = commissionData.deviceName;
     value["rotatingId"]         = rotatingId;
-    value["rotatingIdLen"]      = static_cast<uint64_t>(nodeData.commissionData.rotatingIdLen);
-    value["pairingHint"]        = nodeData.commissionData.pairingHint;
-    value["pairingInstruction"] = nodeData.commissionData.pairingInstruction;
-    value["supportsTcp"]        = nodeData.resolutionData.supportsTcp;
-    value["port"]               = nodeData.resolutionData.port;
-    value["numIPs"]             = static_cast<uint8_t>(nodeData.resolutionData.numIPs);
+    value["rotatingIdLen"]      = static_cast<uint64_t>(commissionData.rotatingIdLen);
+    value["pairingHint"]        = commissionData.pairingHint;
+    value["pairingInstruction"] = commissionData.pairingInstruction;
+    value["supportsTcp"]        = resolutionData.supportsTcp;
+    value["port"]               = resolutionData.port;
+    value["numIPs"]             = static_cast<uint8_t>(resolutionData.numIPs);
 
-    if (nodeData.resolutionData.mrpRetryIntervalIdle.HasValue())
+    if (resolutionData.mrpRetryIntervalIdle.HasValue())
     {
-        value["mrpRetryIntervalIdle"] = nodeData.resolutionData.mrpRetryIntervalIdle.Value().count();
+        value["mrpRetryIntervalIdle"] = resolutionData.mrpRetryIntervalIdle.Value().count();
     }
 
-    if (nodeData.resolutionData.mrpRetryIntervalActive.HasValue())
+    if (resolutionData.mrpRetryIntervalActive.HasValue())
     {
-        value["mrpRetryIntervalActive"] = nodeData.resolutionData.mrpRetryIntervalActive.Value().count();
+        value["mrpRetryIntervalActive"] = resolutionData.mrpRetryIntervalActive.Value().count();
     }
 
     Json::Value rootValue;

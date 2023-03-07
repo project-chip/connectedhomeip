@@ -23,7 +23,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-API_DEPRECATED("Please use MTRBaseDevice deviceWithNodeID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+MTR_DEPRECATED("Please use MTRBaseDevice deviceWithNodeID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NSError * _Nullable error);
 
 @class MTRCommissioningParameters;
@@ -175,79 +175,79 @@ typedef void (^MTRDeviceConnectionCallback)(MTRBaseDevice * _Nullable device, NS
 
 @interface MTRDeviceController (Deprecated)
 
-@property (readonly, nonatomic, nullable) NSNumber * controllerNodeId API_DEPRECATED(
+@property (readonly, nonatomic, nullable) NSNumber * controllerNodeId MTR_DEPRECATED(
     "Please use controllerNodeID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (nullable NSData *)fetchAttestationChallengeForDeviceId:(uint64_t)deviceId
-    API_DEPRECATED(
+    MTR_DEPRECATED(
         "Please use attestationChallengeForDeviceID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (BOOL)getBaseDevice:(uint64_t)deviceID
                 queue:(dispatch_queue_t)queue
     completionHandler:(MTRDeviceConnectionCallback)completionHandler
-    API_DEPRECATED("Please use [MTRBaseDevice deviceWithNodeID:controller:]", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+    MTR_DEPRECATED("Please use [MTRBaseDevice deviceWithNodeID:controller:]", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
         tvos(16.1, 16.4));
 
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
-    API_DEPRECATED("Please use setupCommissioningSessionWithPayload:newNodeID:error:", ios(16.1, 16.4), macos(13.0, 13.3),
+    MTR_DEPRECATED("Please use setupCommissioningSessionWithPayload:newNodeID:error:", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (BOOL)pairDevice:(uint64_t)deviceID
            address:(NSString *)address
               port:(uint16_t)port
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error
-    API_DEPRECATED("Please use setupCommissioningSessionWithPayload:newNodeID:error:", ios(16.1, 16.4), macos(13.0, 13.3),
+    MTR_DEPRECATED("Please use setupCommissioningSessionWithPayload:newNodeID:error:", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (BOOL)pairDevice:(uint64_t)deviceID
     onboardingPayload:(NSString *)onboardingPayload
                 error:(NSError * __autoreleasing *)error
-    API_DEPRECATED("Please use setupCommissioningSessionWithPayload:newNodeID:error:", ios(16.1, 16.4), macos(13.0, 13.3),
+    MTR_DEPRECATED("Please use setupCommissioningSessionWithPayload:newNodeID:error:", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (BOOL)commissionDevice:(uint64_t)deviceId
      commissioningParams:(MTRCommissioningParameters *)commissioningParams
                    error:(NSError * __autoreleasing *)error
-    API_DEPRECATED("Please use commissionNodeWithID:commissioningParams:error:", ios(16.1, 16.4), macos(13.0, 13.3),
+    MTR_DEPRECATED("Please use commissionNodeWithID:commissioningParams:error:", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (BOOL)stopDevicePairing:(uint64_t)deviceID
                     error:(NSError * __autoreleasing *)error
-    API_DEPRECATED(
+    MTR_DEPRECATED(
         "Please use cancelCommissioningForNodeID:error:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (nullable MTRBaseDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId
                                                  error:(NSError * __autoreleasing *)error
-    API_DEPRECATED("Please use deviceBeingCommissionedWithNodeID:error:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+    MTR_DEPRECATED("Please use deviceBeingCommissionedWithNodeID:error:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
         tvos(16.1, 16.4));
 
 - (BOOL)openPairingWindow:(uint64_t)deviceID
                  duration:(NSUInteger)duration
                     error:(NSError * __autoreleasing *)error
-    API_DEPRECATED("Please use MTRDevice or MTRBaseDevice openCommissioningWindowWithSetupPasscode", ios(16.1, 16.4),
+    MTR_DEPRECATED("Please use MTRDevice or MTRBaseDevice openCommissioningWindowWithSetupPasscode", ios(16.1, 16.4),
         macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (nullable NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
                                        duration:(NSUInteger)duration
                                   discriminator:(NSUInteger)discriminator
                                        setupPIN:(NSUInteger)setupPIN
                                           error:(NSError * __autoreleasing *)error
-    API_DEPRECATED("Please use MTRDevice or MTRBaseDevice openCommissioningWindowWithSetupPasscode", ios(16.1, 16.4),
+    MTR_DEPRECATED("Please use MTRDevice or MTRBaseDevice openCommissioningWindowWithSetupPasscode", ios(16.1, 16.4),
         macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (nullable NSData *)computePaseVerifier:(uint32_t)setupPincode
                               iterations:(uint32_t)iterations
                                     salt:(NSData *)salt
-    API_DEPRECATED("Please use computePASEVerifierForSetupPasscode:iterations:salt:error:", ios(16.1, 16.4), macos(13.0, 13.3),
+    MTR_DEPRECATED("Please use computePASEVerifierForSetupPasscode:iterations:salt:error:", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)setPairingDelegate:(id<MTRDevicePairingDelegate>)delegate
-                     queue:(dispatch_queue_t)queue API_DEPRECATED("Please use setDeviceControllerDelegate:", ios(16.1, 16.4),
+                     queue:(dispatch_queue_t)queue MTR_DEPRECATED("Please use setDeviceControllerDelegate:", ios(16.1, 16.4),
                                macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)setNocChainIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer
                     queue:(dispatch_queue_t)queue
-    API_DEPRECATED("Please set the operationalCertificateIssuer in the MTRDeviceControllerStartupParams instead.", ios(16.1, 16.4),
+    MTR_DEPRECATED("Please set the operationalCertificateIssuer in the MTRDeviceControllerStartupParams instead.", ios(16.1, 16.4),
         macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 

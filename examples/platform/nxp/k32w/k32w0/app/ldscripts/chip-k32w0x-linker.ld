@@ -328,6 +328,14 @@ SECTIONS
         . = ALIGN (. != 0 ? 4 : 1) ; /* avoid empty segment */
     } > RAM0
 
+    /* BSS section for unretained contents */
+    .bss_discard (NOLOAD) : ALIGN(4)
+    {
+       *(.discard.bss.pdm)
+
+        . = ALIGN (. != 0 ? 4 : 1) ; /* avoid empty segment */
+    } > RAM0
+
     /* DEFAULT NOINIT SECTION */
     .noinit (NOLOAD): ALIGN(4)
     {

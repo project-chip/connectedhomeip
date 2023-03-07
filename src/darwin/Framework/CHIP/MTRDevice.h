@@ -243,7 +243,7 @@ extern NSString * const MTREventTimestampDateKey MTR_NEWLY_AVAILABLE;
  */
 + (MTRDevice *)deviceWithNodeID:(uint64_t)nodeID
                deviceController:(MTRDeviceController *)deviceController
-    API_DEPRECATED(
+    MTR_DEPRECATED(
         "Please use deviceWithNodeID:controller:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
@@ -255,7 +255,7 @@ extern NSString * const MTREventTimestampDateKey MTR_NEWLY_AVAILABLE;
                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
                         clientQueue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
-    API_DEPRECATED("Please use "
+    MTR_DEPRECATED("Please use "
                    "invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:"
                    "timedInvokeTimeout:queue:completion:",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));

@@ -15,16 +15,24 @@
 # limitations under the License.
 
 import argparse
+import logging
 import os
 import re
+import shlex
 import subprocess
 import sys
 
 # Absolute path to Tizen Studio CLI tool.
 tizen_sdk_root = os.environ["TIZEN_SDK_ROOT"]
 
+# Setup basic logging capabilities.
+logging.basicConfig(level=logging.DEBUG)
+
 parser = argparse.ArgumentParser(
     description="Run Tizen on QEMU.")
+parser.add_argument(
+    '-i', '--interactive', action='store_true',
+    help="run QEMU in interactive mode (no output redirection, no runner)")
 parser.add_argument(
     '--smp', metavar='NUM', type=int, default=2,
     help=("the number of CPUs available in QEMU; default: %(default)s"))
@@ -94,14 +102,24 @@ qemu_args += [
     '-drive', 'file=%s,id=virtio-blk1,if=none,format=raw,readonly=on' % args.image_root,
 ]
 
+kernel_args = "console=ttyAMA0 earlyprintk earlycon root=/dev/vda"
+if args.interactive:
+    # Run root shell instead of the runner script.
+    kernel_args += " rootshell"
+
 qemu_args += [
     '-kernel', args.kernel,
-    '-append', "console=ttyAMA0 earlyprintk earlycon root=/dev/vda",
+    '-append', kernel_args,
 ]
+
+if args.interactive:
+    # Run QEMU in interactive mode.
+    sys.exit(subprocess.call(qemu_args))
 
 status = 0
 # Run QEMU.
 with open(args.output, "wb") as output:
+    logging.info("run: %s", " ".join(map(shlex.quote, qemu_args)))
     with subprocess.Popen(qemu_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) as proc:
         for line in iter(proc.stdout.readline, b''):
 

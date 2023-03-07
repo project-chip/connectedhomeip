@@ -200,9 +200,8 @@ bool WebSocketServer::OnWebSocketMessageReceived(char * msg)
     return shouldContinue;
 }
 
-CHIP_ERROR WebSocketServer::Send(const char * msg)
+void WebSocketServer::Send(const char * msg)
 {
     std::lock_guard<std::mutex> lock(gMutex);
     gMessageQueue.push_back(msg);
-    return CHIP_NO_ERROR;
 }

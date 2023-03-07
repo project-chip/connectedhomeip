@@ -67,6 +67,7 @@ static_library("efr32") {
     "../../SingletonConfigurationManager.cpp",
     "ConfigurationManagerImpl.cpp",
     "KeyValueStoreManagerImpl.cpp",
+    "MigrationManager.cpp",
     "PlatformManagerImpl.cpp",
   ]
 
