@@ -20,6 +20,7 @@
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <app/util/af.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -99,23 +100,40 @@ void CleanShutdown()
 using PostAttributeChangeCallback = void (*)(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t type,
                                              uint16_t size, uint8_t * value);
 
+using PreAttributeChangeCallback = chip::Protocols::InteractionModel::Status (*)(EndpointId endpoint, ClusterId clusterId,
+                                                                                 AttributeId attributeId, uint8_t type,
+                                                                                 uint16_t size, uint8_t * value);
+
+using ExternalAttributeReadCallback = EmberAfStatus (*)(EndpointId endpoint, ClusterId clusterId,
+                                                        const EmberAfAttributeMetadata * attributeMetadata, void * buffer,
+                                                        uint16_t maxReadLength);
+
+using ExternalAttributeWriteCallback = EmberAfStatus (*)(EndpointId endpoint, ClusterId clusterId,
+                                                         const EmberAfAttributeMetadata * attributeMetadata, void * buffer);
+
 class PythonServerDelegate // : public ServerDelegate
 {
 public:
-    void SetPostAttributeChangeCallback(PostAttributeChangeCallback cb)
-    {
-        // ChipLogProgress(NotSpecified, "callback %p", cb);
-        mPostAttributeChangeCallback = cb;
-    };
-    PostAttributeChangeCallback mPostAttributeChangeCallback = nullptr;
+    void SetPreAttributeChangeCallback(PreAttributeChangeCallback cb) { mPreAttributeChangeCallback = cb; };
+    void SetPostAttributeChangeCallback(PostAttributeChangeCallback cb) { mPostAttributeChangeCallback = cb; };
+    void SetExternalAttributeReadCallback(ExternalAttributeReadCallback cb) { mExternalAttributeReadCallback = cb; };
+    void SetExternalAttributeWriteCallback(ExternalAttributeWriteCallback cb) { mExternalAttributeWriteCallback = cb; };
+    PreAttributeChangeCallback mPreAttributeChangeCallback         = nullptr;
+    PostAttributeChangeCallback mPostAttributeChangeCallback       = nullptr;
+    ExternalAttributeReadCallback mExternalAttributeReadCallback   = nullptr;
+    ExternalAttributeWriteCallback mExternalAttributeWriteCallback = nullptr;
 };
 
 PythonServerDelegate gPythonServerDelegate;
 
-void pychip_server_set_callbacks(PostAttributeChangeCallback cb)
+void pychip_server_set_callbacks(PreAttributeChangeCallback pre, PostAttributeChangeCallback post,
+                                 ExternalAttributeReadCallback read, ExternalAttributeWriteCallback write)
 {
     // ChipLogProgress(NotSpecified, "setting cb");
-    gPythonServerDelegate.SetPostAttributeChangeCallback(cb);
+    gPythonServerDelegate.SetPreAttributeChangeCallback(pre);
+    gPythonServerDelegate.SetPostAttributeChangeCallback(post);
+    gPythonServerDelegate.SetExternalAttributeReadCallback(read);
+    gPythonServerDelegate.SetExternalAttributeWriteCallback(write);
 }
 
 void pychip_server_native_init()
@@ -190,10 +208,28 @@ void pychip_server_native_init()
 }
 }
 
+chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                                           uint8_t type, uint16_t size, uint8_t * value)
+{
+    // ChipLogProgress(NotSpecified, "MatterPreAttributeChangeCallback()");
+    if (gPythonServerDelegate.mPreAttributeChangeCallback != nullptr)
+    {
+        // ChipLogProgress(NotSpecified, "callback %p", gPythonServerDelegate.mPreAttributeChangeCallback);
+        return gPythonServerDelegate.mPreAttributeChangeCallback(attributePath.mEndpointId, attributePath.mClusterId,
+                                                                 attributePath.mAttributeId, type, size, value);
+    }
+    else
+    {
+        // ChipLogProgress(NotSpecified, "callback nullptr");
+    }
+
+    return chip::Protocols::InteractionModel::Status::Success;
+};
+
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-    // ChipLogProgress(NotSpecified, "emberAfPostAttributeChangeCallback()");
+    // ChipLogProgress(NotSpecified, "MatterPostAttributeChangeCallback()");
     if (gPythonServerDelegate.mPostAttributeChangeCallback != nullptr)
     {
         // ChipLogProgress(NotSpecified, "callback %p", gPythonServerDelegate.mPostAttributeChangeCallback);
@@ -205,3 +241,38 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         // ChipLogProgress(NotSpecified, "callback nullptr");
     }
 };
+
+EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                   uint16_t maxReadLength)
+{
+    ChipLogProgress(NotSpecified, "emberAfExternalAttributeReadCallback()");
+    if (gPythonServerDelegate.mExternalAttributeReadCallback != nullptr)
+    {
+        // ChipLogProgress(NotSpecified, "callback %p", gPythonServerDelegate.mExternalAttributeReadCallback);
+        return gPythonServerDelegate.mExternalAttributeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+    }
+    else
+    {
+        // ChipLogProgress(NotSpecified, "callback nullptr");
+    }
+
+    return EmberAfStatus::EMBER_ZCL_STATUS_FAILURE;
+}
+
+EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+{
+    ChipLogProgress(NotSpecified, "emberAfExternalAttributeWriteCallback()");
+    if (gPythonServerDelegate.mExternalAttributeWriteCallback != nullptr)
+    {
+        // ChipLogProgress(NotSpecified, "callback %p", gPythonServerDelegate.mExternalAttributeWriteCallback);
+        return gPythonServerDelegate.mExternalAttributeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+    }
+    else
+    {
+        // ChipLogProgress(NotSpecified, "callback nullptr");
+    }
+
+    return EmberAfStatus::EMBER_ZCL_STATUS_FAILURE;
+}
