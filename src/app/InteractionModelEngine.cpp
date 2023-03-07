@@ -74,6 +74,8 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
 void InteractionModelEngine::Shutdown()
 {
+    mpExchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(ResumeSubscriptionsTimerCallback, this);
+
     CommandHandlerInterface * handlerIter = mCommandHandlerList;
 
     //
@@ -1615,10 +1617,8 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
     if (subscriptionsToResume)
     {
         ChipLogProgress(InteractionModel, "Resuming %d subscriptions in %u seconds", subscriptionsToResume, minInterval);
-        ReturnErrorOnFailure(mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(
-            System::Clock::Seconds16(minInterval),
-            [](System::Layer *, void * me) { static_cast<InteractionModelEngine *>(me)->ResumeSubscriptionsTimerCallback(); },
-            this));
+        ReturnErrorOnFailure(mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(System::Clock::Seconds16(minInterval),
+                                                                                           ResumeSubscriptionsTimerCallback, this));
     }
     else
     {
@@ -1629,36 +1629,39 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR InteractionModelEngine::ResumeSubscriptionsTimerCallback()
+void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * apSystemLayer, void * apAppState)
 {
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    VerifyOrReturn(apAppState != nullptr);
+    InteractionModelEngine * imEngine = static_cast<InteractionModelEngine *>(apAppState);
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
-    auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    auto * iterator = imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions();
     while (iterator->Next(subscriptionInfo))
     {
         auto requestedAttributePathCount = subscriptionInfo.mAttributePaths.AllocatedSize();
         auto requestedEventPathCount     = subscriptionInfo.mEventPaths.AllocatedSize();
-        if (!EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, requestedAttributePathCount, requestedEventPathCount))
+        if (!imEngine->EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, requestedAttributePathCount,
+                                                     requestedEventPathCount))
         {
             ChipLogProgress(InteractionModel, "no resource for Subscription resumption");
             iterator->Release();
-            return CHIP_ERROR_NO_MEMORY;
+            return;
         }
 
-        ReadHandler * handler = mReadHandlers.CreateObject(*this);
+        ReadHandler * handler = imEngine->mReadHandlers.CreateObject(*imEngine);
         if (handler == nullptr)
         {
             ChipLogProgress(InteractionModel, "no resource for ReadHandler creation");
             iterator->Release();
-            return CHIP_ERROR_NO_MEMORY;
+            return;
         }
 
-        handler->ResumeSubscription(*mpCASESessionMgr, subscriptionInfo);
+        handler->ResumeSubscription(*imEngine->mpCASESessionMgr, subscriptionInfo);
     }
     iterator->Release();
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
 
-    return CHIP_NO_ERROR;
+    return;
 }
 
 } // namespace app
