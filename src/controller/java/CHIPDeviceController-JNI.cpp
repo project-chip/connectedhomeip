@@ -1067,7 +1067,8 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
 }
 
 JNI_METHOD(jboolean, openPairingWindowWithPIN)
-(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator, jobject setupPinCode)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator,
+ jobject setupPinCode)
 {
     VerifyOrReturnValue(chip::CanCastTo<uint32_t>(iteration), false);
 
@@ -1084,9 +1085,10 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     Optional<uint32_t> pinCode = Optional<uint32_t>();
-    if (setupPinCode != nullptr) {
+    if (setupPinCode != nullptr)
+    {
         jlong jsetupPinCode = chip::JniReferences::GetInstance().LongToPrimitive(setupPinCode);
-        pinCode = MakeOptional(static_cast<uint32_t>(jsetupPinCode));
+        pinCode             = MakeOptional(static_cast<uint32_t>(jsetupPinCode));
     }
 
     chip::SetupPayload setupPayload;
@@ -1131,8 +1133,8 @@ JNI_METHOD(jboolean, openPairingWindowCallback)
 }
 
 JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
-(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator, jobject setupPinCode,
- jobject jcallback)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator,
+ jobject setupPinCode, jobject jcallback)
 {
     VerifyOrReturnValue(chip::CanCastTo<uint32_t>(iteration), false);
 
@@ -1149,9 +1151,10 @@ JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     Optional<uint32_t> pinCode = Optional<uint32_t>();
-    if (setupPinCode != nullptr) {
+    if (setupPinCode != nullptr)
+    {
         jlong jsetupPinCode = chip::JniReferences::GetInstance().LongToPrimitive(setupPinCode);
-        pinCode = MakeOptional(static_cast<uint32_t>(jsetupPinCode));
+        pinCode             = MakeOptional(static_cast<uint32_t>(jsetupPinCode));
     }
 
     chip::SetupPayload setupPayload;
