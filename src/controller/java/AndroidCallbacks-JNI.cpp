@@ -85,3 +85,17 @@ JNI_METHOD(void, WriteAttributesCallbackJni, deleteCallback)(JNIEnv * env, jobje
     VerifyOrReturn(writeAttributesCallback != nullptr, ChipLogError(Controller, "WriteAttributesCallback handle is nullptr"));
     delete writeAttributesCallback;
 }
+
+JNI_METHOD(jlong, InvokeCallbackJni, newCallback)
+(JNIEnv * env, jobject self, jobject invokeCallbackJava)
+{
+    InvokeCallback * invokeCallback = chip::Platform::New<InvokeCallback>(self, invokeCallbackJava);
+    return reinterpret_cast<jlong>(invokeCallback);
+}
+
+JNI_METHOD(void, InvokeCallbackJni, deleteCallback)(JNIEnv * env, jobject self, jlong callbackHandle)
+{
+    InvokeCallback * invokeCallback = reinterpret_cast<InvokeCallback *>(callbackHandle);
+    VerifyOrReturn(invokeCallback != nullptr, ChipLogError(Controller, "InvokeCallback handle is nullptr"));
+    delete invokeCallback;
+}

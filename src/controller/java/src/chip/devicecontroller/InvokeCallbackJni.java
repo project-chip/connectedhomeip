@@ -17,21 +17,21 @@
  */
 package chip.devicecontroller;
 
-/** JNI wrapper callback class for {@link WriteAttributesCallback}. */
-public final class WriteAttributesCallbackJni {
-  private final WriteAttributesCallback wrappedWriteAttributesCallback;
+/** JNI wrapper callback class for {@link InvokeCallback}. */
+public final class InvokeCallbackJni {
+  private final InvokeCallback wrappedInvokeCallback;
   private long callbackHandle;
 
-  public WriteAttributesCallbackJni(WriteAttributesCallback wrappedWriteAttributesCallback) {
-    this.wrappedWriteAttributesCallback = wrappedWriteAttributesCallback;
-    this.callbackHandle = newCallback(wrappedWriteAttributesCallback);
+  public InvokeCallbackJni(InvokeCallback wrappedInvokeCallback) {
+    this.wrappedInvokeCallback = wrappedInvokeCallback;
+    this.callbackHandle = newCallback(wrappedInvokeCallback);
   }
 
   long getCallbackHandle() {
     return callbackHandle;
   }
 
-  private native long newCallback(WriteAttributesCallback wrappedCallback);
+  private native long newCallback(InvokeCallback wrappedCallback);
 
   private native void deleteCallback(long callbackHandle);
 

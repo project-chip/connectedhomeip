@@ -23,6 +23,7 @@ import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCal
 import chip.devicecontroller.model.AttributeWriteRequest;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
+import chip.devicecontroller.model.InvokeElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -627,6 +628,32 @@ public class ChipDeviceController {
   }
 
   /**
+   * @brief Invoke command to target device
+   * @param InvokeCallback Callback when an invoke response has been received and processed for the
+   *     given invoke command.
+   * @param devicePtr connected device pointer
+   * @param invokeElement invoke command's path and arguments
+   * @param timedRequestTimeoutMs this is timed request if this value is larger than 0
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
+  public void invoke(
+      InvokeCallback callback,
+      long devicePtr,
+      InvokeElement invokeElement,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs) {
+    InvokeCallbackJni jniCallback = new InvokeCallbackJni(callback);
+    invoke(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        invokeElement,
+        timedRequestTimeoutMs,
+        imTimeoutMs);
+  }
+
+  /**
    * Converts a given X.509v3 certificate into a Matter certificate.
    *
    * @throws ChipDeviceControllerException if there was an issue during encoding (e.g. out of
@@ -678,6 +705,14 @@ public class ChipDeviceController {
       long callbackHandle,
       long devicePtr,
       List<AttributeWriteRequest> attributeList,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs);
+
+  private native void invoke(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      InvokeElement invokeElement,
       int timedRequestTimeoutMs,
       int imTimeoutMs);
 
