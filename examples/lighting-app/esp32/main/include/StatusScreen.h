@@ -16,13 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- * @file StatusScreen.h
- *
- * Screen which displays a QR code.
- *
- */
-
 #pragma once
 
 #include "ListScreen.h"
