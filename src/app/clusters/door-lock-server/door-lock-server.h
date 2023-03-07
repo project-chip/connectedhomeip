@@ -121,7 +121,16 @@ public:
     bool SetOneTouchLocking(chip::EndpointId endpointId, bool isEnabled);
     bool SetPrivacyModeButton(chip::EndpointId endpointId, bool isEnabled);
 
-    bool TrackWrongCodeEntry(chip::EndpointId endpointId);
+    /**
+     * @brief Handles a wrong code entry attempt for the endpoint. If the number of wrong entry attempts exceeds the max limit,
+     *        engage lockout. Otherwise increment the number of incorrect attempts by 1. This is handled automatically for
+     *        remote operations - lock and unlock . Any app that uses SetLockState or sends lock/unlock events via
+     * SendLockOperationEvent has to handle tracking of wrong retry attempts and needs to call this API to update the wrong entry
+     * attempt count or engage lockoutif retry limit is exceeded.
+     *
+     * @param endpointId
+     */
+    bool HandleWrongCodeEntry(chip::EndpointId endpointId);
 
     bool GetAutoRelockTime(chip::EndpointId endpointId, uint32_t & autoRelockTime);
     bool GetNumberOfUserSupported(chip::EndpointId endpointId, uint16_t & numberOfUsersSupported);
@@ -183,6 +192,16 @@ public:
     bool OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
     static void DoorLockOnAutoRelockCallback(chip::System::Layer *, void * callbackContext);
+    /**
+     * @brief Resets the wrong code entry attempts to 0 for the endpoint. This API is called from HandleRemoteLockOperation
+     *        to reset the count if we have an lock/unlock remote operation with valid credential automatically. An app that
+     *        calls SetLockState also will have this done automatically on successful unlock operation using valid credential.
+     *        Any app that sends unlock events via SendLockOperationEvent has to handle resetting the wrong retry count by
+     *        calling this API.
+     *
+     * @param endpointId
+     */
+    void ResetWrongCodeEntryAttempts(chip::EndpointId endpointId);
 
 private:
     chip::FabricIndex getFabricIndex(const chip::app::CommandHandler * commandObj);
