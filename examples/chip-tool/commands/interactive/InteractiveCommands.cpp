@@ -132,6 +132,10 @@ struct InteractiveServerResult
         case chip::Logging::kLogCategory_Detail:
             messageType = kCategoryDetail;
             break;
+        default:
+            // This should not happen.
+            chipDie();
+            break;
         }
 
         mLogs.push_back(InteractiveServerResultLog({ module, base64Message, messageType }));
