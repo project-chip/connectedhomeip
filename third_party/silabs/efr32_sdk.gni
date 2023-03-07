@@ -31,7 +31,7 @@ declare_args() {
   use_silabs_thread_lib = false
   enable_openthread_cli = true
 
-  kvs_max_entries = 75
+  kvs_max_entries = 255
 
   # Use Silabs factory data provider example.
   # Users can implement their own.

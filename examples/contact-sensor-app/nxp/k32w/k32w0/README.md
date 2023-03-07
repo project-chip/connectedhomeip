@@ -20,13 +20,13 @@ network.
     -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
 -   [Device UI](#device-ui)
 -   [Building](#building)
-    -   [Known issues](#known-issues)
+    -   [Known issues buiulding](#known-issues-building)
 -   [Manufacturing data](#manufacturing-data)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Pigweed Tokenizer](#pigweed-tokenizer)
     -   [Detokenizer script](#detokenizer-script)
     -   [Notes](#notes)
-    -   [Known issues](#known-issues-1)
+    -   [Known issues tokenizer](#known-issues-tokenizer)
 -   [NXP Ultrafast P256 ECC Library](#nxp-ultrafast-p256-ecc-library)
     -   [Building steps](#building-steps)
 -   [Tinycrypt ECC library](#tinycrypt-ecc-library)
@@ -36,10 +36,10 @@ network.
     -   [Writing the PSECT](#writing-the-psect)
     -   [Writing the application](#writing-the-application)
     -   [OTA Testing](#ota-testing)
-    -   [Known issues](#known-issues-2)
+    -   [Known issues ota](#known-issues-ota)
 -   [Low power](#low-power)
 
-    -   [Known issues](#known-issues-3)
+    -   [Known issues power](#known-issues-low-power)
 
 -   [Removing SSBL Upgrade region](#removing-ssbl-upgrade-region)
 
@@ -233,7 +233,7 @@ pycryptodome           3.9.8
 
 The resulting output file can be found in out/debug/chip-k32w0x-contact-example.
 
-## Known issues
+### Known issues building
 
 -   When using Secure element and cross-compiling on Linux, log messages from
     the Plug&Trust middleware stack may not echo to the console.
@@ -325,7 +325,7 @@ detokenizer script to see logs of a contact-sensor app:
 python3 ../../../../../examples/platform/nxp/k32w/k32w0/scripts/detokenizer.py serial -i /dev/ttyACM0 -d out/debug/chip-k32w0x-contact-example-database.bin -o device.txt
 ```
 
-### Known issues
+### Known issues tokenizer
 
 The building process will not update the token database if it already exists. In
 case that new strings are added and the database already exists in the output
@@ -531,7 +531,7 @@ Start the OTA process:
 user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
 ```
 
-## Known issues
+### Known issues ota
 
 -   SRP cache on the openthread border router needs to flushed each time a new
     commissioning process is attempted. For this, factory reset the device, then
@@ -595,7 +595,7 @@ below:
 Please note that that the Power Measurement Tool is not very accurate and
 professional tools must be used if exact power consumption needs to be known.
 
-## Known issues
+### Known issues low power
 
 -   Power Measurement Tool may not work correctly in MCUXpresso versions greater
     that 11.0.1.

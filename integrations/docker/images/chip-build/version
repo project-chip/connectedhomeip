@@ -1,1 +1,1 @@
-0.6.44 Version bump reason: [Java] update kotlin compiler version to 1.8.10
+0.6.49 Version bump reason: Fix systemd services run race in Tizen QEMU image

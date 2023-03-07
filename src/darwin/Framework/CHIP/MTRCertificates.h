@@ -177,7 +177,7 @@ NS_ASSUME_NONNULL_BEGIN
                                     issuerId:(nullable NSNumber *)issuerId
                                     fabricId:(nullable NSNumber *)fabricId
                                        error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_DEPRECATED("Please use createRootCertificate:issuerID:fabricID:error:", ios(16.1, 16.4), macos(13.0, 13.3),
+    MTR_DEPRECATED("Please use createRootCertificate:issuerID:fabricID:error:", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 + (nullable NSData *)generateIntermediateCertificate:(id<MTRKeypair>)rootKeypair
@@ -186,7 +186,7 @@ NS_ASSUME_NONNULL_BEGIN
                                             issuerId:(nullable NSNumber *)issuerId
                                             fabricId:(nullable NSNumber *)fabricId
                                                error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_DEPRECATED("Please use createIntermediateCertificate:rootCertificate:intermediatePublicKey:issuerID:fabricID:error:",
+    MTR_DEPRECATED("Please use createIntermediateCertificate:rootCertificate:intermediatePublicKey:issuerID:fabricID:error:",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 + (nullable NSData *)generateOperationalCertificate:(id<MTRKeypair>)signingKeypair
@@ -196,14 +196,14 @@ NS_ASSUME_NONNULL_BEGIN
                                              nodeId:(NSNumber *)nodeId
                               caseAuthenticatedTags:(NSArray<NSNumber *> * _Nullable)caseAuthenticatedTags
                                               error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_DEPRECATED(
+    MTR_DEPRECATED(
         "Plase use "
         "createOperationalCertificate:signingCertificate:operationalPublicKey:fabricID:nodeID:caseAuthenticatedTags:error:",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 + (nullable NSData *)generateCertificateSigningRequest:(id<MTRKeypair>)keypair
                                                  error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_DEPRECATED("Please use createCertificateSigningRequest:error:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+    MTR_DEPRECATED("Please use createCertificateSigningRequest:error:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
         tvos(16.1, 16.4));
 
 @end

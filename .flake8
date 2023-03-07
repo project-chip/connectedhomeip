@@ -8,7 +8,6 @@ exclude = third_party
           # temporarily scan only directories with fixed files
           # TODO: Remove the paths below when all bugs are fixed
           src/tools/chip-cert/*
-          src/test_driver/openiotsdk/*
           src/test_driver/mbed/*
           src/test_driver/linux-cirque/*
           build/chip/java/tests/*

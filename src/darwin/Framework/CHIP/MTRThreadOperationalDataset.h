@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -62,7 +62,7 @@ NS_ASSUME_NONNULL_BEGIN
  * The expected lengths of each of the NSData fields in the MTRThreadOperationalDataset
  */
 extern size_t const MTRSizeThreadNetworkName;
-extern size_t const MTRSizeThreadExtendedPanId API_DEPRECATED(
+extern size_t const MTRSizeThreadExtendedPanId MTR_DEPRECATED(
     "Please use MTRSizeThreadExtendedPANID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 extern size_t const MTRSizeThreadExtendedPANID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 extern size_t const MTRSizeThreadMasterKey;
@@ -109,7 +109,7 @@ extern size_t const MTRSizeThreadPANID API_AVAILABLE(ios(16.4), macos(13.3), wat
 
 @interface MTRThreadOperationalDataset (Deprecated)
 
-@property (nonatomic, readwrite) uint16_t channel API_DEPRECATED(
+@property (nonatomic, readwrite) uint16_t channel MTR_DEPRECATED(
     "Please use channelNumber", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (nullable instancetype)initWithNetworkName:(NSString *)networkName
@@ -118,7 +118,7 @@ extern size_t const MTRSizeThreadPANID API_AVAILABLE(ios(16.4), macos(13.3), wat
                                         PSKc:(NSData *)PSKc
                                      channel:(uint16_t)channel
                                        panID:(NSData *)panID
-    API_DEPRECATED("Please use initWithNetworkName:extendedPANID:masterKey:PSKc:channelNumber:panID", ios(16.1, 16.4),
+    MTR_DEPRECATED("Please use initWithNetworkName:extendedPANID:masterKey:PSKc:channelNumber:panID", ios(16.1, 16.4),
         macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end

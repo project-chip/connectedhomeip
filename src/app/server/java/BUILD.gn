@@ -43,6 +43,8 @@ static_library("jni") {
   ]
 
   public_configs = [ "${chip_root}/src:includes" ]
+
+  cflags = [ "-Wconversion" ]
 }
 
 android_library("java") {

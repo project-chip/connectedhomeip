@@ -103,13 +103,12 @@ app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
 #endif /* SL_WIFI */
 
-#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
+bool sIsProvisioned = false;
 
-bool sIsProvisioned      = false;
+#if !(defined(CHIP_DEVICE_CONFIG_ENABLE_SED) && CHIP_DEVICE_CONFIG_ENABLE_SED)
 bool sIsEnabled          = false;
 bool sIsAttached         = false;
 bool sHaveBLEConnections = false;
-
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
@@ -236,6 +235,9 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
         SILABS_LOG("Getting QR code failed!");
     }
 
+    PlatformMgr().AddEventHandler(OnPlatformEvent, 0);
+    sIsProvisioned = ConnectivityMgr().IsThreadProvisioned();
+
     return err;
 }
 
@@ -287,7 +289,7 @@ void BaseApplication::FunctionEventHandler(AppEvent * aEvent)
         StopStatusLEDTimer();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 
-        chip::Server::GetInstance().ScheduleFactoryReset();
+        ScheduleFactoryReset();
     }
 }
 
@@ -307,9 +309,8 @@ void BaseApplication::LightEventHandler()
         sIsAttached    = ConnectivityMgr().IsWiFiStationConnected();
 #endif /* SL_WIFI */
 #if CHIP_ENABLE_OPENTHREAD
-        sIsProvisioned = ConnectivityMgr().IsThreadProvisioned();
-        sIsEnabled     = ConnectivityMgr().IsThreadEnabled();
-        sIsAttached    = ConnectivityMgr().IsThreadAttached();
+        sIsEnabled  = ConnectivityMgr().IsThreadEnabled();
+        sIsAttached = ConnectivityMgr().IsThreadAttached();
 #endif /* CHIP_ENABLE_OPENTHREAD */
         sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
         PlatformMgr().UnlockChipStack();
@@ -427,7 +428,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
 #ifdef SL_WIFI
             if (!ConnectivityMgr().IsWiFiStationProvisioned())
 #else
-            if (!ConnectivityMgr().IsThreadProvisioned())
+            if (!sIsProvisioned)
 #endif /* !SL_WIFI */
             {
                 // Open Basic CommissioningWindow. Will start BLE advertisements
@@ -568,5 +569,21 @@ void BaseApplication::DispatchEvent(AppEvent * aEvent)
     else
     {
         SILABS_LOG("Event received with no handler. Dropping event.");
+    }
+}
+
+void BaseApplication::ScheduleFactoryReset()
+{
+    PlatformMgr().ScheduleWork([](intptr_t) {
+        PlatformMgr().HandleServerShuttingDown();
+        ConfigurationMgr().InitiateFactoryReset();
+    });
+}
+
+void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
+{
+    if (event->Type == DeviceEventType::kServiceProvisioningChange)
+    {
+        sIsProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
     }
 }

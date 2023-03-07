@@ -319,7 +319,7 @@ source_set("efr32-common") {
 
   # Attestation Credentials
   if (chip_build_platform_attestation_credentials_provider) {
-    deps += [ ":efr32-attestation-credentials" ]
+    public_deps += [ ":efr32-attestation-credentials" ]
   }
 
   # Factory Data Provider
