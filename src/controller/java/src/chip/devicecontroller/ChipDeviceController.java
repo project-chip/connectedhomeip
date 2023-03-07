@@ -106,6 +106,19 @@ public class ChipDeviceController {
         deviceControllerPtr, failSafeExpiryTimeoutSecs, deviceAttestationDelegate);
   }
 
+  /**
+   * Set the delegate of attestation trust store for device attestation.
+   *
+   * <p>It will replace the built-in attestation trust store, please make sure you have the required
+   * paa certificates before commissioning.
+   *
+   * @param attestationTrustStoreDelegate Delegate for attestation trust store
+   */
+  public void setAttestationTrustStoreDelegate(
+      AttestationTrustStoreDelegate attestationTrustStoreDelegate) {
+    setAttestationTrustStoreDelegate(deviceControllerPtr, attestationTrustStoreDelegate);
+  }
+
   public void pairDevice(
       BluetoothGatt bleServer,
       int connId,
@@ -662,6 +675,14 @@ public class ChipDeviceController {
   public native byte[] convertX509CertToMatterCert(byte[] x509Cert);
 
   /**
+   * Extract skid from paa cert.
+   *
+   * @param paaCert The product attestation authority (PAA) cert
+   * @return The subject key identifier (SKID)
+   */
+  public native byte[] extractSkidFromPaaCert(byte[] paaCert);
+
+  /**
    * Generates a new PASE verifier for the given setup PIN code.
    *
    * @param devicePtr a pointer to the device object for which to generate the PASE verifier
@@ -720,6 +741,9 @@ public class ChipDeviceController {
 
   private native void setDeviceAttestationDelegate(
       long deviceControllerPtr, int failSafeExpiryTimeoutSecs, DeviceAttestationDelegate delegate);
+
+  private native void setAttestationTrustStoreDelegate(
+      long deviceControllerPtr, AttestationTrustStoreDelegate delegate);
 
   private native void pairDevice(
       long deviceControllerPtr,
