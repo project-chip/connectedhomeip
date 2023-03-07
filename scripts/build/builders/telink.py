@@ -32,6 +32,7 @@ class TelinkApp(Enum):
     PUMP_CONTROLLER = auto()
     TEMPERATURE_MEASUREMENT = auto()
     THERMOSTAT = auto()
+    WINDOW_COVERING = auto()
 
     def ExampleName(self):
         if self == TelinkApp.ALL_CLUSTERS:
@@ -56,6 +57,8 @@ class TelinkApp(Enum):
             return 'temperature-measurement-app'
         elif self == TelinkApp.THERMOSTAT:
             return 'thermostat'
+        elif self == TelinkApp.WINDOW_COVERING:
+            return 'window-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -82,6 +85,8 @@ class TelinkApp(Enum):
             return 'chip-telink-temperature-measurement-example'
         elif self == TelinkApp.THERMOSTAT:
             return 'chip-telink-thermostat-example'
+        elif self == TelinkApp.WINDOW_COVERING:
+            return 'chip-telink-window-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 

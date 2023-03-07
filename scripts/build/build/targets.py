@@ -554,6 +554,7 @@ def BuildTelinkTarget():
         TargetPart('pump-controller', app=TelinkApp.PUMP_CONTROLLER),
         TargetPart('temperature-measurement', app=TelinkApp.TEMPERATURE_MEASUREMENT),
         TargetPart('thermostat', app=TelinkApp.THERMOSTAT),
+        TargetPart('window-covering', app=TelinkApp.WINDOW_COVERING),
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
