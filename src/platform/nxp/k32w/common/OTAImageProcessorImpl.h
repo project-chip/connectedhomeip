@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,15 +19,28 @@
 #pragma once
 
 #include <lib/core/OTAImageHeader.h>
+#include <map>
+#include <platform/nxp/k32w/common/OTATlvProcessor.h>
 #include <src/app/clusters/ota-requestor/OTADownloader.h>
 #include <src/include/platform/CHIPDeviceLayer.h>
 #include <src/include/platform/OTAImageProcessor.h>
+
+/*
+ * OTA hooks that can be overwritten by application.
+ * Default behavior is implemented as WEAK symbols in
+ * platform OtaHooks.cpp.
+ */
+extern "C" CHIP_ERROR OtaHookInit();
+extern "C" void OtaHookReset();
 
 namespace chip {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
 public:
+    CHIP_ERROR Init(OTADownloader * downloader);
+    void Clear();
+
     //////////// OTAImageProcessorInterface Implementation ///////////////
     CHIP_ERROR PrepareDownload() override;
     CHIP_ERROR Finalize() override;
@@ -36,18 +49,24 @@ public:
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
     bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override;
-    void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
-    void SetOTAImageFile(const char * imageFile) { mImageFile = imageFile; }
+
+    CHIP_ERROR ProcessHeader(ByteSpan & block);
+    CHIP_ERROR ProcessPayload(ByteSpan & block);
+    CHIP_ERROR SelectProcessor(ByteSpan & block);
+    CHIP_ERROR RegisterProcessor(uint32_t tag, OTATlvProcessor * processor);
+
+    static void FetchNextData(uint32_t context);
+    static OTAImageProcessorImpl & GetDefaultInstance();
 
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
     static void HandlePrepareDownload(intptr_t context);
-    CHIP_ERROR ProcessHeader(ByteSpan & block);
     static void HandleFinalize(intptr_t context);
     static void HandleApply(intptr_t context);
     static void HandleAbort(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
-    static void HandleBlockEraseComplete(uint32_t context);
+
+    void HandleStatus(CHIP_ERROR status);
 
     /**
      * Called to allocate memory for mBlock if necessary and set it to block
@@ -59,10 +78,12 @@ private:
      */
     CHIP_ERROR ReleaseBlock();
 
+    MutableByteSpan mBlock;
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
-    MutableByteSpan mBlock;
-    const char * mImageFile = nullptr;
+    OTATlvProcessor * mCurrentProcessor = nullptr;
+    OTADataAccumulator mAccumulator;
+    std::map<uint32_t, OTATlvProcessor *> mProcessorMap;
 };
 
 } // namespace chip

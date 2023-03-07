@@ -226,7 +226,7 @@ bool InteractiveServer::Command(const chip::app::ConcreteCommandPath & path)
 
     auto valueStr = JsonToString(value);
     gInteractiveServerResult.MaybeAddResult(valueStr.c_str());
-    LogErrorOnFailure(mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str()));
+    mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str());
     gInteractiveServerResult.Reset();
     return mIsReady;
 }
@@ -243,7 +243,7 @@ bool InteractiveServer::ReadAttribute(const chip::app::ConcreteAttributePath & p
 
     auto valueStr = JsonToString(value);
     gInteractiveServerResult.MaybeAddResult(valueStr.c_str());
-    LogErrorOnFailure(mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str()));
+    mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str());
     gInteractiveServerResult.Reset();
     return mIsReady;
 }
@@ -260,7 +260,7 @@ bool InteractiveServer::WriteAttribute(const chip::app::ConcreteAttributePath & 
 
     auto valueStr = JsonToString(value);
     gInteractiveServerResult.MaybeAddResult(valueStr.c_str());
-    LogErrorOnFailure(mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str()));
+    mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str());
     gInteractiveServerResult.Reset();
     return mIsReady;
 }
@@ -273,6 +273,6 @@ void InteractiveServer::CommissioningComplete()
     Json::Value value = Json::objectValue;
     auto valueStr     = JsonToString(value);
     gInteractiveServerResult.MaybeAddResult(valueStr.c_str());
-    LogErrorOnFailure(mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str()));
+    mWebSocketServer.Send(gInteractiveServerResult.AsJsonString().c_str());
     gInteractiveServerResult.Reset();
 }

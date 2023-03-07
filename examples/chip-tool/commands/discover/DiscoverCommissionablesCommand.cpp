@@ -30,8 +30,8 @@ void DiscoverCommissionablesCommandBase::OnDiscoveredDevice(const chip::Dnssd::D
     if (mDiscoverOnce.ValueOr(true))
     {
         mCommissioner->RegisterDeviceDiscoveryDelegate(nullptr);
-        mCommissioner->StopCommissionableDiscovery();
-        SetCommandExitStatus(CHIP_NO_ERROR);
+        auto err = mCommissioner->StopCommissionableDiscovery();
+        SetCommandExitStatus(err);
     }
 }
 

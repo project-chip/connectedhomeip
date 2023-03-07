@@ -154,7 +154,7 @@ def BuildEsp32Target():
 
     # boards
     target.AppendFixedTargets([
-        TargetPart('m5stack', board=Esp32Board.M5Stack).OnlyIfRe('-(all-clusters|ota-requestor)'),
+        TargetPart('m5stack', board=Esp32Board.M5Stack),
         TargetPart('c3devkit', board=Esp32Board.C3DevKit),
         TargetPart('devkitc', board=Esp32Board.DevKitC),
         TargetPart('qemu', board=Esp32Board.QEMU).OnlyIfRe('-tests'),
@@ -554,6 +554,7 @@ def BuildTelinkTarget():
         TargetPart('pump-controller', app=TelinkApp.PUMP_CONTROLLER),
         TargetPart('temperature-measurement', app=TelinkApp.TEMPERATURE_MEASUREMENT),
         TargetPart('thermostat', app=TelinkApp.THERMOSTAT),
+        TargetPart('window-covering', app=TelinkApp.WINDOW_COVERING),
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)

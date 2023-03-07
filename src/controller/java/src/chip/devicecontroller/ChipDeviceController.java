@@ -23,6 +23,7 @@ import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCal
 import chip.devicecontroller.model.AttributeWriteRequest;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
+import chip.devicecontroller.model.InvokeElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -103,6 +104,19 @@ public class ChipDeviceController {
       int failSafeExpiryTimeoutSecs, DeviceAttestationDelegate deviceAttestationDelegate) {
     setDeviceAttestationDelegate(
         deviceControllerPtr, failSafeExpiryTimeoutSecs, deviceAttestationDelegate);
+  }
+
+  /**
+   * Set the delegate of attestation trust store for device attestation.
+   *
+   * <p>It will replace the built-in attestation trust store, please make sure you have the required
+   * paa certificates before commissioning.
+   *
+   * @param attestationTrustStoreDelegate Delegate for attestation trust store
+   */
+  public void setAttestationTrustStoreDelegate(
+      AttestationTrustStoreDelegate attestationTrustStoreDelegate) {
+    setAttestationTrustStoreDelegate(deviceControllerPtr, attestationTrustStoreDelegate);
   }
 
   public void pairDevice(
@@ -627,12 +641,46 @@ public class ChipDeviceController {
   }
 
   /**
+   * @brief Invoke command to target device
+   * @param InvokeCallback Callback when an invoke response has been received and processed for the
+   *     given invoke command.
+   * @param devicePtr connected device pointer
+   * @param invokeElement invoke command's path and arguments
+   * @param timedRequestTimeoutMs this is timed request if this value is larger than 0
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
+  public void invoke(
+      InvokeCallback callback,
+      long devicePtr,
+      InvokeElement invokeElement,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs) {
+    InvokeCallbackJni jniCallback = new InvokeCallbackJni(callback);
+    invoke(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        invokeElement,
+        timedRequestTimeoutMs,
+        imTimeoutMs);
+  }
+
+  /**
    * Converts a given X.509v3 certificate into a Matter certificate.
    *
    * @throws ChipDeviceControllerException if there was an issue during encoding (e.g. out of
    *     memory, invalid certificate format)
    */
   public native byte[] convertX509CertToMatterCert(byte[] x509Cert);
+
+  /**
+   * Extract skid from paa cert.
+   *
+   * @param paaCert The product attestation authority (PAA) cert
+   * @return The subject key identifier (SKID)
+   */
+  public native byte[] extractSkidFromPaaCert(byte[] paaCert);
 
   /**
    * Generates a new PASE verifier for the given setup PIN code.
@@ -681,10 +729,21 @@ public class ChipDeviceController {
       int timedRequestTimeoutMs,
       int imTimeoutMs);
 
+  private native void invoke(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      InvokeElement invokeElement,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs);
+
   private native long newDeviceController(ControllerParams params);
 
   private native void setDeviceAttestationDelegate(
       long deviceControllerPtr, int failSafeExpiryTimeoutSecs, DeviceAttestationDelegate delegate);
+
+  private native void setAttestationTrustStoreDelegate(
+      long deviceControllerPtr, AttestationTrustStoreDelegate delegate);
 
   private native void pairDevice(
       long deviceControllerPtr,
