@@ -74,6 +74,19 @@ public:
         MOVE_MODE_DOWN = 0x03
     };
 
+    enum StepMode
+    {
+        STEP_MODE_STOP = 0x00,
+        STEP_MODE_UP   = 0x01,
+        STEP_MODE_DOWN = 0x03
+    };
+
+    enum ColorLoopDirection
+    {
+        DECREMENT_HUE = 0x00,
+        INCREMENT_HUE = 0x01,
+    };
+
     enum ColorMode
     {
         COLOR_MODE_HSV         = 0x00,
