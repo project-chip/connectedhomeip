@@ -8,15 +8,15 @@
     -   [Building and installing](#building-and-installing)
     -   [Accessory Matter device setup](#accessory-matter-device-setup)
     -   [Device commissioning for Android](#device-commissioning-for-android)
-    -   [Sending ZCL commands](#sending-zcl-commands)
+    -   [Sending ZCL commands](#sending-zcl-commands-android)
 -   [POSIX CLI CHIPTool](#posix-cli-chiptool)
     -   [Building](#building)
     -   [Device commissioning for CLI](#device-commissioning-for-cli)
-    -   [Sending ZCL commands](#sending-zcl-commands-1)
+    -   [Sending ZCL commands](#sending-zcl-commands-posix)
 -   [Python Device Controller](#python-device-controller)
     -   [Building and installing](#building-and-installing-1)
     -   [Device commissioning for Python Device Controller](#device-commissioning-for-python-device-controller)
-    -   [Sending ZCL commands](#sending-zcl-commands-2)
+    -   [Sending ZCL commands](#sending-zcl-commands-python)
         -   [ZCL commands details](#zcl-commands-details)
 
 <hr>
@@ -137,7 +137,7 @@ steps:
 -   After successful completion of the process, the application returns to the
     main screen.
 
-### Sending ZCL commands
+### Sending ZCL commands Android
 
 After the accessory device has been successfully commissioned to the network, it
 is possible to communicate with it using IP. Matter uses Zigbee Cluster Library
@@ -179,7 +179,7 @@ Example:
 
     $ chip-tool pairing ble-wifi node_id_to_assign network_ssid network_password 20202021 3840
 
-### Sending ZCL commands
+### Sending ZCL commands POSIX
 
 If the commissioning process was successful, it is possible to send a ZCL
 command to the device which initiate a certain action.
@@ -232,7 +232,7 @@ To run the auto commissioning process via BLE:
 
         chip-device-ctrl > connect -ble 3840 20202021 1234
 
-### Sending ZCL commands
+### Sending ZCL commands Python
 
 If the commissioning process was successful, it is possible to send a ZCL
 command to the device which initiates a certain action.

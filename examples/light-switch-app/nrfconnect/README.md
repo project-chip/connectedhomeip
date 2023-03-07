@@ -319,13 +319,13 @@ platform image.
 
     -   If pressed for less than 0.5 seconds, it changes the light state to the
         opposite one on the bound lighting device
-        ([lighting-app](../../lighting-app/nrfconnect/README.md))
+        [lighting-app](../../lighting-app/nrfconnect/README.md)
 
     -   If pressed for more than 0.5 seconds, it changes the brightness of the
         light on the bound lighting bulb device
-        ([lighting-app](../../lighting-app/nrfconnect/README.md)). The
-        brightness is changing from 0% to 100% with 1% increments every 300
-        milliseconds as long as **Button 2** is pressed.
+        [lighting-app](../../lighting-app/nrfconnect/README.md). The brightness
+        is changing from 0% to 100% with 1% increments every 300 milliseconds as
+        long as **Button 2** is pressed.
 
 -   On nRF7002 DK:
 
@@ -665,7 +665,7 @@ communicate with each other.
 
 To perform binding, you need a controller that can write the binding table to
 the light switch device and write proper ACL to the endpoint light bulb on the
-[Lighting Example application](../../lighting-app/nrfconnect/README.md)). For
+[Lighting Example application](../../lighting-app/nrfconnect/README.md). For
 example, you can use the
 [CHIP Tool for Windows or Linux](../../chip-tool/README.md) as the controller.
 The ACL should contain information about all clusters that can be called by the

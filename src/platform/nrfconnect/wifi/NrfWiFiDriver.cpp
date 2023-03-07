@@ -48,7 +48,7 @@ bool NrfWiFiDriver::WiFiNetworkIterator::Next(Network & item)
     }
 
     memcpy(item.networkID, mDriver->mStagingNetwork.ssid, mDriver->mStagingNetwork.ssidLen);
-    item.networkIDLen = mDriver->mStagingNetwork.ssidLen;
+    item.networkIDLen = static_cast<uint8_t>(mDriver->mStagingNetwork.ssidLen);
     item.connected    = false;
 
     mExhausted = true;

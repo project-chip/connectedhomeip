@@ -1010,6 +1010,16 @@
 #define CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH (0x10000)
 #endif
 
+/**
+ * @def CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
+ *
+ * @brief
+ *   By default, don't record UTC timestamps.
+ */
+#ifndef CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 0
+#endif
+
 // -------------------- Software Update Manager Configuration --------------------
 
 /**

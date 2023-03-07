@@ -138,10 +138,31 @@ if (chip_link_tests) {
   }
 }
 
+kotlin_library("tlv") {
+  output_name = "libCHIPTlv.jar"
+
+  deps = [ "${chip_root}/third_party/java_deps:protobuf-java" ]
+
+  sources = [
+    "src/chip/tlv/Element.kt",
+    "src/chip/tlv/TlvReader.kt",
+    "src/chip/tlv/TlvWriter.kt",
+    "src/chip/tlv/tags.kt",
+    "src/chip/tlv/types.kt",
+    "src/chip/tlv/utils.kt",
+    "src/chip/tlv/values.kt",
+  ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
 android_library("java") {
   output_name = "CHIPController.jar"
 
-  deps = [ "${chip_root}/third_party/java_deps:annotation" ]
+  deps = [
+    ":tlv",
+    "${chip_root}/third_party/java_deps:annotation",
+  ]
 
   data_deps = [ ":jni" ]
 
@@ -175,13 +196,17 @@ android_library("java") {
     "src/chip/devicecontroller/ResubscriptionAttemptCallback.java",
     "src/chip/devicecontroller/SubscriptionEstablishedCallback.java",
     "src/chip/devicecontroller/UnpairDeviceCallback.java",
+    "src/chip/devicecontroller/WriteAttributesCallback.java",
+    "src/chip/devicecontroller/WriteAttributesCallbackJni.java",
     "src/chip/devicecontroller/model/AttributeState.java",
+    "src/chip/devicecontroller/model/AttributeWriteRequest.java",
     "src/chip/devicecontroller/model/ChipAttributePath.java",
     "src/chip/devicecontroller/model/ChipEventPath.java",
     "src/chip/devicecontroller/model/ChipPathId.java",
     "src/chip/devicecontroller/model/ClusterState.java",
     "src/chip/devicecontroller/model/EndpointState.java",
     "src/chip/devicecontroller/model/EventState.java",
+    "src/chip/devicecontroller/model/InvokeElement.java",
     "src/chip/devicecontroller/model/NodeState.java",
     "zap-generated/chip/devicecontroller/ChipClusters.java",
     "zap-generated/chip/devicecontroller/ChipEventStructs.java",

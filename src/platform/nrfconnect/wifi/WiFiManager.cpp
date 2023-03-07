@@ -252,8 +252,8 @@ CHIP_ERROR WiFiManager::GetWiFiInfo(WiFiInfo & info) const
         info.mBssId        = ByteSpan(mac_string_buf, sizeof(mac_string_buf));
         info.mSecurityType = static_cast<uint8_t>(status.security);
         info.mWiFiVersion  = static_cast<uint8_t>(status.link_mode);
-        info.mRssi         = status.rssi;
-        info.mChannel      = status.channel;
+        info.mRssi         = static_cast<int8_t>(status.rssi);
+        info.mChannel      = static_cast<uint16_t>(status.channel);
         info.mSsidLen      = status.ssid_len;
         memcpy(info.mSsid, status.ssid, status.ssid_len);
 
@@ -291,12 +291,12 @@ void WiFiManager::ScanResultHandler(uint8_t * data)
         if (scanResult->rssi > Instance().mWiFiParams.mRssi)
         {
             Instance().ClearStationProvisioningData();
-            Instance().mWiFiParams.mParams.ssid_length = Instance().mWantedNetwork.ssidLen;
+            Instance().mWiFiParams.mParams.ssid_length = static_cast<uint8_t>(Instance().mWantedNetwork.ssidLen);
             Instance().mWiFiParams.mParams.ssid        = Instance().mWantedNetwork.ssid;
             // Fallback to the WIFI_SECURITY_TYPE_PSK if the security is unknown
             Instance().mWiFiParams.mParams.security =
                 scanResult->security <= WIFI_SECURITY_TYPE_MAX ? scanResult->security : WIFI_SECURITY_TYPE_PSK;
-            Instance().mWiFiParams.mParams.psk_length = Instance().mWantedNetwork.passLen;
+            Instance().mWiFiParams.mParams.psk_length = static_cast<uint8_t>(Instance().mWantedNetwork.passLen);
 
             // If the security is none, WiFi driver expects the psk to be nullptr
             if (Instance().mWiFiParams.mParams.security == WIFI_SECURITY_TYPE_NONE)

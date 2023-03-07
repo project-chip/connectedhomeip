@@ -190,8 +190,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
 
-        ReturnErrorOnFailure(
-            DataModel::Encode(*(attributeData.GetWriter()), TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), value));
+        ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()), TLV::ContextTag(AttributeDataIB::Tag::kData), value));
         ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB().GetError());
         return attributeReport.EndOfAttributeReportIB().GetError();
     }

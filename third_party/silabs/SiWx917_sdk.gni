@@ -105,9 +105,7 @@ template("efr32_sdk") {
       "HARD_FAULT_LOG_ENABLE",
       "CORTEXM3_EFM32_MICRO",
       "SILABS_LOG_ENABLED=1",
-
-      #Matter required at least 40960 but SiWx917 SoC requires an extra 20k to resolve nvm3_open() error, Need to be checked.
-      "NVM3_DEFAULT_NVM_SIZE=73728",
+      "NVM3_DEFAULT_NVM_SIZE=40960",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
       "EFR32_OPENTHREAD_API",
