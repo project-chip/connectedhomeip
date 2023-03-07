@@ -126,6 +126,7 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
         specific_apps = {
             Esp32App.ALL_CLUSTERS,
             Esp32App.ALL_CLUSTERS_MINIMAL,
+            Esp32App.LIGHT,
             Esp32App.OTA_REQUESTOR,
         }
         if app in specific_apps:
