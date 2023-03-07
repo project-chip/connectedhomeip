@@ -111,7 +111,6 @@ public class NsdDiscoveryListener implements NsdManager.DiscoveryListener {
     failureCallback.handle(
         new MatterError(
             3, "NsdDiscoveryListener Discovery failed to start: Nsd Error code:" + errorCode));
-    nsdManager.stopServiceDiscovery(this);
   }
 
   @Override
@@ -123,6 +122,5 @@ public class NsdDiscoveryListener implements NsdManager.DiscoveryListener {
     failureCallback.handle(
         new MatterError(
             3, "NsdDiscoveryListener Discovery failed to stop: Nsd Error code:" + errorCode));
-    nsdManager.stopServiceDiscovery(this);
   }
 }
