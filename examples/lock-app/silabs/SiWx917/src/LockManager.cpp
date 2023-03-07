@@ -134,8 +134,9 @@ bool LockManager::ReadConfigValues()
     SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
                                      sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
 
-    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
-                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * ArraySize(mLockCredentials), outLen);
+    SilabsConfig::ReadConfigValueBin(
+        SilabsConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
+        sizeof(EmberAfPluginDoorLockCredentialInfo) * LockParams.numberOfCredentialsPerUser * kNumCredentialTypes, outLen);
 
     SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames),
                                      sizeof(mUserNames), outLen);
@@ -378,12 +379,9 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
 
     for (size_t i = 0; i < totalCredentials; ++i)
     {
-        mCredentials[userIndex][i] = credentials[i];
-        // TODO: Why are we modifying the passed-in credentials?
-        // https://github.com/project-chip/connectedhomeip/issues/25082
-        // For now, preserve pre-existing behavior, which set credentialType to 1.
-        mCredentials[userIndex][i].credentialType  = CredentialTypeEnum::kPin;
-        mCredentials[userIndex][i].credentialIndex = i + 1;
+        mCredentials[userIndex][i]                 = credentials[i];
+        mCredentials[userIndex][i].credentialType  = credentials[i].credentialType;
+        mCredentials[userIndex][i].credentialIndex = credentials[i].credentialIndex;
     }
 
     userInStorage.credentials = chip::Span<const CredentialStruct>(mCredentials[userIndex], totalCredentials);
@@ -420,7 +418,7 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     ChipLogProgress(Zcl, "Lock App: LockManager::GetCredential [credentialType=%u], credentialIndex=%d",
                     to_underlying(credentialType), credentialIndex);
 
-    const auto & credentialInStorage = mLockCredentials[credentialIndex];
+    const auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex];
 
     credential.status = credentialInStorage.status;
     ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, credentialIndex);
@@ -465,19 +463,21 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                     "[credentialStatus=%u,credentialType=%u,credentialDataSize=%u,creator=%d,modifier=%d]",
                     to_underlying(credentialStatus), to_underlying(credentialType), credentialData.size(), creator, modifier);
 
-    auto & credentialInStorage = mLockCredentials[credentialIndex];
+    auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex];
 
     credentialInStorage.status         = credentialStatus;
     credentialInStorage.credentialType = credentialType;
     credentialInStorage.createdBy      = creator;
     credentialInStorage.lastModifiedBy = modifier;
 
-    memcpy(mCredentialData[credentialIndex], credentialData.data(), credentialData.size());
-    credentialInStorage.credentialData = chip::ByteSpan{ mCredentialData[credentialIndex], credentialData.size() };
+    memcpy(mCredentialData[to_underlying(credentialType)][credentialIndex], credentialData.data(), credentialData.size());
+    credentialInStorage.credentialData =
+        chip::ByteSpan{ mCredentialData[to_underlying(credentialType)][credentialIndex], credentialData.size() };
 
     // Save credential information in NVM flash
     SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
-                                      sizeof(EmberAfPluginDoorLockCredentialInfo) * LockParams.numberOfCredentialsPerUser);
+                                      sizeof(EmberAfPluginDoorLockCredentialInfo) * LockParams.numberOfCredentialsPerUser *
+                                          kNumCredentialTypes);
 
     SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
                                       sizeof(mCredentialData));
@@ -682,15 +682,15 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
     }
 
     // Check the PIN code
-    for (uint8_t i = 0; i < kMaxCredentials; i++)
+    for (uint8_t i = 0; i < kMaxCredentialsPerUser; i++)
     {
-        if (mLockCredentials[i].credentialType != CredentialTypeEnum::kPin ||
-            mLockCredentials[i].status == DlCredentialStatus::kAvailable)
+
+        if (mLockCredentials[to_underlying(CredentialTypeEnum::kPin)][i].status == DlCredentialStatus::kAvailable)
         {
             continue;
         }
 
-        if (mLockCredentials[i].credentialData.data_equal(pin.Value()))
+        if (mLockCredentials[to_underlying(CredentialTypeEnum::kPin)][i].credentialData.data_equal(pin.Value()))
         {
             ChipLogDetail(Zcl,
                           "Lock App: specified PIN code was found in the database, setting lock state to \"%s\" [endpointId=%d]",

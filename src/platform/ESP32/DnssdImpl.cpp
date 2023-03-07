@@ -170,6 +170,13 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
         espError = mdns_service_txt_set(service->mType, GetProtocolString(service->mProtocol), items,
                                         static_cast<uint8_t>(service->mTextEntrySize));
     }
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+    for (size_t i = 0; i < service->mSubTypeSize; i++)
+    {
+        mdns_service_subtype_add_for_host(service->mName, service->mType, GetProtocolString(service->mProtocol), service->mHostName,
+                                          service->mSubTypes[i]);
+    }
+#endif
     VerifyOrExit(espError == ESP_OK, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -432,7 +439,11 @@ void MdnsQueryDone(intptr_t context)
     }
     mdns_search_once_t * searchHandle = reinterpret_cast<mdns_search_once_t *>(context);
     GenericContext * ctx              = FindMdnsQuery(searchHandle);
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
+    if (mdns_query_async_get_results(searchHandle, kTimeoutMilli, &(ctx->mResult), NULL))
+#else
     if (mdns_query_async_get_results(searchHandle, kTimeoutMilli, &(ctx->mResult)))
+#endif // ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
     {
         if (ctx->mContextType == ContextType::Browse)
         {
