@@ -1867,7 +1867,7 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
     else
     {
         colorYTransitionState->finalValue = MIN_CIE_XY_VALUE;
-        unsignedRate                      = (uint16_t) (rateY * -1);
+        unsignedRate                      = (uint16_t)(rateY * -1);
     }
     transitionTimeY                       = computeTransitionTimeFromStateAndRate(colorYTransitionState, unsignedRate);
     colorYTransitionState->stepsRemaining = transitionTimeY;
