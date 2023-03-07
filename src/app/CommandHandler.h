@@ -182,6 +182,13 @@ public:
     CHIP_ERROR PrepareStatus(const ConcreteCommandPath & aCommandPath);
     CHIP_ERROR FinishStatus();
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
+
+    /**
+     * GetAccessingFabricIndex() may only be called during synchronous command
+     * processing.  Anything that runs async (while holding a
+     * CommandHandler::Handle or equivalent) must not call this method, because
+     * it will not work right if the session we're using was evicted.
+     */
     FabricIndex GetAccessingFabricIndex() const;
 
     /**
@@ -272,7 +279,17 @@ public:
         msgContext->FlushAcks();
     }
 
-    Access::SubjectDescriptor GetSubjectDescriptor() const { return mExchangeCtx->GetSessionHandle()->GetSubjectDescriptor(); }
+    /**
+     * GetSubjectDescriptor() may only be called during synchronous command
+     * processing.  Anything that runs async (while holding a
+     * CommandHandler::Handle or equivalent) must not call this method, because
+     * it might not work right if the session we're using was evicted.
+     */
+    Access::SubjectDescriptor GetSubjectDescriptor() const
+    {
+        VerifyOrDie(!mGoneAsync);
+        return mExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
+    }
 
 private:
     friend class TestCommandInteraction;
@@ -394,6 +411,10 @@ private:
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     TLV::TLVWriter mBackupWriter;
     bool mBufferAllocated = false;
+    // If mGoneAsync is true, we have finished out initial processing of the
+    // incoming invoke.  After this point, our session could go away at any
+    // time.
+    bool mGoneAsync = false;
 };
 
 } // namespace app
