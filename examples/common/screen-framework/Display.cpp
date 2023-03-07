@@ -54,7 +54,7 @@
 // The M5Stack's backlight is on Channel 7
 #define BACKLIGHT_CHANNEL LEDC_CHANNEL_7
 
-extern const char * TAG;
+static const char * TAG = "Display";
 
 uint16_t DisplayHeight = 0;
 uint16_t DisplayWidth  = 0;

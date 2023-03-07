@@ -29,6 +29,12 @@ set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/QRCode"
 )
 
+if(${IDF_TARGET} STREQUAL "esp32")
+    list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/m5stack-tft/repo/components/tft"
+                                     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/m5stack-tft/repo/components/spidriver"
+                                     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/screen-framework")
+endif()
+
 project(chip-lighting-app)
 
 # C++17 is required for RPC build.

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,38 +18,14 @@
 
 #pragma once
 
-struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
+#include "BluetoothWidget.h"
+#include "LEDWidget.h"
+#include "WiFiWidget.h"
+#include "transport/raw/MessageHeader.h"
 
-struct AppEvent
-{
-    enum AppEventTypes
-    {
-        kEventType_Button = 0,
-        kEventType_Timer,
-        kEventType_Light,
-        kEventType_Install,
-    };
-
-    uint16_t Type;
-
-    union
-    {
-        struct
-        {
-            uint8_t Action;
-            uint8_t PinNo;
-        } ButtonEvent;
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-        struct
-        {
-            uint8_t Action;
-            int32_t Actor;
-        } LightEvent;
-    };
-
-    EventHandler mHandler;
-};
+extern LEDWidget statusLED1;
+extern LEDWidget statusLED2;
+extern BluetoothWidget bluetoothLED;
+extern WiFiWidget wifiLED;
+extern const chip::NodeId kLocalNodeId;
+extern WiFiWidget pairingWindowLED;

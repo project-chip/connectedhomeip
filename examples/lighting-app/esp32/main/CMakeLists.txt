@@ -86,7 +86,7 @@ set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
 endif (CONFIG_ENABLE_PW_RPC)
 
 if ("${CONFIG_DEVICE_TYPE_M5STACK}" STREQUAL "y")
-    set(PRIV_REQUIRES_LIST ${PRI_REQUIRES_LIST} tft screen-framework)
+    list(APPEND PRIV_REQUIRES_LIST tft screen-framework)
 endif()
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}

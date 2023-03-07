@@ -16,40 +16,10 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "Globals.h"
 
-struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
-
-struct AppEvent
-{
-    enum AppEventTypes
-    {
-        kEventType_Button = 0,
-        kEventType_Timer,
-        kEventType_Light,
-        kEventType_Install,
-    };
-
-    uint16_t Type;
-
-    union
-    {
-        struct
-        {
-            uint8_t Action;
-            uint8_t PinNo;
-        } ButtonEvent;
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-        struct
-        {
-            uint8_t Action;
-            int32_t Actor;
-        } LightEvent;
-    };
-
-    EventHandler mHandler;
-};
+LEDWidget statusLED1;
+LEDWidget statusLED2;
+BluetoothWidget bluetoothLED;
+WiFiWidget wifiLED;
+WiFiWidget pairingWindowLED;

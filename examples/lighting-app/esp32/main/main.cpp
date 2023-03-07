@@ -45,6 +45,8 @@
 #include "Rpc.h"
 #endif
 
+#include "DeviceWithDisplay.h"
+
 #if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 #include <platform/ESP32/ESP32DeviceInfoProvider.h>
 #else
@@ -76,8 +78,9 @@ static void InitServer(intptr_t context)
 {
 
 #if CONFIG_DEVICE_TYPE_M5STACK
-    #error TODO
+    SetupPretendDevices();
 #endif
+
     // Print QR Code URL
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
