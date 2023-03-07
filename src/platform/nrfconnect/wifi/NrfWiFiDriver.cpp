@@ -147,6 +147,10 @@ CHIP_ERROR NrfWiFiDriver::CommitConfiguration()
 
 CHIP_ERROR NrfWiFiDriver::RevertConfiguration()
 {
+    // Abort Connection Recovery if it is in progress during reverting configuration.
+    // This is needed to stop recovery process after failsafe timer expiring.
+    WiFiManager::Instance().AbortConnectionRecovery();
+
     LoadFromStorage();
 
     if (WiFiManager::StationStatus::CONNECTING <= WiFiManager::Instance().GetStationStatus())
@@ -222,12 +226,13 @@ void NrfWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
                                               [] { Instance().OnNetworkStatusChanged(Status::kUnknownError); },
                                               System::Clock::Seconds32{ kWiFiConnectNetworkTimeoutSeconds } };
 
+    VerifyOrExit(mpConnectCallback == nullptr, status = Status::kUnknownError);
+    mpConnectCallback = callback;
+
     VerifyOrExit(WiFiManager::StationStatus::CONNECTING != WiFiManager::Instance().GetStationStatus(),
                  status = Status::kOtherConnectionFailure);
     VerifyOrExit(networkId.data_equal(mStagingNetwork.GetSsidSpan()), status = Status::kNetworkIDNotFound);
-    VerifyOrExit(mpConnectCallback == nullptr, status = Status::kUnknownError);
 
-    mpConnectCallback = callback;
     WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling);
 
 exit:
