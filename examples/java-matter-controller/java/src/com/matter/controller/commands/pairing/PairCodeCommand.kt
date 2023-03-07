@@ -21,6 +21,6 @@ import chip.devicecontroller.ChipDeviceController
 import com.matter.controller.commands.common.CredentialsIssuer
 
 class PairCodeCommand(controller: ChipDeviceController, credsIssue: CredentialsIssuer?) :
-  PairingCommand(controller, "code", PairingModeType.CODE, PairingNetworkType.NONE, credsIssue) {
+  PairingCommand(controller, "code", credsIssue, PairingModeType.CODE, PairingNetworkType.NONE) {
   override fun runCommand() {}
 }

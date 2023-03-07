@@ -19,65 +19,60 @@ package com.matter.controller.commands.pairing
 
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback
-import chip.devicecontroller.WriteAttributesCallback
-import chip.devicecontroller.model.AttributeWriteRequest
-import chip.devicecontroller.model.ChipAttributePath
+import chip.devicecontroller.InvokeCallback
+import chip.devicecontroller.model.InvokeElement
 import com.matter.controller.commands.common.CredentialsIssuer
 import java.util.logging.Level
 import java.util.logging.Logger
-import javax.annotation.Nullable
 
-class PairOnNetworkLongImWriteCommand(
+class PairOnNetworkLongImInvokeCommand(
   controller: ChipDeviceController, credsIssue: CredentialsIssuer?
 ) : PairingCommand(
   controller,
-  "onnetwork-long-im-write",
+  "onnetwork-long-im-invoke",
   credsIssue,
   PairingModeType.ON_NETWORK,
   PairingNetworkType.NONE,
   DiscoveryFilterType.LONG_DISCRIMINATOR
 ) {
   private var devicePointer: Long = 0
+  private fun setDevicePointer(devicePointer: Long) {
+    this.devicePointer = devicePointer
+  }
 
-  private inner class InternalWriteAttributesCallback : WriteAttributesCallback {
-    override fun onError(attributePath: ChipAttributePath?, e: Exception) {
-      logger.log(Level.INFO, "Write receive onError on ")
-      if (attributePath != null) {
-        logger.log(Level.INFO, attributePath.toString())
-      }
+  private inner class InternalInvokeCallback : InvokeCallback {
+    override fun onError(e: Exception) {
+      logger.log(Level.INFO, "Invoke receive onError" + e.message)
       setFailure("write failure")
     }
 
-    override fun onResponse(attributePath: ChipAttributePath?) {
-      logger.log(Level.INFO, "Write receve OnResponse on ")
-      if (attributePath != null) {
-        logger.log(Level.INFO, attributePath.toString())
+    override fun onResponse(element: InvokeElement?, successCode: Long) {
+      logger.log(Level.INFO, "Invoke receive OnResponse on ")
+      if (element != null) {
+        logger.log(Level.INFO, element.toString())
       }
+      logger.log(Level.INFO, "success code is$successCode")
       setSuccess()
     }
   }
 
   private inner class InternalGetConnectedDeviceCallback : GetConnectedDeviceCallback {
     override fun onDeviceConnected(devicePointer: Long) {
-      this@PairOnNetworkLongImWriteCommand.devicePointer = devicePointer
+      setDevicePointer(devicePointer)
       logger.log(Level.INFO, "onDeviceConnected")
     }
 
-    override fun onConnectionFailure(nodeId: Long, error: Exception?) {
+    override fun onConnectionFailure(nodeId: Long, error: Exception) {
       logger.log(Level.INFO, "onConnectionFailure")
     }
   }
 
   override fun runCommand() {
-    // boolean true for tlv
-    val booleanTLV = byteArrayOf(0x09)
-    val attributeList = listOf(
-      AttributeWriteRequest.newInstance(
-        /* endpointId= */ 0,
-        CLUSTER_ID_BASIC,
-        ATTR_ID_LOCAL_CONFIG_DISABLED,
-        booleanTLV,
-      )
+    // tlv structure with tag 0, unsigned integer 1 inside, {0: 1}
+    val intTLV = byteArrayOf(0x15, 0x24, 0x00, 0x01, 0x18)
+
+    val element: InvokeElement = InvokeElement.newInstance( /* endpointId= */
+      0L, CLUSTER_ID_IDENTIFY, IDENTIFY_COMMAND, intTLV, null
     )
 
     currentCommissioner()
@@ -94,18 +89,17 @@ class PairOnNetworkLongImWriteCommand(
     currentCommissioner()
       .getConnectedDevicePointer(getNodeId(), InternalGetConnectedDeviceCallback())
     clear()
-    currentCommissioner()
-      .write(InternalWriteAttributesCallback(), devicePointer, attributeList, 0, 0)
+    currentCommissioner().invoke(InternalInvokeCallback(), devicePointer, element, 0, 0)
     waitCompleteMs(getTimeoutMillis())
   }
 
   companion object {
     private val logger = Logger.getLogger(
-      PairOnNetworkLongImWriteCommand::class.java.name
+      PairOnNetworkLongImInvokeCommand::class.java.name
     )
 
     private const val MATTER_PORT = 5540
-    private const val CLUSTER_ID_BASIC = 0x0028L
-    private const val ATTR_ID_LOCAL_CONFIG_DISABLED = 16L
+    private const val CLUSTER_ID_IDENTIFY = 0x0003L
+    private const val IDENTIFY_COMMAND = 0L
   }
 }

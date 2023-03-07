@@ -25,9 +25,9 @@ class PairAlreadyDiscoveredCommand(
 ) : PairingCommand(
   controller,
   "already-discovered",
+  credsIssue,
   PairingModeType.ALREADY_DISCOVERED,
-  PairingNetworkType.NONE,
-  credsIssue
+  PairingNetworkType.NONE
 ) {
   override fun runCommand() {
     currentCommissioner()

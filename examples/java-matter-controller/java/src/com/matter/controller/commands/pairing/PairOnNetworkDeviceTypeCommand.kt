@@ -25,9 +25,9 @@ class PairOnNetworkDeviceTypeCommand(
 ) : PairingCommand(
   controller,
   "onnetwork-device-type",
+  credsIssue,
   PairingModeType.ON_NETWORK,
   PairingNetworkType.NONE,
-  credsIssue,
   DiscoveryFilterType.DEVICE_TYPE
 ) {
   override fun runCommand() {}

@@ -25,12 +25,10 @@ import java.util.logging.Logger
 class PairAddressPaseCommand(controller: ChipDeviceController, credsIssue: CredentialsIssuer?) : PairingCommand(
   controller,
   "address-paseonly",
+  credsIssue,
   PairingModeType.ADDRESS_PASE_ONLY,
-  PairingNetworkType.NONE,
-  credsIssue
+  PairingNetworkType.NONE
 ) {
-  private val logger = Logger.getLogger(PairAddressPaseCommand::class.java.name)
-
   override fun onPairingComplete(errorCode: Int) {
     logger.log(Level.INFO, "onPairingComplete with error code: $errorCode")
     if (errorCode == 0) {
@@ -50,5 +48,9 @@ class PairAddressPaseCommand(controller: ChipDeviceController, credsIssue: Crede
       )
     currentCommissioner().setCompletionListener(this)
     waitCompleteMs(getTimeoutMillis())
+  }
+
+  companion object {
+    private val logger = Logger.getLogger(PairAddressPaseCommand::class.java.name)
   }
 }

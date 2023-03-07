@@ -25,9 +25,9 @@ class PairOnNetworkInstanceNameCommand(
 ) : PairingCommand(
   controller,
   "onnetwork-instance-name",
+  credsIssue,
   PairingModeType.ON_NETWORK,
   PairingNetworkType.NONE,
-  credsIssue,
   DiscoveryFilterType.INSTANCE_NAME
 ) {
   override fun runCommand() {}

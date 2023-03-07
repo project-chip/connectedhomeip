@@ -25,9 +25,9 @@ class PairOnNetworkCommissioningModeCommand(
 ) : PairingCommand(
   controller,
   "onnetwork-commissioning-mode",
+  credsIssue,
   PairingModeType.ON_NETWORK,
   PairingNetworkType.NONE,
-  credsIssue,
   DiscoveryFilterType.COMMISSIONING_MODE
 ) {
   override fun runCommand() {}

@@ -23,9 +23,9 @@ import com.matter.controller.commands.common.CredentialsIssuer
 class PairOnNetworkVendorCommand(controller: ChipDeviceController, credsIssue: CredentialsIssuer?) : PairingCommand(
   controller,
   "onnetwork-vendor",
+  credsIssue,
   PairingModeType.ON_NETWORK,
   PairingNetworkType.NONE,
-  credsIssue,
   DiscoveryFilterType.VENDOR_ID
 ) {
   override fun runCommand() {}

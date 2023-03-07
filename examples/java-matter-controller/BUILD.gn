@@ -36,7 +36,6 @@ java_library("java") {
     "java/src/com/matter/controller/commands/common/IPAddress.java",
     "java/src/com/matter/controller/commands/common/MatterCommand.java",
     "java/src/com/matter/controller/commands/common/RealResult.java",
-    "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImInvokeCommand.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
@@ -69,6 +68,7 @@ kotlin_binary("java-matter-controller") {
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkFabricCommand.kt",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkInstanceNameCommand.kt",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImInvokeCommand.kt",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImWriteCommand.kt",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkShortCommand.kt",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkVendorCommand.kt",

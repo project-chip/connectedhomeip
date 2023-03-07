@@ -32,58 +32,40 @@ import java.util.logging.Logger
 abstract class PairingCommand(
   controller: ChipDeviceController,
   commandName: String?,
-  mode: PairingModeType,
-  network: PairingNetworkType,
   credsIssuer: CredentialsIssuer?,
-  filter: DiscoveryFilterType
+  private val pairingMode: PairingModeType = PairingModeType.NONE,
+  private val networkType: PairingNetworkType = PairingNetworkType.NONE,
+  private val filterType: DiscoveryFilterType = DiscoveryFilterType.NONE
 ) : MatterCommand(controller, commandName, credsIssuer), ChipDeviceController.CompletionListener {
-  private val logger = Logger.getLogger(PairingCommand::class.java.name)
-  private var pairingMode: PairingModeType = PairingModeType.NONE
-  private var networkType: PairingNetworkType = PairingNetworkType.NONE
-  private var filterType = DiscoveryFilterType.NONE
-  private var remoteAddr: IPAddress? = null
-  private val nodeId: AtomicLong = AtomicLong()
-  private val discoveryFilterCode: AtomicLong = AtomicLong()
-  private val timeoutMillis: AtomicLong = AtomicLong()
-  private val discoverOnce: AtomicBoolean = AtomicBoolean()
-  private val useOnlyOnNetworkDiscovery: AtomicBoolean = AtomicBoolean()
-  private val remotePort: AtomicInteger = AtomicInteger()
-  private val discriminator: AtomicInteger = AtomicInteger()
-  private val setupPINCode: AtomicLong = AtomicLong()
+  private val remoteAddr: IPAddress = IPAddress(InetAddress.getByName("::1"))
+  private val nodeId = AtomicLong()
+  private val discoveryFilterCode = AtomicLong()
+  private val timeoutMillis = AtomicLong()
+  private val discoverOnce = AtomicBoolean()
+  private val useOnlyOnNetworkDiscovery = AtomicBoolean()
+  private val remotePort = AtomicInteger()
+  private val discriminator = AtomicInteger()
+  private val setupPINCode = AtomicLong()
   private val operationalDataset = StringBuffer()
-  private val SSID = StringBuffer()
+  private val ssid = StringBuffer()
   private val password = StringBuffer()
   private val onboardingPayload = StringBuffer()
   private val discoveryFilterInstanceName = StringBuffer()
 
-  constructor(
-    controller: ChipDeviceController,
-    commandName: String?,
-    mode: PairingModeType,
-    network: PairingNetworkType,
-    credsIssuer: CredentialsIssuer?
-  ) : this(controller, commandName, mode, network, credsIssuer, DiscoveryFilterType.NONE)
-
   init {
-    pairingMode = mode
-    networkType = network
-    filterType = filter
-    try {
-      remoteAddr = IPAddress(InetAddress.getByName("::1"))
-    } catch (e: UnknownHostException) {
-      throw RuntimeException(e)
-    }
     addArgument("node-id", 0, Long.MAX_VALUE, nodeId, null, false)
+
     when (networkType) {
       PairingNetworkType.NONE -> {}
       PairingNetworkType.WIFI -> {
-        addArgument("ssid", SSID, null, false)
+        addArgument("ssid", ssid, null, false)
         addArgument("password", password, null, false)
       }
 
       PairingNetworkType.THREAD -> addArgument("operationalDataset", operationalDataset, null, false)
     }
-    when (mode) {
+
+    when (pairingMode) {
       PairingModeType.NONE -> {}
       PairingModeType.CODE, PairingModeType.CODE_PASE_ONLY -> {
         addArgument("payload", onboardingPayload, null, false)
@@ -116,17 +98,10 @@ abstract class PairingCommand(
         addArgument("device-remote-port", 0.toShort(), Short.MAX_VALUE, remotePort, null, false)
       }
     }
+
     when (filterType) {
       DiscoveryFilterType.NONE -> {}
-      DiscoveryFilterType.SHORT_DISCRIMINATOR -> addArgument(
-        "discriminator",
-        0.toShort(),
-        4096.toShort(),
-        discriminator,
-        null,
-        false
-      )
-
+      DiscoveryFilterType.SHORT_DISCRIMINATOR,
       DiscoveryFilterType.LONG_DISCRIMINATOR -> addArgument(
         "discriminator",
         0.toShort(),
@@ -138,8 +113,8 @@ abstract class PairingCommand(
 
       DiscoveryFilterType.VENDOR_ID -> addArgument(
         "vendor-id",
-        0,
-        Long.MAX_VALUE,
+        1.toShort(),
+        Short.MAX_VALUE,
         discoveryFilterCode,
         null,
         false
@@ -147,7 +122,7 @@ abstract class PairingCommand(
 
       DiscoveryFilterType.COMPRESSED_FABRIC_ID -> addArgument(
         "fabric-id",
-        0,
+        0L,
         Long.MAX_VALUE,
         discoveryFilterCode,
         null,
@@ -157,8 +132,8 @@ abstract class PairingCommand(
       DiscoveryFilterType.COMMISSIONING_MODE, DiscoveryFilterType.COMMISSIONER -> {}
       DiscoveryFilterType.DEVICE_TYPE -> addArgument(
         "device-type",
-        0,
-        Long.MAX_VALUE,
+        0.toShort(),
+        Short.MAX_VALUE,
         discoveryFilterCode,
         null,
         false
@@ -166,6 +141,7 @@ abstract class PairingCommand(
 
       DiscoveryFilterType.INSTANCE_NAME -> addArgument("name", discoveryFilterInstanceName, null, false)
     }
+
     addArgument("timeout", 0L, Long.MAX_VALUE, timeoutMillis, null, false)
   }
 
@@ -232,7 +208,7 @@ abstract class PairingCommand(
   }
 
   fun getRemoteAddr(): IPAddress {
-    return remoteAddr!!
+    return remoteAddr
   }
 
   fun getRemotePort(): Int {
@@ -249,5 +225,9 @@ abstract class PairingCommand(
 
   fun getTimeoutMillis(): Long {
     return timeoutMillis.get()
+  }
+
+  companion object {
+    private val logger = Logger.getLogger(PairingCommand::class.java.name)
   }
 }

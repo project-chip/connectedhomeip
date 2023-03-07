@@ -23,9 +23,9 @@ import com.matter.controller.commands.common.CredentialsIssuer
 class PairOnNetworkFabricCommand(controller: ChipDeviceController, credsIssue: CredentialsIssuer?) : PairingCommand(
   controller,
   "onnetwork-fabric",
+  credsIssue,
   PairingModeType.ON_NETWORK,
   PairingNetworkType.NONE,
-  credsIssue,
   DiscoveryFilterType.COMPRESSED_FABRIC_ID
 ) {
   override fun runCommand() {}

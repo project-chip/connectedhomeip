@@ -23,9 +23,9 @@ import com.matter.controller.commands.common.CredentialsIssuer
 class PairCodePaseCommand(controller: ChipDeviceController, credsIssue: CredentialsIssuer?) : PairingCommand(
   controller,
   "code-paseonly",
+  credsIssue,
   PairingModeType.CODE_PASE_ONLY,
-  PairingNetworkType.NONE,
-  credsIssue
+  PairingNetworkType.NONE  
 ) {
   override fun runCommand() {}
 }

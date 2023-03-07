@@ -20,16 +20,16 @@ package com.matter.controller.commands.pairing
 import chip.devicecontroller.ChipDeviceController
 import com.matter.controller.commands.common.CredentialsIssuer
 
+private const val MATTER_PORT = 5540
+
 class PairOnNetworkLongCommand(controller: ChipDeviceController, credsIssue: CredentialsIssuer?) : PairingCommand(
   controller,
   "onnetwork-long",
+  credsIssue,
   PairingModeType.ON_NETWORK,
   PairingNetworkType.NONE,
-  credsIssue,
   DiscoveryFilterType.LONG_DISCRIMINATOR
 ) {
-  private val MATTER_PORT = 5540
-
   override fun runCommand() {
     currentCommissioner()
       .pairDeviceWithAddress(

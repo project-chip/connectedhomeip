@@ -23,9 +23,9 @@ import com.matter.controller.commands.common.CredentialsIssuer
 class PairOnNetworkShortCommand(controller: ChipDeviceController, credsIssue: CredentialsIssuer?) : PairingCommand(
   controller,
   "onnetwork-short",
+  credsIssue,
   PairingModeType.ON_NETWORK,
   PairingNetworkType.NONE,
-  credsIssue,
   DiscoveryFilterType.SHORT_DISCRIMINATOR
 ) {
   override fun runCommand() {}
