@@ -181,3 +181,38 @@ if (use_silabs_thread_lib) {
     ]
   }
 }
+
+# LwIP GSDK libraries configurations
+if (use_silabs_lwip_lib) {
+  import("${chip_root}/src/lwip/lwip.gni")
+  import("${efr32_sdk_build_root}/lwip.gni")
+
+  assert(lwip_platform == "external",
+         "Unsupported lwIP platform: ${lwip_platform}")
+
+  config("lwip_config") {
+    include_dirs = [ "${chip_root}/src/lwip/silabs" ]
+    include_dirs += [ "${chip_root}/src/lwip/freertos" ]
+  }
+
+  lwip_target("lwip") {
+    public = [
+      "${chip_root}/src/lwip/silabs/arch/cc.h",
+      "${chip_root}/src/lwip/silabs/arch/perf.h",
+      "${chip_root}/src/lwip/silabs/lwipopts.h",
+    ]
+
+    sources = []
+
+    public += [
+      "${chip_root}/src/lwip/freertos/arch/sys_arch.h",
+      "${chip_root}/src/lwip/silabs/lwippools.h",
+    ]
+    sources += [ "${chip_root}/src/lwip/freertos/sys_arch.c" ]
+
+    public_configs = [
+      ":lwip_config",
+      "${chip_root}/src:includes",
+    ]
+  }
+}

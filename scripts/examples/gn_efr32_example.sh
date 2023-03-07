@@ -137,70 +137,74 @@ else
     shift
     while [ $# -gt 0 ]; do
         case $1 in
-            --wifi)
-                if [ -z "$2" ]; then
-                    echo "--wifi requires rs9116 or SiWx917 or wf200"
-                    exit 1
-                fi
-                if [ "$2" = "rs9116" ]; then
-                    optArgs+="use_rs9116=true "
-                elif [ "$2" = "SiWx917" ]; then
-                    optArgs+="use_SiWx917=true "
-                elif [ "$2" = "wf200" ]; then
-                    optArgs+="use_wf200=true "
-                else
-                    echo "Wifi usage: --wifi rs9116|SiWx917|wf200"
-                    exit 1
-                fi
+        --wifi)
+            if [ -z "$2" ]; then
+                echo "--wifi requires rs9116 or SiWx917 or wf200"
+                exit 1
+            fi
+            if [ "$2" = "rs9116" ]; then
+                optArgs+="use_rs9116=true "
+            elif [ "$2" = "SiWx917" ]; then
+                optArgs+="use_SiWx917=true "
+            elif [ "$2" = "wf200" ]; then
+                optArgs+="use_wf200=true "
+            else
+                echo "Wifi usage: --wifi rs9116|SiWx917|wf200"
+                exit 1
+            fi
+            USE_WIFI=true
+            shift
+            shift
+            ;;
+        --sed)
+            optArgs+="enable_sleepy_device=true chip_openthread_ftd=false "
+            shift
+            ;;
+        --low-power)
+            optArgs+="chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true "
+            shift
+            ;;
+        --chip_enable_wifi_ipv4)
+            optArgs+="chip_enable_wifi_ipv4=true "
+            shift
+            ;;
+        --additional_data_advertising)
+            optArgs+="chip_enable_additional_data_advertising=true chip_enable_rotating_device_id=true "
+            shift
+            ;;
+        --use_ot_lib)
+            optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" "
+            shift
+            ;;
+        --use_ot_coap_lib)
+            optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
+            shift
+            ;;
+        --use_lwip_lib)
+            optArgs+="use_silabs_lwip_lib=true lwip_platform=\""external"\" "
+            shift
+            ;;
+        # Option not to be used until ot-efr32 github is updated
+        # --use_ot_github_sources)
+        #   optArgs+="openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/openthread\" openthread_efr32_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/src/src\""
+        #    shift
+        #    ;;
+        --no-version)
+            USE_GIT_SHA_FOR_VERSION=false
+            shift
+            ;;
+        --release)
+            optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
+            shift
+            ;;
+        *)
+            if [ "$1" =~ *"use_rs9116=true"* ] || [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                 USE_WIFI=true
-                shift
-                shift
-                ;;
-            --sed)
-                optArgs+="enable_sleepy_device=true chip_openthread_ftd=false "
-                shift
-                ;;
-            --low-power)
-                optArgs+="chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true "
-                shift
-                ;;
-            --chip_enable_wifi_ipv4)
-                optArgs+="chip_enable_wifi_ipv4=true "
-                shift
-                ;;
-            --additional_data_advertising)
-                optArgs+="chip_enable_additional_data_advertising=true chip_enable_rotating_device_id=true "
-                shift
-                ;;
-            --use_ot_lib)
-                optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" "
-                shift
-                ;;
-            --use_ot_coap_lib)
-                optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
-                shift
-                ;;
-            # Option not to be used until ot-efr32 github is updated
-            # --use_ot_github_sources)
-            #   optArgs+="openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/openthread\" openthread_efr32_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/src/src\""
-            #    shift
-            #    ;;
-            --no-version)
-                USE_GIT_SHA_FOR_VERSION=false
-                shift
-                ;;
-            --release)
-                optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
-                shift
-                ;;
-            *)
-                if [ "$1" =~ *"use_rs9116=true"* ] || [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
-                    USE_WIFI=true
-                fi
+            fi
 
-                optArgs+=$1" "
-                shift
-                ;;
+            optArgs+=$1" "
+            shift
+            ;;
         esac
     done
 
