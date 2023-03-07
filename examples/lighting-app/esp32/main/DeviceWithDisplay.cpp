@@ -408,11 +408,10 @@ esp_err_t InitM5Stack(std::string qrCodeText)
                        ESP_LOGI(TAG, "Opening Setup list");
                        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<SetupListModel>()));
                    })
-            ->Item("Status",
-                   [=]() {
-                       ESP_LOGI(TAG, "Opening Status screen");
-                       ScreenManager::PushScreen(chip::Platform::New<StatusScreen>());
-                   })));
+            ->Item("Status", [=]() {
+                ESP_LOGI(TAG, "Opening Status screen");
+                ScreenManager::PushScreen(chip::Platform::New<StatusScreen>());
+            })));
     return ESP_OK;
 }
 #endif
@@ -436,17 +435,7 @@ void InitDeviceDisplay()
 
     // Initialize the screen manager
     ScreenManager::Init();
-
-    // Connect the status LED to VLEDs.
-    int vled1 = ScreenManager::AddVLED(TFT_GREEN);
-    statusLED1.SetVLED(vled1);
-
-    int vled2 = ScreenManager::AddVLED(TFT_CYAN);
-    statusLED2.SetVLED(vled2);
-
-    bluetoothLED.SetVLED(ScreenManager::AddVLED(TFT_BLUE));
     wifiLED.SetVLED(ScreenManager::AddVLED(TFT_YELLOW));
-    pairingWindowLED.SetVLED(ScreenManager::AddVLED(TFT_ORANGE));
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 

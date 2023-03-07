@@ -44,3 +44,10 @@ private:
     void OnColorControlAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
 #endif
 };
+
+class AppDeviceCallbacksDelegate : public DeviceCallbacksDelegate
+{
+public:
+    void OnIPv4ConnectivityEstablished() override;
+    void OnIPv4ConnectivityLost() override;
+};

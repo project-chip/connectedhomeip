@@ -61,6 +61,7 @@ using namespace ::chip::DeviceLayer;
 static const char * TAG = "light-app";
 
 static AppDeviceCallbacks EchoCallbacks;
+static AppDeviceCallbacksDelegate sAppDeviceCallbacksDelegate;
 
 namespace {
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
@@ -84,6 +85,7 @@ static void InitServer(intptr_t context)
     // Print QR Code URL
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
+    DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 }
 

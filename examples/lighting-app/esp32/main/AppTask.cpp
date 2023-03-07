@@ -112,6 +112,8 @@ CHIP_ERROR AppTask::Init()
 
 #if CONFIG_HAVE_DISPLAY
     InitDeviceDisplay();
+
+    AppLED.SetVLED(ScreenManager::AddVLED(TFT_YELLOW));
 #endif
 
     return err;

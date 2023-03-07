@@ -18,8 +18,4 @@
 
 #include "Globals.h"
 
-LEDWidget statusLED1;
-LEDWidget statusLED2;
-BluetoothWidget bluetoothLED;
 WiFiWidget wifiLED;
-WiFiWidget pairingWindowLED;

@@ -27,6 +27,7 @@
 
 #include "DeviceCallbacks.h"
 #include "LEDWidget.h"
+#include "Globals.h"
 
 #include <app/util/util.h>
 
@@ -146,4 +147,14 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
     ESP_LOGI(TAG, "emberAfOnOffClusterInitCallback");
     GetAppTask().UpdateClusterState();
+}
+
+void AppDeviceCallbacksDelegate::OnIPv4ConnectivityEstablished()
+{
+    wifiLED.Set(true);
+}
+
+void AppDeviceCallbacksDelegate::OnIPv4ConnectivityLost()
+{
+    wifiLED.Set(false);
 }
