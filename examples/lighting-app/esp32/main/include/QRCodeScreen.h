@@ -16,13 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- * @file QRCodeScreen.h
- *
- * Screen which displays a QR code.
- *
- */
-
 #pragma once
 
 #include "Screen.h"
