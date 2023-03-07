@@ -38,6 +38,9 @@ menu "Demo"
         config DEVICE_TYPE_ESP32_WROVER_KIT
             bool "ESP32-WROVER-KIT_V4.1"
             depends on IDF_TARGET_ESP32
+        config DEVICE_TYPE_M5STACK
+            bool "M5Stack"
+            depends on IDF_TARGET_ESP32
         config DEVICE_TYPE_ESP32_C3_DEVKITM
             bool "ESP32C3-DevKitM"
             depends on IDF_TARGET_ESP32C3

@@ -17,6 +17,8 @@
 #    Description:
 #      Some useful defaults for the demo app configuration.
 #
+CONFIG_IDF_TARGET="esp32"
+CONFIG_IDF_TARGET_ESP32=y
 CONFIG_DEVICE_TYPE_M5STACK=y
 
 # Default to 921600 baud when flashing and monitoring device
@@ -46,6 +48,10 @@ CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
 #enable lwIP route hooks
 CONFIG_LWIP_HOOK_IP6_ROUTE_DEFAULT=y
 CONFIG_LWIP_HOOK_ND6_GET_GW_DEFAULT=y
+
+# Main task needs a bit more stack than the default
+# default is 3584, bump this up to 5k.
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=5120
 
 # Serial Flasher config
 CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
