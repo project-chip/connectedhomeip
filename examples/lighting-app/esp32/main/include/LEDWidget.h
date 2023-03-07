@@ -52,7 +52,6 @@ private:
     bool mState;
     uint8_t mBrightness;
 
-
 #if CONFIG_LED_TYPE_RMT
     uint8_t mHue;
     uint8_t mSaturation;

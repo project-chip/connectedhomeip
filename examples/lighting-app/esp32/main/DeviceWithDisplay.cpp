@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include "Globals.h"
 #include "DeviceWithDisplay.h"
+#include "Globals.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>

@@ -61,7 +61,6 @@ private:
     static void ButtonPressedAction(AppEvent * aEvent);
 #endif
 
-
     static AppTask sAppTask;
 };
 

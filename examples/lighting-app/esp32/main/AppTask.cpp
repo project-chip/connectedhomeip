@@ -62,18 +62,20 @@ CHIP_ERROR AppTask::StartAppTask()
     return (xReturned == pdPASS) ? CHIP_NO_ERROR : APP_ERROR_CREATE_TASK_FAILED;
 }
 
-void AppTask::ButtonEventHandler(const uint8_t buttonHandle, uint8_t btnAction) {
-    if (btnAction != APP_BUTTON_PRESSED) {
+void AppTask::ButtonEventHandler(const uint8_t buttonHandle, uint8_t btnAction)
+{
+    if (btnAction != APP_BUTTON_PRESSED)
+    {
         return;
     }
 
-    AppEvent button_event             = {};
-    button_event.Type                = AppEvent::kEventType_Button;
+    AppEvent button_event = {};
+    button_event.Type     = AppEvent::kEventType_Button;
 
 #if CONFIG_HAVE_DISPLAY
     button_event.ButtonEvent.PinNo  = buttonHandle;
     button_event.ButtonEvent.Action = btnAction;
-    button_event.mHandler = ButtonPressedAction;
+    button_event.mHandler           = ButtonPressedAction;
 #else
     button_event.mHandler = AppTask::LightingActionEventHandler;
 #endif
