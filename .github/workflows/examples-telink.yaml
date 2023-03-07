@@ -79,6 +79,9 @@ jobs:
                     out/telink-tlsr9518adk80d-all-clusters/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
+            - name: clean out build output
+              run: rm -rf ./out
+
             - name: Build example Telink All Clusters Minimal App
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -87,6 +90,9 @@ jobs:
                     telink tlsr9518adk80d all-clusters-minimal-app \
                     out/telink-tlsr9518adk80d-all-clusters-minimal/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
+
+            - name: clean out build output
+              run: rm -rf ./out
 
             - name: Build example Telink Contact Sensor App
               run: |
@@ -97,6 +103,9 @@ jobs:
                     out/telink-tlsr9518adk80d-contact-sensor/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
+            - name: clean out build output
+              run: rm -rf ./out
+
             - name: Build example Telink Lighting App
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -106,14 +115,20 @@ jobs:
                     out/telink-tlsr9518adk80d-light/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
+            - name: clean out build output
+              run: rm -rf ./out
+
             - name: Build example Telink Lighting App with RPC
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light-rpc' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d lighting-app-rpc \
-                    out/telink-tlsr9518adk80d-light/zephyr/zephyr.elf \
+                    out/telink-tlsr9518adk80d-light-rpc/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
+
+            - name: clean out build output
+              run: rm -rf ./out
 
             - name: Build example Telink Light Switch App
               run: |
@@ -124,6 +139,9 @@ jobs:
                     out/telink-tlsr9518adk80d-light-switch/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
+            - name: clean out build output
+              run: rm -rf ./out
+
             - name: Build example Telink Lock App
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -132,6 +150,9 @@ jobs:
                     telink tlsr9518adk80d lock-app \
                     out/telink-tlsr9518adk80d-lock/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
+
+            - name: clean out build output
+              run: rm -rf ./out
 
             - name: Build example Telink OTA Requestor App
               run: |
@@ -142,6 +163,9 @@ jobs:
                     out/telink-tlsr9518adk80d-ota-requestor/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
+            - name: clean out build output
+              run: rm -rf ./out
+
             - name: Build example Telink Pump App
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -150,6 +174,9 @@ jobs:
                     telink tlsr9518adk80d pump-app \
                     out/telink-tlsr9518adk80d-pump/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
+
+            - name: clean out build output
+              run: rm -rf ./out
 
             - name: Build example Telink Pump Controller App
               run: |
@@ -160,6 +187,9 @@ jobs:
                     out/telink-tlsr9518adk80d-pump-controller/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
+            - name: clean out build output
+              run: rm -rf ./out
+
             - name: Build example Telink Temperature Measurement App
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -169,6 +199,9 @@ jobs:
                     out/telink-tlsr9518adk80d-temperature-measurement/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
+            - name: clean out build output
+              run: rm -rf ./out
+
             - name: Build example Telink Thermostat App
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -177,6 +210,9 @@ jobs:
                     telink tlsr9518adk80d thermostat \
                     out/telink-tlsr9518adk80d-thermostat/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
+
+            - name: clean out build output
+              run: rm -rf ./out
 
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v3

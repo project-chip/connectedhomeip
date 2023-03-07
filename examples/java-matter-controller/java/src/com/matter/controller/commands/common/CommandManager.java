@@ -18,21 +18,19 @@
 
 package com.matter.controller.commands.common;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class CommandManager {
-  private final ArrayList<Command> mCommandMgr = new ArrayList<Command>();
-  private final Map<String, ArrayList<Command>> mClusters =
-      new HashMap<String, ArrayList<Command>>();
+  private final Map<String, List<Command>> mClusters = new HashMap<String, List<Command>>();
   private static Logger logger = Logger.getLogger(CommandManager.class.getName());
 
-  public final void register(String clusterName, ArrayList<Command> commandsList) {
+  public final void register(String clusterName, List<Command> commandsList) {
     mClusters.put(clusterName, commandsList);
   }
 
@@ -45,7 +43,7 @@ public final class CommandManager {
       return;
     }
 
-    ArrayList<Command> commands = mClusters.get(args[0]);
+    List<Command> commands = mClusters.get(args[0]);
     if (commands == null) {
       logger.log(Level.INFO, "Unknown cluster: " + args[0]);
       showClusters();
@@ -121,7 +119,7 @@ public final class CommandManager {
     return isAttributeCommand(commandName) || isEventCommand(commandName);
   }
 
-  private Command getCommand(ArrayList<Command> commands, String commandName) {
+  private Command getCommand(List<Command> commands, String commandName) {
     for (Command command : commands) {
       if (commandName.equals(command.getName())) {
         return command;
@@ -132,7 +130,7 @@ public final class CommandManager {
   }
 
   private Command getGlobalCommand(
-      ArrayList<Command> commands, String commandName, String attributeName) {
+      List<Command> commands, String commandName, String attributeName) {
     for (Command command : commands) {
       if (commandName.equals(command.getName()) && attributeName.equals(command.getAttribute())) {
         return command;
@@ -166,7 +164,7 @@ public final class CommandManager {
         "  +-------------------------------------------------------------------------------------+");
   }
 
-  private void showCluster(String clusterName, ArrayList<Command> commands) {
+  private void showCluster(String clusterName, List<Command> commands) {
     logger.log(Level.INFO, "Usage:");
     logger.log(
         Level.INFO,
@@ -216,7 +214,7 @@ public final class CommandManager {
   }
 
   private void showClusterAttributes(
-      String clusterName, String commandName, ArrayList<Command> commands) {
+      String clusterName, String commandName, List<Command> commands) {
     logger.log(Level.INFO, "Usage:");
     System.out.printf(
         "  java-matter-controller %s %s attribute-name [param1 param2 ...]\n",
@@ -241,8 +239,7 @@ public final class CommandManager {
         "  +-------------------------------------------------------------------------------------+");
   }
 
-  private void showClusterEvents(
-      String clusterName, String commandName, ArrayList<Command> commands) {
+  private void showClusterEvents(String clusterName, String commandName, List<Command> commands) {
     logger.log(Level.INFO, "Usage:");
     System.out.printf(
         "  java-matter-controller %s %s event-name [param1 param2 ...]\n",
