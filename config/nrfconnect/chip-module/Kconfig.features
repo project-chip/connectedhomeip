@@ -98,6 +98,18 @@ config MCUMGR_SMP_BT_AUTHEN
 config MCUMGR_BUF_COUNT
 	default 6
 
+config MCUMGR_MGMT_NOTIFICATION_HOOKS
+	bool
+	default y
+
+config MCUMGR_GRP_IMG_UPLOAD_CHECK_HOOK
+	bool
+	default y
+
+config MCUMGR_SMP_COMMAND_STATUS_HOOKS
+	bool
+	default y
+
 # Increase BT MTU and RX buffer for big size DFU messages
 config BT_L2CAP_TX_MTU
 	default 498
@@ -125,5 +137,38 @@ config MCUMGR_GRP_BASIC_CMD_STORAGE_ERASE
 endif # SOC_SERIES_NRF53X
 
 endif # CHIP_DFU_OVER_BT_SMP
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
+	int "Define the minimum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 500
+	help
+	  Specifies the minimum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL
+	int "Define the maximum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 3600000 # 1 hour
+	help
+	  Specifies the maximum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAX_RETRIES_NUMBER
+	int "Define the maximum amount of connection recovery occurrences"
+	depends on CHIP_WIFI
+	default 0
+	help
+	  Specifies the maximum number of connection recovery attempts.
+	  If set to 0, no limitation is applied and attempts
+	  to recover the connection are performed indefinitely.
+
+config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
+	int "Define the connection recovery jitter in milliseconds"
+	depends on CHIP_WIFI
+	default 2000
+	help
+	  Specifies the maximum connection recovery jitter interval (in milliseconds).
+	  Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
+	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
+	  within range [-JITTER; +JITTER].
 
 endif # CHIP
