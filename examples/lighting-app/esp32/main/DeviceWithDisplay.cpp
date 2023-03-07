@@ -435,7 +435,7 @@ void InitDeviceDisplay()
 
     // Initialize the screen manager
     ScreenManager::Init();
-    wifiLED.SetVLED(ScreenManager::AddVLED(TFT_YELLOW));
+    wifiLED.SetVLED(ScreenManager::AddVLED(TFT_GREEN));
 
 #if CONFIG_DEVICE_TYPE_M5STACK
 
