@@ -26,8 +26,8 @@
 #include "AppTask.h"
 
 #include "DeviceCallbacks.h"
-#include "LEDWidget.h"
 #include "Globals.h"
+#include "LEDWidget.h"
 
 #include <app/util/util.h>
 
