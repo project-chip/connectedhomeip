@@ -40,8 +40,8 @@ step.
     ```
 
 -   For ESP32H2, please checkout tag
-    [v5.0-beta1](https://github.com/espressif/esp-idf/tree/v5.0-beta1),
-    currently only lighting-app is supported on H2
+    [v5.0](https://github.com/espressif/esp-idf/tree/v5.0), currently only
+    lighting-app is supported on H2
 
     ```
     $ cd esp-idf

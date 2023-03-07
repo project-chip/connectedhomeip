@@ -33,6 +33,7 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <platform/ESP32/ESP32Utils.h>
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
@@ -90,10 +91,24 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
         return;
     }
+    err = esp_event_loop_create_default();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_event_loop_create_default() failed: %s", esp_err_to_name(err));
+        return;
+    }
 
     ESP_LOGI(TAG, "==================================================");
     ESP_LOGI(TAG, "chip-esp32-light-switch-example starting");
     ESP_LOGI(TAG, "==================================================");
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    if (DeviceLayer::Internal::ESP32Utils::InitWiFiStack() != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to initialize the Wi-Fi stack");
+        return;
+    }
+#endif
 
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
@@ -120,12 +135,12 @@ extern "C" void app_main()
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    if (ThreadStackMgr().InitThreadStack() != CHIP_NO_ERROR)
+    if (DeviceLayer::ThreadStackMgr().InitThreadStack() != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to initialize Thread stack");
         return;
     }
-    if (ThreadStackMgr().StartThreadTask() != CHIP_NO_ERROR)
+    if (DeviceLayer::ThreadStackMgr().StartThreadTask() != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to launch Thread task");
         return;
