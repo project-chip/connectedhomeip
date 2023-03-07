@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 typedef NS_OPTIONS(NSUInteger, MTRDiscoveryCapabilities) {
     MTRDiscoveryCapabilitiesUnknown = 0, // Device capabilities are not known (e.g. all we have is a numeric code).
-    MTRDiscoveryCapabilitiesNone API_DEPRECATED_WITH_REPLACEMENT(
+    MTRDiscoveryCapabilitiesNone MTR_DEPRECATED_WITH_REPLACEMENT(
         "MTRDiscoveryCapabilitiesUnknown", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0,
     MTRDiscoveryCapabilitiesSoftAP = 1 << 0, // Device supports WiFi softAP
@@ -40,7 +40,7 @@ typedef NS_ENUM(NSUInteger, MTRCommissioningFlow) {
 };
 
 typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
-    MTROptionalQRCodeInfoTypeUnknown API_DEPRECATED(
+    MTROptionalQRCodeInfoTypeUnknown MTR_DEPRECATED(
         "The type is never actually unknown", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)),
     MTROptionalQRCodeInfoTypeString,
     MTROptionalQRCodeInfoTypeInt32,
@@ -145,20 +145,20 @@ typedef NS_ENUM(NSUInteger, MTROptionalQRCodeInfoType) {
 @interface MTROptionalQRCodeInfo (Deprecated)
 
 @property (nonatomic, copy)
-    NSNumber * infoType API_DEPRECATED("Please use type", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+    NSNumber * infoType MTR_DEPRECATED("Please use type", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end
 
 @interface MTRSetupPayload (Deprecated)
 
-@property (nonatomic, copy, nullable) NSNumber * rendezvousInformation API_DEPRECATED(
+@property (nonatomic, copy, nullable) NSNumber * rendezvousInformation MTR_DEPRECATED(
     "Please use discoveryCapabilities", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-@property (nonatomic, copy) NSNumber * setUpPINCode API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * setUpPINCode MTR_DEPRECATED(
     "Please use setupPasscode", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-- (instancetype)init API_DEPRECATED("Please use initWithSetupPasscode or setupPayloadWithOnboardingPayload", ios(16.1, 16.4),
+- (instancetype)init MTR_DEPRECATED("Please use initWithSetupPasscode or setupPayloadWithOnboardingPayload", ios(16.1, 16.4),
     macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-+ (instancetype)new API_DEPRECATED("Please use initWithSetupPasscode or setupPayloadWithOnboardingPayload", ios(16.1, 16.4),
++ (instancetype)new MTR_DEPRECATED("Please use initWithSetupPasscode or setupPayloadWithOnboardingPayload", ios(16.1, 16.4),
     macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end
