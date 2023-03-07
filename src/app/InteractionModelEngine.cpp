@@ -1660,8 +1660,6 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
     }
     iterator->Release();
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-
-    return;
 }
 
 } // namespace app
