@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,38 +18,19 @@
 
 #pragma once
 
-struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
+#include "Display.h"
 
-struct AppEvent
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+class WiFiWidget
 {
-    enum AppEventTypes
-    {
-        kEventType_Button = 0,
-        kEventType_Timer,
-        kEventType_Light,
-        kEventType_Install,
-    };
+public:
+    void Init();
+    void Set(bool state);
+    void SetVLED(int id);
 
-    uint16_t Type;
-
-    union
-    {
-        struct
-        {
-            uint8_t Action;
-            uint8_t PinNo;
-        } ButtonEvent;
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-        struct
-        {
-            uint8_t Action;
-            int32_t Actor;
-        } LightEvent;
-    };
-
-    EventHandler mHandler;
+private:
+    int mVLED;
+    bool mState;
 };

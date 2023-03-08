@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,38 +18,25 @@
 
 #pragma once
 
-struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
+#include "Screen.h"
+#include "ScreenManager.h"
 
-struct AppEvent
+#if CONFIG_HAVE_DISPLAY
+
+#include <cstdint>
+#include <vector>
+
+class QRCodeScreen : public Screen
 {
-    enum AppEventTypes
-    {
-        kEventType_Button = 0,
-        kEventType_Timer,
-        kEventType_Light,
-        kEventType_Install,
-    };
+    std::vector<uint8_t> qrCode;
+    std::string title;
 
-    uint16_t Type;
+public:
+    QRCodeScreen(std::string text, std::string title = "QR Code");
 
-    union
-    {
-        struct
-        {
-            uint8_t Action;
-            uint8_t PinNo;
-        } ButtonEvent;
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-        struct
-        {
-            uint8_t Action;
-            int32_t Actor;
-        } LightEvent;
-    };
+    virtual std::string GetTitle() { return title; }
 
-    EventHandler mHandler;
+    virtual void Display();
 };
+
+#endif // CONFIG_HAVE_DISPLAY
