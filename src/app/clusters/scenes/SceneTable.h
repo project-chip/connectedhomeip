@@ -117,7 +117,8 @@ public:
     /// @brief From stored scene (e.g RecallScene), applies EFS values to cluster at transition time
     /// @param endpoint Endpoint ID
     /// @param cluster Cluster ID
-    /// @param serialisedBytes ExtensionFieldSet stored in NVM
+    /// @param serializedBytes ExtensionFieldSet stored in NVM
+
     /// @param timeMs Transition time in ms to apply the scene
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
     virtual CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, ByteSpan & serialisedBytes, TransitionTimeMs timeMs) = 0;
