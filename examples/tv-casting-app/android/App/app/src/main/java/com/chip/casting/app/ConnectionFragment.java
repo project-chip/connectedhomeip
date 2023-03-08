@@ -26,7 +26,6 @@ public class ConnectionFragment extends Fragment {
   private final TvCastingApp tvCastingApp;
   private final DiscoveredNodeData selectedCommissioner;
 
-  private boolean verifyOrEstablishConnectionSuccess;
   private boolean openCommissioningWindowSuccess;
   private boolean sendUdcSuccess;
 
