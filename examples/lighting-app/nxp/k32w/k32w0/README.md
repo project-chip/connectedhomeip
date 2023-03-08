@@ -395,7 +395,14 @@ SDK example(s)_ -> select _wireless->framework->ssbl_ application.
 
 ![SSBL Application Select](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_select.JPG)
 
-The SSBL project must be compiled using the PDM_EXT_FLASH define.
+To support multi-image OTA feature, the SSBL project must be compiled using the following defines:
+- `PDM_EXT_FLASH=1`
+- `gOTAUseCustomOtaEntry=1`
+- `gOTACustomOtaEntryMemory=1` - K32W0 uses `OTACustomStorage_ExtFlash` (1) by default.
+
+Optionally, add the following defines:
+- `SPIFI_OPTIM_SIZE=1` - to optimize SSBL size.
+- `EXTERNAL_FLASH_DATA_OTA=1` - to support external RO data.
 
 ![PDM_EXT_FLASH](../../../../platform/nxp/k32w/k32w0/doc/images/pdm_ext_flash.JPG)
 
@@ -417,7 +424,7 @@ DK6Programmer.exe -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x00="k32w061dk6_ssbl
 
 ### Writing the PSECT
 
-First, image directory 0 must be written:
+First, image directory 0 (SSBL partition) must be written:
 
 ```
 DK6Programmer.exe -V5 -s <COM port> -P 1000000 -w image_dir_0=0000000010000000
@@ -432,7 +439,7 @@ Here is the interpretation of the fields:
 00       -> SSBL Image Type
 ```
 
-Second, image directory 1 must be written:
+Second, image directory 1 (application partition) must be written:
 
 ```
 DK6Programmer.exe -V5 -s <COM port> -P 1000000 -w image_dir_1=00400000C9040101
@@ -445,6 +452,30 @@ Here is the interpretation of the fields:
 CD04     -> 0x4C9 pages of 512-bytes (= 612,5kB)
 01       -> bootable flag
 01       -> image type for the application
+```
+
+Optionally, the user can write some additional partitions (increment `image_dir_` starting from 2):
+```
+00000010800000fe: Ext Flash text partition
+
+    00000010 -----------> 0x10000000 Start Address (external flash)
+    8000 ---------------> 0x0080 Number of 512-bytes pages
+    00 -----------------> 0x00 Bootable flag
+    fe -----------------> 0xFE Image type (0xFE = Ext Flash text)
+
+00000110300200fc : OTA Image partition
+
+    00000110 -----------> 0x10010000 Start Address
+    3002----------------> 0x0230 Number of 512-bytes pages
+    00 -----------------> 0x00 Bootable flag
+    fc -----------------> 0xFC Image type (0x00 = SSBL)
+
+00000510100000fd: NVM partition
+
+    00000510 -----------> 0x10050000 Start Address
+    1000 ---------------> 0x0010 Number of 512-bytes pages
+    00 -----------------> 0x00 Bootable flag
+    fd -----------------> 0xFC Image type (0xFC = NVM)
 ```
 
 ### Writing the application
