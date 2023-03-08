@@ -18,7 +18,7 @@
 package chip.devicecontroller;
 
 /** JNI wrapper callback class for {@link WriteAttributesCallback}. */
-public class WriteAttributesCallbackJni {
+public final class WriteAttributesCallbackJni {
   private final WriteAttributesCallback wrappedWriteAttributesCallback;
   private long callbackHandle;
 

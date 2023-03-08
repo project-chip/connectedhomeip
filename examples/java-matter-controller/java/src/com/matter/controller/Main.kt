@@ -63,6 +63,7 @@ private fun getImCommands(
 ): List<Command> {
   return listOf(
     PairOnNetworkLongImWriteCommand(controller, credentialsIssuer),
+    PairOnNetworkLongImInvokeCommand(controller, credentialsIssuer),
   )
 }
 
@@ -80,11 +81,13 @@ fun main(args: Array<String>) {
   commandManager.register("discover", getDiscoveryCommands(controller, credentialsIssuer))
   commandManager.register("pairing", getPairingCommands(controller, credentialsIssuer))
   commandManager.register("im", getImCommands(controller, credentialsIssuer))
+
   try {
     commandManager.run(args)
   } catch (e: Exception) {
     println("Run command failed with exception: " + e.message)
     System.exit(1)
   }
+
   controller.shutdownCommissioning()
 }

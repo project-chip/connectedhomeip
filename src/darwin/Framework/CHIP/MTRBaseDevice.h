@@ -495,7 +495,7 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
                errorHandler:(MTRDeviceErrorHandler)errorHandler
     subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
     resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
-    API_DEPRECATED("Please use "
+    MTR_DEPRECATED("Please use "
                    "subscribeWithQueue:params:clusterStateCacheContainer:attributeReportHandler:eventReportHandler:errorHandler:"
                    "subscriptionEstablished:resubscriptionScheduled:",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
@@ -506,7 +506,7 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
                              params:(MTRReadParams * _Nullable)params
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion
-    API_DEPRECATED("Please use readAttributesWithEndpointID:clusterID:attributeID:params:queue:completion:", ios(16.1, 16.4),
+    MTR_DEPRECATED("Please use readAttributesWithEndpointID:clusterID:attributeID:params:queue:completion:", ios(16.1, 16.4),
         macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
@@ -516,7 +516,7 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                          clientQueue:(dispatch_queue_t)clientQueue
                           completion:(MTRDeviceResponseHandler)completion
-    API_DEPRECATED("Please use writeAttributeWithEndpointID:clusterID:attributeID:value:timedWriteTimeout:queue:completion:",
+    MTR_DEPRECATED("Please use writeAttributeWithEndpointID:clusterID:attributeID:value:timedWriteTimeout:queue:completion:",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)invokeCommandWithEndpointId:(NSNumber *)endpointId
@@ -526,7 +526,7 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion
-    API_DEPRECATED("Please use invokeCommandWithEndpointID:clusterID:commandID:commandFields:timedInvokeTimeout:queue:completion",
+    MTR_DEPRECATED("Please use invokeCommandWithEndpointID:clusterID:commandID:commandFields:timedInvokeTimeout:queue:completion",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
@@ -538,14 +538,14 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
                              clientQueue:(dispatch_queue_t)clientQueue
                            reportHandler:(MTRDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
-    API_DEPRECATED("Please use "
+    MTR_DEPRECATED("Please use "
                    "subscribeToAttributesWithEndpointID:clusterID:attributeID:params:queue:"
                    "reportHandler:subscriptionEstablished:",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)queue
                                      completion:(dispatch_block_t)completion
-    API_DEPRECATED("Pease use deregisterReportHandlersWithQueue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+    MTR_DEPRECATED("Pease use deregisterReportHandlersWithQueue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
         tvos(16.1, 16.4));
 
 @end
@@ -555,7 +555,7 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
 + (instancetype)attributePathWithEndpointId:(NSNumber *)endpointId
                                   clusterId:(NSNumber *)clusterId
                                 attributeId:(NSNumber *)attributeId
-    API_DEPRECATED("Please use attributePathWithEndpointID:clusterID:attributeID:", ios(16.1, 16.4), macos(13.0, 13.3),
+    MTR_DEPRECATED("Please use attributePathWithEndpointID:clusterID:attributeID:", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end
@@ -565,7 +565,7 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
 + (instancetype)eventPathWithEndpointId:(NSNumber *)endpointId
                               clusterId:(NSNumber *)clusterId
                                 eventId:(NSNumber *)eventId
-    API_DEPRECATED("Please use eventPathWithEndpointID:clusterID:eventID:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+    MTR_DEPRECATED("Please use eventPathWithEndpointID:clusterID:eventID:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
         tvos(16.1, 16.4));
 
 @end
@@ -575,7 +575,7 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
 + (instancetype)commandPathWithEndpointId:(NSNumber *)endpointId
                                 clusterId:(NSNumber *)clusterId
                                 commandId:(NSNumber *)commandId
-    API_DEPRECATED("Please use commandPathWithEndpointID:clusterID:commandID:", ios(16.1, 16.4), macos(13.0, 13.3),
+    MTR_DEPRECATED("Please use commandPathWithEndpointID:clusterID:commandID:", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end

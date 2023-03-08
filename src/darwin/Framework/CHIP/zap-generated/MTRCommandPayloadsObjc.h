@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#import <Matter/MTRDefines.h>
 #import <Matter/MTRStructsObjc.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -116,7 +116,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTRGroupsClusterAddGroupParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -141,13 +141,13 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
 @interface MTRGroupsClusterAddGroupResponseParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -183,7 +183,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTRGroupsClusterViewGroupParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -210,13 +210,13 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
 @interface MTRGroupsClusterViewGroupResponseParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -271,7 +271,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -307,7 +307,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTRGroupsClusterRemoveGroupParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -332,13 +332,13 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
 @interface MTRGroupsClusterRemoveGroupResponseParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -404,7 +404,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTRGroupsClusterAddGroupIfIdentifyingParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -448,10 +448,10 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTRScenesClusterAddSceneParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId MTR_DEPRECATED(
     "Please use sceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -478,16 +478,16 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
 @interface MTRScenesClusterAddSceneResponseParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId MTR_DEPRECATED(
     "Please use sceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -525,10 +525,10 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTRScenesClusterViewSceneParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId MTR_DEPRECATED(
     "Please use sceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -561,16 +561,16 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
 @interface MTRScenesClusterViewSceneResponseParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId MTR_DEPRECATED(
     "Please use sceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -608,10 +608,10 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTRScenesClusterRemoveSceneParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId MTR_DEPRECATED(
     "Please use sceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -638,16 +638,16 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
 @interface MTRScenesClusterRemoveSceneResponseParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId MTR_DEPRECATED(
     "Please use sceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -683,7 +683,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTRScenesClusterRemoveAllScenesParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -708,13 +708,13 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
 @interface MTRScenesClusterRemoveAllScenesResponseParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -752,10 +752,10 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTRScenesClusterStoreSceneParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId MTR_DEPRECATED(
     "Please use sceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -782,16 +782,16 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
 @interface MTRScenesClusterStoreSceneResponseParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId MTR_DEPRECATED(
     "Please use sceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -831,10 +831,10 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTRScenesClusterRecallSceneParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId MTR_DEPRECATED(
     "Please use sceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -870,7 +870,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTRScenesClusterGetSceneMembershipParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -899,13 +899,13 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
 @interface MTRScenesClusterGetSceneMembershipResponseParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -949,10 +949,10 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTRScenesClusterEnhancedAddSceneParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId MTR_DEPRECATED(
     "Please use sceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -979,16 +979,16 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
 @interface MTRScenesClusterEnhancedAddSceneResponseParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId MTR_DEPRECATED(
     "Please use sceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -1026,10 +1026,10 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTRScenesClusterEnhancedViewSceneParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId MTR_DEPRECATED(
     "Please use sceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -1062,16 +1062,16 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
 @interface MTRScenesClusterEnhancedViewSceneResponseParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupId MTR_DEPRECATED(
     "Please use groupID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull sceneId MTR_DEPRECATED(
     "Please use sceneID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -1115,16 +1115,16 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTRScenesClusterCopySceneParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupIdFrom API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupIdFrom MTR_DEPRECATED(
     "Please use groupIdentifierFrom", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneIdFrom API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull sceneIdFrom MTR_DEPRECATED(
     "Please use sceneIdentifierFrom", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupIdTo API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupIdTo MTR_DEPRECATED(
     "Please use groupIdentifierTo", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneIdTo API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull sceneIdTo MTR_DEPRECATED(
     "Please use sceneIdentifierTo", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -1151,16 +1151,16 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
 @interface MTRScenesClusterCopySceneResponseParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull groupIdFrom API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull groupIdFrom MTR_DEPRECATED(
     "Please use groupIdentifierFrom", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull sceneIdFrom API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull sceneIdFrom MTR_DEPRECATED(
     "Please use sceneIdentifierFrom", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -1282,7 +1282,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTROnOffClusterOffWithEffectParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull effectId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull effectId MTR_DEPRECATED(
     "Please use effectIdentifier", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -2056,7 +2056,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("This command has been removed", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+MTR_DEPRECATED("This command has been removed", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRBasicClusterMfgSpecificPingParams : NSObject <NSCopying>
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
@@ -2129,17 +2129,17 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTROtaSoftwareUpdateProviderClusterQueryImageParams : MTROTASoftwareUpdateProviderClusterQueryImageParams
 @end
 
 @interface MTROTASoftwareUpdateProviderClusterQueryImageParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull vendorId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull vendorId MTR_DEPRECATED(
     "Please use vendorID", ios(16.4, 16.4), macos(13.3, 13.3), watchos(9.4, 9.4), tvos(16.4, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull productId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull productId MTR_DEPRECATED(
     "Please use productID", ios(16.4, 16.4), macos(13.3, 13.3), watchos(9.4, 9.4), tvos(16.4, 16.4));
 @end
 
@@ -2177,11 +2177,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
-API_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterQueryImageResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams : MTROTASoftwareUpdateProviderClusterQueryImageResponseParams
 @end
@@ -2219,7 +2219,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams : MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams
 @end
@@ -2245,11 +2245,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
-API_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams
     : MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams
@@ -2287,7 +2287,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
     : MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams
@@ -2331,7 +2331,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams
     : MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams
@@ -2339,10 +2339,10 @@ API_DEPRECATED("Please use MTROTASoftwareUpdateRequestorClusterAnnounceOTAProvid
 
 @interface MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull providerNodeId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull providerNodeId MTR_DEPRECATED(
     "Please use providerNodeID", ios(16.4, 16.4), macos(13.3, 13.3), watchos(9.4, 9.4), tvos(16.4, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nonnull vendorId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull vendorId MTR_DEPRECATED(
     "Please use vendorID", ios(16.4, 16.4), macos(13.3, 13.3), watchos(9.4, 9.4), tvos(16.4, 16.4));
 @end
 
@@ -2399,7 +2399,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -2459,7 +2459,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -2512,7 +2512,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -2573,7 +2573,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -2698,7 +2698,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -2757,7 +2757,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -2854,16 +2854,16 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
 @interface MTRDiagnosticLogsClusterRetrieveLogsResponseParams (Deprecated)
 
-@property (nonatomic, copy) NSData * _Nonnull content API_DEPRECATED(
+@property (nonatomic, copy) NSData * _Nonnull content MTR_DEPRECATED(
     "Please use logContent", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-@property (nonatomic, copy) NSNumber * _Nullable timeStamp API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nullable timeStamp MTR_DEPRECATED(
     "Please use utcTimeStamp", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -3086,7 +3086,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTRAdministratorCommissioningClusterOpenCommissioningWindowParams (Deprecated)
 
-@property (nonatomic, copy) NSData * _Nonnull pakeVerifier API_DEPRECATED(
+@property (nonatomic, copy) NSData * _Nonnull pakeVerifier MTR_DEPRECATED(
     "Please use pakePasscodeVerifier", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -3200,13 +3200,13 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
 @interface MTROperationalCredentialsClusterAttestationResponseParams (Deprecated)
 
-@property (nonatomic, copy) NSData * _Nonnull signature API_DEPRECATED(
+@property (nonatomic, copy) NSData * _Nonnull signature MTR_DEPRECATED(
     "Please use attestationSignature", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -3259,7 +3259,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -3316,7 +3316,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -3413,7 +3413,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -3509,7 +3509,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTROperationalCredentialsClusterAddTrustedRootCertificateParams (Deprecated)
 
-@property (nonatomic, copy) NSData * _Nonnull rootCertificate API_DEPRECATED(
+@property (nonatomic, copy) NSData * _Nonnull rootCertificate MTR_DEPRECATED(
     "Please use rootCACertificate", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -3594,7 +3594,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -3677,7 +3677,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -3911,7 +3911,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -4042,7 +4042,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -4171,7 +4171,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -4249,7 +4249,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTRDoorLockClusterSetUserParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nullable userUniqueId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nullable userUniqueId MTR_DEPRECATED(
     "Please use userUniqueID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -4321,13 +4321,13 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
 @interface MTRDoorLockClusterGetUserResponseParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nullable userUniqueId API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nullable userUniqueId MTR_DEPRECATED(
     "Please use userUniqueID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -4426,7 +4426,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -4490,7 +4490,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -4848,7 +4848,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -5361,7 +5361,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 @interface MTRColorControlClusterMoveToColorTemperatureParams (Deprecated)
 
-@property (nonatomic, copy) NSNumber * _Nonnull colorTemperature API_DEPRECATED(
+@property (nonatomic, copy) NSNumber * _Nonnull colorTemperature MTR_DEPRECATED(
     "Please use colorTemperatureMireds", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -5726,7 +5726,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -5846,7 +5846,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -5934,7 +5934,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED(
+MTR_DEPRECATED(
     "Please use MTRMediaPlaybackClusterStopParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRMediaPlaybackClusterStopPlaybackParams : MTRMediaPlaybackClusterStopParams
 @end
@@ -6162,7 +6162,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -6391,7 +6391,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -6486,11 +6486,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
-API_DEPRECATED("Please use MTRContentLauncherClusterLauncherResponseParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+MTR_DEPRECATED("Please use MTRContentLauncherClusterLauncherResponseParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
     tvos(16.1, 16.4))
 @interface MTRContentLauncherClusterLaunchResponseParams : MTRContentLauncherClusterLauncherResponseParams
 @end
@@ -6673,7 +6673,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -6727,7 +6727,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -6819,7 +6819,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -6882,7 +6882,7 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
@@ -6948,7 +6948,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED(
+MTR_DEPRECATED(
     "Please use MTRUnitTestingClusterTestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestParams : MTRUnitTestingClusterTestParams
 @end
@@ -6972,11 +6972,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestSpecificResponseParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSpecificResponseParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
     tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestSpecificResponseParams : MTRUnitTestingClusterTestSpecificResponseParams
 @end
@@ -7009,7 +7009,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED(
+MTR_DEPRECATED(
     "Please use MTRUnitTestingClusterTestNotHandledParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestNotHandledParams : MTRUnitTestingClusterTestNotHandledParams
 @end
@@ -7033,11 +7033,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestAddArgumentsResponseParams : MTRUnitTestingClusterTestAddArgumentsResponseParams
 @end
@@ -7070,7 +7070,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED(
+MTR_DEPRECATED(
     "Please use MTRUnitTestingClusterTestSpecificParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestSpecificParams : MTRUnitTestingClusterTestSpecificParams
 @end
@@ -7094,11 +7094,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestSimpleArgumentResponseParams : MTRUnitTestingClusterTestSimpleArgumentResponseParams
 @end
@@ -7131,7 +7131,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestUnknownCommandParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestUnknownCommandParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
     tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestUnknownCommandParams : MTRUnitTestingClusterTestUnknownCommandParams
 @end
@@ -7165,11 +7165,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestStructArrayArgumentResponseParams : MTRUnitTestingClusterTestStructArrayArgumentResponseParams
 @end
@@ -7206,7 +7206,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestAddArgumentsParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
     tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestAddArgumentsParams : MTRUnitTestingClusterTestAddArgumentsParams
 @end
@@ -7230,11 +7230,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestListInt8UReverseResponseParams : MTRUnitTestingClusterTestListInt8UReverseResponseParams
 @end
@@ -7269,7 +7269,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestSimpleArgumentRequestParams : MTRUnitTestingClusterTestSimpleArgumentRequestParams
 @end
@@ -7295,11 +7295,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsResponseParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsResponseParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
     tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestEnumsResponseParams : MTRUnitTestingClusterTestEnumsResponseParams
 @end
@@ -7344,7 +7344,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestStructArrayArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestStructArrayArgumentRequestParams : MTRUnitTestingClusterTestStructArrayArgumentRequestParams
 @end
@@ -7374,11 +7374,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestNullableOptionalResponseParams : MTRUnitTestingClusterTestNullableOptionalResponseParams
 @end
@@ -7414,7 +7414,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestStructArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestStructArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestStructArgumentRequestParams : MTRUnitTestingClusterTestStructArgumentRequestParams
 @end
@@ -7514,11 +7514,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptionalResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptionalResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestComplexNullableOptionalResponseParams
     : MTRUnitTestingClusterTestComplexNullableOptionalResponseParams
@@ -7555,7 +7555,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestNestedStructArgumentRequestParams : MTRUnitTestingClusterTestNestedStructArgumentRequestParams
 @end
@@ -7579,11 +7579,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterBooleanResponseParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterBooleanResponseParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
     tvos(16.1, 16.4))
 @interface MTRTestClusterClusterBooleanResponseParams : MTRUnitTestingClusterBooleanResponseParams
 @end
@@ -7618,7 +7618,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestListStructArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListStructArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestListStructArgumentRequestParams : MTRUnitTestingClusterTestListStructArgumentRequestParams
 @end
@@ -7643,11 +7643,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructResponseParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructResponseParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
     tvos(16.1, 16.4))
 @interface MTRTestClusterClusterSimpleStructResponseParams : MTRUnitTestingClusterSimpleStructResponseParams
 @end
@@ -7682,7 +7682,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestListInt8UArgumentRequestParams : MTRUnitTestingClusterTestListInt8UArgumentRequestParams
 @end
@@ -7706,11 +7706,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestEmitTestEventResponseParams : MTRUnitTestingClusterTestEmitTestEventResponseParams
 @end
@@ -7746,7 +7746,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructListArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNestedStructListArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestNestedStructListArgumentRequestParams
     : MTRUnitTestingClusterTestNestedStructListArgumentRequestParams
@@ -7771,11 +7771,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  */
 @property (nonatomic, copy, nullable)
-    NSNumber * timedInvokeTimeoutMs API_DEPRECATED("Timed invoke does not make sense for server to client commands",
+    NSNumber * timedInvokeTimeoutMs MTR_DEPRECATED("Timed invoke does not make sense for server to client commands",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams
     : MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams
@@ -7811,7 +7811,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestListNestedStructListArgumentRequestParams
     : MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams
@@ -7847,7 +7847,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestListInt8UReverseRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestListInt8UReverseRequestParams : MTRUnitTestingClusterTestListInt8UReverseRequestParams
 @end
@@ -7884,7 +7884,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEnumsRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
     tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestEnumsRequestParams : MTRUnitTestingClusterTestEnumsRequestParams
 @end
@@ -7919,7 +7919,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestNullableOptionalRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestNullableOptionalRequestParams : MTRUnitTestingClusterTestNullableOptionalRequestParams
 @end
@@ -7982,7 +7982,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptionalRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestComplexNullableOptionalRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestComplexNullableOptionalRequestParams
     : MTRUnitTestingClusterTestComplexNullableOptionalRequestParams
@@ -8019,7 +8019,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructEchoRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterSimpleStructEchoRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterSimpleStructEchoRequestParams : MTRUnitTestingClusterSimpleStructEchoRequestParams
 @end
@@ -8052,7 +8052,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTimedInvokeRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTimedInvokeRequestParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
     tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTimedInvokeRequestParams : MTRUnitTestingClusterTimedInvokeRequestParams
 @end
@@ -8087,7 +8087,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams
     : MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams
@@ -8127,7 +8127,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestEventRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestEmitTestEventRequestParams : MTRUnitTestingClusterTestEmitTestEventRequestParams
 @end
@@ -8162,7 +8162,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-API_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
+MTR_DEPRECATED("Please use MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams", ios(16.1, 16.4), macos(13.0, 13.3),
     watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams
     : MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams

@@ -173,14 +173,14 @@ In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
 -   Download
-    [K32W061DK6 SDK 2.6.9](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_9_K32W061DK6.zip).
+    [K32W061DK6 SDK 2.6.10](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_10_K32W061DK6.zip).
 
 -   Start building the application either with Secure Element or without
 
     -   without Secure Element
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_9_K32W061DK6/
+user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_10_K32W061DK6/
 user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/nxp/k32w/k32w0

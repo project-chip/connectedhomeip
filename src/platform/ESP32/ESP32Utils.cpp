@@ -38,9 +38,9 @@
 using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 CHIP_ERROR ESP32Utils::IsAPEnabled(bool & apEnabled)
 {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     wifi_mode_t curWiFiMode;
 
     esp_err_t err = esp_wifi_get_mode(&curWiFiMode);
@@ -53,8 +53,10 @@ CHIP_ERROR ESP32Utils::IsAPEnabled(bool & apEnabled)
     apEnabled = (curWiFiMode == WIFI_MODE_AP || curWiFiMode == WIFI_MODE_APSTA);
 
     return CHIP_NO_ERROR;
-}
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+}
 
 CHIP_ERROR ESP32Utils::IsStationEnabled(bool & staEnabled)
 {
@@ -325,6 +327,58 @@ CHIP_ERROR ESP32Utils::ClearWiFiStationProvision(void)
     memset(&stationConfig, 0, sizeof(stationConfig));
     esp_wifi_set_config(WIFI_IF_STA, &stationConfig);
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ESP32Utils::InitWiFiStack(void)
+{
+    wifi_init_config_t cfg;
+    uint8_t ap_mac[6];
+    wifi_mode_t mode;
+    esp_err_t err = esp_netif_init();
+    if (err != ESP_OK)
+    {
+        return ESP32Utils::MapError(err);
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+    if (!esp_netif_create_default_wifi_ap())
+    {
+        ChipLogError(DeviceLayer, "Failed to create the WiFi AP netif");
+        return CHIP_ERROR_INTERNAL;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+    if (!esp_netif_create_default_wifi_sta())
+    {
+        ChipLogError(DeviceLayer, "Failed to create the WiFi STA netif");
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    // Initialize the ESP WiFi layer.
+    cfg = WIFI_INIT_CONFIG_DEFAULT();
+    err = esp_wifi_init(&cfg);
+    if (err != ESP_OK)
+    {
+        return ESP32Utils::MapError(err);
+    }
+
+    esp_wifi_get_mode(&mode);
+    if ((mode == WIFI_MODE_AP) || (mode == WIFI_MODE_APSTA))
+    {
+        esp_fill_random(ap_mac, sizeof(ap_mac));
+        /* Bit 0 of the first octet of MAC Address should always be 0 */
+        ap_mac[0] &= (uint8_t) ~0x01;
+        err = esp_wifi_set_mac(WIFI_IF_AP, ap_mac);
+        if (err != ESP_OK)
+        {
+            return ESP32Utils::MapError(err);
+        }
+    }
+    err = esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
+    if (err != ESP_OK)
+    {
+        return ESP32Utils::MapError(err);
+    }
     return CHIP_NO_ERROR;
 }
 

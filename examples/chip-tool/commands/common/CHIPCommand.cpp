@@ -506,7 +506,16 @@ CHIP_ERROR CHIPCommand::StartWaiting(chip::System::Clock::Timeout duration)
             mWaitingForResponse = true;
         }
 
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
+        auto err = chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
+        if (CHIP_NO_ERROR != err)
+        {
+            {
+                std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
+                mWaitingForResponse = false;
+            }
+            return err;
+        }
+
         auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(duration);
         {
             std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);

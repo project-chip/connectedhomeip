@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app/BufferedReadCallback.h>
+#include <app/CommandSender.h>
 #include <app/ReadClient.h>
 #include <app/WriteClient.h>
 #include <controller/CHIPDeviceController.h>
@@ -150,6 +151,28 @@ struct WriteAttributesCallback : public app::WriteClient::Callback
     app::ChunkedWriteCallback mChunkedWriteCallback;
     jobject mWrapperCallbackRef = nullptr;
     jobject mJavaCallbackRef    = nullptr;
+};
+
+struct InvokeCallback : public app::CommandSender::Callback
+{
+    InvokeCallback(jobject wrapperCallback, jobject javaCallback);
+    ~InvokeCallback();
+
+    void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatusIB,
+                    TLV::TLVReader * apData) override;
+    /** Report errors back to Java layer. attributePath may be nullptr for general errors. */
+    void OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override;
+
+    void OnDone(app::CommandSender * apCommandSender) override;
+
+    CHIP_ERROR CreateInvokeElement(const app::ConcreteCommandPath & aPath, TLV::TLVReader * apData, jobject & outObj);
+    void ReportError(CHIP_ERROR err);
+    void ReportError(Protocols::InteractionModel::Status status);
+    void ReportError(const char * message, ChipError::StorageType errorCode);
+
+    app::CommandSender * mCommandSender = nullptr;
+    jobject mWrapperCallbackRef         = nullptr;
+    jobject mJavaCallbackRef            = nullptr;
 };
 
 } // namespace Controller

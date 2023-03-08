@@ -63,10 +63,6 @@ config BT_HCI_RAW_RESERVE
 config BT_BUF_CMD_TX_COUNT
     default 10
 
-# Enable support for Wi-Fi and Bluetooth LE coexistance
-config MPSL_CX
-    default y
-
 config ASSERT
     default y
 
