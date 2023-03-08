@@ -93,7 +93,8 @@ public:
 
     /// @brief From command StoreScene, retrieves ExtensionField from currently active values, it is the function's responsibility to
 
-    /// resize the mutable span if necessary, a number of byte equal to the span will be stored in memory
+    /// place the serialized data in serializedBytes as described below.
+
     /// @param endpoint Target Endpoint
     /// @param cluster Target Cluster
     /// @param serialisedBytes Output buffer, data needs to be writen in there and size adjusted if smaller than
