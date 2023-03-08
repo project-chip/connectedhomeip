@@ -77,7 +77,7 @@ public:
 
     CHIP_ERROR GetWiFiBssId(ByteSpan & BssId) override;
     CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType) override;
-    CHIP_ERROR GetWiFiVersion(uint8_t & wifiVersion) override;
+    CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion) override;
     CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber) override;
     CHIP_ERROR GetWiFiRssi(int8_t & rssi) override;
     CHIP_ERROR GetWiFiBeaconRxCount(uint32_t & beaconRxCount) override;

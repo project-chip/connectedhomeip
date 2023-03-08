@@ -82,16 +82,19 @@ app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum MapAuthModeToSecurityTyp
     }
 }
 
-uint8_t GetWiFiVersionFromAPRecord(wifi_ap_record_t ap_info)
+app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum GetWiFiVersionFromAPRecord(wifi_ap_record_t ap_info)
 {
+    using app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum;
     if (ap_info.phy_11n)
-        return 3;
+        return WiFiVersionEnum::kN;
     else if (ap_info.phy_11g)
-        return 2;
+        return WiFiVersionEnum::kG;
     else if (ap_info.phy_11b)
-        return 1;
+        return WiFiVersionEnum::kB;
     else
-        return 0;
+        // TODO: This is keeping the old behavior, it doesn't look right.
+        // https://github.com/project-chip/connectedhomeip/issues/25544
+        return WiFiVersionEnum::kA;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
@@ -305,17 +308,18 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wifiVersion)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion)
 {
-    wifiVersion = 0;
     wifi_ap_record_t ap_info;
     esp_err_t err;
     err = esp_wifi_sta_get_ap_info(&ap_info);
     if (err == ESP_OK)
     {
         wifiVersion = GetWiFiVersionFromAPRecord(ap_info);
+        return CHIP_NO_ERROR;
     }
-    return CHIP_NO_ERROR;
+
+    return ESP32Utils::MapError(err);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
@@ -328,8 +332,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNu
     if (err == ESP_OK)
     {
         channelNumber = ap_info.primary;
+        return CHIP_NO_ERROR;
     }
-    return CHIP_NO_ERROR;
+
+    return ESP32Utils::MapError(err);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
@@ -343,8 +349,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
     if (err == ESP_OK)
     {
         rssi = ap_info.rssi;
+        return CHIP_NO_ERROR;
     }
-    return CHIP_NO_ERROR;
+
+    return ESP32Utils::MapError(err);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
