@@ -113,6 +113,8 @@ if [ "$#" == "0" ]; then
             enable Addition data advertissing and rotating device ID
         --use_ot_lib
             use the silabs openthread library
+        --use_lwip_lib
+            use the silabs lwip library
         --no-version
             Skip the silabs formating for the Matter software version string
             Currently : v1.0-<branchName>-<ShortCommitSha>
