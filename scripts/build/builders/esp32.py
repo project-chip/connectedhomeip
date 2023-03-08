@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -126,6 +126,7 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
         specific_apps = {
             Esp32App.ALL_CLUSTERS,
             Esp32App.ALL_CLUSTERS_MINIMAL,
+            Esp32App.LIGHT,
             Esp32App.OTA_REQUESTOR,
         }
         if app in specific_apps:

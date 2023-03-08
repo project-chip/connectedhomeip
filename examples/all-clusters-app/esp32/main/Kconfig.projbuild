@@ -25,6 +25,7 @@ menu "Demo"
         default DEVICE_TYPE_ESP32_DEVKITC if IDF_TARGET_ESP32
         default DEVICE_TYPE_ESP32_C3_DEVKITM if IDF_TARGET_ESP32C3
         default DEVICE_TYPE_ESP32_C2_DEVKITM if IDF_TARGET_ESP32C2
+        default DEVICE_TYPE_ESP32_C6_DEVKITC if IDF_TARGET_ESP32C6
         help
             Specifies the type of ESP32 device.
 
@@ -50,6 +51,9 @@ menu "Demo"
         config DEVICE_TYPE_ESP32_C2_DEVKITM
             bool "ESP32C2-DevKitM"
             depends on IDF_TARGET_ESP32C2
+        config DEVICE_TYPE_ESP32_C6_DEVKITC
+            bool "ESP32C6-DevKitC"
+            depends on IDF_TARGET_ESP32C6
     endchoice
 
     choice
@@ -81,7 +85,7 @@ menu "Demo"
         int
         range 0 5
         default 0 if DEVICE_TYPE_ESP32_DEVKITC
-        default 0 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM
+        default 0 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32_C6_DEVKITC
         default 3 if DEVICE_TYPE_M5STACK
         default 4 if DEVICE_TYPE_ESP32_WROVER_KIT
 
@@ -102,12 +106,12 @@ menu "Demo"
             To reduce wear and heat the M5Stack's Display is automatically switched off after a few seconds
 
     config STATUS_LED_GPIO_NUM
-        int 
+        int
         range 0 40
-        default 2 if DEVICE_TYPE_ESP32_DEVKITC         #Use LED1 (blue LED) as status LED on DevKitC      
+        default 2 if DEVICE_TYPE_ESP32_DEVKITC         #Use LED1 (blue LED) as status LED on DevKitC
         default 2 if DEVICE_TYPE_ESP32_ETHERNET_KIT
-        default 8 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM
-        default 26 if DEVICE_TYPE_ESP32_WROVER_KIT     
+        default 8 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32_C6_DEVKITC
+        default 26 if DEVICE_TYPE_ESP32_WROVER_KIT
         default 40 if DEVICE_TYPE_M5STACK
         help
             Each board has a status led, define its pin number.

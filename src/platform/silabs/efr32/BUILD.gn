@@ -57,8 +57,10 @@ static_library("efr32") {
     "${silabs_platform_dir}/DiagnosticDataProviderImpl.cpp",
     "${silabs_platform_dir}/DiagnosticDataProviderImpl.h",
     "${silabs_platform_dir}/InetPlatformConfig.h",
+    "${silabs_platform_dir}/KeyValueStoreManagerImpl.cpp",
     "${silabs_platform_dir}/KeyValueStoreManagerImpl.h",
     "${silabs_platform_dir}/Logging.cpp",
+    "${silabs_platform_dir}/MigrationManager.cpp",
     "${silabs_platform_dir}/PlatformManagerImpl.h",
     "${silabs_platform_dir}/SilabsConfig.cpp",
     "${silabs_platform_dir}/SilabsConfig.h",
@@ -66,8 +68,6 @@ static_library("efr32") {
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
     "ConfigurationManagerImpl.cpp",
-    "KeyValueStoreManagerImpl.cpp",
-    "MigrationManager.cpp",
     "PlatformManagerImpl.cpp",
   ]
 

@@ -270,10 +270,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wifiVersion)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion)
 {
     // Support 802.11a/n Wi-Fi in AmebaD chipset
-    wifiVersion = to_underlying(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kN);
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/25542
+    wifiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kN;
     return CHIP_NO_ERROR;
 }
 
