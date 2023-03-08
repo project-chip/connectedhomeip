@@ -30,6 +30,8 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <protocols/interaction_model/StatusCode.h>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -117,7 +119,7 @@ CHIP_ERROR CheckValidBindingList(const EndpointId localEndpoint, const Decodable
     return CHIP_NO_ERROR;
 }
 
-void CreateBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
+CHIP_ERROR CreateBindingEntry(const TargetStructType & entry, EndpointId localEndpoint)
 {
     EmberBindingTableEntry bindingEntry;
 
@@ -131,7 +133,7 @@ void CreateBindingEntry(const TargetStructType & entry, EndpointId localEndpoint
                                                        entry.cluster);
     }
 
-    AddBindingEntry(bindingEntry);
+    return AddBindingEntry(bindingEntry);
 }
 
 CHIP_ERROR BindingTableAccess::Read(const ConcreteReadAttributePath & path, AttributeValueEncoder & encoder)
@@ -225,10 +227,11 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         }
 
         // Add new entries
-        auto iter = newBindingList.begin();
-        while (iter.Next())
+        auto iter      = newBindingList.begin();
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        while (iter.Next() && err == CHIP_NO_ERROR)
         {
-            CreateBindingEntry(iter.GetValue(), path.mEndpointId);
+            err = CreateBindingEntry(iter.GetValue(), path.mEndpointId);
         }
 
         // If this was not caused by a list operation, OnListWriteEnd is not going to be triggered
@@ -238,7 +241,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
             // Notify binding table has changed
             LogErrorOnFailure(NotifyBindingsChanged());
         }
-        return CHIP_NO_ERROR;
+        return err;
     }
     if (path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
@@ -248,8 +251,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
-        CreateBindingEntry(target, path.mEndpointId);
-        return CHIP_NO_ERROR;
+        return CreateBindingEntry(target, path.mEndpointId);
     }
     return CHIP_IM_GLOBAL_STATUS(UnsupportedWrite);
 }
@@ -269,11 +271,22 @@ void MatterBindingPluginServerInitCallback()
     registerAttributeAccessOverride(&gAttrAccess);
 }
 
-void AddBindingEntry(const EmberBindingTableEntry & entry)
+CHIP_ERROR AddBindingEntry(const EmberBindingTableEntry & entry)
 {
+    CHIP_ERROR err = BindingTable::GetInstance().Add(entry);
+    if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
     if (entry.type == EMBER_UNICAST_BINDING)
     {
-        CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+        err = BindingManager::GetInstance().UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
         if (err != CHIP_NO_ERROR)
         {
             // Unicast connection failure can happen if peer is offline. We'll retry connection on-demand.
@@ -283,5 +296,5 @@ void AddBindingEntry(const EmberBindingTableEntry & entry)
         }
     }
 
-    BindingTable::GetInstance().Add(entry);
+    return CHIP_NO_ERROR;
 }
