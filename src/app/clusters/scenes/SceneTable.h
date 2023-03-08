@@ -91,7 +91,8 @@ public:
     virtual CHIP_ERROR SerializeAdd(EndpointId endpoint, ClusterId & cluster, MutableByteSpan & serialisedBytes,
                                     app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet) = 0;
 
-    /// @brief From command StoreScene, retrieves ExtensionField from currently active values, it is the functions responsability to
+    /// @brief From command StoreScene, retrieves ExtensionField from currently active values, it is the function's responsibility to
+
     /// resize the mutable span if necessary, a number of byte equal to the span will be stored in memory
     /// @param endpoint Target Endpoint
     /// @param cluster Target Cluster
