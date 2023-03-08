@@ -283,7 +283,8 @@ void AppTask::lockMgr_Init()
     }
 
     ConfigurationMgr().LogDeviceConfig();
-
+    // Users and credentials should be checked once from flash on boot
+    LockMgr().ReadConfigValues();
     // Print setup info
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
 }
@@ -322,9 +323,6 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     sAppTask.Init();
     P6_LOG("App Task started");
-
-    // Users and credentials should be checked once from flash on boot
-    LockMgr().ReadConfigValues();
 
     while (true)
     {
