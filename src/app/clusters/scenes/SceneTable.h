@@ -97,8 +97,8 @@ public:
 
     /// @param endpoint Target Endpoint
     /// @param cluster Target Cluster
-    /// @param serialisedBytes Output buffer, data needs to be writen in there and size adjusted if smaller than
-    /// kMaxFieldsPerCluster
+    /// @param serializedBytes Output buffer, data needs to be writen in there and size adjusted to the size of the data written.
+
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
     virtual CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serialisedBytes) = 0;
 
