@@ -34,6 +34,8 @@ using SceneData       = DefaultSceneTableImpl::SceneData;
 
 struct FabricHavingSceneList : public CommonPersistentData::FabricList
 {
+    // This implementation uses the same key as the GroupFabricList from GroupDataProviderImpl to avoid duplicating the list in
+    // memory. If a different GroupDataProvider implementation is used, it will create the list in flash memory.
     CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
         key = DefaultStorageKeyAllocator::GroupFabricList();
