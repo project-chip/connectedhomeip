@@ -121,7 +121,8 @@ public:
 
     /// @param timeMs Transition time in ms to apply the scene
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
-    virtual CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, ByteSpan & serialisedBytes, TransitionTimeMs timeMs) = 0;
+    virtual CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes, TransitionTimeMs timeMs) = 0;
+
 };
 
 template <class EFStype>
