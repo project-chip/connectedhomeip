@@ -110,7 +110,8 @@ public:
 
     /// @param extensionFieldSet ExtensionFieldSet in command format
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
-    virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, ByteSpan & serialisedBytes,
+    virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
+
                                    app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & extensionFieldSet) = 0;
 
     /// @brief From stored scene (e.g RecallScene), applies EFS values to cluster at transition time
