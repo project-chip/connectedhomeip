@@ -121,6 +121,15 @@ CHIP_ERROR AmebaUtils::ClearWiFiConfig()
     rtw_wifi_config_t wifiConfig;
     memset(&wifiConfig, 0, sizeof(wifiConfig));
     err = SetWiFiConfig(&wifiConfig);
+
+    /* Clear Wi-Fi Configurations in Storage */
+    err = PersistedStorage::KeyValueStoreMgr().Delete(kWiFiSSIDKeyName);
+    SuccessOrExit(err);
+
+    err = PersistedStorage::KeyValueStoreMgr().Delete(kWiFiCredentialsKeyName);
+    SuccessOrExit(err);
+
+exit:
     return err;
 }
 
