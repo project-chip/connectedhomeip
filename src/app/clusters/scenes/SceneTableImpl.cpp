@@ -74,7 +74,7 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
-        CharSpan NameSpan(mStorageData.mName, mStorageData.mNameLength);
+        CharSpan nameSpan(mStorageData.mName, mStorageData.mNameLength);
         TLV::TLVType container;
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
 
