@@ -183,7 +183,7 @@ else
             shift
             ;;
         --use_lwip_lib)
-            optArgs+="use_silabs_lwip_lib=true lwip_platform=\""external"\" "
+            optArgs+="use_silabs_lwip_lib=true "
             shift
             ;;
         # Option not to be used until ot-efr32 github is updated
