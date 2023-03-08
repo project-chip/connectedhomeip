@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,17 +13,14 @@
 # limitations under the License.
 import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
-import("//build_overrides/lwip.gni")
-
-# Replace directory for lwIP to use gecko_sdk
-lwip_root = "${efr32_sdk_build_root}/gecko_sdk/util/third_party/lwip"
+import("${chip_root}/src/platform/silabs/lwip/lwip.gni")
 
 # Defines a lwIP build target.
 #
 # lwIP depends on external header files to compile. This template defines
 # a combined build of the lwIP sources plus target configuration.
 template("lwip_target") {
-  _lwip_root = "${lwip_root}/lwip"
+  _lwip_root = "${efr32_sdk_build_root}/gecko_sdk/util/third_party/lwip/lwip"
 
   lwip_target_name = target_name
 
@@ -58,7 +55,7 @@ template("lwip_target") {
   }
 
   config("${lwip_target_name}_base_config") {
-    include_dirs = [ "${lwip_root}/lwip/src/include" ]
+    include_dirs = [ "${_lwip_root}/src/include" ]
   }
 
   source_set(lwip_target_name) {
