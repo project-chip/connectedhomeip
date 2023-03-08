@@ -104,3 +104,24 @@ tests:
                   { FabricIndex: 1, Node: 1, Endpoint: 1, Cluster: 6 },
                   { FabricIndex: 1, Node: 2, Endpoint: 1 },
               ]
+
+    - label: "Write over-long binding table on endpoint 1"
+      command: "writeAttribute"
+      attribute: "Binding"
+      arguments:
+          value:
+              [
+                  { FabricIndex: 0, Node: 1, Endpoint: 1, Cluster: 6 },
+                  { FabricIndex: 0, Node: 2, Endpoint: 2, Cluster: 6 },
+                  { FabricIndex: 0, Node: 3, Endpoint: 3, Cluster: 6 },
+                  { FabricIndex: 0, Node: 4, Endpoint: 4, Cluster: 6 },
+                  { FabricIndex: 0, Node: 5, Endpoint: 5, Cluster: 6 },
+                  { FabricIndex: 0, Node: 6, Endpoint: 6, Cluster: 6 },
+                  { FabricIndex: 0, Node: 7, Endpoint: 7, Cluster: 6 },
+                  { FabricIndex: 0, Node: 8, Endpoint: 8, Cluster: 6 },
+                  { FabricIndex: 0, Node: 9, Endpoint: 9, Cluster: 6 },
+                  { FabricIndex: 0, Node: 10, Endpoint: 10, Cluster: 6 },
+                  { FabricIndex: 0, Node: 11, Endpoint: 11, Cluster: 6 },
+              ]
+      response:
+          error: RESOURCE_EXHAUSTED
