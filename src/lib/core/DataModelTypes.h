@@ -40,7 +40,6 @@ typedef uint32_t EventId;
 typedef uint64_t EventNumber;
 typedef uint64_t FabricId;
 typedef uint8_t FabricIndex;
-typedef uint8_t SceneIndex;
 typedef uint32_t FieldId;
 typedef uint16_t ListIndex;
 typedef uint16_t LocalizedStringIdentifier;
@@ -48,7 +47,6 @@ typedef uint32_t TransactionId;
 typedef uint16_t KeysetId;
 typedef uint8_t InteractionModelRevision;
 typedef uint32_t SubscriptionId;
-typedef GroupId SceneGroupID;
 typedef uint8_t SceneId;
 
 constexpr CompressedFabricId kUndefinedCompressedFabricId = 0ULL;

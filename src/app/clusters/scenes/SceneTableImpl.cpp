@@ -79,21 +79,21 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
 
         // Scene ID
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagSceneEndpointID), static_cast<uint16_t>(mStorageId.mEndpointId)));
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagSceneGroupID), static_cast<uint16_t>(mStorageId.mGroupId)));
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagSceneID), static_cast<uint8_t>(mStorageId.mSceneId)));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kEndpointID), static_cast<uint16_t>(mStorageId.mEndpointId)));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kGroupID), static_cast<uint16_t>(mStorageId.mGroupId)));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kID), static_cast<uint8_t>(mStorageId.mSceneId)));
 
         // Scene Data
         // A length of 0 means the name wasn't used so it won't get stored
-        if (!NameSpan.empty())
+        if (!nameSpan.empty())
         {
-            ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(kTagSceneName), NameSpan));
+            ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(TagScene::kName), nameSpan));
         }
 
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kTransitionTime),
+                                        static_cast<uint16_t>(mStorageData.mSceneTransitionTimeSeconds)));
         ReturnErrorOnFailure(
-            writer.Put(TLV::ContextTag(kTagSceneDTransitionTime), static_cast<uint16_t>(mStorageData.mSceneTransitionTimeSeconds)));
-        ReturnErrorOnFailure(
-            writer.Put(TLV::ContextTag(kTagSceneDTransitionTime100), static_cast<uint8_t>(mStorageData.mTransitionTime100ms)));
+            writer.Put(TLV::ContextTag(TagScene::kTransitionTime100), static_cast<uint8_t>(mStorageData.mTransitionTime100ms)));
         ReturnErrorOnFailure(mStorageData.mExtensionFieldSets.Serialize(writer));
 
         return writer.EndContainer(container);
@@ -101,7 +101,7 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
 
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
     {
-        CharSpan NameSpan(mStorageData.mName);
+        CharSpan nameSpan(mStorageData.mName);
 
         ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag()));
         VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
@@ -110,29 +110,29 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
         ReturnErrorOnFailure(reader.EnterContainer(container));
 
         // Scene ID
-        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagSceneEndpointID)));
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kEndpointID)));
         ReturnErrorOnFailure(reader.Get(mStorageId.mEndpointId));
-        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagSceneGroupID)));
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kGroupID)));
         ReturnErrorOnFailure(reader.Get(mStorageId.mGroupId));
-        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagSceneID)));
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kID)));
         ReturnErrorOnFailure(reader.Get(mStorageId.mSceneId));
 
         // Scene Data
         ReturnErrorOnFailure(reader.Next());
         TLV::Tag currTag = reader.GetTag();
-        VerifyOrReturnError(TLV::ContextTag(kTagSceneName) == currTag || TLV::ContextTag(kTagSceneDTransitionTime) == currTag,
+        VerifyOrReturnError(TLV::ContextTag(TagScene::kName) == currTag || TLV::ContextTag(TagScene::kTransitionTime) == currTag,
                             CHIP_ERROR_WRONG_TLV_TYPE);
 
         // If there was no error, a name is expected from the storage, if there was an unexpectec TLV element,
-        if (currTag == TLV::ContextTag(kTagSceneName))
+        if (currTag == TLV::ContextTag(TagScene::kName))
         {
-            ReturnErrorOnFailure(reader.Get(NameSpan));
-            mStorageData.SetName(NameSpan);
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagSceneDTransitionTime)));
+            ReturnErrorOnFailure(reader.Get(nameSpan));
+            mStorageData.SetName(nameSpan);
+            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kTransitionTime)));
         }
 
         ReturnErrorOnFailure(reader.Get(mStorageData.mSceneTransitionTimeSeconds));
-        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagSceneDTransitionTime100)));
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kTransitionTime100)));
         ReturnErrorOnFailure(reader.Get(mStorageData.mTransitionTime100ms));
         ReturnErrorOnFailure(mStorageData.mExtensionFieldSets.Deserialize(reader));
 
@@ -162,7 +162,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
     CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
         VerifyOrReturnError(kUndefinedFabricIndex != fabric_index, CHIP_ERROR_INVALID_FABRIC_INDEX);
-        key = DefaultStorageKeyAllocator::FabricScenesKey(fabric_index);
+        key = DefaultStorageKeyAllocator::FabricSceneDataKey(fabric_index);
         return CHIP_NO_ERROR;
     }
 
@@ -186,9 +186,10 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         // Storing the scene map
         for (uint8_t i = 0; i < kMaxScenePerFabric; i++)
         {
-            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagSceneEndpointID), static_cast<uint16_t>(scene_map[i].mEndpointId)));
-            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagSceneGroupID), static_cast<uint16_t>(scene_map[i].mGroupId)));
-            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagSceneID), static_cast<uint8_t>(scene_map[i].mSceneId)));
+            ReturnErrorOnFailure(
+                writer.Put(TLV::ContextTag(TagScene::kEndpointID), static_cast<uint16_t>(scene_map[i].mEndpointId)));
+            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kGroupID), static_cast<uint16_t>(scene_map[i].mGroupId)));
+            ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kID), static_cast<uint8_t>(scene_map[i].mSceneId)));
         }
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagNext), static_cast<uint16_t>(next)));
 
@@ -207,11 +208,11 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         ReturnErrorOnFailure(reader.Get(scene_count));
         for (uint8_t i = 0; i < kMaxScenePerFabric; i++)
         {
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagSceneEndpointID)));
+            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kEndpointID)));
             ReturnErrorOnFailure(reader.Get(scene_map[i].mEndpointId));
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagSceneGroupID)));
+            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kGroupID)));
             ReturnErrorOnFailure(reader.Get(scene_map[i].mGroupId));
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagSceneID)));
+            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kID)));
             ReturnErrorOnFailure(reader.Get(scene_map[i].mSceneId));
         }
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagNext)));
@@ -445,10 +446,10 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntry(FabricIndex fabric_index
 /// @param fabric_index Fabric in which the scene belongs
 /// @param scened_idx Position in the Scene Table
 /// @return CHIP_NO_ERROR if removal was successful, errors if failed to remove the scene or to update the fabric after removing it
-CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scened_idx)
+CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scene_idx)
 {
     FabricSceneData fabric(fabric_index);
-    SceneTableData scene(fabric_index, scened_idx);
+    SceneTableData scene(fabric_index, scene_idx);
 
     ReturnErrorOnFailure(scene.Delete(mStorage));
 
@@ -533,7 +534,7 @@ CHIP_ERROR DefaultSceneTableImpl::UnregisterHandler(SceneHandler * handler)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::UnregisterAllHandler()
+CHIP_ERROR DefaultSceneTableImpl::UnregisterAllHandlers()
 {
     for (uint8_t i = 0; i < this->mNumHandlers; i++)
     {
@@ -556,8 +557,8 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
                 this->mHandlers[i]->GetSupportedClusters(scene.mStorageId.mEndpointId, cSpan);
                 for (uint8_t j = 0; j < cSpan.size(); j++)
                 {
-                    ExtensionFieldsSet EFS;
-                    MutableByteSpan EFSSpan = MutableByteSpan(EFS.mBytesBuffer, kMaxFieldsPerCluster);
+                    ExtensionFieldSet EFS;
+                    MutableByteSpan EFSSpan = MutableByteSpan(EFS.mBytesBuffer, kMaxFieldBytesPerCluster);
 
                     EFS.mID = cArray[j];
                     ReturnErrorOnFailure(this->mHandlers[i]->SerializeSave(scene.mStorageId.mEndpointId, EFS.mID, EFSSpan));
@@ -575,7 +576,7 @@ CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(FabricIndex fabric_index, const 
 {
     FabricSceneData fabric(fabric_index);
     SceneTableData scene(fabric_index);
-    ExtensionFieldsSet EFS;
+    ExtensionFieldSet EFS;
     TransitionTimeMs time;
     clusterId cluster;
 
@@ -585,7 +586,7 @@ CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(FabricIndex fabric_index, const 
 
     if (!this->HandlerListEmpty())
     {
-        for (uint8_t i = 0; i < scene.mStorageData.mExtensionFieldSets.GetFieldNum(); i++)
+        for (uint8_t i = 0; i < scene.mStorageData.mExtensionFieldSets.GetFieldSetCount(); i++)
         {
             scene.mStorageData.mExtensionFieldSets.GetFieldSetAtPosition(EFS, i);
             cluster = EFS.mID;
@@ -624,7 +625,7 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
     return fabric.Delete(mStorage);
 }
 
-DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneEntry(FabricIndex fabric_index)
+DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneEntries(FabricIndex fabric_index)
 {
     VerifyOrReturnError(IsInitialized(), nullptr);
     return mSceneEntryIterators.CreateObject(*this, fabric_index);

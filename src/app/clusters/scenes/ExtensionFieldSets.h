@@ -23,10 +23,11 @@
 namespace chip {
 namespace scenes {
 
-static constexpr uint8_t kInvalidPosition     = 0xff;
-static constexpr uint8_t kMaxClusterPerScenes = CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES;
-static constexpr uint8_t kMaxFieldsPerCluster = CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER;
+static constexpr uint8_t kInvalidPosition         = 0xff;
+static constexpr uint8_t kMaxClusterPerScenes     = CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE;
+static constexpr uint8_t kMaxFieldBytesPerCluster = CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER;
 
+/// @brief class meant serialize all extension ßfield sets of a scene so it can be stored and retrieved from flash memory.
 class ExtensionFieldSets
 {
 public:
@@ -37,7 +38,9 @@ public:
     virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader)     = 0;
     virtual void Clear()                                        = 0;
     virtual bool IsEmpty() const                                = 0;
-    virtual uint8_t GetFieldNum() const                         = 0;
+    /// @brief Gets a count of how many initialized fields sets are in the object
+    /// @return The number of initialized field sets in the object
+    virtual uint8_t GetFieldSetCount() const = 0;
 };
 } // namespace scenes
 } // namespace chip
