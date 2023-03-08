@@ -167,6 +167,22 @@ public abstract class Command {
    * @return The number of arguments currently added to the command
    */
   public final void addArgument(
+      String name, short min, short max, AtomicLong out, @Nullable String desc, boolean optional) {
+    Argument arg = new Argument(name, min, max, out, desc, optional);
+    addArgumentToList(arg, optional);
+  }
+
+  /**
+   * @brief Add a long Integer command argument
+   * @param name The name that will be displayed in the command help
+   * @param min The minimum value of the argv value
+   * @param max The minimum value of the argv value
+   * @param out A pointer to a MutableInteger where the argv value will be stored
+   * @param desc The description of the argument that will be displayed in the command help
+   * @param optional Indicate if an optional argument
+   * @return The number of arguments currently added to the command
+   */
+  public final void addArgument(
       String name, long min, long max, AtomicLong out, @Nullable String desc, boolean optional) {
     Argument arg = new Argument(name, min, max, out, desc, optional);
     addArgumentToList(arg, optional);
