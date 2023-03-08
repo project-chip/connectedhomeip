@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#if CONFIG_HAVE_DISPLAY
-
 #include "DeviceWithDisplay.h"
+
+#if CONFIG_HAVE_DISPLAY
 
 #include "Globals.h"
 #include <app-common/zap-generated/attributes/Accessors.h>

@@ -18,8 +18,6 @@
 
 #pragma once
 
-#if CONFIG_HAVE_DISPLAY
-
 #include "Button.h"
 #include "DeviceCallbacks.h"
 #include "Display.h"
@@ -35,6 +33,8 @@
 #include <string>
 #include <vector>
 
+#if CONFIG_HAVE_DISPLAY
+
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -49,5 +49,4 @@ esp_err_t InitM5Stack(std::string qrCodeText);
 #endif
 
 void InitDeviceDisplay();
-
 #endif
