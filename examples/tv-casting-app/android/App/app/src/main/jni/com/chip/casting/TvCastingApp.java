@@ -152,7 +152,7 @@ public class TvCastingApp {
         multicastLock.release();
       }
       this.discoveryStarted = false;
-      }
+    }
   }
 
   public native boolean openBasicCommissioningWindow(
