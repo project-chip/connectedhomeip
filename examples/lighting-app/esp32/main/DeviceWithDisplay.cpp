@@ -16,13 +16,15 @@
  *    limitations under the License.
  */
 
+#if CONFIG_HAVE_DISPLAY
+
 #include "DeviceWithDisplay.h"
+
 #include "Globals.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
-#if CONFIG_HAVE_DISPLAY
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;

@@ -18,6 +18,8 @@
 
 #pragma once
 
+#if CONFIG_HAVE_DISPLAY
+
 #include "Button.h"
 #include "DeviceCallbacks.h"
 #include "Display.h"
@@ -46,6 +48,6 @@
 esp_err_t InitM5Stack(std::string qrCodeText);
 #endif
 
-#if CONFIG_HAVE_DISPLAY
 void InitDeviceDisplay();
+
 #endif
