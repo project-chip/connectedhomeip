@@ -51,15 +51,14 @@ static int uartTxCallback(void * p_arg)
 
 static int uartRxCallback(void * p_arg)
 {
-    uint32_t len = 0, readlen = 0;
+    uint32_t len                        = 0;
     BaseType_t xHigherPriorityTaskWoken = 1;
 
     if (chipUart_var.head >= chipUart_var.tail)
     {
         if (chipUart_var.head < MAX_BUFFER_SIZE)
         {
-            readlen = len =
-                hosal_uart_receive(&uart_stdio, chipUart_var.rxbuf + chipUart_var.head, MAX_BUFFER_SIZE - chipUart_var.head);
+            len = hosal_uart_receive(&uart_stdio, chipUart_var.rxbuf + chipUart_var.head, MAX_BUFFER_SIZE - chipUart_var.head);
             chipUart_var.head = (chipUart_var.head + len) % MAX_BUFFER_SIZE;
         }
 
@@ -67,17 +66,15 @@ static int uartRxCallback(void * p_arg)
         {
             len = hosal_uart_receive(&uart_stdio, chipUart_var.rxbuf, chipUart_var.tail - 1);
             chipUart_var.head += len;
-            readlen += len;
         }
     }
     else
     {
-        readlen =
+        chipUart_var.head +=
             hosal_uart_receive(&uart_stdio, chipUart_var.rxbuf + chipUart_var.head, chipUart_var.tail - chipUart_var.head - 1);
-        chipUart_var.head += readlen;
     }
 
-    if (0 == readlen || (chipUart_var.head + 1) % MAX_BUFFER_SIZE == chipUart_var.tail)
+    if (chipUart_var.head != chipUart_var.tail)
     {
         xSemaphoreGiveFromISR(chipUart_var.sema, &xHigherPriorityTaskWoken);
     }
