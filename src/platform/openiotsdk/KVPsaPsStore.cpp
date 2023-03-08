@@ -601,7 +601,7 @@ void KVPsaPsStoreKeyBuilder::AddKey()
         return;
     }
 
-    uint32_t keyIndex = CONVERT_KEY_TO_INDEX(keyValue);
+    auto keyIndex = CONVERT_KEY_TO_INDEX(keyValue);
     memset(mKvsStoredKeyString[keyIndex], 0, sizeof(mKvsStoredKeyString[keyIndex]));
     Platform::CopyString(mKvsStoredKeyString[keyIndex], buffer);
     KVPsaPsStore::ScheduleKVSKeyMapUpdate();
@@ -614,7 +614,7 @@ void KVPsaPsStoreKeyBuilder::RemoveKey()
         return;
     }
 
-    uint32_t keyIndex = CONVERT_KEY_TO_INDEX(keyValue);
+    auto keyIndex = CONVERT_KEY_TO_INDEX(keyValue);
     memset(mKvsStoredKeyString[keyIndex], 0, sizeof(mKvsStoredKeyString[keyIndex]));
     KVPsaPsStore::ScheduleKVSKeyMapUpdate();
 }

@@ -23,13 +23,9 @@ import com.matter.controller.commands.common.CredentialsIssuer
 import com.matter.controller.commands.common.MatterCommand
 import java.util.concurrent.TimeUnit
 
-private const val MAX_DISCOVERED_DEVICES = 10
-private const val TIME_TO_WAIT_FOR_RESULTS_SECONDS = 7L
-
 class DiscoverCommissionablesCommand(
   controller: ChipDeviceController, credsIssuer: CredentialsIssuer?
 ) : MatterCommand(controller, "commissionables", credsIssuer) {
-
   override fun runCommand() {
     currentCommissioner().discoverCommissionableNodes()
 
@@ -55,4 +51,9 @@ class DiscoverCommissionablesCommand(
     System.out.format("\tDiscriminator: %d", device.discriminator)
     System.out.format("\tIP Address : %s%n", device.ipAddress)
   }
+
+  companion object {
+    private const val MAX_DISCOVERED_DEVICES = 10
+    private const val TIME_TO_WAIT_FOR_RESULTS_SECONDS = 7L
+  }  
 }

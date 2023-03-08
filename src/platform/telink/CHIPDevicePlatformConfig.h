@@ -122,6 +122,12 @@
 #endif // !defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_NEWLIB_LIBC)
 #endif // CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
 
+#ifndef CHIP_DEVICE_BLE_ADVERTISING_PRIORITY
+/// Priority of the Matter BLE advertising when there are multiple application
+/// components that compete for the BLE advertising.
+#define CHIP_DEVICE_BLE_ADVERTISING_PRIORITY 0
+#endif // CHIP_DEVICE_BLE_ADVERTISING_PRIORITY
+
 #ifndef CHIP_DEVICE_CONFIG_CERTIFICATION_DECLARATION
 //-> format_version = 1
 //-> vendor_id = 0xFFF1

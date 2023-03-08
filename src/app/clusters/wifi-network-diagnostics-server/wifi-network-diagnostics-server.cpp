@@ -119,12 +119,12 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::ReadSecurityType(AttributeValueEncoder & aE
 CHIP_ERROR WiFiDiagosticsAttrAccess::ReadWiFiVersion(AttributeValueEncoder & aEncoder)
 {
     Attributes::WiFiVersion::TypeInfo::Type version;
-    uint8_t value = 0;
+    WiFiVersionEnum value = WiFiVersionEnum::kUnknownEnumValue;
 
     if (DeviceLayer::GetDiagnosticDataProvider().GetWiFiVersion(value) == CHIP_NO_ERROR)
     {
-        version.SetNonNull(static_cast<WiFiNetworkDiagnostics::WiFiVersionEnum>(value));
-        ChipLogProgress(Zcl, "The current 802.11 standard version in use by the Node: %d", value);
+        version.SetNonNull(value);
+        ChipLogProgress(Zcl, "The current 802.11 standard version in use by the Node: %d", to_underlying(value));
     }
     else
     {

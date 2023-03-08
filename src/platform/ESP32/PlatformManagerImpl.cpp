@@ -63,63 +63,17 @@ static int app_entropy_source(void * data, unsigned char * output, size_t len, s
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
-    esp_err_t err;
     // Arrange for CHIP-encapsulated ESP32 errors to be translated to text
     Internal::ESP32Utils::RegisterESP32ErrorFormatter();
-
     // Make sure the LwIP core lock has been initialized
     ReturnErrorOnFailure(Internal::InitLwIPCoreLock());
-
-    err = esp_netif_init();
-    if (err != ESP_OK)
-    {
-        goto exit;
-    }
-
     // Arrange for the ESP event loop to deliver events into the CHIP Device layer.
-    err = esp_event_loop_create_default();
+    esp_err_t err = esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
     if (err != ESP_OK)
     {
-        goto exit;
+        return Internal::ESP32Utils::MapError(err);
     }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    {
-        wifi_init_config_t cfg;
-        uint8_t ap_mac[6];
-        wifi_mode_t mode;
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-        esp_netif_create_default_wifi_ap();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-        esp_netif_create_default_wifi_sta();
-
-        esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
-        esp_event_handler_register(IP_EVENT, ESP_EVENT_ANY_ID, PlatformManagerImpl::HandleESPSystemEvent, NULL);
-        mStartTime = System::SystemClock().GetMonotonicTimestamp();
-
-        // Initialize the ESP WiFi layer.
-        cfg = WIFI_INIT_CONFIG_DEFAULT();
-        err = esp_wifi_init(&cfg);
-        if (err != ESP_OK)
-        {
-            goto exit;
-        }
-
-        esp_wifi_get_mode(&mode);
-        if ((mode == WIFI_MODE_AP) || (mode == WIFI_MODE_APSTA))
-        {
-            esp_fill_random(ap_mac, sizeof(ap_mac));
-            /* Bit 0 of the first octet of MAC Address should always be 0 */
-            ap_mac[0] &= (uint8_t) ~0x01;
-            err = esp_wifi_set_mac(WIFI_IF_AP, ap_mac);
-            if (err != ESP_OK)
-            {
-                goto exit;
-            }
-        }
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
     ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16));
 
     // Call _InitChipStack() on the generic implementation base class
@@ -127,8 +81,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
 
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
-exit:
-    return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
+    return CHIP_NO_ERROR;
 }
 
 void PlatformManagerImpl::_Shutdown()
@@ -183,6 +136,7 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
             break;
         }
     }
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     else if (eventBase == WIFI_EVENT)
     {
         switch (eventId)
@@ -227,6 +181,7 @@ void PlatformManagerImpl::HandleESPSystemEvent(void * arg, esp_event_base_t even
             break;
         }
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     sInstance.PostEventOrDie(&event);
 }

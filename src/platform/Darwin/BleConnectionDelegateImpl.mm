@@ -376,24 +376,19 @@ namespace DeviceLayer {
         chip::Ble::ChipBleUUID charId;
         [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
 
-        // build a inet buffer from the rxEv and send to blelayer.
-        __block chip::System::PacketBufferHandle msgBuf
-            = chip::System::PacketBufferHandle::NewWithData(characteristic.value.bytes, characteristic.value.length);
+        dispatch_async(_chipWorkQueue, ^{
+            // build a inet buffer from the rxEv and send to blelayer.
+            auto msgBuf = chip::System::PacketBufferHandle::NewWithData(characteristic.value.bytes, characteristic.value.length);
 
-        if (!msgBuf.IsNull()) {
-            dispatch_async(_chipWorkQueue, ^{
-                if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, std::move(msgBuf))) {
-                    // since this error comes from device manager core
-                    // we assume it would do the right thing, like closing the connection
-                    ChipLogError(Ble, "Failed at handling incoming BLE data");
-                }
-            });
-        } else {
-            ChipLogError(Ble, "Failed at allocating buffer for incoming BLE data");
-            dispatch_async(_chipWorkQueue, ^{
+            if (msgBuf.IsNull()) {
+                ChipLogError(Ble, "Failed at allocating buffer for incoming BLE data");
                 _mBleLayer->HandleConnectionError((__bridge void *) peripheral, CHIP_ERROR_NO_MEMORY);
-            });
-        }
+            } else if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, std::move(msgBuf))) {
+                // since this error comes from device manager core
+                // we assume it would do the right thing, like closing the connection
+                ChipLogError(Ble, "Failed at handling incoming BLE data");
+            }
+        });
     } else {
         ChipLogError(
             Ble, "BLE:Error receiving indication of Characteristics on the device: [%s]", [error.localizedDescription UTF8String]);

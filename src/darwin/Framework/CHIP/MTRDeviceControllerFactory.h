@@ -151,20 +151,20 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 
 @end
 
-API_DEPRECATED(
+MTR_DEPRECATED(
     "Please use MTRDeviceControllerFactoryParams", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRControllerFactoryParams : MTRDeviceControllerFactoryParams
-@property (nonatomic, strong, readonly) id<MTRPersistentStorageDelegate> storageDelegate API_DEPRECATED(
+@property (nonatomic, strong, readonly) id<MTRPersistentStorageDelegate> storageDelegate MTR_DEPRECATED(
     "Please use the storage property", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-@property (nonatomic, assign) BOOL startServer API_DEPRECATED(
+@property (nonatomic, assign) BOOL startServer MTR_DEPRECATED(
     "Please use shouldStartServer", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-@property (nonatomic, copy, nullable) NSArray<NSData *> * paaCerts API_DEPRECATED(
+@property (nonatomic, copy, nullable) NSArray<NSData *> * paaCerts MTR_DEPRECATED(
     "Please use productAttestationAuthorityCertificates", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-@property (nonatomic, copy, nullable) NSArray<NSData *> * cdCerts API_DEPRECATED(
+@property (nonatomic, copy, nullable) NSArray<NSData *> * cdCerts MTR_DEPRECATED(
     "Please use certificationDeclarationCertificates", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 
-API_DEPRECATED("Please use MTRDeviceControllerFactory", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+MTR_DEPRECATED("Please use MTRDeviceControllerFactory", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @interface MTRControllerFactory : NSObject
 @property (readonly, nonatomic) BOOL isRunning;
 + (MTRControllerFactory *)sharedInstance;

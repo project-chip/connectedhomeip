@@ -1150,7 +1150,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(ByteSpan & value)
     return err;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
+CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & securityType)
 {
     const gchar * mode = nullptr;
 
@@ -1201,10 +1201,11 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(app::Clusters::WiFiNetwo
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(uint8_t & wiFiVersion)
+CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(WiFiVersionEnum & wiFiVersion)
 {
     // We don't have direct API to get the WiFi version yet, return 802.11n on Linux simulation.
-    wiFiVersion = to_underlying(WiFiVersionEnum::kN);
+    // TODO: This is not "Linux simulation".
+    wiFiVersion = WiFiVersionEnum::kN;
 
     return CHIP_NO_ERROR;
 }

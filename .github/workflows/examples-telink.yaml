@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-telink:0.6.44
+            image: connectedhomeip/chip-build-telink:0.6.47
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -209,6 +209,18 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d thermostat \
                     out/telink-tlsr9518adk80d-thermostat/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output
+              run: rm -rf ./out
+
+            - name: Build example Telink Window Covering App
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-window-covering' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d window-covering \
+                    out/telink-tlsr9518adk80d-window-covering/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output

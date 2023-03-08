@@ -246,10 +246,10 @@ struct __attribute__((packed)) PyReadAttributeParams
 };
 
 // Encodes n attribute write requests, follows 3 * n arguments, in the (AttributeWritePath*=void *, uint8_t*, size_t) order.
-PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, uint16_t timedWriteTimeoutMs,
-                                               uint16_t interactionTimeoutMs, uint16_t busyWaitMs, size_t n, ...);
-PyChipError pychip_WriteClient_WriteGroupAttributes(chip::GroupId groupId, chip::Controller::DeviceCommissioner * devCtrl,
-                                                    uint16_t busyWaitMs, size_t n, ...);
+PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
+                                               size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT, size_t n, ...);
+PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::Controller::DeviceCommissioner * devCtrl,
+                                                    size_t busyWaitMsSizeT, size_t n, ...);
 PyChipError pychip_ReadClient_ReadAttributes(void * appContext, ReadClient ** pReadClient, ReadClientCallback ** pCallback,
                                              DeviceProxy * device, uint8_t * readParamsBuf, size_t n, size_t total, ...);
 }
@@ -325,10 +325,16 @@ void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttribute
     gOnReportEndCallback               = onReportEndCallback;
 }
 
-PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, uint16_t timedWriteTimeoutMs,
-                                               uint16_t interactionTimeoutMs, uint16_t busyWaitMs, size_t n, ...)
+PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
+                                               size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT, size_t n, ...)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // The FFI from Python to C when calling a variadic function has issues when the regular, non-variadic, function
+    // arguments are unit16_t. As a result we pass these arguments as size_t and cast them to the expected uint16_t.
+    uint16_t timedWriteTimeoutMs  = static_cast<uint16_t>(timedWriteTimeoutMsSizeT);
+    uint16_t interactionTimeoutMs = static_cast<uint16_t>(interactionTimeoutMsSizeT);
+    uint16_t busyWaitMs           = static_cast<uint16_t>(busyWaitMsSizeT);
 
     std::unique_ptr<WriteClientCallback> callback = std::make_unique<WriteClientCallback>(appContext);
     std::unique_ptr<WriteClient> client           = std::make_unique<WriteClient>(
@@ -383,10 +389,16 @@ exit:
     return ToPyChipError(err);
 }
 
-PyChipError pychip_WriteClient_WriteGroupAttributes(chip::GroupId groupId, chip::Controller::DeviceCommissioner * devCtrl,
-                                                    uint16_t busyWaitMs, size_t n, ...)
+PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::Controller::DeviceCommissioner * devCtrl,
+                                                    size_t busyWaitMsSizeT, size_t n, ...)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // The FFI from Python to C when calling a variadic function has issues when the regular, non-variadic, function
+    // arguments are unit16_t (which is the type for chip::GroupId). As a result we pass these arguments as size_t
+    // and cast them to the expected type here.
+    chip::GroupId groupId = static_cast<chip::GroupId>(groupIdSizeT);
+    uint16_t busyWaitMs   = static_cast<uint16_t>(busyWaitMsSizeT);
 
     chip::Messaging::ExchangeManager * exchangeManager = chip::app::InteractionModelEngine::GetInstance()->GetExchangeManager();
     VerifyOrReturnError(exchangeManager != nullptr, ToPyChipError(CHIP_ERROR_INCORRECT_STATE));

@@ -1239,10 +1239,10 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & secur
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(uint8_t & wiFiVersion)
+CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(WiFiVersionEnum & wiFiVersion)
 {
     // We don't have direct API to get the WiFi version yet, return 802.11n on Linux simulation.
-    wiFiVersion = to_underlying(WiFiVersionEnum::kN);
+    wiFiVersion = WiFiVersionEnum::kN;
 
     return CHIP_NO_ERROR;
 }

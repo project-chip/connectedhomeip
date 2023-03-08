@@ -146,6 +146,15 @@
     <string name="subscribe_dialog_keep_subscriptions_hint">keep subscriptions (bool)</string>
     <string name="subscribe_dialog_is_fabric_filtered_hint">is Fabric Filtered (bool)</string>
 
+    <string name="write_dialog_title_text">Write</string>
+    <string name="write_dialog_write_btn_text">Write</string>
+    <string name="write_dialog_value_type_hint">Write Value Type</string>
+    <string name="write_dialog_write_value_hint">Write Value</string>
+    <string name="write_dialog_data_version_hint">Data Version (Optional)</string>
+    <string name="write_dialog_timed_request_timeout_hint">Timed Request Timeout</string>
+    <string name="write_dialog_im_timeout_hint">Timeout</string>
+    <string name="write_dialog_user_guide_hint">Example:\nIdentifyCluster, IdentifyTime - Type : UInt\nBasicInformationCluster, UserLabel - Type : String\nIf you want to enter an array, separate the value by \',\'.(abc,def)</string>
+
     <string name="endpoint_id_label">Endpoint ID</string>
     <string name="cluster_id_label">Cluster ID</string>
     <string name="attribute_id_label">Attribute ID</string>
@@ -153,6 +162,7 @@
     <string name="wildcard_help_label">Leave blank for wildcard</string>
     <string name="wildcard_subscribe_btn_text">Subscribe</string>
     <string name="wildcard_read_btn_text">Read</string>
+    <string name="wildcard_write_btn_text">Write</string>
     <string name="wildcard_subscribe_event_btn_text">Subscribe Event</string>
     <string name="wildcard_read_event_btn_text">Read Event</string>
 
