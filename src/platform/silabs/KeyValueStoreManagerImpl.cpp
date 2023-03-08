@@ -49,7 +49,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::Init(void)
     err = SilabsConfig::Init();
     SuccessOrExit(err);
 
-    EFR32::EFR32Migration::GetMigrationManager().applyMigrations();
+    Silabs::MigrationManager::GetMigrationInstance().applyMigrations();
 
     memset(mKvsKeyMap, 0, sizeof(mKvsKeyMap));
     size_t outLen;

@@ -26,7 +26,7 @@ using namespace ::chip::DeviceLayer::PersistedStorage;
 
 namespace chip {
 namespace DeviceLayer {
-namespace EFR32 {
+namespace Silabs {
 
 namespace {
 typedef void (*func_ptr)();
@@ -45,7 +45,7 @@ static migrationData_t migrationTable[] = {
 
 } // namespace
 
-void EFR32Migration::applyMigrations()
+void MigrationManager::applyMigrations()
 {
     uint32_t lastMigationGroupDone = 0;
     SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_MigrationCounter, lastMigationGroupDone);
@@ -62,12 +62,12 @@ void EFR32Migration::applyMigrations()
     SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MigrationCounter, completedMigrationGroup);
 }
 
-EFR32Migration & EFR32Migration::GetMigrationManager()
+MigrationManager & MigrationManager::GetMigrationInstance()
 {
-    static EFR32Migration sMigrationManager;
+    static MigrationManager sMigrationManager;
     return sMigrationManager;
 }
 
-} // namespace EFR32
+} // namespace Silabs
 } // namespace DeviceLayer
 } // namespace chip
