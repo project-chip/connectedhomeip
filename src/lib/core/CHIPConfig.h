@@ -1366,14 +1366,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @brief Value used when setting or getting the endpoint in a Scene table
- * entry.  It indicates that the entry is not in use.
- */
-#ifndef CHIP_CONFIG_SCENES_TABLE_UNUSED_ENDPOINT_ID
-#define CHIP_CONFIG_SCENES_TABLE_UNUSED_ENDPOINT_ID 0x00
-#endif
-
-/**
  * @brief The minimum number of scenes to support according to spec
  */
 #ifndef CHIP_CONFIG_SCENES_MAX_NUMBER
@@ -1398,14 +1390,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief The maximum number of clusters per scene
  */
 #ifndef CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE
-#define CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES 3
-#endif
+#define CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE 3
+#endif  
+
 
 /**
  * @brief The maximum size of a single extension field set for a single cluster
  */
 #ifndef CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER
-#define CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER 100
+#define CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER 128
 #endif
 
 /**

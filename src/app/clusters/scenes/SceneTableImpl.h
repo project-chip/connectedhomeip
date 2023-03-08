@@ -16,6 +16,7 @@
  */
 
 #pragma once
+#include <app/clusters/scenes/ExtensionFieldSetsImpl.h>
 #include <app/clusters/scenes/SceneTable.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CommonIterator.h>
@@ -25,16 +26,21 @@
 namespace chip {
 namespace scenes {
 
-enum SceneTLVTag
+/// @brief Tags Used to serialize Scenes so they can be stored in flash memory.
+/// kEndpointID: Tag for the Endpoint ID to which this scene applies to
+/// kGroupID: Tag for GroupID if the Scene is a Group Scene
+/// kID: Tag for the scene ID together with the two previous tag, forms the SceneStorageID
+/// kName: Tag for the name of the scene
+/// kTransitionTime: Tag for the transition time of the scene in seconds
+/// kTransitionTime100: Tag for the transition time of the scene in tenth of a second (enhanced scenes)
+enum class TagScene : uint8_t
 {
-    kTagSceneStorageIDContainer = 1,
-    kTagSceneEndpointID,
-    kTagSceneGroupID,
-    kTagSceneID,
-    kTagSceneDataContainer,
-    kTagSceneName,
-    kTagSceneDTransitionTime,
-    kTagSceneDTransitionTime100,
+    kEndpointID = 1,
+    kGroupID,
+    kID,
+    kName,
+    kTransitionTime,
+    kTransitionTime100,
 };
 
 using clusterId = chip::ClusterId;
@@ -53,14 +59,15 @@ public:
     DefaultSceneHandlerImpl() = default;
     ~DefaultSceneHandlerImpl() override{};
 
-    /// @brief Function to serialize data from an add scene command, assume the incoming extensionFieldSet is initialized
-    /// @param endpoint Target Endpoint
-    /// @param cluster Cluster in the Extension field set, filled by the function
-    /// @param serialisedBytes Mutable Byte span to hold EFS data from command
-    /// @param extensionFieldSet Extension field set from commmand, pre initialized
-    /// @return CHIP_NO_ERROR if success, specific CHIP_ERROR otherwise
-    virtual CHIP_ERROR SerializeAdd(EndpointId endpoint, ClusterId & cluster, MutableByteSpan & serialisedBytes,
-                                    app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet) override
+    /// @brief From command AddScene, allows handler to filter through clusters in command to serialize only the supported ones.
+    /// @param endpoint[in] Endpoint ID
+    /// @param extensionFieldSet[in] ExtensionFieldSets provided by the AddScene Command, pre initialized
+    /// @param cluster[out]  Cluster in the Extension field set, filled by the function
+    /// @param serialisedBytes[out] Buffer to fill from the ExtensionFieldSet in command
+    /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
+    virtual CHIP_ERROR SerializeAdd(EndpointId endpoint,
+                                    const app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
+                                    ClusterId & cluster, MutableByteSpan & serialisedBytes) override
     {
         app::DataModel::List<app::Clusters::Scenes::Structs::AttributeValuePair::Type> attributeValueList;
         app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType aVPair;
@@ -115,7 +122,7 @@ public:
     /// @param cluster  target cluster
     /// @param serialisedBytes data to deserialize into EFS
     /// @return CHIP_NO_ERROR if Extension Field Set was successfully populated, specific CHIP_ERROR otherwise
-    virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, ByteSpan & serialisedBytes,
+    virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serialisedBytes,
                                    app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & extensionFieldSet) override
     {
         app::DataModel::DecodableList<app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType> attributeValueList;
@@ -192,12 +199,12 @@ public:
     CHIP_ERROR SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry) override;
     CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry) override;
     CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id) override;
-    CHIP_ERROR RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scened_idx) override;
+    CHIP_ERROR RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scene_idx) override;
 
     // SceneHandlers
     CHIP_ERROR RegisterHandler(SceneHandler * handler) override;
     CHIP_ERROR UnregisterHandler(SceneHandler * handler) override;
-    CHIP_ERROR UnregisterAllHandler() override;
+    CHIP_ERROR UnregisterAllHandlers() override;
 
     // Extension field sets operation
     CHIP_ERROR SceneSaveEFS(SceneTableEntry & scene) override;
@@ -207,7 +214,7 @@ public:
     CHIP_ERROR RemoveFabric(FabricIndex fabric_index) override;
 
     // Iterators
-    SceneEntryIterator * IterateSceneEntry(FabricIndex fabric_index) override;
+    SceneEntryIterator * IterateSceneEntries(FabricIndex fabric_index) override;
 
 protected:
     class SceneEntryIteratorImpl : public SceneEntryIterator

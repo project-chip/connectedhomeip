@@ -23,49 +23,66 @@
 namespace chip {
 namespace scenes {
 
-enum EFSTLVTag
+/// @brief Tags Used to serialize Extension Field Sets struct as well as individual field sets.
+/// kArrayContainer: Tag for the container of the Struct with the EFS array
+/// kFieldSetsCount: Tag representing the number of individual field sets
+/// kIndividualContainer: Tag for the container of single EFS struct
+/// kClusterID: Tag for the ClusterID of a field set
+/// kBufferBytes: Tag for the serialized field set data
+enum class TagEFS : uint8_t
 {
-    kTagEFSArrayContainer = 1,
-    kTagEFSFieldNum       = 1,
-    kTagEFSContainer,
-    kTagEFSClusterID,
-    kTagEFS,
+    kFieldSetArrayContainer = 1,
+    kFieldSetsCount,
+    kIndividualContainer,
+    kClusterID,
+    kClusterFieldSetData,
 };
 
-using clusterId = chip::ClusterId;
-
-struct ExtensionFieldsSet
+/// @brief Struct to serialize and de serialize a cluster extension field set
+/// mID: Cluster ID, allows to identify which cluster is serialized
+/// mBytesBuffer: Field ID serialized into a byte array
+/// mUsedBytes: Number of bytes in the Buffer containing data, used for serializing only those bytes.
+struct ExtensionFieldSet
 {
-    clusterId mID                              = kInvalidClusterId;
-    uint8_t mBytesBuffer[kMaxFieldsPerCluster] = { 0 };
-    uint8_t mUsedBytes                         = 0;
+    ClusterId mID                                  = kInvalidClusterId;
+    uint8_t mBytesBuffer[kMaxFieldBytesPerCluster] = { 0 };
+    uint8_t mUsedBytes                             = 0;
 
-    ExtensionFieldsSet() = default;
-    ExtensionFieldsSet(clusterId cmID, const uint8_t * data, uint8_t dataSize) : mID(cmID), mUsedBytes(dataSize)
+    ExtensionFieldSet() = default;
+    ExtensionFieldSet(ClusterId cmID, const uint8_t * data, uint8_t dataSize) : mID(cmID), mUsedBytes(dataSize)
     {
-        if (dataSize <= kMaxFieldsPerCluster)
+        if (dataSize <= sizeof(mBytesBuffer))
         {
             memcpy(mBytesBuffer, data, mUsedBytes);
         }
-    }
-
-    ExtensionFieldsSet(clusterId cmID, ByteSpan bytes) : mID(cmID), mUsedBytes(static_cast<uint8_t>(bytes.size()))
-    {
-        if (bytes.size() <= kMaxFieldsPerCluster)
+        else
         {
-            memcpy(mBytesBuffer, bytes.data(), bytes.size());
+            mUsedBytes = 0;
         }
     }
 
-    ~ExtensionFieldsSet() = default;
+    ExtensionFieldSet(ClusterId cmID, ByteSpan bytes) : mID(cmID), mUsedBytes(static_cast<uint8_t>(bytes.size()))
+    {
+        if (bytes.size() <= sizeof(mBytesBuffer))
+        {
+            memcpy(mBytesBuffer, bytes.data(), bytes.size());
+        }
+        else
+        {
+            mUsedBytes = 0;
+        }
+    }
+
+    ~ExtensionFieldSet() = default;
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const
     {
         TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(kTagEFSContainer), TLV::kTLVType_Structure, container));
+        ReturnErrorOnFailure(
+            writer.StartContainer(TLV::ContextTag(TagEFS::kIndividualContainer), TLV::kTLVType_Structure, container));
 
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagEFSClusterID), static_cast<uint16_t>(this->mID)));
-        ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(kTagEFS), mBytesBuffer, mUsedBytes));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagEFS::kClusterID), static_cast<uint32_t>(mID)));
+        ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(TagEFS::kClusterFieldSetData), mBytesBuffer, mUsedBytes));
 
         return writer.EndContainer(container);
     }
@@ -74,58 +91,58 @@ struct ExtensionFieldsSet
     {
         ByteSpan buffer;
         TLV::TLVType container;
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(kTagEFSContainer)));
+        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(TagEFS::kIndividualContainer)));
         ReturnErrorOnFailure(reader.EnterContainer(container));
 
-        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagEFSClusterID)));
-        ReturnErrorOnFailure(reader.Get(this->mID));
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagEFS::kClusterID)));
+        ReturnErrorOnFailure(reader.Get(mID));
 
-        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagEFS)));
+        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagEFS::kClusterFieldSetData)));
         ReturnErrorOnFailure(reader.Get(buffer));
-        VerifyOrReturnError(buffer.size() <= kMaxFieldsPerCluster, CHIP_ERROR_BUFFER_TOO_SMALL);
-        this->mUsedBytes = static_cast<uint8_t>(buffer.size());
-        memcpy(this->mBytesBuffer, buffer.data(), this->mUsedBytes);
+        VerifyOrReturnError(buffer.size() <= sizeof(mBytesBuffer), CHIP_ERROR_BUFFER_TOO_SMALL);
+        mUsedBytes = static_cast<decltype(mUsedBytes)>(buffer.size());
+        memcpy(mBytesBuffer, buffer.data(), mUsedBytes);
 
         return reader.ExitContainer(container);
     }
 
     void Clear()
     {
-        this->mID = kInvalidClusterId;
-        memset(this->mBytesBuffer, 0, kMaxFieldsPerCluster);
-        this->mUsedBytes = 0;
+        mID = kInvalidClusterId;
+        memset(mBytesBuffer, 0, kMaxFieldBytesPerCluster);
+        mUsedBytes = 0;
     }
 
     bool IsEmpty() const { return (this->mUsedBytes == 0); }
 
-    bool operator==(const ExtensionFieldsSet & other)
+    bool operator==(const ExtensionFieldSet & other) const
     {
-        return (this->mID == other.mID && !memcmp(this->mBytesBuffer, other.mBytesBuffer, this->mUsedBytes) &&
-                this->mUsedBytes == other.mUsedBytes);
+        return (this->mID == other.mID && this->mUsedBytes == other.mUsedBytes &&
+                !memcmp(this->mBytesBuffer, other.mBytesBuffer, this->mUsedBytes));
     }
 };
 
 class ExtensionFieldSetsImpl : public ExtensionFieldSets
 {
 public:
-    ExtensionFieldSetsImpl();
+    ExtensionFieldSetsImpl(){};
     ~ExtensionFieldSetsImpl() override{};
 
     // overrides
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override;
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override;
     void Clear() override;
-    bool IsEmpty() const override { return (this->mFieldNum == 0); }
-    uint8_t GetFieldNum() const override { return this->mFieldNum; };
+    bool IsEmpty() const override { return (mFieldSetsCount == 0); }
+    uint8_t GetFieldSetCount() const override { return mFieldSetsCount; };
 
-    // implementation
-    CHIP_ERROR InsertFieldSet(const ExtensionFieldsSet & field);
-    CHIP_ERROR GetFieldSetAtPosition(ExtensionFieldsSet & field, uint8_t position);
+    CHIP_ERROR InsertFieldSet(const ExtensionFieldSet & field);
+    CHIP_ERROR GetFieldSetAtPosition(ExtensionFieldSet & field, uint8_t position);
     CHIP_ERROR RemoveFieldAtPosition(uint8_t position);
 
-    bool operator==(const ExtensionFieldSetsImpl & other)
+    // implementation
+    bool operator==(const ExtensionFieldSetsImpl & other) const
     {
-        for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
+        for (uint8_t i = 0; i < mFieldSetsCount; i++)
         {
             if (!(this->mEFS[i] == other.mEFS[i]))
             {
@@ -137,18 +154,18 @@ public:
 
     ExtensionFieldSetsImpl & operator=(const ExtensionFieldSetsImpl & other)
     {
-        for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
+        for (uint8_t i = 0; i < other.mFieldSetsCount; i++)
         {
             this->mEFS[i] = other.mEFS[i];
         }
-        mFieldNum = other.mFieldNum;
+        mFieldSetsCount = other.mFieldSetsCount;
 
         return *this;
     }
 
 protected:
-    ExtensionFieldsSet mEFS[kMaxClusterPerScenes];
-    uint8_t mFieldNum = 0;
+    ExtensionFieldSet mEFS[kMaxClusterPerScenes];
+    uint8_t mFieldSetsCount = 0;
 };
 } // namespace scenes
 } // namespace chip

@@ -25,13 +25,13 @@
 
 using namespace chip;
 
-using SceneTable         = scenes::SceneTable<scenes::ExtensionFieldSetsImpl>;
-using SceneTableEntry    = scenes::DefaultSceneTableImpl::SceneTableEntry;
-using SceneTableImpl     = scenes::DefaultSceneTableImpl;
-using SceneStorageId     = scenes::DefaultSceneTableImpl::SceneStorageId;
-using SceneData          = scenes::DefaultSceneTableImpl::SceneData;
-using ExtensionFieldsSet = scenes::ExtensionFieldsSet;
-using TransitionTimeMs   = scenes::TransitionTimeMs;
+using SceneTable        = scenes::SceneTable<scenes::ExtensionFieldSetsImpl>;
+using SceneTableEntry   = scenes::DefaultSceneTableImpl::SceneTableEntry;
+using SceneTableImpl    = scenes::DefaultSceneTableImpl;
+using SceneStorageId    = scenes::DefaultSceneTableImpl::SceneStorageId;
+using SceneData         = scenes::DefaultSceneTableImpl::SceneData;
+using ExtensionFieldSet = scenes::ExtensionFieldSet;
+using TransitionTimeMs  = scenes::TransitionTimeMs;
 
 namespace {
 // Test Cluster ID
@@ -111,9 +111,9 @@ static app::Clusters::Scenes::Structs::AttributeValuePair::Type OOPairs[1];
 static app::Clusters::Scenes::Structs::AttributeValuePair::Type LCPairs[2];
 static app::Clusters::Scenes::Structs::AttributeValuePair::Type CCPairs[8];
 
-static uint8_t OO_buffer[scenes::kMaxFieldsPerCluster] = { 0 };
-static uint8_t LC_buffer[scenes::kMaxFieldsPerCluster] = { 0 };
-static uint8_t CC_buffer[scenes::kMaxFieldsPerCluster] = { 0 };
+static uint8_t OO_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
+static uint8_t LC_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
+static uint8_t CC_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
 
 static uint32_t OO_buffer_serialized_length = 0;
 static uint32_t LC_buffer_serialized_length = 0;
@@ -206,14 +206,14 @@ public:
             case kOnOffClusterId:
                 err = CHIP_NO_ERROR;
                 // Warning: OO_buffer needs to be populated before calling this function
-                memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldsPerCluster);
+                memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldBytesPerCluster);
                 // Warning: serialized size of the buffer must also be computed before calling this function
                 serialisedBytes.reduce_size(OO_buffer_serialized_length); // Used memory for OnOff TLV
                 break;
             case kLevelControlClusterId:
                 err = CHIP_NO_ERROR;
                 // Warning: LC_buffer needs to be populated before calling this function
-                memcpy(serialisedBytes.data(), LC_buffer, scenes::kMaxFieldsPerCluster);
+                memcpy(serialisedBytes.data(), LC_buffer, scenes::kMaxFieldBytesPerCluster);
                 // Warning: serialized size of the buffer must also be computed before calling this function
                 serialisedBytes.reduce_size(LC_buffer_serialized_length); // Used memory for Level Control TLV
                 break;
@@ -228,14 +228,14 @@ public:
             case kOnOffClusterId:
                 err = CHIP_NO_ERROR;
                 // Warning: OO_buffer needs to be populated before calling this function
-                memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldsPerCluster);
+                memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldBytesPerCluster);
                 // Warning: serialized size of the buffer must also be computed before calling this function
                 serialisedBytes.reduce_size(OO_buffer_serialized_length); // Used memory for OnOff TLV
                 break;
             case kColorControlClusterId:
                 err = CHIP_NO_ERROR;
                 // Warning: CC_buffer needs to be populated before calling this function
-                memcpy(serialisedBytes.data(), CC_buffer, scenes::kMaxFieldsPerCluster);
+                memcpy(serialisedBytes.data(), CC_buffer, scenes::kMaxFieldBytesPerCluster);
                 // Warning: serialized size of the buffer must also be computed before calling this function
                 serialisedBytes.reduce_size(CC_buffer_serialized_length); // Used memory for Color Control TLV
                 break;
@@ -250,21 +250,21 @@ public:
             case kOnOffClusterId:
                 err = CHIP_NO_ERROR;
                 // Warning: OO_buffer needs to be populated before calling this function
-                memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldsPerCluster);
+                memcpy(serialisedBytes.data(), OO_buffer, scenes::kMaxFieldBytesPerCluster);
                 // Warning: serialized size of the buffer must also be computed before calling this function
                 serialisedBytes.reduce_size(OO_buffer_serialized_length); // Used memory for OnOff TLV
                 break;
             case kLevelControlClusterId:
                 err = CHIP_NO_ERROR;
                 // Warning: LC_buffer needs to be populated before calling this function
-                memcpy(serialisedBytes.data(), LC_buffer, scenes::kMaxFieldsPerCluster);
+                memcpy(serialisedBytes.data(), LC_buffer, scenes::kMaxFieldBytesPerCluster);
                 // Warning: serialized size of the buffer must also be computed before calling this function
                 serialisedBytes.reduce_size(LC_buffer_serialized_length); // Used memory for Level Control TLV
                 break;
             case kColorControlClusterId:
                 err = CHIP_NO_ERROR;
                 // Warning: CC_buffer needs to be populated before calling this function
-                memcpy(serialisedBytes.data(), CC_buffer, scenes::kMaxFieldsPerCluster);
+                memcpy(serialisedBytes.data(), CC_buffer, scenes::kMaxFieldBytesPerCluster);
                 // Warning: serialized size of the buffer must also be computed before calling this function
                 serialisedBytes.reduce_size(CC_buffer_serialized_length); // Used memory for Color Control TLV
                 break;
@@ -283,7 +283,7 @@ public:
     /// @param timeMs transition time in ms
     /// @return CHIP_NO_ERROR if value as expected, CHIP_ERROR_INVALID_ARGUMENT otherwise
     CHIP_ERROR
-    ApplyScene(EndpointId endpoint, ClusterId cluster, ByteSpan & serialisedBytes, TransitionTimeMs timeMs) override
+    ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serialisedBytes, TransitionTimeMs timeMs) override
     {
         CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
 
@@ -411,7 +411,7 @@ void TestHandlerRegistration(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[scenes::kMaxSceneHandlers - 1]);
 
     // Emptying Handler array
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterAllHandler());
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterAllHandlers());
     for (uint8_t i = 0; i < scenes::kMaxSceneHandlers; i++)
     {
         NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(&tmpHandler[i]));
@@ -487,7 +487,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     ByteSpan LC_list(LC_buffer);
     ByteSpan CC_list(CC_buffer);
 
-    uint8_t buffer[scenes::kMaxFieldsPerCluster] = { 0 };
+    uint8_t buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
     MutableByteSpan buff_span(buffer);
 
     // Serialize Extension Field sets as if they were recovered from memory
@@ -537,7 +537,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == extensionFieldSetIn.attributeValueList.Decode(reader));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.ExitContainer(outerRead));
 
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(kTestEndpoint1, tempCluster, buff_span, extensionFieldSetIn));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(kTestEndpoint1, extensionFieldSetIn, tempCluster, buff_span));
 
     // Verify the handler extracted buffer matches the initial field sets
     NL_TEST_ASSERT(aSuite, 0 == memcmp(OO_list.data(), buff_span.data(), buff_span.size()));
@@ -553,7 +553,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == extensionFieldSetIn.attributeValueList.Decode(reader));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.ExitContainer(outerRead));
 
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(kTestEndpoint1, tempCluster, buff_span, extensionFieldSetIn));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(kTestEndpoint1, extensionFieldSetIn, tempCluster, buff_span));
 
     // Verify the handler extracted buffer matches the initial field sets
     NL_TEST_ASSERT(aSuite, 0 == memcmp(LC_list.data(), buff_span.data(), buff_span.size()));
@@ -569,7 +569,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == extensionFieldSetIn.attributeValueList.Decode(reader));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.ExitContainer(outerRead));
 
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(kTestEndpoint2, tempCluster, buff_span, extensionFieldSetIn));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sHandler.SerializeAdd(kTestEndpoint2, extensionFieldSetIn, tempCluster, buff_span));
 
     // Verify the handler extracted buffer matches the initial field sets
     NL_TEST_ASSERT(aSuite, 0 == memcmp(CC_list.data(), buff_span.data(), buff_span.size()));
@@ -725,7 +725,7 @@ void TestIterateScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, sceneTable);
 
     SceneTableEntry scene;
-    auto * iterator = sceneTable->IterateSceneEntry(kFabric1);
+    auto * iterator = sceneTable->IterateSceneEntries(kFabric1);
 
     NL_TEST_ASSERT(aSuite, iterator != nullptr);
 
@@ -764,7 +764,7 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
 
     // Remove middle
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene5.mStorageId));
-    auto * iterator = sceneTable->IterateSceneEntry(kFabric1);
+    auto * iterator = sceneTable->IterateSceneEntries(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 7);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene10);
@@ -772,7 +772,7 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
 
     // Add scene in middle, a spot should have been freed
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene9));
-    iterator = sceneTable->IterateSceneEntry(kFabric1);
+    iterator = sceneTable->IterateSceneEntries(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 8);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId9, scene));
     NL_TEST_ASSERT(aSuite, scene == scene9);
@@ -780,7 +780,7 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
 
     // Remove the recently added scene 9
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene9.mStorageId));
-    iterator = sceneTable->IterateSceneEntry(kFabric1);
+    iterator = sceneTable->IterateSceneEntries(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 7);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene10);
@@ -788,7 +788,7 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
 
     // Remove first
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene1.mStorageId));
-    iterator = sceneTable->IterateSceneEntry(kFabric1);
+    iterator = sceneTable->IterateSceneEntries(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 6);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene2);
@@ -796,7 +796,7 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
 
     // Remove Next
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene3.mStorageId));
-    iterator = sceneTable->IterateSceneEntry(kFabric1);
+    iterator = sceneTable->IterateSceneEntries(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 5);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene2);
@@ -805,28 +805,28 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
     iterator->Release();
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene2.mStorageId));
-    iterator = sceneTable->IterateSceneEntry(kFabric1);
+    iterator = sceneTable->IterateSceneEntries(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 4);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene4);
     iterator->Release();
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene4.mStorageId));
-    iterator = sceneTable->IterateSceneEntry(kFabric1);
+    iterator = sceneTable->IterateSceneEntries(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 3);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene6);
     iterator->Release();
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene6.mStorageId));
-    iterator = sceneTable->IterateSceneEntry(kFabric1);
+    iterator = sceneTable->IterateSceneEntries(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 2);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene7);
     iterator->Release();
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene7.mStorageId));
-    iterator = sceneTable->IterateSceneEntry(kFabric1);
+    iterator = sceneTable->IterateSceneEntries(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 1);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene));
     NL_TEST_ASSERT(aSuite, scene == scene12);
@@ -834,14 +834,14 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
 
     // Remove last
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene8.mStorageId));
-    iterator = sceneTable->IterateSceneEntry(kFabric1);
+    iterator = sceneTable->IterateSceneEntries(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 0);
     NL_TEST_ASSERT(aSuite, iterator->Next(scene) == false);
     iterator->Release();
 
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->RemoveSceneTableEntry(kFabric1, scene8.mStorageId));
 
-    iterator = sceneTable->IterateSceneEntry(kFabric1);
+    iterator = sceneTable->IterateSceneEntries(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 0);
     iterator->Release();
 }
@@ -927,6 +927,7 @@ int TestTeardown(void * inContext)
 
     return SUCCESS;
 }
+
 int TestSceneTable()
 {
     static nlTest sTests[] = { NL_TEST_DEF("TestHandlerRegistration", TestHandlerRegistration),
