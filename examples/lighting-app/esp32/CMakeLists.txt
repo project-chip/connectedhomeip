@@ -52,6 +52,8 @@ idf_build_set_property(COMPILE_OPTIONS "-Wno-error=maybe-uninitialized" APPEND)
 
 #For the H2, -Werror=uninitialized will cause an error in "src/lib/support/LambdaBridge.h"
 idf_build_set_property(COMPILE_OPTIONS "-Wno-error=uninitialized" APPEND)
+#For ESP32-C6, -Werror=array-bounds will cause an error in 'third_party/nlfaultinjection/repo/src/nlfaultinjection.cpp'
+idf_build_set_property(COMPILE_OPTIONS "-Wno-error=array-bounds" APPEND)
 
 flashing_script()
 
