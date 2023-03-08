@@ -20,6 +20,7 @@ import com.chip.casting.SuccessCallback;
 import com.chip.casting.TvCastingApp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -89,9 +90,11 @@ public class CommissionerDiscoveryFragment extends Fragment {
             new Handler(Looper.getMainLooper())
                 .post(
                     () -> {
-                      if (commissionerVideoPlayerList.contains(discoveredNodeData)) {
-                        Log.d(TAG, "Replacing existing entry in players list");
-                        arrayAdapter.remove(discoveredNodeData);
+                      final Optional<DiscoveredNodeData> discoveredNodeInList = commissionerVideoPlayerList.stream().filter(
+                              node -> discoveredNodeData.discoveredNodeHasSameSource(node)).findFirst();
+                      if (discoveredNodeInList.isPresent()) {
+                        Log.d(TAG, "Replacing existing entry " + discoveredNodeInList.get().getDeviceName() + " in players list");
+                        arrayAdapter.remove(discoveredNodeInList.get());
                       }
                       arrayAdapter.add(discoveredNodeData);
                     });
