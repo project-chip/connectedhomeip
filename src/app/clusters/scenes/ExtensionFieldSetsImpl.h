@@ -119,7 +119,7 @@ public:
     uint8_t GetFieldNum() const override { return this->mFieldNum; };
 
     // implementation
-    CHIP_ERROR InsertFieldSet(ExtensionFieldsSet & field);
+    CHIP_ERROR InsertFieldSet(const ExtensionFieldsSet & field);
     CHIP_ERROR GetFieldSetAtPosition(ExtensionFieldsSet & field, uint8_t position);
     CHIP_ERROR RemoveFieldAtPosition(uint8_t position);
 
