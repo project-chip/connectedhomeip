@@ -25,9 +25,9 @@
 
 #pragma once
 
+#include <BindingHandler.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/CommonDeviceCallbacks.h>
-#include <BindingHandler.h>
 
 class AppDeviceCallbacks : public CommonDeviceCallbacks
 {
@@ -46,5 +46,5 @@ class AppDeviceCallbacksDelegate : public DeviceCallbacksDelegate
 public:
     void OnIPv4ConnectivityEstablished(void) override {}
     void OnIPv4ConnectivityLost(void) override {}
-    void OnDnssdInitialized(void) override { InitBindingHandler();}
+    void OnDnssdInitialized(void) override { InitBindingHandler(); }
 };

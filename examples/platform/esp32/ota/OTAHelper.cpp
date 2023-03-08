@@ -77,8 +77,8 @@ void OTAHelpers::InitOTARequestor()
     static bool isOTAInitialized = false;
     if (!isOTAInitialized)
     {
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec), InitOTARequestorHandler,
-                                                  nullptr);
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(kInitOTARequestorDelaySec),
+                                                    InitOTARequestorHandler, nullptr);
         isOTAInitialized = true;
     }
 }
