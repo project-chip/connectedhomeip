@@ -15,14 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- * @file Button.cpp
- *
- * Implements a Button tied to a GPIO and provides debouncing
- *
- **/
-
 #include "driver/gpio.h"
 #include "esp_check.h"
 #include "esp_log.h"

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-/**
- * @file DeviceCallbacks.cpp
- *
- * Implements all the callbacks to the application from the CHIP Stack
- *
- **/
-
 #include "AppTask.h"
 
 #include "DeviceCallbacks.h"
