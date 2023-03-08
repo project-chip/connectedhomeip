@@ -93,7 +93,7 @@ CHIP_ERROR ExtensionFieldSetsImpl::InsertFieldSet(ExtensionFieldsSet & fieldSet)
             break;
         }
 
-        if (this->mEFS[i].IsEmpty() && firstEmptyPosition == 0xFF)
+        if (this->mEFS[i].IsEmpty() && firstEmptyPosition == kInvalidPosition)
         {
             firstEmptyPosition = i;
         }
