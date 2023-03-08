@@ -273,7 +273,8 @@ public:
     // SceneHandlers
     virtual CHIP_ERROR RegisterHandler(SceneHandler * handler)   = 0;
     virtual CHIP_ERROR UnregisterHandler(SceneHandler * handler) = 0;
-    virtual CHIP_ERROR UnregisterAllHandler()                    = 0;
+    virtual CHIP_ERROR UnregisterAllHandlers()                   = 0;
+
 
     // Extension field sets operation
     virtual CHIP_ERROR SceneSaveEFS(SceneTableEntry & scene)                                    = 0;
