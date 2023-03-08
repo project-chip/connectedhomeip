@@ -106,7 +106,8 @@ public:
     /// @brief From stored scene (e.g. ViewScene), deserialize ExtensionFieldSet into a cluster object
     /// @param endpoint Endpoint ID
     /// @param cluster Cluster ID to save
-    /// @param serialisedBytes ExtensionFieldSet stored in NVM
+    /// @param serializedBytes ExtensionFieldSet stored in NVM
+
     /// @param extensionFieldSet ExtensionFieldSet in command format
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
     virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, ByteSpan & serialisedBytes,
