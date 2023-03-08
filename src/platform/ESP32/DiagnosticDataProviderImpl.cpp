@@ -92,9 +92,7 @@ app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum GetWiFiVersionFromAPRecor
     else if (ap_info.phy_11b)
         return WiFiVersionEnum::kB;
     else
-        // TODO: This is keeping the old behavior, it doesn't look right.
-        // https://github.com/project-chip/connectedhomeip/issues/25544
-        return WiFiVersionEnum::kA;
+        return WiFiVersionEnum::kUnknownEnumValue;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
@@ -237,7 +235,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             {
                 memcpy(ifp->Ipv4AddressesBuffer[0], &(ipv4_info.ip.addr), kMaxIPv4AddrSize);
                 ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
-                ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
+                ifp->IPv4Addresses       = app::DataModel::List<ByteSpan>(ifp->Ipv4AddressSpans, 1);
             }
 
             static_assert(kMaxIPv6AddrCount <= UINT8_MAX, "Count might not fit in ipv6_addr_count");
@@ -256,7 +254,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 memcpy(ifp->Ipv6AddressesBuffer[idx], ip6_addr[idx].addr, kMaxIPv6AddrSize);
                 ifp->Ipv6AddressSpans[idx] = ByteSpan(ifp->Ipv6AddressesBuffer[idx], kMaxIPv6AddrSize);
             }
-            ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, ipv6_addr_count);
+            ifp->IPv6Addresses = app::DataModel::List<ByteSpan>(ifp->Ipv6AddressSpans, ipv6_addr_count);
 
             ifp->Next = head;
             head      = ifp;
@@ -311,15 +309,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion)
 {
     wifi_ap_record_t ap_info;
-    esp_err_t err;
-    err = esp_wifi_sta_get_ap_info(&ap_info);
-    if (err == ESP_OK)
-    {
-        wifiVersion = GetWiFiVersionFromAPRecord(ap_info);
-        return CHIP_NO_ERROR;
-    }
+    esp_err_t err = esp_wifi_sta_get_ap_info(&ap_info);
+    VerifyOrReturnError(err == ESP_OK, ESP32Utils::MapError(err));
 
-    return ESP32Utils::MapError(err);
+    wifiVersion = GetWiFiVersionFromAPRecord(ap_info);
+    VerifyOrReturnError(wifiVersion != app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kUnknownEnumValue,
+                        CHIP_ERROR_INTERNAL);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
