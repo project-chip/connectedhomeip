@@ -118,6 +118,11 @@ bool LockManager::IsValidCredentialIndex(uint16_t credentialIndex, CredentialTyp
     return (credentialIndex < kMaxCredentialsPerUser);
 }
 
+bool LockManager::IsValidCredentialType(CredentialTypeEnum type)
+{
+    return (to_underlying(type) < kNumCredentialTypes);
+}
+
 bool LockManager::IsValidWeekdayScheduleIndex(uint8_t scheduleIndex)
 {
     return (scheduleIndex < kMaxWeekdaySchedulesPerUser);
@@ -140,7 +145,7 @@ bool LockManager::ReadConfigValues()
                                  sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
 
     P6Config::ReadConfigValueBin(P6Config::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
-                                 sizeof(EmberAfPluginDoorLockCredentialInfo) * ArraySize(mLockCredentials), outLen);
+                                 sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes, outLen);
 
     P6Config::ReadConfigValueBin(P6Config::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames), sizeof(mUserNames),
                                  outLen);
@@ -149,8 +154,7 @@ bool LockManager::ReadConfigValues()
                                  sizeof(mCredentialData), outLen);
 
     P6Config::ReadConfigValueBin(P6Config::kConfigKey_UserCredentials, reinterpret_cast<uint8_t *>(mCredentials),
-                                 sizeof(CredentialStruct) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser,
-                                 outLen);
+                                 sizeof(CredentialStruct) * LockParams.numberOfUsers * kMaxCredentials, outLen);
 
     P6Config::ReadConfigValueBin(P6Config::kConfigKey_WeekDaySchedules, reinterpret_cast<uint8_t *>(mWeekdaySchedule),
                                  sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser *
@@ -384,11 +388,6 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
     for (size_t i = 0; i < totalCredentials; ++i)
     {
         mCredentials[userIndex][i] = credentials[i];
-        // TODO: Why are we modifying the passed-in credentials?
-        // https://github.com/project-chip/connectedhomeip/issues/25081
-        // For now, preserve pre-existing behavior, which set credentialType to 1.
-        mCredentials[userIndex][i].credentialType  = CredentialTypeEnum::kPin;
-        mCredentials[userIndex][i].credentialIndex = i + 1;
     }
 
     userInStorage.credentials = chip::Span<const CredentialStruct>(mCredentials[userIndex], totalCredentials);
@@ -398,7 +397,7 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
                                   sizeof(EmberAfPluginDoorLockUserInfo) * LockParams.numberOfUsers);
 
     P6Config::WriteConfigValueBin(P6Config::kConfigKey_UserCredentials, reinterpret_cast<const uint8_t *>(mCredentials),
-                                  sizeof(CredentialStruct) * LockParams.numberOfUsers * LockParams.numberOfCredentialsPerUser);
+                                  sizeof(CredentialStruct) * LockParams.numberOfUsers * kMaxCredentials);
 
     P6Config::WriteConfigValueBin(P6Config::kConfigKey_LockUserName, reinterpret_cast<const uint8_t *>(mUserNames),
                                   sizeof(mUserNames));
@@ -411,25 +410,21 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
 bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                 EmberAfPluginDoorLockCredentialInfo & credential)
 {
-
-    VerifyOrReturnValue(credentialIndex > 0, false); // indices are one-indexed
-
-    credentialIndex--;
-
-    VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType), false);
+    VerifyOrReturnValue(IsValidCredentialType(credentialType), false);
+    if (CredentialTypeEnum::kProgrammingPIN == credentialType)
+    {
+        VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType),
+                            false); // programming pin index is only index allowed to contain 0
+    }
+    else
+    {
+        VerifyOrReturnValue(IsValidCredentialIndex(--credentialIndex, credentialType), false); // otherwise, indices are one-indexed
+    }
 
     ChipLogProgress(Zcl, "Lock App: LockManager::GetCredential [credentialType=%u], credentialIndex=%d",
                     to_underlying(credentialType), credentialIndex);
 
-    if (credentialType == CredentialTypeEnum::kProgrammingPIN)
-    {
-        ChipLogError(Zcl, "Programming user not supported [credentialType=%u], credentialIndex=%d", to_underlying(credentialType),
-                     credentialIndex);
-
-        return true;
-    }
-
-    const auto & credentialInStorage = mLockCredentials[credentialIndex];
+    const auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex];
 
     credential.status = credentialInStorage.status;
     ChipLogDetail(Zcl, "CredentialStatus: %d, CredentialIndex: %d ", (int) credential.status, credentialIndex);
@@ -458,31 +453,36 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                                 chip::FabricIndex modifier, DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
                                 const chip::ByteSpan & credentialData)
 {
-
-    VerifyOrReturnValue(credentialIndex > 0, false); // indices are one-indexed
-
-    credentialIndex--;
-
-    VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType), false);
+    VerifyOrReturnValue(IsValidCredentialType(credentialType), false);
+    if (CredentialTypeEnum::kProgrammingPIN == credentialType)
+    {
+        VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType),
+                            false); // programming pin index is only index allowed to contain 0
+    }
+    else
+    {
+        VerifyOrReturnValue(IsValidCredentialIndex(--credentialIndex, credentialType), false); // otherwise, indices are one-indexed
+    }
 
     ChipLogProgress(Zcl,
                     "Door Lock App: LockManager::SetCredential "
                     "[credentialStatus=%u,credentialType=%u,credentialDataSize=%u,creator=%d,modifier=%d]",
                     to_underlying(credentialStatus), to_underlying(credentialType), credentialData.size(), creator, modifier);
 
-    auto & credentialInStorage = mLockCredentials[credentialIndex];
+    auto & credentialInStorage = mLockCredentials[to_underlying(credentialType)][credentialIndex];
 
     credentialInStorage.status         = credentialStatus;
     credentialInStorage.credentialType = credentialType;
     credentialInStorage.createdBy      = creator;
     credentialInStorage.lastModifiedBy = modifier;
 
-    memcpy(mCredentialData[credentialIndex], credentialData.data(), credentialData.size());
-    credentialInStorage.credentialData = chip::ByteSpan{ mCredentialData[credentialIndex], credentialData.size() };
+    memcpy(mCredentialData[to_underlying(credentialType)][credentialIndex], credentialData.data(), credentialData.size());
+    credentialInStorage.credentialData =
+        chip::ByteSpan{ mCredentialData[to_underlying(credentialType)][credentialIndex], credentialData.size() };
 
     // Save credential information in NVM flash
     P6Config::WriteConfigValueBin(P6Config::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
-                                  sizeof(EmberAfPluginDoorLockCredentialInfo) * LockParams.numberOfCredentialsPerUser);
+                                  sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes);
 
     P6Config::WriteConfigValueBin(P6Config::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
                                   sizeof(mCredentialData));
@@ -686,15 +686,15 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
     }
 
     // Check the PIN code
-    for (uint8_t i = 0; i < kMaxCredentials; i++)
+    for (const auto & currentCredential : mLockCredentials[to_underlying(CredentialTypeEnum::kPin)])
     {
-        if (mLockCredentials[i].credentialType != CredentialTypeEnum::kPin ||
-            mLockCredentials[i].status == DlCredentialStatus::kAvailable)
+
+        if (currentCredential.status == DlCredentialStatus::kAvailable)
         {
             continue;
         }
 
-        if (mLockCredentials[i].credentialData.data_equal(pin.Value()))
+        if (currentCredential.credentialData.data_equal(pin.Value()))
         {
             ChipLogDetail(Zcl,
                           "Lock App: specified PIN code was found in the database, setting lock state to \"%s\" [endpointId=%d]",
