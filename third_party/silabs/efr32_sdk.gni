@@ -31,10 +31,10 @@ declare_args() {
   use_silabs_thread_lib = false
   enable_openthread_cli = true
 
-  kvs_max_entries = 255
   # Build LwIP with gecko_sdk lwip
   use_silabs_lwip_lib = false
 
+  kvs_max_entries = 255
 
   # Use Silabs factory data provider example.
   # Users can implement their own.
@@ -258,14 +258,6 @@ template("efr32_sdk") {
         } else {
           defines += [ "LWIP_IPV6=0" ]
         }
-      }
-
-      if (use_silabs_lwip_lib) {
-        _include_dirs += [
-          "${efr32_sdk_root}/util/third_party/lwip/lwip/src/include",
-          "${chip_root}/src/lwip/silabs",
-          "${chip_root}/src/lwip/freertos",
-        ]
       }
     }
 
