@@ -18,38 +18,21 @@
 
 #pragma once
 
-struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
+#include "ListScreen.h"
+#include "ScreenManager.h"
 
-struct AppEvent
+#if CONFIG_HAVE_DISPLAY
+
+#include <cstdint>
+#include <vector>
+
+class StatusScreen : public ListScreen
 {
-    enum AppEventTypes
-    {
-        kEventType_Button = 0,
-        kEventType_Timer,
-        kEventType_Light,
-        kEventType_Install,
-    };
 
-    uint16_t Type;
+public:
+    StatusScreen();
 
-    union
-    {
-        struct
-        {
-            uint8_t Action;
-            uint8_t PinNo;
-        } ButtonEvent;
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-        struct
-        {
-            uint8_t Action;
-            int32_t Actor;
-        } LightEvent;
-    };
-
-    EventHandler mHandler;
+    virtual ~StatusScreen() {}
 };
+
+#endif // CONFIG_HAVE_DISPLAY
