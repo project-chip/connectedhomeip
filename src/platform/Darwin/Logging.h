@@ -65,8 +65,7 @@ enum OSLogCategory
 };
 
 os_log_t LoggerForModule(chip::Logging::LogModule moduleId, char const * moduleName);
-void LogByteSpan(chip::Logging::LogModule moduleId, char const * moduleName, os_log_type_t type,
-                           const chip::ByteSpan & span);
+void LogByteSpan(chip::Logging::LogModule moduleId, char const * moduleName, os_log_type_t type, const chip::ByteSpan & span);
 
 // Helper constructs for compile-time validation of format strings for C++ / ObjC++ contexts.
 // Note that ObjC++ contexts are restricted to NSString style specifiers. Supporting os_log()
