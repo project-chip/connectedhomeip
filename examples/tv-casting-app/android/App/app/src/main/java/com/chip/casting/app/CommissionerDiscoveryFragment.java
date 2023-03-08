@@ -90,10 +90,17 @@ public class CommissionerDiscoveryFragment extends Fragment {
             new Handler(Looper.getMainLooper())
                 .post(
                     () -> {
-                      final Optional<DiscoveredNodeData> discoveredNodeInList = commissionerVideoPlayerList.stream().filter(
-                              node -> discoveredNodeData.discoveredNodeHasSameSource(node)).findFirst();
+                      final Optional<DiscoveredNodeData> discoveredNodeInList =
+                          commissionerVideoPlayerList
+                              .stream()
+                              .filter(node -> discoveredNodeData.discoveredNodeHasSameSource(node))
+                              .findFirst();
                       if (discoveredNodeInList.isPresent()) {
-                        Log.d(TAG, "Replacing existing entry " + discoveredNodeInList.get().getDeviceName() + " in players list");
+                        Log.d(
+                            TAG,
+                            "Replacing existing entry "
+                                + discoveredNodeInList.get().getDeviceName()
+                                + " in players list");
                         arrayAdapter.remove(discoveredNodeInList.get());
                       }
                       arrayAdapter.add(discoveredNodeData);

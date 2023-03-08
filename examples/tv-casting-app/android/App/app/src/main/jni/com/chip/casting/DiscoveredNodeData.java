@@ -221,6 +221,7 @@ public class DiscoveredNodeData {
   /**
    * Checks to see if a discovered node is "effectively equal" to another by comparing the
    * parameters that should not change.
+   *
    * @param o the object to compare to.
    * @return true if the objects are from the same source, false otherwise.
    */
