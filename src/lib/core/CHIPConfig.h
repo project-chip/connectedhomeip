@@ -1397,7 +1397,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 /**
  * @brief The maximum number of clusters per scene
  */
-#ifndef CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES
+#ifndef CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE
 #define CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENES 3
 #endif
 
