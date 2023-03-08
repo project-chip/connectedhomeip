@@ -20,25 +20,25 @@
 
 namespace chip {
 namespace DeviceLayer {
-namespace EFR32 {
+namespace Silabs {
 
-class EFR32Migration
+class MigrationManager
 {
     friend class KeyValueStoreManagerImpl;
 
 public:
     /**
-     * The EFR32 migration manager is implemented as a singleton
+     * The Silabs migration manager is implemented as a singleton
      * User should get the object from this getter.
      */
-    static EFR32Migration & GetMigrationManager();
+    static MigrationManager & GetMigrationInstance();
     static void applyMigrations();
 
 private:
-    EFR32Migration(){};
-    ~EFR32Migration(){};
+    MigrationManager(){};
+    ~MigrationManager(){};
 };
 
-} // namespace EFR32
+} // namespace Silabs
 } // namespace DeviceLayer
 } // namespace chip
