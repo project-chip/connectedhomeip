@@ -100,7 +100,8 @@ public:
     /// @param serializedBytes Output buffer, data needs to be writen in there and size adjusted to the size of the data written.
 
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
-    virtual CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serialisedBytes) = 0;
+    virtual CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) = 0;
+
 
     /// @brief From stored scene (e.g. ViewScene), deserialize ExtensionFieldSet into a cluster object
     /// @param endpoint Endpoint ID
