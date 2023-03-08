@@ -143,7 +143,6 @@ void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, u
 {
     WFX_RSI_LOG("%s: starting", __func__);
     event_msg.reason = reason;
-    memcpy(event_msg.resp_disconnect, resp_disconnect, sizeof(rsi_ble_event_disconnect_t));
     rsi_ble_app_set_event(RSI_BLE_DISCONN_EVENT);
 }
 

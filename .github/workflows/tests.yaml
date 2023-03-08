@@ -32,7 +32,7 @@ env:
 jobs:
     test_suites_linux:
         name: Test Suites - Linux
-        timeout-minutes: 145
+        timeout-minutes: 180
 
         strategy:
             matrix:
@@ -48,7 +48,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.35
+            image: connectedhomeip/chip-build:0.6.47
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -82,6 +82,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |
@@ -196,7 +197,7 @@ jobs:
             - name: Build Apps
               timeout-minutes: 60
               run: |
-                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env --include_yamltests'
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
@@ -225,13 +226,32 @@ jobs:
                      --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                      --bridge-app ./out/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
                   "
+
+            - name: Run Tests using the python parser sending commands to chip-tool
+              timeout-minutes: 65
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                  "./scripts/tests/run_test_suite.py \
+                     --runner chip_tool_python \
+                     --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     run \
+                     --iterations 1 \
+                     --test-timeout-seconds 120 \
+                     --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --lock-app ./out/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
+                     --ota-provider-app ./out/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-requestor-app ./out/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --bridge-app ./out/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                  "
+
             - name: Run Tests using chip-repl (skip slow)
               timeout-minutes: 45
               if: github.event_name == 'pull_request'
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
-                     --run-yamltests-with-chip-repl \
+                     --runner chip_repl_python \
                      --exclude-tags MANUAL \
                      --exclude-tags FLAKY \
                      --exclude-tags IN_DEVELOPMENT \
@@ -252,7 +272,7 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
-                     --run-yamltests-with-chip-repl \
+                     --runner chip_repl_python \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -282,7 +302,7 @@ jobs:
 
     test_suites_darwin:
         name: Test Suites - Darwin
-        timeout-minutes: 150
+        timeout-minutes: 180
 
         strategy:
             matrix:
@@ -321,6 +341,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |
@@ -370,6 +391,26 @@ jobs:
                      --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                      --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
                   "
+
+            - name: Run Tests using the python parser sending commands to chip-tool
+              timeout-minutes: 80
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                  "./scripts/tests/run_test_suite.py \
+                     --runner chip_tool_python \
+                     --chip-tool ./out/darwin-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --target-skip-glob '{Test_TC_DGTHREAD_2_1,Test_TC_DGTHREAD_2_2,Test_TC_DGTHREAD_2_3,Test_TC_DGTHREAD_2_4}' \
+                     run \
+                     --iterations 1 \
+                     --test-timeout-seconds 120 \
+                     --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --lock-app ./out/darwin-x64-lock-${BUILD_VARIANT}/chip-lock-app \
+                     --ota-provider-app ./out/darwin-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                  "
+
             - name: Uploading core files
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
@@ -404,13 +445,13 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.35
+            image: connectedhomeip/chip-build:0.6.47
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
             - name: Try to ensure the directories for core dumping exist and we
@@ -422,6 +463,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |
@@ -489,13 +531,13 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.35
+            image: connectedhomeip/chip-build-java:0.6.47
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
             - name: Try to ensure the directories for core dumping exist and we
@@ -507,6 +549,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |
@@ -570,6 +613,18 @@ jobs:
                      --tool-args "already-discovered --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
                      --factoryreset \
                   '
+            - name: Run Pairing Address-PaseOnly Test
+              timeout-minutes: 10
+              run: |
+                  scripts/run_in_build_env.sh \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "pairing" \
+                     --tool-args "address-paseonly --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
+                     --factoryreset \
+                  '
             - name: Uploading core files
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
@@ -603,7 +658,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform darwin
             - name: Setup Environment
@@ -619,6 +674,7 @@ jobs:
 
             - name: Bootstrap cache
               uses: actions/cache@v3
+              timeout-minutes: 10
               with:
                   key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
                   path: |

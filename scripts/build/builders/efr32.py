@@ -25,6 +25,7 @@ class Efr32App(Enum):
     LOCK = auto()
     SWITCH = auto()
     WINDOW_COVERING = auto()
+    THERMOSTAT = auto()
     UNIT_TEST = auto()
 
     def ExampleName(self):
@@ -36,6 +37,8 @@ class Efr32App(Enum):
             return 'light-switch-app'
         elif self == Efr32App.WINDOW_COVERING:
             return 'window-app'
+        elif self == Efr32App.THERMOSTAT:
+            return 'thermostat'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -48,6 +51,8 @@ class Efr32App(Enum):
             return 'chip-efr32-light-switch-example'
         elif self == Efr32App.WINDOW_COVERING:
             return 'chip-efr32-window-example'
+        elif self == Efr32App.THERMOSTAT:
+            return 'chip-efr32-thermostat-example'
         elif self == Efr32App.UNIT_TEST:
             return 'chip-efr32-device_tests'
         else:
@@ -62,6 +67,8 @@ class Efr32App(Enum):
             return 'light_switch_app.flashbundle.txt'
         elif self == Efr32App.WINDOW_COVERING:
             return 'window_app.flashbundle.txt'
+        elif self == Efr32App.THERMOSTAT:
+            return 'thermostat_app.flashbundle.txt'
         elif self == Efr32App.UNIT_TEST:
             return 'efr32_device_tests.flashbundle.txt'
         else:
@@ -84,6 +91,7 @@ class Efr32Board(Enum):
     BRD4187A = 7
     BRD4304A = 8
     BRD4187C = 9
+    BRD4186C = 10
 
     def GnArgName(self):
         if self == Efr32Board.BRD4161A:
@@ -102,6 +110,8 @@ class Efr32Board(Enum):
             return 'BRD4187A'
         elif self == Efr32Board.BRD4304A:
             return 'BRD4304A'
+        elif self == Efr32Board.BRD4186C:
+            return 'BRD4186C'
         elif self == Efr32Board.BRD4187C:
             return 'BRD4187C'
         else:
@@ -157,16 +167,16 @@ class Efr32Builder(GnBuilder):
         if chip_build_libshell:
             self.extra_gn_options.append('chip_build_libshell=true')
 
-        if chip_logging == False:
+        if chip_logging is False:
             self.extra_gn_options.append('chip_logging=false')
 
-        if chip_openthread_ftd == False:
+        if chip_openthread_ftd is False:
             self.extra_gn_options.append('chip_openthread_ftd=false')
 
         if enable_heap_monitoring:
             self.extra_gn_options.append('enable_heap_monitoring=true')
 
-        if enable_openthread_cli == False:
+        if enable_openthread_cli is False:
             self.extra_gn_options.append('enable_openthread_cli=false')
 
         if show_qr_code:
@@ -198,7 +208,8 @@ class Efr32Builder(GnBuilder):
 
         if enable_ot_coap_lib:
             self.extra_gn_options.append(
-                'use_silabs_thread_lib=true chip_openthread_target="../silabs:ot-efr32-cert" use_thread_coap_lib=true openthread_external_platform=""')
+                'use_silabs_thread_lib=true chip_openthread_target="../silabs:ot-efr32-cert" '
+                'use_thread_coap_lib=true openthread_external_platform=""')
 
         if not no_version:
             shortCommitSha = subprocess.check_output(

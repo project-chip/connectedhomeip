@@ -174,15 +174,14 @@ tests:
               - name: "ms"
                 value: 5000
 
-    #Issue https://github.com/CHIP-Specifications/chip-test-plans/issues/2175
+    #Issue https://github.com/CHIP-Specifications/chip-certification-tool/issues/689#issuecomment-1422612456
     - label: "TH reads ColorTemperatureMireds attribute from DUT."
       PICS: CC.S.F04 && CC.S.A0007 && CC.S.C4c.Rsp && PICS_SKIP_SAMPLE_APP
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
       response:
-          value: ColorTempPhysicalMaxMiredsValue
           constraints:
-              minValue: ColorTempPhysicalMinMiredsValue
+              minValue: ColorTempPhysicalMaxMiredsValue - 1
               maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label:

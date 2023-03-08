@@ -312,6 +312,7 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
         ap->scan.ssid[scan_result->ssid_def.ssid_length] = 0; /* make sure about null terminate */
         /* We do it in this order WPA3 first */
         /* No EAP supported - Is this required */
+        ap->scan.security = WFX_SEC_UNSPECIFIED;
         if (scan_result->security_mode.wpa3)
         {
             ap->scan.security = WFX_SEC_WPA3;
@@ -967,27 +968,8 @@ void wfx_set_wifi_provision(wfx_wifi_provision_t * wifiConfig)
 {
     memcpy(wifi_provision.ssid, wifiConfig->ssid, sizeof(wifiConfig->ssid));
     memcpy(wifi_provision.passkey, wifiConfig->passkey, sizeof(wifiConfig->passkey));
+    wifi_provision.security = wifiConfig->security;
     SILABS_LOG("WIFI: Provision SSID=%s", &wifi_provision.ssid[0]);
-
-    /* Not very good - To be improved */
-    switch (wifiConfig->security)
-    {
-    case WFX_SEC_WPA:
-        wifi_provision.security = static_cast<uint8_t>(sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA2_WPA1_PSK);
-        break;
-    case WFX_SEC_WPA3:
-        wifi_provision.security = WFM_SECURITY_MODE_WPA3_SAE;
-        break;
-    case WFX_SEC_WPA2:
-        wifi_provision.security = static_cast<uint8_t>(sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA2_WPA1_PSK);
-        break;
-    case WFX_SEC_WPA_WPA2_MIXED:
-        wifi_provision.security = static_cast<uint8_t>(sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA2_WPA1_PSK);
-        break;
-    default:
-        wifi_provision.security = WFM_SECURITY_MODE_WPA2_PSK;
-        break;
-    }
 }
 
 /****************************************************************************
@@ -1039,6 +1021,7 @@ bool wfx_is_sta_provisioned(void)
 sl_status_t wfx_connect_to_ap(void)
 {
     sl_status_t result;
+    sl_wfx_security_mode_t connect_security_mode;
 
     if (wifi_provision.ssid[0] == 0)
     {
@@ -1050,10 +1033,28 @@ sl_status_t wfx_connect_to_ap(void)
                "Time: %d, Number of prob: %d",
                ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
     (void) sl_wfx_set_scan_parameters(ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
-    result =
-        sl_wfx_send_join_command((uint8_t *) wifi_provision.ssid, strlen(wifi_provision.ssid), NULL, CHANNEL_0,
-                                 static_cast<sl_wfx_security_mode_t>(wifi_provision.security), PREVENT_ROAMING, DISABLE_PMF_MODE,
-                                 (uint8_t *) wifi_provision.passkey, strlen(wifi_provision.passkey), NULL, IE_DATA_LENGTH);
+    switch (wifi_provision.security)
+    {
+    case WFX_SEC_WEP:
+        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WEP;
+        break;
+    case WFX_SEC_WPA:
+    case WFX_SEC_WPA2:
+        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA2_WPA1_PSK;
+        break;
+    case WFX_SEC_WPA3:
+        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA3_SAE;
+        break;
+    case WFX_SEC_NONE:
+        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_OPEN;
+        break;
+    default:
+        SILABS_LOG("%s: error: unknown security type.");
+        return SL_STATUS_INVALID_STATE;
+    }
+    result = sl_wfx_send_join_command((uint8_t *) wifi_provision.ssid, strlen(wifi_provision.ssid), NULL, CHANNEL_0,
+                                      connect_security_mode, PREVENT_ROAMING, DISABLE_PMF_MODE, (uint8_t *) wifi_provision.passkey,
+                                      strlen(wifi_provision.passkey), NULL, IE_DATA_LENGTH);
 
     return result;
 }

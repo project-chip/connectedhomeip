@@ -156,7 +156,7 @@ CHIP_ERROR EventDataIB::Parser::PrettyPrint() const
 CHIP_ERROR EventDataIB::Parser::GetPath(EventPathIB::Parser * const apPath)
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kPath)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kPath), reader));
     ReturnErrorOnFailure(apPath->Init(reader));
     return CHIP_NO_ERROR;
 }
@@ -193,7 +193,7 @@ CHIP_ERROR EventDataIB::Parser::GetDeltaSystemTimestamp(uint64_t * const apDelta
 
 CHIP_ERROR EventDataIB::Parser::GetData(TLV::TLVReader * const apReader) const
 {
-    return mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kData)), *apReader);
+    return mReader.FindElementWithTag(TLV::ContextTag(Tag::kData), *apReader);
 }
 
 CHIP_ERROR EventDataIB::Parser::ProcessEventPath(EventPathIB::Parser & aEventPath, ConcreteEventPath & aConcreteEventPath)
@@ -306,7 +306,7 @@ EventDataIB::Builder & EventDataIB::Builder::Priority(const uint8_t aPriority)
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kPriority)), aPriority);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kPriority), aPriority);
     }
     return *this;
 }
@@ -316,7 +316,7 @@ EventDataIB::Builder & EventDataIB::Builder::EventNumber(const uint64_t aEventNu
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kEventNumber)), aEventNumber);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kEventNumber), aEventNumber);
     }
     return *this;
 }
@@ -326,7 +326,7 @@ EventDataIB::Builder & EventDataIB::Builder::EpochTimestamp(const uint64_t aEpoc
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kEpochTimestamp)), aEpochTimestamp);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kEpochTimestamp), aEpochTimestamp);
     }
     return *this;
 }
@@ -336,7 +336,7 @@ EventDataIB::Builder & EventDataIB::Builder::SystemTimestamp(const uint64_t aSys
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kSystemTimestamp)), aSystemTimestamp);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kSystemTimestamp), aSystemTimestamp);
     }
     return *this;
 }
@@ -346,7 +346,7 @@ EventDataIB::Builder & EventDataIB::Builder::DeltaEpochTimestamp(const uint64_t 
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kDeltaEpochTimestamp)), aDeltaEpochTimestamp);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kDeltaEpochTimestamp), aDeltaEpochTimestamp);
     }
     return *this;
 }
@@ -356,7 +356,7 @@ EventDataIB::Builder & EventDataIB::Builder::DeltaSystemTimestamp(const uint64_t
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kDeltaSystemTimestamp)), aDeltaSystemTimestamp);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kDeltaSystemTimestamp), aDeltaSystemTimestamp);
     }
     return *this;
 }

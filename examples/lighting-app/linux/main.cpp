@@ -23,11 +23,16 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/server/Server.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
-#include "ui.h"
+#include <imgui_ui/ui.h>
+#include <imgui_ui/windows/light.h>
+#include <imgui_ui/windows/occupancy_sensing.h>
+#include <imgui_ui/windows/qrcode.h>
+
 #endif
 
 using namespace chip;
@@ -77,41 +82,6 @@ void ApplicationInit()
 #endif
 }
 
-#if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
-
-class UiAppMainLoopImplementation : public AppMainLoopImplementation
-{
-public:
-    void RunMainLoop() override;
-    void SignalSafeStopMainLoop() override;
-};
-
-void UiAppMainLoopImplementation::RunMainLoop()
-{
-    // Guaranteed to be on the main task (no chip event loop started yet)
-    example::Ui::Init();
-
-    // Platform event loop will be on a separate thread,
-    // while the event UI loop will be on the main thread.
-    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
-
-    // StopEventLoop will stop the loop below. It is called
-    // from within SignalSafeStopMainLoop below and
-    // UI knows how to stop itself if windows are closed.
-    example::Ui::EventLoop();
-
-    // Stop the chip main loop as well. This is expected to
-    // wait for the task to finish.
-    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
-}
-
-void UiAppMainLoopImplementation::SignalSafeStopMainLoop()
-{
-    example::Ui::StopEventLoop();
-}
-
-#endif
-
 int main(int argc, char * argv[])
 {
     if (ChipLinuxAppInit(argc, argv) != 0)
@@ -122,8 +92,13 @@ int main(int argc, char * argv[])
     LightingMgr().Init();
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
-    UiAppMainLoopImplementation loop;
-    ChipLinuxAppMainLoop(&loop);
+    example::Ui::ImguiUi ui;
+
+    ui.AddWindow(std::make_unique<example::Ui::Windows::QRCode>());
+    ui.AddWindow(std::make_unique<example::Ui::Windows::OccupancySensing>(chip::EndpointId(1), "Occupancy"));
+    ui.AddWindow(std::make_unique<example::Ui::Windows::Light>(chip::EndpointId(1)));
+
+    ChipLinuxAppMainLoop(&ui);
 #else
     ChipLinuxAppMainLoop();
 #endif

@@ -62,35 +62,39 @@ InterfaceTypeEnum GetInterfaceType(const char * if_desc)
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-uint8_t MapAuthModeToSecurityType(wifi_auth_mode_t authmode)
+app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum MapAuthModeToSecurityType(wifi_auth_mode_t authmode)
 {
+    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
     switch (authmode)
     {
     case WIFI_AUTH_OPEN:
-        return 1;
+        return SecurityTypeEnum::kNone;
     case WIFI_AUTH_WEP:
-        return 2;
+        return SecurityTypeEnum::kWep;
     case WIFI_AUTH_WPA_PSK:
-        return 3;
+        return SecurityTypeEnum::kWpa;
     case WIFI_AUTH_WPA2_PSK:
-        return 4;
+        return SecurityTypeEnum::kWpa2;
     case WIFI_AUTH_WPA3_PSK:
-        return 5;
+        return SecurityTypeEnum::kWpa3;
     default:
-        return 0;
+        return SecurityTypeEnum::kUnspecified;
     }
 }
 
-uint8_t GetWiFiVersionFromAPRecord(wifi_ap_record_t ap_info)
+app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum GetWiFiVersionFromAPRecord(wifi_ap_record_t ap_info)
 {
+    using app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum;
     if (ap_info.phy_11n)
-        return 3;
+        return WiFiVersionEnum::kN;
     else if (ap_info.phy_11g)
-        return 2;
+        return WiFiVersionEnum::kG;
     else if (ap_info.phy_11b)
-        return 1;
+        return WiFiVersionEnum::kB;
     else
-        return 0;
+        // TODO: This is keeping the old behavior, it doesn't look right.
+        // https://github.com/project-chip/connectedhomeip/issues/25544
+        return WiFiVersionEnum::kA;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
@@ -235,7 +239,18 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 ifp->Ipv4AddressSpans[0] = ByteSpan(ifp->Ipv4AddressesBuffer[0], kMaxIPv4AddrSize);
                 ifp->IPv4Addresses       = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv4AddressSpans, 1);
             }
-            ipv6_addr_count = esp_netif_get_all_ip6(ifa, ip6_addr);
+
+            static_assert(kMaxIPv6AddrCount <= UINT8_MAX, "Count might not fit in ipv6_addr_count");
+            static_assert(ArraySize(ip6_addr) >= LWIP_IPV6_NUM_ADDRESSES, "Not enough space for our addresses.");
+            auto addr_count = esp_netif_get_all_ip6(ifa, ip6_addr);
+            if (addr_count < 0)
+            {
+                ipv6_addr_count = 0;
+            }
+            else
+            {
+                ipv6_addr_count = static_cast<uint8_t>(min(addr_count, static_cast<int>(kMaxIPv6AddrCount)));
+            }
             for (uint8_t idx = 0; idx < ipv6_addr_count; ++idx)
             {
                 memcpy(ifp->Ipv6AddressesBuffer[idx], ip6_addr[idx].addr, kMaxIPv6AddrSize);
@@ -277,9 +292,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityType)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
-    securityType = 0;
+    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
+
+    securityType = SecurityTypeEnum::kUnspecified;
     wifi_ap_record_t ap_info;
     esp_err_t err;
 
@@ -291,17 +308,18 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityTyp
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wifiVersion)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion)
 {
-    wifiVersion = 0;
     wifi_ap_record_t ap_info;
     esp_err_t err;
     err = esp_wifi_sta_get_ap_info(&ap_info);
     if (err == ESP_OK)
     {
         wifiVersion = GetWiFiVersionFromAPRecord(ap_info);
+        return CHIP_NO_ERROR;
     }
-    return CHIP_NO_ERROR;
+
+    return ESP32Utils::MapError(err);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
@@ -314,8 +332,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNu
     if (err == ESP_OK)
     {
         channelNumber = ap_info.primary;
+        return CHIP_NO_ERROR;
     }
-    return CHIP_NO_ERROR;
+
+    return ESP32Utils::MapError(err);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
@@ -329,8 +349,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
     if (err == ESP_OK)
     {
         rssi = ap_info.rssi;
+        return CHIP_NO_ERROR;
     }
-    return CHIP_NO_ERROR;
+
+    return ESP32Utils::MapError(err);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)

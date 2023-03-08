@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <app/util/config.h>
+
 #ifdef EMBER_AF_PLUGIN_SCENES_USE_TOKENS
 
 #define CREATOR_SCENES_NUM_ENTRIES (0x8723)

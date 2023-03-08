@@ -55,7 +55,11 @@ public:
      * Stop the above `RunMainLoop` function.
      *
      * Generally should contain at least a
-     *    Server::GetInstance().DispatchShutDownAndStopEventLoop()
+     *
+     *    Server::GetInstance().GenerateShutDownEvent()
+     *
+     * and then call StopEventLoopTask() in whatever way is appropriate for the
+     * way the event loop was started.
      */
     virtual void SignalSafeStopMainLoop() = 0;
 };
@@ -64,7 +68,11 @@ class DefaultAppMainLoopImplementation : public AppMainLoopImplementation
 {
 public:
     void RunMainLoop() override { chip::DeviceLayer::PlatformMgr().RunEventLoop(); }
-    void SignalSafeStopMainLoop() override { chip::Server::GetInstance().DispatchShutDownAndStopEventLoop(); }
+    void SignalSafeStopMainLoop() override
+    {
+        chip::Server::GetInstance().GenerateShutDownEvent();
+        chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); });
+    }
 };
 
 /**

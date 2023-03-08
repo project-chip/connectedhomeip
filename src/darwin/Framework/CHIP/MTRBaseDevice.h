@@ -141,8 +141,9 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  * fabric, but attempts to actually use the MTRBaseDevice will fail
  * (asynchronously) in that case.
  */
-+ (instancetype)deviceWithNodeID:(NSNumber *)nodeID
-                      controller:(MTRDeviceController *)controller API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
++ (MTRBaseDevice *)deviceWithNodeID:(NSNumber *)nodeID
+                         controller:(MTRDeviceController *)controller
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The transport used by the current session with this device, or
@@ -214,6 +215,11 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  *
  * A non-nil attributeID along with a nil clusterID will only succeed if the
  * attribute ID is for a global attribute that applies to all clusters.
+ *
+ * The completion will be called with an error if the entire read interaction fails.
+ * Otherwise it will be called with values, which may be empty (e.g. if no paths
+ * matched the wildcard) or may include per-path errors if particular paths
+ * failed.
  */
 - (void)readAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
                            clusterID:(NSNumber * _Nullable)clusterID
@@ -233,8 +239,13 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  *
  * @param completion  response handler will receive either values or error.
  *
- *                    Received values are documented in the definition of
- *                    MTRDeviceResponseHandler.
+ *                    A path-specific error status will get turned into an error
+ *                    passed to the completion, so values will only be passed in
+ *                    when the write succeeds.  In that case, values will have
+ *                    the format documented in the definition of
+ *                    MTRDeviceResponseHandler and will be an array with a single element
+ *                    which is a dictionary that has a MTRAttributePathKey entry in it, whose value
+ *                    is the attribute path that was successfully written to.
  */
 - (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
@@ -255,7 +266,10 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  *
  * @param timeoutMs   timeout in milliseconds for timed invoke, or nil.
  *
- * @param completion  response handler will receive either values or error.
+ * @param completion  response handler will receive either values or error.  A
+ *                    path-specific error status from the command invocation
+ *                    will result in an error being passed to the completion, so
+ *                    values will only be passed in when the command succeeds.
  */
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID
@@ -335,6 +349,11 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  *
  * If all of endpointID, clusterID, eventID are nil, all events on the
  * device will be read.
+ *
+ * The completion will be called with an error if the entire read interaction fails.
+ * Otherwise it will be called with values, which may be empty (e.g. if no paths
+ * matched the wildcard) or may include per-path errors if particular paths
+ * failed.
  */
 
 - (void)readEventsWithEndpointID:(NSNumber * _Nullable)endpointID
@@ -377,7 +396,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, readonly, copy) NSNumber * endpoint;
 @property (nonatomic, readonly, copy) NSNumber * cluster;
 
-+ (instancetype)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
++ (MTRClusterPath *)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -390,9 +409,10 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRAttributePath : MTRClusterPath
 @property (nonatomic, readonly, copy) NSNumber * attribute;
 
-+ (instancetype)attributePathWithEndpointID:(NSNumber *)endpointID
-                                  clusterID:(NSNumber *)clusterID
-                                attributeID:(NSNumber *)attributeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
++ (MTRAttributePath *)attributePathWithEndpointID:(NSNumber *)endpointID
+                                        clusterID:(NSNumber *)clusterID
+                                      attributeID:(NSNumber *)attributeID
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 @end
 
 /**
@@ -403,9 +423,9 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTREventPath : MTRClusterPath
 @property (nonatomic, readonly, copy) NSNumber * event;
 
-+ (instancetype)eventPathWithEndpointID:(NSNumber *)endpointID
-                              clusterID:(NSNumber *)clusterID
-                                eventID:(NSNumber *)eventID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
++ (MTREventPath *)eventPathWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                                  eventID:(NSNumber *)eventID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 @end
 
 /**
@@ -415,9 +435,9 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRCommandPath : MTRClusterPath
 @property (nonatomic, readonly, copy) NSNumber * command;
 
-+ (instancetype)commandPathWithEndpointID:(NSNumber *)endpointID
-                                clusterID:(NSNumber *)clusterID
-                                commandID:(NSNumber *)commandID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
++ (MTRCommandPath *)commandPathWithEndpointID:(NSNumber *)endpointID
+                                    clusterID:(NSNumber *)clusterID
+                                    commandID:(NSNumber *)commandID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 @end
 
 @interface MTRAttributeReport : NSObject
@@ -475,7 +495,7 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
                errorHandler:(MTRDeviceErrorHandler)errorHandler
     subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
     resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduledHandler
-    API_DEPRECATED("Please use "
+    MTR_DEPRECATED("Please use "
                    "subscribeWithQueue:params:clusterStateCacheContainer:attributeReportHandler:eventReportHandler:errorHandler:"
                    "subscriptionEstablished:resubscriptionScheduled:",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
@@ -486,7 +506,7 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
                              params:(MTRReadParams * _Nullable)params
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion
-    API_DEPRECATED("Please use readAttributesWithEndpointID:clusterID:attributeID:params:queue:completion:", ios(16.1, 16.4),
+    MTR_DEPRECATED("Please use readAttributesWithEndpointID:clusterID:attributeID:params:queue:completion:", ios(16.1, 16.4),
         macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)writeAttributeWithEndpointId:(NSNumber *)endpointId
@@ -496,7 +516,7 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                          clientQueue:(dispatch_queue_t)clientQueue
                           completion:(MTRDeviceResponseHandler)completion
-    API_DEPRECATED("Please use writeAttributeWithEndpointID:clusterID:attributeID:value:timedWriteTimeout:queue:completion:",
+    MTR_DEPRECATED("Please use writeAttributeWithEndpointID:clusterID:attributeID:value:timedWriteTimeout:queue:completion:",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)invokeCommandWithEndpointId:(NSNumber *)endpointId
@@ -506,7 +526,7 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
                         clientQueue:(dispatch_queue_t)clientQueue
                          completion:(MTRDeviceResponseHandler)completion
-    API_DEPRECATED("Please use invokeCommandWithEndpointID:clusterID:commandID:commandFields:timedInvokeTimeout:queue:completion",
+    MTR_DEPRECATED("Please use invokeCommandWithEndpointID:clusterID:commandID:commandFields:timedInvokeTimeout:queue:completion",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)subscribeAttributeWithEndpointId:(NSNumber * _Nullable)endpointId
@@ -518,14 +538,14 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
                              clientQueue:(dispatch_queue_t)clientQueue
                            reportHandler:(MTRDeviceResponseHandler)reportHandler
                  subscriptionEstablished:(dispatch_block_t _Nullable)subscriptionEstablishedHandler
-    API_DEPRECATED("Please use "
+    MTR_DEPRECATED("Please use "
                    "subscribeToAttributesWithEndpointID:clusterID:attributeID:params:queue:"
                    "reportHandler:subscriptionEstablished:",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)deregisterReportHandlersWithClientQueue:(dispatch_queue_t)queue
                                      completion:(dispatch_block_t)completion
-    API_DEPRECATED("Pease use deregisterReportHandlersWithQueue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+    MTR_DEPRECATED("Pease use deregisterReportHandlersWithQueue:completion:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
         tvos(16.1, 16.4));
 
 @end
@@ -535,7 +555,7 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
 + (instancetype)attributePathWithEndpointId:(NSNumber *)endpointId
                                   clusterId:(NSNumber *)clusterId
                                 attributeId:(NSNumber *)attributeId
-    API_DEPRECATED("Please use attributePathWithEndpointID:clusterID:attributeID:", ios(16.1, 16.4), macos(13.0, 13.3),
+    MTR_DEPRECATED("Please use attributePathWithEndpointID:clusterID:attributeID:", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end
@@ -545,7 +565,7 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
 + (instancetype)eventPathWithEndpointId:(NSNumber *)endpointId
                               clusterId:(NSNumber *)clusterId
                                 eventId:(NSNumber *)eventId
-    API_DEPRECATED("Please use eventPathWithEndpointID:clusterID:eventID:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
+    MTR_DEPRECATED("Please use eventPathWithEndpointID:clusterID:eventID:", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4),
         tvos(16.1, 16.4));
 
 @end
@@ -555,7 +575,7 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
 + (instancetype)commandPathWithEndpointId:(NSNumber *)endpointId
                                 clusterId:(NSNumber *)clusterId
                                 commandId:(NSNumber *)commandId
-    API_DEPRECATED("Please use commandPathWithEndpointID:clusterID:commandID:", ios(16.1, 16.4), macos(13.0, 13.3),
+    MTR_DEPRECATED("Please use commandPathWithEndpointID:clusterID:commandID:", ios(16.1, 16.4), macos(13.0, 13.3),
         watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end

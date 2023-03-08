@@ -175,29 +175,26 @@ namespace DeviceLayer {
 {
     auto timeout =
         [self hasDiscriminator] ? kScanningWithDiscriminatorTimeoutInSeconds : kScanningWithoutDiscriminatorTimeoutInSeconds;
-    dispatch_source_set_timer(_timer, dispatch_walltime(nullptr, timeout * NSEC_PER_SEC), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
+    dispatch_source_set_timer(
+        _timer, dispatch_walltime(nullptr, static_cast<int64_t>(timeout * NSEC_PER_SEC)), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
 }
 
 // All our callback dispatch must happen on _chipWorkQueue
 - (void)dispatchConnectionError:(CHIP_ERROR)error
 {
-    if (self.onConnectionError == nil) {
-        return;
-    }
-
     dispatch_async(_chipWorkQueue, ^{
-        self.onConnectionError(self.appState, error);
+        if (self.onConnectionError != nil) {
+            self.onConnectionError(self.appState, error);
+        }
     });
 }
 
 - (void)dispatchConnectionComplete:(CBPeripheral *)peripheral
 {
-    if (self.onConnectionComplete == nil) {
-        return;
-    }
-
     dispatch_async(_chipWorkQueue, ^{
-        self.onConnectionComplete(self.appState, (__bridge void *) peripheral);
+        if (self.onConnectionComplete != nil) {
+            self.onConnectionComplete(self.appState, (__bridge void *) peripheral);
+        }
     });
 }
 
@@ -379,24 +376,19 @@ namespace DeviceLayer {
         chip::Ble::ChipBleUUID charId;
         [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
 
-        // build a inet buffer from the rxEv and send to blelayer.
-        __block chip::System::PacketBufferHandle msgBuf
-            = chip::System::PacketBufferHandle::NewWithData(characteristic.value.bytes, characteristic.value.length);
+        dispatch_async(_chipWorkQueue, ^{
+            // build a inet buffer from the rxEv and send to blelayer.
+            auto msgBuf = chip::System::PacketBufferHandle::NewWithData(characteristic.value.bytes, characteristic.value.length);
 
-        if (!msgBuf.IsNull()) {
-            dispatch_async(_chipWorkQueue, ^{
-                if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, std::move(msgBuf))) {
-                    // since this error comes from device manager core
-                    // we assume it would do the right thing, like closing the connection
-                    ChipLogError(Ble, "Failed at handling incoming BLE data");
-                }
-            });
-        } else {
-            ChipLogError(Ble, "Failed at allocating buffer for incoming BLE data");
-            dispatch_async(_chipWorkQueue, ^{
+            if (msgBuf.IsNull()) {
+                ChipLogError(Ble, "Failed at allocating buffer for incoming BLE data");
                 _mBleLayer->HandleConnectionError((__bridge void *) peripheral, CHIP_ERROR_NO_MEMORY);
-            });
-        }
+            } else if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, std::move(msgBuf))) {
+                // since this error comes from device manager core
+                // we assume it would do the right thing, like closing the connection
+                ChipLogError(Ble, "Failed at handling incoming BLE data");
+            }
+        });
     } else {
         ChipLogError(
             Ble, "BLE:Error receiving indication of Characteristics on the device: [%s]", [error.localizedDescription UTF8String]);

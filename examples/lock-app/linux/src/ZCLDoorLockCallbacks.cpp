@@ -13,13 +13,13 @@ using namespace chip::app::Clusters::DoorLock;
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
                                             OperationErrorEnum & err)
 {
-    return LockManager::Instance().Lock(endpointId, pinCode, err);
+    return LockManager::Instance().Lock(endpointId, pinCode, err, OperationSourceEnum::kRemote);
 }
 
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const Optional<ByteSpan> & pinCode,
                                               OperationErrorEnum & err)
 {
-    return LockManager::Instance().Unlock(endpointId, pinCode, err);
+    return LockManager::Instance().Unlock(endpointId, pinCode, err, OperationSourceEnum::kRemote);
 }
 
 bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)

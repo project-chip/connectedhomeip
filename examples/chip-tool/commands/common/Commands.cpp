@@ -181,9 +181,7 @@ int Commands::RunInteractive(const char * command)
         delete[] argv[i];
     }
 
-    VerifyOrReturnValue(CHIP_NO_ERROR == err, EXIT_FAILURE, ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err)));
-
-    return EXIT_SUCCESS;
+    return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 CHIP_ERROR Commands::RunCommand(int argc, char ** argv, bool interactive)

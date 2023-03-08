@@ -65,7 +65,7 @@ typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 }
 + (instancetype)pairWithFirst:(id)first second:(id)second
 {
-    return [[MTRPair alloc] initWithFirst:first second:second];
+    return [[self alloc] initWithFirst:first second:second];
 }
 @end
 
@@ -91,7 +91,7 @@ typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 }
 + (instancetype)weakReferenceWithObject:(id)object
 {
-    return [[MTRWeakReference alloc] initWithObject:object];
+    return [[self alloc] initWithObject:object];
 }
 - (id)strongObject
 {
@@ -221,7 +221,7 @@ private:
     return [NSString stringWithFormat:@"<MTRDevice: %p>[fabric: %u, nodeID: %@]", self, _fabricIndex, _nodeID];
 }
 
-+ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
++ (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     return [controller deviceForNodeID:nodeID];
 }
@@ -252,6 +252,17 @@ private:
     _weakDelegate = nil;
 
     os_unfair_lock_unlock(&self->_lock);
+}
+
+- (void)nodeMayBeAdvertisingOperational
+{
+    // TODO: Figure out what to do with that information.  If we're not waiting
+    // to subscribe/resubscribe, do nothing, otherwise perhaps trigger the
+    // subscribe/resubscribe immediately?  We need to have much better tracking
+    // of our internal state for that, and may need to add something on
+    // ReadClient to cancel its outstanding timer and try to resubscribe
+    // immediately....
+    MTR_LOG_DEFAULT("%@ saw new operational advertisement", self);
 }
 
 // assume lock is held
@@ -982,7 +993,7 @@ private:
 
 @implementation MTRDevice (Deprecated)
 
-+ (instancetype)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
++ (MTRDevice *)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
 {
     return [self deviceWithNodeID:@(nodeID) controller:deviceController];
 }

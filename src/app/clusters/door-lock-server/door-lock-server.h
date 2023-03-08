@@ -54,6 +54,7 @@ using chip::app::Clusters::DoorLock::UserStatusEnum;
 using chip::app::Clusters::DoorLock::UserTypeEnum;
 using chip::app::DataModel::List;
 using chip::app::DataModel::Nullable;
+using chip::app::DataModel::NullNullable;
 
 using CredentialStruct  = chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type;
 using LockOpCredentials = CredentialStruct;
@@ -95,7 +96,9 @@ public:
      *
      * @return true on success, false on failure.
      */
-    bool SetLockState(chip::EndpointId endpointId, DlLockState newLockState, OperationSourceEnum opSource);
+    bool SetLockState(chip::EndpointId endpointId, DlLockState newLockState, OperationSourceEnum opSource,
+                      const Nullable<uint16_t> & userIndex                        = NullNullable,
+                      const Nullable<List<const LockOpCredentials>> & credentials = NullNullable);
 
     /**
      * Updates the LockState attribute with new value.
@@ -178,6 +181,8 @@ public:
     }
 
     bool OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
+
+    static void DoorLockOnAutoRelockCallback(chip::System::Layer *, void * callbackContext);
 
 private:
     chip::FabricIndex getFabricIndex(const chip::app::CommandHandler * commandObj);
@@ -408,7 +413,7 @@ private:
     void SendLockOperationEvent(chip::EndpointId endpointId, LockOperationTypeEnum opType, OperationSourceEnum opSource,
                                 OperationErrorEnum opErr, const Nullable<uint16_t> & userId,
                                 const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
-                                LockOpCredentials * credList, size_t credListSize, bool opSuccess = true);
+                                const Nullable<List<const LockOpCredentials>> & credentials = NullNullable, bool opSuccess = true);
 
     /**
      * @brief Schedule auto relocking with a given timeout
@@ -417,8 +422,6 @@ private:
      * @param timeoutSec    timeout in seconds
      */
     void ScheduleAutoRelock(chip::EndpointId endpointId, uint32_t timeoutSec);
-
-    static void DoorLockOnAutoRelockCallback(chip::EndpointId endpointId);
 
     /**
      * @brief Send generic event
@@ -535,8 +538,6 @@ private:
     friend bool emberAfDoorLockClusterClearYearDayScheduleCallback(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::DecodableType & commandData);
-
-    EmberEventControl AutolockEvent; /**< for automatic relock scheduling */
 
     std::array<EmberAfDoorLockEndpointContext, EMBER_AF_DOOR_LOCK_CLUSTER_SERVER_ENDPOINT_COUNT> mEndpointCtx;
 

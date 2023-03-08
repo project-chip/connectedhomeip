@@ -27,7 +27,6 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/EventLogging.h>
 #include <app/server/Server.h>
-#include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/error-mapping.h>
 #include <cinttypes>
@@ -46,10 +45,7 @@ using chip::Protocols::InteractionModel::Status;
 static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_HOUR   = 23;
 static constexpr uint8_t DOOR_LOCK_SCHEDULE_MAX_MINUTE = 59;
 
-// emberEventControlSetDelayMS() uses uint32_t for timeout in milliseconds but doesn't accept
-// values more than MAX(UINT32) / 2. This is internal value. Thus, lets limit our relock timeout
-// in seconds with the appropriate maximum to ensure that delay setting won't fail.
-static constexpr uint32_t DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC = MAX_INT32U_VALUE / (2 * MILLISECOND_TICKS_PER_SECOND);
+static constexpr uint32_t DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC = MAX_INT32U_VALUE / MILLISECOND_TICKS_PER_SECOND;
 
 DoorLockServer DoorLockServer::instance;
 
@@ -107,7 +103,8 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
     return SetAttribute(endpointId, Attributes::LockState::Id, Attributes::LockState::Set, newLockState);
 }
 
-bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState, OperationSourceEnum opSource)
+bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState, OperationSourceEnum opSource,
+                                  const Nullable<uint16_t> & userIndex, const Nullable<List<const LockOpCredentials>> & credentials)
 {
     bool success = SetLockState(endpointId, newLockState);
 
@@ -122,8 +119,8 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
     // Send LockOperation event
     auto opType = (DlLockState::kLocked == newLockState) ? LockOperationTypeEnum::kLock : LockOperationTypeEnum::kUnlock;
 
-    SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kUnspecified, Nullable<uint16_t>(),
-                           Nullable<chip::FabricIndex>(), Nullable<chip::NodeId>(), nullptr, 0, success);
+    SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kUnspecified, userIndex, Nullable<chip::FabricIndex>(),
+                           Nullable<chip::NodeId>(), credentials, success);
 
     // Schedule auto-relocking
     if (success && LockOperationTypeEnum::kUnlock == opType)
@@ -436,82 +433,58 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
         return;
     }
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
     EmberAfPluginDoorLockUserInfo user;
-    VerifyOrExit(emberAfPluginDoorLockGetUser(commandPath.mEndpointId, userIndex, user), err = CHIP_ERROR_INTERNAL);
+    if (!emberAfPluginDoorLockGetUser(commandPath.mEndpointId, userIndex, user))
     {
-        chip::app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ::Id, Commands::GetUserResponse::Id };
-        chip::TLV::TLVWriter * writer;
-        SuccessOrExit(err = commandObj->PrepareCommand(path));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(
-            err = writer->Put(chip::TLV::ContextTag(to_underlying(Commands::GetUserResponse::Fields::kUserIndex)), userIndex));
-
-        using ResponseFields = Commands::GetUserResponse::Fields;
-
-        // appclusters, 5.2.4.36: we should not add user-specific field if the user status is set to Available
-        if (UserStatusEnum::kAvailable != user.userStatus)
-        {
-            emberAfDoorLockClusterPrintln("Found user in storage: "
-                                          "[userIndex=%d,userName=\"%.*s\",userStatus=%u,userType=%u"
-                                          ",credentialRule=%u,createdBy=%u,modifiedBy=%u]",
-                                          userIndex, static_cast<int>(user.userName.size()), user.userName.data(),
-                                          to_underlying(user.userStatus), to_underlying(user.userType),
-                                          to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
-
-            SuccessOrExit(err = writer->PutString(TLV::ContextTag(to_underlying(ResponseFields::kUserName)), user.userName));
-            if (0xFFFFFFFFU != user.userUniqueId)
-            {
-                SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserUniqueID)), user.userUniqueId));
-            }
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserStatus)), user.userStatus));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserType)), user.userType));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCredentialRule)), user.credentialRule));
-            if (!user.credentials.empty())
-            {
-                TLV::TLVType credentialsContainer;
-                SuccessOrExit(err = writer->StartContainer(TLV::ContextTag(to_underlying(ResponseFields::kCredentials)),
-                                                           TLV::kTLVType_Array, credentialsContainer));
-                for (size_t i = 0; i < user.credentials.size(); ++i)
-                {
-                    SuccessOrExit(err = user.credentials.data()[i].Encode(*writer, TLV::AnonymousTag()));
-                }
-                SuccessOrExit(err = writer->EndContainer(credentialsContainer));
-            }
-            // Append fabric IDs only if the user was created/modified by matter
-            if (user.creationSource == DlAssetSource::kMatterIM)
-            {
-                SuccessOrExit(err =
-                                  writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCreatorFabricIndex)), user.createdBy));
-            }
-            if (user.modificationSource == DlAssetSource::kMatterIM)
-            {
-                SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kLastModifiedFabricIndex)),
-                                                user.lastModifiedBy));
-            }
-        }
-        else
-        {
-            emberAfDoorLockClusterPrintln("[GetUser] User not found [userIndex=%d]", userIndex);
-        }
-
-        // appclusters, 5.2.4.36.1: We need to add next occupied user after userIndex if any.
-        uint16_t nextAvailableUserIndex = 0;
-        if (findOccupiedUserSlot(commandPath.mEndpointId, static_cast<uint16_t>(userIndex + 1), nextAvailableUserIndex))
-        {
-            SuccessOrExit(err =
-                              writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kNextUserIndex)), nextAvailableUserIndex));
-        }
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
-
-exit:
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(Zcl, "[GetUser] Command processing failed [endpointId=%d,userIndex=%d,err=\"%s\"]", commandPath.mEndpointId,
-                     userIndex, err.AsString());
+        emberAfDoorLockClusterPrintln("[GetUser] Could not get user info [userIndex=%d]", userIndex);
         commandObj->AddStatus(commandPath, Status::Failure);
+        return;
     }
+
+    Commands::GetUserResponse::Type response;
+    response.userIndex = userIndex;
+
+    // appclusters, 5.2.4.36: we should not set user-specific fields to non-null if the user status is set to Available
+    if (UserStatusEnum::kAvailable != user.userStatus)
+    {
+        emberAfDoorLockClusterPrintln("Found user in storage: "
+                                      "[userIndex=%d,userName=\"%.*s\",userStatus=%u,userType=%u"
+                                      ",credentialRule=%u,createdBy=%u,modifiedBy=%u]",
+                                      userIndex, static_cast<int>(user.userName.size()), user.userName.data(),
+                                      to_underlying(user.userStatus), to_underlying(user.userType),
+                                      to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
+
+        response.userName.SetNonNull(user.userName);
+        if (0xFFFFFFFFU != user.userUniqueId)
+        {
+            response.userUniqueID.SetNonNull(user.userUniqueId);
+        }
+        response.userStatus.SetNonNull(user.userStatus);
+        response.userType.SetNonNull(user.userType);
+        response.credentialRule.SetNonNull(user.credentialRule);
+        response.credentials.SetNonNull(user.credentials);
+        // Set fabric indices only if the user was created/modified by matter.
+        if (user.creationSource == DlAssetSource::kMatterIM)
+        {
+            response.creatorFabricIndex.SetNonNull(user.createdBy);
+        }
+        if (user.modificationSource == DlAssetSource::kMatterIM)
+        {
+            response.lastModifiedFabricIndex.SetNonNull(user.lastModifiedBy);
+        }
+    }
+    else
+    {
+        emberAfDoorLockClusterPrintln("[GetUser] User not found [userIndex=%d]", userIndex);
+    }
+
+    // appclusters, 5.2.4.36.1: We need to add next occupied user after userIndex if any.
+    uint16_t nextAvailableUserIndex = 0;
+    if (findOccupiedUserSlot(commandPath.mEndpointId, static_cast<uint16_t>(userIndex + 1), nextAvailableUserIndex))
+    {
+        response.nextUserIndex.SetNonNull(nextAvailableUserIndex);
+    }
+    commandObj->AddResponse(commandPath, response);
 }
 
 void DoorLockServer::clearUserCommandHandler(chip::app::CommandHandler * commandObj,
@@ -727,6 +700,12 @@ void DoorLockServer::setCredentialCommandHandler(
         // if userIndex is NULL then we're changing the programming user PIN
         if (userIndex.IsNull())
         {
+            if (!userStatus.IsNull() || userType != UserTypeEnum::kProgrammingUser)
+            {
+                emberAfDoorLockClusterPrintln("[SetCredential] Unable to modify programming PIN: invalid argument "
+                                              "[endpointId=%d,credentialIndex=%d]",
+                                              commandPath.mEndpointId, credentialIndex);
+            }
             status = modifyProgrammingPIN(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
                                           existingCredential, credentialData);
             sendSetCredentialResponse(commandObj, commandPath, status, 0, nextAvailableCredentialSlot);
@@ -2272,7 +2251,16 @@ DlStatus DoorLockServer::createCredential(chip::EndpointId endpointId, chip::Fab
     }
     else
     {
-        // appclusters, 5.2.4.40: if user index is NULL, we should try to modify the existing user
+        // appclusters, 5.2.4.40: if user index is NULL, we should try to modify
+        // the existing user.  In this case userStatus and userType shall both
+        // be null.
+        if (!userStatus.IsNull() || !userType.IsNull())
+        {
+            emberAfDoorLockClusterPrintln("[SetCredential] Unable to add credential: invalid arguments "
+                                          "[endpointId=%d,credentialIndex=%d,credentialType=%u]",
+                                          endpointId, credentialIndex, to_underlying(credentialType));
+            return DlStatus::kInvalidField;
+        }
         status = createNewCredentialAndAddItToUser(endpointId, creatorFabricIdx, userIndex.Value(), credential, credentialData);
     }
 
@@ -2341,7 +2329,7 @@ DlStatus DoorLockServer::modifyCredential(chip::EndpointId endpointId, chip::Fab
 {
 
     // appclusters, 5.2.4.40: when modifying a credential, userStatus and userType shall both be NULL.
-    if (!userStatus.IsNull() || (!userType.IsNull() && UserTypeEnum::kProgrammingUser != userType.Value()))
+    if (!userStatus.IsNull() || !userType.IsNull())
     {
         emberAfDoorLockClusterPrintln("[SetCredential] Unable to modify the credential: invalid arguments "
                                       "[endpointId=%d,credentialIndex=%d,credentialType=%u]",
@@ -3072,9 +3060,7 @@ LockDataTypeEnum DoorLockServer::credentialTypeToLockDataType(CredentialTypeEnum
     case CredentialTypeEnum::kFingerVein:
         return LockDataTypeEnum::kFingerVein;
     case CredentialTypeEnum::kFace:
-        // So far there's no distinct data type for face credentials.
-        // See https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/6272
-        return LockDataTypeEnum::kUnspecified;
+        return LockDataTypeEnum::kFace;
     case CredentialTypeEnum::kUnknownEnumValue:
         return LockDataTypeEnum::kUnspecified;
     }
@@ -3380,46 +3366,31 @@ exit:
 
     // Send LockOperation/LockOperationError event.  The credential index in
     // foundCred will be filled in if we actually have a value to fill in.
+    Nullable<List<const LockOpCredentials>> credentials{};
     LockOpCredentials foundCred[] = { { CredentialTypeEnum::kPin, UINT16_MAX } };
-    LockOpCredentials * credList  = nullptr;
-    size_t credListSize           = 0;
 
     // appclusters.pdf 5.3.5.3, 5.3.5.4:
     // The list of credentials used in performing the lock operation. This SHALL be null if no credentials were involved.
     if (pinCode.HasValue() && pinCredIdx.HasValue())
     {
         foundCred[0].credentialIndex = pinCredIdx.Value();
-        credList                     = foundCred;
-        credListSize                 = 1;
+        credentials.SetNonNull(foundCred);
     }
 
     SendLockOperationEvent(endpoint, opType, OperationSourceEnum::kRemote, reason, pinUserIdx,
                            Nullable<chip::FabricIndex>(getFabricIndex(commandObj)), Nullable<chip::NodeId>(getNodeId(commandObj)),
-                           credList, credListSize, success);
+                           credentials, success);
     return success;
 }
 
 void DoorLockServer::SendLockOperationEvent(chip::EndpointId endpointId, LockOperationTypeEnum opType, OperationSourceEnum opSource,
                                             OperationErrorEnum opErr, const Nullable<uint16_t> & userId,
                                             const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
-                                            LockOpCredentials * credList, size_t credListSize, bool opSuccess)
+                                            const Nullable<List<const LockOpCredentials>> & credentials, bool opSuccess)
 {
-    Nullable<List<const Structs::CredentialStruct::Type>> credentials{};
-
-    // appclusters.pdf 5.3.5.3, 5.3.5.4:
-    // The list of credentials used in performing the lock operation. This SHALL be null if no credentials were involved.
-    if (nullptr == credList || 0 == credListSize)
-    {
-        credentials.SetNull();
-    }
-    else
-    {
-        credentials.SetNonNull(List<const Structs::CredentialStruct::Type>(credList, credListSize));
-    }
 
     // TODO: if [USR] feature is not supported then credentials should be omitted (Optional.HasValue()==false)?
     // Spec just says that it should be NULL if no PIN were provided.
-
     if (opSuccess)
     {
         Events::LockOperation::Type event{ opType, opSource, userId, fabricIdx, nodeId, MakeOptional(credentials) };
@@ -3434,18 +3405,17 @@ void DoorLockServer::SendLockOperationEvent(chip::EndpointId endpointId, LockOpe
 
 void DoorLockServer::ScheduleAutoRelock(chip::EndpointId endpointId, uint32_t timeoutSec)
 {
-    emberEventControlSetInactive(&AutolockEvent);
-
-    AutolockEvent.endpoint = endpointId;
-    AutolockEvent.callback = DoorLockOnAutoRelockCallback;
-
     uint32_t timeoutMs =
         (DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC >= timeoutSec) ? timeoutSec * MILLISECOND_TICKS_PER_SECOND : DOOR_LOCK_MAX_LOCK_TIMEOUT_SEC;
-    auto err = emberEventControlSetDelayMS(&AutolockEvent, timeoutMs);
 
-    if (EMBER_SUCCESS != err)
+    CHIP_ERROR err =
+        DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(timeoutMs), DoorLockOnAutoRelockCallback,
+                                              reinterpret_cast<void *>(static_cast<uintptr_t>(endpointId)));
+
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to schedule autorelock: timeout=%" PRIu32 ", status=0x%x", timeoutSec, err);
+        ChipLogError(Zcl, "Failed to schedule autorelock: timeout=%" PRIu32 ", status=%" CHIP_ERROR_FORMAT, timeoutSec,
+                     err.Format());
     }
 }
 
@@ -3804,13 +3774,21 @@ void MatterDoorLockPluginServerInitCallback()
 
 void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath) {}
 
+void MatterDoorLockClusterServerShutdownCallback(EndpointId endpoint)
+{
+    emberAfDoorLockClusterPrintln("Shuting door lock server cluster on endpoint %d", endpoint);
+
+    DeviceLayer::SystemLayer().CancelTimer(DoorLockServer::DoorLockOnAutoRelockCallback,
+                                           reinterpret_cast<void *>(static_cast<uintptr_t>(endpoint)));
+}
+
 // =============================================================================
 // Timer callbacks
 // =============================================================================
 
-void DoorLockServer::DoorLockOnAutoRelockCallback(chip::EndpointId endpointId)
+void DoorLockServer::DoorLockOnAutoRelockCallback(System::Layer *, void * callbackContext)
 {
-    emberEventControlSetInactive(&DoorLockServer::Instance().AutolockEvent);
+    auto endpointId = static_cast<EndpointId>(reinterpret_cast<uintptr_t>(callbackContext));
 
     Nullable<DlLockState> lockState;
     if (Attributes::LockState::Get(endpointId, lockState) != EMBER_ZCL_STATUS_SUCCESS || lockState.IsNull() ||

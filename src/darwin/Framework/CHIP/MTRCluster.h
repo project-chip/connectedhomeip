@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#import <Matter/MTRDefines.h>
 
-API_DEPRECATED("ResponseHandler is not used", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+MTR_DEPRECATED("ResponseHandler is not used", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 typedef void (^ResponseHandler)(id _Nullable value, NSError * _Nullable error);
-API_DEPRECATED("Please use MTRStatusCompletion instead", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+MTR_DEPRECATED("Please use MTRStatusCompletion instead", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 typedef void (^StatusCompletion)(NSError * _Nullable error);
-API_DEPRECATED(
+MTR_DEPRECATED(
     "Please use MTRSubscriptionEstablishedHandler instead", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 typedef void (^SubscriptionEstablishedHandler)(void);
 
@@ -177,16 +177,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRReadParams (Deprecated)
 
-@property (nonatomic, copy, nullable) NSNumber * fabricFiltered API_DEPRECATED(
+@property (nonatomic, copy, nullable) NSNumber * fabricFiltered MTR_DEPRECATED(
     "Please use filterByFabric", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end
 
 @interface MTRSubscribeParams (Deprecated)
 
-@property (nonatomic, copy, nullable) NSNumber * keepPreviousSubscriptions API_DEPRECATED(
+@property (nonatomic, copy, nullable) NSNumber * keepPreviousSubscriptions MTR_DEPRECATED(
     "Please use replaceExistingSubscriptions", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-@property (nonatomic, copy, nullable) NSNumber * autoResubscribe API_DEPRECATED(
+@property (nonatomic, copy, nullable) NSNumber * autoResubscribe MTR_DEPRECATED(
     "Please use resubscribeAutomatically", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 /**
@@ -195,9 +195,9 @@ NS_ASSUME_NONNULL_BEGIN
  * own.  Uses of MTRSubscribeParams that rely on init must all be using
  * (deprecated) APIs that pass in a separate minInterval and maxInterval.
  */
-- (instancetype)init API_DEPRECATED(
+- (instancetype)init MTR_DEPRECATED(
     "Please use initWithMinInterval", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-+ (instancetype)new API_DEPRECATED(
++ (instancetype)new MTR_DEPRECATED(
     "Please use initWithMinInterval", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @end
 

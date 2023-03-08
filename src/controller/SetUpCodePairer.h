@@ -68,6 +68,7 @@ enum class SetupCodePairerBehaviour : uint8_t
 enum class DiscoveryType : uint8_t
 {
     kDiscoveryNetworkOnly,
+    kDiscoveryNetworkOnlyWithoutPASEAutoRetry,
     kAll,
 };
 

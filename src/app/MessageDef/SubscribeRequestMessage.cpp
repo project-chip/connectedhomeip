@@ -155,28 +155,28 @@ CHIP_ERROR SubscribeRequestMessage::Parser::GetMaxIntervalCeilingSeconds(uint16_
 CHIP_ERROR SubscribeRequestMessage::Parser::GetAttributeRequests(AttributePathIBs::Parser * const apAttributeRequests) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kAttributeRequests)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kAttributeRequests), reader));
     return apAttributeRequests->Init(reader);
 }
 
 CHIP_ERROR SubscribeRequestMessage::Parser::GetDataVersionFilters(DataVersionFilterIBs::Parser * const apDataVersionFilters) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kDataVersionFilters)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kDataVersionFilters), reader));
     return apDataVersionFilters->Init(reader);
 }
 
 CHIP_ERROR SubscribeRequestMessage::Parser::GetEventRequests(EventPathIBs::Parser * const apEventRequests) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventRequests)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kEventRequests), reader));
     return apEventRequests->Init(reader);
 }
 
 CHIP_ERROR SubscribeRequestMessage::Parser::GetEventFilters(EventFilterIBs::Parser * const apEventFilters) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventFilters)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kEventFilters), reader));
     return apEventFilters->Init(reader);
 }
 
@@ -189,7 +189,7 @@ SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::KeepSubscri
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kKeepSubscriptions)), aKeepSubscriptions);
+        mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kKeepSubscriptions), aKeepSubscriptions);
     }
     return *this;
 }
@@ -199,7 +199,7 @@ SubscribeRequestMessage::Builder::MinIntervalFloorSeconds(const uint16_t aMinInt
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kMinIntervalFloorSeconds)), aMinIntervalFloorSeconds);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kMinIntervalFloorSeconds), aMinIntervalFloorSeconds);
     }
     return *this;
 }
@@ -209,7 +209,7 @@ SubscribeRequestMessage::Builder::MaxIntervalCeilingSeconds(const uint16_t aMaxI
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kMaxIntervalCeilingSeconds)), aMaxIntervalCeilingSeconds);
+        mError = mpWriter->Put(TLV::ContextTag(Tag::kMaxIntervalCeilingSeconds), aMaxIntervalCeilingSeconds);
     }
     return *this;
 }
@@ -256,7 +256,7 @@ SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::IsFabricFil
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kIsFabricFiltered)), aIsFabricFiltered);
+        mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kIsFabricFiltered), aIsFabricFiltered);
     }
     return *this;
 }

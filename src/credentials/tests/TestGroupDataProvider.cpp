@@ -17,6 +17,7 @@
  */
 
 #include <credentials/GroupDataProviderImpl.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
@@ -1196,6 +1197,7 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
 namespace {
 
 static chip::TestPersistentStorageDelegate sDelegate;
+static chip::Crypto::DefaultSessionKeystore sSessionKeystore;
 static GroupDataProviderImpl sProvider(chip::app::TestGroups::kMaxGroupsPerFabric, chip::app::TestGroups::kMaxGroupKeysPerFabric);
 
 static EpochKey kEpochKeys0[] = {
@@ -1228,6 +1230,7 @@ int Test_Setup(void * inContext)
 
     // Initialize Group Data Provider
     sProvider.SetStorageDelegate(&sDelegate);
+    sProvider.SetSessionKeystore(&sSessionKeystore);
     sProvider.SetListener(&chip::app::TestGroups::sListener);
     VerifyOrReturnError(CHIP_NO_ERROR == sProvider.Init(), FAILURE);
     SetGroupDataProvider(&sProvider);

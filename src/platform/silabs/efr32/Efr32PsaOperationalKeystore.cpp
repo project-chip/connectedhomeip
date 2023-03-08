@@ -56,7 +56,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::Init()
     size_t existingLen = 0;
     bool update_cache  = false;
 
-    if (SILABSConfig::ConfigValueExists(SILABSConfig::kConfigKey_OpKeyMap, existingLen))
+    if (SilabsConfig::ConfigValueExists(SilabsConfig::kConfigKey_OpKeyMap, existingLen))
     {
         // There's a pre-existing key map on disk. Size the map to read it fully.
         size_t outLen = 0;
@@ -76,7 +76,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::Init()
         VerifyOrExit(mKeyMap, error = CHIP_ERROR_NO_MEMORY);
 
         // Read the existing key map
-        error = SILABSConfig::ReadConfigValueBin(SILABSConfig::kConfigKey_OpKeyMap, (uint8_t *) mKeyMap, existingLen, outLen);
+        error = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_OpKeyMap, (uint8_t *) mKeyMap, existingLen, outLen);
         SuccessOrExit(error);
 
         // If upsizing, extend the map with undefined indices
@@ -127,7 +127,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::Init()
     // Write-out keymap if needed
     if (update_cache)
     {
-        error = SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_OpKeyMap, mKeyMap, mKeyMapSize);
+        error = SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_OpKeyMap, mKeyMap, mKeyMapSize);
         SuccessOrExit(error);
     }
 
@@ -304,7 +304,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::CommitOpKeypairForFabric(FabricIndex fab
     mKeyMap[keymap_index] = fabricIndex;
 
     // Persist key map
-    CHIP_ERROR error = SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_OpKeyMap, mKeyMap, mKeyMapSize);
+    CHIP_ERROR error = SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_OpKeyMap, mKeyMap, mKeyMapSize);
     if (error != CHIP_NO_ERROR)
     {
         return error;
@@ -349,7 +349,7 @@ CHIP_ERROR Efr32PsaOperationalKeystore::RemoveOpKeypairForFabric(FabricIndex fab
     mKeyMap[keymap_index] = kUndefinedFabricIndex;
 
     // Persist key map
-    CHIP_ERROR error = SILABSConfig::WriteConfigValueBin(SILABSConfig::kConfigKey_OpKeyMap, mKeyMap, mKeyMapSize);
+    CHIP_ERROR error = SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_OpKeyMap, mKeyMap, mKeyMapSize);
     if (error != CHIP_NO_ERROR)
     {
         return error;

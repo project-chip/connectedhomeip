@@ -382,7 +382,8 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     {
         ChipLogError(DeviceLayer, "esp_wifi_restore() failed: %s", esp_err_to_name(error));
     }
-#elif CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     ThreadStackMgr().ErasePersistentInfo();
 #endif
 

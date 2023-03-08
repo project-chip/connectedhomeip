@@ -473,7 +473,7 @@ void AppTask::UpdateClusterState(void)
 void AppTask::UpdateCluster(intptr_t context)
 {
     EmberStatus status;
-    BitMask<PumpConfigurationAndControl::PumpStatus> pumpStatus;
+    BitMask<PumpConfigurationAndControl::PumpStatusBitmap> pumpStatus;
 
     ChipLogProgress(NotSpecified, "Update Cluster State");
 
@@ -481,34 +481,34 @@ void AppTask::UpdateCluster(intptr_t context)
     PumpConfigurationAndControl::Attributes::PumpStatus::Get(PCC_CLUSTER_ENDPOINT, &pumpStatus);
     if (PumpMgr().IsStopped())
     {
-        pumpStatus.Clear(PumpConfigurationAndControl::PumpStatus::kRunning);
+        pumpStatus.Clear(PumpConfigurationAndControl::PumpStatusBitmap::kRunning);
     }
     else
     {
-        pumpStatus.Set(PumpConfigurationAndControl::PumpStatus::kRunning);
+        pumpStatus.Set(PumpConfigurationAndControl::PumpStatusBitmap::kRunning);
     }
     PumpConfigurationAndControl::Attributes::PumpStatus::Set(PCC_CLUSTER_ENDPOINT, pumpStatus);
 
     status = PumpConfigurationAndControl::Attributes::ControlMode::Set(PCC_CLUSTER_ENDPOINT,
-                                                                       PumpConfigurationAndControl::PumpControlMode::kConstantFlow);
+                                                                       PumpConfigurationAndControl::ControlModeEnum::kConstantFlow);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Constant Flow error  %x", status);
     }
     status = PumpConfigurationAndControl::Attributes::ControlMode::Set(
-        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantPressure);
+        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::ControlModeEnum::kConstantPressure);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Constant Pressure error  %x", status);
     }
     status = PumpConfigurationAndControl::Attributes::ControlMode::Set(
-        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantSpeed);
+        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::ControlModeEnum::kConstantSpeed);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Constant Speed error  %x", status);
     }
     status = PumpConfigurationAndControl::Attributes::ControlMode::Set(
-        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantTemperature);
+        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::ControlModeEnum::kConstantTemperature);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Constant Temperature error  %x", status);

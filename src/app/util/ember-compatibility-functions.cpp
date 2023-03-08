@@ -33,7 +33,7 @@
 #include <app/util/attribute-storage-null-handling.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
-#include <app/util/ember-compatibility-functions.h>
+#include <app/util/config.h>
 #include <app/util/error-mapping.h>
 #include <app/util/odd-sized-integers.h>
 #include <app/util/util.h>
@@ -54,7 +54,6 @@
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::Compatibility;
 using namespace chip::Access;
 
 namespace chip {
@@ -64,10 +63,6 @@ namespace {
 // On some apps, ATTRIBUTE_LARGEST can as small as 3, making compiler unhappy since data[kAttributeReadBufferSize] cannot hold
 // uint64_t. Make kAttributeReadBufferSize at least 8 so it can fit all basic types.
 constexpr size_t kAttributeReadBufferSize = (ATTRIBUTE_LARGEST >= 8 ? ATTRIBUTE_LARGEST : 8);
-EmberAfClusterCommand imCompatibilityEmberAfCluster;
-EmberApsFrame imCompatibilityEmberApsFrame;
-EmberAfInterpanHeader imCompatibilityInterpanHeader;
-CommandHandler * currentCommandObject;
 
 // BasicType maps the type to basic int(8|16|32|64)(s|u) types.
 EmberAfAttributeType BaseType(EmberAfAttributeType type)
@@ -146,41 +141,9 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
 
 } // namespace
 
-void SetupEmberAfCommandHandler(CommandHandler * command, const ConcreteCommandPath & commandPath)
-{
-    Messaging::ExchangeContext * commandExchangeCtx = command->GetExchangeContext();
-
-    imCompatibilityEmberApsFrame.clusterId           = commandPath.mClusterId;
-    imCompatibilityEmberApsFrame.destinationEndpoint = commandPath.mEndpointId;
-    imCompatibilityEmberApsFrame.sourceEndpoint      = 1; // source endpoint is fixed to 1 for now.
-    imCompatibilityEmberApsFrame.sequence =
-        (commandExchangeCtx != nullptr ? static_cast<uint8_t>(commandExchangeCtx->GetExchangeId() & 0xFF) : 0);
-
-    if (commandExchangeCtx->IsGroupExchangeContext())
-    {
-        imCompatibilityEmberAfCluster.type = EMBER_INCOMING_MULTICAST;
-    }
-    else
-    {
-        imCompatibilityEmberAfCluster.type = EMBER_INCOMING_UNICAST;
-    }
-
-    imCompatibilityEmberAfCluster.commandId      = commandPath.mCommandId;
-    imCompatibilityEmberAfCluster.apsFrame       = &imCompatibilityEmberApsFrame;
-    imCompatibilityEmberAfCluster.interPanHeader = &imCompatibilityInterpanHeader;
-    imCompatibilityEmberAfCluster.source         = commandExchangeCtx;
-
-    emAfCurrentCommand   = &imCompatibilityEmberAfCluster;
-    currentCommandObject = command;
-}
-
-void ResetEmberAfObjects()
-{
-    emAfCurrentCommand   = nullptr;
-    currentCommandObject = nullptr;
-}
-
 } // namespace Compatibility
+
+using namespace chip::app::Compatibility;
 
 namespace {
 // Common buffer for ReadSingleClusterData & WriteSingleClusterData
@@ -191,7 +154,7 @@ CHIP_ERROR attributeBufferToNumericTlvData(TLV::TLVWriter & writer, bool isNulla
 {
     typename NumericAttributeTraits<T>::StorageType value;
     memcpy(&value, attributeData, sizeof(value));
-    TLV::Tag tag = TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData));
+    TLV::Tag tag = TLV::ContextTag(AttributeDataIB::Tag::kData);
     if (isNullable && NumericAttributeTraits<T>::IsNullValue(value))
     {
         return writer.PutNull(tag);
@@ -367,10 +330,15 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
             {
                 AttributeId id              = mCluster->attributes[i].attributeId;
                 constexpr auto lastGlobalId = GlobalAttributesNotInMetadata[ArraySize(GlobalAttributesNotInMetadata) - 1];
-                // We are relying on GlobalAttributesNotInMetadata not having
-                // any gaps in their ids here.
+#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
+                // The GlobalAttributesNotInMetadata shouldn't have any gaps in their ids here.
                 static_assert(lastGlobalId - GlobalAttributesNotInMetadata[0] == ArraySize(GlobalAttributesNotInMetadata) - 1,
                               "Ids in GlobalAttributesNotInMetadata not consecutive");
+#else
+                // If EventList is not supported. The GlobalAttributesNotInMetadata is missing one id here.
+                static_assert(lastGlobalId - GlobalAttributesNotInMetadata[0] == ArraySize(GlobalAttributesNotInMetadata),
+                              "Ids in GlobalAttributesNotInMetadata not consecutive (except EventList)");
+#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
                 if (!addedExtraGlobals && id > lastGlobalId)
                 {
                     for (const auto & globalId : GlobalAttributesNotInMetadata)
@@ -390,6 +358,7 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
             }
             return CHIP_NO_ERROR;
         });
+#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     case EventList::Id:
         return aEncoder.EncodeList([this](const auto & encoder) {
             for (size_t i = 0; i < mCluster->eventCount; ++i)
@@ -398,6 +367,7 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
             }
             return CHIP_NO_ERROR;
         });
+#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     case AcceptedCommandList::Id:
         return EncodeCommandList(aPath, aEncoder, &CommandHandlerInterface::EnumerateAcceptedCommands,
                                  mCluster->acceptedCommandList);
@@ -640,7 +610,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         bool isNullable                    = attributeMetadata->IsNullable();
         TLV::TLVWriter * writer            = attributeDataIBBuilder.GetWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
-        TLV::Tag tag = TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData));
+        TLV::Tag tag = TLV::ContextTag(AttributeDataIB::Tag::kData);
         switch (BaseType(attributeType))
         {
         case ZCL_NO_DATA_ATTRIBUTE_TYPE: // No data

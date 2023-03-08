@@ -22,20 +22,20 @@ network.
     -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
 -   [Device UI](#device-ui)
 -   [Building](#building)
-    -   [Known issues](#known-issues)
+    -   [Known issues](#known-issues-building)
 -   [Manufacturing data](#manufacturing-data)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Pigweed Tokenizer](#pigweed-tokenizer)
     -   [Detokenizer script](#detokenizer-script)
     -   [Notes](#notes)
-    -   [Known issues](#known-issues-1)
+    -   [Known issues](#known-issues-tokenizer)
 -   [NXP Ultrafast P256 ECC Library](#nxp-ultrafast-p256-ecc-library)
     -   [Building steps](#building-steps)
 -   [Tinycrypt ECC library](#tinycrypt-ecc-library)
     -   [Building steps](#building-steps-1)
 -   [Low power](#low-power)
 
-    -   [Known issues](#known-issues-2)
+    -   [Known issues](#known-issues-low-power)
 
     </hr>
 
@@ -173,14 +173,14 @@ In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
 -   Download
-    [K32W061DK6 SDK 2.6.9](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_9_K32W061DK6.zip).
+    [K32W061DK6 SDK 2.6.10](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_10_K32W061DK6.zip).
 
 -   Start building the application either with Secure Element or without
 
     -   without Secure Element
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_9_K32W061DK6/
+user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_10_K32W061DK6/
 user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/nxp/k32w/k32w0
@@ -219,7 +219,7 @@ pycryptodome           3.9.8
 
 The resulting output file can be found in out/debug/chip-k32w0x-lock-example.
 
-## Known issues
+## Known issues building
 
 -   When using Secure element and cross-compiling on Linux, log messages from
     the Plug&Trust middleware stack may not echo to the console.
@@ -311,7 +311,7 @@ detokenizer script to see logs of a lock app:
 python3 ../../../../../examples/platform/nxp/k32w/k32w0/scripts/detokenizer.py serial -i /dev/ttyACM0 -d out/debug/chip-k32w0x-lock-example-database.bin -o device.txt
 ```
 
-### Known issues
+### Known issues tokenizer
 
 The building process will not update the token database if it already exists. In
 case that new strings are added and the database already exists in the output
@@ -382,7 +382,7 @@ below:
 Please note that that the Power Measurement Tool is not very accurate and
 professional tools must be used if exact power consumption needs to be known.
 
-## Known issues
+## Known issues low power
 
 -   Power Measurement Tool may not work correctly in MCUXpresso versions greater
     that 11.0.1.

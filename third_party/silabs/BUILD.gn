@@ -45,6 +45,7 @@ config("silabs_config") {
 
 group("efr32_sdk") {
   public_deps = [ efr32_sdk_target ]
+  public_configs = [ ":silabs_config" ]
 }
 
 # Openthread GSDK libraries configurations
@@ -86,6 +87,7 @@ if (use_silabs_thread_lib) {
 
     include_dirs = [
       "${chip_root}/examples/platform/silabs/efr32",
+      "${chip_root}/examples/platform/silabs",
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}",
       "${sl_ot_efr32_root}/platform-abstraction/efr32",
       "${sl_openthread_root}/src/",

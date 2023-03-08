@@ -21,8 +21,74 @@
 #include <app/CommandHandler.h>
 #include <app/data-model/DecodableList.h>
 #include <app/util/af-types.h>
+#include <app/util/config.h>
 #include <lib/support/Span.h>
 #include <stdint.h>
+
+/**
+ * @brief A structure used to store scene table entries in RAM or in storage,
+ * depending on a plugin setting.  If endpoint field is
+ * ::EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID, the entry is unused.
+ */
+typedef struct
+{
+    chip::EndpointId endpoint; // 0x00 when this record is not in use
+    chip::GroupId groupId;     // 0x0000 if not associated with a group
+    uint8_t sceneId;
+#if defined(MATTER_CLUSTER_SCENE_NAME_SUPPORT) && MATTER_CLUSTER_SCENE_NAME_SUPPORT
+    uint8_t name[ZCL_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH + 1];
+#endif
+    uint16_t transitionTime;     // in seconds
+    uint8_t transitionTime100ms; // in tenths of a seconds
+#ifdef ZCL_USING_ON_OFF_CLUSTER_SERVER
+    bool hasOnOffValue;
+    bool onOffValue;
+#endif
+#ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER
+    bool hasCurrentLevelValue;
+    chip::app::DataModel::Nullable<uint8_t> currentLevelValue;
+#endif
+#ifdef ZCL_USING_THERMOSTAT_CLUSTER_SERVER
+    bool hasOccupiedCoolingSetpointValue;
+    int16_t occupiedCoolingSetpointValue;
+    bool hasOccupiedHeatingSetpointValue;
+    int16_t occupiedHeatingSetpointValue;
+    bool hasSystemModeValue;
+    uint8_t systemModeValue;
+#endif
+#ifdef ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
+    bool hasCurrentXValue;
+    uint16_t currentXValue;
+    bool hasCurrentYValue;
+    uint16_t currentYValue;
+    bool hasEnhancedCurrentHueValue;
+    uint16_t enhancedCurrentHueValue;
+    bool hasCurrentSaturationValue;
+    uint8_t currentSaturationValue;
+    bool hasColorLoopActiveValue;
+    uint8_t colorLoopActiveValue;
+    bool hasColorLoopDirectionValue;
+    uint8_t colorLoopDirectionValue;
+    bool hasColorLoopTimeValue;
+    uint16_t colorLoopTimeValue;
+    bool hasColorTemperatureMiredsValue;
+    uint16_t colorTemperatureMiredsValue;
+#endif // ZCL_USING_COLOR_CONTROL_CLUSTER_SERVER
+#ifdef ZCL_USING_DOOR_LOCK_CLUSTER_SERVER
+    bool hasLockStateValue;
+    chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> lockStateValue;
+#endif
+#ifdef ZCL_USING_WINDOW_COVERING_CLUSTER_SERVER
+    bool hasCurrentPositionLiftPercentageValue;
+    chip::app::DataModel::Nullable<chip::Percent> currentPositionLiftPercentageValue;
+    bool hasCurrentPositionTiltPercentageValue;
+    chip::app::DataModel::Nullable<chip::Percent> currentPositionTiltPercentageValue;
+    bool hasTargetPositionLiftPercent100thsValue;
+    chip::app::DataModel::Nullable<chip::Percent100ths> targetPositionLiftPercent100thsValue;
+    bool hasTargetPositionTiltPercent100thsValue;
+    chip::app::DataModel::Nullable<chip::Percent100ths> targetPositionTiltPercent100thsValue;
+#endif
+} EmberAfSceneTableEntry;
 
 EmberAfStatus emberAfScenesSetSceneCountAttribute(chip::EndpointId endpoint, uint8_t newCount);
 EmberAfStatus emberAfScenesMakeValid(chip::EndpointId endpoint, uint8_t sceneId, chip::GroupId groupId);

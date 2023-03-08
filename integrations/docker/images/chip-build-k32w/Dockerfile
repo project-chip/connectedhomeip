@@ -12,9 +12,9 @@ RUN set -x \
 WORKDIR /opt/sdk
 # Setup the K32W SDK
 RUN set -x \
-    && wget https://cache.nxp.com/lgfiles/bsps/SDK_2_6_9_K32W061DK6.zip \
-    && unzip SDK_2_6_9_K32W061DK6.zip \
-    && rm -rf SDK_2_6_9_K32W061DK6.zip \
+    && wget https://cache.nxp.com/lgfiles/bsps/SDK_2_6_10_K32W061DK6.zip \
+    && unzip SDK_2_6_10_K32W061DK6.zip \
+    && rm -rf SDK_2_6_10_K32W061DK6.zip \
     && : # last line
 
 FROM connectedhomeip/chip-build:${VERSION}

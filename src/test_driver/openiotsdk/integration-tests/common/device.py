@@ -96,7 +96,6 @@ class Device:
                 if line:
                     lines.append(line)
                     if search in line:
-                        end = time()
                         return lines
 
             except queue.Empty:
