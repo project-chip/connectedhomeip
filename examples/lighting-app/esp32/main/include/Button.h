@@ -30,44 +30,15 @@
 class Button
 {
 public:
-    /**
-     * @brief
-     *  construct a button
-     */
     Button();
-    /**
-     * @brief
-     *  construct a button with given GPIO number
-     */
     Button(gpio_num_t gpioNum);
-    /**
-     * @brief
-     *  Initialize a button
-     * @return esp_err_t
-     */
+
     esp_err_t Init();
-    /**
-     * @brief
-     *  Initialize a button with given GPIO number
-     * @param gpioNum           The GPIO pin this button should keep track of
-     * @return esp_err_t
-     */
     esp_err_t Init(gpio_num_t gpioNum);
-    /**
-     * @brief
-     *  Get the pin number assosiate to a button
-     * @return gpio_num_t
-     */
+
     inline gpio_num_t GetGPIONum();
-    /**
-     * @brief
-     *  Global Button debouncing Timer Callback function
-     */
     static void TimerCallback(TimerHandle_t xTimer);
-    /**
-     * @brief
-     *  Button gpio isr
-     */
+
     friend void IRAM_ATTR button_isr_handler(void * arg);
 
 private:
