@@ -165,7 +165,7 @@ private:
 
     mdns::Minimal::ResponseSender * mResponder;
     const Inet::IPPacketInfo * mCurrentSource = nullptr;
-    uint32_t mMessageId                       = 0;
+    uint16_t mMessageId                       = 0;
 };
 
 mdns::Minimal::Server<10 /* endpoints */> gMdnsServer;

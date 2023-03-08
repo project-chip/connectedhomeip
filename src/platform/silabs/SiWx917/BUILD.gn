@@ -27,6 +27,9 @@ if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 }
 
+if (chip_crypto == "platform") {
+  import("//build_overrides/mbedtls.gni")
+}
 static_library("SiWx917") {
   sources = [
     "${silabs_platform_dir}/BLEManagerImpl.h",
@@ -66,6 +69,15 @@ static_library("SiWx917") {
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
+
+  # Add platform crypto implementation
+  if (chip_crypto == "platform") {
+    sources += [ "CHIPCryptoPALTinyCrypt.cpp" ]
+    public_deps += [
+      "${chip_root}/src/crypto",
+      "${mbedtls_root}:mbedtls",
+    ]
+  }
 
   if (chip_enable_wifi) {
     sources += [

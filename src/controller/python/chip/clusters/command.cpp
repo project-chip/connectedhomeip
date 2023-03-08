@@ -153,7 +153,7 @@ PyChipError pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * de
         VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         reader.Init(payload, length);
         reader.Next();
-        SuccessOrExit(writer->CopyContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kFields)), reader));
+        SuccessOrExit(writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
     }
 
     SuccessOrExit(err = sender->FinishCommand(timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)
@@ -197,7 +197,7 @@ PyChipError pychip_CommandSender_SendGroupCommand(chip::GroupId groupId, chip::C
         VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         reader.Init(payload, length);
         reader.Next();
-        SuccessOrExit(writer->CopyContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kFields)), reader));
+        SuccessOrExit(writer->CopyContainer(TLV::ContextTag(CommandDataIB::Tag::kFields), reader));
     }
 
     SuccessOrExit(err = sender->FinishCommand(Optional<uint16_t>::Missing()));

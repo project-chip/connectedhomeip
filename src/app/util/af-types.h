@@ -35,6 +35,7 @@
 
 #include <app/ConcreteAttributePath.h>
 #include <app/data-model/Nullable.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/Variant.h>
 #include <messaging/ExchangeContext.h>
 
@@ -123,7 +124,7 @@ typedef struct
  */
 typedef struct
 {
-    uint16_t deviceId;
+    chip::DeviceTypeId deviceId;
     uint8_t deviceVersion;
 } EmberAfDeviceType;
 

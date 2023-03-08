@@ -95,7 +95,7 @@ chip_test_suite("tests") {
     "TestCommandPathParams.cpp",
     "TestDataModelSerialization.cpp",
     "TestDefaultOTARequestorStorage.cpp",
-    "TestEventLogging.cpp",
+    "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
@@ -124,6 +124,14 @@ chip_test_suite("tests") {
   if (chip_device_platform != "nrfconnect") {
     test_sources += [ "TestBufferedReadCallback.cpp" ]
     test_sources += [ "TestClusterStateCache.cpp" ]
+  }
+
+  # On NRF and fake platforms we do not have a realtime clock available, so
+  # TestEventLogging.cpp would be testing the same thing as
+  # TestEventLoggingNoUTCTime, but it's not set up to deal with the timestamps
+  # being that low.
+  if (chip_device_platform != "nrfconnect" && chip_device_platform != "fake") {
+    test_sources += [ "TestEventLogging.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]

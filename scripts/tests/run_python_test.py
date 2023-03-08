@@ -44,7 +44,7 @@ def EnqueueLogOutput(fp, tag, q):
             try:
                 timestamp = float(line[1:18].decode())
                 line = line[19:]
-            except Exception as ex:
+            except Exception:
                 pass
         sys.stdout.buffer.write(
             (f"[{datetime.datetime.fromtimestamp(timestamp).isoformat(sep=' ')}]").encode() + tag + line)
@@ -67,12 +67,23 @@ def DumpProgramOutputToQueue(thread_list: typing.List[threading.Thread], tag: st
 
 
 @click.command()
-@click.option("--app", type=click.Path(exists=True), default=None, help='Path to local application to use, omit to use external apps.')
-@click.option("--factoryreset", is_flag=True, help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests.')
-@click.option("--app-args", type=str, default='', help='The extra arguments passed to the device.')
-@click.option("--script", type=click.Path(exists=True), default=os.path.join(DEFAULT_CHIP_ROOT, 'src', 'controller', 'python', 'test', 'test_scripts', 'mobile-device-test.py'), help='Test script to use.')
-@click.option("--script-args", type=str, default='', help='Path to the test script to use, omit to use the default test script (mobile-device-test.py).')
-@click.option("--script-gdb", is_flag=True, help='Run script through gdb')
+@click.option("--app", type=click.Path(exists=True), default=None,
+              help='Path to local application to use, omit to use external apps.')
+@click.option("--factoryreset", is_flag=True,
+              help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests.')
+@click.option("--app-args", type=str, default='',
+              help='The extra arguments passed to the device.')
+@click.option("--script", type=click.Path(exists=True), default=os.path.join(DEFAULT_CHIP_ROOT,
+                                                                             'src',
+                                                                             'controller',
+                                                                             'python',
+                                                                             'test',
+                                                                             'test_scripts',
+                                                                             'mobile-device-test.py'), help='Test script to use.')
+@click.option("--script-args", type=str, default='',
+              help='Path to the test script to use, omit to use the default test script (mobile-device-test.py).')
+@click.option("--script-gdb", is_flag=True,
+              help='Run script through gdb')
 def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: str, script_gdb: bool):
     if factoryreset:
         # Remove native app config
@@ -123,10 +134,12 @@ def main(app: str, factoryreset: bool, app_args: str, script: str, script_args: 
 
     if script_gdb:
         #
-        # When running through Popen, we need to preserve some space-delimited args to GDB as a single logical argument. To do that, let's use '|' as a placeholder
-        # for the space character so that the initial split will not tokenize them, and then replace that with the space char there-after.
+        # When running through Popen, we need to preserve some space-delimited args to GDB as a single logical argument.
+        # To do that, let's use '|' as a placeholder for the space character so that the initial split will not tokenize them,
+        # and then replace that with the space char there-after.
         #
-        script_command = "gdb -batch -return-child-result -q -ex run -ex thread|apply|all|bt --args python3".split() + script_command
+        script_command = ("gdb -batch -return-child-result -q -ex run -ex "
+                          "thread|apply|all|bt --args python3".split() + script_command)
     else:
         script_command = "/usr/bin/env python3".split() + script_command
 

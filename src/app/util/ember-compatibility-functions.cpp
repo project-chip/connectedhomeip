@@ -154,7 +154,7 @@ CHIP_ERROR attributeBufferToNumericTlvData(TLV::TLVWriter & writer, bool isNulla
 {
     typename NumericAttributeTraits<T>::StorageType value;
     memcpy(&value, attributeData, sizeof(value));
-    TLV::Tag tag = TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData));
+    TLV::Tag tag = TLV::ContextTag(AttributeDataIB::Tag::kData);
     if (isNullable && NumericAttributeTraits<T>::IsNullValue(value))
     {
         return writer.PutNull(tag);
@@ -330,10 +330,15 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
             {
                 AttributeId id              = mCluster->attributes[i].attributeId;
                 constexpr auto lastGlobalId = GlobalAttributesNotInMetadata[ArraySize(GlobalAttributesNotInMetadata) - 1];
-                // We are relying on GlobalAttributesNotInMetadata not having
-                // any gaps in their ids here.
+#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
+                // The GlobalAttributesNotInMetadata shouldn't have any gaps in their ids here.
                 static_assert(lastGlobalId - GlobalAttributesNotInMetadata[0] == ArraySize(GlobalAttributesNotInMetadata) - 1,
                               "Ids in GlobalAttributesNotInMetadata not consecutive");
+#else
+                // If EventList is not supported. The GlobalAttributesNotInMetadata is missing one id here.
+                static_assert(lastGlobalId - GlobalAttributesNotInMetadata[0] == ArraySize(GlobalAttributesNotInMetadata),
+                              "Ids in GlobalAttributesNotInMetadata not consecutive (except EventList)");
+#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
                 if (!addedExtraGlobals && id > lastGlobalId)
                 {
                     for (const auto & globalId : GlobalAttributesNotInMetadata)
@@ -353,6 +358,7 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
             }
             return CHIP_NO_ERROR;
         });
+#if CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     case EventList::Id:
         return aEncoder.EncodeList([this](const auto & encoder) {
             for (size_t i = 0; i < mCluster->eventCount; ++i)
@@ -361,6 +367,7 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
             }
             return CHIP_NO_ERROR;
         });
+#endif // CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE
     case AcceptedCommandList::Id:
         return EncodeCommandList(aPath, aEncoder, &CommandHandlerInterface::EnumerateAcceptedCommands,
                                  mCluster->acceptedCommandList);
@@ -603,7 +610,7 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
         bool isNullable                    = attributeMetadata->IsNullable();
         TLV::TLVWriter * writer            = attributeDataIBBuilder.GetWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
-        TLV::Tag tag = TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData));
+        TLV::Tag tag = TLV::ContextTag(AttributeDataIB::Tag::kData);
         switch (BaseType(attributeType))
         {
         case ZCL_NO_DATA_ATTRIBUTE_TYPE: // No data

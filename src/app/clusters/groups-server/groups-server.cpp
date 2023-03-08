@@ -201,12 +201,11 @@ struct GroupMembershipResponse
         ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
 
         ReturnErrorOnFailure(app::DataModel::Encode(
-            writer, TLV::ContextTag(to_underlying(Commands::GetGroupMembershipResponse::Fields::kCapacity)), kCapacityUnknown));
+            writer, TLV::ContextTag(Commands::GetGroupMembershipResponse::Fields::kCapacity), kCapacityUnknown));
         {
             TLV::TLVType type;
-            ReturnErrorOnFailure(
-                writer.StartContainer(TLV::ContextTag(to_underlying(Commands::GetGroupMembershipResponse::Fields::kGroupList)),
-                                      TLV::kTLVType_Array, type));
+            ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(Commands::GetGroupMembershipResponse::Fields::kGroupList),
+                                                       TLV::kTLVType_Array, type));
             {
                 GroupDataProvider::GroupEndpoint mapping;
                 size_t requestedCount = 0;

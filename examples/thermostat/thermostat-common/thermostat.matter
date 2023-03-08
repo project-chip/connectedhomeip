@@ -580,7 +580,7 @@ server cluster LocalizationConfiguration = 43 {
 }
 
 server cluster TimeFormatLocalization = 44 {
-  enum CalendarType : ENUM8 {
+  enum CalendarTypeEnum : ENUM8 {
     kBuddhist = 0;
     kChinese = 1;
     kCoptic = 2;
@@ -595,14 +595,14 @@ server cluster TimeFormatLocalization = 44 {
     kTaiwanese = 11;
   }
 
-  enum HourFormat : ENUM8 {
+  enum HourFormatEnum : ENUM8 {
     k12hr = 0;
     k24hr = 1;
   }
 
-  attribute HourFormat hourFormat = 0;
-  attribute CalendarType activeCalendarType = 1;
-  readonly attribute CalendarType supportedCalendarTypes[] = 2;
+  attribute HourFormatEnum hourFormat = 0;
+  attribute CalendarTypeEnum activeCalendarType = 1;
+  readonly attribute CalendarTypeEnum supportedCalendarTypes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -612,7 +612,7 @@ server cluster TimeFormatLocalization = 44 {
 }
 
 server cluster UnitLocalization = 45 {
-  enum TempUnit : ENUM8 {
+  enum TempUnitEnum : ENUM8 {
     kFahrenheit = 0;
     kCelsius = 1;
     kKelvin = 2;
@@ -622,7 +622,7 @@ server cluster UnitLocalization = 45 {
     kTemperatureUnit = 0x1;
   }
 
-  attribute TempUnit temperatureUnit = 0;
+  attribute TempUnitEnum temperatureUnit = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1161,6 +1161,8 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 server cluster WiFiNetworkDiagnostics = 54 {

@@ -1,5 +1,5 @@
 steps:
-    - name: "connectedhomeip/chip-build-vscode:0.6.40"
+    - name: "connectedhomeip/chip-build-vscode:0.6.48"
       entrypoint: "bash"
       args:
           - "-c"
@@ -7,7 +7,7 @@ steps:
               git config --global --add safe.directory "*"
               git submodule update --init --recursive
       id: Submodules
-    - name: "connectedhomeip/chip-build-vscode:0.6.40"
+    - name: "connectedhomeip/chip-build-vscode:0.6.48"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -22,7 +22,7 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "connectedhomeip/chip-build-vscode:0.6.40"
+    - name: "connectedhomeip/chip-build-vscode:0.6.48"
       id: ESP32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -30,8 +30,9 @@ steps:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle --target
               esp32-m5stack-all-clusters-ipv6only --target
-              esp32-m5stack-all-clusters-minimal-rpc-ipv6only --target
               esp32-m5stack-all-clusters-rpc --target
+              esp32-m5stack-light --target
+              esp32-m5stack-light-ipv6only --target
               esp32-m5stack-ota-requestor build --create-archives
               /workspace/artifacts/
       waitFor:
@@ -40,7 +41,7 @@ steps:
       volumes:
           - name: pwenv
             path: /pwenv
-    - name: "connectedhomeip/chip-build-vscode:0.6.40"
+    - name: "connectedhomeip/chip-build-vscode:0.6.48"
       id: NRFConnect
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -61,7 +62,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.6.40"
+    - name: "connectedhomeip/chip-build-vscode:0.6.48"
       id: EFR32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -83,7 +84,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.6.40"
+    - name: "connectedhomeip/chip-build-vscode:0.6.48"
       id: Linux
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -116,8 +117,10 @@ steps:
               --target linux-x64-chip-cert
               --target linux-x64-chip-tool-ipv6only
               --target linux-x64-chip-tool-ipv6only-minmdns-verbose
+              --target linux-x64-contact-sensor-no-ble-with-ui
               --target linux-x64-dynamic-bridge-ipv6only
               --target linux-x64-efr32-test-runner
+              --target linux-x64-light-no-ble-with-ui
               --target linux-x64-light-rpc-ipv6only
               --target linux-x64-light-rpc-ipv6only-minmdns-verbose
               --target linux-x64-lock-ipv6only
@@ -141,7 +144,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.6.40"
+    - name: "connectedhomeip/chip-build-vscode:0.6.48"
       id: Android
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -149,7 +152,7 @@ steps:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
               --target 'android-arm64-chip-tool'
-              build 
+              build
               --create-archives /workspace/artifacts/
       waitFor:
           - Bootstrap

@@ -44,7 +44,7 @@ namespace detail {
 // Structs shared across multiple clusters.
 namespace Structs {
 namespace ApplicationStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kCatalogVendorID = 0,
     kApplicationID   = 1,
@@ -67,7 +67,7 @@ using DecodableType = Type;
 
 } // namespace ApplicationStruct
 namespace LabelStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kLabel = 0,
     kValue = 1,
@@ -188,7 +188,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace Identify {
-enum class Fields
+enum class Fields : uint8_t
 {
     kIdentifyTime = 0,
 };
@@ -220,7 +220,7 @@ public:
 };
 }; // namespace Identify
 namespace TriggerEffect {
-enum class Fields
+enum class Fields : uint8_t
 {
     kEffectIdentifier = 0,
     kEffectVariant    = 1,
@@ -398,7 +398,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace AddGroup {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupID   = 0,
     kGroupName = 1,
@@ -433,7 +433,7 @@ public:
 };
 }; // namespace AddGroup
 namespace AddGroupResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus  = 0,
     kGroupID = 1,
@@ -468,7 +468,7 @@ public:
 };
 }; // namespace AddGroupResponse
 namespace ViewGroup {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupID = 0,
 };
@@ -500,7 +500,7 @@ public:
 };
 }; // namespace ViewGroup
 namespace ViewGroupResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus    = 0,
     kGroupID   = 1,
@@ -538,7 +538,7 @@ public:
 };
 }; // namespace ViewGroupResponse
 namespace GetGroupMembership {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupList = 0,
 };
@@ -570,7 +570,7 @@ public:
 };
 }; // namespace GetGroupMembership
 namespace GetGroupMembershipResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kCapacity  = 0,
     kGroupList = 1,
@@ -605,7 +605,7 @@ public:
 };
 }; // namespace GetGroupMembershipResponse
 namespace RemoveGroup {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupID = 0,
 };
@@ -637,7 +637,7 @@ public:
 };
 }; // namespace RemoveGroup
 namespace RemoveGroupResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus  = 0,
     kGroupID = 1,
@@ -672,7 +672,7 @@ public:
 };
 }; // namespace RemoveGroupResponse
 namespace RemoveAllGroups {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -700,7 +700,7 @@ public:
 };
 }; // namespace RemoveAllGroups
 namespace AddGroupIfIdentifying {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupID   = 0,
     kGroupName = 1,
@@ -809,7 +809,7 @@ struct TypeInfo
 namespace Scenes {
 namespace Structs {
 namespace AttributeValuePair {
-enum class Fields
+enum class Fields : uint8_t
 {
     kAttributeID    = 0,
     kAttributeValue = 1,
@@ -839,7 +839,7 @@ public:
 
 } // namespace AttributeValuePair
 namespace ExtensionFieldSet {
-enum class Fields
+enum class Fields : uint8_t
 {
     kClusterID          = 0,
     kAttributeValueList = 1,
@@ -972,7 +972,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace AddScene {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupID            = 0,
     kSceneID            = 1,
@@ -1016,7 +1016,7 @@ public:
 };
 }; // namespace AddScene
 namespace AddSceneResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus  = 0,
     kGroupID = 1,
@@ -1054,7 +1054,7 @@ public:
 };
 }; // namespace AddSceneResponse
 namespace ViewScene {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupID = 0,
     kSceneID = 1,
@@ -1089,7 +1089,7 @@ public:
 };
 }; // namespace ViewScene
 namespace ViewSceneResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus             = 0,
     kGroupID            = 1,
@@ -1136,7 +1136,7 @@ public:
 };
 }; // namespace ViewSceneResponse
 namespace RemoveScene {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupID = 0,
     kSceneID = 1,
@@ -1171,7 +1171,7 @@ public:
 };
 }; // namespace RemoveScene
 namespace RemoveSceneResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus  = 0,
     kGroupID = 1,
@@ -1209,7 +1209,7 @@ public:
 };
 }; // namespace RemoveSceneResponse
 namespace RemoveAllScenes {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupID = 0,
 };
@@ -1241,7 +1241,7 @@ public:
 };
 }; // namespace RemoveAllScenes
 namespace RemoveAllScenesResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus  = 0,
     kGroupID = 1,
@@ -1276,7 +1276,7 @@ public:
 };
 }; // namespace RemoveAllScenesResponse
 namespace StoreScene {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupID = 0,
     kSceneID = 1,
@@ -1311,7 +1311,7 @@ public:
 };
 }; // namespace StoreScene
 namespace StoreSceneResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus  = 0,
     kGroupID = 1,
@@ -1349,7 +1349,7 @@ public:
 };
 }; // namespace StoreSceneResponse
 namespace RecallScene {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupID        = 0,
     kSceneID        = 1,
@@ -1387,7 +1387,7 @@ public:
 };
 }; // namespace RecallScene
 namespace GetSceneMembership {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupID = 0,
 };
@@ -1419,7 +1419,7 @@ public:
 };
 }; // namespace GetSceneMembership
 namespace GetSceneMembershipResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus    = 0,
     kCapacity  = 1,
@@ -1460,7 +1460,7 @@ public:
 };
 }; // namespace GetSceneMembershipResponse
 namespace EnhancedAddScene {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupID            = 0,
     kSceneID            = 1,
@@ -1504,7 +1504,7 @@ public:
 };
 }; // namespace EnhancedAddScene
 namespace EnhancedAddSceneResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus  = 0,
     kGroupID = 1,
@@ -1542,7 +1542,7 @@ public:
 };
 }; // namespace EnhancedAddSceneResponse
 namespace EnhancedViewScene {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupID = 0,
     kSceneID = 1,
@@ -1577,7 +1577,7 @@ public:
 };
 }; // namespace EnhancedViewScene
 namespace EnhancedViewSceneResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus             = 0,
     kGroupID            = 1,
@@ -1624,7 +1624,7 @@ public:
 };
 }; // namespace EnhancedViewSceneResponse
 namespace CopyScene {
-enum class Fields
+enum class Fields : uint8_t
 {
     kMode                = 0,
     kGroupIdentifierFrom = 1,
@@ -1668,7 +1668,7 @@ public:
 };
 }; // namespace CopyScene
 namespace CopySceneResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus              = 0,
     kGroupIdentifierFrom = 1,
@@ -1881,7 +1881,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace Off {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -1909,7 +1909,7 @@ public:
 };
 }; // namespace Off
 namespace On {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -1937,7 +1937,7 @@ public:
 };
 }; // namespace On
 namespace Toggle {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -1965,7 +1965,7 @@ public:
 };
 }; // namespace Toggle
 namespace OffWithEffect {
-enum class Fields
+enum class Fields : uint8_t
 {
     kEffectIdentifier = 0,
     kEffectVariant    = 1,
@@ -2000,7 +2000,7 @@ public:
 };
 }; // namespace OffWithEffect
 namespace OnWithRecallGlobalScene {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -2028,7 +2028,7 @@ public:
 };
 }; // namespace OnWithRecallGlobalScene
 namespace OnWithTimedOff {
-enum class Fields
+enum class Fields : uint8_t
 {
     kOnOffControl = 0,
     kOnTime       = 1,
@@ -2328,7 +2328,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace MoveToLevel {
-enum class Fields
+enum class Fields : uint8_t
 {
     kLevel           = 0,
     kTransitionTime  = 1,
@@ -2369,7 +2369,7 @@ public:
 };
 }; // namespace MoveToLevel
 namespace Move {
-enum class Fields
+enum class Fields : uint8_t
 {
     kMoveMode        = 0,
     kRate            = 1,
@@ -2410,7 +2410,7 @@ public:
 };
 }; // namespace Move
 namespace Step {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStepMode        = 0,
     kStepSize        = 1,
@@ -2454,7 +2454,7 @@ public:
 };
 }; // namespace Step
 namespace Stop {
-enum class Fields
+enum class Fields : uint8_t
 {
     kOptionsMask     = 0,
     kOptionsOverride = 1,
@@ -2489,7 +2489,7 @@ public:
 };
 }; // namespace Stop
 namespace MoveToLevelWithOnOff {
-enum class Fields
+enum class Fields : uint8_t
 {
     kLevel           = 0,
     kTransitionTime  = 1,
@@ -2530,7 +2530,7 @@ public:
 };
 }; // namespace MoveToLevelWithOnOff
 namespace MoveWithOnOff {
-enum class Fields
+enum class Fields : uint8_t
 {
     kMoveMode        = 0,
     kRate            = 1,
@@ -2571,7 +2571,7 @@ public:
 };
 }; // namespace MoveWithOnOff
 namespace StepWithOnOff {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStepMode        = 0,
     kStepSize        = 1,
@@ -2615,7 +2615,7 @@ public:
 };
 }; // namespace StepWithOnOff
 namespace StopWithOnOff {
-enum class Fields
+enum class Fields : uint8_t
 {
     kOptionsMask     = 0,
     kOptionsOverride = 1,
@@ -2650,7 +2650,7 @@ public:
 };
 }; // namespace StopWithOnOff
 namespace MoveToClosestFrequency {
-enum class Fields
+enum class Fields : uint8_t
 {
     kFrequency = 0,
 };
@@ -3164,7 +3164,7 @@ struct TypeInfo
 namespace Descriptor {
 namespace Structs {
 namespace DeviceTypeStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kDeviceType = 0,
     kRevision   = 1,
@@ -3302,7 +3302,7 @@ struct TypeInfo
 namespace Binding {
 namespace Structs {
 namespace TargetStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNode        = 1,
     kGroup       = 2,
@@ -3414,7 +3414,7 @@ struct TypeInfo
 namespace AccessControl {
 namespace Structs {
 namespace Target {
-enum class Fields
+enum class Fields : uint8_t
 {
     kCluster    = 0,
     kEndpoint   = 1,
@@ -3439,7 +3439,7 @@ using DecodableType = Type;
 
 } // namespace Target
 namespace AccessControlEntryStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kPrivilege   = 1,
     kAuthMode    = 2,
@@ -3490,7 +3490,7 @@ public:
 
 } // namespace AccessControlEntryStruct
 namespace AccessControlExtensionStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kData        = 1,
     kFabricIndex = 254,
@@ -3651,7 +3651,7 @@ namespace Events {
 namespace AccessControlEntryChanged {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kAdminNodeID     = 1,
     kAdminPasscodeID = 2,
@@ -3698,7 +3698,7 @@ public:
 namespace AccessControlExtensionChanged {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kAdminNodeID     = 1,
     kAdminPasscodeID = 2,
@@ -3747,7 +3747,7 @@ public:
 namespace Actions {
 namespace Structs {
 namespace ActionStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kActionID          = 0,
     kName              = 1,
@@ -3778,7 +3778,7 @@ using DecodableType = Type;
 
 } // namespace ActionStruct
 namespace EndpointListStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kEndpointListID = 0,
     kName           = 1,
@@ -3882,7 +3882,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace InstantAction {
-enum class Fields
+enum class Fields : uint8_t
 {
     kActionID = 0,
     kInvokeID = 1,
@@ -3917,7 +3917,7 @@ public:
 };
 }; // namespace InstantAction
 namespace InstantActionWithTransition {
-enum class Fields
+enum class Fields : uint8_t
 {
     kActionID       = 0,
     kInvokeID       = 1,
@@ -3955,7 +3955,7 @@ public:
 };
 }; // namespace InstantActionWithTransition
 namespace StartAction {
-enum class Fields
+enum class Fields : uint8_t
 {
     kActionID = 0,
     kInvokeID = 1,
@@ -3990,7 +3990,7 @@ public:
 };
 }; // namespace StartAction
 namespace StartActionWithDuration {
-enum class Fields
+enum class Fields : uint8_t
 {
     kActionID = 0,
     kInvokeID = 1,
@@ -4028,7 +4028,7 @@ public:
 };
 }; // namespace StartActionWithDuration
 namespace StopAction {
-enum class Fields
+enum class Fields : uint8_t
 {
     kActionID = 0,
     kInvokeID = 1,
@@ -4063,7 +4063,7 @@ public:
 };
 }; // namespace StopAction
 namespace PauseAction {
-enum class Fields
+enum class Fields : uint8_t
 {
     kActionID = 0,
     kInvokeID = 1,
@@ -4098,7 +4098,7 @@ public:
 };
 }; // namespace PauseAction
 namespace PauseActionWithDuration {
-enum class Fields
+enum class Fields : uint8_t
 {
     kActionID = 0,
     kInvokeID = 1,
@@ -4136,7 +4136,7 @@ public:
 };
 }; // namespace PauseActionWithDuration
 namespace ResumeAction {
-enum class Fields
+enum class Fields : uint8_t
 {
     kActionID = 0,
     kInvokeID = 1,
@@ -4171,7 +4171,7 @@ public:
 };
 }; // namespace ResumeAction
 namespace EnableAction {
-enum class Fields
+enum class Fields : uint8_t
 {
     kActionID = 0,
     kInvokeID = 1,
@@ -4206,7 +4206,7 @@ public:
 };
 }; // namespace EnableAction
 namespace EnableActionWithDuration {
-enum class Fields
+enum class Fields : uint8_t
 {
     kActionID = 0,
     kInvokeID = 1,
@@ -4244,7 +4244,7 @@ public:
 };
 }; // namespace EnableActionWithDuration
 namespace DisableAction {
-enum class Fields
+enum class Fields : uint8_t
 {
     kActionID = 0,
     kInvokeID = 1,
@@ -4279,7 +4279,7 @@ public:
 };
 }; // namespace DisableAction
 namespace DisableActionWithDuration {
-enum class Fields
+enum class Fields : uint8_t
 {
     kActionID = 0,
     kInvokeID = 1,
@@ -4421,7 +4421,7 @@ namespace Events {
 namespace StateChanged {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kActionID = 0,
     kInvokeID = 1,
@@ -4460,7 +4460,7 @@ public:
 namespace ActionFailed {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kActionID = 0,
     kInvokeID = 1,
@@ -4504,7 +4504,7 @@ public:
 namespace BasicInformation {
 namespace Structs {
 namespace CapabilityMinimaStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kCaseSessionsPerFabric  = 0,
     kSubscriptionsPerFabric = 1,
@@ -4540,7 +4540,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace MfgSpecificPing {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -4901,7 +4901,7 @@ namespace Events {
 namespace StartUp {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kSoftwareVersion = 0,
 };
@@ -4934,7 +4934,7 @@ public:
 namespace ShutDown {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -4962,7 +4962,7 @@ public:
 namespace Leave {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kFabricIndex = 0,
 };
@@ -4995,7 +4995,7 @@ public:
 namespace ReachableChanged {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kReachableNewValue = 0,
 };
@@ -5061,7 +5061,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace QueryImage {
-enum class Fields
+enum class Fields : uint8_t
 {
     kVendorID            = 0,
     kProductID           = 1,
@@ -5114,7 +5114,7 @@ public:
 };
 }; // namespace QueryImage
 namespace QueryImageResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus                = 0,
     kDelayedActionTime     = 1,
@@ -5167,7 +5167,7 @@ public:
 };
 }; // namespace QueryImageResponse
 namespace ApplyUpdateRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kUpdateToken = 0,
     kNewVersion  = 1,
@@ -5202,7 +5202,7 @@ public:
 };
 }; // namespace ApplyUpdateRequest
 namespace ApplyUpdateResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kAction            = 0,
     kDelayedActionTime = 1,
@@ -5237,7 +5237,7 @@ public:
 };
 }; // namespace ApplyUpdateResponse
 namespace NotifyUpdateApplied {
-enum class Fields
+enum class Fields : uint8_t
 {
     kUpdateToken     = 0,
     kSoftwareVersion = 1,
@@ -5333,7 +5333,7 @@ struct TypeInfo
 namespace OtaSoftwareUpdateRequestor {
 namespace Structs {
 namespace ProviderLocation {
-enum class Fields
+enum class Fields : uint8_t
 {
     kProviderNodeID = 1,
     kEndpoint       = 2,
@@ -5379,7 +5379,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace AnnounceOTAProvider {
-enum class Fields
+enum class Fields : uint8_t
 {
     kProviderNodeID     = 0,
     kVendorID           = 1,
@@ -5539,7 +5539,7 @@ namespace Events {
 namespace StateTransition {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kPreviousState         = 0,
     kNewState              = 1,
@@ -5581,7 +5581,7 @@ public:
 namespace VersionApplied {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kSoftwareVersion = 0,
     kProductID       = 1,
@@ -5617,7 +5617,7 @@ public:
 namespace DownloadError {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kSoftwareVersion = 0,
     kBytesDownloaded = 1,
@@ -5751,9 +5751,9 @@ namespace Attributes {
 namespace HourFormat {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::TimeFormatLocalization::HourFormat;
-    using DecodableType    = chip::app::Clusters::TimeFormatLocalization::HourFormat;
-    using DecodableArgType = chip::app::Clusters::TimeFormatLocalization::HourFormat;
+    using Type             = chip::app::Clusters::TimeFormatLocalization::HourFormatEnum;
+    using DecodableType    = chip::app::Clusters::TimeFormatLocalization::HourFormatEnum;
+    using DecodableArgType = chip::app::Clusters::TimeFormatLocalization::HourFormatEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HourFormat::Id; }
@@ -5763,9 +5763,9 @@ struct TypeInfo
 namespace ActiveCalendarType {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::TimeFormatLocalization::CalendarType;
-    using DecodableType    = chip::app::Clusters::TimeFormatLocalization::CalendarType;
-    using DecodableArgType = chip::app::Clusters::TimeFormatLocalization::CalendarType;
+    using Type             = chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum;
+    using DecodableType    = chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum;
+    using DecodableArgType = chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveCalendarType::Id; }
@@ -5775,9 +5775,10 @@ struct TypeInfo
 namespace SupportedCalendarTypes {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::app::Clusters::TimeFormatLocalization::CalendarType>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> &;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedCalendarTypes::Id; }
@@ -5830,9 +5831,9 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::HourFormat::TypeInfo::DecodableType hourFormat =
-            static_cast<chip::app::Clusters::TimeFormatLocalization::HourFormat>(0);
+            static_cast<chip::app::Clusters::TimeFormatLocalization::HourFormatEnum>(0);
         Attributes::ActiveCalendarType::TypeInfo::DecodableType activeCalendarType =
-            static_cast<chip::app::Clusters::TimeFormatLocalization::CalendarType>(0);
+            static_cast<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum>(0);
         Attributes::SupportedCalendarTypes::TypeInfo::DecodableType supportedCalendarTypes;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
@@ -5851,9 +5852,9 @@ namespace Attributes {
 namespace TemperatureUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::UnitLocalization::TempUnit;
-    using DecodableType    = chip::app::Clusters::UnitLocalization::TempUnit;
-    using DecodableArgType = chip::app::Clusters::UnitLocalization::TempUnit;
+    using Type             = chip::app::Clusters::UnitLocalization::TempUnitEnum;
+    using DecodableType    = chip::app::Clusters::UnitLocalization::TempUnitEnum;
+    using DecodableArgType = chip::app::Clusters::UnitLocalization::TempUnitEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::UnitLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureUnit::Id; }
@@ -5906,7 +5907,7 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::TemperatureUnit::TypeInfo::DecodableType temperatureUnit =
-            static_cast<chip::app::Clusters::UnitLocalization::TempUnit>(0);
+            static_cast<chip::app::Clusters::UnitLocalization::TempUnitEnum>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -5992,7 +5993,7 @@ struct TypeInfo
 namespace PowerSource {
 namespace Structs {
 namespace BatChargeFaultChangeType {
-enum class Fields
+enum class Fields : uint8_t
 {
     kCurrent  = 0,
     kPrevious = 1,
@@ -6001,8 +6002,8 @@ enum class Fields
 struct Type
 {
 public:
-    DataModel::List<const BatChargeFault> current;
-    DataModel::List<const BatChargeFault> previous;
+    DataModel::List<const BatChargeFaultEnum> current;
+    DataModel::List<const BatChargeFaultEnum> previous;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -6012,8 +6013,8 @@ public:
 struct DecodableType
 {
 public:
-    DataModel::DecodableList<BatChargeFault> current;
-    DataModel::DecodableList<BatChargeFault> previous;
+    DataModel::DecodableList<BatChargeFaultEnum> current;
+    DataModel::DecodableList<BatChargeFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -6022,7 +6023,7 @@ public:
 
 } // namespace BatChargeFaultChangeType
 namespace BatFaultChangeType {
-enum class Fields
+enum class Fields : uint8_t
 {
     kCurrent  = 0,
     kPrevious = 1,
@@ -6031,8 +6032,8 @@ enum class Fields
 struct Type
 {
 public:
-    DataModel::List<const BatFault> current;
-    DataModel::List<const BatFault> previous;
+    DataModel::List<const BatFaultEnum> current;
+    DataModel::List<const BatFaultEnum> previous;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -6042,8 +6043,8 @@ public:
 struct DecodableType
 {
 public:
-    DataModel::DecodableList<BatFault> current;
-    DataModel::DecodableList<BatFault> previous;
+    DataModel::DecodableList<BatFaultEnum> current;
+    DataModel::DecodableList<BatFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -6052,7 +6053,7 @@ public:
 
 } // namespace BatFaultChangeType
 namespace WiredFaultChangeType {
-enum class Fields
+enum class Fields : uint8_t
 {
     kCurrent  = 0,
     kPrevious = 1,
@@ -6061,8 +6062,8 @@ enum class Fields
 struct Type
 {
 public:
-    DataModel::List<const WiredFault> current;
-    DataModel::List<const WiredFault> previous;
+    DataModel::List<const WiredFaultEnum> current;
+    DataModel::List<const WiredFaultEnum> previous;
 
     static constexpr bool kIsFabricScoped = false;
 
@@ -6072,8 +6073,8 @@ public:
 struct DecodableType
 {
 public:
-    DataModel::DecodableList<WiredFault> current;
-    DataModel::DecodableList<WiredFault> previous;
+    DataModel::DecodableList<WiredFaultEnum> current;
+    DataModel::DecodableList<WiredFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -6088,9 +6089,9 @@ namespace Attributes {
 namespace Status {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::PowerSource::PowerSourceStatus;
-    using DecodableType    = chip::app::Clusters::PowerSource::PowerSourceStatus;
-    using DecodableArgType = chip::app::Clusters::PowerSource::PowerSourceStatus;
+    using Type             = chip::app::Clusters::PowerSource::PowerSourceStatusEnum;
+    using DecodableType    = chip::app::Clusters::PowerSource::PowerSourceStatusEnum;
+    using DecodableArgType = chip::app::Clusters::PowerSource::PowerSourceStatusEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Status::Id; }
@@ -6149,9 +6150,9 @@ struct TypeInfo
 namespace WiredCurrentType {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::PowerSource::WiredCurrentType;
-    using DecodableType    = chip::app::Clusters::PowerSource::WiredCurrentType;
-    using DecodableArgType = chip::app::Clusters::PowerSource::WiredCurrentType;
+    using Type             = chip::app::Clusters::PowerSource::WiredCurrentTypeEnum;
+    using DecodableType    = chip::app::Clusters::PowerSource::WiredCurrentTypeEnum;
+    using DecodableArgType = chip::app::Clusters::PowerSource::WiredCurrentTypeEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredCurrentType::Id; }
@@ -6209,9 +6210,9 @@ struct TypeInfo
 namespace ActiveWiredFaults {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::app::Clusters::PowerSource::WiredFault>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFault> &;
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::PowerSource::WiredFaultEnum>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFaultEnum>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFaultEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveWiredFaults::Id; }
@@ -6257,9 +6258,9 @@ struct TypeInfo
 namespace BatChargeLevel {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::PowerSource::BatChargeLevel;
-    using DecodableType    = chip::app::Clusters::PowerSource::BatChargeLevel;
-    using DecodableArgType = chip::app::Clusters::PowerSource::BatChargeLevel;
+    using Type             = chip::app::Clusters::PowerSource::BatChargeLevelEnum;
+    using DecodableType    = chip::app::Clusters::PowerSource::BatChargeLevelEnum;
+    using DecodableArgType = chip::app::Clusters::PowerSource::BatChargeLevelEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatChargeLevel::Id; }
@@ -6281,9 +6282,9 @@ struct TypeInfo
 namespace BatReplaceability {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::PowerSource::BatReplaceability;
-    using DecodableType    = chip::app::Clusters::PowerSource::BatReplaceability;
-    using DecodableArgType = chip::app::Clusters::PowerSource::BatReplaceability;
+    using Type             = chip::app::Clusters::PowerSource::BatReplaceabilityEnum;
+    using DecodableType    = chip::app::Clusters::PowerSource::BatReplaceabilityEnum;
+    using DecodableArgType = chip::app::Clusters::PowerSource::BatReplaceabilityEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatReplaceability::Id; }
@@ -6305,9 +6306,9 @@ struct TypeInfo
 namespace ActiveBatFaults {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::app::Clusters::PowerSource::BatFault>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFault>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFault> &;
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::PowerSource::BatFaultEnum>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFaultEnum>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFaultEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveBatFaults::Id; }
@@ -6330,9 +6331,9 @@ struct TypeInfo
 namespace BatCommonDesignation {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::Clusters::PowerSource::BatCommonDesignationEnum;
+    using DecodableType    = chip::app::Clusters::PowerSource::BatCommonDesignationEnum;
+    using DecodableArgType = chip::app::Clusters::PowerSource::BatCommonDesignationEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatCommonDesignation::Id; }
@@ -6368,9 +6369,9 @@ struct TypeInfo
 namespace BatApprovedChemistry {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = chip::app::Clusters::PowerSource::BatApprovedChemistryEnum;
+    using DecodableType    = chip::app::Clusters::PowerSource::BatApprovedChemistryEnum;
+    using DecodableArgType = chip::app::Clusters::PowerSource::BatApprovedChemistryEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatApprovedChemistry::Id; }
@@ -6404,9 +6405,9 @@ struct TypeInfo
 namespace BatChargeState {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::PowerSource::BatChargeState;
-    using DecodableType    = chip::app::Clusters::PowerSource::BatChargeState;
-    using DecodableArgType = chip::app::Clusters::PowerSource::BatChargeState;
+    using Type             = chip::app::Clusters::PowerSource::BatChargeStateEnum;
+    using DecodableType    = chip::app::Clusters::PowerSource::BatChargeStateEnum;
+    using DecodableArgType = chip::app::Clusters::PowerSource::BatChargeStateEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatChargeState::Id; }
@@ -6452,9 +6453,9 @@ struct TypeInfo
 namespace ActiveBatChargeFaults {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::app::Clusters::PowerSource::BatChargeFault>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFault> &;
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::PowerSource::BatChargeFaultEnum>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFaultEnum>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFaultEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveBatChargeFaults::Id; }
@@ -6506,13 +6507,14 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Status::TypeInfo::DecodableType status = static_cast<chip::app::Clusters::PowerSource::PowerSourceStatus>(0);
-        Attributes::Order::TypeInfo::DecodableType order   = static_cast<uint8_t>(0);
+        Attributes::Status::TypeInfo::DecodableType status =
+            static_cast<chip::app::Clusters::PowerSource::PowerSourceStatusEnum>(0);
+        Attributes::Order::TypeInfo::DecodableType order = static_cast<uint8_t>(0);
         Attributes::Description::TypeInfo::DecodableType description;
         Attributes::WiredAssessedInputVoltage::TypeInfo::DecodableType wiredAssessedInputVoltage;
         Attributes::WiredAssessedInputFrequency::TypeInfo::DecodableType wiredAssessedInputFrequency;
         Attributes::WiredCurrentType::TypeInfo::DecodableType wiredCurrentType =
-            static_cast<chip::app::Clusters::PowerSource::WiredCurrentType>(0);
+            static_cast<chip::app::Clusters::PowerSource::WiredCurrentTypeEnum>(0);
         Attributes::WiredAssessedCurrent::TypeInfo::DecodableType wiredAssessedCurrent;
         Attributes::WiredNominalVoltage::TypeInfo::DecodableType wiredNominalVoltage = static_cast<uint32_t>(0);
         Attributes::WiredMaximumCurrent::TypeInfo::DecodableType wiredMaximumCurrent = static_cast<uint32_t>(0);
@@ -6522,21 +6524,23 @@ struct TypeInfo
         Attributes::BatPercentRemaining::TypeInfo::DecodableType batPercentRemaining;
         Attributes::BatTimeRemaining::TypeInfo::DecodableType batTimeRemaining;
         Attributes::BatChargeLevel::TypeInfo::DecodableType batChargeLevel =
-            static_cast<chip::app::Clusters::PowerSource::BatChargeLevel>(0);
+            static_cast<chip::app::Clusters::PowerSource::BatChargeLevelEnum>(0);
         Attributes::BatReplacementNeeded::TypeInfo::DecodableType batReplacementNeeded = static_cast<bool>(0);
         Attributes::BatReplaceability::TypeInfo::DecodableType batReplaceability =
-            static_cast<chip::app::Clusters::PowerSource::BatReplaceability>(0);
+            static_cast<chip::app::Clusters::PowerSource::BatReplaceabilityEnum>(0);
         Attributes::BatPresent::TypeInfo::DecodableType batPresent = static_cast<bool>(0);
         Attributes::ActiveBatFaults::TypeInfo::DecodableType activeBatFaults;
         Attributes::BatReplacementDescription::TypeInfo::DecodableType batReplacementDescription;
-        Attributes::BatCommonDesignation::TypeInfo::DecodableType batCommonDesignation = static_cast<uint32_t>(0);
+        Attributes::BatCommonDesignation::TypeInfo::DecodableType batCommonDesignation =
+            static_cast<chip::app::Clusters::PowerSource::BatCommonDesignationEnum>(0);
         Attributes::BatANSIDesignation::TypeInfo::DecodableType batANSIDesignation;
         Attributes::BatIECDesignation::TypeInfo::DecodableType batIECDesignation;
-        Attributes::BatApprovedChemistry::TypeInfo::DecodableType batApprovedChemistry = static_cast<uint32_t>(0);
-        Attributes::BatCapacity::TypeInfo::DecodableType batCapacity                   = static_cast<uint32_t>(0);
-        Attributes::BatQuantity::TypeInfo::DecodableType batQuantity                   = static_cast<uint8_t>(0);
+        Attributes::BatApprovedChemistry::TypeInfo::DecodableType batApprovedChemistry =
+            static_cast<chip::app::Clusters::PowerSource::BatApprovedChemistryEnum>(0);
+        Attributes::BatCapacity::TypeInfo::DecodableType batCapacity = static_cast<uint32_t>(0);
+        Attributes::BatQuantity::TypeInfo::DecodableType batQuantity = static_cast<uint8_t>(0);
         Attributes::BatChargeState::TypeInfo::DecodableType batChargeState =
-            static_cast<chip::app::Clusters::PowerSource::BatChargeState>(0);
+            static_cast<chip::app::Clusters::PowerSource::BatChargeStateEnum>(0);
         Attributes::BatTimeToFullCharge::TypeInfo::DecodableType batTimeToFullCharge;
         Attributes::BatFunctionalWhileCharging::TypeInfo::DecodableType batFunctionalWhileCharging = static_cast<bool>(0);
         Attributes::BatChargingCurrent::TypeInfo::DecodableType batChargingCurrent;
@@ -6554,7 +6558,7 @@ namespace Events {
 namespace WiredFaultChange {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kCurrent  = 0,
     kPrevious = 1,
@@ -6568,8 +6572,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::List<const WiredFault> current;
-    DataModel::List<const WiredFault> previous;
+    DataModel::List<const WiredFaultEnum> current;
+    DataModel::List<const WiredFaultEnum> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6581,8 +6585,8 @@ public:
     static constexpr EventId GetEventId() { return Events::WiredFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
 
-    DataModel::DecodableList<WiredFault> current;
-    DataModel::DecodableList<WiredFault> previous;
+    DataModel::DecodableList<WiredFaultEnum> current;
+    DataModel::DecodableList<WiredFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -6590,7 +6594,7 @@ public:
 namespace BatFaultChange {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kCurrent  = 0,
     kPrevious = 1,
@@ -6604,8 +6608,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::List<const BatFault> current;
-    DataModel::List<const BatFault> previous;
+    DataModel::List<const BatFaultEnum> current;
+    DataModel::List<const BatFaultEnum> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6617,8 +6621,8 @@ public:
     static constexpr EventId GetEventId() { return Events::BatFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
 
-    DataModel::DecodableList<BatFault> current;
-    DataModel::DecodableList<BatFault> previous;
+    DataModel::DecodableList<BatFaultEnum> current;
+    DataModel::DecodableList<BatFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -6626,7 +6630,7 @@ public:
 namespace BatChargeFaultChange {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kCurrent  = 0,
     kPrevious = 1,
@@ -6640,8 +6644,8 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    DataModel::List<const BatChargeFault> current;
-    DataModel::List<const BatChargeFault> previous;
+    DataModel::List<const BatChargeFaultEnum> current;
+    DataModel::List<const BatChargeFaultEnum> previous;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6653,8 +6657,8 @@ public:
     static constexpr EventId GetEventId() { return Events::BatChargeFaultChange::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
 
-    DataModel::DecodableList<BatChargeFault> current;
-    DataModel::DecodableList<BatChargeFault> previous;
+    DataModel::DecodableList<BatChargeFaultEnum> current;
+    DataModel::DecodableList<BatChargeFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -6664,7 +6668,7 @@ public:
 namespace GeneralCommissioning {
 namespace Structs {
 namespace BasicCommissioningInfo {
-enum class Fields
+enum class Fields : uint8_t
 {
     kFailSafeExpiryLengthSeconds  = 0,
     kMaxCumulativeFailsafeSeconds = 1,
@@ -6725,7 +6729,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace ArmFailSafe {
-enum class Fields
+enum class Fields : uint8_t
 {
     kExpiryLengthSeconds = 0,
     kBreadcrumb          = 1,
@@ -6760,7 +6764,7 @@ public:
 };
 }; // namespace ArmFailSafe
 namespace ArmFailSafeResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kErrorCode = 0,
     kDebugText = 1,
@@ -6795,7 +6799,7 @@ public:
 };
 }; // namespace ArmFailSafeResponse
 namespace SetRegulatoryConfig {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNewRegulatoryConfig = 0,
     kCountryCode         = 1,
@@ -6833,7 +6837,7 @@ public:
 };
 }; // namespace SetRegulatoryConfig
 namespace SetRegulatoryConfigResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kErrorCode = 0,
     kDebugText = 1,
@@ -6868,7 +6872,7 @@ public:
 };
 }; // namespace SetRegulatoryConfigResponse
 namespace CommissioningComplete {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -6896,7 +6900,7 @@ public:
 };
 }; // namespace CommissioningComplete
 namespace CommissioningCompleteResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kErrorCode = 0,
     kDebugText = 1,
@@ -7059,7 +7063,7 @@ struct TypeInfo
 namespace NetworkCommissioning {
 namespace Structs {
 namespace NetworkInfo {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNetworkID = 0,
     kConnected = 1,
@@ -7082,7 +7086,7 @@ using DecodableType = Type;
 
 } // namespace NetworkInfo
 namespace ThreadInterfaceScanResult {
-enum class Fields
+enum class Fields : uint8_t
 {
     kPanId           = 0,
     kExtendedPanId   = 1,
@@ -7117,7 +7121,7 @@ using DecodableType = Type;
 
 } // namespace ThreadInterfaceScanResult
 namespace WiFiInterfaceScanResult {
-enum class Fields
+enum class Fields : uint8_t
 {
     kSecurity = 0,
     kSsid     = 1,
@@ -7201,7 +7205,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace ScanNetworks {
-enum class Fields
+enum class Fields : uint8_t
 {
     kSsid       = 0,
     kBreadcrumb = 1,
@@ -7236,7 +7240,7 @@ public:
 };
 }; // namespace ScanNetworks
 namespace ScanNetworksResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNetworkingStatus  = 0,
     kDebugText         = 1,
@@ -7277,7 +7281,7 @@ public:
 };
 }; // namespace ScanNetworksResponse
 namespace AddOrUpdateWiFiNetwork {
-enum class Fields
+enum class Fields : uint8_t
 {
     kSsid        = 0,
     kCredentials = 1,
@@ -7315,7 +7319,7 @@ public:
 };
 }; // namespace AddOrUpdateWiFiNetwork
 namespace AddOrUpdateThreadNetwork {
-enum class Fields
+enum class Fields : uint8_t
 {
     kOperationalDataset = 0,
     kBreadcrumb         = 1,
@@ -7350,7 +7354,7 @@ public:
 };
 }; // namespace AddOrUpdateThreadNetwork
 namespace RemoveNetwork {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNetworkID  = 0,
     kBreadcrumb = 1,
@@ -7385,7 +7389,7 @@ public:
 };
 }; // namespace RemoveNetwork
 namespace NetworkConfigResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNetworkingStatus = 0,
     kDebugText        = 1,
@@ -7423,7 +7427,7 @@ public:
 };
 }; // namespace NetworkConfigResponse
 namespace ConnectNetwork {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNetworkID  = 0,
     kBreadcrumb = 1,
@@ -7458,7 +7462,7 @@ public:
 };
 }; // namespace ConnectNetwork
 namespace ConnectNetworkResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNetworkingStatus = 0,
     kDebugText        = 1,
@@ -7496,7 +7500,7 @@ public:
 };
 }; // namespace ConnectNetworkResponse
 namespace ReorderNetwork {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNetworkID    = 0,
     kNetworkIndex = 1,
@@ -7719,7 +7723,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace RetrieveLogsRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kIntent                 = 0,
     kRequestedProtocol      = 1,
@@ -7757,7 +7761,7 @@ public:
 };
 }; // namespace RetrieveLogsRequest
 namespace RetrieveLogsResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus        = 0,
     kLogContent    = 1,
@@ -7859,7 +7863,7 @@ struct TypeInfo
 namespace GeneralDiagnostics {
 namespace Structs {
 namespace NetworkInterface {
-enum class Fields
+enum class Fields : uint8_t
 {
     kName                            = 0,
     kIsOperational                   = 1,
@@ -7920,7 +7924,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace TestEventTrigger {
-enum class Fields
+enum class Fields : uint8_t
 {
     kEnableKey    = 0,
     kEventTrigger = 1,
@@ -8137,7 +8141,7 @@ namespace Events {
 namespace HardwareFaultChange {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kCurrent  = 0,
     kPrevious = 1,
@@ -8173,7 +8177,7 @@ public:
 namespace RadioFaultChange {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kCurrent  = 0,
     kPrevious = 1,
@@ -8209,7 +8213,7 @@ public:
 namespace NetworkFaultChange {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kCurrent  = 0,
     kPrevious = 1,
@@ -8245,7 +8249,7 @@ public:
 namespace BootReason {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kBootReason = 0,
 };
@@ -8280,7 +8284,7 @@ public:
 namespace SoftwareDiagnostics {
 namespace Structs {
 namespace ThreadMetricsStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kId               = 0,
     kName             = 1,
@@ -8322,7 +8326,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace ResetWatermarks {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -8465,7 +8469,7 @@ namespace Events {
 namespace SoftwareFault {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kId             = 0,
     kName           = 1,
@@ -8506,7 +8510,7 @@ public:
 namespace ThreadNetworkDiagnostics {
 namespace Structs {
 namespace NeighborTable {
-enum class Fields
+enum class Fields : uint8_t
 {
     kExtAddress       = 0,
     kAge              = 1,
@@ -8553,7 +8557,7 @@ using DecodableType = Type;
 
 } // namespace NeighborTable
 namespace OperationalDatasetComponents {
-enum class Fields
+enum class Fields : uint8_t
 {
     kActiveTimestampPresent  = 0,
     kPendingTimestampPresent = 1,
@@ -8596,7 +8600,7 @@ using DecodableType = Type;
 
 } // namespace OperationalDatasetComponents
 namespace RouteTable {
-enum class Fields
+enum class Fields : uint8_t
 {
     kExtAddress      = 0,
     kRloc16          = 1,
@@ -8635,7 +8639,7 @@ using DecodableType = Type;
 
 } // namespace RouteTable
 namespace SecurityPolicy {
-enum class Fields
+enum class Fields : uint8_t
 {
     kRotationTime = 0,
     kFlags        = 1,
@@ -8671,7 +8675,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace ResetCounts {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -9593,7 +9597,7 @@ namespace Events {
 namespace ConnectionStatus {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kConnectionStatus = 0,
 };
@@ -9626,7 +9630,7 @@ public:
 namespace NetworkFaultChange {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kCurrent  = 0,
     kPrevious = 1,
@@ -9675,7 +9679,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace ResetCounts {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -9934,7 +9938,7 @@ namespace Events {
 namespace Disconnection {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kReasonCode = 0,
 };
@@ -9967,7 +9971,7 @@ public:
 namespace AssociationFailure {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kAssociationFailure = 0,
     kStatus             = 1,
@@ -10003,7 +10007,7 @@ public:
 namespace ConnectionStatus {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kConnectionStatus = 0,
 };
@@ -10049,7 +10053,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace ResetCounts {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -10255,7 +10259,7 @@ struct TypeInfo
 namespace TimeSynchronization {
 namespace Structs {
 namespace DSTOffsetStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kOffset        = 0,
     kValidStarting = 1,
@@ -10280,7 +10284,7 @@ using DecodableType = Type;
 
 } // namespace DSTOffsetStruct
 namespace TimeZoneStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kOffset  = 0,
     kValidAt = 1,
@@ -10318,7 +10322,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace SetUtcTime {
-enum class Fields
+enum class Fields : uint8_t
 {
     kUtcTime     = 0,
     kGranularity = 1,
@@ -10819,7 +10823,7 @@ namespace Events {
 namespace StartUp {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kSoftwareVersion = 0,
 };
@@ -10852,7 +10856,7 @@ public:
 namespace ShutDown {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -10880,7 +10884,7 @@ public:
 namespace Leave {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -10908,7 +10912,7 @@ public:
 namespace ReachableChanged {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kReachableNewValue = 0,
 };
@@ -11041,7 +11045,7 @@ namespace Events {
 namespace SwitchLatched {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kNewPosition = 0,
 };
@@ -11074,7 +11078,7 @@ public:
 namespace InitialPress {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kNewPosition = 0,
 };
@@ -11107,7 +11111,7 @@ public:
 namespace LongPress {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kNewPosition = 0,
 };
@@ -11140,7 +11144,7 @@ public:
 namespace ShortRelease {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kPreviousPosition = 0,
 };
@@ -11173,7 +11177,7 @@ public:
 namespace LongRelease {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kPreviousPosition = 0,
 };
@@ -11206,7 +11210,7 @@ public:
 namespace MultiPressOngoing {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kNewPosition                   = 0,
     kCurrentNumberOfPressesCounted = 1,
@@ -11242,7 +11246,7 @@ public:
 namespace MultiPressComplete {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kPreviousPosition            = 0,
     kTotalNumberOfPressesCounted = 1,
@@ -11301,7 +11305,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace OpenCommissioningWindow {
-enum class Fields
+enum class Fields : uint8_t
 {
     kCommissioningTimeout = 0,
     kPAKEPasscodeVerifier = 1,
@@ -11345,7 +11349,7 @@ public:
 };
 }; // namespace OpenCommissioningWindow
 namespace OpenBasicCommissioningWindow {
-enum class Fields
+enum class Fields : uint8_t
 {
     kCommissioningTimeout = 0,
 };
@@ -11377,7 +11381,7 @@ public:
 };
 }; // namespace OpenBasicCommissioningWindow
 namespace RevokeCommissioning {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -11506,7 +11510,7 @@ struct TypeInfo
 namespace OperationalCredentials {
 namespace Structs {
 namespace FabricDescriptorStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kRootPublicKey = 1,
     kVendorID      = 2,
@@ -11545,7 +11549,7 @@ using DecodableType = Type;
 
 } // namespace FabricDescriptorStruct
 namespace NOCStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNoc         = 1,
     kIcac        = 2,
@@ -11646,7 +11650,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace AttestationRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kAttestationNonce = 0,
 };
@@ -11678,7 +11682,7 @@ public:
 };
 }; // namespace AttestationRequest
 namespace AttestationResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kAttestationElements  = 0,
     kAttestationSignature = 1,
@@ -11713,7 +11717,7 @@ public:
 };
 }; // namespace AttestationResponse
 namespace CertificateChainRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kCertificateType = 0,
 };
@@ -11745,7 +11749,7 @@ public:
 };
 }; // namespace CertificateChainRequest
 namespace CertificateChainResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kCertificate = 0,
 };
@@ -11777,7 +11781,7 @@ public:
 };
 }; // namespace CertificateChainResponse
 namespace CSRRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kCSRNonce       = 0,
     kIsForUpdateNOC = 1,
@@ -11812,7 +11816,7 @@ public:
 };
 }; // namespace CSRRequest
 namespace CSRResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNOCSRElements        = 0,
     kAttestationSignature = 1,
@@ -11847,7 +11851,7 @@ public:
 };
 }; // namespace CSRResponse
 namespace AddNOC {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNOCValue         = 0,
     kICACValue        = 1,
@@ -11891,7 +11895,7 @@ public:
 };
 }; // namespace AddNOC
 namespace UpdateNOC {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNOCValue  = 0,
     kICACValue = 1,
@@ -11926,7 +11930,7 @@ public:
 };
 }; // namespace UpdateNOC
 namespace NOCResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatusCode  = 0,
     kFabricIndex = 1,
@@ -11964,7 +11968,7 @@ public:
 };
 }; // namespace NOCResponse
 namespace UpdateFabricLabel {
-enum class Fields
+enum class Fields : uint8_t
 {
     kLabel = 0,
 };
@@ -11996,7 +12000,7 @@ public:
 };
 }; // namespace UpdateFabricLabel
 namespace RemoveFabric {
-enum class Fields
+enum class Fields : uint8_t
 {
     kFabricIndex = 0,
 };
@@ -12028,7 +12032,7 @@ public:
 };
 }; // namespace RemoveFabric
 namespace AddTrustedRootCertificate {
-enum class Fields
+enum class Fields : uint8_t
 {
     kRootCACertificate = 0,
 };
@@ -12204,7 +12208,7 @@ struct TypeInfo
 namespace GroupKeyManagement {
 namespace Structs {
 namespace GroupInfoMapStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupId     = 1,
     kEndpoints   = 2,
@@ -12252,7 +12256,7 @@ public:
 
 } // namespace GroupInfoMapStruct
 namespace GroupKeyMapStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupId       = 1,
     kGroupKeySetID = 2,
@@ -12285,7 +12289,7 @@ using DecodableType = Type;
 
 } // namespace GroupKeyMapStruct
 namespace GroupKeySetStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupKeySetID          = 0,
     kGroupKeySecurityPolicy = 1,
@@ -12358,7 +12362,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace KeySetWrite {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupKeySet = 0,
 };
@@ -12390,7 +12394,7 @@ public:
 };
 }; // namespace KeySetWrite
 namespace KeySetRead {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupKeySetID = 0,
 };
@@ -12422,7 +12426,7 @@ public:
 };
 }; // namespace KeySetRead
 namespace KeySetReadResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupKeySet = 0,
 };
@@ -12454,7 +12458,7 @@ public:
 };
 }; // namespace KeySetReadResponse
 namespace KeySetRemove {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupKeySetID = 0,
 };
@@ -12486,7 +12490,7 @@ public:
 };
 }; // namespace KeySetRemove
 namespace KeySetReadAllIndices {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupKeySetIDs = 0,
 };
@@ -12518,7 +12522,7 @@ public:
 };
 }; // namespace KeySetReadAllIndices
 namespace KeySetReadAllIndicesResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kGroupKeySetIDs = 0,
 };
@@ -13068,7 +13072,7 @@ namespace Events {
 namespace StateChange {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kStateValue = 0,
 };
@@ -13103,7 +13107,7 @@ public:
 namespace ModeSelect {
 namespace Structs {
 namespace SemanticTagStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kMfgCode = 0,
     kValue   = 1,
@@ -13126,7 +13130,7 @@ using DecodableType = Type;
 
 } // namespace SemanticTagStruct
 namespace ModeOptionStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kLabel        = 0,
     kMode         = 1,
@@ -13172,7 +13176,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace ChangeToMode {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNewMode = 0,
 };
@@ -13346,7 +13350,7 @@ struct TypeInfo
 namespace DoorLock {
 namespace Structs {
 namespace CredentialStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kCredentialType  = 0,
     kCredentialIndex = 1,
@@ -13497,7 +13501,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace LockDoor {
-enum class Fields
+enum class Fields : uint8_t
 {
     kPINCode = 0,
 };
@@ -13529,7 +13533,7 @@ public:
 };
 }; // namespace LockDoor
 namespace UnlockDoor {
-enum class Fields
+enum class Fields : uint8_t
 {
     kPINCode = 0,
 };
@@ -13561,7 +13565,7 @@ public:
 };
 }; // namespace UnlockDoor
 namespace UnlockWithTimeout {
-enum class Fields
+enum class Fields : uint8_t
 {
     kTimeout = 0,
     kPINCode = 1,
@@ -13596,7 +13600,7 @@ public:
 };
 }; // namespace UnlockWithTimeout
 namespace SetWeekDaySchedule {
-enum class Fields
+enum class Fields : uint8_t
 {
     kWeekDayIndex = 0,
     kUserIndex    = 1,
@@ -13646,7 +13650,7 @@ public:
 };
 }; // namespace SetWeekDaySchedule
 namespace GetWeekDaySchedule {
-enum class Fields
+enum class Fields : uint8_t
 {
     kWeekDayIndex = 0,
     kUserIndex    = 1,
@@ -13681,7 +13685,7 @@ public:
 };
 }; // namespace GetWeekDaySchedule
 namespace GetWeekDayScheduleResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kWeekDayIndex = 0,
     kUserIndex    = 1,
@@ -13734,7 +13738,7 @@ public:
 };
 }; // namespace GetWeekDayScheduleResponse
 namespace ClearWeekDaySchedule {
-enum class Fields
+enum class Fields : uint8_t
 {
     kWeekDayIndex = 0,
     kUserIndex    = 1,
@@ -13769,7 +13773,7 @@ public:
 };
 }; // namespace ClearWeekDaySchedule
 namespace SetYearDaySchedule {
-enum class Fields
+enum class Fields : uint8_t
 {
     kYearDayIndex   = 0,
     kUserIndex      = 1,
@@ -13810,7 +13814,7 @@ public:
 };
 }; // namespace SetYearDaySchedule
 namespace GetYearDaySchedule {
-enum class Fields
+enum class Fields : uint8_t
 {
     kYearDayIndex = 0,
     kUserIndex    = 1,
@@ -13845,7 +13849,7 @@ public:
 };
 }; // namespace GetYearDaySchedule
 namespace GetYearDayScheduleResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kYearDayIndex   = 0,
     kUserIndex      = 1,
@@ -13889,7 +13893,7 @@ public:
 };
 }; // namespace GetYearDayScheduleResponse
 namespace ClearYearDaySchedule {
-enum class Fields
+enum class Fields : uint8_t
 {
     kYearDayIndex = 0,
     kUserIndex    = 1,
@@ -13924,7 +13928,7 @@ public:
 };
 }; // namespace ClearYearDaySchedule
 namespace SetHolidaySchedule {
-enum class Fields
+enum class Fields : uint8_t
 {
     kHolidayIndex   = 0,
     kLocalStartTime = 1,
@@ -13965,7 +13969,7 @@ public:
 };
 }; // namespace SetHolidaySchedule
 namespace GetHolidaySchedule {
-enum class Fields
+enum class Fields : uint8_t
 {
     kHolidayIndex = 0,
 };
@@ -13997,7 +14001,7 @@ public:
 };
 }; // namespace GetHolidaySchedule
 namespace GetHolidayScheduleResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kHolidayIndex   = 0,
     kStatus         = 1,
@@ -14041,7 +14045,7 @@ public:
 };
 }; // namespace GetHolidayScheduleResponse
 namespace ClearHolidaySchedule {
-enum class Fields
+enum class Fields : uint8_t
 {
     kHolidayIndex = 0,
 };
@@ -14073,7 +14077,7 @@ public:
 };
 }; // namespace ClearHolidaySchedule
 namespace SetUser {
-enum class Fields
+enum class Fields : uint8_t
 {
     kOperationType  = 0,
     kUserIndex      = 1,
@@ -14123,7 +14127,7 @@ public:
 };
 }; // namespace SetUser
 namespace GetUser {
-enum class Fields
+enum class Fields : uint8_t
 {
     kUserIndex = 0,
 };
@@ -14155,7 +14159,7 @@ public:
 };
 }; // namespace GetUser
 namespace GetUserResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kUserIndex               = 0,
     kUserName                = 1,
@@ -14214,7 +14218,7 @@ public:
 };
 }; // namespace GetUserResponse
 namespace ClearUser {
-enum class Fields
+enum class Fields : uint8_t
 {
     kUserIndex = 0,
 };
@@ -14246,7 +14250,7 @@ public:
 };
 }; // namespace ClearUser
 namespace SetCredential {
-enum class Fields
+enum class Fields : uint8_t
 {
     kOperationType  = 0,
     kCredential     = 1,
@@ -14293,7 +14297,7 @@ public:
 };
 }; // namespace SetCredential
 namespace SetCredentialResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus              = 0,
     kUserIndex           = 1,
@@ -14331,7 +14335,7 @@ public:
 };
 }; // namespace SetCredentialResponse
 namespace GetCredentialStatus {
-enum class Fields
+enum class Fields : uint8_t
 {
     kCredential = 0,
 };
@@ -14363,7 +14367,7 @@ public:
 };
 }; // namespace GetCredentialStatus
 namespace GetCredentialStatusResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kCredentialExists        = 0,
     kUserIndex               = 1,
@@ -14407,7 +14411,7 @@ public:
 };
 }; // namespace GetCredentialStatusResponse
 namespace ClearCredential {
-enum class Fields
+enum class Fields : uint8_t
 {
     kCredential = 0,
 };
@@ -14978,7 +14982,7 @@ namespace Events {
 namespace DoorLockAlarm {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kAlarmCode = 0,
 };
@@ -15011,7 +15015,7 @@ public:
 namespace DoorStateChange {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kDoorState = 0,
 };
@@ -15044,7 +15048,7 @@ public:
 namespace LockOperation {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kLockOperationType = 0,
     kOperationSource   = 1,
@@ -15092,7 +15096,7 @@ public:
 namespace LockOperationError {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kLockOperationType = 0,
     kOperationSource   = 1,
@@ -15143,7 +15147,7 @@ public:
 namespace LockUserChange {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kLockDataType      = 0,
     kDataOperationType = 1,
@@ -15237,7 +15241,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace UpOrOpen {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -15265,7 +15269,7 @@ public:
 };
 }; // namespace UpOrOpen
 namespace DownOrClose {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -15293,7 +15297,7 @@ public:
 };
 }; // namespace DownOrClose
 namespace StopMotion {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -15321,7 +15325,7 @@ public:
 };
 }; // namespace StopMotion
 namespace GoToLiftValue {
-enum class Fields
+enum class Fields : uint8_t
 {
     kLiftValue = 0,
 };
@@ -15353,7 +15357,7 @@ public:
 };
 }; // namespace GoToLiftValue
 namespace GoToLiftPercentage {
-enum class Fields
+enum class Fields : uint8_t
 {
     kLiftPercent100thsValue = 0,
 };
@@ -15385,7 +15389,7 @@ public:
 };
 }; // namespace GoToLiftPercentage
 namespace GoToTiltValue {
-enum class Fields
+enum class Fields : uint8_t
 {
     kTiltValue = 0,
 };
@@ -15417,7 +15421,7 @@ public:
 };
 }; // namespace GoToTiltValue
 namespace GoToTiltPercentage {
-enum class Fields
+enum class Fields : uint8_t
 {
     kTiltPercent100thsValue = 0,
 };
@@ -15816,7 +15820,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace BarrierControlGoToPercent {
-enum class Fields
+enum class Fields : uint8_t
 {
     kPercentOpen = 0,
 };
@@ -15848,7 +15852,7 @@ public:
 };
 }; // namespace BarrierControlGoToPercent
 namespace BarrierControlStop {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16430,7 +16434,7 @@ namespace Events {
 namespace SupplyVoltageLow {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16458,7 +16462,7 @@ public:
 namespace SupplyVoltageHigh {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16486,7 +16490,7 @@ public:
 namespace PowerMissingPhase {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16514,7 +16518,7 @@ public:
 namespace SystemPressureLow {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16542,7 +16546,7 @@ public:
 namespace SystemPressureHigh {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16570,7 +16574,7 @@ public:
 namespace DryRunning {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16598,7 +16602,7 @@ public:
 namespace MotorTemperatureHigh {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16626,7 +16630,7 @@ public:
 namespace PumpMotorFatalFailure {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16654,7 +16658,7 @@ public:
 namespace ElectronicTemperatureHigh {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16682,7 +16686,7 @@ public:
 namespace PumpBlocked {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16710,7 +16714,7 @@ public:
 namespace SensorFailure {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16738,7 +16742,7 @@ public:
 namespace ElectronicNonFatalFailure {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16766,7 +16770,7 @@ public:
 namespace ElectronicFatalFailure {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16794,7 +16798,7 @@ public:
 namespace GeneralFault {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16822,7 +16826,7 @@ public:
 namespace Leakage {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16850,7 +16854,7 @@ public:
 namespace AirDetection {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16878,7 +16882,7 @@ public:
 namespace TurbineOperation {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -16908,7 +16912,7 @@ public:
 namespace Thermostat {
 namespace Structs {
 namespace ThermostatScheduleTransition {
-enum class Fields
+enum class Fields : uint8_t
 {
     kTransitionTime = 0,
     kHeatSetpoint   = 1,
@@ -16966,7 +16970,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace SetpointRaiseLower {
-enum class Fields
+enum class Fields : uint8_t
 {
     kMode   = 0,
     kAmount = 1,
@@ -17001,7 +17005,7 @@ public:
 };
 }; // namespace SetpointRaiseLower
 namespace GetWeeklyScheduleResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNumberOfTransitionsForSequence = 0,
     kDayOfWeekForSequence           = 1,
@@ -17042,7 +17046,7 @@ public:
 };
 }; // namespace GetWeeklyScheduleResponse
 namespace SetWeeklySchedule {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNumberOfTransitionsForSequence = 0,
     kDayOfWeekForSequence           = 1,
@@ -17083,7 +17087,7 @@ public:
 };
 }; // namespace SetWeeklySchedule
 namespace GetWeeklySchedule {
-enum class Fields
+enum class Fields : uint8_t
 {
     kDaysToReturn = 0,
     kModeToReturn = 1,
@@ -17118,7 +17122,7 @@ public:
 };
 }; // namespace GetWeeklySchedule
 namespace ClearWeeklySchedule {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -18248,7 +18252,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace MoveToHue {
-enum class Fields
+enum class Fields : uint8_t
 {
     kHue             = 0,
     kDirection       = 1,
@@ -18292,7 +18296,7 @@ public:
 };
 }; // namespace MoveToHue
 namespace MoveHue {
-enum class Fields
+enum class Fields : uint8_t
 {
     kMoveMode        = 0,
     kRate            = 1,
@@ -18333,7 +18337,7 @@ public:
 };
 }; // namespace MoveHue
 namespace StepHue {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStepMode        = 0,
     kStepSize        = 1,
@@ -18377,7 +18381,7 @@ public:
 };
 }; // namespace StepHue
 namespace MoveToSaturation {
-enum class Fields
+enum class Fields : uint8_t
 {
     kSaturation      = 0,
     kTransitionTime  = 1,
@@ -18418,7 +18422,7 @@ public:
 };
 }; // namespace MoveToSaturation
 namespace MoveSaturation {
-enum class Fields
+enum class Fields : uint8_t
 {
     kMoveMode        = 0,
     kRate            = 1,
@@ -18459,7 +18463,7 @@ public:
 };
 }; // namespace MoveSaturation
 namespace StepSaturation {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStepMode        = 0,
     kStepSize        = 1,
@@ -18503,7 +18507,7 @@ public:
 };
 }; // namespace StepSaturation
 namespace MoveToHueAndSaturation {
-enum class Fields
+enum class Fields : uint8_t
 {
     kHue             = 0,
     kSaturation      = 1,
@@ -18547,7 +18551,7 @@ public:
 };
 }; // namespace MoveToHueAndSaturation
 namespace MoveToColor {
-enum class Fields
+enum class Fields : uint8_t
 {
     kColorX          = 0,
     kColorY          = 1,
@@ -18591,7 +18595,7 @@ public:
 };
 }; // namespace MoveToColor
 namespace MoveColor {
-enum class Fields
+enum class Fields : uint8_t
 {
     kRateX           = 0,
     kRateY           = 1,
@@ -18632,7 +18636,7 @@ public:
 };
 }; // namespace MoveColor
 namespace StepColor {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStepX           = 0,
     kStepY           = 1,
@@ -18676,7 +18680,7 @@ public:
 };
 }; // namespace StepColor
 namespace MoveToColorTemperature {
-enum class Fields
+enum class Fields : uint8_t
 {
     kColorTemperatureMireds = 0,
     kTransitionTime         = 1,
@@ -18717,7 +18721,7 @@ public:
 };
 }; // namespace MoveToColorTemperature
 namespace EnhancedMoveToHue {
-enum class Fields
+enum class Fields : uint8_t
 {
     kEnhancedHue     = 0,
     kDirection       = 1,
@@ -18761,7 +18765,7 @@ public:
 };
 }; // namespace EnhancedMoveToHue
 namespace EnhancedMoveHue {
-enum class Fields
+enum class Fields : uint8_t
 {
     kMoveMode        = 0,
     kRate            = 1,
@@ -18802,7 +18806,7 @@ public:
 };
 }; // namespace EnhancedMoveHue
 namespace EnhancedStepHue {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStepMode        = 0,
     kStepSize        = 1,
@@ -18846,7 +18850,7 @@ public:
 };
 }; // namespace EnhancedStepHue
 namespace EnhancedMoveToHueAndSaturation {
-enum class Fields
+enum class Fields : uint8_t
 {
     kEnhancedHue     = 0,
     kSaturation      = 1,
@@ -18890,7 +18894,7 @@ public:
 };
 }; // namespace EnhancedMoveToHueAndSaturation
 namespace ColorLoopSet {
-enum class Fields
+enum class Fields : uint8_t
 {
     kUpdateFlags     = 0,
     kAction          = 1,
@@ -18940,7 +18944,7 @@ public:
 };
 }; // namespace ColorLoopSet
 namespace StopMoveStep {
-enum class Fields
+enum class Fields : uint8_t
 {
     kOptionsMask     = 0,
     kOptionsOverride = 1,
@@ -18975,7 +18979,7 @@ public:
 };
 }; // namespace StopMoveStep
 namespace MoveColorTemperature {
-enum class Fields
+enum class Fields : uint8_t
 {
     kMoveMode                      = 0,
     kRate                          = 1,
@@ -19022,7 +19026,7 @@ public:
 };
 }; // namespace MoveColorTemperature
 namespace StepColorTemperature {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStepMode                      = 0,
     kStepSize                      = 1,
@@ -20985,7 +20989,7 @@ struct TypeInfo
 namespace Channel {
 namespace Structs {
 namespace ChannelInfoStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kMajorNumber       = 0,
     kMinorNumber       = 1,
@@ -21014,7 +21018,7 @@ using DecodableType = Type;
 
 } // namespace ChannelInfoStruct
 namespace LineupInfoStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kOperatorName   = 0,
     kLineupName     = 1,
@@ -21069,7 +21073,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace ChangeChannel {
-enum class Fields
+enum class Fields : uint8_t
 {
     kMatch = 0,
 };
@@ -21101,7 +21105,7 @@ public:
 };
 }; // namespace ChangeChannel
 namespace ChangeChannelResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus = 0,
     kData   = 1,
@@ -21136,7 +21140,7 @@ public:
 };
 }; // namespace ChangeChannelResponse
 namespace ChangeChannelByNumber {
-enum class Fields
+enum class Fields : uint8_t
 {
     kMajorNumber = 0,
     kMinorNumber = 1,
@@ -21171,7 +21175,7 @@ public:
 };
 }; // namespace ChangeChannelByNumber
 namespace SkipChannel {
-enum class Fields
+enum class Fields : uint8_t
 {
     kCount = 0,
 };
@@ -21307,7 +21311,7 @@ struct TypeInfo
 namespace TargetNavigator {
 namespace Structs {
 namespace TargetInfoStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kIdentifier = 0,
     kName       = 1,
@@ -21348,7 +21352,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace NavigateTarget {
-enum class Fields
+enum class Fields : uint8_t
 {
     kTarget = 0,
     kData   = 1,
@@ -21383,7 +21387,7 @@ public:
 };
 }; // namespace NavigateTarget
 namespace NavigateTargetResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus = 0,
     kData   = 1,
@@ -21507,7 +21511,7 @@ struct TypeInfo
 namespace MediaPlayback {
 namespace Structs {
 namespace PlaybackPositionStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kUpdatedAt = 0,
     kPosition  = 1,
@@ -21598,7 +21602,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace Play {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -21626,7 +21630,7 @@ public:
 };
 }; // namespace Play
 namespace Pause {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -21654,7 +21658,7 @@ public:
 };
 }; // namespace Pause
 namespace Stop {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -21682,7 +21686,7 @@ public:
 };
 }; // namespace Stop
 namespace StartOver {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -21710,7 +21714,7 @@ public:
 };
 }; // namespace StartOver
 namespace Previous {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -21738,7 +21742,7 @@ public:
 };
 }; // namespace Previous
 namespace Next {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -21766,7 +21770,7 @@ public:
 };
 }; // namespace Next
 namespace Rewind {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -21794,7 +21798,7 @@ public:
 };
 }; // namespace Rewind
 namespace FastForward {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -21822,7 +21826,7 @@ public:
 };
 }; // namespace FastForward
 namespace SkipForward {
-enum class Fields
+enum class Fields : uint8_t
 {
     kDeltaPositionMilliseconds = 0,
 };
@@ -21854,7 +21858,7 @@ public:
 };
 }; // namespace SkipForward
 namespace SkipBackward {
-enum class Fields
+enum class Fields : uint8_t
 {
     kDeltaPositionMilliseconds = 0,
 };
@@ -21886,7 +21890,7 @@ public:
 };
 }; // namespace SkipBackward
 namespace PlaybackResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus = 0,
     kData   = 1,
@@ -21921,7 +21925,7 @@ public:
 };
 }; // namespace PlaybackResponse
 namespace Seek {
-enum class Fields
+enum class Fields : uint8_t
 {
     kPosition = 0,
 };
@@ -22108,7 +22112,7 @@ struct TypeInfo
 namespace MediaInput {
 namespace Structs {
 namespace InputInfoStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kIndex       = 0,
     kInputType   = 1,
@@ -22163,7 +22167,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace SelectInput {
-enum class Fields
+enum class Fields : uint8_t
 {
     kIndex = 0,
 };
@@ -22195,7 +22199,7 @@ public:
 };
 }; // namespace SelectInput
 namespace ShowInputStatus {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -22223,7 +22227,7 @@ public:
 };
 }; // namespace ShowInputStatus
 namespace HideInputStatus {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -22251,7 +22255,7 @@ public:
 };
 }; // namespace HideInputStatus
 namespace RenameInput {
-enum class Fields
+enum class Fields : uint8_t
 {
     kIndex = 0,
     kName  = 1,
@@ -22386,7 +22390,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace Sleep {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -22491,7 +22495,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace SendKey {
-enum class Fields
+enum class Fields : uint8_t
 {
     kKeyCode = 0,
 };
@@ -22523,7 +22527,7 @@ public:
 };
 }; // namespace SendKey
 namespace SendKeyResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus = 0,
 };
@@ -22616,7 +22620,7 @@ struct TypeInfo
 namespace ContentLauncher {
 namespace Structs {
 namespace DimensionStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kWidth  = 0,
     kHeight = 1,
@@ -22641,7 +22645,7 @@ using DecodableType = Type;
 
 } // namespace DimensionStruct
 namespace AdditionalInfoStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kName  = 0,
     kValue = 1,
@@ -22664,7 +22668,7 @@ using DecodableType = Type;
 
 } // namespace AdditionalInfoStruct
 namespace ParameterStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kType           = 0,
     kValue          = 1,
@@ -22697,7 +22701,7 @@ public:
 
 } // namespace ParameterStruct
 namespace ContentSearchStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kParameterList = 0,
 };
@@ -22724,7 +22728,7 @@ public:
 
 } // namespace ContentSearchStruct
 namespace StyleInformationStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kImageURL = 0,
     kColor    = 1,
@@ -22749,7 +22753,7 @@ using DecodableType = Type;
 
 } // namespace StyleInformationStruct
 namespace BrandingInformationStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kProviderName = 0,
     kBackground   = 1,
@@ -22803,7 +22807,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace LaunchContent {
-enum class Fields
+enum class Fields : uint8_t
 {
     kSearch   = 0,
     kAutoPlay = 1,
@@ -22841,7 +22845,7 @@ public:
 };
 }; // namespace LaunchContent
 namespace LaunchURL {
-enum class Fields
+enum class Fields : uint8_t
 {
     kContentURL          = 0,
     kDisplayString       = 1,
@@ -22879,7 +22883,7 @@ public:
 };
 }; // namespace LaunchURL
 namespace LauncherResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus = 0,
     kData   = 1,
@@ -23001,7 +23005,7 @@ struct TypeInfo
 namespace AudioOutput {
 namespace Structs {
 namespace OutputInfoStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kIndex      = 0,
     kOutputType = 1,
@@ -23044,7 +23048,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace SelectOutput {
-enum class Fields
+enum class Fields : uint8_t
 {
     kIndex = 0,
 };
@@ -23076,7 +23080,7 @@ public:
 };
 }; // namespace SelectOutput
 namespace RenameOutput {
-enum class Fields
+enum class Fields : uint8_t
 {
     kIndex = 0,
     kName  = 1,
@@ -23201,7 +23205,7 @@ namespace ApplicationLauncher {
 namespace Structs {
 namespace ApplicationStruct = Clusters::detail::Structs::ApplicationStruct;
 namespace ApplicationEPStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kApplication = 0,
     kEndpoint    = 1,
@@ -23252,7 +23256,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace LaunchApp {
-enum class Fields
+enum class Fields : uint8_t
 {
     kApplication = 0,
     kData        = 1,
@@ -23287,7 +23291,7 @@ public:
 };
 }; // namespace LaunchApp
 namespace StopApp {
-enum class Fields
+enum class Fields : uint8_t
 {
     kApplication = 0,
 };
@@ -23319,7 +23323,7 @@ public:
 };
 }; // namespace StopApp
 namespace HideApp {
-enum class Fields
+enum class Fields : uint8_t
 {
     kApplication = 0,
 };
@@ -23351,7 +23355,7 @@ public:
 };
 }; // namespace HideApp
 namespace LauncherResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStatus = 0,
     kData   = 1,
@@ -23671,7 +23675,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace GetSetupPIN {
-enum class Fields
+enum class Fields : uint8_t
 {
     kTempAccountIdentifier = 0,
 };
@@ -23703,7 +23707,7 @@ public:
 };
 }; // namespace GetSetupPIN
 namespace GetSetupPINResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kSetupPIN = 0,
 };
@@ -23735,7 +23739,7 @@ public:
 };
 }; // namespace GetSetupPINResponse
 namespace Login {
-enum class Fields
+enum class Fields : uint8_t
 {
     kTempAccountIdentifier = 0,
     kSetupPIN              = 1,
@@ -23770,7 +23774,7 @@ public:
 };
 }; // namespace Login
 namespace Logout {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -23885,7 +23889,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace GetProfileInfoResponseCommand {
-enum class Fields
+enum class Fields : uint8_t
 {
     kProfileCount          = 0,
     kProfileIntervalPeriod = 1,
@@ -23926,7 +23930,7 @@ public:
 };
 }; // namespace GetProfileInfoResponseCommand
 namespace GetProfileInfoCommand {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -23954,7 +23958,7 @@ public:
 };
 }; // namespace GetProfileInfoCommand
 namespace GetMeasurementProfileResponseCommand {
-enum class Fields
+enum class Fields : uint8_t
 {
     kStartTime                  = 0,
     kStatus                     = 1,
@@ -24001,7 +24005,7 @@ public:
 };
 }; // namespace GetMeasurementProfileResponseCommand
 namespace GetMeasurementProfileCommand {
-enum class Fields
+enum class Fields : uint8_t
 {
     kAttributeId       = 0,
     kStartTime         = 1,
@@ -25781,7 +25785,7 @@ struct TypeInfo
 namespace ClientMonitoring {
 namespace Structs {
 namespace MonitoringRegistration {
-enum class Fields
+enum class Fields : uint8_t
 {
     kClientNodeId = 1,
     kICid         = 2,
@@ -25837,7 +25841,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace RegisterClientMonitoring {
-enum class Fields
+enum class Fields : uint8_t
 {
     kClientNodeId = 0,
     kICid         = 1,
@@ -25872,7 +25876,7 @@ public:
 };
 }; // namespace RegisterClientMonitoring
 namespace UnregisterClientMonitoring {
-enum class Fields
+enum class Fields : uint8_t
 {
     kClientNodeId = 0,
     kICid         = 1,
@@ -25907,7 +25911,7 @@ public:
 };
 }; // namespace UnregisterClientMonitoring
 namespace StayAwakeRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -26050,7 +26054,7 @@ struct TypeInfo
 namespace UnitTesting {
 namespace Structs {
 namespace SimpleStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kA = 0,
     kB = 1,
@@ -26085,7 +26089,7 @@ using DecodableType = Type;
 
 } // namespace SimpleStruct
 namespace TestFabricScoped {
-enum class Fields
+enum class Fields : uint8_t
 {
     kFabricSensitiveInt8u                 = 1,
     kOptionalFabricSensitiveInt8u         = 2,
@@ -26145,7 +26149,7 @@ public:
 
 } // namespace TestFabricScoped
 namespace NullablesAndOptionalsStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNullableInt            = 0,
     kOptionalInt            = 1,
@@ -26205,7 +26209,7 @@ public:
 
 } // namespace NullablesAndOptionalsStruct
 namespace NestedStruct {
-enum class Fields
+enum class Fields : uint8_t
 {
     kA = 0,
     kB = 1,
@@ -26230,7 +26234,7 @@ using DecodableType = Type;
 
 } // namespace NestedStruct
 namespace NestedStructList {
-enum class Fields
+enum class Fields : uint8_t
 {
     kA = 0,
     kB = 1,
@@ -26275,7 +26279,7 @@ public:
 
 } // namespace NestedStructList
 namespace DoubleNestedStructList {
-enum class Fields
+enum class Fields : uint8_t
 {
     kA = 0,
 };
@@ -26302,7 +26306,7 @@ public:
 
 } // namespace DoubleNestedStructList
 namespace TestListStructOctet {
-enum class Fields
+enum class Fields : uint8_t
 {
     kMember1 = 0,
     kMember2 = 1,
@@ -26503,7 +26507,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace Test {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -26531,7 +26535,7 @@ public:
 };
 }; // namespace Test
 namespace TestSpecificResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kReturnValue = 0,
 };
@@ -26563,7 +26567,7 @@ public:
 };
 }; // namespace TestSpecificResponse
 namespace TestNotHandled {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -26591,7 +26595,7 @@ public:
 };
 }; // namespace TestNotHandled
 namespace TestAddArgumentsResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kReturnValue = 0,
 };
@@ -26623,7 +26627,7 @@ public:
 };
 }; // namespace TestAddArgumentsResponse
 namespace TestSpecific {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -26651,7 +26655,7 @@ public:
 };
 }; // namespace TestSpecific
 namespace TestSimpleArgumentResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kReturnValue = 0,
 };
@@ -26683,7 +26687,7 @@ public:
 };
 }; // namespace TestSimpleArgumentResponse
 namespace TestUnknownCommand {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -26711,7 +26715,7 @@ public:
 };
 }; // namespace TestUnknownCommand
 namespace TestStructArrayArgumentResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
     kArg2 = 1,
@@ -26758,7 +26762,7 @@ public:
 };
 }; // namespace TestStructArrayArgumentResponse
 namespace TestAddArguments {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
     kArg2 = 1,
@@ -26793,7 +26797,7 @@ public:
 };
 }; // namespace TestAddArguments
 namespace TestListInt8UReverseResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
 };
@@ -26825,7 +26829,7 @@ public:
 };
 }; // namespace TestListInt8UReverseResponse
 namespace TestSimpleArgumentRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
 };
@@ -26857,7 +26861,7 @@ public:
 };
 }; // namespace TestSimpleArgumentRequest
 namespace TestEnumsResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
     kArg2 = 1,
@@ -26892,7 +26896,7 @@ public:
 };
 }; // namespace TestEnumsResponse
 namespace TestStructArrayArgumentRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
     kArg2 = 1,
@@ -26939,7 +26943,7 @@ public:
 };
 }; // namespace TestStructArrayArgumentRequest
 namespace TestNullableOptionalResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kWasPresent    = 0,
     kWasNull       = 1,
@@ -26980,7 +26984,7 @@ public:
 };
 }; // namespace TestNullableOptionalResponse
 namespace TestStructArgumentRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
 };
@@ -27012,7 +27016,7 @@ public:
 };
 }; // namespace TestStructArgumentRequest
 namespace TestComplexNullableOptionalResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNullableIntWasNull               = 0,
     kNullableIntValue                 = 1,
@@ -27125,7 +27129,7 @@ public:
 };
 }; // namespace TestComplexNullableOptionalResponse
 namespace TestNestedStructArgumentRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
 };
@@ -27157,7 +27161,7 @@ public:
 };
 }; // namespace TestNestedStructArgumentRequest
 namespace BooleanResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kValue = 0,
 };
@@ -27189,7 +27193,7 @@ public:
 };
 }; // namespace BooleanResponse
 namespace TestListStructArgumentRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
 };
@@ -27221,7 +27225,7 @@ public:
 };
 }; // namespace TestListStructArgumentRequest
 namespace SimpleStructResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
 };
@@ -27253,7 +27257,7 @@ public:
 };
 }; // namespace SimpleStructResponse
 namespace TestListInt8UArgumentRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
 };
@@ -27285,7 +27289,7 @@ public:
 };
 }; // namespace TestListInt8UArgumentRequest
 namespace TestEmitTestEventResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kValue = 0,
 };
@@ -27317,7 +27321,7 @@ public:
 };
 }; // namespace TestEmitTestEventResponse
 namespace TestNestedStructListArgumentRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
 };
@@ -27349,7 +27353,7 @@ public:
 };
 }; // namespace TestNestedStructListArgumentRequest
 namespace TestEmitTestFabricScopedEventResponse {
-enum class Fields
+enum class Fields : uint8_t
 {
     kValue = 0,
 };
@@ -27381,7 +27385,7 @@ public:
 };
 }; // namespace TestEmitTestFabricScopedEventResponse
 namespace TestListNestedStructListArgumentRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
 };
@@ -27413,7 +27417,7 @@ public:
 };
 }; // namespace TestListNestedStructListArgumentRequest
 namespace TestListInt8UReverseRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
 };
@@ -27445,7 +27449,7 @@ public:
 };
 }; // namespace TestListInt8UReverseRequest
 namespace TestEnumsRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
     kArg2 = 1,
@@ -27480,7 +27484,7 @@ public:
 };
 }; // namespace TestEnumsRequest
 namespace TestNullableOptionalRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
 };
@@ -27512,7 +27516,7 @@ public:
 };
 }; // namespace TestNullableOptionalRequest
 namespace TestComplexNullableOptionalRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kNullableInt            = 0,
     kOptionalInt            = 1,
@@ -27577,7 +27581,7 @@ public:
 };
 }; // namespace TestComplexNullableOptionalRequest
 namespace SimpleStructEchoRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
 };
@@ -27609,7 +27613,7 @@ public:
 };
 }; // namespace SimpleStructEchoRequest
 namespace TimedInvokeRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
 };
 
@@ -27637,7 +27641,7 @@ public:
 };
 }; // namespace TimedInvokeRequest
 namespace TestSimpleOptionalArgumentRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
 };
@@ -27669,7 +27673,7 @@ public:
 };
 }; // namespace TestSimpleOptionalArgumentRequest
 namespace TestEmitTestEventRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
     kArg2 = 1,
@@ -27707,7 +27711,7 @@ public:
 };
 }; // namespace TestEmitTestEventRequest
 namespace TestEmitTestFabricScopedEventRequest {
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 0,
 };
@@ -28887,7 +28891,7 @@ namespace Events {
 namespace TestEvent {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kArg1 = 1,
     kArg2 = 2,
@@ -28935,7 +28939,7 @@ public:
 namespace TestFabricScopedEvent {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 
-enum class Fields
+enum class Fields : uint8_t
 {
     kFabricIndex = 254,
 };
@@ -28988,7 +28992,7 @@ struct DecodableType;
 
 namespace Commands {
 namespace FailAtFault {
-enum class Fields
+enum class Fields : uint8_t
 {
     kType           = 0,
     kId             = 1,
@@ -29032,7 +29036,7 @@ public:
 };
 }; // namespace FailAtFault
 namespace FailRandomlyAtFault {
-enum class Fields
+enum class Fields : uint8_t
 {
     kType       = 0,
     kId         = 1,

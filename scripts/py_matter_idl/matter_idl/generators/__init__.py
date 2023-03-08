@@ -13,11 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import logging
-import jinja2
-
+import os
 from typing import Dict
+
+import jinja2
 from matter_idl.matter_idl_types import Idl
 
 from .filters import RegisterCommonFilters
@@ -102,7 +102,7 @@ class CodeGenerator:
       'render' will perform a rendering of all files.
 
     As special optimizations, CodeGenerators generally will try to read
-    existing data and will not re-write content if not changed (so that 
+    existing data and will not re-write content if not changed (so that
     write time of files do not change and rebuilds are not triggered).
     """
 
@@ -146,7 +146,7 @@ class CodeGenerator:
         if dry-run was requested during `render`.
 
         NOTE: to make this method suitable for rebuilds, this file will NOT alter
-              the timestamp of the output file if the file content would not 
+              the timestamp of the output file if the file content would not
               change (i.e. no write will be invoked in that case.)
 
         Args:

@@ -1,5 +1,6 @@
 package chip.devicecontroller;
 
+import java.util.Optional;
 import javax.annotation.Nullable;
 
 /** Parameters representing initialization arguments for {@link ChipDeviceController}. */
@@ -13,6 +14,8 @@ public final class ControllerParams {
   private final boolean attemptNetworkScanWiFi;
   private final boolean attemptNetworkScanThread;
   private final boolean skipCommissioningComplete;
+  private final Optional<String> countryCode;
+  private final Optional<Integer> regulatoryLocationType;
   @Nullable private final KeypairDelegate keypairDelegate;
   @Nullable private final byte[] rootCertificate;
   @Nullable private final byte[] intermediateCertificate;
@@ -32,6 +35,8 @@ public final class ControllerParams {
     this.attemptNetworkScanWiFi = builder.attemptNetworkScanWiFi;
     this.attemptNetworkScanThread = builder.attemptNetworkScanThread;
     this.skipCommissioningComplete = builder.skipCommissioningComplete;
+    this.countryCode = builder.countryCode;
+    this.regulatoryLocationType = builder.regulatoryLocationType;
     this.keypairDelegate = builder.keypairDelegate;
     this.rootCertificate = builder.rootCertificate;
     this.intermediateCertificate = builder.intermediateCertificate;
@@ -71,6 +76,14 @@ public final class ControllerParams {
 
   public boolean getSkipCommissioningComplete() {
     return skipCommissioningComplete;
+  }
+
+  public Optional<String> getCountryCode() {
+    return countryCode;
+  }
+
+  public Optional<Integer> getRegulatoryLocation() {
+    return regulatoryLocationType;
   }
 
   public KeypairDelegate getKeypairDelegate() {
@@ -126,6 +139,8 @@ public final class ControllerParams {
     private boolean attemptNetworkScanWiFi = false;
     private boolean attemptNetworkScanThread = false;
     private boolean skipCommissioningComplete = false;
+    private Optional<String> countryCode = Optional.empty();
+    private Optional<Integer> regulatoryLocationType = Optional.empty();
     @Nullable private KeypairDelegate keypairDelegate = null;
     @Nullable private byte[] rootCertificate = null;
     @Nullable private byte[] intermediateCertificate = null;
@@ -244,6 +259,46 @@ public final class ControllerParams {
      */
     public Builder setSkipCommissioningComplete(boolean skipCommissioningComplete) {
       this.skipCommissioningComplete = skipCommissioningComplete;
+      return this;
+    }
+
+    /**
+     * Sets the Regulatory Location country code passed to ChipDeviceCommissioner's
+     * CommissioningParameters.
+     *
+     * <p>Setting the country code will set the CountryCode when the SetRegulatoryConfig command is
+     * sent by this ChipDeviceCommissioner.
+     *
+     * @param countryCode an ISO 3166-1 alpha-2 code to represent the country, dependent territory,
+     *     or special area of geographic interest
+     * @return
+     */
+    public Builder setCountryCode(final String countryCode) {
+      if (countryCode == null || countryCode.length() != 2) {
+        throw new IllegalArgumentException("countryCode must be 2 characters");
+      }
+      this.countryCode = Optional.of(countryCode);
+      return this;
+    }
+
+    /**
+     * Sets the Regulatory Location capability passed to ChipDeviceCommissioner's
+     * CommissioningParameters.
+     *
+     * <p>Setting the regulatory location type will set the NewRegulatoryConfig when the
+     * SetRegulatoryConfig command is sent by this ChipDeviceCommissioner.
+     *
+     * @param regulatoryLocation an app::Clusters::GeneralCommissioning::RegulatoryLocationType enum
+     *     value
+     * @return
+     */
+    public Builder setRegulatoryLocation(int regulatoryLocation) {
+      if ((regulatoryLocation < 0) || (regulatoryLocation > 2)) {
+        throw new IllegalArgumentException(
+            "regulatoryLocation value must be between RegulatoryLocationType::kIndoor and "
+                + "RegulatoryLocationType::kIndoorOutdoor");
+      }
+      this.regulatoryLocationType = Optional.of(regulatoryLocation);
       return this;
     }
 

@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Iterator, Set
 
 from . import linux, runner
-from .test_definition import ApplicationPaths, TestDefinition, TestRunTime, TestTag, TestTarget
+from .test_definition import ApplicationPaths, TestDefinition, TestTag, TestTarget
 
 _DEFAULT_CHIP_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", ".."))
@@ -84,10 +84,12 @@ def _GetManualTests() -> Set[str]:
 
 
 def _GetFlakyTests() -> Set[str]:
-    """List of flaky tests, ideally this list should become empty."""
-    return {
-        "Test_TC_OO_2_4.yaml"
-    }
+    """List of flaky tests.
+
+    While this list is empty, it remains here in case we need to quickly add a new test
+    that is flaky.
+    """
+    return set()
 
 
 def _GetSlowTests() -> Set[str]:
@@ -149,7 +151,13 @@ def _AllYamlTests():
 
 
 def target_for_name(name: str):
-    if name.startswith("TV_") or name.startswith("Test_TC_MC_") or name.startswith("Test_TC_LOWPOWER_") or name.startswith("Test_TC_KEYPADINPUT_") or name.startswith("Test_TC_APPLAUNCHER_") or name.startswith("Test_TC_MEDIAINPUT_") or name.startswith("Test_TC_WAKEONLAN_") or name.startswith("Test_TC_CHANNEL_") or name.startswith("Test_TC_MEDIAPLAYBACK_") or name.startswith("Test_TC_AUDIOOUTPUT_") or name.startswith("Test_TC_TGTNAV_") or name.startswith("Test_TC_APBSC_") or name.startswith("Test_TC_CONTENTLAUNCHER_") or name.startswith("Test_TC_ALOGIN_"):
+    if (name.startswith("TV_") or name.startswith("Test_TC_MC_") or
+            name.startswith("Test_TC_LOWPOWER_") or name.startswith("Test_TC_KEYPADINPUT_") or
+            name.startswith("Test_TC_APPLAUNCHER_") or name.startswith("Test_TC_MEDIAINPUT_") or
+            name.startswith("Test_TC_WAKEONLAN_") or name.startswith("Test_TC_CHANNEL_") or
+            name.startswith("Test_TC_MEDIAPLAYBACK_") or name.startswith("Test_TC_AUDIOOUTPUT_") or
+            name.startswith("Test_TC_TGTNAV_") or name.startswith("Test_TC_APBSC_") or
+            name.startswith("Test_TC_CONTENTLAUNCHER_") or name.startswith("Test_TC_ALOGIN_")):
         return TestTarget.TV
     if name.startswith("DL_") or name.startswith("Test_TC_DRLK_"):
         return TestTarget.LOCK

@@ -169,7 +169,7 @@ class DeviceProvisioningFragment : Fragment() {
         R.string.rendezvous_over_ble_scanning_text,
         deviceInfo.discriminator.toString()
       )
-      val device = bluetoothManager.getBluetoothDevice(requireContext(), deviceInfo.discriminator) ?: run {
+      val device = bluetoothManager.getBluetoothDevice(requireContext(), deviceInfo.discriminator, deviceInfo.isShortDiscriminator) ?: run {
         showMessage(R.string.rendezvous_over_ble_scanning_failed_text)
         return@launch
       }

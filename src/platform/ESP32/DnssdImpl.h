@@ -104,7 +104,7 @@ struct ResolveContext : public GenericContext
     ResolveContext(DnssdService * service, Inet::InterfaceId ifId, mdns_search_once_t * searchHandle, DnssdResolveCallback cb,
                    void * cbCtx)
     {
-        Platform::CopyString(mType, type);
+        Platform::CopyString(mType, service->mType);
         Platform::CopyString(mInstanceName, service->mName);
         mContextType  = ContextType::Resolve;
         mProtocol     = service->mProtocol;

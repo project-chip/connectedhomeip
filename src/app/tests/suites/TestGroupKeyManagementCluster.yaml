@@ -18,9 +18,41 @@ config:
     nodeId: 0x12344321
     cluster: "Group Key Management"
     endpoint: 0
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
 
 tests:
-    - label: "Wait for the commissioned device to be retrieved"
+    - label: "Wait for the commissioned device to be retrieved for alpha"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+
+    - label: "Open Commissioning Window from alpha"
+      cluster: "Administrator Commissioning"
+      command: "OpenBasicCommissioningWindow"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "CommissioningTimeout"
+                value: 180
+
+    - label: "Commission from beta"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Wait for the commissioned device to be retrieved for beta"
+      identity: "beta"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -73,6 +105,26 @@ tests:
                         EpochKey1: "\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef",
                         EpochStartTime1: 2110001,
                         EpochKey2: "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
+                        EpochStartTime2: 2110002,
+                    }
+
+    - label: "KeySet Write 3"
+      identity: "beta"
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "GroupKeySet"
+                value:
+                    {
+                        GroupKeySetID: 0x01a3,
+                        GroupKeySecurityPolicy: 1,
+                        EpochKey0:
+                            "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
+                        EpochStartTime0: 2110000,
+                        EpochKey1: "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
+                        EpochStartTime1: 2110001,
+                        EpochKey2:
+                            "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f",
                         EpochStartTime2: 2110002,
                     }
 
@@ -129,7 +181,7 @@ tests:
       response:
           error: FAILURE
 
-    - label: "Write Group Keys"
+    - label: "Write Group Keys on alpha"
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
@@ -141,7 +193,20 @@ tests:
                   { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a2 },
               ]
 
-    - label: "Read Group Keys"
+    - label: "Write Group Keys on beta"
+      identity: "beta"
+      command: "writeAttribute"
+      attribute: "GroupKeyMap"
+      arguments:
+          value: [
+                  # Note: the FabricIndex here does not matter; it's not sent on the wire.
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 1, GroupId: 0x0105, GroupKeySetID: 0x01a3 },
+              ]
+
+    - label: "Read Group Keys on alpha"
       command: "readAttribute"
       attribute: "GroupKeyMap"
       response:
@@ -151,6 +216,54 @@ tests:
                   { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
                   { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a1 },
                   { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a2 },
+              ]
+
+    - label: "Read Group Keys on alpha without fabric filtering"
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 2, GroupId: 0x0102, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0103, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0104, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0105, GroupKeySetID: 0x01a3 },
+              ]
+
+    - label: "Read Group Keys on beta"
+      identity: "beta"
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      response:
+          value:
+              [
+                  { FabricIndex: 2, GroupId: 0x0102, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0103, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0104, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0105, GroupKeySetID: 0x01a3 },
+              ]
+
+    - label: "Read Group Keys on beta without fabric filtering"
+      identity: "beta"
+      command: "readAttribute"
+      attribute: "GroupKeyMap"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0102, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: 0x0104, GroupKeySetID: 0x01a2 },
+                  { FabricIndex: 2, GroupId: 0x0102, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0103, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0104, GroupKeySetID: 0x01a3 },
+                  { FabricIndex: 2, GroupId: 0x0105, GroupKeySetID: 0x01a3 },
               ]
 
     - label: "Add Group 1"
@@ -221,7 +334,25 @@ tests:
               - name: "GroupID"
                 value: 0x0104
 
-    - label: "Read GroupTable"
+    - label: "Add Group 5"
+      identity: "beta"
+      cluster: "Groups"
+      endpoint: 1
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "GroupID"
+                value: 0x0105
+              - name: "GroupName"
+                value: "Group #5"
+      response:
+          values:
+              - name: "Status"
+                value: 0
+              - name: "GroupID"
+                value: 0x0105
+
+    - label: "Read GroupTable from alpha"
       command: "readAttribute"
       attribute: "GroupTable"
       response:
@@ -250,6 +381,100 @@ tests:
                       GroupId: 0x0104,
                       Endpoints: [1],
                       GroupName: "Group #4",
+                  },
+              ]
+
+    - label: "Read GroupTable from alpha without fabric filtering"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0101,
+                      Endpoints: [1],
+                      GroupName: "Group #1",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0102,
+                      Endpoints: [1],
+                      GroupName: "Group #2",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0103,
+                      Endpoints: [1],
+                      GroupName: "Group #3",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0104,
+                      Endpoints: [1],
+                      GroupName: "Group #4",
+                  },
+                  {
+                      FabricIndex: 2,
+                      GroupId: 0x0105,
+                      Endpoints: [1],
+                      GroupName: "Group #5",
+                  },
+              ]
+
+    - label: "Read GroupTable from beta"
+      identity: "beta"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 2,
+                      GroupId: 0x0105,
+                      Endpoints: [1],
+                      GroupName: "Group #5",
+                  },
+              ]
+
+    - label: "Read GroupTable from beta without fabric filtering"
+      identity: "beta"
+      command: "readAttribute"
+      attribute: "GroupTable"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0101,
+                      Endpoints: [1],
+                      GroupName: "Group #1",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0102,
+                      Endpoints: [1],
+                      GroupName: "Group #2",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0103,
+                      Endpoints: [1],
+                      GroupName: "Group #3",
+                  },
+                  {
+                      FabricIndex: 1,
+                      GroupId: 0x0104,
+                      Endpoints: [1],
+                      GroupName: "Group #4",
+                  },
+                  {
+                      FabricIndex: 2,
+                      GroupId: 0x0105,
+                      Endpoints: [1],
+                      GroupName: "Group #5",
                   },
               ]
 

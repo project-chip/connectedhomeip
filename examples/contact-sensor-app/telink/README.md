@@ -92,7 +92,7 @@ be used to specify the the effect. It is able to be in following effects:
 
 #### Indicate current state of Contact Sensor
 
-**Blue** LED shows current state of Contact Sensor
+**White** LED shows current state of Contact Sensor
 
 ### CHIP tool commands
 

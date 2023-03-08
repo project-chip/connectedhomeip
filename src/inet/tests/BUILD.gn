@@ -92,4 +92,6 @@ chip_test_suite("tests") {
     # TODO: This test does not seem executed
     sources += [ "TestLwIPDNS.cpp" ]
   }
+
+  cflags = [ "-Wconversion" ]
 }

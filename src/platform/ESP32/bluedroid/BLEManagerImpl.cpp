@@ -652,7 +652,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     advData[index++] = 0x02;                            // length
     advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;        // AD type : flags
     advData[index++] = CHIP_ADV_DATA_FLAGS;             // AD value
-    advData[index++] = 0x0A;                            // length
+    advData[index++] = 0x0B;                            // length
     advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA; // AD type: (Service Data - 16-bit UUID)
     advData[index++] = ShortUUID_CHIPoBLEService[0];    // AD value
     advData[index++] = ShortUUID_CHIPoBLEService[1];    // AD value

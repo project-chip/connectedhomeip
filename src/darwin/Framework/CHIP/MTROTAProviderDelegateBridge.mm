@@ -461,9 +461,7 @@ private:
         CHIP_ERROR err = mSystemLayer->StartTimer(kBdxInitReceivedTimeout, HandleBdxInitReceivedTimeoutExpired, this);
         LogErrorOnFailure(err);
 
-        // The caller of this method maps CHIP_ERROR to specific BDX Status Codes (see GetBdxStatusCodeFromChipError)
-        // and those are used by the BDX session to prepare the status report.
-        VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(err);
 
         mFabricIndex.SetValue(fabricIndex);
         mNodeId.SetValue(nodeId);
@@ -615,7 +613,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
     auto * commandParams = [[MTROTASoftwareUpdateProviderClusterQueryImageParams alloc] init];
     CHIP_ERROR err = ConvertToQueryImageParams(commandData, commandParams);
     if (err != CHIP_NO_ERROR) {
-        commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        commandObj->AddStatus(commandPath, StatusIB(err).mStatus);
         return;
     }
 
@@ -635,64 +633,83 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                 ChipLogDetail(Controller, "QueryImage: application responded with: %s",
                     [[data description] cStringUsingEncoding:NSUTF8StringEncoding]);
 
-                Commands::QueryImageResponse::Type response;
-                ConvertFromQueryImageResponseParms(data, response);
-
                 auto hasUpdate = [data.status isEqual:@(MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable)];
                 auto isBDXProtocolSupported = [commandParams.protocolsSupported
                     containsObject:@(MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous)];
 
-                if (hasUpdate && isBDXProtocolSupported) {
-                    auto fabricIndex = handler->GetSubjectDescriptor().fabricIndex;
-                    auto nodeId = handler->GetSubjectDescriptor().subject;
-                    CHIP_ERROR err = gOtaSender.PrepareForTransfer(fabricIndex, nodeId);
-                    if (CHIP_NO_ERROR != err) {
-                        LogErrorOnFailure(err);
-                        if (err == CHIP_ERROR_BUSY) {
-                            Commands::QueryImageResponse::Type busyResponse;
-                            busyResponse.status = static_cast<OTAQueryStatus>(MTROTASoftwareUpdateProviderOTAQueryStatusBusy);
-                            busyResponse.delayedActionTime.SetValue(response.delayedActionTime.ValueOr(kDelayedActionTimeSeconds));
-                            handler->AddResponse(cachedCommandPath, busyResponse);
-                            handle.Release();
-                            return;
-                        }
-                        handler->AddStatus(cachedCommandPath, Protocols::InteractionModel::Status::Failure);
-                        handle.Release();
-                        gOtaSender.ResetState();
-                        return;
-                    }
-                    auto targetNodeId
-                        = handler->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetLocalScopedNodeId();
+                // The logic we are following here is if none of the protocols supported by the requestor are supported by us, we
+                // can't transfer the image even if we had an image available and we would return a Protocol Not Supported status.
+                // Assumption here is the requestor would send us a list of all the protocols it supports. If one/more of the
+                // protocols supported by the requestor are supported by us, we check if an image is not available due to various
+                // reasons - image not available, delegate reporting busy, we will respond with the status in the delegate response.
+                // If update is available, we try to prepare for transfer and build the uri in the response with a status of Image
+                // Available
 
-                    char uriBuffer[kMaxBDXURILen];
-                    MutableCharSpan uri(uriBuffer);
-                    err = bdx::MakeURI(targetNodeId.GetNodeId(), AsCharSpan(data.imageURI), uri);
-                    if (CHIP_NO_ERROR != err) {
-                        LogErrorOnFailure(err);
-                        handler->AddStatus(cachedCommandPath, Protocols::InteractionModel::Status::Failure);
-                        handle.Release();
-                        gOtaSender.ResetState();
-                        return;
-                    }
-
-                    response.imageURI.SetValue(uri);
+                // If the protocol requested is not supported, return status - Protocol Not Supported
+                if (!isBDXProtocolSupported) {
+                    Commands::QueryImageResponse::Type response;
+                    response.status
+                        = static_cast<OTAQueryStatus>(MTROTASoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported);
                     handler->AddResponse(cachedCommandPath, response);
                     handle.Release();
                     return;
                 }
+
+                Commands::QueryImageResponse::Type delegateResponse;
+                ConvertFromQueryImageResponseParams(data, delegateResponse);
+
+                // If update is not available, return the delegate response
                 if (!hasUpdate) {
-                    // Send whatever error response our delegate decided on.
-                    handler->AddResponse(cachedCommandPath, response);
-                } else {
-                    // We must have isBDXProtocolSupported false.  Send the corresponding error status.
-                    Commands::QueryImageResponse::Type protocolNotSupportedResponse;
-                    protocolNotSupportedResponse.status
-                        = static_cast<OTAQueryStatus>(MTROTASoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported);
-                    handler->AddResponse(cachedCommandPath, protocolNotSupportedResponse);
+                    handler->AddResponse(cachedCommandPath, delegateResponse);
+                    handle.Release();
+                    return;
                 }
+
+                // If there is an update available, try to prepare for a transfer.
+                auto fabricIndex = handler->GetSubjectDescriptor().fabricIndex;
+                auto nodeId = handler->GetSubjectDescriptor().subject;
+                CHIP_ERROR err = gOtaSender.PrepareForTransfer(fabricIndex, nodeId);
+                if (CHIP_NO_ERROR != err) {
+
+                    // Handle busy error separately as we have a query image response status that maps to busy
+                    if (err == CHIP_ERROR_BUSY) {
+                        ChipLogError(
+                            Controller, "Responding with Busy due to being in the middle of handling another BDX transfer");
+                        Commands::QueryImageResponse::Type response;
+                        response.status = static_cast<OTAQueryStatus>(MTROTASoftwareUpdateProviderOTAQueryStatusBusy);
+                        response.delayedActionTime.SetValue(delegateResponse.delayedActionTime.ValueOr(kDelayedActionTimeSeconds));
+                        handler->AddResponse(cachedCommandPath, response);
+                        handle.Release();
+                        // We do not reset state when we get the busy error because that means we are locked in a BDX transfer
+                        // session with another requestor when we get this query image request. We do not want to interrupt the
+                        // ongoing transfer instead just respond to the second requestor with a busy status and a delayedActionTime
+                        // in which the requestor can retry.
+                        return;
+                    }
+                    LogErrorOnFailure(err);
+                    handler->AddStatus(cachedCommandPath, StatusIB(err).mStatus);
+                    handle.Release();
+                    // We need to reset state here to clean up any initialization we might have done including starting the BDX
+                    // timeout timer while preparing for transfer if any failure occurs afterwards.
+                    gOtaSender.ResetState();
+                    return;
+                }
+                auto targetNodeId = handler->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetLocalScopedNodeId();
+
+                char uriBuffer[kMaxBDXURILen];
+                MutableCharSpan uri(uriBuffer);
+                err = bdx::MakeURI(targetNodeId.GetNodeId(), AsCharSpan(data.imageURI), uri);
+                if (CHIP_NO_ERROR != err) {
+                    LogErrorOnFailure(err);
+                    handler->AddStatus(cachedCommandPath, StatusIB(err).mStatus);
+                    handle.Release();
+                    gOtaSender.ResetState();
+                    return;
+                }
+                delegateResponse.imageURI.SetValue(uri);
+                handler->AddResponse(cachedCommandPath, delegateResponse);
                 handle.Release();
             }
-
                           errorHandler:^(NSError *) {
                               // Not much we can do here
                           }];
@@ -867,7 +884,7 @@ CHIP_ERROR MTROTAProviderDelegateBridge::ConvertToQueryImageParams(
     return CHIP_NO_ERROR;
 }
 
-void MTROTAProviderDelegateBridge::ConvertFromQueryImageResponseParms(
+void MTROTAProviderDelegateBridge::ConvertFromQueryImageResponseParams(
     const MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * responseParams,
     Commands::QueryImageResponse::Type & response)
 {

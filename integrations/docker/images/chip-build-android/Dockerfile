@@ -1,5 +1,5 @@
 ARG VERSION=latest
-FROM connectedhomeip/chip-build:${VERSION}
+FROM connectedhomeip/chip-build-java:${VERSION}
 
 # JDK 8 access
 # JDK 8 is required because Android `sdkmanager`

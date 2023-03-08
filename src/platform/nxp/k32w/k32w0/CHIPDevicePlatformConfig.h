@@ -42,26 +42,6 @@
 // These are configuration options that are unique to the K32W platform.
 // These can be overridden by the application as needed.
 
-/**
- * @def CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
- *
- * The priority of the SoftDevice observer event handler registered by the
- * chip BleLayer.
- */
-#ifndef CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
-#define CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY 3
-#endif // CHIP_DEVICE_LAYER_BLE_OBSERVER_PRIORITY
-
-/**
- * @def CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
- *
- * The SoftDevice BLE connection configuration tag used by the chip
- * BleLayer.
- */
-#ifndef CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
-#define CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG 1
-#endif // CHIP_DEVICE_LAYER_BLE_CONN_CFG_TAG
-
 #ifndef CHIP_DEVICE_CONFIG_CERTIFICATION_DECLARATION
 //-> format_version = 1
 //-> vendor_id = 0xFFF1
@@ -122,6 +102,16 @@
 #ifndef CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
 #define CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY 3000
 #endif // CHIP_DEVICE_LAYER_OTA_REBOOT_DELAY
+
+/**
+ * @def CONFIG_CHIP_K32W0_OTA_DEFAULT_PROCESSORS
+ *
+ * Enables default OTA TLV processors.
+ * Disabled by default.
+ */
+#ifndef CONFIG_CHIP_K32W0_OTA_DEFAULT_PROCESSORS
+#define CONFIG_CHIP_K32W0_OTA_DEFAULT_PROCESSORS 0
+#endif // CONFIG_CHIP_K32W0_OTA_DEFAULT_PROCESSORS
 
 /**
  * @def CHIP_DEVICE_LAYER_ENABLE_PDM_LOGS

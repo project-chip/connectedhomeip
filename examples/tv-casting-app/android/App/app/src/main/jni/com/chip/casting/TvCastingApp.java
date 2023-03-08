@@ -137,7 +137,9 @@ public class TvCastingApp {
               public void run() {
                 Log.d(TAG, "TvCastingApp stopping Video Player commissioner discovery");
                 nsdManager.stopServiceDiscovery(nsdDiscoveryListener);
-                multicastLock.release();
+                if (multicastLock.isHeld()) {
+                  multicastLock.release();
+                }
               }
             },
             discoveryDurationSeconds,
