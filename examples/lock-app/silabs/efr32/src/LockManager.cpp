@@ -113,6 +113,11 @@ bool LockManager::IsValidCredentialIndex(uint16_t credentialIndex, CredentialTyp
     return (credentialIndex < kMaxCredentialsPerUser);
 }
 
+bool LockManager::IsValidCredentialType(CredentialTypeEnum type)
+{
+    return (to_underlying(type) < kNumCredentialTypes);
+}
+
 bool LockManager::IsValidWeekdayScheduleIndex(uint8_t scheduleIndex)
 {
     return (scheduleIndex < kMaxWeekdaySchedulesPerUser);
@@ -134,9 +139,8 @@ bool LockManager::ReadConfigValues()
     SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
                                      sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
 
-    SilabsConfig::ReadConfigValueBin(
-        SilabsConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
-        sizeof(EmberAfPluginDoorLockCredentialInfo) * LockParams.numberOfCredentialsPerUser * kNumCredentialTypes, outLen);
+    SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
+                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes, outLen);
 
     SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames),
                                      sizeof(mUserNames), outLen);
@@ -379,9 +383,7 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
 
     for (size_t i = 0; i < totalCredentials; ++i)
     {
-        mCredentials[userIndex][i]                 = credentials[i];
-        mCredentials[userIndex][i].credentialType  = credentials[i].credentialType;
-        mCredentials[userIndex][i].credentialIndex = credentials[i].credentialIndex;
+        mCredentials[userIndex][i] = credentials[i];
     }
 
     userInStorage.credentials = chip::Span<const CredentialStruct>(mCredentials[userIndex], totalCredentials);
@@ -404,6 +406,8 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
 bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, CredentialTypeEnum credentialType,
                                 EmberAfPluginDoorLockCredentialInfo & credential)
 {
+
+    VerifyOrReturnValue(IsValidCredentialType(credentialType), false);
 
     if (CredentialTypeEnum::kProgrammingPIN == credentialType)
     {
@@ -448,6 +452,8 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                                 const chip::ByteSpan & credentialData)
 {
 
+    VerifyOrReturnValue(IsValidCredentialType(credentialType), false);
+
     if (CredentialTypeEnum::kProgrammingPIN == credentialType)
     {
         VerifyOrReturnValue(IsValidCredentialIndex(credentialIndex, credentialType),
@@ -476,8 +482,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
 
     // Save credential information in NVM flash
     SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_Credential, reinterpret_cast<const uint8_t *>(&mLockCredentials),
-                                      sizeof(EmberAfPluginDoorLockCredentialInfo) * LockParams.numberOfCredentialsPerUser *
-                                          kNumCredentialTypes);
+                                      sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes);
 
     SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_CredentialData, reinterpret_cast<const uint8_t *>(&mCredentialData),
                                       sizeof(mCredentialData));
@@ -682,15 +687,15 @@ bool LockManager::setLockState(chip::EndpointId endpointId, DlLockState lockStat
     }
 
     // Check the PIN code
-    for (uint8_t i = 0; i < kMaxCredentialsPerUser; i++)
+    for (const auto & currentCredential : mLockCredentials[to_underlying(CredentialTypeEnum::kPin)])
     {
 
-        if (mLockCredentials[to_underlying(CredentialTypeEnum::kPin)][i].status == DlCredentialStatus::kAvailable)
+        if (currentCredential.status == DlCredentialStatus::kAvailable)
         {
             continue;
         }
 
-        if (mLockCredentials[to_underlying(CredentialTypeEnum::kPin)][i].credentialData.data_equal(pin.Value()))
+        if (currentCredential.credentialData.data_equal(pin.Value()))
         {
             ChipLogDetail(Zcl,
                           "Lock App: specified PIN code was found in the database, setting lock state to \"%s\" [endpointId=%d]",
