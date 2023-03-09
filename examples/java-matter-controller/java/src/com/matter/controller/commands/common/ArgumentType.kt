@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2022 Project CHIP Authors
+ *   Copyright (c) 2023 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +15,9 @@
  *   limitations under the License.
  *
  */
+package com.matter.controller.commands.common
 
-package com.matter.controller.commands.common;
-
-public enum ArgumentType {
+enum class ArgumentType {
   NUMBER_INT8,
   NUMBER_INT16,
   NUMBER_INT32,
@@ -36,5 +35,5 @@ public enum ArgumentType {
   VECTOR_BOOL,
   VECTOR16,
   VECTOR32,
-  VECTOR_CUSTOM,
+  VECTOR_CUSTOM
 }

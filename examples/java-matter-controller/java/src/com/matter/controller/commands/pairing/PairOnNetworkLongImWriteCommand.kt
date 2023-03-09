@@ -25,7 +25,6 @@ import chip.devicecontroller.model.ChipAttributePath
 import com.matter.controller.commands.common.CredentialsIssuer
 import java.util.logging.Level
 import java.util.logging.Logger
-import javax.annotation.Nullable
 
 class PairOnNetworkLongImWriteCommand(
   controller: ChipDeviceController, credsIssue: CredentialsIssuer?

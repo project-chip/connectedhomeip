@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2022 Project CHIP Authors
+ *   Copyright (c) 2023 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,12 +15,11 @@
  *   limitations under the License.
  *
  */
-
-package com.matter.controller.commands.common;
+package com.matter.controller.commands.common
 
 /**
  * @brief Credentials Issuer for the Command
  * @details Contains all credential information of the issuer of the command, such as operational
- *     credentials for a given fabric, the DAC verifier of the commisioner, etc ..
+ * credentials for a given fabric, the DAC verifier of the commisioner, etc ..
  */
-public class CredentialsIssuer {}
+class CredentialsIssuer 

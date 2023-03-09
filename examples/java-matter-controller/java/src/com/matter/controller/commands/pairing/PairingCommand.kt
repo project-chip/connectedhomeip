@@ -31,12 +31,12 @@ import java.util.logging.Logger
 
 abstract class PairingCommand(
   controller: ChipDeviceController,
-  commandName: String?,
+  commandName: String,
   credsIssuer: CredentialsIssuer?,
   private val pairingMode: PairingModeType = PairingModeType.NONE,
   private val networkType: PairingNetworkType = PairingNetworkType.NONE,
   private val filterType: DiscoveryFilterType = DiscoveryFilterType.NONE
-) : MatterCommand(controller, commandName, credsIssuer), ChipDeviceController.CompletionListener {
+) : MatterCommand(controller, credsIssuer, commandName), ChipDeviceController.CompletionListener {
   private val remoteAddr: IPAddress = IPAddress(InetAddress.getByName("::1"))
   private val nodeId = AtomicLong()
   private val discoveryFilterCode = AtomicLong()

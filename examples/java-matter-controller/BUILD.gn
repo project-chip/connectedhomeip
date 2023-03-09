@@ -27,14 +27,7 @@ java_library("java") {
   ]
 
   sources = [
-    "java/src/com/matter/controller/commands/common/Argument.java",
-    "java/src/com/matter/controller/commands/common/ArgumentType.java",
-    "java/src/com/matter/controller/commands/common/Command.java",
-    "java/src/com/matter/controller/commands/common/CommandManager.java",
-    "java/src/com/matter/controller/commands/common/CredentialsIssuer.java",
     "java/src/com/matter/controller/commands/common/FutureResult.java",
-    "java/src/com/matter/controller/commands/common/IPAddress.java",
-    "java/src/com/matter/controller/commands/common/MatterCommand.java",
     "java/src/com/matter/controller/commands/common/RealResult.java",
   ]
 
@@ -50,6 +43,13 @@ kotlin_binary("java-matter-controller") {
 
   sources = [
     "java/src/com/matter/controller/Main.kt",
+    "java/src/com/matter/controller/commands/common/Argument.kt",
+    "java/src/com/matter/controller/commands/common/ArgumentType.kt",
+    "java/src/com/matter/controller/commands/common/Command.kt",
+    "java/src/com/matter/controller/commands/common/CommandManager.kt",
+    "java/src/com/matter/controller/commands/common/CredentialsIssuer.kt",
+    "java/src/com/matter/controller/commands/common/IPAddress.kt",
+    "java/src/com/matter/controller/commands/common/MatterCommand.kt",
     "java/src/com/matter/controller/commands/discover/DiscoverCommand.kt",
     "java/src/com/matter/controller/commands/discover/DiscoverCommissionablesCommand.kt",
     "java/src/com/matter/controller/commands/discover/DiscoverCommissionersCommand.kt",
