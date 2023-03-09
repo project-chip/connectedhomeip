@@ -79,7 +79,7 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
 
     // Create FreeRTOS sw timer for lock timer.
     sLockTimer = xTimerCreate("lockTmr",        // Just a text name, not used by the RTOS kernel
-                              pdMS_TO_TICKS(1), // == default timer period (mS)
+                              pdMS_TO_TICKS(1), // == default timer period
                               false,            // no timer reload (==one-shot)
                               (void *) this,    // init timer id = lock obj context
                               TimerEventHandler // timer callback handler

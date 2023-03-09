@@ -52,7 +52,7 @@ CHIP_ERROR LightingManager::Init()
 {
     // Create FreeRTOS sw timer for light timer.
     sLightTimer = xTimerCreate("lightTmr",       // Just a text name, not used by the RTOS kernel
-                               pdMS_TO_TICKS(1), // == default timer period (mS)
+                               pdMS_TO_TICKS(1), // == default timer period
                                false,            // no timer reload (==one-shot)
                                (void *) this,    // init timer id = light obj context
                                TimerEventHandler // timer callback handler

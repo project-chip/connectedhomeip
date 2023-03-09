@@ -124,7 +124,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
     sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
-                                       pdMS_TO_TICKS(1),    // == default timer period (mS)
+                                       pdMS_TO_TICKS(1),    // == default timer period
                                        false,               // no timer reload (==one-shot)
                                        (void *) this,       // init timer id = ble obj context
                                        BleAdvTimeoutHandler // timer callback handler

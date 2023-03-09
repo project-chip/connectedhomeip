@@ -209,7 +209,7 @@ namespace {
 #define BLE_CONFIG_MIN_CE_LENGTH (0)      // Leave to min value
 #define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
 
-#define BLE__DEFAULT_TIMER_PERIOD 1
+#define BLE_DEFAULT_TIMER_PERIOD 1
 
 TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
 
@@ -248,7 +248,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
     sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",                            // Just a text name, not used by the RTOS kernel
-                                       pdMS_TO_TICKS(BLE__DEFAULT_TIMER_PERIOD), // == default timer period (mS)
+                                       pdMS_TO_TICKS(BLE_DEFAULT_TIMER_PERIOD), // == default timer period
                                        false,                                    // no timer reload (==one-shot)
                                        (void *) this,                            // init timer id = ble obj context
                                        BleAdvTimeoutHandler                      // timer callback handler
