@@ -26,8 +26,6 @@
 
 #include "DeviceCallbacks.h"
 
-// static const char * TAG = "bridge-devicecallbacks";
-
 using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::app::Clusters;
@@ -38,9 +36,8 @@ using namespace ::chip::System;
 // void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
 //                                                      uint8_t type, uint16_t size, uint8_t * value)
 // {
-//     ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%" PRIx32 "', EndPoint ID: '0x%x', Attribute ID: '0x%" PRIx32 "'",
+//     LOG_DBG("PostAttributeChangeCallback - Cluster ID: '0x%" PRIx32 "', EndPoint ID: '0x%x', Attribute ID: '0x%" PRIx32 "'",
 //              clusterId, endpointId, attributeId);
-//     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 // }
 
 namespace {

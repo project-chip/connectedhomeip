@@ -21,7 +21,8 @@
  * - fix the `prj.conf` App-ID: 32773 == 0x8005 (example lighting-app)
  * - README
  * - consider using CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT from bridge-common (as in linux example)
-*/
+ * - add Temperature Sensor
+ */
 #include "AppTask.h"
 
 #include "AppConfig.h"
@@ -30,8 +31,9 @@
 #include "Device.h"
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <lib/support/ZclString.h>
 #include <app/reporting/reporting.h>
+#include <app/util/af-types.h>
+#include <lib/support/ZclString.h>
 
 #include "ThreadUtil.h"
 
@@ -80,12 +82,12 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 namespace {
-constexpr int kFactoryResetCalcTimeout          = 3000;
-constexpr int kFactoryResetTriggerCntr          = 3;
-constexpr int kAppEventQueueSize                = 10;
-constexpr uint8_t kButtonPushEvent              = 1;
-constexpr uint8_t kButtonReleaseEvent           = 0;
-constexpr EndpointId kLightEndpointId           = 1;
+constexpr int kFactoryResetCalcTimeout = 3000;
+constexpr int kFactoryResetTriggerCntr = 3;
+constexpr int kAppEventQueueSize       = 10;
+constexpr uint8_t kButtonPushEvent     = 1;
+constexpr uint8_t kButtonReleaseEvent  = 0;
+constexpr EndpointId kLightEndpointId  = 1;
 // NOTE: consider moving these 2 here:
 // static EndpointId gCurrentEndpointId;
 // static EndpointId gFirstDynamicEndpointId;
@@ -149,7 +151,7 @@ AppTask AppTask::sAppTask;
 
 /////////// BRIDGE ///////////
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
-                    const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId);
+                      const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId);
 CHIP_ERROR RemoveDeviceEndpoint(Device * dev);
 // static void AppTask::InitServer(intptr_t context);
 
@@ -167,6 +169,7 @@ static Device gLight1("Light 1", "Office");
 static Device gLight2("Light 2", "Office");
 static Device gLight3("Light 3", "Kitchen");
 static Device gLight4("Light 4", "Den");
+static Device gThermostat("Thermo", "Office");
 
 // (taken from chip-devices.xml)
 #define DEVICE_TYPE_BRIDGED_NODE 0x0013
@@ -177,7 +180,8 @@ static Device gLight4("Light 4", "Den");
 #define DEVICE_TYPE_ROOT_NODE 0x0016
 // (taken from chip-devices.xml)
 #define DEVICE_TYPE_BRIDGE 0x000e
-
+// (taken from src/app/zap-templates/zcl/data-model/chip/thermostat-cluster.xml)
+#define DEVICE_TYPE_THERMOSTAT 0x0201
 // Device Version for dynamic endpoints:
 #define DEVICE_VERSION_DEFAULT 1
 
@@ -185,6 +189,7 @@ static Device gLight4("Light 4", "Den");
    - On/Off
    - Descriptor
    - Bridged Device Basic Information
+   - Thermostat
 */
 
 // Declare On/Off cluster attributes
@@ -194,16 +199,22 @@ DECLARE_DYNAMIC_ATTRIBUTE(Clusters::OnOff::Attributes::OnOff::Id, BOOLEAN, 1, 0)
 
 // Declare Descriptor cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(descriptorAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Descriptor::Attributes::DeviceTypeList::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* device list */
-    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Descriptor::Attributes::ServerList::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* server list */
-    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Descriptor::Attributes::ClientList::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* client list */
-    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Descriptor::Attributes::PartsList::Id, ARRAY, kDescriptorAttributeArraySize, 0),  /* parts list */
+DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Descriptor::Attributes::DeviceTypeList::Id, ARRAY, kDescriptorAttributeArraySize,
+                          0), /* device list */
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Descriptor::Attributes::ServerList::Id, ARRAY, kDescriptorAttributeArraySize,
+                              0), /* server list */
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Descriptor::Attributes::ClientList::Id, ARRAY, kDescriptorAttributeArraySize,
+                              0), /* client list */
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Descriptor::Attributes::PartsList::Id, ARRAY, kDescriptorAttributeArraySize,
+                              0), /* parts list */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Bridged Device Basic Information cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(bridgedDeviceBasicAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::NodeLabel::Id, CHAR_STRING, kNodeLabelSize, 0), /* NodeLabel */
-    DECLARE_DYNAMIC_ATTRIBUTE(chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::Reachable::Id, BOOLEAN, 1, 0),              /* Reachable */
+DECLARE_DYNAMIC_ATTRIBUTE(chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::NodeLabel::Id, CHAR_STRING,
+                          kNodeLabelSize, 0), /* NodeLabel */
+    DECLARE_DYNAMIC_ATTRIBUTE(chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::Reachable::Id, BOOLEAN, 1,
+                              0), /* Reachable */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Cluster List for Bridged Light endpoint
@@ -225,6 +236,45 @@ DECLARE_DYNAMIC_CLUSTER(Clusters::OnOff::Id, onOffAttrs, onOffIncomingCommands, 
     DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, nullptr,
                             nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
+// Declare Thermostat
+const EmberAfDeviceType gBridgedThermostatDeviceTypes[] = { { DEVICE_TYPE_THERMOSTAT, DEVICE_VERSION_DEFAULT },
+                                                            { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
+// ---------------------------------------------------------------------------
+//
+// THERMOSTAT ENDPOINT: contains the following clusters:
+// - Thermostat
+// - Descriptor
+// - Bridged Device Basic
+
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(thermostatAttrs)
+DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::LocalTemperature::Id, INT16S, 2, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::Id, INT16S, 2, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::Id, INT16S, 2, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::Id, INT16S, 2, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::Id, INT16S, 2, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Id, INT16S, 2, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Id, INT16S, 2, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::MinSetpointDeadBand::Id, INT8S, 1, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::ControlSequenceOfOperation::Id, INT8U, 1, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::SystemMode::Id, INT8U, 1, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::FeatureMap::Id, BITMAP32, 4, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+
+constexpr chip::CommandId ThermostatIncomingCommands[] = {
+    chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Id,
+    chip::kInvalidCommandId,
+};
+
+DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedThermostatClusters)
+DECLARE_DYNAMIC_CLUSTER(Clusters::Thermostat::Id, thermostatAttrs, ThermostatIncomingCommands, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(Clusters::Descriptor::Id, descriptorAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(Clusters::BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER_LIST_END;
+
+// Declare Bridged Thermostat endpoint
+DECLARE_DYNAMIC_ENDPOINT(bridgedThermostatEndpoint, bridgedThermostatClusters);
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
 
@@ -232,6 +282,7 @@ DataVersion gLight1DataVersions[ArraySize(bridgedLightClusters)];
 DataVersion gLight2DataVersions[ArraySize(bridgedLightClusters)];
 DataVersion gLight3DataVersions[ArraySize(bridgedLightClusters)];
 DataVersion gLight4DataVersions[ArraySize(bridgedLightClusters)];
+DataVersion gThermostatDataVersions[ArraySize(thermostatAttrs)];
 
 const EmberAfDeviceType gRootDeviceTypes[]          = { { DEVICE_TYPE_ROOT_NODE, DEVICE_VERSION_DEFAULT } };
 const EmberAfDeviceType gAggregateNodeDeviceTypes[] = { { DEVICE_TYPE_BRIDGE, DEVICE_VERSION_DEFAULT } };
@@ -559,12 +610,17 @@ CHIP_ERROR AppTask::Init(void)
     gLight2.SetReachable(true);
     gLight3.SetReachable(true);
     gLight4.SetReachable(true);
+    gThermostat.SetReachable(true);
 
     // Whenever bridged device changes its state
     gLight1.SetChangeCallback(&HandleDeviceStatusChanged);
     gLight2.SetChangeCallback(&HandleDeviceStatusChanged);
     gLight3.SetChangeCallback(&HandleDeviceStatusChanged);
     gLight4.SetChangeCallback(&HandleDeviceStatusChanged);
+
+    // NOTE: HandleDeviceStatusChanged is unified callback only for OnOff, refactor is needed
+    // gThermostat.SetChangeCallback(&HandleDeviceStatusChanged);
+
     PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
     ////////////////////////////////
     return CHIP_NO_ERROR;
@@ -625,6 +681,10 @@ static void AppTask::InitServer(intptr_t context)
     // Re-add Light 2 -- > will be mapped to ZCL endpoint 7
     AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
                       Span<DataVersion>(gLight2DataVersions), 1);
+
+    // Add Thermostat -- > will be mapped to ZCL endpoint 8
+    AddDeviceEndpoint(&gThermostat, &bridgedThermostatEndpoint, Span<const EmberAfDeviceType>(gBridgedThermostatDeviceTypes),
+                      Span<DataVersion>(gThermostatDataVersions), 1);
 }
 
 void AppTask::LightingActionButtonEventHandler(void)
@@ -948,7 +1008,7 @@ void AppTask::UpdateClusterState(void)
         LOG_ERR("Update OnOff fail: %x", status);
     }
     uint8_t setLevel = sAppTask.mPwmRgbBlueLed.GetLevel();
-    status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kLightEndpointId, setLevel);
+    status           = Clusters::LevelControl::Attributes::CurrentLevel::Set(kLightEndpointId, setLevel);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         LOG_ERR("Update CurrentLevel fail: %x", status);
