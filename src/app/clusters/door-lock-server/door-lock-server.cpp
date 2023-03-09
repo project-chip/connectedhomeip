@@ -3374,7 +3374,7 @@ exit:
     }
 
     // Reset the wrong code retry attempts if a valid credential is presented during lock/unlock
-    if ((opType == LockOperationTypeEnum::kUnlock || opType == LockOperationTypeEnum::kLock) && success && pinCode.HasValue())
+    if (success && pinCode.HasValue())
     {
         ResetWrongCodeEntryAttempts(endpoint);
     }
