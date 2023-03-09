@@ -202,7 +202,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_mib_req_s
  * be held in the Blocked state to wait for the start command to be successfully
  * sent to the timer command queue.
  */
-#define TIMER_TICKS_TO_WAIT_0 0
+#define TIMER_TICKS_TO_WAIT_0 pdMS_TO_TICKS(0)
 
 #define CONVERT_SEC_TO_MSEC 1000
 #define CONVERT_USEC_TO_MSEC (1 / 1000)

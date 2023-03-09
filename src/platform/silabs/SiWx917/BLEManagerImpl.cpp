@@ -209,7 +209,7 @@ namespace {
 #define BLE_CONFIG_MIN_CE_LENGTH (0)      // Leave to min value
 #define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
 
-#define BLE__DEFAULT_TIMER_PERIOD 1
+#define BLE_DEFAULT_TIMER_PERIOD 1
 
 TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
 
@@ -247,11 +247,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
-    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",             // Just a text name, not used by the RTOS kernel
-                                       BLE__DEFAULT_TIMER_PERIOD, // == default timer period (mS)
-                                       false,                     // no timer reload (==one-shot)
-                                       (void *) this,             // init timer id = ble obj context
-                                       BleAdvTimeoutHandler       // timer callback handler
+    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",                           // Just a text name, not used by the RTOS kernel
+                                       pdMS_TO_TICKS(BLE_DEFAULT_TIMER_PERIOD), // == default timer period
+                                       false,                                   // no timer reload (==one-shot)
+                                       (void *) this,                           // init timer id = ble obj context
+                                       BleAdvTimeoutHandler                     // timer callback handler
     );
 
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
@@ -985,7 +985,7 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 
 void BLEManagerImpl::CancelBleAdvTimeoutTimer(void)
 {
-    if (xTimerStop(sbleAdvTimeoutTimer, 0) == pdFAIL)
+    if (xTimerStop(sbleAdvTimeoutTimer, pdMS_TO_TICKS(0)) == pdFAIL)
     {
         ChipLogError(DeviceLayer, "Failed to stop BledAdv timeout timer");
     }
@@ -1001,7 +1001,7 @@ void BLEManagerImpl::StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs)
     // timer is not active, change its period to required value (== restart).
     // FreeRTOS- Block for a maximum of 100 ticks if the change period command
     // cannot immediately be sent to the timer command queue.
-    if (xTimerChangePeriod(sbleAdvTimeoutTimer, aTimeoutInMs / portTICK_PERIOD_MS, 100) != pdPASS)
+    if (xTimerChangePeriod(sbleAdvTimeoutTimer, pdMS_TO_TICKS(aTimeoutInMs), pdMS_TO_TICKS(100)) != pdPASS)
     {
         ChipLogError(DeviceLayer, "Failed to start BledAdv timeout timer");
     }

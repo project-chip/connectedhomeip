@@ -95,7 +95,7 @@ public:
     pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
     {
         mRebootTimer = xTimerCreateStatic("Reboot", kRebootTimerPeriodTicks, false, nullptr, RebootHandler, &mRebootTimerBuffer);
-        xTimerStart(mRebootTimer, 0);
+        xTimerStart(mRebootTimer, pdMS_TO_TICKS(0));
         return pw::OkStatus();
     }
 

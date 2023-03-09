@@ -69,11 +69,11 @@ chip::app::Clusters::NetworkCommissioning::Instance
 WindowAppImpl::Timer::Timer(const char * name, uint32_t timeoutInMs, Callback callback, void * context) :
     WindowApp::Timer(name, timeoutInMs, callback, context)
 {
-    mHandler = xTimerCreate(name,          // Just a text name, not used by the RTOS kernel
-                            timeoutInMs,   // == default timer period (mS)
-                            false,         // no timer reload (==one-shot)
-                            (void *) this, // init timer id = app task obj context
-                            TimerCallback  // timer callback handler
+    mHandler = xTimerCreate(name,                       // Just a text name, not used by the RTOS kernel
+                            pdMS_TO_TICKS(timeoutInMs), // == default timer period
+                            false,                      // no timer reload (==one-shot)
+                            (void *) this,              // init timer id = app task obj context
+                            TimerCallback               // timer callback handler
     );
     if (mHandler == NULL)
     {
@@ -90,7 +90,7 @@ void WindowAppImpl::Timer::Start()
     }
 
     // Timer is not active
-    if (xTimerStart(mHandler, 100) != pdPASS)
+    if (xTimerStart(mHandler, pdMS_TO_TICKS(100)) != pdPASS)
     {
         SILABS_LOG("Timer start() failed");
         appError(CHIP_ERROR_INTERNAL);
@@ -115,7 +115,7 @@ void WindowAppImpl::Timer::IsrStart()
 void WindowAppImpl::Timer::Stop()
 {
     mIsActive = false;
-    if (xTimerStop(mHandler, 0) == pdFAIL)
+    if (xTimerStop(mHandler, pdMS_TO_TICKS(0)) == pdFAIL)
     {
         SILABS_LOG("Timer stop() failed");
         appError(CHIP_ERROR_INTERNAL);
