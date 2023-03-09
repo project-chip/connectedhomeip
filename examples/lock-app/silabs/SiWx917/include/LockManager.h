@@ -175,6 +175,7 @@ public:
 
     bool IsValidUserIndex(uint16_t userIndex);
     bool IsValidCredentialIndex(uint16_t credentialIndex, CredentialTypeEnum type);
+    bool IsValidCredentialType(CredentialTypeEnum type);
     bool IsValidWeekdayScheduleIndex(uint8_t scheduleIndex);
     bool IsValidYeardayScheduleIndex(uint8_t scheduleIndex);
     bool IsValidHolidayScheduleIndex(uint8_t scheduleIndex);
