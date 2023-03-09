@@ -116,12 +116,6 @@ exit:
 
 CHIP_ERROR AmebaUtils::ClearWiFiConfig()
 {
-    // Clear Ameba WiFi station config
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    rtw_wifi_config_t wifiConfig;
-    memset(&wifiConfig, 0, sizeof(wifiConfig));
-    err = SetWiFiConfig(&wifiConfig);
-
     /* Clear Wi-Fi Configurations in Storage */
     err = PersistedStorage::KeyValueStoreMgr().Delete(kWiFiSSIDKeyName);
     SuccessOrExit(err);
