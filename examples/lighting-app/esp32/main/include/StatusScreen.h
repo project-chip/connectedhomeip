@@ -18,10 +18,9 @@
 
 #pragma once
 
+#if CONFIG_HAVE_DISPLAY
 #include "ListScreen.h"
 #include "ScreenManager.h"
-
-#if CONFIG_HAVE_DISPLAY
 
 #include <cstdint>
 #include <vector>

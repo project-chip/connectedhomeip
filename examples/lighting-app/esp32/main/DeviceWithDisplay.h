@@ -20,10 +20,7 @@
 
 #include "Button.h"
 #include "DeviceCallbacks.h"
-#include "Display.h"
-#include "ListScreen.h"
 #include "QRCodeScreen.h"
-#include "ScreenManager.h"
 #include "StatusScreen.h"
 #include "esp_check.h"
 #include "esp_log.h"
@@ -34,6 +31,9 @@
 #include <vector>
 
 #if CONFIG_HAVE_DISPLAY
+#include "Display.h"
+#include "ListScreen.h"
+#include "ScreenManager.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/server/Dnssd.h>
