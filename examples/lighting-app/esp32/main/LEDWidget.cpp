@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include "LEDWidget.h"
 #include "ColorFormat.h"
+#include "ScreenManager.h"
 #include "led_strip.h"
 
 static const char * TAG = "LEDWidget";
@@ -126,11 +127,27 @@ void LEDWidget::DoSet(void)
         mStrip->refresh(mStrip, 100);
     }
 #else
-    ESP_LOGI(TAG, "DoSet to GPIO number %d", mGPIONum);
     if (mGPIONum < GPIO_NUM_MAX)
     {
         ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, brightness);
         ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
     }
 #endif // CONFIG_LED_TYPE_RMT
+#if CONFIG_HAVE_DISPLAY
+    if (mVirtualLEDIndex != -1)
+    {
+        ScreenManager::SetVLED(mVirtualLEDIndex, mState);
+    }
+#endif // CONFIG_HAVE_DISPLAY
 }
+
+#if CONFIG_DEVICE_TYPE_M5STACK
+void LEDWidget::SetVLED(int id1)
+{
+    mVirtualLEDIndex = id1;
+    if (mVirtualLEDIndex != -1)
+    {
+        ScreenManager::SetVLED(mVirtualLEDIndex, mState);
+    }
+}
+#endif

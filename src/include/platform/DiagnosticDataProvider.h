@@ -158,7 +158,7 @@ public:
      */
     virtual CHIP_ERROR GetWiFiBssId(ByteSpan & value);
     virtual CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType);
-    virtual CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion);
+    virtual CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion);
     virtual CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber);
     virtual CHIP_ERROR GetWiFiRssi(int8_t & rssi);
     virtual CHIP_ERROR GetWiFiBeaconLostCount(uint32_t & beaconLostCount);
@@ -339,7 +339,7 @@ DiagnosticDataProvider::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostic
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-inline CHIP_ERROR DiagnosticDataProvider::GetWiFiVersion(uint8_t & wiFiVersion)
+inline CHIP_ERROR DiagnosticDataProvider::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

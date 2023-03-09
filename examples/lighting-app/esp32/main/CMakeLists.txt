@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2021 Project CHIP Authors
+#    Copyright (c) 2021-2023 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -84,6 +84,10 @@ set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed/esp32"
 )
 endif (CONFIG_ENABLE_PW_RPC)
+
+if ("${CONFIG_DEVICE_TYPE_M5STACK}" STREQUAL "y")
+    list(APPEND PRIV_REQUIRES_LIST tft screen-framework)
+endif()
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
                        SRC_DIRS ${SRC_DIRS_LIST}

@@ -34,7 +34,7 @@ public:
 #ifdef CONFIG_WIFI_NRF700X
     CHIP_ERROR GetWiFiBssId(ByteSpan & value) override;
     CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType) override;
-    CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion) override;
+    CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion) override;
     CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber) override;
     CHIP_ERROR GetWiFiRssi(int8_t & rssi) override;
     CHIP_ERROR GetWiFiBeaconLostCount(uint32_t & beaconLostCount) override;
