@@ -203,10 +203,10 @@ abstract class Command(
 
   /**
    * @brief Initialize command arguments
-   * @param argc The number of arguments to a command (Does not include command itself)
    * @param args Supplied command-line arguments as an array of String objects.
    */
-  fun initArguments(argc: Int, args: Array<String>) {
+  fun initArguments(args: Array<String>) {
+    val argc = args.size
     var mandatoryArgsCount = 0
     var currentIndex = 0
     for (arg in arguments) {
@@ -222,7 +222,7 @@ abstract class Command(
     }
 
     // Initialize optional arguments
-    // Optional arguments expect a name and a value, so i is increased by 2 on every step.
+    // Optional arguments expect a name and a value, so it is increased by 2 on every step.
     var i = mandatoryArgsCount
     while (i < argc) {
 

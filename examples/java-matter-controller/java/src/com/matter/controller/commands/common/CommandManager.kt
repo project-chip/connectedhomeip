@@ -84,7 +84,7 @@ class CommandManager {
     // need skip over binary and command name and only get arguments
     val temp = Arrays.copyOfRange(args, 2, args.size)
     try {
-      command.initArguments(temp.size, temp)
+      command.initArguments(temp)
     } catch (e: IllegalArgumentException) {
       logger.log(Level.INFO, "Arguments init failed with exception: " + e.message)
       showCommand(args[0], command)
