@@ -141,6 +141,10 @@ template("efr32_sdk") {
 
     defines += board_defines
 
+    if (invoker.chip_enable_wifi_ipv4) {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
+    }
+
     # Enabling led interface
     if (use_wstk_leds) {
       defines += [ "ENABLE_WSTK_LEDS" ]

@@ -36,6 +36,9 @@ declare_args() {
   use_SiWx917 = false
   use_rs911x_sockets = false
   chip_enable_ble_rs911x = false
+
+  # Argument to Disable IPv4 for wifi(rs911)
+  chip_enable_wifi_ipv4 = false
 }
 
 declare_args() {

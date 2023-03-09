@@ -197,6 +197,9 @@ template("efr32_sdk") {
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
+      if (invoker.chip_enable_wifi_ipv4) {
+        defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
+      }
       if (use_rs9116 || use_SiWx917) {
         defines += [
           "SL_HEAP_SIZE=32768",
