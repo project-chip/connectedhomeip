@@ -15,14 +15,20 @@
  *   limitations under the License.
  *
  */
-package com.matter.controller.commands.discover
+package com.matter.controller.commands.common
 
-import chip.devicecontroller.ChipDeviceController
-import com.matter.controller.commands.common.CredentialsIssuer
-import com.matter.controller.commands.common.MatterCommand
+import java.net.InetAddress
 
-class DiscoverCommissionersCommand(
-  controller: ChipDeviceController, credsIssuer: CredentialsIssuer?
-) : MatterCommand(controller, credsIssuer, "commissioners") {
-  override fun runCommand() {}
+class IPAddress(private var address: InetAddress) {
+  fun setAddress(address: InetAddress) {
+    this.address = address
+  }
+
+  fun getHostAddress(): String {
+    return address.hostAddress
+  }
+
+  override fun toString(): String {
+    return address.toString()
+  }
 }
