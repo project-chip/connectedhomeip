@@ -123,7 +123,7 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
         VerifyOrReturnError(TLV::ContextTag(TagScene::kName) == currTag || TLV::ContextTag(TagScene::kTransitionTime) == currTag,
                             CHIP_ERROR_WRONG_TLV_TYPE);
 
-        // If there was no error, a name is expected from the storage, if there was an unexpectec TLV element,
+        // A name may or may not have been stored.  Check whether it was.
         if (currTag == TLV::ContextTag(TagScene::kName))
         {
             ReturnErrorOnFailure(reader.Get(nameSpan));
@@ -140,7 +140,7 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
     }
 };
 
-// A Full fabric serialized TLV length is 88 bytes, 128 bytes gives some slack tested bu running writer.GetLengthWritten at the
+// A Full fabric serialized TLV length is 88 bytes, 128 bytes gives some slack.  Tested by running writer.GetLengthWritten at the
 // end of the Serialize method of FabricSceneData
 static constexpr size_t kPersistentFabricBufferMax = 128;
 
@@ -441,7 +441,7 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntry(FabricIndex fabric_index
     return fabric.RemoveScene(mStorage, scene_id);
 }
 
-/// @brief This function is meant to provide a way to empty the scene table without knowing any specific scene Id. Outisde of this
+/// @brief This function is meant to provide a way to empty the scene table without knowing any specific scene Id. Outside of this
 /// specific use case, RemoveSceneTableEntry should be used.
 /// @param fabric_index Fabric in which the scene belongs
 /// @param scened_idx Position in the Scene Table
@@ -469,7 +469,7 @@ CHIP_ERROR DefaultSceneTableImpl::RegisterHandler(SceneHandler * handler)
 {
     CHIP_ERROR err             = CHIP_ERROR_NO_MEMORY;
     uint8_t idPosition         = kInvalidPosition;
-    uint8_t fisrtEmptyPosition = kInvalidPosition;
+    uint8_t firstEmptyPosition = kInvalidPosition;
 
     for (uint8_t i = 0; i < kMaxSceneHandlers; i++)
     {
@@ -642,7 +642,7 @@ DefaultSceneTableImpl::SceneEntryIteratorImpl::SceneEntryIteratorImpl(DefaultSce
 
 size_t DefaultSceneTableImpl::SceneEntryIteratorImpl::Count()
 {
-    return mTotalScene;
+    return mTotalScenes;
 }
 
 bool DefaultSceneTableImpl::SceneEntryIteratorImpl::Next(SceneTableEntry & output)
