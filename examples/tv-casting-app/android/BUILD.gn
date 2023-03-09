@@ -68,7 +68,6 @@ android_library("java") {
     "App/app/src/main/jni/com/chip/casting/ContentApp.java",
     "App/app/src/main/jni/com/chip/casting/ContentLauncherTypes.java",
     "App/app/src/main/jni/com/chip/casting/DACProvider.java",
-    "App/app/src/main/jni/com/chip/casting/DACProviderStub.java",
     "App/app/src/main/jni/com/chip/casting/DiscoveredNodeData.java",
     "App/app/src/main/jni/com/chip/casting/FailureCallback.java",
     "App/app/src/main/jni/com/chip/casting/MatterCallbackHandler.java",
