@@ -236,6 +236,8 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds16 commiss
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_THREAD_FTD
     // Block device role changing into Router if commissioning window opened and device not yet Router.
+    // AdvertiseAndListenForPASE fails doesn't matter, because if it does the callers of OpenCommissioningWindow
+    // will end up calling ResetState, which will reset the boolean.
     if (ConnectivityManagerImpl().GetThreadDeviceType() == ConnectivityManager::kThreadDeviceType_Router)
     {
         ThreadStackMgr().SetRouterPromotion(false);
