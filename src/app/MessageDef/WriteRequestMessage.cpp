@@ -123,7 +123,7 @@ CHIP_ERROR WriteRequestMessage::Parser::GetTimedRequest(bool * const apTimedRequ
 CHIP_ERROR WriteRequestMessage::Parser::GetWriteRequests(AttributeDataIBs::Parser * const apAttributeDataIBs) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kWriteRequests)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kWriteRequests), reader));
     return apAttributeDataIBs->Init(reader);
 }
 
@@ -137,7 +137,7 @@ WriteRequestMessage::Builder & WriteRequestMessage::Builder::SuppressResponse(co
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kSuppressResponse)), aSuppressResponse);
+        mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kSuppressResponse), aSuppressResponse);
     }
     return *this;
 }
@@ -147,7 +147,7 @@ WriteRequestMessage::Builder & WriteRequestMessage::Builder::TimedRequest(const 
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kTimedRequest)), aTimedRequest);
+        mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kTimedRequest), aTimedRequest);
     }
     return *this;
 }
@@ -167,7 +167,7 @@ WriteRequestMessage::Builder & WriteRequestMessage::Builder::MoreChunkedMessages
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kMoreChunkedMessages)), aMoreChunkedMessages);
+        mError = mpWriter->PutBoolean(TLV::ContextTag(Tag::kMoreChunkedMessages), aMoreChunkedMessages);
     }
     return *this;
 }

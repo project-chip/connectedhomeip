@@ -45,7 +45,7 @@
 
 #include "JsonParser.h"
 
-constexpr uint8_t kMaxLabelLength  = 100;
+constexpr uint8_t kMaxLabelLength  = UINT8_MAX;
 constexpr const char kNullString[] = "null";
 
 class ComplexArgumentParser
@@ -168,12 +168,19 @@ public:
         }
 
         auto content = static_cast<typename std::remove_const<T>::type *>(chip::Platform::MemoryCalloc(value.size(), sizeof(T)));
+        VerifyOrReturnError(content != nullptr, CHIP_ERROR_NO_MEMORY);
 
         Json::ArrayIndex size = value.size();
         for (Json::ArrayIndex i = 0; i < size; i++)
         {
             char labelWithIndex[kMaxLabelLength];
-            snprintf(labelWithIndex, sizeof(labelWithIndex), "%s[%d]", label, i);
+            // GCC 7.0.1 has introduced some new warnings for snprintf (-Werror=format-truncation) by default.
+            // This is not particularly useful when using snprintf and especially in this context, so in order
+            // to disable the warning the %s is constrained to be of max length: (254 - 11 - 2) where:
+            //  - 254 is kMaxLabelLength - 1 (for null)
+            //  - 11 is the maximum length of a %d (-2147483648, 2147483647)
+            //  - 2 is the length for the "[" and "]" characters.
+            snprintf(labelWithIndex, sizeof(labelWithIndex), "%.241s[%d]", label, i);
             ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithIndex, content[i], value[i]));
         }
 
@@ -200,6 +207,8 @@ public:
             size = str.size();
 
             buffer = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(size, sizeof(uint8_t)));
+            VerifyOrReturnError(buffer != nullptr, CHIP_ERROR_NO_MEMORY);
+
             memcpy(buffer, str.c_str(), size);
         }
         else
@@ -244,6 +253,8 @@ public:
 
         size_t size = strlen(value.asCString());
         auto buffer = static_cast<char *>(chip::Platform::MemoryCalloc(size, sizeof(char)));
+        VerifyOrReturnError(buffer != nullptr, CHIP_ERROR_NO_MEMORY);
+
         memcpy(buffer, value.asCString(), size);
 
         request = chip::CharSpan(buffer, size);

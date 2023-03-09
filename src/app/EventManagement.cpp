@@ -24,7 +24,6 @@
 #include <app/RequiredPrivilege.h>
 #include <assert.h>
 #include <inttypes.h>
-#include <lib/core/CHIPEventLoggingConfig.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -381,16 +380,16 @@ CHIP_ERROR EventManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, si
         // Does not go on the wire.
         return CHIP_NO_ERROR;
     }
-    if ((aReader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kSystemTimestamp))) && !(ctx->mpContext->mFirst) &&
+    if ((aReader.GetTag() == TLV::ContextTag(EventDataIB::Tag::kSystemTimestamp)) && !(ctx->mpContext->mFirst) &&
         (ctx->mpContext->mCurrentTime.mType == ctx->mpContext->mPreviousTime.mType))
     {
-        return ctx->mpWriter->Put(TLV::ContextTag(to_underlying(EventDataIB::Tag::kDeltaSystemTimestamp)),
+        return ctx->mpWriter->Put(TLV::ContextTag(EventDataIB::Tag::kDeltaSystemTimestamp),
                                   ctx->mpContext->mCurrentTime.mValue - ctx->mpContext->mPreviousTime.mValue);
     }
-    if ((aReader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kEpochTimestamp))) && !(ctx->mpContext->mFirst) &&
+    if ((aReader.GetTag() == TLV::ContextTag(EventDataIB::Tag::kEpochTimestamp)) && !(ctx->mpContext->mFirst) &&
         (ctx->mpContext->mCurrentTime.mType == ctx->mpContext->mPreviousTime.mType))
     {
-        return ctx->mpWriter->Put(TLV::ContextTag(to_underlying(EventDataIB::Tag::kDeltaEpochTimestamp)),
+        return ctx->mpWriter->Put(TLV::ContextTag(EventDataIB::Tag::kDeltaEpochTimestamp),
                                   ctx->mpContext->mCurrentTime.mValue - ctx->mpContext->mPreviousTime.mValue);
     }
 
@@ -428,7 +427,9 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, c
     CircularTLVWriter checkpoint = writer;
     EventLoadOutContext ctxt     = EventLoadOutContext(writer, aEventOptions.mPriority, mLastEventNumber);
     EventOptions opts;
+
     Timestamp timestamp;
+#if CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
     System::Clock::Milliseconds64 utc_time;
     err = System::SystemClock().GetClock_RealTimeMS(utc_time);
     if (err == CHIP_NO_ERROR)
@@ -436,6 +437,7 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, c
         timestamp = Timestamp::Epoch(utc_time);
     }
     else
+#endif // CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
     {
         auto systemTimeMs = System::SystemClock().GetMonotonicMilliseconds64() - mMonotonicStartupTime;
         timestamp         = Timestamp::System(systemTimeMs);
@@ -508,7 +510,7 @@ CHIP_ERROR EventManagement::CopyEvent(const TLVReader & aReader, TLVWriter & aWr
     ReturnErrorOnFailure(reader.Next());
     ReturnErrorOnFailure(reader.EnterContainer(containerType1));
     ReturnErrorOnFailure(
-        aWriter.StartContainer(TLV::ContextTag(to_underlying(EventReportIB::Tag::kEventData)), kTLVType_Structure, containerType1));
+        aWriter.StartContainer(TLV::ContextTag(EventReportIB::Tag::kEventData), kTLVType_Structure, containerType1));
     err = TLV::Utilities::Iterate(reader, CopyAndAdjustDeltaTime, &context, false /*recurse*/);
     if (err == CHIP_END_OF_TLV)
     {
@@ -683,7 +685,7 @@ CHIP_ERROR EventManagement::FabricRemovedCB(const TLV::TLVReader & aReader, size
     TLVType tlvType1;
     event.Init(aReader);
     VerifyOrReturnError(event.EnterContainer(tlvType) == CHIP_NO_ERROR, CHIP_NO_ERROR);
-    VerifyOrReturnError(event.Next(TLV::ContextTag(to_underlying(EventReportIB::Tag::kEventData))) == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    VerifyOrReturnError(event.Next(TLV::ContextTag(EventReportIB::Tag::kEventData)) == CHIP_NO_ERROR, CHIP_NO_ERROR);
     VerifyOrReturnError(event.EnterContainer(tlvType1) == CHIP_NO_ERROR, CHIP_NO_ERROR);
 
     while (CHIP_NO_ERROR == event.Next())
@@ -751,7 +753,7 @@ CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size
     TLVReader reader;
     reader.Init(aReader);
 
-    if (reader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kPath)))
+    if (reader.GetTag() == TLV::ContextTag(EventDataIB::Tag::kPath))
     {
         EventPathIB::Parser path;
         ReturnErrorOnFailure(path.Init(aReader));
@@ -761,7 +763,7 @@ CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size
         envelope->mFieldsToRead |= 1 << to_underlying(EventDataIB::Tag::kPath);
     }
 
-    if (reader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kPriority)))
+    if (reader.GetTag() == TLV::ContextTag(EventDataIB::Tag::kPriority))
     {
         uint16_t extPriority; // Note: the type here matches the type case in EventManagement::LogEvent, priority section
         ReturnErrorOnFailure(reader.Get(extPriority));
@@ -769,12 +771,12 @@ CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size
         envelope->mFieldsToRead |= 1 << to_underlying(EventDataIB::Tag::kPriority);
     }
 
-    if (reader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kEventNumber)))
+    if (reader.GetTag() == TLV::ContextTag(EventDataIB::Tag::kEventNumber))
     {
         ReturnErrorOnFailure(reader.Get(envelope->mEventNumber));
     }
 
-    if (reader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kSystemTimestamp)))
+    if (reader.GetTag() == TLV::ContextTag(EventDataIB::Tag::kSystemTimestamp))
     {
         uint64_t systemTime;
         ReturnErrorOnFailure(reader.Get(systemTime));
@@ -782,7 +784,7 @@ CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size
         envelope->mCurrentTime.mValue = systemTime;
     }
 
-    if (reader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kEpochTimestamp)))
+    if (reader.GetTag() == TLV::ContextTag(EventDataIB::Tag::kEpochTimestamp))
     {
         uint64_t epochTime;
         ReturnErrorOnFailure(reader.Get(epochTime));

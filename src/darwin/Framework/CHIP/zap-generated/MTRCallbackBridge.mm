@@ -2997,8 +2997,8 @@ void MTRLocalizationConfigurationAttributeListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value)
+void MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14220,15 +14220,15 @@ void MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCall
     }
 }
 
-void MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TimeFormatLocalization::CalendarType value)
+void MTRTimeFormatLocalizationClusterCalendarTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRTimeFormatLocalizationClusterCalendarTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14243,8 +14243,8 @@ void MTRTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value)
+void MTRNullableTimeFormatLocalizationClusterCalendarTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14255,7 +14255,7 @@ void MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableTimeFormatLocalizationClusterCalendarTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14270,15 +14270,15 @@ void MTRNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscr
     }
 }
 
-void MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TimeFormatLocalization::HourFormat value)
+void MTRTimeFormatLocalizationClusterHourFormatEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TimeFormatLocalization::HourFormatEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRTimeFormatLocalizationClusterHourFormatEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14293,8 +14293,8 @@ void MTRTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::HourFormat> & value)
+void MTRNullableTimeFormatLocalizationClusterHourFormatEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::HourFormatEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -14305,7 +14305,7 @@ void MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableTimeFormatLocalizationClusterHourFormatEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

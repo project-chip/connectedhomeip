@@ -51,9 +51,10 @@ class TestParserBuilderConfig:
            current parsing state.
     """
     tests: list[str] = field(default_factory=list)
-    parser_config: TestParserConfig = TestParserConfig()
+    parser_config: TestParserConfig = field(default_factory=TestParserConfig)
     hooks: TestParserHooks = TestParserHooks()
-    options: TestParserBuilderOptions = TestParserBuilderOptions()
+    options: TestParserBuilderOptions = field(
+        default_factory=TestParserBuilderOptions)
 
 
 class TestParserBuilder:

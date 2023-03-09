@@ -37,7 +37,9 @@ class CommissionerDiscoveryViewModel: ObservableObject {
                     self.Log.info("discoveredCommissionerHandler called with \(commissioner)")
                     if(self.commissioners.contains(commissioner))
                     {
-                        self.Log.info("Skipping previously discovered commissioner \(commissioner.description)")
+                        var index = self.commissioners.firstIndex(of: commissioner)
+                        self.commissioners[index!] = commissioner
+                        self.Log.info("Updating previously discovered commissioner \(commissioner.description)")
                     }
                     else if(commissioner.numIPs == 0)
                     {
@@ -69,7 +71,9 @@ class CommissionerDiscoveryViewModel: ObservableObject {
                     if(commissioner != nil){
                         if(self.commissioners.contains(commissioner!))
                         {
-                            self.Log.info("Skipping previously discovered commissioner \(commissioner!.description)")
+                            var index = self.commissioners.firstIndex(of: commissioner!)
+                            self.commissioners[index!] = commissioner!
+                            self.Log.info("Updating previously discovered commissioner \(commissioner!.description)")
                         }
                         else
                         {

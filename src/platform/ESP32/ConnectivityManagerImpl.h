@@ -161,7 +161,7 @@ private:
     void UpdateInternetConnectivityState(void);
     void OnStationIPv4AddressAvailable(const ip_event_got_ip_t & got_ip);
     void OnStationIPv4AddressLost(void);
-    void OnIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip);
+    void OnStationIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     // ===== Members for internal use by the following friends.

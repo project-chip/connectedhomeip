@@ -25,7 +25,6 @@ public class ConnectionFragment extends Fragment {
   private final TvCastingApp tvCastingApp;
   private final DiscoveredNodeData selectedCommissioner;
 
-  private boolean verifyOrEstablishConnectionSuccess;
   private boolean openCommissioningWindowSuccess;
   private boolean sendUdcSuccess;
 
@@ -83,9 +82,8 @@ public class ConnectionFragment extends Fragment {
     if (selectedCommissioner != null && selectedCommissioner.isPreCommissioned()) {
       VideoPlayer videoPlayer = selectedCommissioner.toConnectableVideoPlayer();
       Log.d(TAG, "Calling verifyOrEstablishConnectionSuccess with VideoPlayer: " + videoPlayer);
-      this.verifyOrEstablishConnectionSuccess =
-          tvCastingApp.verifyOrEstablishConnection(
-              videoPlayer, onConnectionSuccess, onConnectionFailure, onNewOrUpdatedEndpoints);
+      tvCastingApp.verifyOrEstablishConnection(
+          videoPlayer, onConnectionSuccess, onConnectionFailure, onNewOrUpdatedEndpoints);
     } else {
       Log.d(TAG, "Running commissioning");
       this.openCommissioningWindowSuccess =

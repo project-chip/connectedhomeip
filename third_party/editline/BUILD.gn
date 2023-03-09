@@ -18,8 +18,10 @@ import("${build_root}/config/compiler/compiler.gni")
 config("editline_config") {
   include_dirs = [ "repo/include" ]
 
+  cflags = [ "-Wno-conversion" ]
+
   if (is_clang) {
-    cflags = [ "-Wno-shorten-64-to-32" ]
+    cflags += [ "-Wno-shorten-64-to-32" ]
   }
 }
 

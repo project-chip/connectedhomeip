@@ -174,7 +174,7 @@ We welcome your contributions to Matter. Read our contribution guidelines
 
 # Building and Developing in Matter
 
-Instructions about how to build Matter can be found [here](./docs/README.md).
+Instructions about how to build Matter can be found [here](./docs/README.md) .
 
 # Directory Structure
 

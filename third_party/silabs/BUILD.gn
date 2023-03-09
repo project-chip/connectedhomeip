@@ -45,6 +45,7 @@ config("silabs_config") {
 
 group("efr32_sdk") {
   public_deps = [ efr32_sdk_target ]
+  public_configs = [ ":silabs_config" ]
 }
 
 # Openthread GSDK libraries configurations

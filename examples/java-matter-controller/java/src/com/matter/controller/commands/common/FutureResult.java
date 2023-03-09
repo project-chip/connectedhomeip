@@ -56,10 +56,13 @@ public class FutureResult {
       } catch (InterruptedException e) {
       }
     }
-
     if (!realResult.get().getResult()) {
       logger.log(Level.INFO, "error: %s", realResult.get().getError());
       throw new RuntimeException("received failure test result");
     }
+  }
+
+  public synchronized void clear() {
+    realResult = Optional.empty();
   }
 }

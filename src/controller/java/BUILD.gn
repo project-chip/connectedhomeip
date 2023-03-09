@@ -43,6 +43,8 @@ shared_library("jni") {
     "AndroidDeviceControllerWrapper.h",
     "AndroidOperationalCredentialsIssuer.cpp",
     "AndroidOperationalCredentialsIssuer.h",
+    "AttestationTrustStoreBridge.cpp",
+    "AttestationTrustStoreBridge.h",
     "BaseCHIPCluster-JNI.cpp",
     "CHIPAttributeTLVValueDecoder.h",
     "CHIPDefaultCallbacks.cpp",
@@ -138,10 +140,31 @@ if (chip_link_tests) {
   }
 }
 
+kotlin_library("tlv") {
+  output_name = "libCHIPTlv.jar"
+
+  deps = [ "${chip_root}/third_party/java_deps:protobuf-java" ]
+
+  sources = [
+    "src/chip/tlv/Element.kt",
+    "src/chip/tlv/TlvReader.kt",
+    "src/chip/tlv/TlvWriter.kt",
+    "src/chip/tlv/tags.kt",
+    "src/chip/tlv/types.kt",
+    "src/chip/tlv/utils.kt",
+    "src/chip/tlv/values.kt",
+  ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
 android_library("java") {
   output_name = "CHIPController.jar"
 
-  deps = [ "${chip_root}/third_party/java_deps:annotation" ]
+  deps = [
+    ":tlv",
+    "${chip_root}/third_party/java_deps:annotation",
+  ]
 
   data_deps = [ ":jni" ]
 
@@ -153,6 +176,7 @@ android_library("java") {
     "src/chip/clusterinfo/DelegatedClusterCallback.java",
     "src/chip/clusterinfo/InteractionInfo.java",
     "src/chip/devicecontroller/AttestationInfo.java",
+    "src/chip/devicecontroller/AttestationTrustStoreDelegate.java",
     "src/chip/devicecontroller/CSRInfo.java",
     "src/chip/devicecontroller/ChipClusterException.java",
     "src/chip/devicecontroller/ChipCommandType.java",
@@ -162,6 +186,8 @@ android_library("java") {
     "src/chip/devicecontroller/DeviceAttestationDelegate.java",
     "src/chip/devicecontroller/DiscoveredDevice.java",
     "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
+    "src/chip/devicecontroller/InvokeCallback.java",
+    "src/chip/devicecontroller/InvokeCallbackJni.java",
     "src/chip/devicecontroller/KeypairDelegate.java",
     "src/chip/devicecontroller/NetworkCredentials.java",
     "src/chip/devicecontroller/NetworkLocation.java",
@@ -175,13 +201,17 @@ android_library("java") {
     "src/chip/devicecontroller/ResubscriptionAttemptCallback.java",
     "src/chip/devicecontroller/SubscriptionEstablishedCallback.java",
     "src/chip/devicecontroller/UnpairDeviceCallback.java",
+    "src/chip/devicecontroller/WriteAttributesCallback.java",
+    "src/chip/devicecontroller/WriteAttributesCallbackJni.java",
     "src/chip/devicecontroller/model/AttributeState.java",
+    "src/chip/devicecontroller/model/AttributeWriteRequest.java",
     "src/chip/devicecontroller/model/ChipAttributePath.java",
     "src/chip/devicecontroller/model/ChipEventPath.java",
     "src/chip/devicecontroller/model/ChipPathId.java",
     "src/chip/devicecontroller/model/ClusterState.java",
     "src/chip/devicecontroller/model/EndpointState.java",
     "src/chip/devicecontroller/model/EventState.java",
+    "src/chip/devicecontroller/model/InvokeElement.java",
     "src/chip/devicecontroller/model/NodeState.java",
     "zap-generated/chip/devicecontroller/ChipClusters.java",
     "zap-generated/chip/devicecontroller/ChipEventStructs.java",

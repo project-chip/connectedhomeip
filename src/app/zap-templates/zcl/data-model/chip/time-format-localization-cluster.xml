@@ -16,12 +16,12 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP" />
-  <enum name="HourFormat" type="ENUM8">
+  <enum name="HourFormatEnum" type="ENUM8">
     <cluster code="0x002c"/>
     <item name="12hr" value="0x00"/>
     <item name="24hr" value="0x01"/>
   </enum>
-  <enum name="CalendarType" type="ENUM8">
+  <enum name="CalendarTypeEnum" type="ENUM8">
     <cluster code="0x002c"/>
     <item name="Buddhist" value="0x00"/>
     <item name="Chinese" value="0x01"/>
@@ -48,8 +48,8 @@ limitations under the License.
       or audibly convey time information need a mechanism by which they can be configured to use a
       user’s preferred format.</description>
     <!-- Base data types -->
-    <attribute side="server" code="0x00" define="HOUR_FORMAT" type="HourFormat" min="0x00" max="0x01" writable="true" optional="false">HourFormat</attribute>
-    <attribute side="server" code="0x01" define="ACTIVE_CALENDAR_TYPE" type="CalendarType" writable="true" optional="true">ActiveCalendarType</attribute>
-    <attribute side="server" code="0x02" define="SUPPORTED_CALENDAR_TYPES" type="ARRAY" entryType="CalendarType" writable="false" optional="true">SupportedCalendarTypes</attribute>  
+    <attribute side="server" code="0x00" define="HOUR_FORMAT" type="HourFormatEnum" min="0x00" max="0x01" writable="true" optional="false">HourFormat</attribute>
+    <attribute side="server" code="0x01" define="ACTIVE_CALENDAR_TYPE" type="CalendarTypeEnum" writable="true" optional="true">ActiveCalendarType</attribute>
+    <attribute side="server" code="0x02" define="SUPPORTED_CALENDAR_TYPES" type="ARRAY" entryType="CalendarTypeEnum" writable="false" optional="true">SupportedCalendarTypes</attribute>  
   </cluster>
 </configurator>
