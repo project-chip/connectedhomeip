@@ -191,11 +191,10 @@ public:
 
     static void DoorLockOnAutoRelockCallback(chip::System::Layer *, void * callbackContext);
     /**
-     * @brief Resets the wrong code entry attempts to 0 for the endpoint. This API is called from HandleRemoteLockOperation
-     *        to reset the count if we have an lock/unlock remote operation with valid credential automatically. An app that
-     *        calls SetLockState also will have this done automatically on successful unlock operation using valid credential.
-     *        Any app that sends unlock events via SendLockOperationEvent has to handle resetting the wrong retry count by
-     *        calling this API.
+     * @brief Resets the wrong code entry attempts to 0 for the endpoint. This is done automatically when a
+     *        remote lock operation with credentials succeeds, or when SetLockState is called with a non-empty credentials list.
+     *        Applications that call the two-argument version of SetLockState and handle sending the relevant operation events
+     *        themselves or via SendLockOperationEvent are responsible for calling this API when a valid credential is presented.
      *
      * @param endpointId
      */
