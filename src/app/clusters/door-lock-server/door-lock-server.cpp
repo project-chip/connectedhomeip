@@ -122,7 +122,7 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
     SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kUnspecified, userIndex, Nullable<chip::FabricIndex>(),
                            Nullable<chip::NodeId>(), credentials, success);
 
-    // Reset wrong entry attempts (in case there were any incorrect wrong credentials presented before) if lock/unlock was a success
+    // Reset wrong entry attempts (in case there were any incorrect credentials presented before) if lock/unlock was a success
     // and a valid credential was presented.
     if (success && !credentials.IsNull() && !(credentials.Value().empty()))
     {
