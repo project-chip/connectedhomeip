@@ -1638,6 +1638,21 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
     auto * iterator = imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions();
     while (iterator->Next(subscriptionInfo))
     {
+        // If subscription happens between reboot and this timer callback, it's already live and should skip resumption
+        if (Loop::Break == imEngine->mReadHandlers.ForEachActiveObject([&](ReadHandler * handler) {
+                SubscriptionId subscriptionId;
+                handler->GetSubscriptionId(subscriptionId);
+                if (subscriptionId == subscriptionInfo.mSubscriptionId)
+                {
+                    return Loop::Break;
+                }
+                return Loop::Continue;
+            }))
+        {
+            ChipLogProgress(InteractionModel, "Skip resuming live subscriptionId %" PRIu32, subscriptionInfo.mSubscriptionId);
+            continue;
+        }
+
         auto requestedAttributePathCount = subscriptionInfo.mAttributePaths.AllocatedSize();
         auto requestedEventPathCount     = subscriptionInfo.mEventPaths.AllocatedSize();
         if (!imEngine->EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, requestedAttributePathCount,
@@ -1656,6 +1671,7 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
             return;
         }
 
+        ChipLogProgress(InteractionModel, "Resuming subscriptionId %" PRIu32, subscriptionInfo.mSubscriptionId);
         handler->ResumeSubscription(*imEngine->mpCASESessionMgr, subscriptionInfo);
     }
     iterator->Release();
