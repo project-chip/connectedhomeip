@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ChipIdLookup
+import chip.devicecontroller.InvokeCallback
 import chip.devicecontroller.ReportCallback
 import chip.devicecontroller.ResubscriptionAttemptCallback
 import chip.devicecontroller.SubscriptionEstablishedCallback
@@ -23,8 +24,10 @@ import chip.devicecontroller.model.AttributeWriteRequest
 import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.ChipPathId
+import chip.devicecontroller.model.InvokeElement
 import chip.devicecontroller.model.NodeState
 import chip.tlv.AnonymousTag
+import chip.tlv.ContextSpecificTag
 import chip.tlv.TlvWriter
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
@@ -86,6 +89,18 @@ class WildcardFragment : Fragment() {
     }
   }
 
+  private val invokeCallback = object : InvokeCallback {
+    override fun onError(e: java.lang.Exception?) {
+      Log.e(TAG, "Report error", e)
+    }
+
+    override fun onResponse(invokeElement: InvokeElement?, successCode: Long) {
+      val text = "Invoke Response : $invokeElement, $successCode"
+      requireActivity().runOnUiThread { binding.outputTv.text = text }
+    }
+
+  }
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
@@ -98,6 +113,7 @@ class WildcardFragment : Fragment() {
     binding.writeBtn.setOnClickListener { scope.launch { showWriteDialog() } }
     binding.subscribeEventBtn.setOnClickListener { scope.launch { showSubscribeDialog(EVENT) } }
     binding.readEventBtn.setOnClickListener { scope.launch { showReadDialog(EVENT) } }
+    binding.invokeBtn.setOnClickListener { scope.launch { showInvokeDialog() } }
 
     addressUpdateFragment =
       childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
@@ -234,6 +250,37 @@ class WildcardFragment : Fragment() {
                       imTimeoutMs)
   }
 
+  private suspend fun invoke(invokeField: String, timedRequestTimeoutMs: Int, imTimeoutMs: Int) {
+    val endpointId = getChipPathIdForText(binding.endpointIdEd.text.toString())
+    val clusterId = getChipPathIdForText(binding.clusterIdEd.text.toString())
+    val commandId = getChipPathIdForText(binding.commandIdEd.text.toString())
+
+    val tlvWriter = TlvWriter()
+    val fields = if (invokeField.isEmpty()) { listOf() } else { invokeField.split(",") }
+    var count = 0
+    tlvWriter.startStructure(AnonymousTag)
+    for (field in fields) {
+      try {
+        val type = field.split(":")[0]
+        val value = field.split(":")[1]
+
+        Log.d(TAG, "value : $type - $value")
+        TLV_MAP[type]?.generate(tlvWriter, value.trim(), ContextSpecificTag(count++))
+      } catch (ex: Exception) {
+        Log.e(TAG, "Invalid value", ex)
+        return
+      }
+    }
+    tlvWriter.endStructure()
+    val invokeElement = InvokeElement.newInstance(endpointId, clusterId, commandId, tlvWriter.getEncoded(), null)
+    deviceController.invoke(invokeCallback,
+            ChipClient.getConnectedDevicePointer(requireContext(),
+                    addressUpdateFragment.deviceId),
+            invokeElement,
+            timedRequestTimeoutMs,
+            imTimeoutMs)
+  }
+
   private fun showReadDialog(type: Int) {
     val dialogView = requireActivity().layoutInflater.inflate(R.layout.read_dialog, null)
     val dialog = AlertDialog.Builder(requireContext()).apply {
@@ -316,12 +363,34 @@ class WildcardFragment : Fragment() {
     dialog.show()
   }
 
+  private fun showInvokeDialog() {
+    binding.outputTv.text = ""
+    val dialogView = requireActivity().layoutInflater.inflate(R.layout.invoke_dialog, null)
+    val invokeValueEd = dialogView.findViewById<EditText>(R.id.invokeValueEd)
+    val dialog = AlertDialog.Builder(requireContext()).apply {
+      setView(dialogView)
+    }.create()
+
+    dialogView.findViewById<Button>(R.id.invokeBtn).setOnClickListener {
+      val invokeValue = invokeValueEd.text.toString()
+      val timedRequestTimeoutMs = dialogView.findViewById<EditText>(R.id.timedRequestTimeoutEd).text.toString()
+      val imTimeout = dialogView.findViewById<EditText>(R.id.imTimeoutEd).text.toString()
+      scope.launch {
+        invoke(invokeValue,
+                if (timedRequestTimeoutMs.isEmpty()) { 0 } else { timedRequestTimeoutMs.toInt() },
+                if (imTimeout.isEmpty()) { 0 } else { imTimeout.toInt() } )
+        requireActivity().runOnUiThread { dialog.dismiss() }
+      }
+    }
+    dialog.show()
+  }
+
   private fun getChipPathIdForText(text: String): ChipPathId {
     return if (text.isEmpty()) ChipPathId.forWildcard() else ChipPathId.forId(text.toLong())
   }
 
   interface TlvWriterInterface {
-    fun generate(writer : TlvWriter, value: String)
+    fun generate(writer : TlvWriter, value: String, tag: chip.tlv.Tag = AnonymousTag)
   }
 
   companion object {
@@ -332,39 +401,39 @@ class WildcardFragment : Fragment() {
 
     private val TLV_MAP = mapOf(
             "UnsignedInt" to object:TlvWriterInterface {
-              override fun generate(writer : TlvWriter, value: String) {
-                writer.put(AnonymousTag, value.toUInt())
+              override fun generate(writer : TlvWriter, value: String, tag: chip.tlv.Tag) {
+                writer.put(tag, value.toUInt())
               }
             },
             "Int" to object:TlvWriterInterface {
-              override fun generate(writer : TlvWriter, value: String) {
-                writer.put(AnonymousTag, value.toInt())
+              override fun generate(writer : TlvWriter, value: String, tag: chip.tlv.Tag) {
+                writer.put(tag, value.toInt())
               }
             },
             "Boolean" to object:TlvWriterInterface {
-              override fun generate(writer : TlvWriter, value: String) {
-                writer.put(AnonymousTag, value.toBoolean())
+              override fun generate(writer : TlvWriter, value: String, tag: chip.tlv.Tag) {
+                writer.put(tag, value.toBoolean())
               }
             },
             "Float" to object:TlvWriterInterface {
-              override fun generate(writer : TlvWriter, value: String) {
-                writer.put(AnonymousTag, value.toFloat())
+              override fun generate(writer : TlvWriter, value: String, tag: chip.tlv.Tag) {
+                writer.put(tag, value.toFloat())
               }
             },
             "Double" to object:TlvWriterInterface {
-              override fun generate(writer : TlvWriter, value: String) {
-                writer.put(AnonymousTag, value.toDouble())
+              override fun generate(writer : TlvWriter, value: String, tag: chip.tlv.Tag) {
+                writer.put(tag, value.toDouble())
               }
             },
             "String" to object:TlvWriterInterface {
-              override fun generate(writer : TlvWriter, value: String) {
-                writer.put(AnonymousTag, value)
+              override fun generate(writer : TlvWriter, value: String, tag: chip.tlv.Tag) {
+                writer.put(tag, value)
               }
             },
             "ByteArray(Hex)" to object:TlvWriterInterface {
-              override fun generate(writer : TlvWriter, value: String) {
+              override fun generate(writer : TlvWriter, value: String, tag: chip.tlv.Tag) {
                 val byteStringValue = ByteString.fromHex(value)
-                writer.put(AnonymousTag, byteStringValue)
+                writer.put(tag, byteStringValue)
               }
             },
     )
