@@ -120,7 +120,7 @@ public:
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
 
-    chip::BitFlags<WiFiSecurity> ConvertSecuritytype(uint8_t security);
+    chip::BitFlags<WiFiSecurity> ConvertSecuritytype(wfx_sec_t security);
 
     void OnConnectWiFiNetwork();
     static SlWiFiDriver & GetInstance()

@@ -194,22 +194,22 @@ exit:
     }
 }
 
-chip::BitFlags<WiFiSecurity> SlWiFiDriver::ConvertSecuritytype(uint8_t security)
+chip::BitFlags<WiFiSecurity> SlWiFiDriver::ConvertSecuritytype(wfx_sec_t security)
 {
     chip::BitFlags<WiFiSecurity> securityType;
     if (security == WFX_SEC_NONE)
     {
         securityType = WiFiSecurity::kUnencrypted;
     }
-    else if (security & WFX_SEC_WEP)
+    else if (security == WFX_SEC_WEP)
     {
         securityType = WiFiSecurity::kWep;
     }
-    else if (security & WFX_SEC_WPA)
+    else if (security == WFX_SEC_WPA)
     {
         securityType = WiFiSecurity::kWpaPersonal;
     }
-    else if (security & WFX_SEC_WPA2)
+    else if (security == WFX_SEC_WPA2)
     {
         securityType = WiFiSecurity::kWpa2Personal;
     }

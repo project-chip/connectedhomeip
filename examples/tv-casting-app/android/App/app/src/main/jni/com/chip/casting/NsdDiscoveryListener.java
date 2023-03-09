@@ -95,6 +95,7 @@ public class NsdDiscoveryListener implements NsdManager.DiscoveryListener {
     // When the network service is no longer available.
     // Internal bookkeeping code goes here.
     Log.e(TAG, "Service lost: " + service);
+    failureCallback.handle(MatterError.DISCOVERY_SERVICE_LOST);
   }
 
   @Override
