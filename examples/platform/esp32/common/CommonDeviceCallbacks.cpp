@@ -46,9 +46,6 @@ using namespace chip::DeviceLayer;
 using namespace chip::System;
 
 DeviceCallbacksDelegate * appDelegate = nullptr;
-#if CONFIG_ENABLE_OTA_REQUESTOR
-static bool isOTAInitialized = false;
-#endif
 
 void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -66,14 +63,15 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
         ESP_LOGI(TAG, "CHIPoBLE disconnected");
         break;
 
-    case DeviceEventType::kThreadConnectivityChange:
+    case DeviceEventType::kDnssdInitialized:
 #if CONFIG_ENABLE_OTA_REQUESTOR
-        if (event->ThreadConnectivityChange.Result == kConnectivity_Established && !isOTAInitialized)
-        {
-            OTAHelpers::Instance().InitOTARequestor();
-            isOTAInitialized = true;
-        }
+        OTAHelpers::Instance().InitOTARequestor();
 #endif
+        appDelegate = DeviceCallbacksDelegate::Instance().GetAppDelegate();
+        if (appDelegate != nullptr)
+        {
+            appDelegate->OnDnssdInitialized();
+        }
         break;
 
     case DeviceEventType::kCommissioningComplete: {
@@ -136,13 +134,6 @@ void CommonDeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent *
             appDelegate->OnIPv4ConnectivityEstablished();
         }
         chip::app::DnssdServer::Instance().StartServer();
-#if CONFIG_ENABLE_OTA_REQUESTOR
-        if (!isOTAInitialized)
-        {
-            OTAHelpers::Instance().InitOTARequestor();
-            isOTAInitialized = true;
-        }
-#endif
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -156,14 +147,6 @@ void CommonDeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent *
     {
         ESP_LOGI(TAG, "IPv6 Server ready...");
         chip::app::DnssdServer::Instance().StartServer();
-
-#if CONFIG_ENABLE_OTA_REQUESTOR
-        if (!isOTAInitialized)
-        {
-            OTAHelpers::Instance().InitOTARequestor();
-            isOTAInitialized = true;
-        }
-#endif
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {

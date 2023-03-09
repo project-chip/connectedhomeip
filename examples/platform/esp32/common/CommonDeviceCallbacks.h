@@ -40,6 +40,7 @@ public:
     }
     virtual void OnIPv4ConnectivityEstablished() {}
     virtual void OnIPv4ConnectivityLost() {}
+    virtual void OnDnssdInitialized() {}
     DeviceCallbacksDelegate * mDelegate = nullptr;
     void SetAppDelegate(DeviceCallbacksDelegate * delegate) { mDelegate = delegate; }
     DeviceCallbacksDelegate * GetAppDelegate() { return mDelegate; }
