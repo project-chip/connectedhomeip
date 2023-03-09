@@ -61,6 +61,7 @@
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
+#include <system/SystemClock.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
@@ -787,6 +788,10 @@ private:
 
     static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    static void OnDeviceConnectionRetryFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error,
+                                          System::Clock::Seconds16 retryTimeout);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
     static void OnDeviceAttestationInformationVerification(void * context,
                                                            const Credentials::DeviceAttestationVerifier::AttestationInfo & info,
@@ -897,6 +902,9 @@ private:
 
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    chip::Callback::Callback<OnDeviceConnectionRetry> mOnDeviceConnectionRetryCallback;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
     chip::Callback::Callback<Credentials::DeviceAttestationVerifier::OnAttestationInformationVerification>
         mDeviceAttestationInformationVerificationCallback;
