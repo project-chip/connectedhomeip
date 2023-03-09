@@ -247,11 +247,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
-    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",                            // Just a text name, not used by the RTOS kernel
+    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",                           // Just a text name, not used by the RTOS kernel
                                        pdMS_TO_TICKS(BLE_DEFAULT_TIMER_PERIOD), // == default timer period
-                                       false,                                    // no timer reload (==one-shot)
-                                       (void *) this,                            // init timer id = ble obj context
-                                       BleAdvTimeoutHandler                      // timer callback handler
+                                       false,                                   // no timer reload (==one-shot)
+                                       (void *) this,                           // init timer id = ble obj context
+                                       BleAdvTimeoutHandler                     // timer callback handler
     );
 
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
