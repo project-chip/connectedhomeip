@@ -1393,7 +1393,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE 3
 #endif
 
-
 /**
  * @brief The maximum size of a single extension field set for a single cluster
  */
