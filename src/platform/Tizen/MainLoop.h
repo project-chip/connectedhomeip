@@ -41,9 +41,6 @@ public:
     // Objects for running glib main event loop
     GMainContext * mMainContext = nullptr;
     GMainLoop * mMainLoop       = nullptr;
-    // Optional timeout function
-    timeoutFn_t mTimeoutFn    = nullptr;
-    gpointer mTimeoutUserData = nullptr;
 };
 
 class MainLoop
@@ -51,14 +48,12 @@ class MainLoop
 public:
     bool Init(initFn_t initFn, gpointer userData = nullptr);
     void Deinit(void);
-    bool AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData = nullptr, guint timeoutInterval = 0,
-                      timeoutFn_t timeoutFn = nullptr, gpointer timeoutUserData = nullptr);
+    bool AsyncRequest(asyncFn_t asyncFn, gpointer asyncUserData = nullptr);
     static MainLoop & Instance(void);
 
 private:
     MainLoop() = default;
 
-    static gboolean ThreadTimeout(gpointer userData);
     static void ThreadHandler(std::shared_ptr<LoopData> loopData);
 
     std::vector<std::shared_ptr<LoopData>> mLoopData;
