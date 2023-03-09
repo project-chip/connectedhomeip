@@ -209,10 +209,8 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(ByteSpan & value)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
+CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & securityType)
 {
-    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
-
     int ret = wlan_get_current_network(&sta_network);
     if (ret != WM_SUCCESS)
     {
@@ -244,10 +242,10 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(app::Clusters::WiFiNetwo
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(uint8_t & wiFiVersion)
+CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(WiFiVersionEnum & wiFiVersion)
 {
-    wiFiVersion = to_underlying(WiFiVersionEnum::kN);
-    ChipLogProgress(DeviceLayer, "GetWiFiVersion: %u", wiFiVersion);
+    wiFiVersion = WiFiVersionEnum::kN;
+    ChipLogProgress(DeviceLayer, "GetWiFiVersion: %u", to_underlying(wiFiVersion));
     return CHIP_NO_ERROR;
 }
 

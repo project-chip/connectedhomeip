@@ -50,6 +50,16 @@ step.
     $ ./install.sh
     ```
 
+-   For ESP32C6, please use commit
+    [afbdb0f3e](https://github.com/espressif/esp-idf/tree/afbdb0f3e).
+
+    ```
+    $ cd esp-idf
+    $ git checkout afbdb0f3e
+    $ git submodule update --init
+    $ ./install.sh
+    ```
+
 ## Setup Matter environment
 
 ### Install Prerequisites
