@@ -124,7 +124,8 @@ public:
     /**
      * @brief Handles a wrong code entry attempt for the endpoint. If the number of wrong entry attempts exceeds the max limit,
      *        engage lockout. Otherwise increment the number of incorrect attempts by 1. This is handled automatically for
-     *        remote operations - lock and unlock.  Applications are responsible for calling it for non-remote incorrect credential presentation attempts.
+     *        remote operations - lock and unlock.  Applications are responsible for calling it for non-remote incorrect credential
+     * presentation attempts.
      *
      * @param endpointId
      */
