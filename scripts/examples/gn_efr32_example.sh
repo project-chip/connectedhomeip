@@ -113,8 +113,6 @@ if [ "$#" == "0" ]; then
             enable Addition data advertissing and rotating device ID
         --use_ot_lib
             use the silabs openthread library
-        --use_lwip_lib
-            use the silabs lwip library
         --no-version
             Skip the silabs formating for the Matter software version string
             Currently : v1.0-<branchName>-<ShortCommitSha>
@@ -182,10 +180,10 @@ else
             optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
             shift
             ;;
-        --use_lwip_lib)
-            optArgs+="use_silabs_lwip_lib=true "
-            shift
-            ;;
+        # --use_lwip_lib)
+        #     optArgs+="use_silabs_lwip_lib=true "
+        #     shift
+        #     ;;
         # Option not to be used until ot-efr32 github is updated
         # --use_ot_github_sources)
         #   optArgs+="openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/openthread\" openthread_efr32_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/src/src\""

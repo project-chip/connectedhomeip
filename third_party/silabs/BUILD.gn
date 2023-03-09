@@ -180,8 +180,7 @@ if (use_silabs_thread_lib) {
     ]
   }
 }
-
-if (use_silabs_lwip_lib) {
-  # Use GSDK lwip instead of CHIP
-  lwip_root = "${efr32_sdk_build_root}"
-}
+# if (use_silabs_lwip_lib) {
+#   # Use GSDK lwip instead of CHIP
+#   lwip_root = "${efr32_sdk_build_root}"
+# }
