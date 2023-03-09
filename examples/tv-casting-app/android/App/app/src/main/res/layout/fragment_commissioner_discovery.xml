@@ -7,8 +7,8 @@
 
     <LinearLayout
         android:id="@+id/castingCommissioners"
-        android:layout_width="409dp"
-        android:layout_height="729dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:layout_editor_absoluteX="1dp"
         tools:layout_editor_absoluteY="1dp"
@@ -31,6 +31,12 @@
             android:layout_height="wrap_content"
             android:text="@string/discovery_message_text"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+        <ListView
+            android:id = "@+id/commissionerList"
+            android:layout_width = "match_parent"
+            android:layout_height = "wrap_content"
+            android:fadeScrollbars = "false" />
     </LinearLayout>
 
 

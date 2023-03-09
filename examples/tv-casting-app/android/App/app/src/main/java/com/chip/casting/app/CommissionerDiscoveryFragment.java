@@ -8,25 +8,38 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.ListView;
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.Fragment;
 import com.chip.casting.DiscoveredNodeData;
 import com.chip.casting.FailureCallback;
 import com.chip.casting.MatterError;
 import com.chip.casting.SuccessCallback;
 import com.chip.casting.TvCastingApp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /** A {@link Fragment} to discover commissioners on the network */
 public class CommissionerDiscoveryFragment extends Fragment {
   private static final String TAG = CommissionerDiscoveryFragment.class.getSimpleName();
-  private static final long DISCOVERY_DURATION_SECS = 10;
+  private static final long DISCOVERY_POLL_INTERVAL_MS = 15000;
+  private static final List<DiscoveredNodeData> commissionerVideoPlayerList = new ArrayList<>();
+  private FailureCallback failureCallback;
+  private SuccessCallback<DiscoveredNodeData> successCallback;
+  private ScheduledFuture poller;
   private final TvCastingApp tvCastingApp;
+  private ScheduledExecutorService executor;
 
   public CommissionerDiscoveryFragment(TvCastingApp tvCastingApp) {
     this.tvCastingApp = tvCastingApp;
+    this.executor = Executors.newSingleThreadScheduledExecutor();
   }
 
   /**
@@ -56,75 +69,126 @@ public class CommissionerDiscoveryFragment extends Fragment {
     super.onViewCreated(view, savedInstanceState);
 
     Button manualCommissioningButton = getView().findViewById(R.id.manualCommissioningButton);
+    // In the ideal case we wouldn't rely on the host activity to maintain this object since
+    // the lifecycle of the context isn't tied to this callback. Since this is an example app
+    // this should work fine.
     Callback callback = (Callback) this.getActivity();
     View.OnClickListener manualCommissioningButtonOnClickListener =
-        new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-            callback.handleCommissioningButtonClicked(null);
-          }
-        };
+        v -> callback.handleCommissioningButtonClicked(null);
     manualCommissioningButton.setOnClickListener(manualCommissioningButtonOnClickListener);
 
-    Context context = this.getContext();
-    SuccessCallback<DiscoveredNodeData> successCallback =
+    ArrayAdapter<DiscoveredNodeData> arrayAdapter =
+        new VideoPlayerCommissionerAdapter(getActivity(), commissionerVideoPlayerList);
+    final ListView list = getActivity().findViewById(R.id.commissionerList);
+    list.setAdapter(arrayAdapter);
+
+    this.successCallback =
         new SuccessCallback<DiscoveredNodeData>() {
           @Override
           public void handle(DiscoveredNodeData discoveredNodeData) {
             Log.d(TAG, "Discovered a Video Player Commissioner: " + discoveredNodeData);
-            String buttonText = getCommissionerButtonText(discoveredNodeData);
-
-            if (!buttonText.isEmpty()) {
-              Button commissionerButton = new Button(context);
-              commissionerButton.setText(buttonText);
-              CommissionerDiscoveryFragment.Callback callback =
-                  (CommissionerDiscoveryFragment.Callback) getActivity();
-              commissionerButton.setOnClickListener(
-                  new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                      Log.d(
-                          TAG,
-                          "CommissionerResolveListener.onServiceResolved.OnClickListener.onClick called for "
-                              + discoveredNodeData);
-                      callback.handleCommissioningButtonClicked(discoveredNodeData);
-                    }
-                  });
-              new Handler(Looper.getMainLooper())
-                  .post(
-                      () ->
-                          ((LinearLayout) getActivity().findViewById(R.id.castingCommissioners))
-                              .addView(commissionerButton));
-            }
+            new Handler(Looper.getMainLooper())
+                .post(
+                    () -> {
+                      final Optional<DiscoveredNodeData> discoveredNodeInList =
+                          commissionerVideoPlayerList
+                              .stream()
+                              .filter(node -> discoveredNodeData.discoveredNodeHasSameSource(node))
+                              .findFirst();
+                      if (discoveredNodeInList.isPresent()) {
+                        Log.d(
+                            TAG,
+                            "Replacing existing entry "
+                                + discoveredNodeInList.get().getDeviceName()
+                                + " in players list");
+                        arrayAdapter.remove(discoveredNodeInList.get());
+                      }
+                      arrayAdapter.add(discoveredNodeData);
+                    });
           }
         };
 
-    FailureCallback failureCallback =
+    this.failureCallback =
         new FailureCallback() {
           @Override
           public void handle(MatterError matterError) {
             Log.e(TAG, "Error occurred during video player commissioner discovery: " + matterError);
+            if (MatterError.DISCOVERY_SERVICE_LOST == matterError) {
+              Log.d(TAG, "Attempting to restart service");
+              tvCastingApp.discoverVideoPlayerCommissioners(successCallback, this);
+            }
           }
         };
 
     Button discoverButton = getView().findViewById(R.id.discoverButton);
     discoverButton.setOnClickListener(
-        new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-            Log.d(TAG, "Discovering on button click");
-            tvCastingApp.discoverVideoPlayerCommissioners(
-                DISCOVERY_DURATION_SECS, successCallback, failureCallback);
-          }
+        v -> {
+          Log.d(TAG, "Discovering on button click");
+          tvCastingApp.discoverVideoPlayerCommissioners(successCallback, failureCallback);
         });
-
-    Log.d(TAG, "Auto discovering");
-    tvCastingApp.discoverVideoPlayerCommissioners(
-        DISCOVERY_DURATION_SECS, successCallback, failureCallback);
   }
 
-  @VisibleForTesting
-  public String getCommissionerButtonText(DiscoveredNodeData commissioner) {
+  @Override
+  public void onResume() {
+    super.onResume();
+    Log.d(TAG, "Auto discovering");
+
+    poller =
+        executor.scheduleAtFixedRate(
+            () -> {
+              tvCastingApp.discoverVideoPlayerCommissioners(successCallback, failureCallback);
+            },
+            0,
+            DISCOVERY_POLL_INTERVAL_MS,
+            TimeUnit.MILLISECONDS);
+  }
+
+  @Override
+  public void onPause() {
+    super.onPause();
+    tvCastingApp.stopVideoPlayerDiscovery();
+    poller.cancel(true);
+  }
+
+  /** Interface for notifying the host. */
+  public interface Callback {
+    /** Notifies listener of Commissioning Button click. */
+    void handleCommissioningButtonClicked(DiscoveredNodeData selectedCommissioner);
+  }
+}
+
+class VideoPlayerCommissionerAdapter extends ArrayAdapter<DiscoveredNodeData> {
+  private final List<DiscoveredNodeData> playerList;
+  private final Context context;
+  private LayoutInflater inflater;
+  private static final String TAG = VideoPlayerCommissionerAdapter.class.getSimpleName();
+
+  public VideoPlayerCommissionerAdapter(Context context, List<DiscoveredNodeData> playerList) {
+    super(context, 0, playerList);
+    this.context = context;
+    this.playerList = playerList;
+    inflater = (LayoutInflater.from(context));
+  }
+
+  @Override
+  public View getView(int i, View view, ViewGroup viewGroup) {
+    view = inflater.inflate(R.layout.commissionable_player_list_item, null);
+    String buttonText = getCommissionerButtonText(playerList.get(i));
+    Button playerDescription = view.findViewById(R.id.commissionable_player_description);
+    playerDescription.setText(buttonText);
+    View.OnClickListener clickListener =
+        v -> {
+          DiscoveredNodeData discoveredNodeData = playerList.get(i);
+          Log.d(TAG, "OnItemClickListener.onClick called for " + discoveredNodeData);
+          CommissionerDiscoveryFragment.Callback callback1 =
+              (CommissionerDiscoveryFragment.Callback) context;
+          callback1.handleCommissioningButtonClicked(discoveredNodeData);
+        };
+    playerDescription.setOnClickListener(clickListener);
+    return view;
+  }
+
+  private String getCommissionerButtonText(DiscoveredNodeData commissioner) {
     String main = commissioner.getDeviceName() != null ? commissioner.getDeviceName() : "";
     String aux =
         "" + (commissioner.getProductId() > 0 ? "Product ID: " + commissioner.getProductId() : "");
@@ -140,11 +204,5 @@ public class CommissionerDiscoveryFragment extends Fragment {
 
     String preCommissioned = commissioner.isPreCommissioned() ? " (Pre-commissioned)" : "";
     return main + aux + preCommissioned;
-  }
-
-  /** Interface for notifying the host. */
-  public interface Callback {
-    /** Notifies listener of Commissioning Button click. */
-    void handleCommissioningButtonClicked(DiscoveredNodeData selectedCommissioner);
   }
 }
