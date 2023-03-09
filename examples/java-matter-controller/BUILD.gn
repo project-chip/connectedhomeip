@@ -38,6 +38,9 @@ kotlin_binary("java-matter-controller") {
   output_name = "java-matter-controller"
   deps = [
     ":java",
+    "${chip_root}/src/controller/java:tlv_read_write_test",
+    "${chip_root}/src/controller/java:tlv_reader_test",
+    "${chip_root}/src/controller/java:tlv_writer_test",
     "${chip_root}/third_party/java_deps:kotlin-stdlib",
   ]
 
