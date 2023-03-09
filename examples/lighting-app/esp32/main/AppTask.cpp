@@ -20,7 +20,9 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 
+#if CONFIG_HAVE_DISPLAY
 #include "DeviceWithDisplay.h"
+#endif
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
