@@ -76,7 +76,6 @@ public:
 
     enum StepMode
     {
-        STEP_MODE_STOP = 0x00,
         STEP_MODE_UP   = 0x01,
         STEP_MODE_DOWN = 0x03
     };
