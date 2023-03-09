@@ -30,7 +30,6 @@
 #include "Screen.h"
 #include "ScreenManager.h"
 
-
 #include <cstdint>
 #include <vector>
 
