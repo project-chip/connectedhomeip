@@ -467,7 +467,11 @@ public class ChipDeviceController {
   }
 
   public boolean openPairingWindowWithPIN(
-      long devicePtr, int duration, long iteration, int discriminator, @Nullable Long setupPinCode) {
+      long devicePtr,
+      int duration,
+      long iteration,
+      int discriminator,
+      @Nullable Long setupPinCode) {
     return openPairingWindowWithPIN(
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode);
   }
