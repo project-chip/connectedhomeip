@@ -30,5 +30,7 @@ static_library("pw_rpc") {
   ]
   output_dir = "${root_out_dir}/lib"
 
+  cflags = [ "-Wno-conversion" ]
+
   complete_static_lib = true
 }

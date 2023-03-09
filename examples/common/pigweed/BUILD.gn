@@ -22,6 +22,8 @@ config("default_config") {
     ".",
     "..",
   ]
+
+  cflags = [ "-Wno-conversion" ]
 }
 
 import("//build_overrides/pigweed.gni")

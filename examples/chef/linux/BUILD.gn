@@ -98,6 +98,7 @@ executable("${sample_name}") {
     if (is_clang) {
       cflags += [ "-Wno-gnu-designator" ]
     }
+    cflags += [ "-Wno-conversion" ]
 
     include_dirs += [ "${chip_root}/examples/common" ]
   } else {
