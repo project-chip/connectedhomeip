@@ -11,9 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
-import("${chip_root}/src/platform/silabs/lwip/lwip.gni")
+import("//build_overrides/lwip.gni")
 
 # Defines a lwIP build target.
 #
