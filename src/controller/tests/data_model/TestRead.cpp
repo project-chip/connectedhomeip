@@ -317,6 +317,10 @@ private:
     // of reads in parallel and wait for them all to succeed.
     static void SubscribeThenReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aSubscribeCount, size_t aReadCount);
 
+    // Compute the amount of time it would take a subscription with a given
+    // max-interval to time out.
+    static System::Clock::Timeout ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval);
+
     bool mEmitSubscriptionError      = false;
     int32_t mNumActiveSubscriptions  = 0;
     bool mAlterSubscriptionIntervals = false;
@@ -1684,7 +1688,9 @@ void TestReadInteraction::TestResubscribeAttributeTimeout(nlTestSuite * apSuite,
         attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
         attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::Boolean::Id;
 
-        readPrepareParams.mMaxIntervalCeilingSeconds = 1;
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
 
         auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1701,10 +1707,9 @@ void TestReadInteraction::TestResubscribeAttributeTimeout(nlTestSuite * apSuite,
         //
         // Disable packet transmission, and drive IO till we have reported a re-subscription attempt.
         //
-        // 1.5s should cover the liveness timeout in the client of 1s max interval + 50ms ACK timeout.
         //
         ctx.GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
-        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1500),
+        ctx.GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxIntervalCeilingSeconds)),
                                         [&]() { return callback.mOnResubscriptionsAttempted > 0; });
 
         NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 1);
@@ -1763,7 +1768,8 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
         //
         // Request a max interval that's very small to reduce time to discovering a liveness failure.
         //
-        readPrepareParams.mMaxIntervalCeilingSeconds = 1;
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
 
         auto err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1782,11 +1788,11 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
 
         //
         // Drive IO until we get an error on the subscription, which should be caused
-        // by the liveness timer firing within ~1s of the establishment of the subscription.
+        // by the liveness timer firing once we hit our max-interval plus
+        // retransmit timeouts.
         //
-        // 1.5s should cover the liveness timeout in the client of 1s max interval + 50ms ACK timeout.
-        //
-        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1500), [&]() { return callback.mOnError >= 1; });
+        ctx.GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxIntervalCeilingSeconds)),
+                                        [&]() { return callback.mOnError >= 1; });
 
         NL_TEST_ASSERT(apSuite, callback.mOnError == 1);
         NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_ERROR_TIMEOUT);
@@ -4615,6 +4621,18 @@ void TestReadInteraction::TestReadHandler_KeepSubscriptionTest(nlTestSuite * apS
     NL_TEST_ASSERT(apSuite, readCallback.mOnError != 0);
     app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     ctx.DrainAndServiceIO();
+}
+
+System::Clock::Timeout TestReadInteraction::ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval)
+{
+    // Add 50ms of slack to our max interval to make sure we hit the
+    // subscription liveness timer.
+    const auto & ourMrpConfig = GetDefaultMRPConfig();
+    auto publisherTransmissionTimeout =
+        GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
+                                 System::SystemClock().GetMonotonicTimestamp(), Transport::kMinActiveTime);
+
+    return publisherTransmissionTimeout + aMaxInterval + System::Clock::Milliseconds32(50);
 }
 
 // clang-format off
