@@ -26,7 +26,6 @@
 #include "BaseApplication.h"
 #include "FreeRTOS.h"
 #include "OnOffPlugManager.h"
-//#include "sl_simple_button_instances.h"
 #include "timers.h" // provides FreeRTOS timer support
 #include <ble/BLEEndPoint.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -34,47 +33,10 @@
 /**********************************************************
  * Defines
  *********************************************************/
-#define SL_SIMPLE_BUTTON_MODE_POLL               0U   ///< BUTTON input capture using polling
-#define SL_SIMPLE_BUTTON_MODE_POLL_AND_DEBOUNCE  1U   ///< BUTTON input capture using polling and debouncing
-#define SL_SIMPLE_BUTTON_MODE_INTERRUPT          2U   ///< BUTTON input capture using interrupt
-
-#define SL_SIMPLE_BUTTON_DISABLED                2U   ///< BUTTON state is disabled
-#define SL_SIMPLE_BUTTON_PRESSED                 1U   ///< BUTTON state is pressed
-#define SL_SIMPLE_BUTTON_RELEASED                0U   ///< BUTTON state is released
-
-typedef uint8_t sl_button_mode_t;       ///< BUTTON mode
-typedef uint8_t sl_button_state_t;      ///< BUTTON state
-typedef struct sl_button sl_button_t;
-
-/// A BUTTON instance
-typedef struct sl_button {
-  void                  *context;                       ///< The context for this BUTTON instance
-  void           (*init)(const sl_button_t *handle);   ///< Member function to initialize BUTTON instance
-  void                  (*poll)(const sl_button_t *handle);         ///< Member function to poll BUTTON
-  void                  (*enable)(const sl_button_t *handle);       ///< Member function to enable BUTTON
-  void                  (*disable)(const sl_button_t *handle);      ///< Member function to disable BUTTON
-  sl_button_state_t     (*get_state)(const sl_button_t *handle);    ///< Member function to retrieve BUTTON state
-}sl_button;
-
-const sl_button_t sl_button_btn0 = {
-  .context = NULL,
-  .init = NULL,
-  .poll = NULL,
-  .enable = NULL,
-  .disable = NULL,
-  .get_state = NULL,
-};
-#define APP_FUNCTION_BUTTON &sl_button_btn0
-
-const sl_button_t sl_button_btn1 = {
-  .context = NULL,
-  .init = NULL,
-  .poll = NULL,
-  .enable = NULL,
-  .disable = NULL,
-  .get_state = NULL,
-};
-#define APP_LIGHT_SWITCH &sl_button_btn1
+// Button specific defines for SiWx917
+#define SL_SIMPLE_BUTTON_PRESSED 1
+#define SIWx917_BTN0 0
+#define SIWx917_BTN1 1
 
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
@@ -87,11 +49,11 @@ const sl_button_t sl_button_btn1 = {
 /**********************************************************
  * AppTask Declaration
  *********************************************************/
+
 class AppTask : public BaseApplication
 {
 
 public:
-
     AppTask() = default;
 
     static AppTask & GetAppTask() { return sAppTask; }
@@ -109,11 +71,11 @@ public:
      * @brief Event handler when a button is pressed
      * Function posts an event for button processing
      *
-     * @param buttonHandle APP_LIGHT_SWITCH or APP_FUNCTION_BUTTON
+     * @param button - btn0 or btn1
      * @param btnAction button action - SL_SIMPLE_BUTTON_PRESSED,
      *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
-    void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction);
+    void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
         /**
      * @brief Callback called by the identify-server when an identify command is received

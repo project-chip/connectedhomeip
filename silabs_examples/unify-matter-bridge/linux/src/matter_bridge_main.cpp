@@ -66,7 +66,8 @@ static void call_unify_event_queue(intptr_t)
     if (shutdown)
     {
         matter_running = false;
-        Server::GetInstance().DispatchShutDownAndStopEventLoop();
+        Server::GetInstance().GenerateShutDownEvent();
+        PlatformMgr().ScheduleWork([](intptr_t) { PlatformMgr().StopEventLoopTask(); });
     }
 }
 

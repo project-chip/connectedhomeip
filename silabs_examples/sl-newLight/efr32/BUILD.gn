@@ -34,6 +34,9 @@ assert(current_os == "freertos")
 efr32_project_dir = "${chip_root}/silabs_examples/sl-newLight/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
+if (chip_enable_ble_rs911x) {
+  src_plat_dir = "${chip_root}/src/platform/silabs/efr32"
+}
 
 import("${examples_plat_dir}/args.gni")
 
@@ -67,6 +70,15 @@ efr32_sdk("sdk") {
   if (use_wf200) {
     # TODO efr32_sdk should not need a header from this location
     include_dirs += [ "${examples_plat_dir}/wf200" ]
+  }
+
+  if (chip_enable_ble_rs911x) {
+    # TODO efr32_sdk should not need a header from this location
+    include_dirs += [
+      "${src_plat_dir}/rs911x",
+      "${examples_plat_dir}/rs911x",
+      "${examples_plat_dir}/rs911x/hal",
+    ]
   }
 
   defines = []

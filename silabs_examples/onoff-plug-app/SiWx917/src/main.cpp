@@ -21,8 +21,6 @@
 
 #include "AppConfig.h"
 #include "init_ccpPlatform.h"
-// #include "sl_simple_button_instances.h"
-// #include "sl_system_kernel.h"
 #include <DeviceInfoProviderImpl.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -36,7 +34,7 @@
 #include "rsi_board.h"
 #include "rsi_chip.h"
 
-extern "C" void sl_button_on_change();
+extern "C" void sl_button_on_change(uint8_t btn, uint8_t btnAction);
 
 #define BLE_DEV_NAME "SiLabs-OnOffPlug"
 using namespace ::chip;
@@ -84,7 +82,7 @@ int main(void)
     appError(CHIP_ERROR_INTERNAL);
 }
 
-void sl_button_on_change()
+void sl_button_on_change(uint8_t btn, uint8_t btnAction)
 {
-    AppTask::GetAppTask().ButtonEventHandler(APP_LIGHT_SWITCH, SL_SIMPLE_BUTTON_PRESSED);
+    AppTask::GetAppTask().ButtonEventHandler(btn, btnAction);
 }

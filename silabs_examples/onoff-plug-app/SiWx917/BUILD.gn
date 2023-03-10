@@ -58,6 +58,9 @@ declare_args() {
   # Argument to force enable WPA3 security on rs91x
   rs91x_wpa3_only = false
 
+  # use commissionable data for SiWx917
+  siwx917_commissionable_data = false
+
   #default WiFi SSID
   chip_default_wifi_ssid = ""
 
@@ -158,6 +161,10 @@ efr32_sdk("sdk") {
     ]
   }
 
+  if (siwx917_commissionable_data) {
+    defines += [ "SIWX917_USE_COMISSIONABLE_DATA=1" ]
+  }
+
   # WiFi Settings
   if (chip_enable_wifi) {
     if (use_SiWx917) {
@@ -187,6 +194,7 @@ efr32_sdk("sdk") {
 
 efr32_executable("onoff_plug_app") {
   output_name = "chip-efr32-onoff-plug-example.out"
+  public_configs = [ "${efr32_sdk_build_root}:silabs_config" ]
   include_dirs = [ "include" ]
   defines = []
 
@@ -203,7 +211,7 @@ efr32_executable("onoff_plug_app") {
   ]
 
   if (use_wstk_leds) {
-    # sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
+    sources += [ "${examples_plat_dir}/LEDWidget.cpp" ]
   }
 
   if (chip_enable_pw_rpc || chip_build_libshell || use_SiWx917) {
