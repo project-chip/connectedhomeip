@@ -230,7 +230,7 @@ protected:
         FabricIndex mFabric = kUndefinedFabricIndex;
         SceneIndex mNextSceneIdx;
         SceneIndex mSceneIndex = 0;
-        uint8_t mTotalScene    = 0;
+        uint8_t mTotalScenes   = 0;
     };
     bool IsInitialized() { return (mStorage != nullptr); }
 
