@@ -23,12 +23,13 @@
  * connection on display.
  */
 
-#include "ScreenManager.h"
-
 #include "BluetoothWidget.h"
 
 #include "esp_log.h"
 #include "esp_system.h"
+#if CONFIG_HAVE_DISPLAY
+#include "ScreenManager.h"
+#endif
 
 extern const char * TAG;
 

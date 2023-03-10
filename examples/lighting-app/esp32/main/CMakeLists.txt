@@ -85,7 +85,7 @@ set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
 )
 endif (CONFIG_ENABLE_PW_RPC)
 
-if ("${CONFIG_DEVICE_TYPE_M5STACK}" STREQUAL "y")
+if (CONFIG_HAVE_DISPLAY)
     list(APPEND PRIV_REQUIRES_LIST tft screen-framework)
 endif()
 

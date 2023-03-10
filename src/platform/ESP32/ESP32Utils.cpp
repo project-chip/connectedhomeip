@@ -37,7 +37,7 @@
 
 using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 CHIP_ERROR ESP32Utils::IsAPEnabled(bool & apEnabled)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
@@ -226,27 +226,6 @@ struct netif * ESP32Utils::GetStationNetif(void)
     return GetNetif("WIFI_STA_DEF");
 }
 
-struct netif * ESP32Utils::GetNetif(const char * ifKey)
-{
-    struct netif * netif       = NULL;
-    esp_netif_t * netif_handle = NULL;
-    netif_handle               = esp_netif_get_handle_from_ifkey(ifKey);
-    netif                      = (struct netif *) esp_netif_get_netif_impl(netif_handle);
-    return netif;
-}
-
-bool ESP32Utils::IsInterfaceUp(const char * ifKey)
-{
-    struct netif * netif = GetNetif(ifKey);
-    return netif != NULL && netif_is_up(netif);
-}
-
-bool ESP32Utils::HasIPv6LinkLocalAddress(const char * ifKey)
-{
-    struct esp_ip6_addr if_ip6_unused;
-    return esp_netif_get_ip6_linklocal(esp_netif_get_handle_from_ifkey(ifKey), &if_ip6_unused) == ESP_OK;
-}
-
 CHIP_ERROR ESP32Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials)
 {
     wifi_config_t stationConfig;
@@ -380,6 +359,28 @@ CHIP_ERROR ESP32Utils::InitWiFiStack(void)
         return ESP32Utils::MapError(err);
     }
     return CHIP_NO_ERROR;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+struct netif * ESP32Utils::GetNetif(const char * ifKey)
+{
+    struct netif * netif       = NULL;
+    esp_netif_t * netif_handle = NULL;
+    netif_handle               = esp_netif_get_handle_from_ifkey(ifKey);
+    netif                      = (struct netif *) esp_netif_get_netif_impl(netif_handle);
+    return netif;
+}
+
+bool ESP32Utils::IsInterfaceUp(const char * ifKey)
+{
+    struct netif * netif = GetNetif(ifKey);
+    return netif != NULL && netif_is_up(netif);
+}
+
+bool ESP32Utils::HasIPv6LinkLocalAddress(const char * ifKey)
+{
+    struct esp_ip6_addr if_ip6_unused;
+    return esp_netif_get_ip6_linklocal(esp_netif_get_handle_from_ifkey(ifKey), &if_ip6_unused) == ESP_OK;
 }
 
 CHIP_ERROR ESP32Utils::MapError(esp_err_t error)
