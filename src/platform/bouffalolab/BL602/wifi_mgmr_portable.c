@@ -6,10 +6,10 @@
 #include <bl60x_wifi_driver/wifi_mgmr_profile.h>
 #include <supplicant_api.h>
 
-#include <wpa_supplicant/src/utils/common.h>
-#include <wpa_supplicant/src/common/wpa_common.h>
 #include <wpa_supplicant/src/common/defs.h>
+#include <wpa_supplicant/src/common/wpa_common.h>
 #include <wpa_supplicant/src/rsn_supp/wpa_i.h>
+#include <wpa_supplicant/src/utils/common.h>
 
 extern struct wpa_sm gWpaSm;
 
@@ -112,30 +112,39 @@ int wifi_mgmr_profile_ssid_get(uint8_t * ssid)
     return profile_msg.ssid_len;
 }
 
-uint32_t wifi_mgmr_get_security_type(void) 
+uint32_t wifi_mgmr_get_security_type(void)
 {
     /** return values defined from app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum */
-    if (strlen(wifiMgmr.wifi_mgmr_stat_info.passphr)) {
-        if (gWpaSm.pmk_len) {
-            if (WPA_PROTO_WPA == gWpaSm.proto) {
+    if (strlen(wifiMgmr.wifi_mgmr_stat_info.passphr))
+    {
+        if (gWpaSm.pmk_len)
+        {
+            if (WPA_PROTO_WPA == gWpaSm.proto)
+            {
                 return 3;
             }
-            else if (WPA_PROTO_RSN == gWpaSm.proto) {
-                if (gWpaSm.key_mgmt & (WPA_KEY_MGMT_PSK | WPA_KEY_MGMT_PSK_SHA256)) {
+            else if (WPA_PROTO_RSN == gWpaSm.proto)
+            {
+                if (gWpaSm.key_mgmt & (WPA_KEY_MGMT_PSK | WPA_KEY_MGMT_PSK_SHA256))
+                {
                     return 4;
                 }
-                else {
+                else
+                {
                     return 5;
                 }
             }
-            else if (WPA_PROTO_WAPI == gWpaSm.proto) {
+            else if (WPA_PROTO_WAPI == gWpaSm.proto)
+            {
                 return 6;
             }
-            else {
+            else
+            {
                 return 2;
             }
         }
-        else {
+        else
+        {
             return 2;
         }
     }

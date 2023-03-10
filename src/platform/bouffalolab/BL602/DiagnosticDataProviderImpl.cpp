@@ -29,7 +29,6 @@
 
 #include <lwip/tcpip.h>
 
-
 extern "C" {
 #include <bl60x_fw_api.h>
 #include <bl60x_wifi_driver/bl_main.h>
@@ -250,7 +249,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
-    securityType = (app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum)wifi_mgmr_get_security_type();
+    securityType = (app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum) wifi_mgmr_get_security_type();
     return CHIP_NO_ERROR;
 }
 
