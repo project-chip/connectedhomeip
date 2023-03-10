@@ -24,6 +24,8 @@
 #include <lib/shell/Engine.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "../common/chef-test-cluster-server.h"
+
 using namespace chip;
 using namespace chip::Shell;
 using namespace chip::app;
@@ -52,6 +54,8 @@ int main(int argc, char * argv[])
 #if CHIP_SHELL_ENABLE_CMD_SERVER
     cmd_app_server_init();
 #endif
+    app::Clusters::ChefTestCluster::ChefTestClusterServer chefTestClusterServer(1 /* endpoint */);
+    chefTestClusterServer.Init();
 
     ChipLinuxAppMainLoop();
 

@@ -35628,6 +35628,196 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace FaultInjection
+namespace ChefTestCluster {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace Test {
+struct Type;
+struct DecodableType;
+} // namespace Test
+
+namespace TestAddArgumentsResponse {
+struct Type;
+struct DecodableType;
+} // namespace TestAddArgumentsResponse
+
+namespace TestAddArguments {
+struct Type;
+struct DecodableType;
+} // namespace TestAddArguments
+
+} // namespace Commands
+
+namespace Commands {
+namespace Test {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::Test::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ChefTestCluster::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::Test::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ChefTestCluster::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Test
+namespace TestAddArgumentsResponse {
+enum class Fields : uint8_t
+{
+    kReturnValue = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestAddArgumentsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ChefTestCluster::Id; }
+
+    uint8_t returnValue = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestAddArgumentsResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ChefTestCluster::Id; }
+
+    uint8_t returnValue = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestAddArgumentsResponse
+namespace TestAddArguments {
+enum class Fields : uint8_t
+{
+    kArg1 = 0,
+    kArg2 = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestAddArguments::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ChefTestCluster::Id; }
+
+    uint8_t arg1 = static_cast<uint8_t>(0);
+    uint8_t arg2 = static_cast<uint8_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::ChefTestCluster::Commands::TestAddArgumentsResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestAddArguments::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ChefTestCluster::Id; }
+
+    uint8_t arg1 = static_cast<uint8_t>(0);
+    uint8_t arg2 = static_cast<uint8_t>(0);
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestAddArguments
+} // namespace Commands
+
+namespace Attributes {
+
+namespace Attribute1 {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ChefTestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Attribute1::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Attribute1
+namespace GeneratedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChefTestCluster::Id; }
+};
+} // namespace GeneratedCommandList
+namespace AcceptedCommandList {
+struct TypeInfo : public Clusters::Globals::Attributes::AcceptedCommandList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChefTestCluster::Id; }
+};
+} // namespace AcceptedCommandList
+namespace EventList {
+struct TypeInfo : public Clusters::Globals::Attributes::EventList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChefTestCluster::Id; }
+};
+} // namespace EventList
+namespace AttributeList {
+struct TypeInfo : public Clusters::Globals::Attributes::AttributeList::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChefTestCluster::Id; }
+};
+} // namespace AttributeList
+namespace FeatureMap {
+struct TypeInfo : public Clusters::Globals::Attributes::FeatureMap::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChefTestCluster::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInfo
+{
+    static constexpr ClusterId GetClusterId() { return Clusters::ChefTestCluster::Id; }
+};
+} // namespace ClusterRevision
+
+struct TypeInfo
+{
+    struct DecodableType
+    {
+        static constexpr ClusterId GetClusterId() { return Clusters::ChefTestCluster::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
+
+        Attributes::Attribute1::TypeInfo::DecodableType attribute1 = static_cast<bool>(0);
+        Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
+        Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
+        Attributes::EventList::TypeInfo::DecodableType eventList;
+        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
+        Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
+        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
+    };
+};
+} // namespace Attributes
+} // namespace ChefTestCluster
 
 } // namespace Clusters
 

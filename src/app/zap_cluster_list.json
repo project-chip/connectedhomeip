@@ -55,6 +55,7 @@
         "MEDIA_PLAYBACK_CLUSTER": [],
         "MODE_SELECT_CLUSTER": [],
         "NETWORK_COMMISSIONING_CLUSTER": [],
+        "SAMPLE_MEI_CLUSTER": [],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [],
         "OCCUPANCY_SENSING_CLUSTER": ["occupancy-sensor-server"],
         "ON_OFF_CLUSTER": [],
@@ -183,6 +184,7 @@
         "MEDIA_PLAYBACK_CLUSTER": ["media-playback-server"],
         "MODE_SELECT_CLUSTER": ["mode-select-server"],
         "NETWORK_COMMISSIONING_CLUSTER": ["network-commissioning"],
+        "SAMPLE_MEI_CLUSTER": [],
         "NITROGEN_DIOXIDE_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],

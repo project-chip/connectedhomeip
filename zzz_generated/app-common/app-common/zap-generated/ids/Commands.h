@@ -1479,6 +1479,24 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace FaultInjection
 
+namespace ChefTestCluster {
+namespace Commands {
+
+namespace Test {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Test
+
+namespace TestAddArgumentsResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace TestAddArgumentsResponse
+
+namespace TestAddArguments {
+static constexpr CommandId Id = 0x00000002;
+} // namespace TestAddArguments
+
+} // namespace Commands
+} // namespace ChefTestCluster
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip

@@ -210,3 +210,24 @@ To add new devices for chef:
     `examples/chef/devices`.
     -   This is gated by the workflow in `.github/workflows/zap_templates.yaml`.
 -   All devices added to the repository are built in CD.
+
+## Vendor Defined Clusters
+
+You may add vendor-defined features to chef. The rootnode_onofflight_meisample* device
+showcases its usage by using the "cheftestcluster" which is defined on
+`src/app/zap-templates/zcl/data-model/chip/chef-test-cluster.xml`
+
+This cluster has one boolean attribute and a command/response pair. The
+command takes two uint8 arguments and the command response returns their sum.
+
+You may test the chef-test-cluster via chip-tool using the following commands:
+```
+# commissioning of on-network chef device
+chip-tool pairing onnetwork 1 20202021
+# tests command to sum arguments
+chip-tool cheftestcluster test-add-arguments 1 1 10 20
+# sets attribute1 to false
+chip-tool cheftestcluster write attribute1 0 1 1
+# reads attribute1
+chip-tool cheftestcluster read attribute1 1 1
+```

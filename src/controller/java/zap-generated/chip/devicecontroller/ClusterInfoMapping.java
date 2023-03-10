@@ -15087,6 +15087,104 @@ public class ClusterInfoMapping {
         }
       }
 
+      public static class DelegatedChefTestClusterClusterTestAddArgumentsResponseCallback implements ChipClusters.ChefTestClusterCluster.TestAddArgumentsResponseCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+        @Override
+        public void onSuccess(Integer returnValue) {
+           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+               CommandResponseInfo returnValueResponseValue = new CommandResponseInfo("returnValue", "Integer");
+               responseValues.put(returnValueResponseValue, returnValue);
+           callback.onSuccess(responseValues);
+        }
+
+        @Override
+        public void onError(Exception error) {
+          callback.onFailure(error);
+        }
+      }
+
+      public static class DelegatedChefTestClusterClusterGeneratedCommandListAttributeCallback implements ChipClusters.ChefTestClusterCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedChefTestClusterClusterAcceptedCommandListAttributeCallback implements ChipClusters.ChefTestClusterCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedChefTestClusterClusterEventListAttributeCallback implements ChipClusters.ChefTestClusterCluster.EventListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+      public static class DelegatedChefTestClusterClusterAttributeListAttributeCallback implements ChipClusters.ChefTestClusterCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+        private ClusterCommandCallback callback;
+        @Override
+        public void setCallbackDelegate(ClusterCommandCallback callback) {
+          this.callback = callback;
+        }
+
+@Override
+        public void onSuccess( List<Long> valueList) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+          responseValues.put(commandResponseInfo, valueList);
+          callback.onSuccess(responseValues);
+        }
+        @Override
+        public void onError(Exception ex) {
+          callback.onFailure(ex);
+        }
+      }
+
 
  public Map<String, ClusterInfo> getClusterMap() {
     Map<String, ClusterInfo> clusterMap = initializeClusterMap();
@@ -15392,6 +15490,9 @@ public class ClusterInfoMapping {
       ClusterInfo faultInjectionClusterInfo = new ClusterInfo(
         (ptr, endpointId) -> new ChipClusters.FaultInjectionCluster(ptr, endpointId), new HashMap<>());
       clusterMap.put("faultInjection", faultInjectionClusterInfo);
+      ClusterInfo chefTestClusterClusterInfo = new ClusterInfo(
+        (ptr, endpointId) -> new ChipClusters.ChefTestClusterCluster(ptr, endpointId), new HashMap<>());
+      clusterMap.put("chefTestCluster", chefTestClusterClusterInfo);
     return clusterMap;
  }
 
@@ -15493,6 +15594,7 @@ public class ClusterInfoMapping {
       destination.get("electricalMeasurement").combineCommands(source.get("electricalMeasurement"));
       destination.get("unitTesting").combineCommands(source.get("unitTesting"));
       destination.get("faultInjection").combineCommands(source.get("faultInjection"));
+      destination.get("chefTestCluster").combineCommands(source.get("chefTestCluster"));
  }
 
  @SuppressWarnings("unchecked")
@@ -20323,6 +20425,42 @@ public class ClusterInfoMapping {
        );
        faultInjectionClusterInteractionInfoMap.put("failRandomlyAtFault", faultInjectionfailRandomlyAtFaultInteractionInfo);
      commandMap.put("faultInjection", faultInjectionClusterInteractionInfoMap);
+     Map<String, InteractionInfo> chefTestClusterClusterInteractionInfoMap = new LinkedHashMap<>();
+     Map<String, CommandParameterInfo> chefTestClustertestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       InteractionInfo chefTestClustertestInteractionInfo = new InteractionInfo(
+         (cluster, callback, commandArguments) -> {
+           ((ChipClusters.ChefTestClusterCluster) cluster)
+           .test((DefaultClusterCallback) callback
+           
+           );
+         },
+         () -> new DelegatedDefaultClusterCallback(),
+           chefTestClustertestCommandParams
+       );
+       chefTestClusterClusterInteractionInfoMap.put("test", chefTestClustertestInteractionInfo);
+     Map<String, CommandParameterInfo> chefTestClustertestAddArgumentsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+       CommandParameterInfo chefTestClustertestAddArgumentsarg1CommandParameterInfo = new CommandParameterInfo("arg1", Integer.class, Integer.class);
+       chefTestClustertestAddArgumentsCommandParams.put("arg1",chefTestClustertestAddArgumentsarg1CommandParameterInfo);
+      
+       CommandParameterInfo chefTestClustertestAddArgumentsarg2CommandParameterInfo = new CommandParameterInfo("arg2", Integer.class, Integer.class);
+       chefTestClustertestAddArgumentsCommandParams.put("arg2",chefTestClustertestAddArgumentsarg2CommandParameterInfo);
+     
+       InteractionInfo chefTestClustertestAddArgumentsInteractionInfo = new InteractionInfo(
+         (cluster, callback, commandArguments) -> {
+           ((ChipClusters.ChefTestClusterCluster) cluster)
+           .testAddArguments((ChipClusters.ChefTestClusterCluster.TestAddArgumentsResponseCallback) callback
+           , (Integer)
+           commandArguments.get("arg1")
+           , (Integer)
+           commandArguments.get("arg2")
+           
+           );
+         },
+         () -> new DelegatedChefTestClusterClusterTestAddArgumentsResponseCallback(),
+           chefTestClustertestAddArgumentsCommandParams
+       );
+       chefTestClusterClusterInteractionInfoMap.put("testAddArguments", chefTestClustertestAddArgumentsInteractionInfo);
+     commandMap.put("chefTestCluster", chefTestClusterClusterInteractionInfoMap);
      return commandMap;
   }
 

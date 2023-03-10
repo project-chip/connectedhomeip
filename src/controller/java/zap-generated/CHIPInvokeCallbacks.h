@@ -990,4 +990,19 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPChefTestClusterClusterTestAddArgumentsResponseCallback
+    : public Callback::Callback<CHIPChefTestClusterClusterTestAddArgumentsResponseCallbackType>
+{
+public:
+    CHIPChefTestClusterClusterTestAddArgumentsResponseCallback(jobject javaCallback);
+
+    ~CHIPChefTestClusterClusterTestAddArgumentsResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::ChefTestCluster::Commands::TestAddArgumentsResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 } // namespace chip

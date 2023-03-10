@@ -5077,6 +5077,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const ChefTestCluster::Commands::TestAddArgumentsResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("returnValue", indent + 1, value.returnValue));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
 
 CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data)
 {
@@ -13490,6 +13498,47 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         }
         break;
     }
+    case ChefTestCluster::Id: {
+        switch (path.mAttributeId)
+        {
+        case ChefTestCluster::Attributes::Attribute1::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("attribute1", 1, value);
+        }
+        case ChefTestCluster::Attributes::GeneratedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("GeneratedCommandList", 1, value);
+        }
+        case ChefTestCluster::Attributes::AcceptedCommandList::Id: {
+            chip::app::DataModel::DecodableList<chip::CommandId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AcceptedCommandList", 1, value);
+        }
+        case ChefTestCluster::Attributes::EventList::Id: {
+            chip::app::DataModel::DecodableList<chip::EventId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("EventList", 1, value);
+        }
+        case ChefTestCluster::Attributes::AttributeList::Id: {
+            chip::app::DataModel::DecodableList<chip::AttributeId> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AttributeList", 1, value);
+        }
+        case ChefTestCluster::Attributes::FeatureMap::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("FeatureMap", 1, value);
+        }
+        case ChefTestCluster::Attributes::ClusterRevision::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ClusterRevision", 1, value);
+        }
+        }
+        break;
+    }
     default:
         break;
     }
@@ -13993,6 +14042,17 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestEmitTestFabricScopedEventResponse", 1, value);
+        }
+        }
+        break;
+    }
+    case ChefTestCluster::Id: {
+        switch (path.mCommandId)
+        {
+        case ChefTestCluster::Commands::TestAddArgumentsResponse::Id: {
+            ChefTestCluster::Commands::TestAddArgumentsResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TestAddArgumentsResponse", 1, value);
         }
         }
         break;
