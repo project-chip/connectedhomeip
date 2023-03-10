@@ -45,7 +45,7 @@ directory.
 You need Android SDK 21 & NDK 21.4.7075529 downloaded to your machine. Set the
 `$ANDROID_HOME` environment variable to where the SDK is downloaded and the
 `$ANDROID_NDK_HOME` environment variable to point to where the NDK package is
-downloaded.
+downloaded. The build also requires `kotlinc` to be in your `$PATH`.
 
 1. Install [Android Studio](https://developer.android.com/studio)
 2. Install NDK:
