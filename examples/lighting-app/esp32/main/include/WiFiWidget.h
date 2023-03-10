@@ -18,7 +18,9 @@
 
 #pragma once
 
+#if CONFIG_HAVE_DISPLAY
 #include "Display.h"
+#endif
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"

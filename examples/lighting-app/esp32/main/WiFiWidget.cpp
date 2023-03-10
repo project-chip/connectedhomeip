@@ -22,9 +22,9 @@
  * Implements a WiFi Widget controller that display the state of bluetooth
  * connection on display.
  */
-
+#if CONFIG_HAVE_DISPLAY
 #include "ScreenManager.h"
-
+#endif
 #include "WiFiWidget.h"
 
 #include "esp_log.h"
