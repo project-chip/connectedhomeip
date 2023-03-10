@@ -23,6 +23,7 @@ from .builder import Builder
 class TelinkApp(Enum):
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
+    BRIDGE = auto()
     CONTACT_SENSOR = auto()
     LIGHT = auto()
     SWITCH = auto()
@@ -39,6 +40,8 @@ class TelinkApp(Enum):
             return 'all-clusters-app'
         elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
+        elif self == TelinkApp.BRIDGE:
+            return 'bridge-app'
         elif self == TelinkApp.CONTACT_SENSOR:
             return 'contact-sensor-app'
         elif self == TelinkApp.LIGHT:
@@ -67,6 +70,8 @@ class TelinkApp(Enum):
             return 'chip-telink-all-clusters-example'
         elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'chip-telink-all-clusters-minimal-example'
+        elif self == TelinkApp.BRIDGE:
+            return 'chip-telink-bridge-example'
         elif self == TelinkApp.CONTACT_SENSOR:
             return 'chip-telink-contact-sensor-example'
         elif self == TelinkApp.LIGHT:
