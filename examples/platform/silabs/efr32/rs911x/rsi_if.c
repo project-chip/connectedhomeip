@@ -823,6 +823,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     WFX_RSI_LOG("%s: DHCP OK: IP=%d.%d.%d.%d", __func__, wfx_rsi.ip4_addr[0], wfx_rsi.ip4_addr[1], wfx_rsi.ip4_addr[2],
                 wfx_rsi.ip4_addr[3]);
     /* Notify the Connectivity Manager - via the app */
+    wfx_rsi.dev_state |= WFX_RSI_ST_STA_DHCP_DONE;
     wfx_ip_changed_notify(IP_STATUS_SUCCESS);
     wfx_rsi.dev_state |= WFX_RSI_ST_STA_READY;
 }
