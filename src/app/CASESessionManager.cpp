@@ -33,7 +33,7 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
                                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                 ,
-                                                uint8_t attemptCount
+                                                uint8_t attemptCount, Callback::Callback<OnDeviceConnectionRetry> * onRetry
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 )
 {
@@ -60,6 +60,10 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     session->UpdateAttemptCount(attemptCount);
+    if (onRetry)
+    {
+        session->AddRetryHandler(onRetry);
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
     session->Connect(onConnection, onFailure);

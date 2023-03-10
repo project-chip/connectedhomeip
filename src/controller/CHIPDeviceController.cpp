@@ -398,6 +398,9 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 
 DeviceCommissioner::DeviceCommissioner() :
     mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    mOnDeviceConnectionRetryCallback(OnDeviceConnectionRetryFn, this),
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
 {
@@ -1731,6 +1734,60 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, const Scope
     }
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+// No specific action to take on either success or failure here; we're just
+// trying to bump the fail-safe, and if that fails it's not clear there's much
+// we can to with that.
+static void OnExtendFailsafeForCASERetryFailure(void * context, CHIP_ERROR error)
+{
+    ChipLogError(Controller, "Failed to extend fail-safe for CASE retry: %" CHIP_ERROR_FORMAT, error.Format());
+}
+static void
+OnExtendFailsafeForCASERetrySuccess(void * context,
+                                    const app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
+{
+    ChipLogProgress(Controller, "Status of extending fail-safe for CASE retry: %u", to_underlying(data.errorCode));
+}
+
+void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error,
+                                                   System::Clock::Seconds16 retryTimeout)
+{
+    ChipLogError(Controller,
+                 "Session establishment failed for " ChipLogFormatScopedNodeId ", error: %" CHIP_ERROR_FORMAT
+                 ".  Next retry expected to get a response to Sigma1 or fail within %d seconds",
+                 ChipLogValueScopedNodeId(peerId), error.Format(), retryTimeout.count());
+
+    auto self = static_cast<DeviceCommissioner *>(context);
+
+    // We need to do the fail-safe arming over the PASE session.
+    auto * commissioneeDevice = self->FindCommissioneeDevice(peerId.GetNodeId());
+    if (!commissioneeDevice)
+    {
+        // Commissioning canceled, presumably.  Just ignore the notification,
+        // not much we can do here.
+        return;
+    }
+
+    // Extend by the default failsafe timeout plus our retry timeout, so we can
+    // be sure the fail-safe will not expire before we try the next time, if
+    // there will be a next time.
+    //
+    // TODO: Make it possible for our clients to control the exact timeout here?
+    uint16_t failsafeTimeout;
+    if (UINT16_MAX - retryTimeout.count() < kDefaultFailsafeTimeout)
+    {
+        failsafeTimeout = UINT16_MAX;
+    }
+    else
+    {
+        failsafeTimeout = static_cast<uint16_t>(retryTimeout.count() + kDefaultFailsafeTimeout);
+    }
+    self->ExtendArmFailSafe(commissioneeDevice, CommissioningStage::kFindOperational, failsafeTimeout,
+                            MakeOptional(kMinimumCommissioningStepTimeout), OnExtendFailsafeForCASERetrySuccess,
+                            OnExtendFailsafeForCASERetryFailure);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
 // ClusterStateCache::Callback impl
 void DeviceCommissioner::OnDone(app::ReadClient *)
 {
@@ -2444,7 +2501,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                                                                &mOnDeviceConnectionFailureCallback
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                                                ,
-                                                               /* attemptCount = */ 3
+                                                               /* attemptCount = */ 3, &mOnDeviceConnectionRetryCallback
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
         );
     }
