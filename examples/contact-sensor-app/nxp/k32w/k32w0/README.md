@@ -374,26 +374,27 @@ related data (PSECT). The space between these two zones will be filled by the
 application.
 
 ### Writing the SSBL
+The SDK already provides an SSBL binary compiled with external
+flash support: `boards/k32w061dk6/wireless_examples/framework/ssbl/binary/ssbl_ext_flash_pdm_support.bin`, but it does not offer
+multi-image OTA support.
 
-The SSBL can ge generated from one of the SDK demo examples. The SDK demo
-example needs to be compiled inside MCUXpresso with the define _PDM_EXT_FLASH_.
-The SSBL demo application can be imported from the _Quickstart panel_: _Import
-SDK example(s)_ -> select _wireless->framework->ssbl_ application.
+Alternatively, the SSBL can ge generated from one of the SDK demo examples.
+The SSBL demo application can be imported from the `Quickstart panel`: `Import SDK example(s) -> select wireless -> framework -> ssbl` application.
 
 ![SSBL Application Select](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_select.JPG)
 
 To support multi-image OTA feature, the SSBL project must be compiled using the following defines:
-- `PDM_EXT_FLASH=1`
-- `gOTAUseCustomOtaEntry=1`
-- `gOTACustomOtaEntryMemory=1` - K32W0 uses `OTACustomStorage_ExtFlash` (1) by default.
+- `PDM_EXT_FLASH=1` - support PDM in external flash.
+- `gOTAUseCustomOtaEntry=1` - support custom OTA entry for multi-image.
+- `gOTACustomOtaEntryMemory=OTACustomStorage_ExtFlash` - K32W0 uses `OTACustomStorage_ExtFlash` (1) by default.
 
 Optionally, add the following defines:
 - `SPIFI_OPTIM_SIZE=1` - to optimize SSBL size.
 - `EXTERNAL_FLASH_DATA_OTA=1` - to support external RO data.
 
-![PDM_EXT_FLASH](../../../../platform/nxp/k32w/k32w0/doc/images/pdm_ext_flash.JPG)
+![SSBL_MULTI_IMAGE](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_multi_image.JPG)
 
-Once compiled, the required ssbl file is called k32w061dk6_ssbl.bin
+Once compiled, the required SSBL file is called `k32w061dk6_ssbl.bin`.
 
 ![SSBL_BIN](../../../../platform/nxp/k32w/k32w0/doc/images/ssbl_bin.JPG)
 
@@ -403,13 +404,51 @@ Before writing the SSBL, it it recommanded to fully erase the internal flash:
 DK6Programmer.exe -V 5 -P 1000000 -s <COM_PORT> -e Flash
 ```
 
-k32w061dk6_ssbl.bin must be written at address 0 in the internal flash:
+`k32w061dk6_ssbl.bin` must be written at address 0 in the internal flash:
 
 ```
 DK6Programmer.exe -V2 -s <COM_PORT> -P 1000000 -Y -p FLASH@0x00="k32w061dk6_ssbl.bin"
 ```
 
 ### Writing the PSECT
+
+This is the list of all supported partitions:
+```
+0000000010000000 : SSBL partition
+
+    00000000 -----------> Start Address
+    1000 ---------------> 0x0010 Number of 512-bytes pages
+    00 -----------------> 0x00 Bootable flag
+    00 -----------------> 0x00 Image type (0x00 = SSBL)
+
+004000000f020101: Application partition
+
+    00400000 -----------> 0x00004000 Start Address
+    0f02 ---------------> 0x020f Number of 512-bytes pages
+    01 -----------------> 0x01 Bootable flag
+    01 -----------------> 0x01 Image type (0x01 = Application)
+
+00000010800000fe: Ext Flash text partition
+
+    00000010 -----------> 0x10000000 Start Address (external flash)
+    8000 ---------------> 0x0080 Number of 512-bytes pages
+    00 -----------------> 0x00 Bootable flag
+    fe -----------------> 0xFE Image type (0xFE = Ext Flash text)
+
+00000110300200fc : OTA Image partition
+
+    00000110 -----------> 0x10010000 Start Address
+    3002----------------> 0x0230 Number of 512-bytes pages
+    00 -----------------> 0x00 Bootable flag
+    fc -----------------> 0xFC Image type (0x00 = SSBL)
+
+00000510100000fd: NVM partition
+
+    00000510 -----------> 0x10050000 Start Address
+    1000 ---------------> 0x0010 Number of 512-bytes pages
+    00 -----------------> 0x00 Bootable flag
+    fd -----------------> 0xFC Image type (0xFC = NVM)
+```
 
 First, image directory 0 (SSBL partition) must be written:
 
@@ -441,29 +480,8 @@ CD04     -> 0x4C9 pages of 512-bytes (= 612,5kB)
 01       -> image type for the application
 ```
 
-Optionally, the user can write some additional partitions (increment `image_dir_` starting from 2):
-```
-00000010800000fe: Ext Flash text partition
-
-    00000010 -----------> 0x10000000 Start Address (external flash)
-    8000 ---------------> 0x0080 Number of 512-bytes pages
-    00 -----------------> 0x00 Bootable flag
-    fe -----------------> 0xFE Image type (0xFE = Ext Flash text)
-
-00000110300200fc : OTA Image partition
-
-    00000110 -----------> 0x10010000 Start Address
-    3002----------------> 0x0230 Number of 512-bytes pages
-    00 -----------------> 0x00 Bootable flag
-    fc -----------------> 0xFC Image type (0x00 = SSBL)
-
-00000510100000fd: NVM partition
-
-    00000510 -----------> 0x10050000 Start Address
-    1000 ---------------> 0x0010 Number of 512-bytes pages
-    00 -----------------> 0x00 Bootable flag
-    fd -----------------> 0xFC Image type (0xFC = NVM)
-```
+Please note the user can write additional partitions by
+writing `image_dir_2/3/4` with the wanted configuration.
 
 ### Writing the application
 
@@ -539,33 +557,23 @@ A user can select which default processors to enable:
 
 Please see more in the [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
 
+Here is an example that generates an OTA image with application update TLV:
+```
+./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 42021 -vs "1.0" -da sha256 --app-input-file chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.ota
+```
 
-Note that "standard" TLV format is used. Matter TLV format is only used for
-factory data TLV value. A user can enable the default processors by specifying
-`chip_enable_ota_default_processors=1` in the build command. Please see more in
-the [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
-
-Here is an example that generate an OTA image with factory data and app TLV:
-`user@computer1:~/connectedhomeip$ : ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 -fd --cert_declaration ~/manufacturing/Chip-Test-CD-1037-a220.der -app chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.ota`
+A note regarding OTA image header version (`-vn` option). An application binary
+has its own software version, given by
+`CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION` (`42020` by default), which can be overwritten. For
+having a correct OTA process, the OTA header version should be the same as the
+binary embedded software version. A user can set a custom software version in
+the gn build args by setting `chip_software_version` to the wanted version.
 
 Start the OTA Provider Application:
 
 ```
 user@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
 user@computer1:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-k32w0x-contact-example.ota
-```
-
-A note regarding OTA image header version (`-vn` option). An application binary
-has its own software version (given by
-`CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`, which can be overwritten). For
-having a correct OTA process, the OTA header version should be the same as the
-binary embedded software version. A user can set a custom software version in
-the gn build args by setting `chip_software_version` to the wanted version.
-
-Build Linux chip-tool:
-
-```
-user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/chip-tool out/chip-tool-app
 ```
 
 Provision the OTA provider application and assign node id _1_. Also, grant ACL
