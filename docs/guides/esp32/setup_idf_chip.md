@@ -39,23 +39,12 @@ step.
     $ ./install.sh
     ```
 
--   For ESP32H2, please checkout tag
-    [v5.0](https://github.com/espressif/esp-idf/tree/v5.0), currently only
-    lighting-app is supported on H2
+-   For ESP32C6 & ESP32H2, please use commit
+    [47852846d3](https://github.com/espressif/esp-idf/tree/47852846d3).
 
     ```
     $ cd esp-idf
-    $ git checkout v5.0-beta1
-    $ git submodule update --init
-    $ ./install.sh
-    ```
-
--   For ESP32C6, please use commit
-    [afbdb0f3e](https://github.com/espressif/esp-idf/tree/afbdb0f3e).
-
-    ```
-    $ cd esp-idf
-    $ git checkout afbdb0f3e
+    $ git checkout 47852846d3
     $ git submodule update --init
     $ ./install.sh
     ```

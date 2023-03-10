@@ -26,6 +26,8 @@ menu "Demo"
         default DEVICE_TYPE_ESP32_C3_DEVKITM if IDF_TARGET_ESP32C3
         default DEVICE_TYPE_ESP32_S3_DEVKITM if IDF_TARGET_ESP32S3
         default DEVICE_TYPE_ESP32_C2_DEVKITM if IDF_TARGET_ESP32C2
+        default DEVICE_TYPE_ESP32_C6_DEVKITC if IDF_TARGET_ESP32C6
+        default DEVICE_TYPE_ESP32_H2_DEVKITC if IDF_TARGET_ESP32H2
         help
             Specifies the type of ESP32 device.
 
@@ -53,11 +55,14 @@ menu "Demo"
         config DEVICE_TYPE_ESP32_C2_DEVKITM
             bool "ESP32C2-DevKitM"
             depends on IDF_TARGET_ESP32C2
+        config DEVICE_TYPE_ESP32_C6_DEVKITC
+            bool "ESP32C6-DevKitC"
+            depends on IDF_TARGET_ESP32C6
     endchoice
 
     choice LED_TYPE
         prompt "LED type"
-        default LED_TYPE_RMT if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_S3_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC
+        default LED_TYPE_RMT if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_S3_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC || DEVICE_TYPE_ESP32_C6_DEVKITC
         default LED_TYPE_GPIO
         help
             Defines the default LED type used in the example
@@ -83,7 +88,7 @@ menu "Demo"
         int "LED GPIO number"
         range 0 48
         default 26 if DEVICE_TYPE_ESP32_WROVER_KIT
-        default 8 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC || DEVICE_TYPE_ESP32_C2_DEVKITM
+        default 8 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32_C6_DEVKITC
         default 48 if DEVICE_TYPE_ESP32_S3_DEVKITM
         default 5 if DEVICE_TYPE_M5STACK
         default 5
@@ -113,9 +118,14 @@ menu "Demo"
         int
         range 0 5
         default 0 if DEVICE_TYPE_ESP32_DEVKITC
-        default 0 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM
+        default 0 if DEVICE_TYPE_ESP32_C3_DEVKITM || DEVICE_TYPE_ESP32_C2_DEVKITM || DEVICE_TYPE_ESP32H2_DEVKITC || DEVICE_TYPE_ESP32_C6_DEVKITC
         default 3 if DEVICE_TYPE_M5STACK
         default 4 if DEVICE_TYPE_ESP32_WROVER_KIT
+
+    config HAVE_DISPLAY
+        bool
+        default y if DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT
+        default n if !(DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT)
 
     config RENDEZVOUS_MODE
        int

@@ -20,12 +20,14 @@
 
 #include "Button.h"
 #include "DeviceCallbacks.h"
-#include "Display.h"
 #include "Globals.h"
+#if CONFIG_HAVE_DISPLAY
+#include "Display.h"
 #include "ListScreen.h"
 #include "QRCodeScreen.h"
 #include "ScreenManager.h"
 #include "StatusScreen.h"
+#endif
 #include "esp_check.h"
 #include "esp_log.h"
 #include "esp_system.h"
