@@ -24,6 +24,11 @@ void CASEClient::SetRemoteMRPIntervals(const ReliableMessageProtocolConfig & rem
     mCASESession.SetRemoteMRPConfig(remoteMRPConfig);
 }
 
+const ReliableMessageProtocolConfig & CASEClient::GetRemoteMRPIntervals()
+{
+    return mCASESession.GetRemoteMRPConfig();
+}
+
 CHIP_ERROR CASEClient::EstablishSession(const CASEClientInitParams & params, const ScopedNodeId & peer,
                                         const Transport::PeerAddress & peerAddress,
                                         const ReliableMessageProtocolConfig & remoteMRPConfig,
