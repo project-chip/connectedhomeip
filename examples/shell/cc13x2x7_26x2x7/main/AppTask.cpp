@@ -29,11 +29,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
-#ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
-#include <platform/cc13xx_26xx/cc13x2_26x2/CC13X2_26X2DeviceAttestationCreds.h>
-#else
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#endif
+#include <examples/platform/cc13x2_26x2/CC13X2_26X2DeviceAttestationCreds.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>

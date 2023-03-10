@@ -30,6 +30,8 @@ namespace {
 
 extern "C" {
 
+extern void cc13x4_26x4Log(const char * aFormat, ...);
+
 typedef struct
 {
     const uint32_t len;

@@ -28,11 +28,7 @@
 #include "FreeRTOS.h"
 #include <credentials/DeviceAttestationCredsProvider.h>
 
-#ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
-#include <platform/cc13xx_26xx/cc13x2_26x2/CC13X2_26X2DeviceAttestationCreds.h>
-#else
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#endif
+#include <examples/platform/cc13x2_26x2/CC13X2_26X2DeviceAttestationCreds.h>
 
 #include <app/EventLogging.h>
 #include <app/util/af-types.h>

@@ -79,8 +79,6 @@ ti_simplelink_executable("all-clusters-app") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
-    "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/CC13X4_26X4DeviceAttestationCreds.cpp",
-    "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/CC13X4_26X4DeviceAttestationCreds.h",
     "${project_dir}/main/AppTask.cpp",
     "${project_dir}/main/ClusterManager.cpp",
     "${project_dir}/main/Globals.cpp",
@@ -91,6 +89,7 @@ ti_simplelink_executable("all-clusters-app") {
   deps = [
     ":sdk",
     ":sysconfig",
+    "${chip_root}/examples/platform/cc13x4_26x4:cc13x4_26x4-attestation-credentials",
     "${chip_root}/examples/all-clusters-app/all-clusters-common",
     "${chip_root}/src/lib",
   ]

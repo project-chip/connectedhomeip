@@ -18,6 +18,7 @@ import("//build_overrides/openthread.gni")
 import("//build_overrides/ti_simplelink_sdk.gni")
 
 import("${build_root}/config/defaults.gni")
+
 import("${chip_root}/src/platform/device.gni")
 
 import("${ti_simplelink_sdk_build_root}/ti_simplelink_executable.gni")
@@ -25,18 +26,16 @@ import("${ti_simplelink_sdk_build_root}/ti_simplelink_sdk.gni")
 
 assert(current_os == "freertos")
 
-project_dir = "${chip_root}/examples/pump-app/cc13x4_26x4"
+project_dir = "${chip_root}/examples/lighting-app/cc13x2x7_26x2x7"
 
 ti_simplelink_sdk("sdk") {
-  include_dirs = [ "${project_dir}/main/include" ]
-  public_configs = [ ":pump_app_config" ]
+  include_dirs = [ "${project_dir}/include" ]
 }
 
 ti_sysconfig("sysconfig") {
   sources = [ "${project_dir}/chip.syscfg" ]
 
   outputs = [
-    "ti_devices_config.c",
     "ti_radio_config.c",
     "ti_radio_config.h",
     "ti_drivers_config.c",
@@ -70,23 +69,22 @@ ti_sysconfig("sysconfig") {
   ]
 }
 
-ti_simplelink_executable("pump_app") {
-  output_name = "chip-${ti_simplelink_board}-pump-example.out"
+ti_simplelink_executable("lighting_app") {
+  output_name = "chip-${ti_simplelink_board}-lighting-example.out"
 
   sources = [
-    "${project_dir}/main/AppTask.cpp",
-    "${project_dir}/main/CHIPDeviceManager.cpp",
-    "${project_dir}/main/DeviceCallbacks.cpp",
-    "${project_dir}/main/PumpManager.cpp",
-    "${project_dir}/main/ZclCallbacks.cpp",
-    "${project_dir}/main/main.cpp",
+    "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
+    "${project_dir}/src/AppTask.cpp",
+    "${project_dir}/src/LightingManager.cpp",
+    "${project_dir}/src/ZclCallbacks.cpp",
+    "${project_dir}/src/main.cpp",
   ]
 
   deps = [
     ":sdk",
     ":sysconfig",
-    "${chip_root}/examples/platform/cc13x4_26x4:cc13x4_26x4-attestation-credentials",
-    "${chip_root}/examples/pump-app/pump-common",
+    "${chip_root}/examples/platform/cc13x2_26x2:cc13x2_26x2-attestation-credentials",
+    "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/src/lib",
   ]
 
@@ -98,7 +96,7 @@ ti_simplelink_executable("pump_app") {
 
   include_dirs = [
     "${project_dir}",
-    "${project_dir}/main",
+    "${chip_root}/examples/providers/",
   ]
 
   cflags = [
@@ -110,10 +108,10 @@ ti_simplelink_executable("pump_app") {
   output_dir = root_out_dir
 }
 
-group("cc13x4_26x4") {
-  deps = [ ":pump_app" ]
+group("cc13x2x7_26x2x7") {
+  deps = [ ":lighting_app" ]
 }
 
 group("default") {
-  deps = [ ":cc13x4_26x4" ]
+  deps = [ ":cc13x2x7_26x2x7" ]
 }

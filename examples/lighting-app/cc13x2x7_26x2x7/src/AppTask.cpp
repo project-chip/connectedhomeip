@@ -20,30 +20,39 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
-#include <app/server/Server.h>
 
 #include "FreeRTOS.h"
-#include <credentials/DeviceAttestationCredsProvider.h>
 
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <examples/platform/cc13x2_26x2/CC13X2_26X2DeviceAttestationCreds.h>
 
-#include <app/util/af-types.h>
-#include <app/util/af.h>
+#include <DeviceInfoProviderImpl.h>
+#include <platform/CHIPDeviceLayer.h>
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <platform/cc13xx_26xx/OTAImageProcessorImpl.h>
+#include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
 #endif
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/identify-server/identify-server.h>
+
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
-#include <platform/CHIPDeviceLayer.h>
 
+#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
+
+#include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
+#include <app/util/attribute-storage.h>
 
 #include <ti/drivers/apps/Button.h>
 #include <ti/drivers/apps/LED.h>
@@ -54,6 +63,15 @@
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 4
 #define APP_EVENT_QUEUE_SIZE 10
+
+#define IDENTIFY_TRIGGER_EFFECT_BLINK 0 
+#define IDENTIFY_TRIGGER_EFFECT_BREATHE 1 
+#define IDENTIFY_TRIGGER_EFFECT_OKAY 2 
+#define IDENTIFY_TRIGGER_EFFECT_FINISH_STOP 3
+
+static uint32_t identify_trigger_effect = IDENTIFY_TRIGGER_EFFECT_FINISH_STOP;
+
+#define LIGHTING_APPLICATION_IDENTIFY_ENDPOINT 1
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
@@ -66,10 +84,11 @@ static LED_Handle sAppRedHandle;
 static LED_Handle sAppGreenHandle;
 static Button_Handle sAppLeftHandle;
 static Button_Handle sAppRightHandle;
+static DeviceInfoProviderImpl sExampleDeviceInfoProvider;
 
 AppTask AppTask::sAppTask;
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 static DefaultOTARequestor sRequestorCore;
 static DefaultOTARequestorStorage sRequestorStorage;
 static DefaultOTARequestorDriver sRequestorUser;
@@ -81,18 +100,15 @@ void InitializeOTARequestor(void)
     // Initialize and interconnect the Requestor and Image Processor objects
     SetRequestorInstance(&sRequestorCore);
 
-    sRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    sRequestorCore.Init(chip::Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader);
+    sRequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
+    sRequestorCore.Init(Server::GetInstance(), sRequestorStorage, sRequestorUser, sDownloader);
     sImageProcessor.SetOTADownloader(&sDownloader);
     sDownloader.SetImageProcessorDelegate(&sImageProcessor);
     sRequestorUser.Init(&sRequestorCore, &sImageProcessor);
 }
 #endif
 
-static const chip::EndpointId sIdentifyEndpointId = 0;
-static const uint32_t sIdentifyBlinkRateMs        = 500;
-
-::Identify stIdentify = { sIdentifyEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
+::Identify stIdentify = { LIGHTING_APPLICATION_IDENTIFY_ENDPOINT, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
                           EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, AppTask::TriggerIdentifyEffectHandler };
 
 int AppTask::StartAppTask()
@@ -118,15 +134,47 @@ int AppTask::StartAppTask()
     return ret;
 }
 
+//Action initiated callback
+void uiTurnOn(void)
+{
+    PLAT_LOG("Light On initiated");
+    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+    LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
+}
+
+//Action completed callback 
+void uiTurnedOn(void)
+{
+    PLAT_LOG("Light On completed");
+    LED_stopBlinking(sAppRedHandle);
+    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+}
+
+//Action initiated callback 
+void uiTurnOff(void)
+{
+    PLAT_LOG("Light Off initiated");
+    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+    LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
+}
+
+//Action completed callback 
+void uiTurnedOff(void)
+{
+    PLAT_LOG("Light Off completed");
+    LED_stopBlinking(sAppRedHandle);
+    LED_setOff(sAppRedHandle);
+}
+
 int AppTask::Init()
 {
     LED_Params ledParams;
     Button_Params buttonParams;
 
-    cc13xx_26xxLogInit();
+    cc13x2_26x2LogInit();
 
     // Init Chip memory management before the stack
-    chip::Platform::MemoryInit();
+    Platform::MemoryInit();
 
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
@@ -143,8 +191,11 @@ int AppTask::Init()
         while (1)
             ;
     }
-
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+#else
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#endif
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
@@ -170,9 +221,14 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
-    static chip::CommonCaseDeviceServerInitParams initParams;
+    static CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    chip::Server::GetInstance().Init(initParams);
+
+    // Initialize info provider
+    sExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
+
+    Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
 #ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
@@ -180,7 +236,6 @@ int AppTask::Init()
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
-
 
     // Initialize LEDs
     PLAT_LOG("Initialize LEDs");
@@ -199,31 +254,35 @@ int AppTask::Init()
     Button_init();
 
     Button_Params_init(&buttonParams);
-    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGPRESSED;
-    buttonParams.longPressDuration = 5000U; // ms
+    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
+    buttonParams.longPressDuration = 1000U; // ms
     sAppLeftHandle                 = Button_open(CONFIG_BTN_LEFT, &buttonParams);
     Button_setCallback(sAppLeftHandle, ButtonLeftEventHandler);
 
     Button_Params_init(&buttonParams);
-    buttonParams.buttonEventMask   = Button_EV_CLICKED;
+    buttonParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
     buttonParams.longPressDuration = 1000U; // ms
     sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
     Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
+        
+    ret = LightMgr().Init();
 
-    // Initialize Pump module
-    PLAT_LOG("Initialize Pump");
-    PumpMgr().Init();
+    if (ret != CHIP_NO_ERROR)
+    {
+        PLAT_LOG("LightMgr().Init() failed");
+        while (1)
+            ;
+    }
 
-    PumpMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+    LightMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     ConfigurationMgr().LogDeviceConfig();
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     InitializeOTARequestor();
 #endif
-
     // QR code will be used with CHIP Tool
-    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
 
     return 0;
 }
@@ -244,14 +303,6 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
-void AppTask::PostEvent(const AppEvent * aEvent)
-{
-    if (xQueueSend(sAppEventQueue, aEvent, 0) != pdPASS)
-    {
-        /* Failed to post the message */
-    }
-}
-
 void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask events)
 {
     AppEvent event;
@@ -261,9 +312,9 @@ void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask even
     {
         event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
     }
-    else if (events & Button_EV_LONGPRESSED)
+    else if (events & Button_EV_LONGCLICKED)
     {
-        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongPressed;
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
     }
     // button callbacks are in ISR context
     if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
@@ -281,6 +332,10 @@ void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask eve
     {
         event.ButtonEvent.Type = AppEvent::kAppEventButtonType_Clicked;
     }
+    else if (events & Button_EV_LONGCLICKED)
+    {
+        event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
+    }
     // button callbacks are in ISR context
     if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
     {
@@ -288,82 +343,101 @@ void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask eve
     }
 }
 
-void AppTask::ActionInitiated(PumpManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {
-    // If the action has been initiated by the pump, update the pump trait
-    // and start flashing the LEDs rapidly to indicate action initiation.
-    if (aAction == PumpManager::START_ACTION)
+    if (aAction == LightingManager::ON_ACTION)
     {
-        PLAT_LOG("Pump start initiated");
-        ; // TODO
+        uiTurnOn();
     }
-    else if (aAction == PumpManager::STOP_ACTION)
+    else if (aAction == LightingManager::OFF_ACTION)
     {
-        PLAT_LOG("Stop initiated");
-        ; // TODO
+        uiTurnOff();
     }
-
-    LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
-    LED_startBlinking(sAppGreenHandle, 50 /* ms */, LED_BLINK_FOREVER);
-    LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
-    LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
 }
 
-void AppTask::ActionCompleted(PumpManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionCompleted(LightingManager::Action_t aAction)
 {
-    // if the action has been completed by the pump, update the pump trait.
-    // Turn on the pump state LED if in a STARTED state OR
-    // Turn off the pump state LED if in an STOPPED state.
-    if (aAction == PumpManager::START_ACTION)
+    if (aAction == LightingManager::ON_ACTION)
     {
-        PLAT_LOG("Pump start completed");
-        LED_stopBlinking(sAppGreenHandle);
-        LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
-        LED_stopBlinking(sAppRedHandle);
-        LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
+        uiTurnedOn();
     }
-    else if (aAction == PumpManager::STOP_ACTION)
+    else if (aAction == LightingManager::OFF_ACTION)
     {
-        PLAT_LOG("Pump stop completed");
-        LED_stopBlinking(sAppGreenHandle);
-        LED_setOff(sAppGreenHandle);
-        LED_stopBlinking(sAppRedHandle);
-        LED_setOff(sAppRedHandle);
+        uiTurnedOff();
     }
-    if (aActor == AppEvent::kEventType_ButtonLeft)
+}
+
+void AppTask::PostEvent(const AppEvent * aEvent)
+{
+    if (sAppEventQueue != NULL)
     {
-        sAppTask.UpdateClusterState();
+        BaseType_t status;
+        if (xPortIsInsideInterrupt())
+        {
+            BaseType_t higherPrioTaskWoken = pdFALSE;
+            status                         = xQueueSendFromISR(sAppEventQueue, aEvent, &higherPrioTaskWoken);
+
+#ifdef portYIELD_FROM_ISR
+            portYIELD_FROM_ISR(higherPrioTaskWoken);
+#elif portEND_SWITCHING_ISR // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+            portEND_SWITCHING_ISR(higherPrioTaskWoken);
+#else                       // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+#error "Must have portYIELD_FROM_ISR or portEND_SWITCHING_ISR"
+#endif // portYIELD_FROM_ISR or portEND_SWITCHING_ISR
+        }
+        else
+        {
+            status = xQueueSend(sAppEventQueue, aEvent, 1);
+        }
+
+        if (status != pdTRUE)
+        {
+            PLAT_LOG("Failed to post event to app task event queue");
+        }
+    }
+    else
+    {
+        PLAT_LOG("Event Queue is NULL should never happen");
     }
 }
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
+    int32_t actor;
+
     switch (aEvent->Type)
     {
-    case AppEvent::kEventType_ButtonRight:
-        if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
-        {
-            // Toggle Pump state
-            if (!PumpMgr().IsStopped())
-            {
-                PumpMgr().InitiateAction(0, PumpManager::STOP_ACTION);
-            }
-            else
-            {
-                PumpMgr().InitiateAction(0, PumpManager::START_ACTION);
-            }
-        }
-        break;
-
+    case AppEvent::kEventType_Light:
+    {
+        actor  = aEvent->LightEvent.Actor;
+        LightMgr().IsLightOn() ? LightMgr().InitiateAction(actor, LightingManager::OFF_ACTION): LightMgr().InitiateAction(actor, LightingManager::ON_ACTION);
+    }    
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
-            // Toggle BLE advertisements
+            actor  = AppEvent::kEventType_ButtonLeft;
+            LightMgr().InitiateAction(actor, LightingManager::ON_ACTION);
+        }
+        else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
+        {
+            chip::Server::GetInstance().ScheduleFactoryReset();
+        }
+        break;
+
+    case AppEvent::kEventType_ButtonRight:
+        if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
+        {
+            actor  = AppEvent::kEventType_ButtonRight;
+            LightMgr().InitiateAction(actor, LightingManager::OFF_ACTION);
+        }
+        else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
+        {
+            // Enable BLE advertisements
             if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
             {
-                if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
+                if (Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
                 {
-                    PLAT_LOG("Enabled BLE Advertisement");
+                    PLAT_LOG("Enabled BLE Advertisements");
                 }
                 else
                 {
@@ -377,29 +451,32 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
                 PLAT_LOG("Disabled BLE Advertisements");
             }
         }
-        else if (AppEvent::kAppEventButtonType_LongPressed == aEvent->ButtonEvent.Type)
-        {
-            chip::Server::GetInstance().ScheduleFactoryReset();
-        }
         break;
 
     case AppEvent::kEventType_IdentifyStart:
-        LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
-        LED_startBlinking(sAppGreenHandle, sIdentifyBlinkRateMs, LED_BLINK_FOREVER);
+        switch(identify_trigger_effect)
+        {
+            case IDENTIFY_TRIGGER_EFFECT_BLINK:
+                LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
+                LED_startBlinking(sAppGreenHandle, 1000, LED_BLINK_FOREVER);
+                break;
+            case IDENTIFY_TRIGGER_EFFECT_BREATHE:
+                LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
+                LED_startBlinking(sAppGreenHandle, 100, LED_BLINK_FOREVER);
+                break;
+            case IDENTIFY_TRIGGER_EFFECT_OKAY:
+                LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
+                LED_startBlinking(sAppGreenHandle, 500, LED_BLINK_FOREVER);
+                break;
+            default:
+                break;
+        }
         PLAT_LOG("Identify started");
         break;
 
     case AppEvent::kEventType_IdentifyStop:
         LED_stopBlinking(sAppGreenHandle);
-
-        if (!PumpMgr().IsStopped())
-        {
-            LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
-        }
-        else
-        {
-            LED_setOff(sAppGreenHandle);
-        }
+        LED_setOff(sAppGreenHandle);
         PLAT_LOG("Identify stopped");
         break;
 
@@ -415,8 +492,6 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         break;
     }
 }
-
-void AppTask::UpdateClusterState() {}
 
 void AppTask::IdentifyStartHandler(::Identify *)
 {
@@ -438,22 +513,30 @@ void AppTask::TriggerIdentifyEffectHandler(::Identify * identify)
     {
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
         PLAT_LOG("Starting blink identifier effect");
+        identify_trigger_effect = IDENTIFY_TRIGGER_EFFECT_BLINK;
         IdentifyStartHandler(identify);
         break;
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-        PLAT_LOG("Breathe identifier effect not implemented");
+        PLAT_LOG("Starting breathe identifier effect");
+        identify_trigger_effect = IDENTIFY_TRIGGER_EFFECT_BREATHE;
+        IdentifyStartHandler(identify);
         break;
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-        PLAT_LOG("Okay identifier effect not implemented");
+        PLAT_LOG("Starting okay identifier effect");
+        identify_trigger_effect = IDENTIFY_TRIGGER_EFFECT_OKAY;
+        IdentifyStartHandler(identify);
         break;
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
         PLAT_LOG("Channel Change identifier effect not implemented");
         break;
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
-        PLAT_LOG("Finish identifier effect not implemented");
+        PLAT_LOG("Finish identifier effect");
+        identify_trigger_effect = IDENTIFY_TRIGGER_EFFECT_FINISH_STOP;
+        IdentifyStopHandler(identify);
         break;
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
         PLAT_LOG("Stop identifier effect");
+        identify_trigger_effect = IDENTIFY_TRIGGER_EFFECT_FINISH_STOP;
         IdentifyStopHandler(identify);
         break;
     default:
