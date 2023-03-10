@@ -1180,7 +1180,7 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
     VerifyOrExit(colorHueTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     // Confirm validity of the step mode received
-    if (stepMode != STEP_MODE_STOP && stepMode != STEP_MODE_UP && stepMode != STEP_MODE_DOWN)
+    if (stepMode != STEP_MODE_UP && stepMode != STEP_MODE_DOWN)
     {
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
@@ -1199,12 +1199,6 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
 
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
-
-    if (stepMode == STEP_MODE_STOP)
-    {
-        commandObj->AddStatus(commandPath, Status::Success);
-        return true;
-    }
 
     // Handle color mode transition, if necessary.
     if (isEnhanced)
@@ -1420,7 +1414,7 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
     VerifyOrExit(colorSaturationTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     // Confirm validity of the step mode received
-    if (stepMode != STEP_MODE_STOP && stepMode != STEP_MODE_UP && stepMode != STEP_MODE_DOWN)
+    if (stepMode != STEP_MODE_UP && stepMode != STEP_MODE_DOWN)
     {
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
@@ -1439,12 +1433,6 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
 
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
-
-    if (stepMode == MOVE_MODE_STOP)
-    {
-        commandObj->AddStatus(commandPath, Status::Success);
-        return true;
-    }
 
     // Handle color mode transition, if necessary.
     handleModeSwitch(endpoint, COLOR_MODE_HSV);
@@ -2354,7 +2342,7 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
     VerifyOrExit(colorTempTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     // Confirm validity of the step mode received
-    if (stepMode != STEP_MODE_STOP && stepMode != STEP_MODE_UP && stepMode != STEP_MODE_DOWN)
+    if (stepMode != STEP_MODE_UP && stepMode != STEP_MODE_DOWN)
     {
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
@@ -2368,12 +2356,6 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
 
     // New command.  Need to stop any active transitions.
     stopAllColorTransitions(endpoint);
-
-    if (stepMode == MOVE_MODE_STOP)
-    {
-        commandObj->AddStatus(commandPath, Status::Success);
-        return true;
-    }
 
     Attributes::ColorTempPhysicalMinMireds::Get(endpoint, &tempPhysicalMin);
     Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysicalMax);
