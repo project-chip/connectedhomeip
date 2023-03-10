@@ -31,9 +31,6 @@ declare_args() {
   use_silabs_thread_lib = false
   enable_openthread_cli = true
 
-  # Build LwIP with gecko_sdk lwip
-  use_silabs_lwip_lib = false
-
   kvs_max_entries = 255
 
   # Use Silabs factory data provider example.
