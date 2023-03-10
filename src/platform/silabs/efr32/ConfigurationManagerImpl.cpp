@@ -292,6 +292,13 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
+
+    // When called from an RPC, the following reset occurs before the RPC can respond,
+    // which breaks tests (because it looks like the RPC hasn't successfully completed).
+    // One way to fix this is to reduce the priority of this task, to allow logging to
+    // complete before the reset occurs.
+    vTaskPrioritySet(NULL, 0);
+
     NVIC_SystemReset();
 }
 
