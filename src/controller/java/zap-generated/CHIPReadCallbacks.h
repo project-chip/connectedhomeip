@@ -41,10 +41,10 @@ public:
     }
 
     static void CallbackFn(void * context, bool value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBooleanAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBooleanAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -69,10 +69,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::CharSpan value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPCharStringAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPCharStringAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -97,10 +97,10 @@ public:
     }
 
     static void CallbackFn(void * context, double value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDoubleAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDoubleAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -125,10 +125,10 @@ public:
     }
 
     static void CallbackFn(void * context, float value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFloatAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFloatAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -153,10 +153,10 @@ public:
     }
 
     static void CallbackFn(void * context, int8_t value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPInt8sAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPInt8sAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -181,10 +181,10 @@ public:
     }
 
     static void CallbackFn(void * context, uint8_t value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPInt8uAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPInt8uAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -209,10 +209,10 @@ public:
     }
 
     static void CallbackFn(void * context, int16_t value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPInt16sAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPInt16sAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -237,10 +237,10 @@ public:
     }
 
     static void CallbackFn(void * context, uint16_t value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPInt16uAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPInt16uAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -265,10 +265,10 @@ public:
     }
 
     static void CallbackFn(void * context, int32_t value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPInt32sAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPInt32sAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -293,10 +293,10 @@ public:
     }
 
     static void CallbackFn(void * context, uint32_t value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPInt32uAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPInt32uAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -321,10 +321,10 @@ public:
     }
 
     static void CallbackFn(void * context, int64_t value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPInt64sAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPInt64sAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -349,10 +349,10 @@ public:
     }
 
     static void CallbackFn(void * context, uint64_t value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPInt64uAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPInt64uAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -377,10 +377,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::ByteSpan value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOctetStringAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOctetStringAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -407,10 +407,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPIdentifyGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPIdentifyGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -437,10 +437,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPIdentifyAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPIdentifyAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -466,10 +466,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPIdentifyEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPIdentifyEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -496,10 +496,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPIdentifyAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPIdentifyAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -526,10 +526,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGroupsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGroupsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -556,10 +556,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGroupsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGroupsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -585,10 +585,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGroupsEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGroupsEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -615,10 +615,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGroupsAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGroupsAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -644,10 +644,10 @@ public:
     }
 
     static void CallbackFn(void * context, chip::GroupId value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPScenesCurrentGroupAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPScenesCurrentGroupAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -674,10 +674,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPScenesGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPScenesGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -704,10 +704,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPScenesAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPScenesAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -733,10 +733,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPScenesEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPScenesEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -763,10 +763,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPScenesAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPScenesAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -793,10 +793,10 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOnOffStartUpOnOffAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOnOffStartUpOnOffAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -823,10 +823,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOnOffGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOnOffGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -853,10 +853,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOnOffAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOnOffAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -882,10 +882,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOnOffEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOnOffEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -911,10 +911,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOnOffAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOnOffAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -941,10 +941,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOnOffSwitchConfigurationGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOnOffSwitchConfigurationGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -971,10 +972,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOnOffSwitchConfigurationAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOnOffSwitchConfigurationAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1001,10 +1003,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOnOffSwitchConfigurationEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOnOffSwitchConfigurationEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1031,10 +1033,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOnOffSwitchConfigurationAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOnOffSwitchConfigurationAttributeListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1061,10 +1064,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLevelControlCurrentLevelAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLevelControlCurrentLevelAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1091,10 +1094,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLevelControlOnLevelAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLevelControlOnLevelAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1121,10 +1124,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLevelControlOnTransitionTimeAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLevelControlOnTransitionTimeAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1151,10 +1154,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLevelControlOffTransitionTimeAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLevelControlOffTransitionTimeAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1181,10 +1184,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLevelControlDefaultMoveRateAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLevelControlDefaultMoveRateAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1211,10 +1214,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLevelControlStartUpCurrentLevelAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLevelControlStartUpCurrentLevelAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1241,10 +1244,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLevelControlGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLevelControlGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1271,10 +1274,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLevelControlAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLevelControlAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1301,10 +1304,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLevelControlEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLevelControlEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1331,10 +1334,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLevelControlAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLevelControlAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1361,10 +1364,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBinaryInputBasicGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBinaryInputBasicGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1391,10 +1395,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBinaryInputBasicAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBinaryInputBasicAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1421,10 +1425,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBinaryInputBasicEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBinaryInputBasicEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1451,10 +1455,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBinaryInputBasicAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBinaryInputBasicAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1484,10 +1488,10 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> &
             list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDescriptorDeviceTypeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDescriptorDeviceTypeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1514,10 +1518,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDescriptorServerListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDescriptorServerListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1544,10 +1548,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDescriptorClientListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDescriptorClientListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1574,10 +1578,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDescriptorPartsListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDescriptorPartsListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1604,10 +1608,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDescriptorGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDescriptorGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1634,10 +1638,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDescriptorAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDescriptorAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1664,10 +1668,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDescriptorEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDescriptorEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1694,10 +1698,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDescriptorAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDescriptorAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1725,10 +1729,10 @@ public:
     static void CallbackFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBindingBindingAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBindingBindingAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1755,10 +1759,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBindingGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBindingGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1785,10 +1789,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBindingAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBindingAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1814,10 +1818,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBindingEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBindingEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1844,10 +1848,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBindingAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBindingAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1875,10 +1879,10 @@ public:
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAccessControlAclAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAccessControlAclAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1907,10 +1911,10 @@ public:
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAccessControlExtensionAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAccessControlExtensionAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1937,10 +1941,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAccessControlGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAccessControlGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1967,10 +1971,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAccessControlAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAccessControlAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -1997,10 +2001,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAccessControlEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAccessControlEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2027,10 +2031,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAccessControlAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAccessControlAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2058,10 +2062,10 @@ public:
     static void CallbackFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::ActionStruct::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPActionsActionListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPActionsActionListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2090,10 +2094,10 @@ public:
     static void CallbackFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::EndpointListStruct::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPActionsEndpointListsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPActionsEndpointListsAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2120,10 +2124,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPActionsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPActionsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2150,10 +2154,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPActionsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPActionsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2179,10 +2183,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPActionsEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPActionsEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2209,10 +2213,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPActionsAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPActionsAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2239,10 +2243,10 @@ public:
     }
 
     static void CallbackFn(void * context, chip::VendorId value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBasicInformationVendorIDAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBasicInformationVendorIDAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2269,10 +2273,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBasicInformationGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBasicInformationGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2299,10 +2304,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBasicInformationAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBasicInformationAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2329,10 +2334,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBasicInformationEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBasicInformationEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2359,10 +2364,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBasicInformationAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBasicInformationAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2389,10 +2394,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOtaSoftwareUpdateProviderGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOtaSoftwareUpdateProviderGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2419,10 +2425,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOtaSoftwareUpdateProviderAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOtaSoftwareUpdateProviderAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2449,10 +2456,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOtaSoftwareUpdateProviderEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOtaSoftwareUpdateProviderEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2479,10 +2486,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOtaSoftwareUpdateProviderAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOtaSoftwareUpdateProviderAttributeListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2511,10 +2519,11 @@ public:
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOtaSoftwareUpdateRequestorDefaultOTAProvidersAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2541,10 +2550,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2571,10 +2581,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOtaSoftwareUpdateRequestorGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOtaSoftwareUpdateRequestorGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2601,10 +2612,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOtaSoftwareUpdateRequestorAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOtaSoftwareUpdateRequestorAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2631,10 +2643,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOtaSoftwareUpdateRequestorEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOtaSoftwareUpdateRequestorEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2661,10 +2673,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOtaSoftwareUpdateRequestorAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOtaSoftwareUpdateRequestorAttributeListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2691,10 +2704,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLocalizationConfigurationSupportedLocalesAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLocalizationConfigurationSupportedLocalesAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2721,10 +2735,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLocalizationConfigurationGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLocalizationConfigurationGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2751,10 +2766,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLocalizationConfigurationAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLocalizationConfigurationAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2781,10 +2797,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLocalizationConfigurationEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLocalizationConfigurationEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2811,10 +2827,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLocalizationConfigurationAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLocalizationConfigurationAttributeListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2843,10 +2860,11 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPTimeFormatLocalizationSupportedCalendarTypesAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2873,10 +2891,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTimeFormatLocalizationGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPTimeFormatLocalizationGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2903,10 +2922,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTimeFormatLocalizationAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPTimeFormatLocalizationAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2933,10 +2953,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTimeFormatLocalizationEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPTimeFormatLocalizationEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2963,10 +2983,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTimeFormatLocalizationAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPTimeFormatLocalizationAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2993,10 +3013,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitLocalizationGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitLocalizationGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3023,10 +3044,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitLocalizationAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitLocalizationAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3053,10 +3074,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitLocalizationEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitLocalizationEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3083,10 +3104,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitLocalizationAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitLocalizationAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3113,10 +3134,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceConfigurationSourcesAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceConfigurationSourcesAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3143,10 +3164,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceConfigurationGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceConfigurationGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3173,10 +3195,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceConfigurationAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceConfigurationAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3203,10 +3226,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceConfigurationEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceConfigurationEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3233,10 +3256,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceConfigurationAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceConfigurationAttributeListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3263,10 +3287,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceWiredAssessedInputVoltageAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceWiredAssessedInputVoltageAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3293,10 +3318,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceWiredAssessedInputFrequencyAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceWiredAssessedInputFrequencyAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3323,10 +3349,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceWiredAssessedCurrentAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceWiredAssessedCurrentAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3354,10 +3380,10 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFaultEnum> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceActiveWiredFaultsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceActiveWiredFaultsAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3384,10 +3410,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceBatVoltageAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceBatVoltageAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3414,10 +3440,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceBatPercentRemainingAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceBatPercentRemainingAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3444,10 +3470,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceBatTimeRemainingAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceBatTimeRemainingAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3475,10 +3501,10 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFaultEnum> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceActiveBatFaultsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceActiveBatFaultsAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3505,10 +3531,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceBatTimeToFullChargeAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceBatTimeToFullChargeAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3535,10 +3561,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceBatChargingCurrentAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceBatChargingCurrentAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3566,10 +3592,10 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFaultEnum> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceActiveBatChargeFaultsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceActiveBatChargeFaultsAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3596,10 +3622,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3626,10 +3652,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3656,10 +3682,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3686,10 +3712,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPowerSourceAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPowerSourceAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3716,10 +3742,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGeneralCommissioningGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGeneralCommissioningGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3746,10 +3773,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGeneralCommissioningAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGeneralCommissioningAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3776,10 +3804,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGeneralCommissioningEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGeneralCommissioningEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3806,10 +3834,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGeneralCommissioningAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGeneralCommissioningAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3839,10 +3867,10 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
             list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPNetworkCommissioningNetworksAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPNetworkCommissioningNetworksAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3871,10 +3899,11 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPNetworkCommissioningLastNetworkingStatusAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPNetworkCommissioningLastNetworkingStatusAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3901,10 +3930,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPNetworkCommissioningLastNetworkIDAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPNetworkCommissioningLastNetworkIDAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3931,10 +3960,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPNetworkCommissioningLastConnectErrorValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPNetworkCommissioningLastConnectErrorValueAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3961,10 +3991,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPNetworkCommissioningGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPNetworkCommissioningGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -3991,10 +4022,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPNetworkCommissioningAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPNetworkCommissioningAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4021,10 +4053,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPNetworkCommissioningEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPNetworkCommissioningEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4051,10 +4083,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPNetworkCommissioningAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPNetworkCommissioningAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4081,10 +4113,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDiagnosticLogsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDiagnosticLogsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4111,10 +4143,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDiagnosticLogsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDiagnosticLogsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4141,10 +4173,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDiagnosticLogsEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDiagnosticLogsEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4171,10 +4203,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDiagnosticLogsAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDiagnosticLogsAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4203,10 +4235,10 @@ public:
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4235,10 +4267,11 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGeneralDiagnosticsActiveHardwareFaultsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGeneralDiagnosticsActiveHardwareFaultsAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4267,10 +4300,10 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGeneralDiagnosticsActiveRadioFaultsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGeneralDiagnosticsActiveRadioFaultsAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4299,10 +4332,11 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4329,10 +4363,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGeneralDiagnosticsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGeneralDiagnosticsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4359,10 +4394,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGeneralDiagnosticsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGeneralDiagnosticsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4389,10 +4425,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGeneralDiagnosticsEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGeneralDiagnosticsEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4419,10 +4455,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGeneralDiagnosticsAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGeneralDiagnosticsAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4451,10 +4487,10 @@ public:
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4481,10 +4517,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPSoftwareDiagnosticsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPSoftwareDiagnosticsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4511,10 +4548,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPSoftwareDiagnosticsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPSoftwareDiagnosticsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4541,10 +4579,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPSoftwareDiagnosticsEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPSoftwareDiagnosticsEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4571,10 +4609,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPSoftwareDiagnosticsAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPSoftwareDiagnosticsAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4601,10 +4639,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsChannelAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsChannelAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4633,10 +4671,10 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsRoutingRoleAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsRoutingRoleAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4663,10 +4701,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsNetworkNameAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsNetworkNameAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4693,10 +4731,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsPanIdAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsPanIdAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4723,10 +4761,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsExtendedPanIdAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsExtendedPanIdAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4753,10 +4792,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsMeshLocalPrefixAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsMeshLocalPrefixAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4785,10 +4825,11 @@ public:
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsNeighborTableAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4817,10 +4858,10 @@ public:
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsRouteTableAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4847,10 +4888,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsPartitionIdAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsPartitionIdAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4877,10 +4918,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsWeightingAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsWeightingAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4907,10 +4948,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsDataVersionAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsDataVersionAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4937,10 +4978,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsStableDataVersionAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsStableDataVersionAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4967,10 +5009,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsLeaderRouterIdAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsLeaderRouterIdAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -4997,10 +5040,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsActiveTimestampAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsActiveTimestampAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5027,10 +5071,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsPendingTimestampAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsPendingTimestampAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5057,10 +5102,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsDelayAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsDelayAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5087,10 +5132,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsChannelPage0MaskAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsChannelPage0MaskAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5119,10 +5165,11 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5149,10 +5196,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5179,10 +5227,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5209,10 +5258,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5239,10 +5288,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThreadNetworkDiagnosticsAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThreadNetworkDiagnosticsAttributeListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5269,10 +5319,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWiFiNetworkDiagnosticsBssidAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsBssidAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5301,10 +5351,10 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWiFiNetworkDiagnosticsSecurityTypeAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsSecurityTypeAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5333,10 +5383,10 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWiFiNetworkDiagnosticsWiFiVersionAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsWiFiVersionAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5363,10 +5413,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWiFiNetworkDiagnosticsChannelNumberAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsChannelNumberAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5393,10 +5443,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWiFiNetworkDiagnosticsRssiAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsRssiAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5423,10 +5473,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWiFiNetworkDiagnosticsBeaconLostCountAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsBeaconLostCountAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5453,10 +5504,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWiFiNetworkDiagnosticsBeaconRxCountAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsBeaconRxCountAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5483,10 +5534,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWiFiNetworkDiagnosticsPacketMulticastRxCountAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsPacketMulticastRxCountAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5513,10 +5565,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWiFiNetworkDiagnosticsPacketMulticastTxCountAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsPacketMulticastTxCountAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5543,10 +5596,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWiFiNetworkDiagnosticsPacketUnicastRxCountAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsPacketUnicastRxCountAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5573,10 +5627,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWiFiNetworkDiagnosticsPacketUnicastTxCountAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsPacketUnicastTxCountAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5603,10 +5658,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWiFiNetworkDiagnosticsCurrentMaxRateAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsCurrentMaxRateAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5633,10 +5689,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWiFiNetworkDiagnosticsOverrunCountAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsOverrunCountAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5663,10 +5719,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWiFiNetworkDiagnosticsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5693,10 +5750,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWiFiNetworkDiagnosticsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5723,10 +5781,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWiFiNetworkDiagnosticsEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5753,10 +5811,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWiFiNetworkDiagnosticsAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWiFiNetworkDiagnosticsAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5785,10 +5843,10 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPEthernetNetworkDiagnosticsPHYRateAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5815,10 +5873,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<bool> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPEthernetNetworkDiagnosticsFullDuplexAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5845,10 +5904,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<bool> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPEthernetNetworkDiagnosticsCarrierDetectAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5875,10 +5935,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPEthernetNetworkDiagnosticsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPEthernetNetworkDiagnosticsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5905,10 +5966,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPEthernetNetworkDiagnosticsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPEthernetNetworkDiagnosticsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5935,10 +5997,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPEthernetNetworkDiagnosticsEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPEthernetNetworkDiagnosticsEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5965,10 +6027,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPEthernetNetworkDiagnosticsAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPEthernetNetworkDiagnosticsAttributeListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -5995,10 +6058,11 @@ public:
     }
 
     static void CallbackFn(void * context, chip::VendorId value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBridgedDeviceBasicInformationVendorIDAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBridgedDeviceBasicInformationVendorIDAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6025,10 +6089,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBridgedDeviceBasicInformationGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBridgedDeviceBasicInformationGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6055,10 +6120,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBridgedDeviceBasicInformationAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBridgedDeviceBasicInformationAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6085,10 +6151,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBridgedDeviceBasicInformationEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBridgedDeviceBasicInformationEventListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6115,10 +6182,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBridgedDeviceBasicInformationAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBridgedDeviceBasicInformationAttributeListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6145,10 +6213,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPSwitchGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPSwitchGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6175,10 +6243,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPSwitchAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPSwitchAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6204,10 +6272,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPSwitchEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPSwitchEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6234,10 +6302,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPSwitchAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPSwitchAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6264,10 +6332,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::FabricIndex> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAdministratorCommissioningAdminFabricIndexAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAdministratorCommissioningAdminFabricIndexAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6294,10 +6363,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAdministratorCommissioningAdminVendorIdAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAdministratorCommissioningAdminVendorIdAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6324,10 +6394,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAdministratorCommissioningGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAdministratorCommissioningGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6354,10 +6425,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAdministratorCommissioningAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAdministratorCommissioningAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6384,10 +6456,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAdministratorCommissioningEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAdministratorCommissioningEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6414,10 +6486,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAdministratorCommissioningAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAdministratorCommissioningAttributeListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6447,10 +6520,10 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
             list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOperationalCredentialsNOCsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOperationalCredentialsNOCsAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6479,10 +6552,10 @@ public:
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOperationalCredentialsFabricsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOperationalCredentialsFabricsAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6509,10 +6582,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6539,10 +6613,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOperationalCredentialsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOperationalCredentialsGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6569,10 +6644,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOperationalCredentialsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOperationalCredentialsAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6599,10 +6675,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOperationalCredentialsEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOperationalCredentialsEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6629,10 +6705,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOperationalCredentialsAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOperationalCredentialsAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6661,10 +6737,10 @@ public:
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGroupKeyManagementGroupKeyMapAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGroupKeyManagementGroupKeyMapAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6693,10 +6769,10 @@ public:
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGroupKeyManagementGroupTableAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGroupKeyManagementGroupTableAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6723,10 +6799,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGroupKeyManagementGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGroupKeyManagementGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6753,10 +6830,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGroupKeyManagementAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGroupKeyManagementAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6783,10 +6861,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGroupKeyManagementEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGroupKeyManagementEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6813,10 +6891,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGroupKeyManagementAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGroupKeyManagementAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6845,10 +6923,10 @@ public:
     static void CallbackFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFixedLabelLabelListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFixedLabelLabelListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6875,10 +6953,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFixedLabelGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFixedLabelGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6905,10 +6983,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFixedLabelAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFixedLabelAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6935,10 +7013,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFixedLabelEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFixedLabelEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6965,10 +7043,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFixedLabelAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFixedLabelAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -6996,10 +7074,10 @@ public:
     static void CallbackFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUserLabelLabelListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUserLabelLabelListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7026,10 +7104,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUserLabelGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUserLabelGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7056,10 +7134,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUserLabelAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUserLabelAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7085,10 +7163,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUserLabelEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUserLabelEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7115,10 +7193,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUserLabelAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUserLabelAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7145,10 +7223,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBooleanStateGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBooleanStateGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7175,10 +7253,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBooleanStateAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBooleanStateAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7205,10 +7283,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBooleanStateEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBooleanStateEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7235,10 +7313,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBooleanStateAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBooleanStateAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7265,10 +7343,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPModeSelectStandardNamespaceAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPModeSelectStandardNamespaceAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7298,10 +7376,10 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
             list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPModeSelectSupportedModesAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPModeSelectSupportedModesAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7328,10 +7406,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPModeSelectStartUpModeAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPModeSelectStartUpModeAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7357,10 +7435,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPModeSelectOnModeAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPModeSelectOnModeAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7387,10 +7465,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPModeSelectGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPModeSelectGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7417,10 +7495,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPModeSelectAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPModeSelectAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7447,10 +7525,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPModeSelectEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPModeSelectEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7477,10 +7555,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPModeSelectAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPModeSelectAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7507,10 +7585,10 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDoorLockLockStateAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDoorLockLockStateAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7537,10 +7615,10 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDoorLockDoorStateAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDoorLockDoorStateAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7567,10 +7645,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDoorLockGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDoorLockGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7597,10 +7675,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDoorLockAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDoorLockAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7626,10 +7704,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDoorLockEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDoorLockEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7656,10 +7734,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPDoorLockAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPDoorLockAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7686,10 +7764,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWindowCoveringCurrentPositionLiftAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWindowCoveringCurrentPositionLiftAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7716,10 +7794,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWindowCoveringCurrentPositionTiltAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWindowCoveringCurrentPositionTiltAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7746,10 +7824,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::Percent> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWindowCoveringCurrentPositionLiftPercentageAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWindowCoveringCurrentPositionLiftPercentageAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7776,10 +7855,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::Percent> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWindowCoveringCurrentPositionTiltPercentageAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWindowCoveringCurrentPositionTiltPercentageAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7806,10 +7886,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWindowCoveringTargetPositionLiftPercent100thsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWindowCoveringTargetPositionLiftPercent100thsAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7836,10 +7917,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWindowCoveringTargetPositionTiltPercent100thsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWindowCoveringTargetPositionTiltPercent100thsAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7866,10 +7948,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWindowCoveringCurrentPositionLiftPercent100thsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWindowCoveringCurrentPositionLiftPercent100thsAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7896,10 +7979,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWindowCoveringCurrentPositionTiltPercent100thsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWindowCoveringCurrentPositionTiltPercent100thsAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7926,10 +8010,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWindowCoveringGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWindowCoveringGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7956,10 +8040,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWindowCoveringAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWindowCoveringAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -7986,10 +8070,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWindowCoveringEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWindowCoveringEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8016,10 +8100,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWindowCoveringAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWindowCoveringAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8046,10 +8130,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBarrierControlGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBarrierControlGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8076,10 +8160,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBarrierControlAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBarrierControlAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8106,10 +8190,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBarrierControlEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBarrierControlEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8136,10 +8220,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBarrierControlAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBarrierControlAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8166,10 +8250,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlMaxPressureAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlMaxPressureAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8196,10 +8281,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlMaxSpeedAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlMaxSpeedAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8226,10 +8311,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlMaxFlowAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlMaxFlowAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8256,10 +8341,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlMinConstPressureAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlMinConstPressureAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8286,10 +8372,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlMaxConstPressureAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlMaxConstPressureAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8316,10 +8403,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlMinCompPressureAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlMinCompPressureAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8346,10 +8434,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlMaxCompPressureAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlMaxCompPressureAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8376,10 +8465,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlMinConstSpeedAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlMinConstSpeedAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8406,10 +8496,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlMaxConstSpeedAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlMaxConstSpeedAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8436,10 +8527,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlMinConstFlowAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlMinConstFlowAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8466,10 +8558,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlMaxConstFlowAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlMaxConstFlowAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8496,10 +8589,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlMinConstTempAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlMinConstTempAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8526,10 +8620,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlMaxConstTempAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlMaxConstTempAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8556,10 +8651,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlCapacityAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlCapacityAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8586,10 +8681,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlSpeedAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlSpeedAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8616,10 +8711,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlLifetimeRunningHoursAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlLifetimeRunningHoursAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8646,10 +8742,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlPowerAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlPowerAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8676,10 +8772,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlLifetimeEnergyConsumedAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlLifetimeEnergyConsumedAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8706,10 +8803,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8736,10 +8834,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8766,10 +8865,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlEventListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8796,10 +8896,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPumpConfigurationAndControlAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPumpConfigurationAndControlAttributeListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8826,10 +8927,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThermostatLocalTemperatureAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThermostatLocalTemperatureAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8856,10 +8957,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThermostatGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThermostatGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8886,10 +8987,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThermostatAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThermostatAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8916,10 +9017,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThermostatEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThermostatEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8946,10 +9047,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThermostatAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThermostatAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -8976,10 +9077,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFanControlPercentSettingAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFanControlPercentSettingAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9006,10 +9107,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFanControlSpeedSettingAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFanControlSpeedSettingAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9036,10 +9137,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFanControlGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFanControlGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9066,10 +9167,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFanControlAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFanControlAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9096,10 +9197,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFanControlEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFanControlEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9126,10 +9227,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFanControlAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFanControlAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9156,11 +9257,12 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
             reinterpret_cast<CHIPThermostatUserInterfaceConfigurationGeneratedCommandListAttributeCallback *>(context)
-                ->javaCallbackRef);
+                ->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9187,11 +9289,12 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
             reinterpret_cast<CHIPThermostatUserInterfaceConfigurationAcceptedCommandListAttributeCallback *>(context)
-                ->javaCallbackRef);
+                ->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9218,10 +9321,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThermostatUserInterfaceConfigurationEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThermostatUserInterfaceConfigurationEventListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9248,10 +9352,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPThermostatUserInterfaceConfigurationAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPThermostatUserInterfaceConfigurationAttributeListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9278,10 +9383,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPColorControlNumberOfPrimariesAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPColorControlNumberOfPrimariesAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9308,10 +9413,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPColorControlPrimary1IntensityAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPColorControlPrimary1IntensityAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9338,10 +9443,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPColorControlPrimary2IntensityAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPColorControlPrimary2IntensityAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9368,10 +9473,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPColorControlPrimary3IntensityAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPColorControlPrimary3IntensityAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9398,10 +9503,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPColorControlPrimary4IntensityAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPColorControlPrimary4IntensityAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9428,10 +9533,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPColorControlPrimary5IntensityAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPColorControlPrimary5IntensityAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9458,10 +9563,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPColorControlPrimary6IntensityAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPColorControlPrimary6IntensityAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9488,10 +9593,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPColorControlColorPointRIntensityAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPColorControlColorPointRIntensityAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9518,10 +9623,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPColorControlColorPointGIntensityAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPColorControlColorPointGIntensityAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9548,10 +9653,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPColorControlColorPointBIntensityAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPColorControlColorPointBIntensityAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9578,10 +9683,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPColorControlStartUpColorTemperatureMiredsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPColorControlStartUpColorTemperatureMiredsAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9608,10 +9714,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPColorControlGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPColorControlGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9638,10 +9744,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPColorControlAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPColorControlAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9668,10 +9774,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPColorControlEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPColorControlEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9698,10 +9804,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPColorControlAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPColorControlAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9728,10 +9834,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBallastConfigurationIntrinsicBallastFactorAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9758,10 +9865,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBallastConfigurationBallastFactorAdjustmentAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBallastConfigurationBallastFactorAdjustmentAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9788,10 +9896,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBallastConfigurationLampRatedHoursAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBallastConfigurationLampRatedHoursAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9818,10 +9926,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBallastConfigurationLampBurnHoursAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBallastConfigurationLampBurnHoursAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9848,10 +9956,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBallastConfigurationLampBurnHoursTripPointAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBallastConfigurationLampBurnHoursTripPointAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9878,10 +9987,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBallastConfigurationGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBallastConfigurationGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9908,10 +10018,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBallastConfigurationAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBallastConfigurationAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9938,10 +10049,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBallastConfigurationEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBallastConfigurationEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9968,10 +10079,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPBallastConfigurationAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPBallastConfigurationAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -9998,10 +10109,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPIlluminanceMeasurementMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPIlluminanceMeasurementMeasuredValueAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10028,10 +10139,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPIlluminanceMeasurementMinMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPIlluminanceMeasurementMinMeasuredValueAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10058,10 +10170,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPIlluminanceMeasurementMaxMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPIlluminanceMeasurementMaxMeasuredValueAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10088,10 +10201,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10118,10 +10232,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPIlluminanceMeasurementGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPIlluminanceMeasurementGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10148,10 +10263,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPIlluminanceMeasurementAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPIlluminanceMeasurementAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10178,10 +10294,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPIlluminanceMeasurementEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPIlluminanceMeasurementEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10208,10 +10324,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPIlluminanceMeasurementAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPIlluminanceMeasurementAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10238,10 +10354,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTemperatureMeasurementMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPTemperatureMeasurementMeasuredValueAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10268,10 +10384,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTemperatureMeasurementMinMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPTemperatureMeasurementMinMeasuredValueAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10298,10 +10415,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTemperatureMeasurementMaxMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPTemperatureMeasurementMaxMeasuredValueAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10328,10 +10446,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTemperatureMeasurementGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPTemperatureMeasurementGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10358,10 +10477,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTemperatureMeasurementAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPTemperatureMeasurementAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10388,10 +10508,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTemperatureMeasurementEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPTemperatureMeasurementEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10418,10 +10538,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTemperatureMeasurementAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPTemperatureMeasurementAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10448,10 +10568,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPressureMeasurementMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPressureMeasurementMeasuredValueAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10478,10 +10598,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPressureMeasurementMinMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPressureMeasurementMinMeasuredValueAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10508,10 +10628,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPressureMeasurementMaxMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPressureMeasurementMaxMeasuredValueAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10538,10 +10658,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPressureMeasurementScaledValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPressureMeasurementScaledValueAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10568,10 +10688,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPressureMeasurementMinScaledValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPressureMeasurementMinScaledValueAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10598,10 +10718,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPressureMeasurementMaxScaledValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPressureMeasurementMaxScaledValueAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10628,10 +10748,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPressureMeasurementGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPressureMeasurementGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10658,10 +10779,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPressureMeasurementAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPressureMeasurementAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10688,10 +10810,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPressureMeasurementEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPressureMeasurementEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10718,10 +10840,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPPressureMeasurementAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPPressureMeasurementAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10748,10 +10870,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFlowMeasurementMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFlowMeasurementMeasuredValueAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10778,10 +10900,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFlowMeasurementMinMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFlowMeasurementMinMeasuredValueAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10808,10 +10930,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFlowMeasurementMaxMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFlowMeasurementMaxMeasuredValueAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10838,10 +10960,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFlowMeasurementGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFlowMeasurementGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10868,10 +10990,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFlowMeasurementAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFlowMeasurementAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10898,10 +11020,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFlowMeasurementEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFlowMeasurementEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10928,10 +11050,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPFlowMeasurementAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPFlowMeasurementAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10958,10 +11080,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPRelativeHumidityMeasurementMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPRelativeHumidityMeasurementMeasuredValueAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -10988,10 +11111,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPRelativeHumidityMeasurementMinMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPRelativeHumidityMeasurementMinMeasuredValueAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11018,10 +11142,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPRelativeHumidityMeasurementMaxMeasuredValueAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPRelativeHumidityMeasurementMaxMeasuredValueAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11048,10 +11173,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPRelativeHumidityMeasurementGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPRelativeHumidityMeasurementGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11078,10 +11204,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPRelativeHumidityMeasurementAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPRelativeHumidityMeasurementAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11108,10 +11235,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPRelativeHumidityMeasurementEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPRelativeHumidityMeasurementEventListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11138,10 +11266,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPRelativeHumidityMeasurementAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPRelativeHumidityMeasurementAttributeListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11168,10 +11297,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOccupancySensingGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOccupancySensingGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11198,10 +11328,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOccupancySensingAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOccupancySensingAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11228,10 +11358,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOccupancySensingEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOccupancySensingEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11258,10 +11388,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPOccupancySensingAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPOccupancySensingAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11288,10 +11418,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWakeOnLanGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWakeOnLanGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11318,10 +11448,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWakeOnLanAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWakeOnLanAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11347,10 +11477,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWakeOnLanEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWakeOnLanEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11377,10 +11507,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPWakeOnLanAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPWakeOnLanAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11408,10 +11538,10 @@ public:
     static void CallbackFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPChannelChannelListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPChannelChannelListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11438,10 +11568,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPChannelGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPChannelGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11468,10 +11598,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPChannelAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPChannelAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11497,10 +11627,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPChannelEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPChannelEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11527,10 +11657,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPChannelAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPChannelAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11560,10 +11690,10 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType> &
             list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTargetNavigatorTargetListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPTargetNavigatorTargetListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11590,10 +11720,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTargetNavigatorGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPTargetNavigatorGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11620,10 +11750,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTargetNavigatorAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPTargetNavigatorAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11650,10 +11780,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTargetNavigatorEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPTargetNavigatorEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11680,10 +11810,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTargetNavigatorAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPTargetNavigatorAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11710,10 +11840,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPMediaPlaybackStartTimeAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPMediaPlaybackStartTimeAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11740,10 +11870,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPMediaPlaybackDurationAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPMediaPlaybackDurationAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11770,10 +11900,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPMediaPlaybackSeekRangeEndAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPMediaPlaybackSeekRangeEndAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11800,10 +11930,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPMediaPlaybackSeekRangeStartAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPMediaPlaybackSeekRangeStartAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11830,10 +11960,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPMediaPlaybackGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPMediaPlaybackGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11860,10 +11990,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPMediaPlaybackAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPMediaPlaybackAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11890,10 +12020,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPMediaPlaybackEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPMediaPlaybackEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11920,10 +12050,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPMediaPlaybackAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPMediaPlaybackAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11952,10 +12082,10 @@ public:
     static void CallbackFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfoStruct::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPMediaInputInputListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPMediaInputInputListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -11982,10 +12112,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPMediaInputGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPMediaInputGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12012,10 +12142,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPMediaInputAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPMediaInputAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12042,10 +12172,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPMediaInputEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPMediaInputEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12072,10 +12202,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPMediaInputAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPMediaInputAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12102,10 +12232,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLowPowerGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLowPowerGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12132,10 +12262,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLowPowerAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLowPowerAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12161,10 +12291,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLowPowerEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLowPowerEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12191,10 +12321,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPLowPowerAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPLowPowerAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12221,10 +12351,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPKeypadInputGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPKeypadInputGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12251,10 +12381,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPKeypadInputAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPKeypadInputAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12281,10 +12411,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPKeypadInputEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPKeypadInputEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12311,10 +12441,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPKeypadInputAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPKeypadInputAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12341,10 +12471,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPContentLauncherAcceptHeaderAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPContentLauncherAcceptHeaderAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12371,10 +12501,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPContentLauncherGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPContentLauncherGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12401,10 +12531,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPContentLauncherAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPContentLauncherAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12431,10 +12561,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPContentLauncherEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPContentLauncherEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12461,10 +12591,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPContentLauncherAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPContentLauncherAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12494,10 +12624,10 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::DecodableType> &
             list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAudioOutputOutputListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAudioOutputOutputListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12524,10 +12654,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAudioOutputGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAudioOutputGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12554,10 +12684,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAudioOutputAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAudioOutputAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12584,10 +12714,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAudioOutputEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAudioOutputEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12614,10 +12744,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAudioOutputAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAudioOutputAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12644,10 +12774,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint16_t> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPApplicationLauncherCatalogListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPApplicationLauncherCatalogListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12674,10 +12804,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPApplicationLauncherGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPApplicationLauncherGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12704,10 +12835,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPApplicationLauncherAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPApplicationLauncherAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12734,10 +12866,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPApplicationLauncherEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPApplicationLauncherEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12764,10 +12896,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPApplicationLauncherAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPApplicationLauncherAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12794,10 +12926,10 @@ public:
     }
 
     static void CallbackFn(void * context, chip::VendorId value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPApplicationBasicVendorIDAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPApplicationBasicVendorIDAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12824,10 +12956,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPApplicationBasicAllowedVendorListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPApplicationBasicAllowedVendorListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12854,10 +12986,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPApplicationBasicGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPApplicationBasicGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12884,10 +13017,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPApplicationBasicAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPApplicationBasicAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12914,10 +13047,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPApplicationBasicEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPApplicationBasicEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12944,10 +13077,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPApplicationBasicAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPApplicationBasicAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -12974,10 +13107,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAccountLoginGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAccountLoginGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13004,10 +13137,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAccountLoginAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAccountLoginAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13034,10 +13167,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAccountLoginEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAccountLoginEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13064,10 +13197,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPAccountLoginAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPAccountLoginAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13094,10 +13227,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPElectricalMeasurementGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPElectricalMeasurementGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13124,10 +13258,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPElectricalMeasurementAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPElectricalMeasurementAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13154,10 +13289,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPElectricalMeasurementEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPElectricalMeasurementEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13184,10 +13319,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPElectricalMeasurementAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPElectricalMeasurementAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13216,10 +13351,10 @@ public:
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::ClientMonitoring::Structs::MonitoringRegistration::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPClientMonitoringExpectedClientsAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPClientMonitoringExpectedClientsAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13246,10 +13381,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPClientMonitoringGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPClientMonitoringGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13276,10 +13412,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPClientMonitoringAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPClientMonitoringAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13306,10 +13442,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPClientMonitoringEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPClientMonitoringEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13336,10 +13472,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPClientMonitoringAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPClientMonitoringAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13366,10 +13502,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingListInt8uAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingListInt8uAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13396,10 +13532,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingListOctetStringAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingListOctetStringAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13429,10 +13565,10 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestListStructOctet::DecodableType> &
             list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingListStructOctetStringAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingListStructOctetStringAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13459,10 +13595,10 @@ public:
     }
 
     static void CallbackFn(void * context, chip::VendorId value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingVendorIdAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingVendorIdAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13491,10 +13627,11 @@ public:
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingListNullablesAndOptionalsStructAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingListNullablesAndOptionalsStructAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13521,10 +13658,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingListLongOctetStringAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingListLongOctetStringAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13554,10 +13691,10 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::DecodableType> &
             list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingListFabricScopedAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingListFabricScopedAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13584,10 +13721,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<bool> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableBooleanAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableBooleanAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13616,10 +13753,10 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableBitmap8AttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableBitmap8AttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13648,10 +13785,10 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableBitmap16AttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableBitmap16AttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13680,10 +13817,10 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableBitmap32AttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableBitmap32AttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13712,10 +13849,10 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableBitmap64AttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableBitmap64AttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13742,10 +13879,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableInt8uAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableInt8uAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13772,10 +13909,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableInt16uAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableInt16uAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13802,10 +13939,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableInt24uAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableInt24uAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13832,10 +13969,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableInt32uAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableInt32uAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13862,10 +13999,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableInt40uAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableInt40uAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13892,10 +14029,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableInt48uAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableInt48uAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13922,10 +14059,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableInt56uAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableInt56uAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13952,10 +14089,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableInt64uAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableInt64uAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -13982,10 +14119,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableInt8sAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableInt8sAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14012,10 +14149,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableInt16sAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableInt16sAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14042,10 +14179,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableInt24sAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableInt24sAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14072,10 +14209,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int32_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableInt32sAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableInt32sAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14102,10 +14239,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int64_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableInt40sAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableInt40sAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14132,10 +14269,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int64_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableInt48sAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableInt48sAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14162,10 +14299,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int64_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableInt56sAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableInt56sAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14192,10 +14329,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int64_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableInt64sAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableInt64sAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14222,10 +14359,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableEnum8AttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableEnum8AttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14252,10 +14389,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableEnum16AttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableEnum16AttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14282,10 +14419,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<float> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableFloatSingleAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableFloatSingleAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14312,10 +14449,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<double> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableFloatDoubleAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableFloatDoubleAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14342,10 +14479,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableOctetStringAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableOctetStringAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14372,10 +14509,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableCharStringAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableCharStringAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14403,10 +14540,10 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableEnumAttrAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableEnumAttrAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14433,10 +14570,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableRangeRestrictedInt8uAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableRangeRestrictedInt8uAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14463,10 +14601,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int8_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableRangeRestrictedInt8sAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableRangeRestrictedInt8sAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14493,10 +14632,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableRangeRestrictedInt16uAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableRangeRestrictedInt16uAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14523,10 +14663,11 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingNullableRangeRestrictedInt16sAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingNullableRangeRestrictedInt16sAttributeCallback *>(context)->javaCallbackRef,
+            subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14553,10 +14694,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingGeneratedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14583,10 +14724,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingAcceptedCommandListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14613,10 +14754,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingEventListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingEventListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -14643,10 +14784,10 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPUnitTestingAttributeListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPUnitTestingAttributeListAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 

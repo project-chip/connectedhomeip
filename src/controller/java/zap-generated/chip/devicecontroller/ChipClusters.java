@@ -38,7 +38,7 @@ public class ChipClusters {
 
     void onError(Exception error);
 
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface OctetStringAttributeCallback {
@@ -47,7 +47,7 @@ public class ChipClusters {
 
     void onError(Exception error);
 
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface IntegerAttributeCallback {
@@ -55,7 +55,7 @@ public class ChipClusters {
 
     void onError(Exception error);
 
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface LongAttributeCallback {
@@ -63,7 +63,7 @@ public class ChipClusters {
 
     void onError(Exception error);
 
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface BooleanAttributeCallback {
@@ -71,7 +71,7 @@ public class ChipClusters {
 
     void onError(Exception error);
 
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface FloatAttributeCallback {
@@ -79,7 +79,7 @@ public class ChipClusters {
 
     void onError(Exception error);
 
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface DoubleAttributeCallback {
@@ -87,7 +87,7 @@ public class ChipClusters {
 
     void onError(Exception error);
 
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public abstract static class BaseChipCluster {
@@ -182,7 +182,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -190,7 +190,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -198,7 +198,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -206,7 +206,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readIdentifyTimeAttribute(IntegerAttributeCallback callback) {
@@ -494,7 +494,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -502,7 +502,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -510,7 +510,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -518,7 +518,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readNameSupportAttribute(IntegerAttributeCallback callback) {
@@ -857,7 +857,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -865,7 +865,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -873,7 +873,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -881,7 +881,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -889,7 +889,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readSceneCountAttribute(IntegerAttributeCallback callback) {
@@ -1188,7 +1188,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -1196,7 +1196,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -1204,7 +1204,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -1212,7 +1212,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -1220,7 +1220,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readOnOffAttribute(BooleanAttributeCallback callback) {
@@ -1459,7 +1459,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -1467,7 +1467,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -1475,7 +1475,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -1483,7 +1483,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readSwitchTypeAttribute(IntegerAttributeCallback callback) {
@@ -1922,7 +1922,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface OnLevelAttributeCallback {
@@ -1930,7 +1930,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface OnTransitionTimeAttributeCallback {
@@ -1938,7 +1938,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface OffTransitionTimeAttributeCallback {
@@ -1946,7 +1946,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface DefaultMoveRateAttributeCallback {
@@ -1954,7 +1954,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface StartUpCurrentLevelAttributeCallback {
@@ -1962,7 +1962,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -1970,7 +1970,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -1978,7 +1978,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -1986,7 +1986,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -1994,7 +1994,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readCurrentLevelAttribute(CurrentLevelAttributeCallback callback) {
@@ -2442,7 +2442,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -2450,7 +2450,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -2458,7 +2458,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -2466,7 +2466,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readOutOfServiceAttribute(BooleanAttributeCallback callback) {
@@ -2659,7 +2659,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ServerListAttributeCallback {
@@ -2667,7 +2667,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ClientListAttributeCallback {
@@ -2675,7 +2675,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface PartsListAttributeCallback {
@@ -2683,7 +2683,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -2691,7 +2691,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -2699,7 +2699,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -2707,7 +2707,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -2715,7 +2715,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readDeviceTypeListAttribute(DeviceTypeListAttributeCallback callback) {
@@ -2902,7 +2902,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -2910,7 +2910,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -2918,7 +2918,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -2926,7 +2926,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -2934,7 +2934,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readBindingAttribute(BindingAttributeCallback callback) {
@@ -3085,7 +3085,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ExtensionAttributeCallback {
@@ -3093,7 +3093,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -3101,7 +3101,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -3109,7 +3109,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -3117,7 +3117,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -3125,7 +3125,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readAclAttribute(AclAttributeCallback callback) {
@@ -3617,7 +3617,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EndpointListsAttributeCallback {
@@ -3625,7 +3625,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -3633,7 +3633,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -3641,7 +3641,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -3649,7 +3649,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -3657,7 +3657,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readActionListAttribute(ActionListAttributeCallback callback) {
@@ -3829,7 +3829,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -3837,7 +3837,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -3845,7 +3845,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -3853,7 +3853,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -3861,7 +3861,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readDataModelRevisionAttribute(IntegerAttributeCallback callback) {
@@ -4468,7 +4468,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -4476,7 +4476,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -4484,7 +4484,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -4492,7 +4492,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
@@ -4657,7 +4657,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface UpdateStateProgressAttributeCallback {
@@ -4665,7 +4665,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -4673,7 +4673,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -4681,7 +4681,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -4689,7 +4689,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -4697,7 +4697,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readDefaultOTAProvidersAttribute(DefaultOTAProvidersAttributeCallback callback) {
@@ -4900,7 +4900,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -4908,7 +4908,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -4916,7 +4916,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -4924,7 +4924,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -4932,7 +4932,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readActiveLocaleAttribute(CharStringAttributeCallback callback) {
@@ -5101,7 +5101,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -5109,7 +5109,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -5117,7 +5117,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -5125,7 +5125,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -5133,7 +5133,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readHourFormatAttribute(IntegerAttributeCallback callback) {
@@ -5330,7 +5330,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -5338,7 +5338,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -5346,7 +5346,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -5354,7 +5354,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readTemperatureUnitAttribute(IntegerAttributeCallback callback) {
@@ -5502,7 +5502,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -5510,7 +5510,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -5518,7 +5518,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -5526,7 +5526,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -5534,7 +5534,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readSourcesAttribute(SourcesAttributeCallback callback) {
@@ -5667,7 +5667,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface WiredAssessedInputFrequencyAttributeCallback {
@@ -5675,7 +5675,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface WiredAssessedCurrentAttributeCallback {
@@ -5683,7 +5683,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ActiveWiredFaultsAttributeCallback {
@@ -5691,7 +5691,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface BatVoltageAttributeCallback {
@@ -5699,7 +5699,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface BatPercentRemainingAttributeCallback {
@@ -5707,7 +5707,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface BatTimeRemainingAttributeCallback {
@@ -5715,7 +5715,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ActiveBatFaultsAttributeCallback {
@@ -5723,7 +5723,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface BatTimeToFullChargeAttributeCallback {
@@ -5731,7 +5731,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface BatChargingCurrentAttributeCallback {
@@ -5739,7 +5739,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ActiveBatChargeFaultsAttributeCallback {
@@ -5747,7 +5747,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -5755,7 +5755,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -5763,7 +5763,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -5771,7 +5771,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -5779,7 +5779,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readStatusAttribute(IntegerAttributeCallback callback) {
@@ -6497,7 +6497,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -6505,7 +6505,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -6513,7 +6513,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -6521,7 +6521,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readBreadcrumbAttribute(LongAttributeCallback callback) {
@@ -6878,7 +6878,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface LastNetworkingStatusAttributeCallback {
@@ -6886,7 +6886,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface LastNetworkIDAttributeCallback {
@@ -6894,7 +6894,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface LastConnectErrorValueAttributeCallback {
@@ -6902,7 +6902,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -6910,7 +6910,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -6918,7 +6918,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -6926,7 +6926,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -6934,7 +6934,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readMaxNetworksAttribute(IntegerAttributeCallback callback) {
@@ -7239,7 +7239,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -7247,7 +7247,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -7255,7 +7255,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -7263,7 +7263,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
@@ -7401,7 +7401,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ActiveHardwareFaultsAttributeCallback {
@@ -7409,7 +7409,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ActiveRadioFaultsAttributeCallback {
@@ -7417,7 +7417,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ActiveNetworkFaultsAttributeCallback {
@@ -7425,7 +7425,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -7433,7 +7433,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -7441,7 +7441,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -7449,7 +7449,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -7457,7 +7457,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readNetworkInterfacesAttribute(NetworkInterfacesAttributeCallback callback) {
@@ -7736,7 +7736,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -7744,7 +7744,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -7752,7 +7752,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -7760,7 +7760,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -7768,7 +7768,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readThreadMetricsAttribute(ThreadMetricsAttributeCallback callback) {
@@ -7964,7 +7964,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface RoutingRoleAttributeCallback {
@@ -7972,7 +7972,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NetworkNameAttributeCallback {
@@ -7980,7 +7980,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface PanIdAttributeCallback {
@@ -7988,7 +7988,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ExtendedPanIdAttributeCallback {
@@ -7996,7 +7996,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MeshLocalPrefixAttributeCallback {
@@ -8004,7 +8004,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NeighborTableAttributeCallback {
@@ -8012,7 +8012,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface RouteTableAttributeCallback {
@@ -8020,7 +8020,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface PartitionIdAttributeCallback {
@@ -8028,7 +8028,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface WeightingAttributeCallback {
@@ -8036,7 +8036,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface DataVersionAttributeCallback {
@@ -8044,7 +8044,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface StableDataVersionAttributeCallback {
@@ -8052,7 +8052,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface LeaderRouterIdAttributeCallback {
@@ -8060,7 +8060,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ActiveTimestampAttributeCallback {
@@ -8068,7 +8068,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface PendingTimestampAttributeCallback {
@@ -8076,7 +8076,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface DelayAttributeCallback {
@@ -8084,7 +8084,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ChannelPage0MaskAttributeCallback {
@@ -8092,7 +8092,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ActiveNetworkFaultsListAttributeCallback {
@@ -8100,7 +8100,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -8108,7 +8108,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -8116,7 +8116,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -8124,7 +8124,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -8132,7 +8132,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readChannelAttribute(ChannelAttributeCallback callback) {
@@ -9225,7 +9225,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface SecurityTypeAttributeCallback {
@@ -9233,7 +9233,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface WiFiVersionAttributeCallback {
@@ -9241,7 +9241,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ChannelNumberAttributeCallback {
@@ -9249,7 +9249,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface RssiAttributeCallback {
@@ -9257,7 +9257,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface BeaconLostCountAttributeCallback {
@@ -9265,7 +9265,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface BeaconRxCountAttributeCallback {
@@ -9273,7 +9273,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface PacketMulticastRxCountAttributeCallback {
@@ -9281,7 +9281,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface PacketMulticastTxCountAttributeCallback {
@@ -9289,7 +9289,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface PacketUnicastRxCountAttributeCallback {
@@ -9297,7 +9297,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface PacketUnicastTxCountAttributeCallback {
@@ -9305,7 +9305,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface CurrentMaxRateAttributeCallback {
@@ -9313,7 +9313,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface OverrunCountAttributeCallback {
@@ -9321,7 +9321,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -9329,7 +9329,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -9337,7 +9337,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -9345,7 +9345,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -9353,7 +9353,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readBssidAttribute(BssidAttributeCallback callback) {
@@ -9713,7 +9713,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface FullDuplexAttributeCallback {
@@ -9721,7 +9721,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface CarrierDetectAttributeCallback {
@@ -9729,7 +9729,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -9737,7 +9737,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -9745,7 +9745,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -9753,7 +9753,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -9761,7 +9761,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readPHYRateAttribute(PHYRateAttributeCallback callback) {
@@ -10020,7 +10020,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -10028,7 +10028,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -10036,7 +10036,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -10044,7 +10044,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -10052,7 +10052,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readVendorNameAttribute(CharStringAttributeCallback callback) {
@@ -10443,7 +10443,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -10451,7 +10451,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -10459,7 +10459,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -10467,7 +10467,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readNumberOfPositionsAttribute(IntegerAttributeCallback callback) {
@@ -10681,7 +10681,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AdminVendorIdAttributeCallback {
@@ -10689,7 +10689,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -10697,7 +10697,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -10705,7 +10705,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -10713,7 +10713,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -10721,7 +10721,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readWindowStatusAttribute(IntegerAttributeCallback callback) {
@@ -11080,7 +11080,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface FabricsAttributeCallback {
@@ -11089,7 +11089,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface TrustedRootCertificatesAttributeCallback {
@@ -11097,7 +11097,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -11105,7 +11105,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -11113,7 +11113,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -11121,7 +11121,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -11129,7 +11129,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readNOCsAttribute(NOCsAttributeCallback callback) {
@@ -11419,7 +11419,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GroupTableAttributeCallback {
@@ -11427,7 +11427,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -11435,7 +11435,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -11443,7 +11443,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -11451,7 +11451,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -11459,7 +11459,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readGroupKeyMapAttribute(GroupKeyMapAttributeCallback callback) {
@@ -11662,7 +11662,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -11670,7 +11670,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -11678,7 +11678,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -11686,7 +11686,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -11694,7 +11694,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readLabelListAttribute(LabelListAttributeCallback callback) {
@@ -11827,7 +11827,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -11835,7 +11835,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -11843,7 +11843,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -11851,7 +11851,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -11859,7 +11859,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readLabelListAttribute(LabelListAttributeCallback callback) {
@@ -12010,7 +12010,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -12018,7 +12018,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -12026,7 +12026,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -12034,7 +12034,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readStateValueAttribute(BooleanAttributeCallback callback) {
@@ -12182,7 +12182,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface SupportedModesAttributeCallback {
@@ -12190,7 +12190,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface StartUpModeAttributeCallback {
@@ -12198,7 +12198,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface OnModeAttributeCallback {
@@ -12206,7 +12206,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -12214,7 +12214,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -12222,7 +12222,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -12230,7 +12230,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -12238,7 +12238,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readDescriptionAttribute(CharStringAttributeCallback callback) {
@@ -12967,7 +12967,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface DoorStateAttributeCallback {
@@ -12975,7 +12975,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -12983,7 +12983,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -12991,7 +12991,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -12999,7 +12999,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -13007,7 +13007,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readLockStateAttribute(LockStateAttributeCallback callback) {
@@ -13751,7 +13751,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface CurrentPositionTiltAttributeCallback {
@@ -13759,7 +13759,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface CurrentPositionLiftPercentageAttributeCallback {
@@ -13767,7 +13767,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface CurrentPositionTiltPercentageAttributeCallback {
@@ -13775,7 +13775,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface TargetPositionLiftPercent100thsAttributeCallback {
@@ -13783,7 +13783,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface TargetPositionTiltPercent100thsAttributeCallback {
@@ -13791,7 +13791,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface CurrentPositionLiftPercent100thsAttributeCallback {
@@ -13799,7 +13799,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface CurrentPositionTiltPercent100thsAttributeCallback {
@@ -13807,7 +13807,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -13815,7 +13815,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -13823,7 +13823,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -13831,7 +13831,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -13839,7 +13839,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readTypeAttribute(IntegerAttributeCallback callback) {
@@ -14375,7 +14375,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -14383,7 +14383,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -14391,7 +14391,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -14399,7 +14399,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readBarrierMovingStateAttribute(IntegerAttributeCallback callback) {
@@ -14577,7 +14577,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MaxSpeedAttributeCallback {
@@ -14585,7 +14585,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MaxFlowAttributeCallback {
@@ -14593,7 +14593,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MinConstPressureAttributeCallback {
@@ -14601,7 +14601,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MaxConstPressureAttributeCallback {
@@ -14609,7 +14609,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MinCompPressureAttributeCallback {
@@ -14617,7 +14617,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MaxCompPressureAttributeCallback {
@@ -14625,7 +14625,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MinConstSpeedAttributeCallback {
@@ -14633,7 +14633,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MaxConstSpeedAttributeCallback {
@@ -14641,7 +14641,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MinConstFlowAttributeCallback {
@@ -14649,7 +14649,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MaxConstFlowAttributeCallback {
@@ -14657,7 +14657,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MinConstTempAttributeCallback {
@@ -14665,7 +14665,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MaxConstTempAttributeCallback {
@@ -14673,7 +14673,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface CapacityAttributeCallback {
@@ -14681,7 +14681,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface SpeedAttributeCallback {
@@ -14689,7 +14689,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface LifetimeRunningHoursAttributeCallback {
@@ -14697,7 +14697,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface PowerAttributeCallback {
@@ -14705,7 +14705,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface LifetimeEnergyConsumedAttributeCallback {
@@ -14713,7 +14713,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -14721,7 +14721,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -14729,7 +14729,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -14737,7 +14737,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -14745,7 +14745,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readMaxPressureAttribute(MaxPressureAttributeCallback callback) {
@@ -15408,7 +15408,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -15416,7 +15416,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -15424,7 +15424,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -15432,7 +15432,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -15440,7 +15440,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readLocalTemperatureAttribute(LocalTemperatureAttributeCallback callback) {
@@ -15958,7 +15958,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface SpeedSettingAttributeCallback {
@@ -15966,7 +15966,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -15974,7 +15974,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -15982,7 +15982,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -15990,7 +15990,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -15998,7 +15998,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readFanModeAttribute(IntegerAttributeCallback callback) {
@@ -16377,7 +16377,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -16385,7 +16385,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -16393,7 +16393,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -16401,7 +16401,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readTemperatureDisplayModeAttribute(IntegerAttributeCallback callback) {
@@ -17440,7 +17440,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface Primary1IntensityAttributeCallback {
@@ -17448,7 +17448,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface Primary2IntensityAttributeCallback {
@@ -17456,7 +17456,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface Primary3IntensityAttributeCallback {
@@ -17464,7 +17464,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface Primary4IntensityAttributeCallback {
@@ -17472,7 +17472,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface Primary5IntensityAttributeCallback {
@@ -17480,7 +17480,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface Primary6IntensityAttributeCallback {
@@ -17488,7 +17488,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ColorPointRIntensityAttributeCallback {
@@ -17496,7 +17496,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ColorPointGIntensityAttributeCallback {
@@ -17504,7 +17504,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ColorPointBIntensityAttributeCallback {
@@ -17512,7 +17512,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface StartUpColorTemperatureMiredsAttributeCallback {
@@ -17520,7 +17520,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -17528,7 +17528,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -17536,7 +17536,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -17544,7 +17544,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -17552,7 +17552,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readCurrentHueAttribute(IntegerAttributeCallback callback) {
@@ -18690,7 +18690,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface BallastFactorAdjustmentAttributeCallback {
@@ -18698,7 +18698,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface LampRatedHoursAttributeCallback {
@@ -18706,7 +18706,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface LampBurnHoursAttributeCallback {
@@ -18714,7 +18714,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface LampBurnHoursTripPointAttributeCallback {
@@ -18722,7 +18722,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -18730,7 +18730,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -18738,7 +18738,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -18746,7 +18746,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -18754,7 +18754,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readPhysicalMinLevelAttribute(IntegerAttributeCallback callback) {
@@ -19258,7 +19258,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MinMeasuredValueAttributeCallback {
@@ -19266,7 +19266,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MaxMeasuredValueAttributeCallback {
@@ -19274,7 +19274,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface LightSensorTypeAttributeCallback {
@@ -19282,7 +19282,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -19290,7 +19290,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -19298,7 +19298,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -19306,7 +19306,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -19314,7 +19314,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
@@ -19519,7 +19519,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MinMeasuredValueAttributeCallback {
@@ -19527,7 +19527,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MaxMeasuredValueAttributeCallback {
@@ -19535,7 +19535,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -19543,7 +19543,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -19551,7 +19551,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -19559,7 +19559,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -19567,7 +19567,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
@@ -19754,7 +19754,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MinMeasuredValueAttributeCallback {
@@ -19762,7 +19762,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MaxMeasuredValueAttributeCallback {
@@ -19770,7 +19770,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ScaledValueAttributeCallback {
@@ -19778,7 +19778,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MinScaledValueAttributeCallback {
@@ -19786,7 +19786,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MaxScaledValueAttributeCallback {
@@ -19794,7 +19794,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -19802,7 +19802,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -19810,7 +19810,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -19818,7 +19818,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -19826,7 +19826,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
@@ -20096,7 +20096,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MinMeasuredValueAttributeCallback {
@@ -20104,7 +20104,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MaxMeasuredValueAttributeCallback {
@@ -20112,7 +20112,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -20120,7 +20120,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -20128,7 +20128,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -20136,7 +20136,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -20144,7 +20144,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
@@ -20331,7 +20331,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MinMeasuredValueAttributeCallback {
@@ -20339,7 +20339,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface MaxMeasuredValueAttributeCallback {
@@ -20347,7 +20347,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -20355,7 +20355,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -20363,7 +20363,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -20371,7 +20371,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -20379,7 +20379,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
@@ -20566,7 +20566,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -20574,7 +20574,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -20582,7 +20582,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -20590,7 +20590,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readOccupancyAttribute(IntegerAttributeCallback callback) {
@@ -20754,7 +20754,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -20762,7 +20762,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -20770,7 +20770,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -20778,7 +20778,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readMACAddressAttribute(CharStringAttributeCallback callback) {
@@ -20971,7 +20971,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -20979,7 +20979,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -20987,7 +20987,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -20995,7 +20995,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -21003,7 +21003,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readChannelListAttribute(ChannelListAttributeCallback callback) {
@@ -21165,7 +21165,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -21173,7 +21173,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -21181,7 +21181,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -21189,7 +21189,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -21197,7 +21197,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readTargetListAttribute(TargetListAttributeCallback callback) {
@@ -21514,7 +21514,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface DurationAttributeCallback {
@@ -21522,7 +21522,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface SeekRangeEndAttributeCallback {
@@ -21530,7 +21530,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface SeekRangeStartAttributeCallback {
@@ -21538,7 +21538,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -21546,7 +21546,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -21554,7 +21554,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -21562,7 +21562,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -21570,7 +21570,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readCurrentStateAttribute(IntegerAttributeCallback callback) {
@@ -21843,7 +21843,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -21851,7 +21851,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -21859,7 +21859,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -21867,7 +21867,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -21875,7 +21875,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readInputListAttribute(InputListAttributeCallback callback) {
@@ -22037,7 +22037,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -22045,7 +22045,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -22053,7 +22053,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -22061,7 +22061,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
@@ -22200,7 +22200,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -22208,7 +22208,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -22216,7 +22216,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -22224,7 +22224,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
@@ -22404,7 +22404,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -22412,7 +22412,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -22420,7 +22420,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -22428,7 +22428,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -22436,7 +22436,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readAcceptHeaderAttribute(AcceptHeaderAttributeCallback callback) {
@@ -22636,7 +22636,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -22644,7 +22644,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -22652,7 +22652,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -22660,7 +22660,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -22668,7 +22668,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readOutputListAttribute(OutputListAttributeCallback callback) {
@@ -22885,7 +22885,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -22893,7 +22893,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -22901,7 +22901,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -22909,7 +22909,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -22917,7 +22917,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readCatalogListAttribute(CatalogListAttributeCallback callback) {
@@ -23053,7 +23053,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AllowedVendorListAttributeCallback {
@@ -23061,7 +23061,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -23069,7 +23069,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -23077,7 +23077,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -23085,7 +23085,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -23093,7 +23093,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readVendorNameAttribute(CharStringAttributeCallback callback) {
@@ -23371,7 +23371,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -23379,7 +23379,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -23387,7 +23387,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -23395,7 +23395,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
@@ -23513,7 +23513,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -23521,7 +23521,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -23529,7 +23529,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -23537,7 +23537,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readMeasurementTypeAttribute(LongAttributeCallback callback) {
@@ -23855,7 +23855,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -23863,7 +23863,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -23871,7 +23871,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -23879,7 +23879,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -23887,7 +23887,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readIdleModeIntervalAttribute(LongAttributeCallback callback) {
@@ -24422,7 +24422,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ListOctetStringAttributeCallback {
@@ -24430,7 +24430,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ListStructOctetStringAttributeCallback {
@@ -24438,7 +24438,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface VendorIdAttributeCallback {
@@ -24446,7 +24446,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ListNullablesAndOptionalsStructAttributeCallback {
@@ -24454,7 +24454,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ListLongOctetStringAttributeCallback {
@@ -24462,7 +24462,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface ListFabricScopedAttributeCallback {
@@ -24470,7 +24470,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableBooleanAttributeCallback {
@@ -24478,7 +24478,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableBitmap8AttributeCallback {
@@ -24486,7 +24486,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableBitmap16AttributeCallback {
@@ -24494,7 +24494,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableBitmap32AttributeCallback {
@@ -24502,7 +24502,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableBitmap64AttributeCallback {
@@ -24510,7 +24510,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableInt8uAttributeCallback {
@@ -24518,7 +24518,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableInt16uAttributeCallback {
@@ -24526,7 +24526,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableInt24uAttributeCallback {
@@ -24534,7 +24534,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableInt32uAttributeCallback {
@@ -24542,7 +24542,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableInt40uAttributeCallback {
@@ -24550,7 +24550,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableInt48uAttributeCallback {
@@ -24558,7 +24558,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableInt56uAttributeCallback {
@@ -24566,7 +24566,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableInt64uAttributeCallback {
@@ -24574,7 +24574,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableInt8sAttributeCallback {
@@ -24582,7 +24582,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableInt16sAttributeCallback {
@@ -24590,7 +24590,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableInt24sAttributeCallback {
@@ -24598,7 +24598,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableInt32sAttributeCallback {
@@ -24606,7 +24606,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableInt40sAttributeCallback {
@@ -24614,7 +24614,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableInt48sAttributeCallback {
@@ -24622,7 +24622,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableInt56sAttributeCallback {
@@ -24630,7 +24630,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableInt64sAttributeCallback {
@@ -24638,7 +24638,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableEnum8AttributeCallback {
@@ -24646,7 +24646,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableEnum16AttributeCallback {
@@ -24654,7 +24654,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableFloatSingleAttributeCallback {
@@ -24662,7 +24662,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableFloatDoubleAttributeCallback {
@@ -24670,7 +24670,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableOctetStringAttributeCallback {
@@ -24678,7 +24678,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableCharStringAttributeCallback {
@@ -24686,7 +24686,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableEnumAttrAttributeCallback {
@@ -24694,7 +24694,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableRangeRestrictedInt8uAttributeCallback {
@@ -24702,7 +24702,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableRangeRestrictedInt8sAttributeCallback {
@@ -24710,7 +24710,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableRangeRestrictedInt16uAttributeCallback {
@@ -24718,7 +24718,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface NullableRangeRestrictedInt16sAttributeCallback {
@@ -24726,7 +24726,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface GeneratedCommandListAttributeCallback {
@@ -24734,7 +24734,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AcceptedCommandListAttributeCallback {
@@ -24742,7 +24742,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface EventListAttributeCallback {
@@ -24750,7 +24750,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public interface AttributeListAttributeCallback {
@@ -24758,7 +24758,7 @@ public class ChipClusters {
 
       void onError(Exception ex);
 
-      default void onSubscriptionEstablished() {}
+      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
     public void readBooleanAttribute(BooleanAttributeCallback callback) {

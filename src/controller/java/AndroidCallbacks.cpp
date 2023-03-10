@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 #include "AndroidCallbacks.h"
-
 #include <controller/java/AndroidClusterExceptions.h>
 #include <controller/java/CHIPAttributeTLVValueDecoder.h>
 #include <controller/java/CHIPEventTLVValueDecoder.h>
@@ -511,6 +510,12 @@ void ReportCallback::OnDone(app::ReadClient *)
     err = JniReferences::GetInstance().FindMethod(env, mReportCallbackRef, "onDone", "()V", &onDoneMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onDone method"));
 
+    if (mReadClient != nullptr)
+    {
+        Platform::Delete(mReadClient);
+    }
+    mReadClient = nullptr;
+
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(mReportCallbackRef, onDoneMethod);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
@@ -519,7 +524,8 @@ void ReportCallback::OnDone(app::ReadClient *)
 
 void ReportCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
 {
-    JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef);
+    DeviceLayer::StackUnlock unlock;
+    JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef, aSubscriptionId);
 }
 
 CHIP_ERROR ReportCallback::OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause)
@@ -771,7 +777,8 @@ void ReportEventCallback::OnDone(app::ReadClient *)
 
 void ReportEventCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
 {
-    JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef);
+    chip::DeviceLayer::StackUnlock unlock;
+    JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef, aSubscriptionId);
 }
 
 CHIP_ERROR ReportEventCallback::OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause)

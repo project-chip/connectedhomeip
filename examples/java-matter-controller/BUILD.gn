@@ -69,6 +69,7 @@ kotlin_binary("java-matter-controller") {
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkInstanceNameCommand.kt",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongCommand.kt",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImInvokeCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImSubscribeCommand.kt",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImWriteCommand.kt",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkShortCommand.kt",
     "java/src/com/matter/controller/commands/pairing/PairOnNetworkVendorCommand.kt",
