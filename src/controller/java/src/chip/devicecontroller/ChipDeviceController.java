@@ -499,7 +499,7 @@ public class ChipDeviceController {
 
   /* Shuts down all active subscriptions for the fabric at the given fabricIndex */
   public void shutdownSubscriptions(int fabricIndex) {
-    shutdownSubscriptions(deviceControllerPtr, new Integer(fabricIndex), null, null);
+    shutdownSubscriptions(deviceControllerPtr, Integer.valueOf(fabricIndex), null, null);
   }
 
   /**
@@ -510,7 +510,7 @@ public class ChipDeviceController {
    */
   public void shutdownSubscriptions(int fabricIndex, long peerNodeId) {
     shutdownSubscriptions(
-        deviceControllerPtr, new Integer(fabricIndex), new Long(peerNodeId), null);
+        deviceControllerPtr, Integer.valueOf(fabricIndex), Long.valueOf(peerNodeId), null);
   }
 
   /**
@@ -523,9 +523,9 @@ public class ChipDeviceController {
   public void shutdownSubscriptions(int fabricIndex, long peerNodeId, long subscriptionId) {
     shutdownSubscriptions(
         deviceControllerPtr,
-        new Integer(fabricIndex),
-        new Long(peerNodeId),
-        new Long(subscriptionId));
+        Integer.valueOf(fabricIndex),
+        Long.valueOf(peerNodeId),
+        Long.valueOf(subscriptionId));
   }
 
   /**
