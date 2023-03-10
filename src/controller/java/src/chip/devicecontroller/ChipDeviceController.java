@@ -492,10 +492,40 @@ public class ChipDeviceController {
     return getFabricIndex(deviceControllerPtr);
   }
 
-  /* Shutdown the subscriptions based upon peerNodeId, fabricIndex, and subscriptionId */
-  public void shutdownSubscriptions(
-      @Nullable Integer fabricIndex, @Nullable Long peerNodeId, @Nullable Long subscriptionId) {
-    shutdownSubscriptions(deviceControllerPtr, fabricIndex, peerNodeId, subscriptionId);
+  /* Shuts down all active subscriptions. */
+  public void shutdownSubscriptions() {
+    shutdownSubscriptions(deviceControllerPtr, null, null, null);
+  }
+
+  /* Shuts down all active subscriptions for the fabric at the given fabricIndex */
+  public void shutdownSubscriptions(int fabricIndex) {
+    shutdownSubscriptions(deviceControllerPtr, new Integer(fabricIndex), null, null);
+  }
+
+  /**
+   * Shuts down all subscriptions for a particular node.
+   *
+   * @param fabricIndex the fabric index of to which the node belongs
+   * @param peerNodeId the node ID of the device for which subscriptions should be canceled
+   */
+  public void shutdownSubscriptions(int fabricIndex, long peerNodeId) {
+    shutdownSubscriptions(
+        deviceControllerPtr, new Integer(fabricIndex), new Long(peerNodeId), null);
+  }
+
+  /**
+   * Shuts down all subscriptions for a particular node.
+   *
+   * @param fabricIndex the fabric index of to which the node belongs
+   * @param peerNodeId the node ID of the device for which subscriptions should be canceled
+   * @param subscriptionId the ID of the subscription on the node which should be canceled
+   */
+  public void shutdownSubscriptions(int fabricIndex, long peerNodeId, long subscriptionId) {
+    shutdownSubscriptions(
+        deviceControllerPtr,
+        new Integer(fabricIndex),
+        new Long(peerNodeId),
+        new Long(subscriptionId));
   }
 
   /**

@@ -510,13 +510,16 @@ void ReportCallback::OnDone(app::ReadClient *)
     err = JniReferences::GetInstance().FindMethod(env, mReportCallbackRef, "onDone", "()V", &onDoneMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onDone method"));
 
+    if (mReadClient != nullptr)
+    {
+        Platform::Delete(mReadClient);
+    }
+    mReadClient = nullptr;
+
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(mReportCallbackRef, onDoneMethod);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
     JniReferences::GetInstance().GetEnvForCurrentThread()->DeleteGlobalRef(mWrapperCallbackRef);
-
-    Platform::Delete(mReadClient);
-    mReadClient = nullptr;
 }
 
 void ReportCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
