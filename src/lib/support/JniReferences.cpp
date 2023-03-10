@@ -139,6 +139,7 @@ void JniReferences::CallVoidInt(JNIEnv * env, jobject object, const char * metho
 
     env->ExceptionClear();
     env->CallVoidMethod(object, method, argument);
+    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
 void JniReferences::ReportError(JNIEnv * env, CHIP_ERROR cbErr, const char * functName)
@@ -279,17 +280,17 @@ jdouble JniReferences::DoubleToPrimitive(jobject boxedDouble)
     return env->CallDoubleMethod(boxedDouble, valueMethod);
 }
 
-CHIP_ERROR JniReferences::CallSubscriptionEstablished(jobject javaCallback)
+CHIP_ERROR JniReferences::CallSubscriptionEstablished(jobject javaCallback, long subscriptionId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
 
     jmethodID subscriptionEstablishedMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallback, "onSubscriptionEstablished", "()V",
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallback, "onSubscriptionEstablished", "(J)V",
                                                         &subscriptionEstablishedMethod);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
-    env->CallVoidMethod(javaCallback, subscriptionEstablishedMethod);
+    env->CallVoidMethod(javaCallback, subscriptionEstablishedMethod, subscriptionId);
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
     return err;

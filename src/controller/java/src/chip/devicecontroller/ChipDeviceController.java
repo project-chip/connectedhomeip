@@ -488,9 +488,44 @@ public class ChipDeviceController {
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode, callback);
   }
 
-  /* Shutdown all cluster attribute subscriptions for a given device */
-  public void shutdownSubscriptions(long devicePtr) {
-    shutdownSubscriptions(deviceControllerPtr, devicePtr);
+  public int getFabricIndex() {
+    return getFabricIndex(deviceControllerPtr);
+  }
+
+  /* Shuts down all active subscriptions. */
+  public void shutdownSubscriptions() {
+    shutdownSubscriptions(deviceControllerPtr, null, null, null);
+  }
+
+  /* Shuts down all active subscriptions for the fabric at the given fabricIndex */
+  public void shutdownSubscriptions(int fabricIndex) {
+    shutdownSubscriptions(deviceControllerPtr, new Integer(fabricIndex), null, null);
+  }
+
+  /**
+   * Shuts down all subscriptions for a particular node.
+   *
+   * @param fabricIndex the fabric index of to which the node belongs
+   * @param peerNodeId the node ID of the device for which subscriptions should be canceled
+   */
+  public void shutdownSubscriptions(int fabricIndex, long peerNodeId) {
+    shutdownSubscriptions(
+        deviceControllerPtr, new Integer(fabricIndex), new Long(peerNodeId), null);
+  }
+
+  /**
+   * Shuts down all subscriptions for a particular node.
+   *
+   * @param fabricIndex the fabric index of to which the node belongs
+   * @param peerNodeId the node ID of the device for which subscriptions should be canceled
+   * @param subscriptionId the ID of the subscription on the node which should be canceled
+   */
+  public void shutdownSubscriptions(int fabricIndex, long peerNodeId, long subscriptionId) {
+    shutdownSubscriptions(
+        deviceControllerPtr,
+        new Integer(fabricIndex),
+        new Long(peerNodeId),
+        new Long(subscriptionId));
   }
 
   /**
@@ -833,7 +868,13 @@ public class ChipDeviceController {
 
   private native int onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
 
-  private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
+  private native int getFabricIndex(long deviceControllerPtr);
+
+  private native void shutdownSubscriptions(
+      long deviceControllerPtr,
+      @Nullable Integer fabricIndex,
+      @Nullable Long peerNodeId,
+      @Nullable Long subscriptionId);
 
   private native void shutdownCommissioning(long deviceControllerPtr);
 

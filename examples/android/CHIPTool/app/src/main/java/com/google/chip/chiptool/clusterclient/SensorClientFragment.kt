@@ -181,7 +181,7 @@ class SensorClientFragment : Fragment() {
       return
 
     try {
-      ChipClient.getDeviceController(requireContext()).shutdownSubscriptions(subscribedDevicePtr)
+      ChipClient.getDeviceController(requireContext()).shutdownSubscriptions()
       subscribedDevicePtr = 0
     } catch (ex: Exception) {
       showMessage(R.string.sensor_client_unsubscribe_error_text, ex.toString())
