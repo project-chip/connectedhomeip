@@ -250,7 +250,7 @@ template("efr32_sdk") {
         } else {
           defines += [ "LWIP_IPV4=0" ]
         }
-        if (lwip_ipv4) {
+        if (lwip_ipv6) {
           defines += [ "LWIP_IPV6=1" ]
         } else {
           defines += [ "LWIP_IPV6=0" ]
