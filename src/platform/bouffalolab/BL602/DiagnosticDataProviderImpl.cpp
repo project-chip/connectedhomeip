@@ -29,6 +29,7 @@
 
 #include <lwip/tcpip.h>
 
+
 extern "C" {
 #include <bl60x_fw_api.h>
 #include <bl60x_wifi_driver/bl_main.h>
@@ -36,6 +37,7 @@ extern "C" {
 #include <bl_efuse.h>
 #include <bl_sys.h>
 #include <wifi_mgmr_ext.h>
+#include <wifi_mgmr_portable.h>
 }
 
 extern uint8_t _heap_size;
@@ -248,36 +250,24 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
-    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
-    securityType = SecurityTypeEnum::kUnspecified;
-    // int authmode;
-
-    // authmode     = mgmr_get_security_type();
-    // securityType = MapAuthModeToSecurityType(authmode);
+    securityType = (app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum)wifi_mgmr_get_security_type();
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion)
 {
-    // TODO: Keeping existing behavior, but this looks broken.
-    // https://github.com/project-chip/connectedhomeip/issues/25546
-    wifiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kA;
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
 {
-    channelNumber = 0;
-
-    // channelNumber = mgmr_get_current_channel_num();
-
+    channelNumber = wifiMgmr.channel;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
-    // rssi = mgmr_get_rssi();
-
+    rssi = wifiMgmr.wlan_sta.sta.rssi;
     return CHIP_NO_ERROR;
 }
 
@@ -353,13 +343,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & pa
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCount)
 {
-    overrunCount = 0;
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
 {
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
