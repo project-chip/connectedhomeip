@@ -68,6 +68,7 @@ bl_iot_sdk("sdk") {
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
     "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout}",
+    "OTA_PERIODIC_QUERY_TIMEOUT=${ota_periodic_query_timeout}",
     "OPENTHREAD_CONFIG_PLATFORM_XTAL_ACCURACY=40",
     "PRINT_DEBUG=0",
   ]
