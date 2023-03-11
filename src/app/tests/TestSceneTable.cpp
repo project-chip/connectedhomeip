@@ -17,7 +17,6 @@
  */
 
 #include <app/clusters/scenes/SceneTableImpl.h>
-#include <credentials/GroupDataProviderImpl.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/TLV.h>
 #include <lib/support/Span.h>
@@ -83,17 +82,17 @@ CharSpan empty;
 
 // Scene data
 static const SceneData sceneData1(CharSpan("Scene #1"));
-static const SceneData sceneData2(CharSpan("Scene #2"), 2, 5);
-static const SceneData sceneData3(CharSpan("Scene #3"), 25);
-static const SceneData sceneData4(CharSpan("Scene num4"), 5);
+static const SceneData sceneData2(CharSpan("Scene #2"), 2000);
+static const SceneData sceneData3(CharSpan("Scene #3"), 250);
+static const SceneData sceneData4(CharSpan("Scene num4"), 5000);
 static const SceneData sceneData5(empty);
-static const SceneData sceneData6(CharSpan("Scene #6"), 3, 15);
-static const SceneData sceneData7(CharSpan("Scene #7"), 20, 5);
-static const SceneData sceneData8(CharSpan("NAME TOO LOOONNG!"), 1, 10);
-static const SceneData sceneData9(CharSpan("Scene #9"), 30, 15);
-static const SceneData sceneData10(CharSpan("Scene #10"), 10, 1);
-static const SceneData sceneData11(CharSpan("Scene #11"), 20, 10);
-static const SceneData sceneData12(CharSpan("Scene #12"), 30, 5);
+static const SceneData sceneData6(CharSpan("Scene #6"), 3000);
+static const SceneData sceneData7(CharSpan("Scene #7"), 20000);
+static const SceneData sceneData8(CharSpan("NAME TOO LOOONNG!"), 15000);
+static const SceneData sceneData9(CharSpan("Scene #9"), 3000);
+static const SceneData sceneData10(CharSpan("Scene #10"), 1000);
+static const SceneData sceneData11(CharSpan("Scene #11"), 50);
+static const SceneData sceneData12(CharSpan("Scene #12"), 100);
 
 // Scenes
 SceneTableEntry scene1(sceneId1, sceneData1);
@@ -125,15 +124,6 @@ static uint8_t CC_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
 static uint32_t OO_buffer_serialized_length = 0;
 static uint32_t LC_buffer_serialized_length = 0;
 static uint32_t CC_buffer_serialized_length = 0;
-
-// Group related data
-constexpr chip::GroupId kGroup1 = kMinFabricGroupId;
-constexpr chip::GroupId kGroup2 = 0x2222;
-constexpr chip::GroupId kGroup3 = 0x1111;
-
-static const chip::Credentials::GroupDataProvider::GroupInfo kGroupInfo1_1(kGroup1, "Group-1.1");
-static const chip::Credentials::GroupDataProvider::GroupInfo kGroupInfo1_2(kGroup2, "Group-1.2");
-static const chip::Credentials::GroupDataProvider::GroupInfo kGroupInfo1_3(kGroup3, "Group-1.3");
 
 /// @brief Simulates a Handler where Endpoint 1 supports onoff and level control and Endpoint 2 supports onoff and color control
 class TestSceneHandler : public scenes::DefaultSceneHandlerImpl
@@ -380,10 +370,6 @@ public:
 
 // Storage
 static chip::TestPersistentStorageDelegate testStorage;
-
-// Groups
-static chip::Crypto::DefaultSessionKeystore sSessionKeystore;
-static chip::Credentials::GroupDataProviderImpl sProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
 // Scene
 static SceneTableImpl sSceneTable;
 static TestSceneHandler sHandler;
@@ -392,12 +378,6 @@ void ResetSceneTable(SceneTable * sceneTable)
 {
     sceneTable->RemoveFabric(kFabric1);
     sceneTable->RemoveFabric(kFabric2);
-}
-
-void ResetProvider(chip::Credentials::GroupDataProvider * provider)
-{
-    provider->RemoveFabric(kFabric1);
-    provider->RemoveFabric(kFabric2);
 }
 
 void TestHandlerRegistration(nlTestSuite * aSuite, void * aContext)
@@ -937,125 +917,6 @@ void TestFabricScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric2, sceneId3, scene));
 }
 
-void TestGroupScenesInteraction(nlTestSuite * aSuite, void * aContext)
-{
-    chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
-    NL_TEST_ASSERT(aSuite, provider);
-    SceneTable * sceneTable = &sSceneTable;
-    NL_TEST_ASSERT(aSuite, sceneTable);
-
-    // Scene Entry
-    SceneTableEntry scene;
-
-    // Reset test
-    ResetSceneTable(sceneTable);
-    ResetProvider(provider);
-
-    // Group Info
-    chip::Credentials::GroupDataProvider::GroupInfo group;
-
-    // Setup Group Data in Fabric 1
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->SetGroupInfoAt(kFabric1, 0, kGroupInfo1_1));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->SetGroupInfoAt(kFabric1, 1, kGroupInfo1_2));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->SetGroupInfoAt(kFabric1, 2, kGroupInfo1_3));
-
-    // Validate data written properly
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric1, 0, group));
-    NL_TEST_ASSERT(aSuite, group == kGroupInfo1_1);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric1, 1, group));
-    NL_TEST_ASSERT(aSuite, group == kGroupInfo1_2);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric1, 2, group));
-    NL_TEST_ASSERT(aSuite, group == kGroupInfo1_3);
-
-    // Setup Scene Data in Fabric 1
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene1));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene2));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene3));
-
-    // Validate data written properly
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId1, scene));
-    NL_TEST_ASSERT(aSuite, scene == scene1);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId2, scene));
-    NL_TEST_ASSERT(aSuite, scene == scene2);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId3, scene));
-    NL_TEST_ASSERT(aSuite, scene == scene3);
-
-    // Setup Group Data in Fabric 2
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->SetGroupInfoAt(kFabric2, 0, kGroupInfo1_3));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->SetGroupInfoAt(kFabric2, 1, kGroupInfo1_1));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->SetGroupInfoAt(kFabric2, 2, kGroupInfo1_2));
-
-    // Validate data written properly
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric2, 0, group));
-    NL_TEST_ASSERT(aSuite, group == kGroupInfo1_3);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric2, 1, group));
-    NL_TEST_ASSERT(aSuite, group == kGroupInfo1_1);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric2, 2, group));
-    NL_TEST_ASSERT(aSuite, group == kGroupInfo1_2);
-
-    // Setup Scene Data in Fabric 1
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric2, scene1));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric2, scene2));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric2, scene3));
-
-    // Validate data written properly
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric2, sceneId1, scene));
-    NL_TEST_ASSERT(aSuite, scene == scene1);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric2, sceneId2, scene));
-    NL_TEST_ASSERT(aSuite, scene == scene2);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric2, sceneId3, scene));
-    NL_TEST_ASSERT(aSuite, scene == scene3);
-
-    // Verify removing a Fabric Scene Data doesn't impact Fabric Group Data
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveFabric(kFabric1));
-
-    // Scene Entry
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId1, scene));
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId2, scene));
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId3, scene));
-
-    // Group Info
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric2, 0, group));
-    NL_TEST_ASSERT(aSuite, group == kGroupInfo1_3);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric2, 1, group));
-    NL_TEST_ASSERT(aSuite, group == kGroupInfo1_1);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric2, 2, group));
-    NL_TEST_ASSERT(aSuite, group == kGroupInfo1_2);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric1, 0, group));
-    NL_TEST_ASSERT(aSuite, group == kGroupInfo1_1);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric1, 1, group));
-    NL_TEST_ASSERT(aSuite, group == kGroupInfo1_2);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric1, 2, group));
-    NL_TEST_ASSERT(aSuite, group == kGroupInfo1_3);
-
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->RemoveFabric(kFabric1));
-
-    // Group Info
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupInfoAt(kFabric1, 0, group));
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupInfoAt(kFabric1, 1, group));
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupInfoAt(kFabric1, 2, group));
-
-    // Verify removing a Fabric Group Data doesn't impact Fabric Scene Data
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == provider->RemoveFabric(kFabric2));
-
-    // Group Info
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupInfoAt(kFabric2, 0, group));
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupInfoAt(kFabric2, 1, group));
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupInfoAt(kFabric2, 2, group));
-
-    // Scene Entry
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric2, sceneId1, scene));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric2, sceneId2, scene));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric2, sceneId3, scene));
-
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveFabric(kFabric2));
-
-    // Scene Entry
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric2, sceneId1, scene));
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric2, sceneId2, scene));
-    NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric2, sceneId3, scene));
-}
-
 } // namespace
 
 /**
@@ -1064,17 +925,9 @@ void TestGroupScenesInteraction(nlTestSuite * aSuite, void * aContext)
 int TestSetup(void * inContext)
 {
     VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
-    printf("1\n");
-    // Initialize Group Data Provider
-    sProvider.SetStorageDelegate(&testStorage);
-    sProvider.SetSessionKeystore(&sSessionKeystore);
-    VerifyOrReturnError(CHIP_NO_ERROR == sProvider.Init(), FAILURE);
-    SetGroupDataProvider(&sProvider);
-    printf("2\n");
 
     // Initialize Scene Table
     VerifyOrReturnError(CHIP_NO_ERROR == sSceneTable.Init(&testStorage), FAILURE);
-    printf("3\n");
 
     return SUCCESS;
 }
@@ -1085,11 +938,6 @@ int TestSetup(void * inContext)
 int TestTeardown(void * inContext)
 {
     sSceneTable.Finish();
-    chip::Credentials::GroupDataProvider * provider = chip::Credentials::GetGroupDataProvider();
-    if (nullptr != provider)
-    {
-        provider->Finish();
-    }
     chip::Platform::MemoryShutdown();
 
     return SUCCESS;
@@ -1104,7 +952,6 @@ int TestSceneTable()
                                NL_TEST_DEF("TestIterateScenes", TestIterateScenes),
                                NL_TEST_DEF("TestRemoveScenes", TestRemoveScenes),
                                NL_TEST_DEF("TestFabricScenes", TestFabricScenes),
-                               NL_TEST_DEF("TestGroupScenesInteraction", TestGroupScenesInteraction),
 
                                NL_TEST_SENTINEL() };
 

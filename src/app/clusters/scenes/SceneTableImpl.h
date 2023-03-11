@@ -31,16 +31,14 @@ namespace scenes {
 /// kGroupID: Tag for GroupID if the Scene is a Group Scene
 /// kID: Tag for the scene ID together with the two previous tag, forms the SceneStorageID
 /// kName: Tag for the name of the scene
-/// kTransitionTime: Tag for the transition time of the scene in seconds
-/// kTransitionTime100: Tag for the transition time of the scene in tenth of a second (enhanced scenes)
+/// kTransitionTime: Tag for the transition time of the scene in miliseconds
 enum class TagScene : uint8_t
 {
     kEndpointID = 1,
     kGroupID,
     kID,
     kName,
-    kTransitionTime,
-    kTransitionTime100,
+    kTransitionTimeMs,
 };
 
 using clusterId = chip::ClusterId;

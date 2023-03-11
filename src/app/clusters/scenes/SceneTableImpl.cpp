@@ -28,23 +28,11 @@ namespace scenes {
 enum class TagSceneImpl : uint8_t
 {
     kSceneCount = 1,
-    kNextFabric,
 };
 
 using SceneTableEntry = DefaultSceneTableImpl::SceneTableEntry;
 using SceneStorageId  = DefaultSceneTableImpl::SceneStorageId;
 using SceneData       = DefaultSceneTableImpl::SceneData;
-
-struct FabricHavingSceneList : public CommonPersistentData::FabricList
-{
-    // This implementation uses the same key as the GroupFabricList from GroupDataProviderImpl to avoid duplicating the list in
-    // memory. If a different GroupDataProvider implementation is used, it will create the list in flash memory.
-    CHIP_ERROR UpdateKey(StorageKeyName & key) override
-    {
-        key = DefaultStorageKeyAllocator::GroupFabricList();
-        return CHIP_NO_ERROR;
-    }
-};
 
 // Worst case tested: Add Scene Command with EFS using the default SerializeAdd Method. This yielded a serialized scene of 212bytes
 // when using the OnOff, Level Control and Color Control as well as the maximal name length of 16 bytes. Putting 256 gives some
@@ -93,8 +81,7 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
             ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(TagScene::kName), nameSpan));
         }
 
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kTransitionTime), mStorageData.mSceneTransitionTimeSeconds));
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kTransitionTime100), mStorageData.mTransitionTime100ms));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kTransitionTimeMs), mStorageData.mSceneTransitionTimeMs));
         ReturnErrorOnFailure(mStorageData.mExtensionFieldSets.Serialize(writer));
 
         return writer.EndContainer(container);
@@ -122,7 +109,7 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
         // Scene Data
         ReturnErrorOnFailure(reader.Next());
         TLV::Tag currTag = reader.GetTag();
-        VerifyOrReturnError(TLV::ContextTag(TagScene::kName) == currTag || TLV::ContextTag(TagScene::kTransitionTime) == currTag,
+        VerifyOrReturnError(TLV::ContextTag(TagScene::kName) == currTag || TLV::ContextTag(TagScene::kTransitionTimeMs) == currTag,
                             CHIP_ERROR_WRONG_TLV_TYPE);
 
         // A name may or may not have been stored.  Check whether it was.
@@ -130,12 +117,10 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
         {
             ReturnErrorOnFailure(reader.Get(nameSpan));
             mStorageData.SetName(nameSpan);
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kTransitionTime)));
+            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kTransitionTimeMs)));
         }
 
-        ReturnErrorOnFailure(reader.Get(mStorageData.mSceneTransitionTimeSeconds));
-        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kTransitionTime100)));
-        ReturnErrorOnFailure(reader.Get(mStorageData.mTransitionTime100ms));
+        ReturnErrorOnFailure(reader.Get(mStorageData.mSceneTransitionTimeMs));
         ReturnErrorOnFailure(mStorageData.mExtensionFieldSets.Deserialize(reader));
 
         return reader.ExitContainer(container);
@@ -156,7 +141,6 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
     FabricIndex fabric_index = kUndefinedFabricIndex;
     uint8_t scene_count      = 0;
     SceneStorageId scene_map[kMaxScenePerFabric];
-    FabricIndex next = kUndefinedFabricIndex;
 
     FabricSceneData() = default;
     FabricSceneData(FabricIndex fabric) : fabric_index(fabric) {}
@@ -175,7 +159,6 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         {
             scene_map[i].Clear();
         }
-        next = kUndefinedFabricIndex;
     }
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
@@ -184,7 +167,6 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
 
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagSceneImpl::kSceneCount), (scene_count)));
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagSceneImpl::kNextFabric), (next)));
         // Storing the scene map
         for (uint8_t i = 0; i < kMaxScenePerFabric; i++)
         {
@@ -205,8 +187,6 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
 
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagSceneImpl::kSceneCount)));
         ReturnErrorOnFailure(reader.Get(scene_count));
-        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagSceneImpl::kNextFabric)));
-        ReturnErrorOnFailure(reader.Get(next));
 
         uint8_t i = 0;
         while (reader.Next(TLV::ContextTag(TagScene::kEndpointID)) != CHIP_END_OF_TLV)
@@ -223,86 +203,6 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         return reader.ExitContainer(container);
     }
 
-    // Register the fabric in the list of fabrics having scenes
-    CHIP_ERROR Register(PersistentStorageDelegate * storage)
-    {
-        FabricHavingSceneList fabric_list;
-        CHIP_ERROR err = fabric_list.Load(storage);
-        if (CHIP_ERROR_NOT_FOUND == err)
-        {
-            // New fabric list
-            fabric_list.first_entry = fabric_index;
-            fabric_list.entry_count = 1;
-            return fabric_list.Save(storage);
-        }
-        ReturnErrorOnFailure(err);
-
-        // Existing fabric list, search for existing entry
-        FabricSceneData fabric(fabric_list.first_entry);
-        for (size_t i = 0; i < fabric_list.entry_count; i++)
-        {
-            err = fabric.Load(storage);
-            if (CHIP_NO_ERROR != err)
-            {
-                break;
-            }
-            if (fabric.fabric_index == this->fabric_index)
-            {
-                // Fabric already registered
-                return CHIP_NO_ERROR;
-            }
-            fabric.fabric_index = fabric.next;
-        }
-        // Add this fabric to the fabric list
-        this->next              = fabric_list.first_entry;
-        fabric_list.first_entry = this->fabric_index;
-        fabric_list.entry_count++;
-        return fabric_list.Save(storage);
-    }
-
-    // Remove the fabric from the fabrics' linked list
-    CHIP_ERROR Unregister(PersistentStorageDelegate * storage) const
-    {
-        FabricHavingSceneList fabric_list;
-        CHIP_ERROR err = fabric_list.Load(storage);
-        VerifyOrReturnValue(CHIP_ERROR_NOT_FOUND != err, CHIP_NO_ERROR);
-        ReturnErrorOnFailure(err);
-
-        // Existing fabric list, search for existing entry
-        FabricSceneData fabric(fabric_list.first_entry);
-        FabricSceneData prev;
-
-        for (size_t i = 0; i < fabric_list.entry_count; i++)
-        {
-            err = fabric.Load(storage);
-            if (CHIP_NO_ERROR != err)
-            {
-                break;
-            }
-            if (fabric.fabric_index == this->fabric_index)
-            {
-                // Fabric found
-                if (i == 0)
-                {
-                    // Remove first fabric
-                    fabric_list.first_entry = this->next;
-                }
-                else
-                {
-                    // Remove intermediate fabric
-                    prev.next = this->next;
-                    ReturnErrorOnFailure(prev.Save(storage));
-                }
-                VerifyOrReturnError(fabric_list.entry_count > 0, CHIP_ERROR_INTERNAL);
-                fabric_list.entry_count--;
-                return fabric_list.Save(storage);
-            }
-            prev                = fabric;
-            fabric.fabric_index = fabric.next;
-        }
-        // Fabric not in the list
-        return CHIP_ERROR_NOT_FOUND;
-    }
     /// @brief Finds the index where to insert current scene by going through the whole table and looking if the scene is already in
     /// there. If the target is not in the table, sets idx to the first empty space
     /// @param target_scene Storage Id of scene to store
@@ -335,17 +235,6 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         }
 
         return CHIP_ERROR_NO_MEMORY;
-    }
-    CHIP_ERROR Save(PersistentStorageDelegate * storage) override
-    {
-        ReturnErrorOnFailure(Register(storage));
-        return PersistentData::Save(storage);
-    }
-
-    CHIP_ERROR Delete(PersistentStorageDelegate * storage) override
-    {
-        ReturnErrorOnFailure(Unregister(storage));
-        return PersistentData::Delete(storage);
     }
 
     CHIP_ERROR SaveScene(PersistentStorageDelegate * storage, const SceneTableEntry & entry)
@@ -538,7 +427,10 @@ CHIP_ERROR DefaultSceneTableImpl::UnregisterHandler(SceneHandler * handler)
 
     // TODO: Implement general array management methods
     // Compress array after removal
-    memmove(&this->mHandlers[position], &this->mHandlers[nextPos], sizeof(this->mHandlers[position]) * moveNum);
+    if (moveNum)
+    {
+        memmove(&this->mHandlers[position], &this->mHandlers[nextPos], sizeof(this->mHandlers[position]) * moveNum);
+    }
 
     this->mNumHandlers--;
     // Clear last occupied position
@@ -602,9 +494,8 @@ CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(FabricIndex fabric_index, const 
         for (uint8_t i = 0; i < scene.mStorageData.mExtensionFieldSets.GetFieldSetCount(); i++)
         {
             scene.mStorageData.mExtensionFieldSets.GetFieldSetAtPosition(EFS, i);
-            cluster = EFS.mID;
-            time    = scene.mStorageData.mSceneTransitionTimeSeconds * 1000 +
-                (scene.mStorageData.mTransitionTime100ms ? scene.mStorageData.mTransitionTime100ms * 10 : 0);
+            cluster          = EFS.mID;
+            time             = scene.mStorageData.mSceneTransitionTimeMs;
             ByteSpan EFSSpan = MutableByteSpan(EFS.mBytesBuffer, EFS.mUsedBytes);
 
             if (!EFS.IsEmpty())

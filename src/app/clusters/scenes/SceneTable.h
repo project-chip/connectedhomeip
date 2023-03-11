@@ -20,7 +20,7 @@
 #include <app/clusters/scenes/ExtensionFieldSets.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CommonIterator.h>
-#include <lib/support/CommonPersistentData.h>
+#include <lib/support/PersistentData.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -30,8 +30,7 @@ namespace scenes {
 typedef uint8_t SceneIndex;
 
 typedef uint32_t TransitionTimeMs;
-typedef uint16_t SceneTransitionTime;
-typedef uint8_t TransitionTime100ms;
+typedef uint32_t SceneTransitionTime;
 
 constexpr GroupId kGlobalGroupSceneId       = 0x0000;
 constexpr SceneIndex kUndefinedSceneIndex   = 0xff;
@@ -42,7 +41,7 @@ static constexpr size_t kSceneNameMax       = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM
 
 // Handler's are meant to retrieve a single cluster's extension field set, therefore the maximum number allowed is the maximal
 // number of extension field set.
-static constexpr uint8_t kMaxSceneHandlers = CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE;
+static constexpr uint8_t kMaxSceneHandlers = CHIP_CONFIG_SCENES_MAX_SCENE_HANDLERS;
 
 /// @brief Abstract class allowing different Endpoints interactions with the ExtensionFieldSets added to and retrieved from the
 /// scene Table. The Scene Handler's are meant as interface between various clusters and the Scene table. The expected behaviour of
@@ -156,27 +155,22 @@ public:
     /// mSceneTransitionTimeSeconds in enhanced scene commands
     struct SceneData
     {
-        char mName[kSceneNameMax]                       = { 0 };
-        size_t mNameLength                              = 0;
-        SceneTransitionTime mSceneTransitionTimeSeconds = 0;
+        char mName[kSceneNameMax]                  = { 0 };
+        size_t mNameLength                         = 0;
+        SceneTransitionTime mSceneTransitionTimeMs = 0;
         EFStype mExtensionFieldSets;
-        TransitionTime100ms mTransitionTime100ms = 0;
 
-        SceneData(const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0, TransitionTime100ms time100ms = 0) :
-            mSceneTransitionTimeSeconds(time), mTransitionTime100ms(time100ms)
+        SceneData(const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0) : mSceneTransitionTimeMs(time)
         {
             this->SetName(sceneName);
         }
-        SceneData(EFStype fields, const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0,
-                  TransitionTime100ms time100ms = 0) :
-            mSceneTransitionTimeSeconds(time),
-            mTransitionTime100ms(time100ms)
+        SceneData(EFStype fields, const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0) :
+            mSceneTransitionTimeMs(time)
         {
             this->SetName(sceneName);
             mExtensionFieldSets = fields;
         }
-        SceneData(const SceneData & other) :
-            mSceneTransitionTimeSeconds(other.mSceneTransitionTimeSeconds), mTransitionTime100ms(other.mTransitionTime100ms)
+        SceneData(const SceneData & other) : mSceneTransitionTimeMs(other.mSceneTransitionTimeMs)
         {
             this->SetName(CharSpan(other.mName, other.mNameLength));
             mExtensionFieldSets = other.mExtensionFieldSets;
@@ -201,25 +195,22 @@ public:
         void Clear()
         {
             this->SetName(CharSpan());
-            mSceneTransitionTimeSeconds = 0;
-            mTransitionTime100ms        = 0;
+            mSceneTransitionTimeMs = 0;
             mExtensionFieldSets.Clear();
         }
 
         bool operator==(const SceneData & other)
         {
             return (this->mNameLength == other.mNameLength && !memcmp(this->mName, other.mName, this->mNameLength) &&
-                    (this->mSceneTransitionTimeSeconds == other.mSceneTransitionTimeSeconds) &&
-                    (this->mTransitionTime100ms == other.mTransitionTime100ms) &&
+                    (this->mSceneTransitionTimeMs == other.mSceneTransitionTimeMs) &&
                     (this->mExtensionFieldSets == other.mExtensionFieldSets));
         }
 
         void operator=(const SceneData & other)
         {
             this->SetName(CharSpan(other.mName, other.mNameLength));
-            this->mExtensionFieldSets         = other.mExtensionFieldSets;
-            this->mSceneTransitionTimeSeconds = other.mSceneTransitionTimeSeconds;
-            this->mTransitionTime100ms        = other.mTransitionTime100ms;
+            this->mExtensionFieldSets    = other.mExtensionFieldSets;
+            this->mSceneTransitionTimeMs = other.mSceneTransitionTimeMs;
         }
     };
 
