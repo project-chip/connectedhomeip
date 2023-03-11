@@ -174,49 +174,6 @@ struct FabricGroupData : public PersistentData<kPersistentBufferMax>
         return fabric_list.Save(storage);
     }
 
-    // Remove the fabric from the fabrics' linked list
-    CHIP_ERROR Unregister(PersistentStorageDelegate * storage) const
-    {
-        FabricList fabric_list;
-        CHIP_ERROR err = fabric_list.Load(storage);
-        VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
-
-        // Existing fabric list, search for existing entry
-        FabricGroupData fabric(fabric_list.first_entry);
-        FabricGroupData prev;
-
-        for (size_t i = 0; i < fabric_list.entry_count; i++)
-        {
-            err = fabric.Load(storage);
-            if (CHIP_NO_ERROR != err)
-            {
-                break;
-            }
-            if (fabric.fabric_index == this->fabric_index)
-            {
-                // Fabric found
-                if (i == 0)
-                {
-                    // Remove first fabric
-                    fabric_list.first_entry = this->next;
-                }
-                else
-                {
-                    // Remove intermediate fabric
-                    prev.next = this->next;
-                    ReturnErrorOnFailure(prev.Save(storage));
-                }
-                VerifyOrReturnError(fabric_list.entry_count > 0, CHIP_ERROR_INTERNAL);
-                fabric_list.entry_count--;
-                return fabric_list.Save(storage);
-            }
-            prev                = fabric;
-            fabric.fabric_index = fabric.next;
-        }
-        // Fabric not in the list
-        return CHIP_ERROR_NOT_FOUND;
-    }
-
     // Check the fabric is registered in the fabrics' linked list
     CHIP_ERROR Validate(PersistentStorageDelegate * storage) const
     {
@@ -245,11 +202,7 @@ struct FabricGroupData : public PersistentData<kPersistentBufferMax>
         return PersistentData::Save(storage);
     }
 
-    CHIP_ERROR Delete(PersistentStorageDelegate * storage) override
-    {
-        // ReturnErrorOnFailure(Unregister(storage));
-        return PersistentData::Delete(storage);
-    }
+    CHIP_ERROR Delete(PersistentStorageDelegate * storage) override { return PersistentData::Delete(storage); }
 };
 
 struct GroupData : public GroupDataProvider::GroupInfo, PersistentData<kPersistentBufferMax>
