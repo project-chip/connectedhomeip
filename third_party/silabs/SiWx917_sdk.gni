@@ -32,7 +32,7 @@ declare_args() {
   use_silabs_thread_lib = false
   enable_openthread_cli = true
 
-  kvs_max_entries = 75
+  kvs_max_entries = 255
 
   # Use Silabs factory data provider example.
   # Users can implement their own.
@@ -41,8 +41,7 @@ declare_args() {
   # Enable Segger System View
   use_system_view = false
 
-  # Argument to Disable IPv4 for wifi(rs911)
-  chip_enable_wifi_ipv4 = false
+  silabs_log_enabled = true
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
@@ -107,7 +106,7 @@ template("efr32_sdk") {
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "CORTEXM3_EFM32_MICRO",
-      "SILABS_LOG_ENABLED=1",
+      "SILABS_LOG_ENABLED=${silabs_log_enabled}",
       "NVM3_DEFAULT_NVM_SIZE=40960",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
@@ -143,10 +142,6 @@ template("efr32_sdk") {
     }
 
     defines += board_defines
-
-    if (chip_enable_wifi_ipv4) {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
-    }
 
     # Enabling led interface
     if (use_wstk_leds) {
