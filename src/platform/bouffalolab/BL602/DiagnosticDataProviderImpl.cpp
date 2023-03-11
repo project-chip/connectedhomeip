@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Provides an implementation of the DiagnosticDataProvider object
- *          for k32w0 platform.
+ *          for Bouffalolab BL602 platform.
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -249,8 +249,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
-    securityType = (app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum) wifi_mgmr_get_security_type();
-    return CHIP_NO_ERROR;
+    if (ConnectivityMgrImpl()._IsWiFiStationConnected()) {
+        securityType = static_cast<app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum>(wifi_mgmr_get_security_type());
+        return CHIP_NO_ERROR;
+    }
+    
+    return CHIP_ERROR_READ_FAILED;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion)
@@ -260,14 +264,22 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetwork
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
 {
-    channelNumber = wifiMgmr.channel;
-    return CHIP_NO_ERROR;
+    if (ConnectivityMgrImpl()._IsWiFiStationConnected()) {
+        channelNumber = wifiMgmr.channel;
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_READ_FAILED;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
-    rssi = wifiMgmr.wlan_sta.sta.rssi;
-    return CHIP_NO_ERROR;
+    if (ConnectivityMgrImpl()._IsWiFiStationConnected()) {
+        rssi = wifiMgmr.wlan_sta.sta.rssi;
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_READ_FAILED;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
