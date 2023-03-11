@@ -43,6 +43,7 @@
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/CommonPersistentData.h>
 #include <lib/support/SafeInt.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/KeyValueStoreManager.h>
@@ -89,7 +90,7 @@ struct ServerInitParams
     ServerInitParams() = default;
 
     // Not copyable
-    ServerInitParams(const ServerInitParams &) = delete;
+    ServerInitParams(const ServerInitParams &)             = delete;
     ServerInitParams & operator=(const ServerInitParams &) = delete;
 
     // Application delegate to handle some commissioning lifecycle events
@@ -205,7 +206,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
     CommonCaseDeviceServerInitParams() = default;
 
     // Not copyable
-    CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &) = delete;
+    CommonCaseDeviceServerInitParams(const CommonCaseDeviceServerInitParams &)             = delete;
     CommonCaseDeviceServerInitParams & operator=(const CommonCaseDeviceServerInitParams &) = delete;
 
     /**
@@ -333,41 +334,92 @@ public:
      */
     void RejoinExistingMulticastGroups();
 
-    FabricTable & GetFabricTable() { return mFabrics; }
+    FabricTable & GetFabricTable()
+    {
+        return mFabrics;
+    }
 
-    CASESessionManager * GetCASESessionManager() { return &mCASESessionManager; }
+    CASESessionManager * GetCASESessionManager()
+    {
+        return &mCASESessionManager;
+    }
 
-    Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
+    Messaging::ExchangeManager & GetExchangeManager()
+    {
+        return mExchangeMgr;
+    }
 
-    SessionManager & GetSecureSessionManager() { return mSessions; }
+    SessionManager & GetSecureSessionManager()
+    {
+        return mSessions;
+    }
 
-    SessionResumptionStorage * GetSessionResumptionStorage() { return mSessionResumptionStorage; }
+    SessionResumptionStorage * GetSessionResumptionStorage()
+    {
+        return mSessionResumptionStorage;
+    }
 
-    app::SubscriptionResumptionStorage * GetSubscriptionResumptionStorage() { return mSubscriptionResumptionStorage; }
+    app::SubscriptionResumptionStorage * GetSubscriptionResumptionStorage()
+    {
+        return mSubscriptionResumptionStorage;
+    }
 
-    TransportMgrBase & GetTransportManager() { return mTransports; }
+    TransportMgrBase & GetTransportManager()
+    {
+        return mTransports;
+    }
 
-    Credentials::GroupDataProvider * GetGroupDataProvider() { return mGroupsProvider; }
+    Credentials::GroupDataProvider * GetGroupDataProvider()
+    {
+        return mGroupsProvider;
+    }
 
-    Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
+    Crypto::SessionKeystore * GetSessionKeystore() const
+    {
+        return mSessionKeystore;
+    }
 
 #if CONFIG_NETWORK_LAYER_BLE
-    Ble::BleLayer * GetBleLayerObject() { return mBleLayer; }
+    Ble::BleLayer * GetBleLayerObject()
+    {
+        return mBleLayer;
+    }
 #endif
 
-    CommissioningWindowManager & GetCommissioningWindowManager() { return mCommissioningWindowManager; }
+    CommissioningWindowManager & GetCommissioningWindowManager()
+    {
+        return mCommissioningWindowManager;
+    }
 
-    PersistentStorageDelegate & GetPersistentStorage() { return *mDeviceStorage; }
+    PersistentStorageDelegate & GetPersistentStorage()
+    {
+        return *mDeviceStorage;
+    }
 
-    app::FailSafeContext & GetFailSafeContext() { return mFailSafeContext; }
+    app::FailSafeContext & GetFailSafeContext()
+    {
+        return mFailSafeContext;
+    }
 
-    TestEventTriggerDelegate * GetTestEventTriggerDelegate() { return mTestEventTriggerDelegate; }
+    TestEventTriggerDelegate * GetTestEventTriggerDelegate()
+    {
+        return mTestEventTriggerDelegate;
+    }
 
-    Crypto::OperationalKeystore * GetOperationalKeystore() { return mOperationalKeystore; }
+    Crypto::OperationalKeystore * GetOperationalKeystore()
+    {
+        return mOperationalKeystore;
+    }
 
-    Credentials::OperationalCertificateStore * GetOpCertStore() { return mOpCertStore; }
+    Credentials::OperationalCertificateStore * GetOpCertStore()
+    {
+        return mOpCertStore;
+    }
 
-    app::DefaultAttributePersistenceProvider & GetDefaultAttributePersister() { return mAttributePersister; }
+    app::DefaultAttributePersistenceProvider & GetDefaultAttributePersister()
+    {
+        return mAttributePersister;
+    }
 
     /**
      * This function causes the ShutDown event to be generated async on the
@@ -384,7 +436,10 @@ public:
         return System::SystemClock().GetMonotonicMicroseconds64() - mInitTimestamp;
     }
 
-    static Server & GetInstance() { return sServer; }
+    static Server & GetInstance()
+    {
+        return sServer;
+    }
 
 private:
     Server() = default;
@@ -465,6 +520,9 @@ private:
 
         void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
         {
+            CommonPersistentData::FabricList fabricLinkedList;
+            FabricIndex next = kUndefinedFabricIndex;
+
             (void) fabricTable;
             ClearCASEResumptionStateOnFabricChange(fabricIndex);
             ClearSubscriptionResumptionStateOnFabricChange(fabricIndex);
@@ -472,13 +530,31 @@ private:
             Credentials::GroupDataProvider * groupDataProvider = mServer->GetGroupDataProvider();
             if (groupDataProvider != nullptr)
             {
-                CHIP_ERROR err = groupDataProvider->RemoveFabric(fabricIndex);
+                CHIP_ERROR err = groupDataProvider->GetNextFabric(fabricIndex, next);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer,
+                                 "Warning, failed to get the next fabric index for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
+                                 static_cast<unsigned>(fabricIndex), err.Format());
+                }
+
+                err = groupDataProvider->RemoveFabric(fabricIndex);
                 if (err != CHIP_NO_ERROR)
                 {
                     ChipLogError(AppServer,
                                  "Warning, failed to delete GroupDataProvider state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
                                  static_cast<unsigned>(fabricIndex), err.Format());
                 }
+            }
+
+            // TODO: add fabric scene data removal here
+
+            CHIP_ERROR fListErr = fabricLinkedList.UnregisterFabric(&mServer->GetPersistentStorage(), fabricIndex, next);
+            if (fListErr != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer,
+                             "Warning, failed to unregister fabric index 0x%x from nvm Fabric Linked List: %" CHIP_ERROR_FORMAT,
+                             static_cast<unsigned>(fabricIndex), fListErr.Format());
             }
 
             // Remove access control entries in reverse order (it could be any order, but reverse order

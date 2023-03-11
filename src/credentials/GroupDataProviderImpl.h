@@ -92,6 +92,8 @@ public:
 
     // Fabrics
     CHIP_ERROR RemoveFabric(FabricIndex fabric_index) override;
+    // Gets the next Fabric index in the Fabric linked list
+    CHIP_ERROR GetNextFabric(FabricIndex fabric_index, FabricIndex & next) override;
 
     // Decryption
     Crypto::SymmetricKeyContext * GetKeyContext(FabricIndex fabric_index, GroupId group_id) override;

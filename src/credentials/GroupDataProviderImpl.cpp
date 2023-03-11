@@ -33,15 +33,7 @@ using GroupEndpoint = GroupDataProvider::GroupEndpoint;
 using EpochKey      = GroupDataProvider::EpochKey;
 using KeySet        = GroupDataProvider::KeySet;
 using GroupSession  = GroupDataProvider::GroupSession;
-
-struct FabricList : public CommonPersistentData::FabricList
-{
-    CHIP_ERROR UpdateKey(StorageKeyName & key) override
-    {
-        key = DefaultStorageKeyAllocator::GroupFabricList();
-        return CHIP_NO_ERROR;
-    }
-};
+using FabricList    = CommonPersistentData::FabricList;
 
 constexpr size_t kPersistentBufferMax = 128;
 
@@ -59,7 +51,7 @@ struct LinkedData : public PersistentData<kPersistentBufferMax>
     bool first      = true;
 };
 
-struct FabricData : public PersistentData<kPersistentBufferMax>
+struct FabricGroupData : public PersistentData<kPersistentBufferMax>
 {
     static constexpr TLV::Tag TagFirstGroup() { return TLV::ContextTag(1); }
     static constexpr TLV::Tag TagGroupCount() { return TLV::ContextTag(2); }
@@ -78,8 +70,8 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
     uint16_t keyset_count          = 0;
     chip::FabricIndex next         = kUndefinedFabricIndex;
 
-    FabricData() = default;
-    FabricData(chip::FabricIndex fabric) : fabric_index(fabric) {}
+    FabricGroupData() = default;
+    FabricGroupData(chip::FabricIndex fabric) : fabric_index(fabric) {}
 
     CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
@@ -160,7 +152,7 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
         ReturnErrorOnFailure(err);
 
         // Existing fabric list, search for existing entry
-        FabricData fabric(fabric_list.first_entry);
+        FabricGroupData fabric(fabric_list.first_entry);
         for (size_t i = 0; i < fabric_list.entry_count; i++)
         {
             err = fabric.Load(storage);
@@ -190,8 +182,8 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
         VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
 
         // Existing fabric list, search for existing entry
-        FabricData fabric(fabric_list.first_entry);
-        FabricData prev;
+        FabricGroupData fabric(fabric_list.first_entry);
+        FabricGroupData prev;
 
         for (size_t i = 0; i < fabric_list.entry_count; i++)
         {
@@ -232,7 +224,7 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
         ReturnErrorOnFailure(fabric_list.Load(storage));
 
         // Existing fabric list, search for existing entry
-        FabricData fabric(fabric_list.first_entry);
+        FabricGroupData fabric(fabric_list.first_entry);
 
         for (size_t i = 0; i < fabric_list.entry_count; i++)
         {
@@ -255,7 +247,7 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
 
     CHIP_ERROR Delete(PersistentStorageDelegate * storage) override
     {
-        ReturnErrorOnFailure(Unregister(storage));
+        // ReturnErrorOnFailure(Unregister(storage));
         return PersistentData::Delete(storage);
     }
 };
@@ -333,7 +325,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistentData<kPersiste
         return reader.ExitContainer(container);
     }
 
-    bool Get(PersistentStorageDelegate * storage, const FabricData & fabric, size_t target_index)
+    bool Get(PersistentStorageDelegate * storage, const FabricGroupData & fabric, size_t target_index)
     {
         fabric_index = fabric.fabric_index;
         group_id     = fabric.first_group;
@@ -361,7 +353,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, PersistentData<kPersiste
         return false;
     }
 
-    bool Find(PersistentStorageDelegate * storage, const FabricData & fabric, chip::GroupId target_group)
+    bool Find(PersistentStorageDelegate * storage, const FabricGroupData & fabric, chip::GroupId target_group)
     {
         fabric_index = fabric.fabric_index;
         group_id     = fabric.first_group;
@@ -444,7 +436,7 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
         return reader.ExitContainer(container);
     }
 
-    bool Get(PersistentStorageDelegate * storage, const FabricData & fabric, size_t target_index)
+    bool Get(PersistentStorageDelegate * storage, const FabricGroupData & fabric, size_t target_index)
     {
         fabric_index = fabric.fabric_index;
         id           = fabric.first_map;
@@ -474,7 +466,7 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
         return false;
     }
 
-    bool Find(PersistentStorageDelegate * storage, const FabricData & fabric, const GroupKey & map)
+    bool Find(PersistentStorageDelegate * storage, const FabricGroupData & fabric, const GroupKey & map)
     {
         fabric_index = fabric.fabric_index;
         id           = fabric.first_map;
@@ -505,7 +497,7 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
     }
 
     // returns index if the find_id is found, otherwise std::numeric_limits<size_t>::max
-    size_t Find(PersistentStorageDelegate * storage, const FabricData & fabric, const KeysetId find_id)
+    size_t Find(PersistentStorageDelegate * storage, const FabricGroupData & fabric, const KeysetId find_id)
     {
         fabric_index = fabric.fabric_index;
         id           = fabric.first_map;
@@ -591,7 +583,8 @@ struct EndpointData : GroupDataProvider::GroupEndpoint, PersistentData<kPersiste
         return reader.ExitContainer(container);
     }
 
-    bool Find(PersistentStorageDelegate * storage, const FabricData & fabric, const GroupData & group, chip::EndpointId target_id)
+    bool Find(PersistentStorageDelegate * storage, const FabricGroupData & fabric, const GroupData & group,
+              chip::EndpointId target_id)
     {
         fabric_index = fabric.fabric_index;
         group_id     = group.group_id;
@@ -778,7 +771,7 @@ struct KeySetData : PersistentData<kPersistentBufferMax>
         return reader.ExitContainer(container);
     }
 
-    bool Find(PersistentStorageDelegate * storage, const FabricData & fabric, size_t target_id)
+    bool Find(PersistentStorageDelegate * storage, const FabricGroupData & fabric, size_t target_id)
     {
         uint16_t count = 0;
 
@@ -848,7 +841,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfo(chip::FabricIndex fabric_index, c
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     GroupData group;
 
     // Load fabric data (defaults to zero)
@@ -870,7 +863,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfo(chip::FabricIndex fabric_index, c
 
 CHIP_ERROR GroupDataProviderImpl::GetGroupInfo(chip::FabricIndex fabric_index, chip::GroupId group_id, GroupInfo & info)
 {
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     GroupData group;
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
@@ -883,7 +876,7 @@ CHIP_ERROR GroupDataProviderImpl::GetGroupInfo(chip::FabricIndex fabric_index, c
 
 CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfo(chip::FabricIndex fabric_index, chip::GroupId group_id)
 {
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     GroupData group;
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
@@ -896,7 +889,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     GroupData group;
 
     // Load fabric, defaults to zero
@@ -962,7 +955,7 @@ CHIP_ERROR GroupDataProviderImpl::GetGroupInfoAt(chip::FabricIndex fabric_index,
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     GroupData group;
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
@@ -978,7 +971,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfoAt(chip::FabricIndex fabric_ind
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     GroupData group;
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
@@ -1025,7 +1018,7 @@ bool GroupDataProviderImpl::HasEndpoint(chip::FabricIndex fabric_index, chip::Gr
 {
     VerifyOrReturnError(IsInitialized(), false);
 
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     GroupData group;
     EndpointData endpoint;
 
@@ -1038,7 +1031,7 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     GroupData group;
 
     // Load fabric data (defaults to zero)
@@ -1096,7 +1089,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     GroupData group;
     EndpointData endpoint;
 
@@ -1135,7 +1128,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
 
@@ -1174,7 +1167,7 @@ GroupDataProviderImpl::GroupInfoIteratorImpl::GroupInfoIteratorImpl(GroupDataPro
     mProvider(provider),
     mFabric(fabric_index)
 {
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     if (CHIP_NO_ERROR == fabric.Load(provider.mStorage))
     {
         mNextId = fabric.first_group;
@@ -1218,7 +1211,7 @@ GroupDataProviderImpl::EndpointIteratorImpl::EndpointIteratorImpl(GroupDataProvi
     mProvider(provider),
     mFabric(fabric_index)
 {
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     VerifyOrReturn(CHIP_NO_ERROR == fabric.Load(provider.mStorage));
 
     GroupData group(fabric_index, fabric.first_group);
@@ -1305,7 +1298,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoints(chip::FabricIndex fabric_index
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     GroupData group;
 
     VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -1335,7 +1328,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupKeyAt(chip::FabricIndex fabric_index, 
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     KeyMapData map(fabric_index);
 
     // Load fabric, defaults to zero
@@ -1385,7 +1378,7 @@ CHIP_ERROR GroupDataProviderImpl::GetGroupKeyAt(chip::FabricIndex fabric_index, 
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     KeyMapData map;
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
@@ -1401,7 +1394,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupKeyAt(chip::FabricIndex fabric_inde
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     KeyMapData map;
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
@@ -1433,7 +1426,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupKeys(chip::FabricIndex fabric_index
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
     size_t count = 0;
@@ -1465,7 +1458,7 @@ GroupDataProviderImpl::GroupKeyIteratorImpl::GroupKeyIteratorImpl(GroupDataProvi
     mProvider(provider),
     mFabric(fabric_index)
 {
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     if (CHIP_NO_ERROR == fabric.Load(provider.mStorage))
     {
         mNextId = fabric.first_map;
@@ -1509,7 +1502,7 @@ CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, cons
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     KeySetData keyset;
 
     // Load fabric, defaults to zero
@@ -1557,7 +1550,7 @@ CHIP_ERROR GroupDataProviderImpl::GetKeySet(chip::FabricIndex fabric_index, uint
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     KeySetData keyset;
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
@@ -1580,7 +1573,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveKeySet(chip::FabricIndex fabric_index, u
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     KeySetData keyset;
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
@@ -1635,7 +1628,7 @@ GroupDataProvider::KeySetIterator * GroupDataProviderImpl::IterateKeySets(chip::
 GroupDataProviderImpl::KeySetIteratorImpl::KeySetIteratorImpl(GroupDataProviderImpl & provider, chip::FabricIndex fabric_index) :
     mProvider(provider), mFabric(fabric_index)
 {
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     if (CHIP_NO_ERROR == fabric.Load(provider.mStorage))
     {
         mNextId = fabric.first_keyset;
@@ -1680,7 +1673,7 @@ void GroupDataProviderImpl::KeySetIteratorImpl::Release()
 
 CHIP_ERROR GroupDataProviderImpl::RemoveFabric(chip::FabricIndex fabric_index)
 {
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
 
     // Fabric data defaults to zero, so if not entry is found, no mappings, or keys are removed
     // However, states has a separate list, and needs to be removed regardless
@@ -1722,13 +1715,27 @@ CHIP_ERROR GroupDataProviderImpl::RemoveFabric(chip::FabricIndex fabric_index)
     return fabric.Delete(mStorage);
 }
 
+/// @brief Gets the fabric index for the next fabric in the fabric linked list
+/// @param fabric_index[in] Current fabric index
+/// @param next[out] Next fabric index
+/// @return CHIP_NO_ERROR if manged to load the fabric, loading related CHIP_ERROR otherwise
+CHIP_ERROR GroupDataProviderImpl::GetNextFabric(FabricIndex fabric_index, FabricIndex & next)
+{
+    FabricGroupData fabric(fabric_index);
+
+    ReturnErrorOnFailure(fabric.Load(mStorage));
+    next = fabric.next;
+
+    return CHIP_NO_ERROR;
+}
+
 //
 // Cryptography
 //
 
 Crypto::SymmetricKeyContext * GroupDataProviderImpl::GetKeyContext(FabricIndex fabric_index, GroupId group_id)
 {
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), nullptr);
 
     KeyMapData mapping(fabric.fabric_index, fabric.first_map);
@@ -1756,7 +1763,7 @@ Crypto::SymmetricKeyContext * GroupDataProviderImpl::GetKeyContext(FabricIndex f
 
 CHIP_ERROR GroupDataProviderImpl::GetIpkKeySet(FabricIndex fabric_index, KeySet & out_keyset)
 {
-    FabricData fabric(fabric_index);
+    FabricGroupData fabric(fabric_index);
     VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_NOT_FOUND);
 
     KeyMapData mapping(fabric.fabric_index, fabric.first_map);
@@ -1842,7 +1849,7 @@ GroupDataProviderImpl::GroupSessionIteratorImpl::GroupSessionIteratorImpl(GroupD
 
 size_t GroupDataProviderImpl::GroupSessionIteratorImpl::Count()
 {
-    FabricData fabric(mFirstFabric);
+    FabricGroupData fabric(mFirstFabric);
     size_t count = 0;
 
     for (size_t i = 0; i < mFabricTotal; i++, fabric.fabric_index = fabric.next)
@@ -1885,7 +1892,7 @@ bool GroupDataProviderImpl::GroupSessionIteratorImpl::Next(GroupSession & output
 {
     while (mFabricCount < mFabricTotal)
     {
-        FabricData fabric(mFabric);
+        FabricGroupData fabric(mFabric);
         VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mProvider.mStorage), false);
 
         if (mMapCount >= fabric.map_count)

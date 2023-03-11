@@ -19,6 +19,7 @@
  *    @file
  *          Contains a class handling creation of linked list of stored persistent data.
  */
+#pragma once
 
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/PersistentData.h>
@@ -73,17 +74,40 @@ struct StoredDataList : public PersistentData<kMaxSerializedSize>
     }
 };
 
-constexpr size_t kPersistentFabricBufferMax = 32;
-struct FabricList : StoredDataList<FabricIndex, kPersistentFabricBufferMax>
+constexpr size_t kPersistentFabricListBufferMax = 32;
+struct FabricList : StoredDataList<FabricIndex, kPersistentFabricListBufferMax>
 {
-    // Subclasses need to define UpdateKey to be whatever fabric list key they
-    // care about.
+    CHIP_ERROR UpdateKey(chip::StorageKeyName & key) override
+    {
+        key = DefaultStorageKeyAllocator::GroupFabricList();
+        return CHIP_NO_ERROR;
+    }
 
     void Clear() override
     {
         first_entry = kUndefinedFabricIndex;
         entry_count = 0;
     }
+
+    CHIP_ERROR UnregisterFabric(PersistentStorageDelegate * mStorage, FabricIndex fabric_index, FabricIndex next)
+    {
+        CHIP_ERROR err = this->Load(mStorage);
+        VerifyOrReturnValue(CHIP_ERROR_NOT_FOUND != err, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        // If we are not removing the first fabric, only the entry count needs to be modified
+        if (fabric_index == first_entry)
+        {
+            first_entry = next;
+        }
+
+        entry_count--;
+
+        ReturnErrorOnFailure(this->Save(mStorage));
+
+        return CHIP_NO_ERROR;
+    }
 };
+
 } // namespace CommonPersistentData
 } // namespace chip

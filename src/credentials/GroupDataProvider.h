@@ -202,7 +202,7 @@ public:
     virtual ~GroupDataProvider() = default;
 
     // Not copyable
-    GroupDataProvider(const GroupDataProvider &) = delete;
+    GroupDataProvider(const GroupDataProvider &)             = delete;
     GroupDataProvider & operator=(const GroupDataProvider &) = delete;
 
     uint16_t GetMaxGroupsPerFabric() const { return mMaxGroupsPerFabric; }
@@ -306,6 +306,8 @@ public:
 
     // Fabrics
     virtual CHIP_ERROR RemoveFabric(FabricIndex fabric_index) = 0;
+    // Gets the next Fabric index in the Fabric linked list
+    virtual CHIP_ERROR GetNextFabric(FabricIndex fabric_index, FabricIndex & next) = 0;
 
     // Decryption
     virtual GroupSessionIterator * IterateGroupSessions(uint16_t session_id)                        = 0;
