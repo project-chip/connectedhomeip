@@ -14,12 +14,8 @@
     "mounts": [
         "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
     ],
-    "build": {
-        "dockerfile": "Dockerfile",
-        "args": {
-            "BUILD_VERSION": "0.7.3"
-        }
-    },
+    "initializeCommand": ".devcontainer/build.sh --tag matter-dev-environment:local --version 0.7.3",
+    "image": "matter-dev-environment:local",
     "remoteUser": "vscode",
     // Add the IDs of extensions you want installed when the container is created in the array below.
     "extensions": [
