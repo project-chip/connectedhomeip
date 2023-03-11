@@ -6,10 +6,11 @@
 #include <bl60x_wifi_driver/wifi_mgmr_profile.h>
 #include <supplicant_api.h>
 
+#include <wpa_supplicant/src/utils/common.h>
+
 #include <wpa_supplicant/src/common/defs.h>
 #include <wpa_supplicant/src/common/wpa_common.h>
 #include <wpa_supplicant/src/rsn_supp/wpa_i.h>
-#include <wpa_supplicant/src/utils/common.h>
 
 extern struct wpa_sm gWpaSm;
 
