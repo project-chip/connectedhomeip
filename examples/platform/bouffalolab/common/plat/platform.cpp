@@ -152,7 +152,6 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
     }
 }
 
-
 CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 {
 #if CONFIG_ENABLE_CHIP_SHELL || PW_RPC_ENABLED
@@ -204,7 +203,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 
     static CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    
+
     ReturnLogErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();

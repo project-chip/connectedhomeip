@@ -138,7 +138,8 @@ void AppTask::PostEvent(app_event_t event)
 void AppTask::AppTaskMain(void * pvParameter)
 {
     app_event_t appEvent;
-    bool onoff = false;;
+    bool onoff = false;
+    ;
 
     sLightLED.Init();
 
@@ -233,8 +234,8 @@ void AppTask::LightingUpdate(app_event_t status)
     DataModel::Nullable<uint8_t> v(0);
     EndpointId endpoint = GetAppTask().GetEndpointId();
 
-
-    if (APP_EVENT_LIGHTING_MASK & status) {
+    if (APP_EVENT_LIGHTING_MASK & status)
+    {
         do
         {
             if (EMBER_ZCL_STATUS_SUCCESS != Clusters::OnOff::Attributes::OnOff::Get(endpoint, &onoff))
@@ -277,7 +278,8 @@ void AppTask::LightingUpdate(app_event_t status)
 
         } while (0);
     }
-    else if (APP_EVENT_SYS_BLE_ADV & status) {
+    else if (APP_EVENT_SYS_BLE_ADV & status)
+    {
 #if defined(BL706_NIGHT_LIGHT) || defined(BL602_NIGHT_LIGHT)
         /** show yellow to indicate BLE advertisement */
         sLightLED.SetColor(254, 35, 254);
@@ -354,10 +356,12 @@ void AppTask::TimerEventHandler(app_event_t event)
         StartTimer();
         if (GetAppTask().mIsFactoryResetIndicat)
         {
-            if (GetAppTask().mIsConnected) {
+            if (GetAppTask().mIsConnected)
+            {
                 LightingUpdate(APP_EVENT_LIGHTING_MASK);
             }
-            else {
+            else
+            {
                 LightingUpdate(APP_EVENT_SYS_BLE_ADV);
             }
         }
