@@ -121,15 +121,17 @@ CHIP_ERROR ExtensionFieldSetsImpl::GetFieldSetAtPosition(ExtensionFieldSet & fie
 
 CHIP_ERROR ExtensionFieldSetsImpl::RemoveFieldAtPosition(uint8_t position)
 {
-    VerifyOrReturnError(position < kMaxClusterPerScenes, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnValue(!this->IsEmpty() && !mEFS[position].IsEmpty(), CHIP_NO_ERROR);
+    VerifyOrReturnValue(position < mFieldSetsCount, CHIP_NO_ERROR);
 
     uint8_t nextPos = static_cast<uint8_t>(position + 1);
     uint8_t moveNum = static_cast<uint8_t>(kMaxClusterPerScenes - nextPos);
 
     // TODO: Implement general array management methods
-    // Compress array after removal
-    memmove(&mEFS[position], &mEFS[nextPos], sizeof(ExtensionFieldSet) * moveNum);
+    // Compress array after removal, if the removed position is not the last
+    if (moveNum)
+    {
+        memmove(&mEFS[position], &mEFS[nextPos], sizeof(ExtensionFieldSet) * moveNum);
+    }
 
     mFieldSetsCount--;
     // Clear last occupied position
