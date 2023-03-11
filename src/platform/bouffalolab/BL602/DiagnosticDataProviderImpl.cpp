@@ -249,11 +249,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
-    if (ConnectivityMgrImpl()._IsWiFiStationConnected()) {
+    if (ConnectivityMgrImpl()._IsWiFiStationConnected())
+    {
         securityType = static_cast<app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum>(wifi_mgmr_get_security_type());
         return CHIP_NO_ERROR;
     }
-    
+
     return CHIP_ERROR_READ_FAILED;
 }
 
@@ -264,7 +265,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetwork
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
 {
-    if (ConnectivityMgrImpl()._IsWiFiStationConnected()) {
+    if (ConnectivityMgrImpl()._IsWiFiStationConnected())
+    {
         channelNumber = wifiMgmr.channel;
         return CHIP_NO_ERROR;
     }
@@ -274,7 +276,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNu
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
-    if (ConnectivityMgrImpl()._IsWiFiStationConnected()) {
+    if (ConnectivityMgrImpl()._IsWiFiStationConnected())
+    {
         rssi = wifiMgmr.wlan_sta.sta.rssi;
         return CHIP_NO_ERROR;
     }
