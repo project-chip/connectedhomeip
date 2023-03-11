@@ -24,6 +24,10 @@ import chip.devicecontroller.model.InvokeElement
 import com.matter.controller.commands.common.CredentialsIssuer
 import java.util.logging.Level
 import java.util.logging.Logger
+import kotlin.UShort
+import chip.tlv.AnonymousTag
+import chip.tlv.ContextSpecificTag
+import chip.tlv.TlvWriter
 
 class PairOnNetworkLongImInvokeCommand(
   controller: ChipDeviceController, credsIssue: CredentialsIssuer?
@@ -68,11 +72,14 @@ class PairOnNetworkLongImInvokeCommand(
   }
 
   override fun runCommand() {
-    // tlv structure with tag 0, unsigned integer 1 inside, {0: 1}
-    val intTLV = byteArrayOf(0x15, 0x24, 0x00, 0x01, 0x18)
+    val number : UShort = 1u
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+    tlvWriter.put(ContextSpecificTag(0), number)
+    tlvWriter.endStructure()
 
     val element: InvokeElement = InvokeElement.newInstance( /* endpointId= */
-      0L, CLUSTER_ID_IDENTIFY, IDENTIFY_COMMAND, intTLV, null
+      0L, CLUSTER_ID_IDENTIFY, IDENTIFY_COMMAND, tlvWriter.getEncoded(), null
     )
 
     currentCommissioner()
