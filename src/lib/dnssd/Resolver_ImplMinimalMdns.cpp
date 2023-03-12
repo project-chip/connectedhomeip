@@ -32,7 +32,7 @@
 #include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
-
+#include <set>
 // MDNS servers will receive all broadcast packets over the network.
 // Disable 'invalid packet' messages because the are expected and common
 // These logs are useful for debug only
@@ -277,19 +277,41 @@ public:
     CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override;
     bool IsInitialized() override;
     void Shutdown() override;
-    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
-    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override { mCommissioningDelegate = delegate; }
+    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override
+    {
+        if (delegate == nullptr)
+        {
+            mOperationalDelegates.clear();
+        }
+        else
+        {
+            mOperationalDelegates.insert(delegate);
+        }
+    }
+    void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override
+    {
+        if (delegate == nullptr)
+        {
+            mCommissioningDelegates.clear();
+        }
+        else
+        {
+            mCommissioningDelegates.insert(delegate);
+        }
+    }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId) override;
     void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override;
     CHIP_ERROR DiscoverCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
+    CHIP_ERROR DiscoverOperational(DiscoveryFilter filter = DiscoveryFilter()) override;
+
     CHIP_ERROR StopDiscovery() override;
     CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override;
 
 private:
-    OperationalResolveDelegate * mOperationalDelegate     = nullptr;
-    CommissioningResolveDelegate * mCommissioningDelegate = nullptr;
-    System::Layer * mSystemLayer                          = nullptr;
+    std::set<OperationalResolveDelegate *> mOperationalDelegates;
+    std::set<CommissioningResolveDelegate *> mCommissioningDelegates;
+    System::Layer * mSystemLayer = nullptr;
     ActiveResolveAttempts mActiveResolves;
     PacketParser mPacketParser;
 
@@ -375,11 +397,12 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             }
 
             mActiveResolves.Complete(nodeData);
-            if (mCommissioningDelegate != nullptr)
+            for (auto & delegate : mCommissioningDelegates)
             {
-                mCommissioningDelegate->OnNodeDiscovered(nodeData);
+                delegate->OnNodeDiscovered(nodeData);
             }
-            else
+
+            if (mCommissioningDelegates.empty())
             {
 #if CHIP_MINMDNS_HIGH_VERBOSITY
                 ChipLogError(Discovery, "No delegate to report commissioning node discovery");
@@ -397,11 +420,11 @@ void MinMdnsResolver::AdvancePendingResolverStates()
             }
 
             mActiveResolves.Complete(nodeData.operationalData.peerId);
-            if (mOperationalDelegate != nullptr)
+            for (auto & delgate : mOperationalDelegates)
             {
-                mOperationalDelegate->OnOperationalNodeResolved(nodeData);
+                delgate->OnOperationalNodeResolved(nodeData);
             }
-            else
+            if (mOperationalDelegates.empty())
             {
 #if CHIP_MINMDNS_HIGH_VERBOSITY
                 ChipLogError(Discovery, "No delegate to report operational node discovery");
@@ -642,6 +665,11 @@ CHIP_ERROR MinMdnsResolver::DiscoverCommissioners(DiscoveryFilter filter)
     return BrowseNodes(DiscoveryType::kCommissionerNode, filter);
 }
 
+CHIP_ERROR MinMdnsResolver::DiscoverOperational(DiscoveryFilter filter)
+{
+    return BrowseNodes(DiscoveryType::kOperational, filter);
+}
+
 CHIP_ERROR MinMdnsResolver::StopDiscovery()
 {
     return mActiveResolves.CompleteAllBrowses();
@@ -739,6 +767,13 @@ CHIP_ERROR ResolverProxy::DiscoverCommissioners(DiscoveryFilter filter)
     VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     chip::Dnssd::Resolver::Instance().SetCommissioningDelegate(mDelegate);
     return chip::Dnssd::Resolver::Instance().DiscoverCommissioners(filter);
+}
+
+CHIP_ERROR ResolverProxy::DiscoverOperational(DiscoveryFilter filter)
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    chip::Dnssd::Resolver::Instance().SetOperationalDelegate(mDelegate);
+    return chip::Dnssd::Resolver::Instance().DiscoverOperational(filter);
 }
 
 CHIP_ERROR ResolverProxy::StopDiscovery()

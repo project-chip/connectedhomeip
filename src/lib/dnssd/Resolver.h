@@ -423,6 +423,14 @@ public:
     virtual CHIP_ERROR DiscoverCommissioners(DiscoveryFilter filter = DiscoveryFilter()) = 0;
 
     /**
+     * @brief Finds all operational nodes matching a given filter
+     *
+     * @param filter
+     * @return CHIP_ERROR
+     */
+    virtual CHIP_ERROR DiscoverOperational(DiscoveryFilter filter = DiscoveryFilter()) = 0;
+
+    /**
      * Stop discovery (of commissionable or commissioner nodes).
      *
      * Some back ends may not support stopping discovery, so consumers should

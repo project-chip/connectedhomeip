@@ -625,6 +625,12 @@ void DiscoveryImplPlatform::NodeIdResolutionNoLongerNeeded(const PeerId & peerId
     ChipDnssdResolveNoLongerNeeded(name);
 }
 
+CHIP_ERROR DiscoveryImplPlatform::DiscoverOperational(DiscoveryFilter filter)
+{
+    ReturnErrorOnFailure(InitImpl());
+    return mResolverProxy.DiscoverOperational(filter);
+}
+
 CHIP_ERROR DiscoveryImplPlatform::DiscoverCommissionableNodes(DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(InitImpl());
@@ -699,6 +705,11 @@ void ResolverProxy::NodeIdResolutionNoLongerNeeded(const PeerId & peerId)
 ResolverProxy::~ResolverProxy()
 {
     Shutdown();
+}
+
+CHIP_ERROR ResolverProxy::DiscoverOperational(DiscoveryFilter filter)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ResolverProxy::DiscoverCommissionableNodes(DiscoveryFilter filter)
