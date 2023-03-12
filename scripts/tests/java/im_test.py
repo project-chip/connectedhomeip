@@ -28,7 +28,7 @@ from colorama import Fore, Style
 from java.base import DumpProgramOutputToQueue
 
 
-class CommissioningTest:
+class IMTest:
     def __init__(self, thread_list: typing.List[threading.Thread], queue: queue.Queue, cmd: [], args: str):
         self.thread_list = thread_list
         self.queue = queue
@@ -63,24 +63,32 @@ class CommissioningTest:
 
         logging.basicConfig(level=logging.INFO)
 
-    def TestCmdOnnetworkLong(self, nodeid, setuppin, discriminator, timeout):
-        java_command = self.command + ['pairing', 'onnetwork-long', nodeid, setuppin, discriminator, timeout]
+    def TestCmdOnnetworkLongImInvoke(self, nodeid, setuppin, discriminator, timeout):
+        java_command = self.command + ['im', 'onnetwork-long-im-invoke', nodeid, setuppin, discriminator, timeout]
         logging.info(f"Execute: {java_command}")
         java_process = subprocess.Popen(
             java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
         return java_process.wait()
 
-    def TestCmdAlreadyDiscovered(self, nodeid, setuppin, address, port, timeout):
-        java_command = self.command + ['pairing', 'already-discovered', nodeid, setuppin, address, port, timeout]
+    def TestCmdOnnetworkLongImWrite(self, nodeid, setuppin, discriminator, timeout):
+        java_command = self.command + ['im', 'onnetwork-long-im-write', nodeid, setuppin, discriminator, timeout]
         logging.info(f"Execute: {java_command}")
         java_process = subprocess.Popen(
             java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
         return java_process.wait()
 
-    def TestCmdAddressPaseOnly(self, nodeid, setuppin, address, port, timeout):
-        java_command = self.command + ['pairing', 'address-paseonly', nodeid, setuppin, address, port, timeout]
+    def TestCmdOnnetworkLongImRead(self, nodeid, setuppin, discriminator, timeout):
+        java_command = self.command + ['im', 'onnetwork-long-im-read', nodeid, setuppin, discriminator, timeout]
+        logging.info(f"Execute: {java_command}")
+        java_process = subprocess.Popen(
+            java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        DumpProgramOutputToQueue(self.thread_list, Fore.GREEN + "JAVA " + Style.RESET_ALL, java_process, self.queue)
+        return java_process.wait()
+
+    def TestCmdOnnetworkLongImSubscribe(self, nodeid, setuppin, discriminator, timeout):
+        java_command = self.command + ['im', 'onnetwork-long-im-subscribe', nodeid, setuppin, discriminator, timeout]
         logging.info(f"Execute: {java_command}")
         java_process = subprocess.Popen(
             java_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -88,12 +96,7 @@ class CommissioningTest:
         return java_process.wait()
 
     def RunTest(self):
-        if self.command_name == 'onnetwork-long':
-            logging.info("Testing pairing onnetwork-long")
-            code = self.TestCmdOnnetworkLong(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)
-            if code != 0:
-                raise Exception(f"Testing pairing onnetwork-long failed with error {code}")
-        elif self.command_name == 'onnetwork-long-im-invoke':
+        if self.command_name == 'onnetwork-long-im-invoke':
             logging.info("Testing pairing onnetwork-long-im-invoke")
             code = self.TestCmdOnnetworkLongImInvoke(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)
             if code != 0:
@@ -113,15 +116,5 @@ class CommissioningTest:
             code = self.TestCmdOnnetworkLongImSubscribe(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)
             if code != 0:
                 raise Exception(f"Testing pairing onnetwork-long-im-subscribe failed with error {code}")
-        elif self.command_name == 'already-discovered':
-            logging.info("Testing pairing already-discovered")
-            code = self.TestCmdAlreadyDiscovered(self.nodeid, self.setup_pin_code, self.address, self.port, self.timeout)
-            if code != 0:
-                raise Exception(f"Testing pairing already-discovered failed with error {code}")
-        elif self.command_name == 'address-paseonly':
-            logging.info("Testing pairing address-paseonly")
-            code = self.TestCmdAddressPaseOnly(self.nodeid, self.setup_pin_code, self.address, self.port, self.timeout)
-            if code != 0:
-                raise Exception(f"Testing pairing address-paseonly failed with error {code}")
         else:
             raise Exception(f"Unsupported command {self.command_name}")
