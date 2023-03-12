@@ -93,26 +93,6 @@ class CommissioningTest:
             code = self.TestCmdOnnetworkLong(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)
             if code != 0:
                 raise Exception(f"Testing pairing onnetwork-long failed with error {code}")
-        elif self.command_name == 'onnetwork-long-im-invoke':
-            logging.info("Testing pairing onnetwork-long-im-invoke")
-            code = self.TestCmdOnnetworkLongImInvoke(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)
-            if code != 0:
-                raise Exception(f"Testing pairing onnetwork-long-im-invoke failed with error {code}")
-        elif self.command_name == 'onnetwork-long-im-write':
-            logging.info("Testing pairing onnetwork-long-im-write")
-            code = self.TestCmdOnnetworkLongImWrite(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)
-            if code != 0:
-                raise Exception(f"Testing pairing onnetwork-long-im-write failed with error {code}")
-        elif self.command_name == 'onnetwork-long-im-read':
-            logging.info("Testing pairing onnetwork-long-im-read")
-            code = self.TestCmdOnnetworkLongImRead(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)
-            if code != 0:
-                raise Exception(f"Testing pairing onnetwork-long-im-read failed with error {code}")
-        elif self.command_name == 'onnetwork-long-im-subscribe':
-            logging.info("Testing pairing onnetwork-long-im-subscribe")
-            code = self.TestCmdOnnetworkLongImSubscribe(self.nodeid, self.setup_pin_code, self.discriminator, self.timeout)
-            if code != 0:
-                raise Exception(f"Testing pairing onnetwork-long-im-subscribe failed with error {code}")
         elif self.command_name == 'already-discovered':
             logging.info("Testing pairing already-discovered")
             code = self.TestCmdAlreadyDiscovered(self.nodeid, self.setup_pin_code, self.address, self.port, self.timeout)
