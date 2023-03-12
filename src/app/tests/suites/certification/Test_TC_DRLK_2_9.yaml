@@ -167,8 +167,6 @@ tests:
                 value: 0x85
               - name: "UserIndex"
                 value: null
-              - name: "NextCredentialIndex"
-                value: 3
 
     - label: "TH sends Set Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
@@ -194,8 +192,6 @@ tests:
                 value: 0x02
               - name: "UserIndex"
                 value: null
-              - name: "NextCredentialIndex"
-                value: 3
 
     - label:
           "TH sends Set Credential Command to DUT and Verify that the DUT sends
@@ -353,8 +349,6 @@ tests:
                 value: 0
               - name: "UserIndex"
                 value: null
-              - name: "NextCredentialIndex"
-                value: 2
 
     - label: "TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
