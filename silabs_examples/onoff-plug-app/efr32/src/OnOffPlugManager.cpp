@@ -52,7 +52,7 @@ CHIP_ERROR OnOffPlugManager::Init()
 {
     // Create FreeRTOS sw timer for plug timer.
     sPlugTimer = xTimerCreate("plugTmr",        // Just a text name, not used by the RTOS kernel
-                              1,                // == default timer period (mS)
+                              pdMS_TO_TICKS(1), // == default timer period (mS)
                               false,            // no timer reload (==one-shot)
                               (void *) this,    // init timer id = plug obj context
                               TimerEventHandler // timer callback handler
@@ -163,7 +163,7 @@ void OnOffPlugManager::StartTimer(uint32_t aTimeoutMs)
     // timer is not active, change its period to required value (== restart).
     // FreeRTOS- Block for a maximum of 100 ticks if the change period command
     // cannot immediately be sent to the timer command queue.
-    if (xTimerChangePeriod(sPlugTimer, (aTimeoutMs / portTICK_PERIOD_MS), 100) != pdPASS)
+    if (xTimerChangePeriod(sPlugTimer, pdMS_TO_TICKS(aTimeoutMs), 100) != pdPASS)
     {
         SILABS_LOG("sPlugTimer timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
@@ -172,7 +172,7 @@ void OnOffPlugManager::StartTimer(uint32_t aTimeoutMs)
 
 void OnOffPlugManager::CancelTimer(void)
 {
-    if (xTimerStop(sPlugTimer, 0) == pdFAIL)
+    if (xTimerStop(sPlugTimer, pdMS_TO_TICKS(0)) == pdFAIL)
     {
         SILABS_LOG("sPlugTimer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
