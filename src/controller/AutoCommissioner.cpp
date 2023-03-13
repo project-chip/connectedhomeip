@@ -374,6 +374,9 @@ void AutoCommissioner::SetCASEFailsafeTimerIfNeeded()
         // CASE establishment, and receipt of the commissioning complete command.
         // We know that the mCommissioneeDeviceProxy is still valid at this point since it gets cleared during cleanup
         // and SetCASEFailsafeTimerIfNeeded is always called before that stage.
+        //
+        // A false return from ExtendArmFailSafe is fine; we don't want to make
+        // the fail-safe shorter here.
         mCommissioner->ExtendArmFailSafe(mCommissioneeDeviceProxy, CommissioningStage::kFindOperational,
                                          mParams.GetCASEFailsafeTimerSeconds().Value(),
                                          GetCommandTimeout(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe),

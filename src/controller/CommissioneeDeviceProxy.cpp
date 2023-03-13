@@ -71,11 +71,9 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
 {
     mDeviceAddress = addr;
 
-    mRemoteMRPConfig = config;
-
     // Initialize PASE session state with any MRP parameters that DNS-SD has provided.
     // It can be overridden by PASE session protocol messages that include MRP parameters.
-    mPairing.SetRemoteMRPConfig(mRemoteMRPConfig);
+    mPairing.SetRemoteMRPConfig(config);
 
     if (!mSecureSession)
     {
