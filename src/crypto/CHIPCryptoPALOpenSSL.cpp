@@ -1158,7 +1158,7 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     uint8_t public_key[kP256_PublicKey_Length];
     int rc = 0;
 
-    rc = trusty_matter.P256KeypairInitialize(p256_handler, public_key);
+    rc = trusty_matter.P256KeypairInitialize(p256_handler, fabricIndex, public_key);
     VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
 
     memcpy(Uint8::to_uchar(mPublicKey), public_key, kP256_PublicKey_Length);
