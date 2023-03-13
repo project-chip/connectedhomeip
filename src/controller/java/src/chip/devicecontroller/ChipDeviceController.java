@@ -548,7 +548,9 @@ public class ChipDeviceController {
    * @param ReportCallback Callback when a report data has been received and processed for the given
    *     paths.
    * @param devicePtr connected device pointer
-   * @param attributeList a list of attribute paths
+   * @param attributePaths a list of attribute paths
+   * @param minInterval the requested minimum interval boundary floor in seconds
+   * @param maxInterval the requested maximum interval boundary ceiling in seconds
    * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
    *     layer if this value is non-zero.
    */
@@ -584,7 +586,9 @@ public class ChipDeviceController {
    * @param ReportCallback Callback when a report data has been received and processed for the given
    *     paths.
    * @param devicePtr connected device pointer
-   * @param eventList a list of event paths
+   * @param eventPaths a list of event paths
+   * @param minInterval the requested minimum interval boundary floor in seconds
+   * @param maxInterval the requested maximum interval boundary ceiling in seconds
    * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
    *     layer if this value is non-zero.
    */
@@ -621,8 +625,13 @@ public class ChipDeviceController {
    * @param ReportCallback Callback when a report data has been received and processed for the given
    *     paths.
    * @param devicePtr connected device pointer
-   * @param attributeList a list of attribute paths
-   * @param eventList a list of event paths
+   * @param attributePaths a list of attribute paths
+   * @param eventPaths a list of event paths
+   * @param minInterval the requested minimum interval boundary floor in seconds
+   * @param maxInterval the requested maximum interval boundary ceiling in seconds
+   * @param keepSubscriptions If KeepSubscriptions is FALSE, all existing or pending subscriptions 
+   *      on the publisher for this subscriber SHALL be terminated.
+   * @param isFabricFiltered limits the data read within fabric-scoped lists to the accessing fabric
    * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
    *     layer if this value is non-zero.
    */
@@ -659,7 +668,7 @@ public class ChipDeviceController {
    * @param ReportCallback Callback when a report data has been received and processed for the given
    *     paths.
    * @param devicePtr connected device pointer
-   * @param attributeList a list of attribute paths
+   * @param attributePaths a list of attribute paths
    * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
    *     layer if this value is non-zero.
    */
@@ -684,7 +693,7 @@ public class ChipDeviceController {
    * @param ReportCallback Callback when a report data has been received and processed for the given
    *     paths.
    * @param devicePtr connected device pointer
-   * @param eventList a list of event paths
+   * @param eventPaths a list of event paths
    * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
    *     layer if this value is non-zero.
    */
@@ -706,8 +715,8 @@ public class ChipDeviceController {
    * @param ReportCallback Callback when a report data has been received and processed for the given
    *     paths.
    * @param devicePtr connected device pointer
-   * @param attributeList a list of attribute paths
-   * @param eventList a list of event paths
+   * @param attributePaths a list of attribute paths
+   * @param eventPaths a list of event paths
    * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
    *     layer if this value is non-zero.
    */
