@@ -46,6 +46,9 @@ declare_args() {
 
   # Enable Sleepy end device
   enable_sleepy_device = false
+
+  # Argument to Disable IPv4 for wifi(rs911)
+  chip_enable_wifi_ipv4 = false
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
@@ -197,6 +200,9 @@ template("efr32_sdk") {
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
+      if (chip_enable_wifi_ipv4) {
+        defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
+      }
       if (use_rs9116 || use_SiWx917) {
         defines += [
           "SL_HEAP_SIZE=32768",

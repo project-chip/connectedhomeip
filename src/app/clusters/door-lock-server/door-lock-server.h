@@ -121,7 +121,15 @@ public:
     bool SetOneTouchLocking(chip::EndpointId endpointId, bool isEnabled);
     bool SetPrivacyModeButton(chip::EndpointId endpointId, bool isEnabled);
 
-    bool TrackWrongCodeEntry(chip::EndpointId endpointId);
+    /**
+     * @brief Handles a wrong code entry attempt for the endpoint. If the number of wrong entry attempts exceeds the max limit,
+     *        engage lockout. Otherwise increment the number of incorrect attempts by 1. This is handled automatically for
+     *        remote operations - lock and unlock.  Applications are responsible for calling it for non-remote incorrect credential
+     * presentation attempts.
+     *
+     * @param endpointId
+     */
+    bool HandleWrongCodeEntry(chip::EndpointId endpointId);
 
     bool GetAutoRelockTime(chip::EndpointId endpointId, uint32_t & autoRelockTime);
     bool GetNumberOfUserSupported(chip::EndpointId endpointId, uint16_t & numberOfUsersSupported);
@@ -183,6 +191,15 @@ public:
     bool OnFabricRemoved(chip::EndpointId endpointId, chip::FabricIndex fabricIndex);
 
     static void DoorLockOnAutoRelockCallback(chip::System::Layer *, void * callbackContext);
+    /**
+     * @brief Resets the wrong code entry attempts to 0 for the endpoint. This is done automatically when a
+     *        remote lock operation with credentials succeeds, or when SetLockState is called with a non-empty credentials list.
+     *        Applications that call the two-argument version of SetLockState and handle sending the relevant operation events
+     *        themselves or via SendLockOperationEvent are responsible for calling this API when a valid credential is presented.
+     *
+     * @param endpointId
+     */
+    void ResetWrongCodeEntryAttempts(chip::EndpointId endpointId);
 
 private:
     chip::FabricIndex getFabricIndex(const chip::app::CommandHandler * commandObj);

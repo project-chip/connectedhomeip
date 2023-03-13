@@ -50,7 +50,7 @@ CHIP_ERROR UserDirectedCommissioningClient::SendUDCMessage(TransportMgrBase * tr
             ChipLogError(AppServer, "UDC SendMessage failed: %" CHIP_ERROR_FORMAT, err.Format());
             return err;
         }
-        sleep(1);
+        usleep(100 * 1000); // 100ms
     }
 
     ChipLogProgress(Inet, "UDC msg sent");

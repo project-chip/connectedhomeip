@@ -84,8 +84,6 @@ public:
     {}
     OperationalDeviceProxy() {}
 
-    // Recommended to use InteractionModelEngine::ShutdownSubscriptions directly.
-    void ShutdownSubscriptions() override { VerifyOrDie(false); } // Currently not implemented.
     void Disconnect() override
     {
         if (IsSecureConnected())

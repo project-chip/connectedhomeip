@@ -238,17 +238,119 @@ tests:
       arguments:
           value: 0
 
-    - label: "Read the lockout timeout"
-      command: "readAttribute"
-      attribute: "UserCodeTemporaryDisableTime"
-      response:
-          value: 10
+    # Test resetting wrong code entry retry attempts
+    # Set the retry limit to 3. Try to unlock with incorrect PIN 2 times followed by a third time
+    # with correct PIN code. The retry attempts should be reset to 0. Try to unock with incorrect
+    # PIN 2 times followed by a third time with correct PIN code. We should be able to unlock since
+    # the count has been reset and we are not in lockout.
 
     - label: "Set the WrongCodeEntryLimit to small value so we can test lockout"
       command: "writeAttribute"
       attribute: "WrongCodeEntryLimit"
       arguments:
           value: 3
+
+    - label: "Try to unlock the door with invalid PIN for the first time"
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "000000"
+      response:
+          error: FAILURE
+
+    - label: "Try to unlock the door with invalid PIN for the second time"
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "000000"
+      response:
+          error: FAILURE
+
+    - label: "Try to unlock the door with valid PIN for the third time"
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "123456"
+
+    - label: "Verify that lock state attribute value is set to Unlocked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 2
+
+    - label: "Lock the door back prior to next tests"
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "123456"
+
+    - label: "Verify that lock state attribute value is set to Locked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 1
+
+    - label: "Try to unlock the door with invalid PIN for the first time"
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "000000"
+      response:
+          error: FAILURE
+
+    - label: "Try to unlock the door with invalid PIN for the second time"
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "000000"
+      response:
+          error: FAILURE
+
+    - label: "Try to unlock the door with valid PIN for the third time"
+      command: "UnlockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "123456"
+
+    - label: "Verify that lock state attribute value is set to Unlocked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 2
+
+    - label: "Lock the door back prior to next tests"
+      command: "LockDoor"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "PINCode"
+                value: "123456"
+
+    - label: "Verify that lock state attribute value is set to Locked"
+      command: "readAttribute"
+      attribute: "LockState"
+      response:
+          value: 1
+
+    - label: "Read the lockout timeout"
+      command: "readAttribute"
+      attribute: "UserCodeTemporaryDisableTime"
+      response:
+          value: 10
 
     - label: "Try to unlock the door with invalid PIN for the first time"
       command: "UnlockDoor"

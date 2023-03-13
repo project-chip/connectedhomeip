@@ -18,10 +18,11 @@
 
 #pragma once
 
-#include "Screen.h"
-#include "ScreenManager.h"
+#include "sdkconfig.h"
 
 #if CONFIG_HAVE_DISPLAY
+#include "Screen.h"
+#include "ScreenManager.h"
 
 #include <cstdint>
 #include <vector>

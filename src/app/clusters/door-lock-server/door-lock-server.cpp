@@ -122,6 +122,13 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
     SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kUnspecified, userIndex, Nullable<chip::FabricIndex>(),
                            Nullable<chip::NodeId>(), credentials, success);
 
+    // Reset wrong entry attempts (in case there were any incorrect credentials presented before) if lock/unlock was a success
+    // and a valid credential was presented.
+    if (success && !credentials.IsNull() && !(credentials.Value().empty()))
+    {
+        ResetWrongCodeEntryAttempts(endpointId);
+    }
+
     // Schedule auto-relocking
     if (success && LockOperationTypeEnum::kUnlock == opType)
     {
@@ -181,7 +188,7 @@ bool DoorLockServer::SetPrivacyModeButton(chip::EndpointId endpointId, bool isEn
     return SetAttribute(endpointId, Attributes::EnablePrivacyModeButton::Id, Attributes::EnablePrivacyModeButton::Set, isEnabled);
 }
 
-bool DoorLockServer::TrackWrongCodeEntry(chip::EndpointId endpointId)
+bool DoorLockServer::HandleWrongCodeEntry(chip::EndpointId endpointId)
 {
     auto endpointContext = getContext(endpointId);
     if (nullptr == endpointContext)
@@ -207,6 +214,17 @@ bool DoorLockServer::TrackWrongCodeEntry(chip::EndpointId endpointId)
         return false;
     }
     return true;
+}
+
+void DoorLockServer::ResetWrongCodeEntryAttempts(chip::EndpointId endpointId)
+{
+    auto endpointContext = getContext(endpointId);
+    if (nullptr == endpointContext)
+    {
+        ChipLogError(Zcl, "Failed to reset wrong code entry attempts. No context for endpoint %d", endpointId);
+        return;
+    }
+    endpointContext->wrongCodeEntryAttempts = 0;
 }
 
 bool DoorLockServer::engageLockout(chip::EndpointId endpointId)
@@ -3352,7 +3370,13 @@ bool DoorLockServer::HandleRemoteLockOperation(chip::app::CommandHandler * comma
 exit:
     if (!success && reason == OperationErrorEnum::kInvalidCredential)
     {
-        TrackWrongCodeEntry(endpoint);
+        HandleWrongCodeEntry(endpoint);
+    }
+
+    // Reset the wrong code retry attempts if a valid credential is presented during lock/unlock
+    if (success && pinCode.HasValue())
+    {
+        ResetWrongCodeEntryAttempts(endpoint);
     }
 
     // Send command response
