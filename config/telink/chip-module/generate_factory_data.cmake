@@ -74,16 +74,20 @@ string(APPEND script_args "--chip-cert-path ${chip_cert_exe}\n")
 
 # for development purpose user can use default certs instead of generating or providing them
 if(CONFIG_CHIP_FACTORY_DATA_USE_DEFAULT_CERTS)
+    # convert decimal VID to its hexadecimal representation to find out certification files in repository
+    math(EXPR LOCAL_VID "${CONFIG_CHIP_DEVICE_VENDOR_ID}" OUTPUT_FORMAT HEXADECIMAL)
+    string(SUBSTRING ${LOCAL_VID} 2 -1 raw_vid)
+    string(TOUPPER ${raw_vid} raw_vid_upper)
     # convert decimal PID to its hexadecimal representation to find out certification files in repository
     math(EXPR LOCAL_PID "${CONFIG_CHIP_DEVICE_PRODUCT_ID}" OUTPUT_FORMAT HEXADECIMAL)
     string(SUBSTRING ${LOCAL_PID} 2 -1 raw_pid)
     string(TOUPPER ${raw_pid} raw_pid_upper)
     # all certs are located in ${CHIP_ROOT}/credentials/development/attestation
     # it can be used during development without need to generate new certifications
-    string(APPEND script_args "--dac-cert \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-DAC-${raw_pid_upper}-Cert.pem\"\n")
-    string(APPEND script_args "--dac-key \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-DAC-${raw_pid_upper}-Key.pem\"\n")
-    string(APPEND script_args "--cert \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-PAI-noPID-Cert.pem\"\n")
-    string(APPEND script_args "--key \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-PAI-noPID-Key.pem\"\n")
+    string(APPEND script_args "--dac-cert \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-DAC-${raw_vid_upper}-${raw_pid_upper}-Cert.pem\"\n")
+    string(APPEND script_args "--dac-key \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-DAC-${raw_vid_upper}-${raw_pid_upper}-Key.pem\"\n")
+    string(APPEND script_args "--cert \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-PAI-${raw_vid_upper}-noPID-Cert.pem\"\n")
+    string(APPEND script_args "--key \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-PAI-${raw_vid_upper}-noPID-Key.pem\"\n")
     string(APPEND script_args "-cd \"${CHIP_ROOT}/credentials/development/cd-certs/Chip-Test-CD-Cert.der\"\n")
     string(APPEND script_args "--pai\n")
 else()
