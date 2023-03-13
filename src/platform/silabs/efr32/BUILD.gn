@@ -19,14 +19,6 @@ import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 
-declare_args() {
-  #default WiFi SSID
-  chip_default_wifi_ssid = ""
-
-  #default Wifi Password
-  chip_default_wifi_psk = ""
-}
-
 silabs_platform_dir = "${chip_root}/src/platform/silabs"
 
 assert(chip_device_platform == "efr32")
@@ -42,18 +34,6 @@ if (chip_crypto == "platform") {
 config("efr32-platform-wifi-config") {
   include_dirs = [ "wifi" ]
   defines = []
-
-  if (chip_default_wifi_ssid != "") {
-    defines += [
-      "CHIP_ONNETWORK_PAIRING=1",
-      "CHIP_WIFI_SSID=\"${chip_default_wifi_ssid}\"",
-    ]
-  }
-  if (chip_default_wifi_psk != "") {
-    assert(chip_default_wifi_ssid != "",
-           "ssid can't be null if psk is provided")
-    defines += [ "CHIP_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
-  }
 
   if (use_rs9116 && use_rs911x_sockets) {
     include_dirs += [ "wifi/rsi-sockets" ]

@@ -49,6 +49,12 @@ declare_args() {
 
   # Argument to Disable IPv4 for wifi(rs911)
   chip_enable_wifi_ipv4 = false
+
+  #default WiFi SSID
+  chip_default_wifi_ssid = ""
+
+  #default Wifi Password
+  chip_default_wifi_psk = ""
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
@@ -200,6 +206,17 @@ template("efr32_sdk") {
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
+      if (chip_default_wifi_ssid != "") {
+        defines += [
+          "CHIP_ONNETWORK_PAIRING=1",
+          "CHIP_WIFI_SSID=\"${chip_default_wifi_ssid}\"",
+        ]
+      }
+      if (chip_default_wifi_psk != "") {
+        assert(chip_default_wifi_ssid != "",
+               "ssid can't be null if psk is provided")
+        defines += [ "CHIP_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
+      }
       if (chip_enable_wifi_ipv4) {
         defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
       }
