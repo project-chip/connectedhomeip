@@ -130,9 +130,10 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
             Log.w(
                 TAG,
                 "Failed to resolve service '" + serviceInfo.getServiceName() + "': " + errorCode);
+            String serviceType = serviceInfo.getServiceType();
             chipMdnsCallback.handleServiceResolve(
                 serviceInfo.getServiceName(),
-                serviceInfo.getServiceType(),
+                serviceType.startsWith(".") ? serviceType.substring(1) : serviceType,
                 null,
                 null,
                 0,
@@ -159,9 +160,10 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
                     + "' to "
                     + serviceInfo.getHost());
             // TODO: Find out if DNS-SD results for Android should contain interface ID
+            String serviceType = serviceInfo.getServiceType();
             chipMdnsCallback.handleServiceResolve(
                 serviceInfo.getServiceName(),
-                serviceInfo.getServiceType(),
+                serviceType.startsWith(".") ? serviceType.substring(1) : serviceType,
                 serviceInfo.getHost().getHostName(),
                 serviceInfo.getHost().getHostAddress(),
                 serviceInfo.getPort(),
