@@ -758,8 +758,8 @@ static inline const EC_KEY * to_const_EC_KEY(const P256KeypairContext * context)
 CHIP_ERROR P256Keypair::ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    size_t sig_size = 0;
-    int rc = 0;
+    size_t sig_size  = 0;
+    int rc           = 0;
 
     VerifyOrReturnError((msg != nullptr) && (msg_length > 0), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1020,8 +1020,8 @@ exit:
 CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_key, P256ECDHDerivedSecret & out_secret) const
 {
     ERR_clear_error();
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int result = -1;
+    CHIP_ERROR error      = CHIP_NO_ERROR;
+    int result            = -1;
     size_t out_buf_length = 0;
 
     result = trusty_matter.P256KeypairECDH_derive_secret(p256_handler, Uint8::to_const_uchar(remote_public_key),
@@ -1158,7 +1158,7 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     uint8_t public_key[kP256_PublicKey_Length];
     int rc = 0;
 
-    rc = trusty_matter.P256KeypairInitialize(p256_handler, public_key);
+    rc = trusty_matter.P256KeypairInitialize(p256_handler, fabricIndex, public_key);
     VerifyOrExit(rc == MATTER_ERROR_OK, error = CHIP_ERROR_INTERNAL);
 
     memcpy(Uint8::to_uchar(mPublicKey), public_key, kP256_PublicKey_Length);
@@ -1200,7 +1200,7 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
     Encoding::BufferWriter bbuf(mPublicKey, mPublicKey.Length());
     int rc = 0;
 
-    uint8_t *pubkey = input.Bytes();
+    uint8_t * pubkey  = input.Bytes();
     uint8_t * privkey = input.Bytes() + mPublicKey.Length();
 
     VerifyOrExit(input.Length() == mPublicKey.Length() + kP256_PrivateKey_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -1232,8 +1232,8 @@ P256Keypair::~P256Keypair()
 CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t & csr_length) const
 {
     ERR_clear_error();
-    CHIP_ERROR error     = CHIP_NO_ERROR;
-    int rc = 0;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int rc           = 0;
 
     VerifyOrExit(mInitialized, error = CHIP_ERROR_UNINITIALIZED);
 
