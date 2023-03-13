@@ -630,7 +630,7 @@ public class ChipDeviceController {
    * @param minInterval the requested minimum interval boundary floor in seconds
    * @param maxInterval the requested maximum interval boundary ceiling in seconds
    * @param keepSubscriptions If KeepSubscriptions is FALSE, all existing or pending subscriptions
-   *      on the publisher for this subscriber SHALL be terminated.
+   *     on the publisher for this subscriber SHALL be terminated.
    * @param isFabricFiltered limits the data read within fabric-scoped lists to the accessing fabric
    * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
    *     layer if this value is non-zero.
