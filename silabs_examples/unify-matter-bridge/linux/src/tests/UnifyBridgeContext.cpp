@@ -23,7 +23,7 @@ CHIP_ERROR UnifyBridgeContext::Init()
 
     MockAttributePersistenceProvider persistence;
     chip::app::SetAttributePersistenceProvider(&persistence);
-    InitDataModelHandler(&GetExchangeManager());
+    InitDataModelHandler();
 
     return CHIP_NO_ERROR;
 }
