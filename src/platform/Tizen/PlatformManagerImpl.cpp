@@ -29,6 +29,11 @@
  *       class. */
 #include <platform/PlatformManager.h>
 
+#include <condition_variable>
+#include <mutex>
+
+#include <glib.h>
+
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -45,8 +50,39 @@ namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
+namespace {
+
+struct GLibMatterContextInvokeData
+{
+    CHIP_ERROR (*mFunc)(void *);
+    void * mFuncUserData;
+    CHIP_ERROR mFuncResult;
+    // Sync primitives to wait for the function to be executed
+    std::mutex mDoneMutex;
+    std::condition_variable mDoneCond;
+    bool mDone = false;
+};
+
+void * GLibMainLoopThread(void * userData)
+{
+    GMainLoop * loop       = static_cast<GMainLoop *>(userData);
+    GMainContext * context = g_main_loop_get_context(loop);
+
+    g_main_context_push_thread_default(context);
+    g_main_loop_run(loop);
+
+    return nullptr;
+}
+
+} // namespace
+
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
+    auto * context      = g_main_context_new();
+    mGLibMainLoop       = g_main_loop_new(context, FALSE);
+    mGLibMainLoopThread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop);
+    g_main_context_unref(context);
+
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
 
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack());
@@ -56,6 +92,38 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
     return CHIP_NO_ERROR;
+}
+
+void PlatformManagerImpl::_Shutdown()
+{
+    Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
+
+    g_main_loop_quit(mGLibMainLoop);
+    g_main_loop_unref(mGLibMainLoop);
+    g_thread_join(mGLibMainLoopThread);
+}
+
+CHIP_ERROR PlatformManagerImpl::GLibMatterContextInvoke(CHIP_ERROR (*func)(void *), void * userData)
+{
+    GLibMatterContextInvokeData invokeData{ func, userData };
+
+    g_main_context_invoke_full(
+        g_main_loop_get_context(mGLibMainLoop), G_PRIORITY_HIGH_IDLE,
+        [](void * userData_) {
+            auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
+            data->mDoneMutex.lock();
+            data->mFuncResult = data->mFunc(data->mFuncUserData);
+            data->mDone       = true;
+            data->mDoneMutex.unlock();
+            data->mDoneCond.notify_one();
+            return G_SOURCE_REMOVE;
+        },
+        &invokeData, nullptr);
+
+    std::unique_lock<std::mutex> lock(invokeData.mDoneMutex);
+    invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
+
+    return invokeData.mFuncResult;
 }
 
 } // namespace DeviceLayer
