@@ -77,6 +77,7 @@ buildconfig_header("crypto_buildconfig") {
 
   if (chip_with_trusty_os) {
     defines += [ "CHIP_CRYPTO_TRUSTY_OS=1" ]
+    defines += [ "CHIP_OP_KEYSTORE_TRUSTY_OS=1" ]
   }
 }
 
@@ -185,7 +186,6 @@ static_library("crypto") {
   sources = [
     "CHIPCryptoPAL.cpp",
     "DefaultSessionKeystore.h",
-    "PersistentStorageOperationalKeystore.cpp",
     "PersistentStorageOperationalKeystore.h",
     "RandUtils.cpp",
     "RandUtils.h",
@@ -212,6 +212,12 @@ static_library("crypto") {
       "PSASpake2p.cpp",
       "PSASpake2p.h",
     ]
+  }
+
+  if (chip_with_trusty_os) {
+    sources += [ "PersistentStorageOperationalKeystoreTrusty.cpp" ]
+  } else {
+    sources += [ "PersistentStorageOperationalKeystore.cpp" ]
   }
 
   public_configs = []

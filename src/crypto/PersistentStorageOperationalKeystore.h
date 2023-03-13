@@ -17,12 +17,17 @@
 
 #pragma once
 
+#include <crypto/CryptoBuildConfig.h>
 #include <crypto/OperationalKeystore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+
+#if defined(CHIP_OP_KEYSTORE_TRUSTY_OS)
+#include <trusty_matter.h>
+#endif
 
 namespace chip {
 
@@ -104,6 +109,11 @@ protected:
     // If overridding NewOpKeypairForFabric method in a subclass, set this to true in
     // `NewOpKeypairForFabric` if the mPendingKeypair should not be deleted when no longer in use.
     bool mIsExternallyOwnedKeypair = false;
+
+#if defined(CHIP_OP_KEYSTORE_TRUSTY_OS)
+private:
+    mutable matter::TrustyMatter trusty_matter;
+#endif
 };
 
 } // namespace chip
