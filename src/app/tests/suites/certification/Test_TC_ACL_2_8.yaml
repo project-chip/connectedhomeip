@@ -303,3 +303,18 @@ tests:
                               },
                           FabricIndex: TH2FabricIndex,
                       }
+
+    - label: "TH1 writes ACL attribute value is an empty list"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: []
+
+    - label: "TH2 writes ACL attribute value is an empty list"
+      identity: "beta"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: []

@@ -323,6 +323,22 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
+    - label: "TH2 writes Extension attibute value as empty list"
+      identity: "beta"
+      PICS: ACL.S.A0001
+      command: "writeAttribute"
+      attribute: "Extension"
+      arguments:
+          value: []
+
+    - label: "TH2 writes ACL attribute value is an empty list"
+      identity: "beta"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: []
+
     - label: "Step 15:TH1 removes fabric F2 from DUT"
       PICS: OPCREDS.S.C0a.Rsp
       cluster: "Operational Credentials"
@@ -381,3 +397,17 @@ tests:
                 value: "Enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
+
+    - label: "TH1 writes Extension attribute value as empty list"
+      PICS: ACL.S.A0001
+      command: "writeAttribute"
+      attribute: "Extension"
+      arguments:
+          value: []
+
+    - label: "TH1 writes ACL attribute value is an empty list"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: []
