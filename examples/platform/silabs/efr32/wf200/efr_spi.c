@@ -35,9 +35,6 @@
 
 #include "FreeRTOS.h"
 #include "semphr.h"
-#ifdef SLEEP_ENABLED
-#include "sl_power_manager.h"
-#endif
 #include "AppConfig.h"
 
 #include "gpiointerrupt.h"
@@ -47,6 +44,10 @@
 #include "sl_wfx_host.h"
 #include "sl_wfx_task.h"
 #include "wfx_host_events.h"
+
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+#include "sl_power_manager.h"
+#endif
 
 #if defined(EFR32MG24)
 #include "spi_multiplex.h"
@@ -185,6 +186,10 @@ static bool rx_dma_complete(unsigned int channel, unsigned int sequenceNo, void 
     xSemaphoreGiveFromISR(spi_sem, &xHigherPriorityTaskWoken);
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+    sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
+#endif
+
     return true;
 }
 
@@ -198,6 +203,10 @@ static bool rx_dma_complete(unsigned int channel, unsigned int sequenceNo, void 
  *****************************************************************************/
 void receiveDMA(uint8_t * buffer, uint16_t buffer_length)
 {
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+    sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
+#endif
+
     // Start receive DMA.
     DMADRV_PeripheralMemory(rx_dma_channel, MY_USART_RX_SIGNAL, (void *) buffer, (void *) &(MY_USART->RXDATA), true, buffer_length,
                             dmadrvDataSize1, rx_dma_complete, NULL);
@@ -217,6 +226,10 @@ void receiveDMA(uint8_t * buffer, uint16_t buffer_length)
  *****************************************************************************/
 void transmitDMA(uint8_t * buffer, uint16_t buffer_length)
 {
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+    sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
+#endif
+
     // Receive DMA runs only to initiate callback
     // Start receive DMA.
     DMADRV_PeripheralMemory(rx_dma_channel, MY_USART_RX_SIGNAL, &dummy_rx_data, (void *) &(MY_USART->RXDATA), false, buffer_length,

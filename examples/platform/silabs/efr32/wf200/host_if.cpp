@@ -578,6 +578,18 @@ static void wfx_events_task(void * p_arg)
                 {
                     wfx_ipv6_notify(1);
                     hasNotifiedIPV6 = true;
+#if 0
+                    sl_wfx_set_power_mode(WFM_PM_MODE_ACTIVE, WFM_PM_POLL_UAPSD, BEACON_1);
+                    sl_wfx_disable_device_power_save();
+#elif 1
+                    sl_wfx_set_power_mode(WFM_PM_MODE_DTIM, WFM_PM_POLL_FAST_PS, 0);
+                    // sl_wfx_enable_device_power_save();
+                    sl_wfx_disable_device_power_save();
+#endif
+#if 0
+                    sl_wfx_set_power_mode(WFM_PM_MODE_ACTIVE, WFM_PM_POLL_FAST_PS, 0);
+                    sl_wfx_enable_device_power_save();
+#endif
                     if (!hasNotifiedWifiConnectivity)
                     {
                         wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &ap_mac);
