@@ -364,9 +364,18 @@ bool ColorControlServer::computeNewColor16uValue(ColorControlServer::Color16uTra
     }
     else if (p->finalValue > p->initialValue)
     {
-        newValue32u = ((uint32_t)(p->finalValue - p->initialValue));
-        newValue32u *= ((uint32_t)(p->stepsRemaining));
-        newValue32u /= ((uint32_t)(p->stepsTotal));
+        newValue32u = static_cast<uint32_t>(p->finalValue - p->initialValue);
+        newValue32u *= static_cast<uint32_t>(p->stepsRemaining);
+
+        /*
+            stepsTotal should always be at least 1,
+            still, prevent division by 0 and skips a meaningless division by 1
+        */
+        if (p->stepsTotal > 1)
+        {
+            newValue32u /= static_cast<uint32_t>(p->stepsTotal);
+        }
+
         p->currentValue = static_cast<uint16_t>(p->finalValue - static_cast<uint16_t>(newValue32u));
 
         if (static_cast<uint16_t>(newValue32u) > p->finalValue || p->currentValue > p->highLimit)
@@ -376,9 +385,18 @@ bool ColorControlServer::computeNewColor16uValue(ColorControlServer::Color16uTra
     }
     else
     {
-        newValue32u = ((uint32_t)(p->initialValue - p->finalValue));
-        newValue32u *= ((uint32_t)(p->stepsRemaining));
-        newValue32u /= ((uint32_t)(p->stepsTotal));
+        newValue32u = static_cast<uint32_t>(p->initialValue - p->finalValue);
+        newValue32u *= static_cast<uint32_t>(p->stepsRemaining);
+
+        /*
+            stepsTotal should always be at least 1,
+            still, prevent division by 0 and skips a meaningless division by 1
+        */
+        if (p->stepsTotal > 1)
+        {
+            newValue32u /= static_cast<uint32_t>(p->stepsTotal);
+        }
+
         p->currentValue = static_cast<uint16_t>(p->finalValue + static_cast<uint16_t>(newValue32u));
 
         if (p->finalValue > UINT16_MAX - static_cast<uint16_t>(newValue32u) || p->currentValue < p->lowLimit)
@@ -689,7 +707,15 @@ bool ColorControlServer::computeNewHueValue(ColorControlServer::ColorHueTransiti
         newHue32 = static_cast<uint32_t>(p->isEnhancedHue ? subtractEnhancedHue(p->finalEnhancedHue, p->initialEnhancedHue)
                                                           : subtractHue(p->finalHue, p->initialHue));
         newHue32 *= static_cast<uint32_t>(p->stepsRemaining);
-        newHue32 /= static_cast<uint32_t>(p->stepsTotal);
+
+        /*
+            stepsTotal should always be at least 1,
+            still, prevent division by 0 and skips a meaningless division by 1
+        */
+        if (p->stepsTotal > 1)
+        {
+            newHue32 /= static_cast<uint32_t>(p->stepsTotal);
+        }
 
         if (p->isEnhancedHue)
         {
@@ -705,7 +731,15 @@ bool ColorControlServer::computeNewHueValue(ColorControlServer::ColorHueTransiti
         newHue32 = static_cast<uint32_t>(p->isEnhancedHue ? subtractEnhancedHue(p->initialEnhancedHue, p->finalEnhancedHue)
                                                           : subtractHue(p->initialHue, p->finalHue));
         newHue32 *= static_cast<uint32_t>(p->stepsRemaining);
-        newHue32 /= static_cast<uint32_t>(p->stepsTotal);
+
+        /*
+            stepsTotal should always be at least 1,
+            still, prevent division by 0 and skips a meaningless division by 1
+        */
+        if (p->stepsTotal > 1)
+        {
+            newHue32 /= static_cast<uint32_t>(p->stepsTotal);
+        }
 
         if (p->isEnhancedHue)
         {
@@ -1825,12 +1859,12 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
     if (rateX > 0)
     {
         colorXTransitionState->finalValue = MAX_CIE_XY_VALUE;
-        unsignedRate                      = (uint16_t) rateX;
+        unsignedRate                      = static_cast<uint16_t>(rateX);
     }
     else
     {
         colorXTransitionState->finalValue = MIN_CIE_XY_VALUE;
-        unsignedRate                      = (uint16_t)(rateX * -1);
+        unsignedRate                      = static_cast<uint16_t>(rateX * -1);
     }
     transitionTimeX                       = computeTransitionTimeFromStateAndRate(colorXTransitionState, unsignedRate);
     colorXTransitionState->stepsRemaining = transitionTimeX;
@@ -1844,12 +1878,12 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
     if (rateY > 0)
     {
         colorYTransitionState->finalValue = MAX_CIE_XY_VALUE;
-        unsignedRate                      = (uint16_t) rateY;
+        unsignedRate                      = static_cast<uint16_t>(rateY);
     }
     else
     {
         colorYTransitionState->finalValue = MIN_CIE_XY_VALUE;
-        unsignedRate                      = (uint16_t)(rateY * -1);
+        unsignedRate                      = static_cast<uint16_t>(rateY * -1);
     }
     transitionTimeY                       = computeTransitionTimeFromStateAndRate(colorYTransitionState, unsignedRate);
     colorYTransitionState->stepsRemaining = transitionTimeY;
@@ -2458,8 +2492,6 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
 
     if (colorMode == COLOR_MODE_TEMPERATURE)
     {
-        uint16_t tempCoupleMin = getTemperatureCoupleToLevelMin(endpoint);
-
         app::DataModel::Nullable<uint8_t> currentLevel;
         EmberAfStatus status = LevelControl::Attributes::CurrentLevel::Get(endpoint, currentLevel);
 
@@ -2468,7 +2500,8 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
             currentLevel.SetNonNull((uint8_t) 0x7F);
         }
 
-        uint16_t tempPhysMax = MAX_TEMPERATURE_VALUE;
+        uint16_t tempCoupleMin = getTemperatureCoupleToLevelMin(endpoint);
+        uint16_t tempPhysMax   = MAX_TEMPERATURE_VALUE;
         Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysMax);
 
         // Scale color temp setting between the coupling min and the physical max.
@@ -2485,9 +2518,11 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
         }
         else
         {
-            uint32_t tempDelta = (((uint32_t) tempPhysMax - (uint32_t) tempCoupleMin) * currentLevel.Value()) /
-                (uint32_t)(MAX_CURRENT_LEVEL - MIN_CURRENT_LEVEL + 1);
-            newColorTemp = (uint16_t)((uint32_t) tempPhysMax - tempDelta);
+            uint32_t u32TempPhysMax = static_cast<uint32_t>(tempPhysMax); // use a u32 to prevent overflows in next steps.
+            uint32_t tempDelta =
+                ((u32TempPhysMax - tempCoupleMin) * currentLevel.Value()) / (MAX_CURRENT_LEVEL - MIN_CURRENT_LEVEL + 1);
+
+            newColorTemp = static_cast<uint16_t>(tempPhysMax - tempDelta);
         }
 
         // Apply new color temp.
