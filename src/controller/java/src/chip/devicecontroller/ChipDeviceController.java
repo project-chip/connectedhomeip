@@ -539,14 +539,27 @@ public class ChipDeviceController {
     return getAttestationChallenge(deviceControllerPtr, devicePtr);
   }
 
-  /** Subscribe to the given attribute path. */
+  /**
+   * @brief Auto-Resubscribe to the given attribute path with keepSubscriptions and isFabricFiltered
+   * @param SubscriptionEstablishedCallback Callback when a subscribe response has been received and
+   *     processed
+   * @param ResubscriptionAttemptCallback Callback when a resubscirption haoppens, the termination
+   *     cause is provided to help inform subsequent re-subscription logic.
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param attributeList a list of attribute paths
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
   public void subscribeToAttributePath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ReportCallback reportCallback,
       long devicePtr,
       List<ChipAttributePath> attributePaths,
       int minInterval,
-      int maxInterval) {
+      int maxInterval,
+      int imTimeoutMs) {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
     subscribe(
@@ -558,17 +571,31 @@ public class ChipDeviceController {
         minInterval,
         maxInterval,
         false,
-        false);
+        false,
+        imTimeoutMs);
   }
 
-  /** Subscribe to the given event path */
+  /**
+   * @brief Auto-Resubscribe to the given event path with keepSubscriptions and isFabricFiltered
+   * @param SubscriptionEstablishedCallback Callback when a subscribe response has been received and
+   *     processed
+   * @param ResubscriptionAttemptCallback Callback when a resubscirption haoppens, the termination
+   *     cause is provided to help inform subsequent re-subscription logic.
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param eventList a list of event paths
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
   public void subscribeToEventPath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ReportCallback reportCallback,
       long devicePtr,
       List<ChipEventPath> eventPaths,
       int minInterval,
-      int maxInterval) {
+      int maxInterval,
+      int imTimeoutMs) {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
     subscribe(
@@ -580,10 +607,25 @@ public class ChipDeviceController {
         minInterval,
         maxInterval,
         false,
-        false);
+        false,
+        imTimeoutMs);
   }
 
-  /** Subscribe to the given attribute/event path with keepSubscriptions and isFabricFiltered. */
+  /**
+   * @brief Auto-Resubscribe to the given attribute/event path with keepSubscriptions and
+   *     isFabricFiltered
+   * @param SubscriptionEstablishedCallback Callback when a subscribe response has been received and
+   *     processed
+   * @param ResubscriptionAttemptCallback Callback when a resubscirption haoppens, the termination
+   *     cause is provided to help inform subsequent re-subscription logic.
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param attributeList a list of attribute paths
+   * @param eventList a list of event paths
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
   public void subscribeToPath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ResubscriptionAttemptCallback resubscriptionAttemptCallback,
@@ -594,12 +636,11 @@ public class ChipDeviceController {
       int minInterval,
       int maxInterval,
       boolean keepSubscriptions,
-      boolean isFabricFiltered) {
-    // TODO: pass resubscriptionAttemptCallback to ReportCallbackJni since jni layer
-    // is not ready
-    // for auto-resubscribe
+      boolean isFabricFiltered,
+      int imTimeoutMs) {
     ReportCallbackJni jniCallback =
-        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
+        new ReportCallbackJni(
+            subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
     subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
@@ -609,12 +650,24 @@ public class ChipDeviceController {
         minInterval,
         maxInterval,
         keepSubscriptions,
-        isFabricFiltered);
+        isFabricFiltered,
+        imTimeoutMs);
   }
 
-  /** Read the given attribute path. */
+  /**
+   * @brief read the given attribute path with isFabricFiltered
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param attributeList a list of attribute paths
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
   public void readAttributePath(
-      ReportCallback callback, long devicePtr, List<ChipAttributePath> attributePaths) {
+      ReportCallback callback,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths,
+      int imTimeoutMs) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
     read(
         deviceControllerPtr,
@@ -622,23 +675,49 @@ public class ChipDeviceController {
         devicePtr,
         attributePaths,
         null,
-        true);
+        true,
+        imTimeoutMs);
   }
 
-  /** Read the given event path. */
+  /**
+   * @brief read the given event path with isFabricFiltered
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param eventList a list of event paths
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
   public void readEventPath(
-      ReportCallback callback, long devicePtr, List<ChipEventPath> eventPaths) {
+      ReportCallback callback, long devicePtr, List<ChipEventPath> eventPaths, int imTimeoutMs) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
-    read(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, null, eventPaths, true);
+    read(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        null,
+        eventPaths,
+        true,
+        imTimeoutMs);
   }
 
-  /** Read the given attribute/event path with isFabricFiltered flag. */
+  /**
+   * @brief read the given attribute/event path with isFabricFiltered
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param attributeList a list of attribute paths
+   * @param eventList a list of event paths
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
   public void readPath(
       ReportCallback callback,
       long devicePtr,
       List<ChipAttributePath> attributePaths,
       List<ChipEventPath> eventPaths,
-      boolean isFabricFiltered) {
+      boolean isFabricFiltered,
+      int imTimeoutMs) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
     read(
         deviceControllerPtr,
@@ -646,7 +725,8 @@ public class ChipDeviceController {
         devicePtr,
         attributePaths,
         eventPaths,
-        isFabricFiltered);
+        isFabricFiltered,
+        imTimeoutMs);
   }
 
   /**
@@ -746,7 +826,8 @@ public class ChipDeviceController {
       int minInterval,
       int maxInterval,
       boolean keepSubscriptions,
-      boolean isFabricFiltered);
+      boolean isFabricFiltered,
+      int imTimeoutMs);
 
   private native void read(
       long deviceControllerPtr,
@@ -754,7 +835,8 @@ public class ChipDeviceController {
       long devicePtr,
       List<ChipAttributePath> attributePaths,
       List<ChipEventPath> eventPaths,
-      boolean isFabricFiltered);
+      boolean isFabricFiltered,
+      int imTimeoutMs);
 
   private native void write(
       long deviceControllerPtr,
