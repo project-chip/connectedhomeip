@@ -2507,14 +2507,14 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
             currentLevel.SetNonNull((uint8_t) 0x7F);
         }
 
-        uint32_t tempCoupleMin = getTemperatureCoupleToLevelMin(endpoint);
-        uint32_t tempPhysMax   = MAX_TEMPERATURE_VALUE;
-        Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, reinterpret_cast<uint16_t *>(&tempPhysMax));
+        uint16_t tempCoupleMin = getTemperatureCoupleToLevelMin(endpoint);
+        uint16_t tempPhysMax   = MAX_TEMPERATURE_VALUE;
+        Attributes::ColorTempPhysicalMaxMireds::Get(endpoint, &tempPhysMax);
 
         // Scale color temp setting between the coupling min and the physical max.
         // Note that mireds varies inversely with level: low level -> high mireds.
         // Peg min/MAX level to MAX/min mireds, otherwise interpolate.
-        uint32_t newColorTemp;
+        uint16_t newColorTemp;
         if (currentLevel.Value() <= MIN_CURRENT_LEVEL)
         {
             newColorTemp = tempPhysMax;
@@ -2525,14 +2525,15 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
         }
         else
         {
+            uint32_t u32TempPhysMax = static_cast<uint32_t>(tempPhysMax); // use a u32 to prevent overflows in next steps.
             uint32_t tempDelta =
-                ((tempPhysMax - tempCoupleMin) * currentLevel.Value()) / (MAX_CURRENT_LEVEL - MIN_CURRENT_LEVEL + 1);
+                ((u32TempPhysMax - tempCoupleMin) * currentLevel.Value()) / (MAX_CURRENT_LEVEL - MIN_CURRENT_LEVEL + 1);
 
-            newColorTemp = tempPhysMax - tempDelta;
+            newColorTemp = static_cast<uint16_t>(tempPhysMax - tempDelta);
         }
 
         // Apply new color temp.
-        moveToColorTemp(endpoint, static_cast<uint16_t>(newColorTemp), 0);
+        moveToColorTemp(endpoint, newColorTemp, 0);
     }
 }
 
