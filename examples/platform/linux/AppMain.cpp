@@ -131,6 +131,11 @@
 using namespace chip::Credentials::Trusty;
 #endif
 
+#if CHIP_OP_KEYSTORE_TRUSTY_OS
+#include "PersistentStorageOperationalKeystoreTrusty.h"
+using namespace chip::Trusty;
+#endif
+
 using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Credentials;
@@ -560,6 +565,11 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
         app::TermsAndConditionsManager::GetInstance()->Init(initParams.persistentStorageDelegate, requiredAcknowledgements);
     }
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+
+#if CHIP_OP_KEYSTORE_TRUSTY_OS
+    static chip::Trusty::PersistentStorageOperationalKeystoreTrusty sPersistentStorageOperationalKeystore;
+    initParams.operationalKeystore = &sPersistentStorageOperationalKeystore;
+#endif
 
 #if defined(ENABLE_CHIP_SHELL)
     Engine::Root().Init();
