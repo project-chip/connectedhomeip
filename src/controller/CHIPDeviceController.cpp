@@ -1155,10 +1155,7 @@ bool DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningSta
     CHIP_ERROR err = SendCommand(proxy, request, onSuccess, onFailure, kRootEndpointId, commandTimeout);
     if (err != CHIP_NO_ERROR)
     {
-        // TODO: What's the right error-handling here?  We used to just silently
-        // ignore this failure...  Scheduling a lambda to call
-        // onFailure(this, err) is hard, because a lambda we can schedule can't
-        // capture that much state.
+        onFailure(this, err);
     }
     else
     {
@@ -2499,6 +2496,14 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         SendCommand(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
+    case CommissioningStage::kFailsafeBeforeWiFiEnable:
+        FALLTHROUGH;
+    case CommissioningStage::kFailsafeBeforeThreadEnable:
+        // Before we try to do network enablement, make sure that our fail-safe
+        // is set far enough out that we can later try to do operational
+        // discovery without it timing out.
+        ExtendFailsafeBeforeNetworkEnable(proxy, params, step);
+        break;
     case CommissioningStage::kWiFiNetworkEnable: {
         if (!params.GetWiFiCredentials().HasValue())
         {
@@ -2506,10 +2511,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        // Before we try to do network enablement, make sure that our fail-safe
-        // is set far enough out that we can later try to do operational
-        // discovery without it timing out.
-        ExtendFailsafeBeforeNetworkEnable(proxy, params, step);
         NetworkCommissioning::Commands::ConnectNetwork::Type request;
         request.networkID = params.GetWiFiCredentials().Value().ssid;
         request.breadcrumb.Emplace(breadcrumb);
@@ -2527,10 +2528,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
-        // Before we try to do network enablement, make sure that our fail-safe
-        // is set far enough out that we can later try to do operational
-        // discovery without it timing out.
-        ExtendFailsafeBeforeNetworkEnable(proxy, params, step);
         NetworkCommissioning::Commands::ConnectNetwork::Type request;
         request.networkID = extendedPanId;
         request.breadcrumb.Emplace(breadcrumb);
@@ -2565,19 +2562,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
 }
 
-// No specific action to take on either success or failure here; we're just
-// trying to bump the fail-safe, and if that fails it's not clear there's much
-// we can to with that.
-static void OnExtendFailsafeBeforeNetworkEnableFailure(void * context, CHIP_ERROR error)
-{
-    ChipLogError(Controller, "Failed to extend fail-safe before network enable: %" CHIP_ERROR_FORMAT, error.Format());
-}
-static void OnExtendFailsafeBeforeNetworkEnableSuccess(
-    void * context, const app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
-{
-    ChipLogProgress(Controller, "Status of extending fail-safe before network enable: %u", to_underlying(data.errorCode));
-}
-
 void DeviceCommissioner::ExtendFailsafeBeforeNetworkEnable(DeviceProxy * device, CommissioningParameters & params,
                                                            CommissioningStage step)
 {
@@ -2585,6 +2569,9 @@ void DeviceCommissioner::ExtendFailsafeBeforeNetworkEnable(DeviceProxy * device,
     if (device != commissioneeDevice)
     {
         // Not a commissionee device; just return.
+        ChipLogError(Controller, "Trying to extend fail-safe for an uknown commissionee with device id " ChipLogFormatX64,
+                     ChipLogValueX64(device->GetDeviceId()));
+        CommissioningStageComplete(CHIP_ERROR_INCORRECT_STATE, CommissioningDelegate::CommissioningReport());
         return;
     }
 
@@ -2604,8 +2591,12 @@ void DeviceCommissioner::ExtendFailsafeBeforeNetworkEnable(DeviceProxy * device,
 
     // A false return from ExtendArmFailSafe is fine; we don't want to make the
     // fail-safe shorter here.
-    ExtendArmFailSafe(commissioneeDevice, step, failSafeTimeoutSecs, MakeOptional(kMinimumCommissioningStepTimeout),
-                      OnExtendFailsafeBeforeNetworkEnableSuccess, OnExtendFailsafeBeforeNetworkEnableFailure);
+    if (!ExtendArmFailSafe(commissioneeDevice, step, failSafeTimeoutSecs, MakeOptional(kMinimumCommissioningStepTimeout),
+                           OnArmFailSafe, OnBasicFailure))
+    {
+        // Just move on to the next step.
+        CommissioningStageComplete(CHIP_NO_ERROR, CommissioningDelegate::CommissioningReport());
+    }
 }
 
 CHIP_ERROR DeviceController::GetCompressedFabricIdBytes(MutableByteSpan & outBytes) const

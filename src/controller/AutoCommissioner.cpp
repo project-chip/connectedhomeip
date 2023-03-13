@@ -301,18 +301,21 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         else
         {
-            return CommissioningStage::kWiFiNetworkEnable;
+            return CommissioningStage::kFailsafeBeforeWiFiEnable;
         }
     case CommissioningStage::kThreadNetworkSetup:
         if (mParams.GetWiFiCredentials().HasValue() && mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId)
         {
-            return CommissioningStage::kWiFiNetworkEnable;
+            return CommissioningStage::kFailsafeBeforeWiFiEnable;
         }
         else
         {
-            return CommissioningStage::kThreadNetworkEnable;
+            return CommissioningStage::kFailsafeBeforeThreadEnable;
         }
-
+    case CommissioningStage::kFailsafeBeforeWiFiEnable:
+        return CommissioningStage::kWiFiNetworkEnable;
+    case CommissioningStage::kFailsafeBeforeThreadEnable:
+        return CommissioningStage::kThreadNetworkEnable;
     case CommissioningStage::kWiFiNetworkEnable:
         if (mParams.GetThreadOperationalDataset().HasValue() &&
             mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId)
