@@ -591,6 +591,7 @@ public:
 
 #if CHIP_CRYPTO_TRUSTY_OS
     uint64_t p256_handler = 0;
+    uint8_t fabricIndex   = 0;
 #endif
 
 protected:

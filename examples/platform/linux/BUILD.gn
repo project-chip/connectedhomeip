@@ -100,6 +100,8 @@ source_set("app-main") {
     sources += [
       "DeviceAttestationCreds.cpp",
       "DeviceAttestationCreds.h",
+      "PersistentStorageOperationalKeystoreTrusty.cpp",
+      "PersistentStorageOperationalKeystoreTrusty.h",
     ]
   }
 
@@ -137,6 +139,12 @@ source_set("app-main") {
     defines += [ "CHIP_ATTESTATION_TRUSTY_OS=1" ]
   } else {
     defines += [ "CHIP_ATTESTATION_TRUSTY_OS=0" ]
+  }
+
+  if (chip_with_trusty_os) {
+    defines += [ "CHIP_OP_KEYSTORE_TRUSTY_OS=1" ]
+  } else {
+    defines += [ "CHIP_OP_KEYSTORE_TRUSTY_OS=0" ]
   }
 
   if (chip_enable_pw_rpc) {
