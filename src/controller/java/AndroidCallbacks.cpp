@@ -123,7 +123,7 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, con
 
 ReportCallback::ReportCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback,
                                jobject resubscriptionAttemptCallback) :
-    mClusterCacheAdapter(*this)
+    mClusterCacheAdapter(*this, Optional<EventNumber>::Missing(), false /*cacheData*/)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
