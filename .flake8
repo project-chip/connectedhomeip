@@ -27,14 +27,12 @@ exclude = third_party
           scripts/build/builders/gn.py
           scripts/build/builders/imx.py
           scripts/build/builders/infineon.py
-          scripts/build/builders/nrf.py
           scripts/codegen.py
           scripts/codepregen.py
           scripts/error_table.py
           scripts/examples/gn_to_cmakelists.py
           scripts/flashing/bouffalolab_firmware_utils.py
           scripts/flashing/cyw30739_firmware_utils.py
-          scripts/flashing/nrfconnect_firmware_utils.py
           scripts/gen_chip_version.py
           scripts/helpers/bloat_check.py
           scripts/pregenerate/using_codegen.py
@@ -51,15 +49,11 @@ exclude = third_party
           scripts/py_matter_yamltests/test_yaml_loader.py
           scripts/py_matter_yamltests/test_yaml_parser.py
           scripts/run-clang-tidy-on-compile-commands.py
-          scripts/setup/nrfconnect/update_ncs.py
           scripts/tests/chiptest/yamltest_with_chip_repl_tester.py
           scripts/tools/check_zcl_file_sync.py
           scripts/tools/convert_ini.py
           scripts/tools/memory/memdf/__init__.py
           scripts/tools/memory/report_summary.py
-          scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py
-          scripts/tools/nrfconnect/nrfconnect_generate_partition.py
-          scripts/tools/nrfconnect/tests/test_generate_factory_data.py
           scripts/tools/silabs/FactoryDataProvider.py
           scripts/tools/telink/mfg_tool.py
           scripts/tools/zap/generate.py
