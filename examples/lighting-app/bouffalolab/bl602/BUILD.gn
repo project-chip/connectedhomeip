@@ -62,9 +62,9 @@ bl_iot_sdk("sdk") {
 
   defines = [
     "INCLUDE_xSemaphoreGetMutexHolder=1",
-    "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
-    "OTA_PERIODIC_QUERY_TIMEOUT=${ota_periodic_query_timeout}",
+    "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
+    "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout}",
     "CHIP_UART_BAUDRATE=${baudrate}",
     "SYS_AOS_LOOP_ENABLE",
   ]

@@ -2278,9 +2278,6 @@ using ColorMode                                                                 
 static ColorMode __attribute__((unused)) kColorModekUnknownEnumValue                       = static_cast<ColorMode>(3);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for HueDirection
 enum class HueDirection : uint8_t
 {
@@ -2294,14 +2291,7 @@ enum class HueDirection : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 4,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using HueDirection                                                                         = EmberAfHueDirection;
-static HueDirection __attribute__((unused)) kHueDirectionkUnknownEnumValue                 = static_cast<HueDirection>(4);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for HueMoveMode
 enum class HueMoveMode : uint8_t
 {
@@ -2314,14 +2304,7 @@ enum class HueMoveMode : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using HueMoveMode                                                                          = EmberAfHueMoveMode;
-static HueMoveMode __attribute__((unused)) kHueMoveModekUnknownEnumValue                   = static_cast<HueMoveMode>(2);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for HueStepMode
 enum class HueStepMode : uint8_t
 {
@@ -2333,14 +2316,7 @@ enum class HueStepMode : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 0,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using HueStepMode                                                                          = EmberAfHueStepMode;
-static HueStepMode __attribute__((unused)) kHueStepModekUnknownEnumValue                   = static_cast<HueStepMode>(0);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for SaturationMoveMode
 enum class SaturationMoveMode : uint8_t
 {
@@ -2353,14 +2329,7 @@ enum class SaturationMoveMode : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using SaturationMoveMode                                                                   = EmberAfSaturationMoveMode;
-static SaturationMoveMode __attribute__((unused)) kSaturationMoveModekUnknownEnumValue     = static_cast<SaturationMoveMode>(2);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for SaturationStepMode
 enum class SaturationStepMode : uint8_t
 {
@@ -2372,10 +2341,6 @@ enum class SaturationStepMode : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 0,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using SaturationStepMode                                                                   = EmberAfSaturationStepMode;
-static SaturationStepMode __attribute__((unused)) kSaturationStepModekUnknownEnumValue     = static_cast<SaturationStepMode>(0);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Bitmap for ColorCapabilities
 enum class ColorCapabilities : uint16_t

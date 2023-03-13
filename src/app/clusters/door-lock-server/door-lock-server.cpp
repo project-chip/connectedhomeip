@@ -255,6 +255,8 @@ bool DoorLockServer::engageLockout(chip::EndpointId endpointId)
 
     emberAfDoorLockClusterPrintln("Lockout engaged [endpointId=%d,lockoutTimeout=%d]", endpointId, lockoutTimeout);
 
+    SendLockAlarmEvent(endpointId, AlarmCodeEnum::kWrongCodeEntryLimit);
+
     emberAfPluginDoorLockLockoutStarted(endpointId, endpointContext->lockoutEndTimestamp);
 
     return true;
