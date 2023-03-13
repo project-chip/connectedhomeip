@@ -394,6 +394,14 @@ tests:
       response:
           error: FAILURE
 
+    - label:
+          "Read the DoorLockAlarm event list; verify WrongEntryCodeLimit alarm
+          has been generated"
+      command: "readEvent"
+      event: "DoorLockAlarm"
+      response:
+          value: { "AlarmCode": 4 }
+
     - label: "Wait for the lockout to end"
       cluster: "DelayCommands"
       command: "WaitForMs"
