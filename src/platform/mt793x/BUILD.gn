@@ -65,15 +65,8 @@ static_library("mt793x") {
 
   public_deps += [ "${chip_root}/third_party/mt793x_sdk/mDNSResponder" ]
 
-  # Add pigweed KVS
-  deps = [
-    "$dir_pw_kvs:crc16",
-    "$dir_pw_log",
-  ]
-  public_deps += [
-    "$dir_pw_checksum",
-    "$dir_pw_kvs",
-  ]
+  deps = []
+  public_deps += []
 
   # mDNS
   if (chip_mdns == "platform") {
