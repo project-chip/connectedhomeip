@@ -1378,7 +1378,11 @@ JNI_METHOD(void, subscribe)
     params.mIsFabricFiltered          = (isFabricFiltered != JNI_FALSE);
     params.mTimeout                   = imTimeoutMs != 0 ? System::Clock::Milliseconds32(imTimeoutMs) : System::Clock::kZero;
 
-    SuccessOrExit(err = JniReferences::GetInstance().GetListSize(attributePathList, numAttributePaths));
+    if (attributePathList != nullptr)
+    {
+        SuccessOrExit(err = JniReferences::GetInstance().GetListSize(attributePathList, numAttributePaths));
+    }
+
     if (numAttributePaths > 0)
     {
         std::unique_ptr<chip::app::AttributePathParams[]> attributePaths(new chip::app::AttributePathParams[numAttributePaths]);
@@ -1398,7 +1402,11 @@ JNI_METHOD(void, subscribe)
         attributePaths.release();
     }
 
-    SuccessOrExit(err = JniReferences::GetInstance().GetListSize(eventPathList, numEventPaths));
+    if (eventPathList != nullptr)
+    {
+        SuccessOrExit(err = JniReferences::GetInstance().GetListSize(eventPathList, numEventPaths));
+    }
+
     if (numEventPaths > 0)
     {
         std::unique_ptr<chip::app::EventPathParams[]> eventPaths(new chip::app::EventPathParams[numEventPaths]);
