@@ -120,22 +120,7 @@ rs911x_src_lwip = [
   "${wifi_sdk_dir}/dhcp_client.cpp",
   "${wifi_sdk_dir}/lwip_netif.cpp",
 ]
-rs911x_defs = [
-  "CCP_SI917_BRINGUP=1",
-  "SL_HEAP_SIZE=32768",
-  "SL_WIFI=1",
-  "RS911X_WIFI",
-  "RSI_WLAN_ENABLE",
-  "RSI_WITH_OS",
-  "RSI_M4_INTERFACE",  #Enable CCP bus Interface
-  "RSI_WLAN_API_ENABLE",
-  "HMAC_512",
-  "LITTLE_ENDIAN_ORDER",
-  "_CHIP_9118",
 
-  #  "ROM_WIRELESS"
-  #__CC_ARM DEBUG_UART _CHIP_9118   LITTLE_ENDIAN_ORDER HMAC_512
-]
 rs911x_sock_defs = [
   "RS911X_SOCKETS",
   "RSI_IPV6_ENABLE",

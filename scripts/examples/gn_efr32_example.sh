@@ -234,10 +234,13 @@ else
     BUILD_DIR=$OUTDIR/$SILABS_BOARD
     echo BUILD_DIR="$BUILD_DIR"
     if [ "$USE_WIFI" == true ]; then
+        # wifi build
+        # NCP mode EFR32 + wifi module
         optArgs+="$ipArgs"
         gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
     else
-        # OpenThread build
+        # OpenThread/SoC build
+        #
         if [ "$USE_DOCKER" == true ]; then
             optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
         fi
