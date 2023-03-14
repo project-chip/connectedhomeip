@@ -297,12 +297,14 @@ private:
     {
         if (!mIsWifi &&
             (stage == chip::Controller::CommissioningStage::kWiFiNetworkEnable ||
+             stage == chip::Controller::CommissioningStage::kFailsafeBeforeWiFiEnable ||
              stage == chip::Controller::CommissioningStage::kWiFiNetworkSetup))
         {
             return false;
         }
         if (!mIsThread &&
             (stage == chip::Controller::CommissioningStage::kThreadNetworkEnable ||
+             stage == chip::Controller::CommissioningStage::kFailsafeBeforeThreadEnable ||
              stage == chip::Controller::CommissioningStage::kThreadNetworkSetup))
         {
             return false;
