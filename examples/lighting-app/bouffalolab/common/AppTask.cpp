@@ -139,20 +139,21 @@ void AppTask::AppTaskMain(void * pvParameter)
 {
     app_event_t appEvent;
     bool onoff = false;
-    ;
 
     sLightLED.Init();
 
 #ifdef LED_BTN_RESET
     ButtonInit();
 #else
-
+    /** Without RESET PIN defined, factory reset will be executed if power cycle count(resetCnt) >= APP_REBOOT_RESET_COUNT */
     uint32_t resetCnt      = 0;
     size_t saved_value_len = 0;
     ef_get_env_blob(APP_REBOOT_RESET_COUNT_KEY, &resetCnt, sizeof(resetCnt), &saved_value_len);
     resetCnt++;
     ef_set_env_blob(APP_REBOOT_RESET_COUNT_KEY, &resetCnt, sizeof(resetCnt));
 
+    /** To share with RESET PIN logic, mButtonPressedTime is used to recorded resetCnt increased.
+     * +1 makes sure mButtonPressedTime is not zero */
     GetAppTask().mButtonPressedTime = chip::System::SystemClock().GetMonotonicMilliseconds64().count() + 1;
 #endif
 
