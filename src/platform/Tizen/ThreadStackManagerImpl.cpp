@@ -46,6 +46,7 @@
 #include <lib/dnssd/platform/Dnssd.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceConfig.h>
@@ -538,14 +539,16 @@ CHIP_ERROR ThreadStackManagerImpl::_AddSrpService(const char * aInstanceName, co
     thread_dns_txt_entry_s * ee = entries.data();
     for (auto & entry : aTxtEntries)
     {
-        ee->key       = entry.mKey;
-        ee->value     = entry.mData;
-        ee->value_len = entry.mDataSize;
+        ee->key   = entry.mKey;
+        ee->value = entry.mData;
+        VerifyOrReturnError(chip::CanCastTo<uint8_t>(entry.mDataSize), CHIP_ERROR_INVALID_ARGUMENT);
+        ee->value_len = static_cast<uint8_t>(entry.mDataSize);
         ee++;
     }
 
-    threadErr =
-        thread_srp_client_register_service_full(mThreadInstance, aInstanceName, aName, aPort, 0, 0, entries.data(), entries.size());
+    VerifyOrReturnError(chip::CanCastTo<uint8_t>(entries.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    threadErr = thread_srp_client_register_service_full(mThreadInstance, aInstanceName, aName, aPort, 0, 0, entries.data(),
+                                                        static_cast<uint8_t>(entries.size()));
     VerifyOrReturnError(threadErr == THREAD_ERROR_NONE || threadErr == THREAD_ERROR_ALREADY_DONE, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "thread_srp_client_register_service() failed. ret: %d", threadErr));
 
