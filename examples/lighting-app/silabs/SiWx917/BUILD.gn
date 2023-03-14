@@ -52,6 +52,9 @@ declare_args() {
   sl_wfx_config_softap = false
   sl_wfx_config_scan = true
 
+  # Argument to Disable IPv4 for wifi
+  chip_enable_wifi_ipv4 = false
+
   # Argument to force enable WPA3 security on rs91x
   rs91x_wpa3_only = false
 
