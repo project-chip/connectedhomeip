@@ -13328,6 +13328,12 @@ public class ChipClusters {
           chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
 
+    public void subscribeRequirePINforRemoteOperationAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeRequirePINforRemoteOperationAttribute(
+          chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
       readGeneratedCommandListAttribute(chipClusterPtr, callback);
     }
@@ -13585,6 +13591,9 @@ public class ChipClusters {
         DefaultClusterCallback callback,
         Boolean value,
         @Nullable Integer timedWriteTimeoutMs);
+
+    private native void subscribeRequirePINforRemoteOperationAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(
         long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
