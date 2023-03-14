@@ -179,7 +179,8 @@ class WildcardFragment : Fragment() {
                                        minInterval,
                                        maxInterval,
                                        keepSubscriptions,
-                                       isFabricFiltered)
+                                       isFabricFiltered,
+                                       /* imTimeoutMs= */ 0)
     } else if (type == EVENT) {
       val eventPath = ChipEventPath.newInstance(endpointId, clusterId, eventId, isUrgent)
       deviceController.subscribeToPath(subscriptionEstablishedCallback,
@@ -192,7 +193,8 @@ class WildcardFragment : Fragment() {
                                       minInterval,
                                       maxInterval,
                                       keepSubscriptions,
-                                      isFabricFiltered)
+                                      isFabricFiltered,
+                                      /* imTimeoutMs= */ 0)
     }
   }
 
@@ -209,7 +211,8 @@ class WildcardFragment : Fragment() {
                           addressUpdateFragment.deviceId),
                           listOf(attributePath),
                           null,
-                          isFabricFiltered)
+                          isFabricFiltered,
+                          /* imTimeoutMs= */ 0)
     } else if (type == EVENT) {
       val eventPath = ChipEventPath.newInstance(endpointId, clusterId, eventId)
       deviceController.readPath(reportCallback,
@@ -217,7 +220,8 @@ class WildcardFragment : Fragment() {
                           addressUpdateFragment.deviceId),
                           null,
                           listOf(eventPath),
-                          isFabricFiltered)
+                          isFabricFiltered,
+                          /* imTimeoutMs= */ 0)
     }
   }
 
