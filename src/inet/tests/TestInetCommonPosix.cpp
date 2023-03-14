@@ -83,7 +83,7 @@ System::LayerImpl gSystemLayer;
 Inet::UDPEndPointManagerImpl gUDP;
 Inet::TCPEndPointManagerImpl gTCP;
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 static sys_mbox_t * sLwIPEventQueue   = NULL;
 static unsigned int sLwIPAcquireCount = 0;
 
@@ -122,7 +122,7 @@ static std::vector<struct netif> sNetIFs; // interface to filter
 
 static bool NetworkIsReady();
 static void OnLwIPInitComplete(void * arg);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
 char gDefaultTapDeviceName[32];
 bool gDone = false;
@@ -161,9 +161,9 @@ void ShutdownTestInetCommon()
 
 void InitSystemLayer()
 {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
     AcquireLwIP();
-#endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
     gSystemLayer.Init();
 }
@@ -172,12 +172,12 @@ void ShutdownSystemLayer()
 {
     gSystemLayer.Shutdown();
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
     ReleaseLwIP();
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 static void PrintNetworkState()
 {
     char intfName[chip::Inet::InterfaceId::kMaxIfNameLength];
@@ -222,11 +222,11 @@ static void PrintNetworkState()
         }
     }
 }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
 void InitNetwork()
 {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
     // If an tap device name hasn't been specified, derive one from the IPv6 interface id.
 
@@ -287,9 +287,8 @@ void InitNetwork()
         }
     }
 #endif // CHIP_TARGET_STYLE_UNIX
-#if !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
+
     tcpip_init(OnLwIPInitComplete, NULL);
-#endif // !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -420,7 +419,7 @@ void InitNetwork()
 
     AcquireLwIP();
 
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
     gTCP.Init(gSystemLayer);
     gUDP.Init(gSystemLayer);
@@ -432,7 +431,7 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 
     if (!printed)
     {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
         if (NetworkIsReady())
 #endif
         {
@@ -485,7 +484,7 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 static bool NetworkIsReady()
 {
     bool ready = true;
@@ -509,7 +508,7 @@ static void OnLwIPInitComplete(void * arg)
     printf("Waiting for addresses assignment...\n");
 }
 
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
 
 void ShutdownNetwork()
 {
@@ -524,7 +523,7 @@ void ShutdownNetwork()
         return Loop::Continue;
     });
     gUDP.Shutdown();
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !(CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT)
     ReleaseLwIP();
 #endif
 }
