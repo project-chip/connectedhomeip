@@ -4133,6 +4133,7 @@ class ChipClusters:
                 "attributeName": "RequirePINforRemoteOperation",
                 "attributeId": 0x00000033,
                 "type": "bool",
+                "reportable": True,
                 "writable": True,
             },
             0x0000FFF8: {
