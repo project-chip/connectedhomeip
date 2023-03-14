@@ -130,10 +130,12 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
             Log.w(
                 TAG,
                 "Failed to resolve service '" + serviceInfo.getServiceName() + "': " + errorCode);
-            String serviceType = serviceInfo.getServiceType();
             chipMdnsCallback.handleServiceResolve(
                 serviceInfo.getServiceName(),
-                serviceType.startsWith(".") ? serviceType.substring(1) : serviceType,
+                // Use the target service info since the resolved service info sometimes appends a "." at the front
+                // likely because it is trying to strip the service name out of it and something is missed.
+                // The target service info service type should be effectively the same as the resolved service info.
+                NsdServiceFinderAndResolver.this.targetServiceInfo.getServiceType(),
                 null,
                 null,
                 0,
@@ -158,12 +160,16 @@ class NsdServiceFinderAndResolver implements NsdManager.DiscoveryListener {
                 "Resolved service '"
                     + serviceInfo.getServiceName()
                     + "' to "
-                    + serviceInfo.getHost());
+                    + serviceInfo.getHost()
+                    + ", type : "
+                    + serviceInfo.getServiceType());
             // TODO: Find out if DNS-SD results for Android should contain interface ID
-            String serviceType = serviceInfo.getServiceType();
             chipMdnsCallback.handleServiceResolve(
                 serviceInfo.getServiceName(),
-                serviceType.startsWith(".") ? serviceType.substring(1) : serviceType,
+                // Use the target service info since the resolved service info sometimes appends a "." at the front
+                // likely because it is trying to strip the service name out of it and something is missed.
+                // The target service info service type should be effectively the same as the resolved service info.
+                NsdServiceFinderAndResolver.this.targetServiceInfo.getServiceType(),
                 serviceInfo.getHost().getHostName(),
                 serviceInfo.getHost().getHostAddress(),
                 serviceInfo.getPort(),
