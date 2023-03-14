@@ -2569,7 +2569,7 @@ void DeviceCommissioner::ExtendFailsafeBeforeNetworkEnable(DeviceProxy * device,
     if (device != commissioneeDevice)
     {
         // Not a commissionee device; just return.
-        ChipLogError(Controller, "Trying to extend fail-safe for an uknown commissionee with device id " ChipLogFormatX64,
+        ChipLogError(Controller, "Trying to extend fail-safe for an unknown commissionee with device id " ChipLogFormatX64,
                      ChipLogValueX64(device->GetDeviceId()));
         CommissioningStageComplete(CHIP_ERROR_INCORRECT_STATE, CommissioningDelegate::CommissioningReport());
         return;
