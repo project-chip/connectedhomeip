@@ -38,7 +38,7 @@ JNI_METHOD(void, GetConnectedDeviceCallbackJni, deleteCallback)(JNIEnv * env, jo
     chip::DeviceLayer::StackLock lock;
     GetConnectedDeviceCallback * connectedDeviceCallback = reinterpret_cast<GetConnectedDeviceCallback *>(callbackHandle);
     VerifyOrReturn(connectedDeviceCallback != nullptr, ChipLogError(Controller, "GetConnectedDeviceCallback handle is nullptr"));
-    delete connectedDeviceCallback;
+    chip::Platform::Delete(connectedDeviceCallback);
 }
 
 JNI_METHOD(jlong, ReportCallbackJni, newCallback)
@@ -56,7 +56,7 @@ JNI_METHOD(void, ReportCallbackJni, deleteCallback)(JNIEnv * env, jobject self, 
     chip::DeviceLayer::StackLock lock;
     ReportCallback * reportCallback = reinterpret_cast<ReportCallback *>(callbackHandle);
     VerifyOrReturn(reportCallback != nullptr, ChipLogError(Controller, "ReportCallback handle is nullptr"));
-    delete reportCallback;
+    chip::Platform::Delete(reportCallback);
 }
 
 JNI_METHOD(jlong, ReportEventCallbackJni, newCallback)
@@ -91,7 +91,7 @@ JNI_METHOD(void, WriteAttributesCallbackJni, deleteCallback)(JNIEnv * env, jobje
     chip::DeviceLayer::StackLock lock;
     WriteAttributesCallback * writeAttributesCallback = reinterpret_cast<WriteAttributesCallback *>(callbackHandle);
     VerifyOrReturn(writeAttributesCallback != nullptr, ChipLogError(Controller, "WriteAttributesCallback handle is nullptr"));
-    delete writeAttributesCallback;
+    chip::Platform::Delete(writeAttributesCallback);
 }
 
 JNI_METHOD(jlong, InvokeCallbackJni, newCallback)
@@ -107,5 +107,5 @@ JNI_METHOD(void, InvokeCallbackJni, deleteCallback)(JNIEnv * env, jobject self, 
     chip::DeviceLayer::StackLock lock;
     InvokeCallback * invokeCallback = reinterpret_cast<InvokeCallback *>(callbackHandle);
     VerifyOrReturn(invokeCallback != nullptr, ChipLogError(Controller, "InvokeCallback handle is nullptr"));
-    delete invokeCallback;
+    chip::Platform::Delete(invokeCallback);
 }

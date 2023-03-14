@@ -81,7 +81,7 @@ class PairOnNetworkLongImSubscribeCommand(
       .getConnectedDevicePointer(getNodeId(), InternalGetConnectedDeviceCallback())
     clear()
     currentCommissioner()
-      .subscribeToPath(InternalSubscriptionEstablishedCallback(), InternalResubscriptionAttemptCallback(), InternalReportCallback(), devicePointer, attributePathList, Collections.emptyList(), 0, 5, false, false)
+      .subscribeToPath(InternalSubscriptionEstablishedCallback(), InternalResubscriptionAttemptCallback(), InternalReportCallback(), devicePointer, attributePathList, Collections.emptyList(), 0, 5, false, false, 0)
     waitCompleteMs(getTimeoutMillis())
     currentCommissioner().shutdownSubscriptions(currentCommissioner().getFabricIndex(), getNodeId(), subscriptionId);
   }
