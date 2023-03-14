@@ -26,25 +26,24 @@ static_library("cc13x2_26x2") {
   sources = [
     "../../FreeRTOS/SystemTimeSupport.cpp",
     "../../SingletonConfigurationManager.cpp",
-    "../BlePlatformConfig.h",
     "../CC13XX_26XXConfig.cpp",
     "../CC13XX_26XXConfig.h",
-    "../CHIPDevicePlatformConfig.h",
-    "../CHIPDevicePlatformConfig.h",
-    "../CHIPDevicePlatformEvent.h",
     "../ConfigurationManagerImpl.cpp",
     "../ConnectivityManagerImpl.cpp",
-    "../ConnectivityManagerImpl.h",
     "../DiagnosticDataProviderImpl.cpp",
     "../DiagnosticDataProviderImpl.h",
-    "../InetPlatformConfig.h",
     "../KeyValueStoreManagerImpl.cpp",
-    "../KeyValueStoreManagerImpl.h",
     "../Logging.cpp",
     "../PlatformManagerImpl.cpp",
-    "../PlatformManagerImpl.h",
     "../Random.c",
-    "../SystemPlatformConfig.h",
+    "BlePlatformConfig.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "ConnectivityManagerImpl.h",
+    "InetPlatformConfig.h",
+    "KeyValueStoreManagerImpl.h",
+    "PlatformManagerImpl.h",
+    "SystemPlatformConfig.h",
   ]
 
   deps = []
@@ -59,7 +58,7 @@ static_library("cc13x2_26x2") {
   if (chip_enable_ble) {
     sources += [
       "../BLEManagerImpl.cpp",
-      "../BLEManagerImpl.h",
+      "BLEManagerImpl.h",
     ]
   }
 
@@ -95,7 +94,7 @@ static_library("cc13x2_26x2") {
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",
       "../ThreadStackManagerImpl.cpp",
-      "../ThreadStackManagerImpl.h",
+      "ThreadStackManagerImpl.h",
     ]
 
     if (chip_mdns == "platform") {

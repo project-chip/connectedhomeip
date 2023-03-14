@@ -19,7 +19,7 @@
 /**
  * @file
  * Provides an implementation of the BLEManager object for the Texas
- * Instruments cc13xx_cc26xx platform.
+ * Instruments CC13XX_26XX platform.
  */
 
 #pragma once
@@ -191,7 +191,7 @@ typedef struct
 } PasscodeData_t;
 
 /**
- * Concrete implementation of the BLEManager singleton object for cc13x2_cc26x2.
+ * Concrete implementation of the BLEManager singleton object for CC13XX_26XX.
  */
 class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
 
@@ -349,7 +349,7 @@ inline BLEManager & BLEMgr(void)
  * Returns the platform-specific implementation of the BLEManager singleton object.
  *
  * Internal components can use this to gain access to features of the BLEManager
- * that are specific to the cc13x2_cc26x2 platforms.
+ * that are specific to the CC13XX_26XX platforms.
  */
 inline BLEManagerImpl & BLEMgrImpl(void)
 {

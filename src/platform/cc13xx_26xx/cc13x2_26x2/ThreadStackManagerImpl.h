@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Provides an implementation of the ThreadStackManager object
- *          for the Texas Instruments CC1352 platform.
+ *          for the Texas Instruments CC13XX_26XX platform.
  *
  * NOTE: currently a bare-bones implementation to allow for building.
  */
@@ -46,7 +46,7 @@ class ThreadStackManager;
 class ThreadStackManagerImpl;
 
 /**
- * Concrete implementation of the ThreadStackManager singleton object for CC1352.
+ * Concrete implementation of the ThreadStackManager singleton object for CC13XX_26XX.
  */
 class ThreadStackManagerImpl final : public ThreadStackManager,
                                      public Internal::GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>,
@@ -131,7 +131,7 @@ inline ThreadStackManager & ThreadStackMgr(void)
  * Returns the platform-specific implementation of the ThreadStackManager singleton object.
  *
  * chip applications can use this to gain access to features of the ThreadStackManager
- * that are specific to CC1352 SoC.
+ * that are specific to SoC.
  */
 inline ThreadStackManagerImpl & ThreadStackMgrImpl(void)
 {

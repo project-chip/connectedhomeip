@@ -30,7 +30,7 @@ namespace DeviceLayer {
 
 /**
  * Concrete implementation of the PlatformManager singleton object for the
- * CC13X2_26X2 platform.
+ * CC13XX_26XX platform.
  */
 class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>
 {
@@ -84,7 +84,7 @@ inline PlatformManager & PlatformMgr(void)
  * singleton object.
  *
  * chip applications can use this to gain access to features of the
- * PlatformManager that are specific to the CC1352 SoC.
+ * PlatformManager that are specific to the SoC.
  */
 inline PlatformManagerImpl & PlatformMgrImpl(void)
 {

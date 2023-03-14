@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *          Platform-specific key value storage implementation for CC1352.
+ *          Platform-specific key value storage implementation for CC13XX_26XX.
  */
 
 #pragma once

@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Defines platform-specific event types and data for the chip
- *          for the Texas Instruments CC1352 platform.
+ *          for the Texas Instruments CC13XX_26XX platform.
  *
  * NOTE: currently a bare-bones implementation to allow for building.
  */

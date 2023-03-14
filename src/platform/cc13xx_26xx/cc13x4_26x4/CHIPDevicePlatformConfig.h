@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for the chip Device Layer
- *          for the Texas Instruments CC2652R7 platform.
+ *          for the Texas Instruments CC13XX_CC26XX platform.
  */
 
 #pragma once

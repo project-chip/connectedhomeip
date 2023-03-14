@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Platform-specific connectivity manager class for the Texas
- *          Instruments CC1352 platform.
+ *          Instruments CC13XX_26XX platform.
  */
 
 #pragma once
@@ -45,7 +45,7 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the ConnectivityManager singleton object for the CC13X2_26X2 platforms.
+ * Concrete implementation of the ConnectivityManager singleton object for the CC13XX_26XX platforms.
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
@@ -98,7 +98,7 @@ inline ConnectivityManager & ConnectivityMgr(void)
  * Returns the platform-specific implementation of the ConnectivityManager singleton object.
  *
  * chip applications can use this to gain access to features of the ConnectivityManager
- * that are specific to the CC1352 platform
+ * that are specific to the platform
  */
 inline ConnectivityManagerImpl & ConnectivityMgrImpl(void)
 {
