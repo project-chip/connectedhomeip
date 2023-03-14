@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
                 command=(asUpperCamelCase name preserveAcronyms=true)}}
 {{/chip_cluster_commands}}
 
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server}}
 {{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 {{#*inline "availability"}}
@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params {{> availability}};
 {{/if}}
 {{/unless}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -93,7 +93,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{> commandDecl cluster=(compatClusterNameRemapping parent.name)
                 command=(compatCommandNameRemapping parent.name name)}}
 {{/chip_cluster_commands}}
-{{~#chip_server_cluster_attributes}}
+{{~#zcl_attributes_server}}
 {{~#*inline "attributeDecls"}}
 {{#unless (isStrEqual attribute (asUpperCamelCase name preserveAcronyms=true))}}
 - (NSDictionary<NSString *, id> *)readAttribute{{attribute}}WithParams:(MTRReadParams * _Nullable)params {{availability cluster attribute=attribute deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use readAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithParams on MTRCluster" (asUpperCamelCase parent.name preserveAcronyms=true))}};
@@ -105,7 +105,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{/inline~}}
 {{> attributeDecls cluster=(compatClusterNameRemapping parent.name)
                    attribute=(compatAttributeNameRemapping parent.name name)}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 @end
 
 {{/if}}
