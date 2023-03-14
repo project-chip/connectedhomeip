@@ -124,6 +124,8 @@ void sl_ble_event_handling_task(void)
             rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
             BLEMgrImpl().HandleConnectEvent();
             WFX_RSI_LOG("%s Module got connected", __func__);
+            // Requests the connection parameters change with the remote device
+            rsi_ble_conn_params_update(event_msg.resp_enh_conn.dev_addr, MIN_CONNECTION_INT, MAX_CONNECTION_INT, SLAVE_LATENCY, TIMEOUT);
         }
         break;
         case RSI_BLE_DISCONN_EVENT: {
