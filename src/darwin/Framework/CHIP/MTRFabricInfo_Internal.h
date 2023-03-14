@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,19 +14,10 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
-#import <Matter/Matter.h>
+#import <Matter/MTRFabricInfo.h>
 
-NS_ASSUME_NONNULL_BEGIN
+#include <credentials/FabricTable.h>
 
-@interface MTRTestKeys : NSObject <MTRKeypair>
-
-@property (readonly, nonatomic, strong) NSData * ipk;
-
-@property (readonly, nonatomic) NSData * publicKeyData;
-
-- (instancetype)init;
-
+@interface MTRFabricInfo ()
+- (instancetype)initWithFabricTable:(const chip::FabricTable &)fabricTable fabricInfo:(const chip::FabricInfo &)fabricInfo;
 @end
-
-NS_ASSUME_NONNULL_END
