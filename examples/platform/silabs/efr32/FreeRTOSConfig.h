@@ -140,7 +140,7 @@ extern "C" {
 #define configUSE_TICKLESS_IDLE 0
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
 
-#define configTICK_RATE_HZ (1000)
+#define configTICK_RATE_HZ (1024)
 /* Definition used by Keil to replace default system clock source. */
 #define configOVERRIDE_DEFAULT_TICK_CONFIGURATION 1
 

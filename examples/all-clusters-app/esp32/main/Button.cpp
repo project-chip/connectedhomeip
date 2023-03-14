@@ -31,7 +31,6 @@
 #include "AppTask.h"
 #include "Button.h"
 #include "Globals.h"
-#include "ScreenManager.h"
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <vector>

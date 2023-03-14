@@ -31,19 +31,10 @@ import androidx.fragment.app.Fragment
 import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
-import com.google.chip.chiptool.attestation.AttestationTestFragment
-import com.google.chip.chiptool.clusterclient.clusterinteraction.ClusterInteractionFragment
-import com.google.chip.chiptool.clusterclient.MultiAdminClientFragment
-import com.google.chip.chiptool.clusterclient.OpCredClientFragment
-import com.google.chip.chiptool.clusterclient.BasicClientFragment
-import com.google.chip.chiptool.clusterclient.OnOffClientFragment
-import com.google.chip.chiptool.clusterclient.SensorClientFragment
-import com.google.chip.chiptool.clusterclient.WildcardFragment
 import com.google.chip.chiptool.provisioning.AddressCommissioningFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
 import com.google.chip.chiptool.provisioning.EnterNetworkFragment
 import com.google.chip.chiptool.provisioning.ProvisionNetworkType
-import com.google.chip.chiptool.provisioning.UnpairDeviceFragment
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
@@ -254,7 +245,5 @@ class CHIPToolActivity :
     private const val TAG = "CHIPToolActivity"
     private const val ADDRESS_COMMISSIONING_FRAGMENT_TAG = "address_commissioning_fragment"
     private const val ARG_PROVISION_NETWORK_TYPE = "provision_network_type"
-
-    var REQUEST_CODE_COMMISSIONING = 0xB003
   }
 }

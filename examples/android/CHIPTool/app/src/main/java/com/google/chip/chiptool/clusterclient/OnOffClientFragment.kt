@@ -129,8 +129,8 @@ class OnOffClientFragment : Fragment() {
         showReportMessage(message)
       }
 
-      override fun onSubscriptionEstablished() {
-        val message = "Subscription for on/off established"
+      override fun onSubscriptionEstablished(subscriptionId: Long) {
+        val message = "Subscription for on/off established with subscriptionId: $subscriptionId"
         Log.v(TAG, message)
         showMessage(message)
       }

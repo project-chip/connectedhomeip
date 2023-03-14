@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 #include "AndroidCallbacks.h"
-
 #include <controller/java/AndroidClusterExceptions.h>
 #include <controller/java/CHIPAttributeTLVValueDecoder.h>
 #include <controller/java/CHIPEventTLVValueDecoder.h>
@@ -124,7 +123,7 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, con
 
 ReportCallback::ReportCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback,
                                jobject resubscriptionAttemptCallback) :
-    mClusterCacheAdapter(*this)
+    mClusterCacheAdapter(*this, Optional<EventNumber>::Missing(), false /*cacheData*/)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
@@ -187,6 +186,19 @@ void ReportCallback::OnReportBegin()
     mNodeStateObj = env->NewObject(mNodeStateCls, nodeStateCtor, map);
 }
 
+void ReportCallback::OnDeallocatePaths(app::ReadPrepareParams && aReadPrepareParams)
+{
+    if (aReadPrepareParams.mpAttributePathParamsList != nullptr)
+    {
+        delete[] aReadPrepareParams.mpAttributePathParamsList;
+    }
+
+    if (aReadPrepareParams.mpEventPathParamsList != nullptr)
+    {
+        delete[] aReadPrepareParams.mpEventPathParamsList;
+    }
+}
+
 void ReportCallback::OnReportEnd()
 {
     UpdateClusterDataVersion();
@@ -240,8 +252,12 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     readerForJson.Init(*apData);
 
     jobject value = DecodeAttributeValue(aPath, readerForJavaObject, &err);
-    // If we don't know this attribute, just skip it.
-    VerifyOrReturn(err != CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
+    // If we don't know this attribute, suppress it.
+    if (err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB)
+    {
+        err = CHIP_NO_ERROR;
+    }
+
     VerifyOrReturn(err == CHIP_NO_ERROR, ReportError(attributePathObj, nullptr, err));
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe(),
                    ReportError(attributePathObj, nullptr, CHIP_JNI_ERROR_EXCEPTION_THROWN));
@@ -511,6 +527,12 @@ void ReportCallback::OnDone(app::ReadClient *)
     err = JniReferences::GetInstance().FindMethod(env, mReportCallbackRef, "onDone", "()V", &onDoneMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onDone method"));
 
+    if (mReadClient != nullptr)
+    {
+        Platform::Delete(mReadClient);
+    }
+    mReadClient = nullptr;
+
     DeviceLayer::StackUnlock unlock;
     env->CallVoidMethod(mReportCallbackRef, onDoneMethod);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
@@ -519,7 +541,8 @@ void ReportCallback::OnDone(app::ReadClient *)
 
 void ReportCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
 {
-    JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef);
+    DeviceLayer::StackUnlock unlock;
+    JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef, aSubscriptionId);
 }
 
 CHIP_ERROR ReportCallback::OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause)
@@ -771,7 +794,8 @@ void ReportEventCallback::OnDone(app::ReadClient *)
 
 void ReportEventCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
 {
-    JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef);
+    chip::DeviceLayer::StackUnlock unlock;
+    JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef, aSubscriptionId);
 }
 
 CHIP_ERROR ReportEventCallback::OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause)

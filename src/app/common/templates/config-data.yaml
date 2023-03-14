@@ -9,9 +9,6 @@ WeakEnums:
     - ColorMode
     - EnhancedColorMode
     - HardwareFaultEnum
-    - HueDirection
-    - HueMoveMode
-    - HueStepMode
     - IdentifyEffectIdentifier
     - IdentifyEffectVariant
     - IdentifyIdentifyType
@@ -21,8 +18,6 @@ WeakEnums:
     - PHYRateEnum
     - RadioFaultEnum
     - RoutingRole
-    - SaturationMoveMode
-    - SaturationStepMode
     - StepMode
 
 DefineBitmaps:

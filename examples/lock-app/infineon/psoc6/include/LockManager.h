@@ -56,10 +56,8 @@ static constexpr uint8_t kMaxCredentialsPerUser      = 10;
 static constexpr uint8_t kMaxWeekdaySchedulesPerUser = 10;
 static constexpr uint8_t kMaxYeardaySchedulesPerUser = 10;
 static constexpr uint8_t kMaxHolidaySchedules        = 10;
-static constexpr uint8_t kMaxCredentialSize          = 8;
-
-// Indices received for user/credential/schedules are 1-indexed
-static constexpr uint8_t kStartIndexValue = 1;
+static constexpr uint8_t kMaxCredentialSize          = 20;
+static constexpr uint8_t kNumCredentialTypes         = 6;
 
 static constexpr uint8_t kMaxCredentials = kMaxUsers * kMaxCredentialsPerUser;
 } // namespace ResourceRanges
@@ -178,6 +176,7 @@ public:
                                 uint32_t localEndTime, OperatingModeEnum operatingMode);
 
     bool IsValidUserIndex(uint16_t userIndex);
+    bool IsValidCredentialType(CredentialTypeEnum type);
     bool IsValidCredentialIndex(uint16_t credentialIndex, CredentialTypeEnum type);
     bool IsValidWeekdayScheduleIndex(uint8_t scheduleIndex);
     bool IsValidYeardayScheduleIndex(uint8_t scheduleIndex);
@@ -205,14 +204,14 @@ private:
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 
     EmberAfPluginDoorLockUserInfo mLockUsers[kMaxUsers];
-    EmberAfPluginDoorLockCredentialInfo mLockCredentials[kMaxCredentials];
+    EmberAfPluginDoorLockCredentialInfo mLockCredentials[kNumCredentialTypes][kMaxCredentials];
     WeekDaysScheduleInfo mWeekdaySchedule[kMaxUsers][kMaxWeekdaySchedulesPerUser];
     YearDayScheduleInfo mYeardaySchedule[kMaxUsers][kMaxYeardaySchedulesPerUser];
     HolidayScheduleInfo mHolidaySchedule[kMaxHolidaySchedules];
 
     char mUserNames[ArraySize(mLockUsers)][DOOR_LOCK_MAX_USER_NAME_SIZE];
-    uint8_t mCredentialData[kMaxCredentials][kMaxCredentialSize];
-    CredentialStruct mCredentials[kMaxUsers][kMaxCredentialsPerUser];
+    uint8_t mCredentialData[kNumCredentialTypes][kMaxCredentials][kMaxCredentialSize];
+    CredentialStruct mCredentials[kMaxUsers][kMaxCredentials];
 
     static LockManager sLock;
     P6DoorLock::LockInitParams::LockParam LockParams;

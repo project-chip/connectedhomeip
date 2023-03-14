@@ -127,9 +127,9 @@ public:
     CHIP_ERROR GetObjectField(jobject objectToRead, const char * name, const char * signature, jobject & outObject);
 
     /**
-     * Call a void method with no arguments named "OnSubscriptionEstablished" on the provided jobject.
+     * Call a void method with subscriptionId named "OnSubscriptionEstablished" on the provided jobject.
      */
-    CHIP_ERROR CallSubscriptionEstablished(jobject javaCallback);
+    CHIP_ERROR CallSubscriptionEstablished(jobject javaCallback, long subscriptionId);
 
     /**
      * Creates a boxed type (e.g. java.lang.Integer) based on the the class name ("java/lang/Integer"), constructor JNI signature

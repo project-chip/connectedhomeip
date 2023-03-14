@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit
 
 class DiscoverCommissionablesCommand(
   controller: ChipDeviceController, credsIssuer: CredentialsIssuer?
-) : MatterCommand(controller, "commissionables", credsIssuer) {
+) : MatterCommand(controller, credsIssuer, "commissionables") {
   override fun runCommand() {
     currentCommissioner().discoverCommissionableNodes()
 

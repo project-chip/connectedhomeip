@@ -33,6 +33,7 @@
 #include <app/tests/integration/common.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CHIPCounter.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -177,8 +178,8 @@ CHIP_ERROR InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
         { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
     };
 
-    chip::app::EventManagement::CreateEventManagement(apMgr, sizeof(logStorageResources) / sizeof(logStorageResources[0]),
-                                                      gCircularEventBuffer, logStorageResources, &gEventCounter);
+    chip::app::EventManagement::CreateEventManagement(apMgr, ArraySize(logStorageResources), gCircularEventBuffer,
+                                                      logStorageResources, &gEventCounter);
     return CHIP_NO_ERROR;
 }
 

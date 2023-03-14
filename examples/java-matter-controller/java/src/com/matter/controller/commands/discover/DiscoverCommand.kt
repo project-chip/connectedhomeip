@@ -23,7 +23,7 @@ import com.matter.controller.commands.common.MatterCommand
 import java.util.concurrent.atomic.AtomicLong
 
 class DiscoverCommand(controller: ChipDeviceController, credsIssuer: CredentialsIssuer?) :
-  MatterCommand(controller, "resolve", credsIssuer) {
+  MatterCommand(controller, credsIssuer, "resolve") {
   private val nodeId: AtomicLong = AtomicLong()
   private val fabricId: AtomicLong = AtomicLong()
 

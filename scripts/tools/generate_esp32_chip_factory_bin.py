@@ -486,6 +486,8 @@ def main():
 
     if args.passcode is not None:
         spake2p_params = gen_spake2p_params(args.passcode)
+    else:
+        spake2p_params = None
 
     populate_factory_data(args, spake2p_params)
 

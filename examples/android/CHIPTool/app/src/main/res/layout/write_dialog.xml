@@ -28,7 +28,7 @@
       android:id="@+id/writeValueTypeSp"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:hint="@string/subscribe_dialog_is_urgent_hint"
+      android:hint="@string/write_dialog_value_type_hint"
       android:inputType="text"
       android:spinnerMode="dropdown"
       android:textSize="16sp"

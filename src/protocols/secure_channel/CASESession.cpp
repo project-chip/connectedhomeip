@@ -125,8 +125,9 @@ static_assert(sizeof(kTBEData2_Nonce) == sizeof(kTBEData3_Nonce), "TBEData2_Nonc
 //
 // The session establishment fails if the response is not received within the resulting timeout window,
 // which accounts for both transport latency and the server-side latency.
-static constexpr ExchangeContext::Timeout kExpectedLowProcessingTime  = System::Clock::Seconds16(2);
-static constexpr ExchangeContext::Timeout kExpectedHighProcessingTime = System::Clock::Seconds16(30);
+static constexpr ExchangeContext::Timeout kExpectedLowProcessingTime    = System::Clock::Seconds16(2);
+static constexpr ExchangeContext::Timeout kExpectedSigma1ProcessingTime = kExpectedLowProcessingTime;
+static constexpr ExchangeContext::Timeout kExpectedHighProcessingTime   = System::Clock::Seconds16(30);
 
 CASESession::~CASESession()
 {
@@ -273,7 +274,7 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     mSessionResumptionStorage = sessionResumptionStorage;
     mLocalMRPConfig           = mrpLocalConfig;
 
-    mExchangeCtxt->UseSuggestedResponseTimeout(kExpectedLowProcessingTime);
+    mExchangeCtxt->UseSuggestedResponseTimeout(kExpectedSigma1ProcessingTime);
     mPeerNodeId  = peerScopedNodeId.GetNodeId();
     mLocalNodeId = fabricInfo->GetNodeId();
 
@@ -1972,6 +1973,15 @@ exit:
         AbortPendingEstablish(err);
     }
     return err;
+}
+
+System::Clock::Timeout CASESession::ComputeSigma1ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig)
+{
+    return GetRetransmissionTimeout(remoteMrpConfig.mActiveRetransTimeout, remoteMrpConfig.mIdleRetransTimeout,
+                                    // Assume peer is idle, since that's what we
+                                    // will assume for our initial message.
+                                    System::Clock::kZero, Transport::kMinActiveTime) +
+        kExpectedSigma1ProcessingTime;
 }
 
 } // namespace chip
