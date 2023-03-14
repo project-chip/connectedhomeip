@@ -99,6 +99,15 @@ static BDXDownloader gDownloader;
 constexpr uint16_t requestedOtaBlockSize = 1024;
 #endif
 
+#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+CHIP_ERROR CustomFactoryDataRestoreMechanism(void)
+{
+    K32W_LOG("This is a custom factory data restore mechanism.");
+
+    return CHIP_NO_ERROR;
+}
+#endif
+
 CHIP_ERROR AppTask::StartAppTask()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -133,9 +142,10 @@ CHIP_ERROR AppTask::Init()
 #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
     // Initialize factory data provider
     ReturnErrorOnFailure(AppTask::FactoryDataProvider::GetDefaultInstance().Init());
-    SetDeviceInstanceInfoProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
-    SetDeviceAttestationCredentialsProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
-    SetCommissionableDataProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
+    AppTask::FactoryDataProvider::GetDefaultInstance().RegisterRestoreMechanism(CustomFactoryDataRestoreMechanism);
+	SetDeviceInstanceInfoProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
+	SetDeviceAttestationCredentialsProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
+	SetCommissionableDataProvider(&AppTask::FactoryDataProvider::GetDefaultInstance());
 #else
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());

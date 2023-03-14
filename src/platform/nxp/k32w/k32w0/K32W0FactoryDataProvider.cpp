@@ -63,6 +63,35 @@ K32W0FactoryDataProvider & K32W0FactoryDataProvider::GetDefaultInstance()
     return sInstance;
 }
 
+extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism()
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    uint16_t backupLength = 0;
+
+    // Check if PDM id related to factory data backup exists.
+    // If it does, it means an external event (such as a power loss)
+    // interrupted the factory data update process and the section
+    // from internal flash is most likely erased and should be restored.
+    if (PDM_bDoesDataExist(kNvmId_FactoryDataBackup, &backupLength))
+    {
+        chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
+        buffer.Calloc(K32W0FactoryDataProvider::kFactoryDataSize);
+        ReturnErrorCodeIf(buffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
+
+        auto status =
+            PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void*)buffer.Get(), K32W0FactoryDataProvider::kFactoryDataSize, &backupLength);
+        ReturnErrorCodeIf(PDM_E_STATUS_OK != status, CHIP_FACTORY_DATA_PDM_RESTORE);
+
+        error = K32W0FactoryDataProvider::GetDefaultInstance().UpdateData(buffer.Get());
+        if (CHIP_NO_ERROR == error)
+        {
+            PDM_vDeleteDataRecord(kNvmId_FactoryDataBackup);
+        }
+    }
+
+    return error;
+}
+
 K32W0FactoryDataProvider::K32W0FactoryDataProvider()
 {
     maxLengths[FactoryDataId::kVerifierId]           = kSpake2pSerializedVerifier_MaxBase64Len;
@@ -86,6 +115,8 @@ K32W0FactoryDataProvider::K32W0FactoryDataProvider()
     maxLengths[FactoryDataId::kPartNumber]           = ConfigurationManager::kMaxPartNumberLength;
     maxLengths[FactoryDataId::kProductURL]           = ConfigurationManager::kMaxProductURLLength;
     maxLengths[FactoryDataId::kProductLabel]         = ConfigurationManager::kMaxProductLabelLength;
+
+    RegisterRestoreMechanism(FactoryDataDefaultRestoreMechanism);
 }
 
 CHIP_ERROR K32W0FactoryDataProvider::Init()
@@ -106,21 +137,36 @@ CHIP_ERROR K32W0FactoryDataProvider::Init()
                      kFactoryDataSize);
     }
 
-    error = Validate();
-    if (error != CHIP_NO_ERROR)
+    VerifyOrReturnError(mRestoreMechanisms.size() > 0, CHIP_FACTORY_DATA_RESTORE_MECHANISM);
+
+    for (auto& restore : mRestoreMechanisms)
     {
-        ChipLogError(DeviceLayer, "Factory data validation failed with error: %s", ErrorStr(error));
-        return error;
+        error = restore();
+        if (error != CHIP_NO_ERROR)
+        {
+            continue;
+        }
+
+        error = Validate();
+        if (error != CHIP_NO_ERROR)
+        {
+            continue;
+        }
+
+        break;
     }
 
-    return CHIP_NO_ERROR;
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Factory data init failed with: %s", ErrorStr(error));
+    }
+
+    return error;
 }
 
 CHIP_ERROR K32W0FactoryDataProvider::Validate()
 {
     uint8_t sha256Output[SHA256_HASH_SIZE] = { 0 };
-
-    ReturnErrorOnFailure(Restore());
 
     auto status = OtaUtils_ReadFromInternalFlash((uint16_t) sizeof(Header), kFactoryDataStart, (uint8_t *) &mHeader, NULL,
                                                  pFunctionEepromRead);
@@ -133,34 +179,9 @@ CHIP_ERROR K32W0FactoryDataProvider::Validate()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR K32W0FactoryDataProvider::Restore()
+void K32W0FactoryDataProvider::RegisterRestoreMechanism(RestoreMechanism restore)
 {
-    CHIP_ERROR error      = CHIP_NO_ERROR;
-    uint16_t backupLength = 0;
-
-    // Check if PDM id related to factory data backup exists.
-    // If it does, it means an external event (such as a power loss)
-    // interrupted the factory data update process and the section
-    // from internal flash is most likely erased and should be restored.
-    if (PDM_bDoesDataExist(kNvmId_FactoryDataBackup, &backupLength))
-    {
-        chip::Platform::ScopedMemoryBuffer<uint8_t> buffer;
-        buffer.Calloc(kFactoryDataSize);
-        ReturnErrorCodeIf(buffer.Get() == nullptr, CHIP_ERROR_NO_MEMORY);
-
-        auto status = PDM_eReadDataFromRecord(kNvmId_FactoryDataBackup, (void *) buffer.Get(), kFactoryDataSize, &backupLength);
-        ReturnErrorCodeIf(PDM_E_STATUS_OK != status, CHIP_FACTORY_DATA_PDM_RESTORE);
-
-        error = UpdateData(buffer.Get());
-        if (CHIP_NO_ERROR == error)
-        {
-            PDM_vDeleteDataRecord(kNvmId_FactoryDataBackup);
-        }
-    }
-
-    // TODO: add hook to enable restore customization
-
-    return error;
+    mRestoreMechanisms.insert(mRestoreMechanisms.end(), restore);
 }
 
 CHIP_ERROR K32W0FactoryDataProvider::UpdateData(uint8_t * pBuf)

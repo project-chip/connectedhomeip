@@ -14,10 +14,10 @@ The default processors for K32W0 are already implemented in:
 * `OTAFirmwareProcessor` for application/SSBL update. Enabled by default.
 * `OTAFactoryDataProcessor` for factory data update. Disabled by default, user has to specify `chip_ota_enable_factory_data_processor=1` in the build args.
 
-Some SDK OTA-related flags are defined to support additional features:
-- `gOTAAllowCustomStartAddress=1`
-- `gOTAUseCustomOtaEntry=1`
-- `gOTACustomOtaEntryMemory=1`
+Some SDK OTA module flags are defined to support additional features:
+- `gOTAAllowCustomStartAddress=1` - enable EEPROM offset value. Used internally by SDK OTA module.
+- `gOTAUseCustomOtaEntry=1` - support custom OTA entry for multi-image.
+- `gOTACustomOtaEntryMemory=1` - K32W0 uses `OTACustomStorage_ExtFlash` (1) by default.
 
 ## Implementing custom processors
 A custom processor should implement the abstract interface defined in `OTATlvProcessor.h`. Below is a compact version:
@@ -85,3 +85,23 @@ private:
 ## SSBL max entries example
 `CONFIG_CHIP_K32W0_MAX_ENTRIES_TEST` can be set to 1 to enable max entries test.
 There will be 8 additional processors registered in default `OtaHooks` implementation. The OTA image should be generated with the `create_ota_images.sh` script from `./scripts/tools/nxp/ota/examples`.
+
+## Factory data restore mechanism
+Prior to factory data update, the old factory data is backed up in external flash.
+If anything interrupts the update (e.g. power loss), there is a slight chance the
+internal flash factory data section is erased and has to be restored at next boot.
+The `K32W0FactoryDataProvider` offers a default restore mechanism and support for
+registering additional restore mechanisms or overwriting the default one.
+
+Restore mechanisms are just functions that have this signature: `CHIP_ERROR (*)(void)`.
+Any such function can be registered through `K32W0FactoryDataProvider::RegisterRestoreMechanism`.
+
+The default restore mechanism is implemented as a weak function: `FactoryDataDefaultRestoreMechanism`.
+It is registered in `K32W0FactoryDataProvider::Init`, before factory data validation, and it can be
+overwritten at application level.
+When doing the actual restore, the mechanisms are called in the order they were
+registered.
+
+Please note that the restore mechanisms registration order matters.
+Once a restore mechanism is successful (`CHIP_NO_ERROR` is returned),
+the restore process has finished and subsequent restore mechanisms will not be called.

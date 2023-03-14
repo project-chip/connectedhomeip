@@ -28,6 +28,8 @@
 #include "OtaUtils.h"
 #include "SecLib.h"
 
+#include <vector>
+
 /* Grab symbol for the base address from the linker file. */
 extern uint32_t __FACTORY_DATA_START[];
 extern uint32_t __FACTORY_DATA_SIZE[];
@@ -46,8 +48,9 @@ namespace DeviceLayer {
 #define CHIP_FACTORY_DATA_FLASH_ERASE CHIP_FACTORY_DATA_ERROR(0x06)
 #define CHIP_FACTORY_DATA_FLASH_PROGRAM CHIP_FACTORY_DATA_ERROR(0x07)
 #define CHIP_FACTORY_DATA_INTERNAL_FLASH_READ CHIP_FACTORY_DATA_ERROR(0x08)
-#define CHIP_FACTORY_DATA_PDM_SAVE_RECORD CHIP_FACTORY_DATA_ERROR(0x09)
-#define CHIP_FACTORY_DATA_PDM_READ_RECORD CHIP_FACTORY_DATA_ERROR(0x0A)
+#define CHIP_FACTORY_DATA_PDM_SAVE_RECORD     CHIP_FACTORY_DATA_ERROR(0x09)
+#define CHIP_FACTORY_DATA_PDM_READ_RECORD     CHIP_FACTORY_DATA_ERROR(0x0A)
+#define CHIP_FACTORY_DATA_RESTORE_MECHANISM   CHIP_FACTORY_DATA_ERROR(0x0B)
 
 /**
  * @brief This class provides Commissionable data, Device Attestation Credentials,
@@ -110,17 +113,19 @@ public:
     static constexpr size_t kHashId         = 0xCE47BA5E;
 
     typedef otaUtilsResult_t (*OtaUtils_EEPROM_ReadData)(uint16_t nbBytes, uint32_t address, uint8_t * pInbuf);
-    static uint8_t ReadDataMemcpy(uint16_t num, uint32_t src, uint8_t * dst);
 
+    using RestoreMechanism = CHIP_ERROR (*)(void);
+
+    static uint8_t ReadDataMemcpy(uint16_t num, uint32_t src, uint8_t * dst);
     static K32W0FactoryDataProvider & GetDefaultInstance();
 
     K32W0FactoryDataProvider();
 
     CHIP_ERROR Init();
     CHIP_ERROR Validate();
-    CHIP_ERROR Restore();
-    CHIP_ERROR UpdateData(uint8_t * pBuf);
-    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length, uint32_t * offset = nullptr);
+    void RegisterRestoreMechanism(RestoreMechanism mechanism);
+    CHIP_ERROR UpdateData(uint8_t* pBuf);
+    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t & length, uint32_t * offset=nullptr);
 
     // Custom factory data providers must implement this method in order to define
     // their own custom IDs.
@@ -159,6 +164,7 @@ public:
 protected:
     uint16_t maxLengths[kNumberOfIds];
     Header mHeader;
+    std::vector<RestoreMechanism> mRestoreMechanisms;
 };
 
 } // namespace DeviceLayer
