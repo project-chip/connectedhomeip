@@ -223,9 +223,7 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
 CHIP_ERROR ConnectivityManagerImpl::_GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & SEDIntervalsConfig)
 {
-    // For now Wi-Fi uses DTIM power save mode
-    SEDIntervalsConfig.ActiveIntervalMS = chip::System::Clock::Milliseconds32(50);
-    SEDIntervalsConfig.IdleIntervalMS   = chip::System::Clock::Milliseconds32(300);
+    // For now Wi-Fi uses DTIM power save mode so it varies from AP to AP
     return CHIP_NO_ERROR;
 }
 
