@@ -136,7 +136,7 @@ jobs:
                   ./scripts/build/gn_gen.sh
                   ./scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE chip-cert chip-tool spake2p"
                   ./scripts/run_in_build_env.sh \
-                    ./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light-factory-data' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light-factory-data' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     telink tlsr9518adk80d lighting-app-factory-data \
                     out/telink-tlsr9518adk80d-light-factory-data/zephyr/zephyr.elf \
