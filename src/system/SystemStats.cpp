@@ -60,29 +60,21 @@ count_t sHighWatermarks[kNumEntries];
 
 const Label * GetStrings()
 {
-    assertChipStackLockedByCurrentThread();
-
     return sStatsStrings;
 }
 
 count_t * GetResourcesInUse()
 {
-    assertChipStackLockedByCurrentThread();
-
     return sResourcesInUse;
 }
 
 count_t * GetHighWatermarks()
 {
-    assertChipStackLockedByCurrentThread();
-
     return sHighWatermarks;
 }
 
 void UpdateSnapshot(Snapshot & aSnapshot)
 {
-    assertChipStackLockedByCurrentThread();
-
     memcpy(&aSnapshot.mResourcesInUse, &sResourcesInUse, sizeof(aSnapshot.mResourcesInUse));
     memcpy(&aSnapshot.mHighWatermarks, &sHighWatermarks, sizeof(aSnapshot.mHighWatermarks));
 

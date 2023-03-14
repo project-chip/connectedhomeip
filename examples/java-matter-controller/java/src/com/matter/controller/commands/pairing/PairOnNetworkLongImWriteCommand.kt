@@ -25,6 +25,9 @@ import chip.devicecontroller.model.ChipAttributePath
 import com.matter.controller.commands.common.CredentialsIssuer
 import java.util.logging.Level
 import java.util.logging.Logger
+import chip.tlv.AnonymousTag
+import chip.tlv.ContextSpecificTag
+import chip.tlv.TlvWriter
 
 class PairOnNetworkLongImWriteCommand(
   controller: ChipDeviceController, credsIssue: CredentialsIssuer?
@@ -68,14 +71,14 @@ class PairOnNetworkLongImWriteCommand(
   }
 
   override fun runCommand() {
-    // boolean true for tlv
-    val booleanTLV = byteArrayOf(0x09)
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, true)
     val attributeList = listOf(
       AttributeWriteRequest.newInstance(
         /* endpointId= */ 0,
         CLUSTER_ID_BASIC,
         ATTR_ID_LOCAL_CONFIG_DISABLED,
-        booleanTLV,
+        tlvWriter.getEncoded(),
       )
     )
 
