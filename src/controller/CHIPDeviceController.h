@@ -683,8 +683,11 @@ public:
         return mDefaultCommissioner == nullptr ? NullOptional : MakeOptional(mDefaultCommissioner->GetCommissioningParameters());
     }
 
-    // Reset the arm failsafe timer during commissioning.
-    void ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
+    // Reset the arm failsafe timer during commissioning.  If this returns
+    // false, that means that the timer was already set for a longer time period
+    // than the new time we are trying to set.  In this case, neither
+    // onSuccess nor onFailure will be called.
+    bool ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
                            Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
                            OnExtendFailsafeFailure onFailure);
 
@@ -899,6 +902,11 @@ private:
     // sends a command to immediately expire the failsafe, then sends completion report with the CommissioningDelegate and callbacks
     // to the PairingDelegate upon arm failsafe command completion.
     void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus);
+
+    // Extend the fail-safe before trying to do network-enable (since after that
+    // point, for non-concurrent-commissioning devices, we may not have a way to
+    // extend it).
+    void ExtendFailsafeBeforeNetworkEnable(DeviceProxy * device, CommissioningParameters & params, CommissioningStage step);
 
     chip::Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
