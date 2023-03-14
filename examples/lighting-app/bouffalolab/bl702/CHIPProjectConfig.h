@@ -132,6 +132,4 @@
 
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
 
-#define CHIP_CONFIG_MAX_DEVICE_ADMINS 4 // 3 fabrics + 1 for rotation slack
-
 #define CHIP_BLE_DEVICE_NAME "MatterLight"
