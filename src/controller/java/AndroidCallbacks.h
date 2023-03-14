@@ -69,6 +69,8 @@ struct ReportCallback : public app::ClusterStateCache::Callback
 
     CHIP_ERROR OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
 
+    void OnDeallocatePaths(app::ReadPrepareParams && aReadPrepareParams) override;
+
     /** Report errors back to Java layer. attributePath may be nullptr for general errors. */
     void ReportError(jobject attributePath, jobject eventPath, CHIP_ERROR err);
     void ReportError(jobject attributePath, jobject eventPath, Protocols::InteractionModel::Status status);

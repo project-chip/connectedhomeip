@@ -66,7 +66,7 @@ class PairOnNetworkLongImReadCommand(
       .getConnectedDevicePointer(getNodeId(), InternalGetConnectedDeviceCallback())
     clear()
     currentCommissioner()
-      .readPath(InternalReportCallback(), devicePointer, attributePathList, Collections.emptyList(), false)
+      .readPath(InternalReportCallback(), devicePointer, attributePathList, Collections.emptyList(), false, 0)
     waitCompleteMs(getTimeoutMillis())
   }
 
