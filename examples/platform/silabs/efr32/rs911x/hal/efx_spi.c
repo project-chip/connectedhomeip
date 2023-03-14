@@ -166,7 +166,8 @@ void rsi_hal_board_init(void)
  *@fn static bool rx_dma_complete(unsigned int channel, unsigned int sequenceNo, void *userParam)
  *
  *@brief
- *    complete dma
+ *    DMA transfer completion callback. Called by the DMA interrupt handler.
+ *    This is being set in the tx/rx of the DMA
  *
  * @param[in] channel:
  * @param[in] sequenceNO: sequence number
@@ -216,6 +217,8 @@ static void receiveDMA(uint8_t * rx_buf, uint16_t xlen)
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
 #endif
+
+    // Start receive DMA
     DMADRV_PeripheralMemory(rx_dma_channel, MY_USART_RX_SIGNAL, (void *) rx_buf, (void *) &(MY_USART->RXDATA), true, xlen,
                             dmadrvDataSize1, rx_dma_complete, NULL);
 
@@ -262,6 +265,8 @@ static void transmitDMA(uint8_t * rx_buf, uint8_t * tx_buf, uint16_t xlen)
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
 #endif
+
+    // Start receive DMA
     DMADRV_PeripheralMemory(rx_dma_channel, MY_USART_RX_SIGNAL, buf, (void *) &(MY_USART->RXDATA), srcinc, xlen, dmadrvDataSize1,
                             rx_dma_complete, buf);
     // Start transmit DMA.
