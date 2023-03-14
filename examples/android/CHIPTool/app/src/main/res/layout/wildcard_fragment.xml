@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingStart="16dp"
@@ -15,12 +16,47 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"/>
 
+  <RadioGroup
+      android:id="@+id/selectTypeRadioGroup"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/addressUpdateFragment">
+    <RadioButton
+        android:id="@+id/readRadioBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:textSize="16sp"
+        android:text="@string/wildcard_read_btn_text"/>
+    <RadioButton
+        android:id="@+id/subscribeRadioBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="@string/wildcard_subscribe_btn_text"/>
+    <RadioButton
+        android:id="@+id/writeRadioBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="@string/wildcard_write_btn_text"/>
+    <RadioButton
+        android:id="@+id/invokeRadioBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="@string/wildcard_invoke_btn_text"/>
+  </RadioGroup>
+
   <androidx.constraintlayout.helper.widget.Flow
       android:id="@+id/flow"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
       android:layout_marginTop="8dp"
-      app:constraint_referenced_ids="endpointIdLabel,endpointIdEd,clusterIdLabel,clusterIdEd,attributeIdLabel,attributeIdEd,eventIdLabel,eventIdEd,commandIdLabel,commandIdEd"
+      app:constraint_referenced_ids="endpointIdLabel,endpointIdEd,clusterIdLabel,clusterIdEd,attributeIdLabel,attributeIdEd,eventIdLabel,eventIdEd,commandIdLabel,commandIdEd,isUrgentLabel,isUrgentSp"
       app:flow_horizontalBias="0.0"
       app:flow_horizontalGap="8dp"
       app:flow_horizontalStyle="packed"
@@ -28,7 +64,7 @@
       app:flow_wrapMode="aligned"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/addressUpdateFragment" />
+      app:layout_constraintTop_toBottomOf="@id/selectTypeRadioGroup" />
 
   <TextView
       android:id="@+id/endpointIdLabel"
@@ -98,6 +134,7 @@
       android:layout_height="wrap_content"
       android:padding="8dp"
       android:textSize="16sp"
+      android:visibility="gone"
       android:text="@string/command_id_label" />
 
   <EditText
@@ -106,91 +143,104 @@
       android:layout_height="wrap_content"
       android:layout_margin="16dp"
       android:inputType="number"
+      android:visibility="gone"
       android:hint="@string/wildcard_help_label"/>
 
-  <Button
-      android:id="@+id/readBtn"
+  <TextView
+      android:id="@+id/isUrgentLabel"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:padding="16dp"
-      android:layout_marginTop="16dp"
-      android:layout_marginBottom="8dp"
-      android:layout_gravity="center"
-      android:text="@string/wildcard_read_btn_text"
+      android:padding="8dp"
       android:textSize="16sp"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toStartOf="@id/writeBtn"
-      app:layout_constraintTop_toBottomOf="@id/flow"/>
+      android:visibility="gone"
+      android:text="@string/isUrgent_label"/>
 
-  <Button
-      android:id="@+id/writeBtn"
-      android:layout_width="wrap_content"
+  <Spinner
+      android:id="@+id/isUrgentSp"
+      android:layout_width="0dp"
       android:layout_height="wrap_content"
-      android:padding="16dp"
-      android:layout_marginTop="16dp"
-      android:layout_marginBottom="8dp"
-      android:layout_gravity="center"
-      android:text="@string/wildcard_write_btn_text"
+      android:hint="@string/isUrgent_label"
+      android:entries="@array/chip_select_menu"
+      android:inputType="text"
+      android:spinnerMode="dropdown"
       android:textSize="16sp"
-      app:layout_constraintStart_toEndOf="@id/readBtn"
-      app:layout_constraintEnd_toStartOf="@id/invokeBtn"
-      app:layout_constraintTop_toBottomOf="@id/flow"/>
+      android:visibility="gone"/>
 
-  <Button
-      android:id="@+id/invokeBtn"
+  <androidx.constraintlayout.widget.ConstraintLayout
+      android:id="@+id/addLayout"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:padding="16dp"
-      android:layout_marginTop="16dp"
-      android:layout_marginBottom="8dp"
-      android:layout_gravity="center"
-      android:text="@string/wildcard_invoke_btn_text"
-      android:textSize="16sp"
-      app:layout_constraintStart_toEndOf="@id/writeBtn"
-      app:layout_constraintEnd_toStartOf="@id/subscribeBtn"
-      app:layout_constraintTop_toBottomOf="@id/flow"/>
-
-  <Button
-      android:id="@+id/subscribeBtn"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:padding="16dp"
-      android:layout_marginTop="16dp"
-      android:layout_marginBottom="8dp"
-      android:layout_gravity="center"
-      android:text="@string/wildcard_subscribe_btn_text"
-      android:textSize="16sp"
-      app:layout_constraintStart_toEndOf="@id/invokeBtn"
+      android:orientation="horizontal"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/flow"/>
-
-  <Button
-      android:id="@+id/readEventBtn"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:padding="16dp"
-      android:layout_marginTop="16dp"
-      android:layout_marginBottom="8dp"
-      android:layout_gravity="center"
-      android:text="@string/wildcard_read_event_btn_text"
-      android:textSize="16sp"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toStartOf="@id/subscribeEventBtn"
-      app:layout_constraintTop_toBottomOf="@id/readBtn"/>
+      app:layout_constraintTop_toBottomOf="@id/flow">
+    <TextView
+        android:id="@+id/sendListView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+    <Button
+        android:id="@+id/addAttributeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/wildcard_add_attribute_btn_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/addEventBtn"
+        app:layout_constraintTop_toBottomOf="@id/sendListView"
+        android:textSize="16sp" />
+    <Button
+        android:id="@+id/addEventBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/wildcard_add_event_btn_text"
+        app:layout_constraintStart_toEndOf="@id/addAttributeBtn"
+        app:layout_constraintEnd_toStartOf="@id/resetBtn"
+        app:layout_constraintTop_toBottomOf="@id/sendListView"
+        android:textSize="16sp" />
+    <Button
+        android:id="@+id/resetBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:text="@string/wildcard_reset_btn_text"
+        app:layout_constraintStart_toEndOf="@id/addEventBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sendListView"
+        android:textSize="16sp" />
+  </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <Button
+        android:id="@+id/sendBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_gravity="center"
+        android:text="@string/wildcard_send_btn_text"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/shutdownSubscriptionBtn"
+        app:layout_constraintTop_toBottomOf="@id/addLayout"/>
 
   <Button
-      android:id="@+id/subscribeEventBtn"
+      android:id="@+id/shutdownSubscriptionBtn"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:padding="16dp"
       android:layout_marginTop="16dp"
       android:layout_marginBottom="8dp"
       android:layout_gravity="center"
-      android:text="@string/wildcard_subscribe_event_btn_text"
+      android:text="@string/wildcard_shutdown_subscription_btn_text"
       android:textSize="16sp"
-      app:layout_constraintStart_toEndOf="@id/readEventBtn"
+      android:visibility="gone"
+      app:layout_constraintStart_toEndOf="@id/sendBtn"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/subscribeBtn"/>
+      app:layout_constraintTop_toBottomOf="@id/addLayout"/>
 
   <ScrollView
       android:layout_width="match_parent"
@@ -198,7 +248,7 @@
       android:fadeScrollbars="false"
       app:layout_constraintBottom_toBottomOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/subscribeEventBtn">
+      app:layout_constraintTop_toBottomOf="@id/sendBtn">
     <TextView
         android:id="@+id/outputTv"
         android:layout_width="match_parent"
@@ -208,6 +258,4 @@
         android:singleLine="false"
         android:textSize="20sp" />
   </ScrollView>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
