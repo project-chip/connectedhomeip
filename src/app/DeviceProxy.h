@@ -30,6 +30,7 @@
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/DLLUtil.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 
@@ -54,7 +55,12 @@ public:
 
     virtual CHIP_ERROR SetPeerId(ByteSpan rcac, ByteSpan noc) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
-    const ReliableMessageProtocolConfig & GetRemoteMRPConfig() const { return mRemoteMRPConfig; }
+    /**
+     * Facilities for keeping track of the latest point we can expect the
+     * fail-safe to last through.  These timestamp values use the monotonic clock.
+     */
+    void SetFailSafeExpirationTimestamp(System::Clock::Timestamp timestamp) { mFailSafeExpirationTimestamp = timestamp; }
+    System::Clock::Timestamp GetFailSafeExpirationTimestamp() const { return mFailSafeExpirationTimestamp; }
 
     /**
      * @brief
@@ -69,7 +75,7 @@ public:
 protected:
     virtual bool IsSecureConnected() const = 0;
 
-    ReliableMessageProtocolConfig mRemoteMRPConfig = GetDefaultMRPConfig();
+    System::Clock::Timestamp mFailSafeExpirationTimestamp = System::Clock::kZero;
 };
 
 } // namespace chip

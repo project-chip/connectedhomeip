@@ -22,6 +22,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/util/af.h>
 #include <app/util/config.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #if !defined(EMBER_SCRIPTED_TEST)
@@ -51,14 +52,13 @@
 #include <app-common/zap-generated/attribute-type.h>
 
 #define DECLARE_DYNAMIC_ENDPOINT(endpointName, clusterList)                                                                        \
-    EmberAfEndpointType endpointName = { clusterList, sizeof(clusterList) / sizeof(EmberAfCluster), 0 }
+    EmberAfEndpointType endpointName = { clusterList, ArraySize(clusterList), 0 }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName) EmberAfCluster clusterListName[] = {
 
 #define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, incomingCommands, outgoingCommands)                                       \
     {                                                                                                                              \
-        clusterId, clusterAttrs, sizeof(clusterAttrs) / sizeof(EmberAfAttributeMetadata), 0, ZAP_CLUSTER_MASK(SERVER), NULL,       \
-            incomingCommands, outgoingCommands                                                                                     \
+        clusterId, clusterAttrs, ArraySize(clusterAttrs), 0, ZAP_CLUSTER_MASK(SERVER), NULL, incomingCommands, outgoingCommands    \
     }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_END }
