@@ -242,7 +242,19 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
         }
         else
         {
-            GetCover().StepToward(OperationalState::MovingUpOrOpen, mTiltMode);
+            EmberAfStatus status;
+            NPercent100ths current;
+            chip::EndpointId endId = GetCover().mEndpoint;
+            chip::Percent100ths targetLift;
+            chip::DeviceLayer::PlatformMgr().LockChipStack();
+            status = Attributes::CurrentPositionLiftPercent100ths::Get(endId, current); 
+            if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+            {
+                targetLift = ComputePercent100thsStep(OperationalState::MovingUpOrOpen, current.Value(), LIFT_DELTA);
+            }          
+            (void)Attributes::TargetPositionLiftPercent100ths::Set(endId, targetLift);
+            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+       
         }
         break;
 
@@ -276,7 +288,18 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
         }
         else
         {
-            GetCover().StepToward(OperationalState::MovingDownOrClose, mTiltMode);
+            EmberAfStatus status;
+            NPercent100ths current;
+            chip::EndpointId endId = GetCover().mEndpoint;
+            chip::Percent100ths targetLift;
+            chip::DeviceLayer::PlatformMgr().LockChipStack();
+            status = Attributes::CurrentPositionLiftPercent100ths::Get(endId, current); 
+            if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+            {
+                targetLift = ComputePercent100thsStep(OperationalState::MovingDownOrClose, current.Value(), LIFT_DELTA);
+            }          
+            (void)Attributes::TargetPositionLiftPercent100ths::Set(endId, targetLift);
+            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         }
         break;
     case EventId::AttributeChange:
