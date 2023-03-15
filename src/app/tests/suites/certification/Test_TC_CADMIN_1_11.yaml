@@ -71,6 +71,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label:
+          "TH1 reads CurrentFabricIndex attribute and save it for future use."
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: TH1FabricIndex
+
     - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       PICS: CADMIN.S.C00.Rsp
       cluster: "Administrator Commissioning"
@@ -148,6 +156,15 @@ tests:
               - name: "nodeId"
                 value: nodeId3
 
+    - label:
+          "TH3 reads CurrentFabricIndex attribute and save it for future use."
+      identity: "gamma"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: TH3FabricIndex
+
     - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       PICS: CADMIN.S.C00.Rsp
       cluster: "Administrator Commissioning"
@@ -195,6 +212,15 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId2
+
+    - label:
+          "TH2 reads CurrentFabricIndex attribute and save it for future use."
+      identity: "beta"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: TH2FabricIndex
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE using ECM"
       PICS: CADMIN.S.C00.Rsp
@@ -255,9 +281,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", NodeID: nodeId },
-                  { Label: "", NodeID: nodeId3 },
-                  { Label: "", NodeID: nodeId2 },
+                  { Label: "", FabricIndex: TH1FabricIndex, NodeID: nodeId },
+                  { Label: "", FabricIndex: TH3FabricIndex, NodeID: nodeId3 },
+                  { Label: "", FabricIndex: TH2FabricIndex, NodeID: nodeId2 },
               ]
           constraints:
               type: list
@@ -350,9 +376,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", NodeID: nodeId },
-                  { Label: "", NodeID: nodeId3 },
-                  { Label: "", NodeID: nodeId2 },
+                  { Label: "", FabricIndex: TH1FabricIndex, NodeID: nodeId },
+                  { Label: "", FabricIndex: TH3FabricIndex, NodeID: nodeId3 },
+                  { Label: "", FabricIndex: TH2FabricIndex, NodeID: nodeId2 },
               ]
           constraints:
               type: list
@@ -391,3 +417,31 @@ tests:
       response:
           error: FAILURE
           clusterError: 2
+
+    - label: "TH_CR1 revokes the commissioning window"
+      cluster: "Administrator Commissioning"
+      command: "RevokeCommissioning"
+      PICS: CADMIN.S.C02.Rsp && CADMIN.S.C01.Rsp
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Remove TH2 FabricIndex"
+      PICS: OPCREDS.S.C0a.Rsp && CADMIN.S
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: TH2FabricIndex
+
+    - label: "Remove TH3 FabricIndex"
+      PICS: OPCREDS.S.C0a.Rsp && CADMIN.S
+      identity: "gamma"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: TH3FabricIndex
