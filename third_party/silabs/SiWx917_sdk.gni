@@ -33,8 +33,6 @@ declare_args() {
   # Users can implement their own.
   use_efr32_factory_data_provider = true
 
-  use_silabs_thread_lib = false
-
   silabs_log_enabled = true
 
   # Argument to enable IPv4 for wifi
@@ -47,7 +45,7 @@ declare_args() {
 # Parameters:
 #   wisemcu_sdk_root - The location of the wisemcu SDK.
 #   sources - The sources files to build.
-template("efr32_sdk") {
+template("siwx917_sdk") {
 
   sdk_target_name = target_name
 
@@ -110,7 +108,6 @@ template("efr32_sdk") {
 
       "LITTLE_ENDIAN_ORDER",
       "_CHIP_9118",
-    #Matter required at least 40960 but SiWx917 SoC requires an extra 20k to resolve nvm3_open() error, Need to be checked.
       "NVM3_DEFAULT_NVM_SIZE=40960",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
@@ -129,23 +126,23 @@ template("efr32_sdk") {
       "__error_t_defined",
     ]
 
-    if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
-      if (use_SiWx917) {
-        defines += [
-          "SL_HEAP_SIZE=32768",
-          "SL_WIFI=1",
-          "SL_WFX_USE_SPI",
-          "EFX32_RS911X=1",
-          "RS911X_WIFI",
-          "SiWx917_WIFI",
-          "RSI_WLAN_ENABLE",
-          "RSI_SPI_INTERFACE",
-          "RSI_WITH_OS",
-        ]
-      }
+    defines += [
+      "SL_HEAP_SIZE=32768",
+      "SL_WIFI=1",
+      "SL_WFX_USE_SPI",
+      "EFX32_RS911X=1",
+      "RS911X_WIFI",
+      "SiWx917_WIFI",
+      "RSI_WLAN_ENABLE",
+      "RSI_SPI_INTERFACE",
+      "RSI_WITH_OS",
+    ]
+    #Added this flag only for SiwX917 NCP board
+    #TODO: Remove when rsi_wlan_ext_stats gets implemented using Wisemcu SDK
+    defines += [ "SiWx917_WIFI" ]
 
     if (!use_rs911x_sockets) {
-        import("${chip_root}/src/platform/silabs/SiWx917/wifi_args.gni")
+        import("${chip_root}/src/platform/silabs/SiWx917/args.gni")
 
         defines += [ "LWIP_NETIF_API=1" ]
       if (lwip_ipv4) {
@@ -171,7 +168,7 @@ template("efr32_sdk") {
         defines += [ "LWIP_IPV6=0" ]
       }
     }
-  }
+
 
     defines += board_defines
 
@@ -200,13 +197,13 @@ template("efr32_sdk") {
     if (chip_build_libshell) {  # matter shell
       defines += [
         "ENABLE_CHIP_SHELL",
-        "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1",
       ]
     }
 
+
     # USART include files
     if ((defined(invoker.chip_enable_pw_rpc) && invoker.chip_enable_pw_rpc) ||
-        (chip_build_libshell ) ||
+        chip_build_libshell ||
         (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) ||
         (defined(invoker.show_qr_code) && invoker.show_qr_code) ||
         (defined(invoker.disable_lcd) && !invoker.disable_lcd) ||
@@ -240,8 +237,8 @@ template("efr32_sdk") {
     }
   }
 
-  source_set("si917_mbedtls_config") {
-    # We're setting the mbedTLS config flags here as the siwx917 target
+  source_set("siwx917_mbedtls_config") {
+    # We're setting the mbedTLS config flags here as the siwx917_sdk target
     # acts as the mbedTLS target for SiWx917 builds. We need this for the build
     # system to recompile mbedTLS (= the SDK) when the mbedTLS config gets
     # edited.
@@ -344,7 +341,7 @@ template("efr32_sdk") {
     ]
 
     public_deps = [
-      ":si917_mbedtls_config",
+      ":siwx917_mbedtls_config",
       "${segger_rtt_root}:segger_rtt",
       "${segger_rtt_root}:segger_rtt_printf",
       "${segger_rtt_root}:segger_rtt_syscalls",

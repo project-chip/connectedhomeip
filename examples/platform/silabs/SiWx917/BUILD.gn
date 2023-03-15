@@ -49,12 +49,10 @@ silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
 import("${silabs_common_plat_dir}/SiWx917/args.gni")
 
 # Sanity check
-assert((chip_enable_wifi && use_SiWx917))
-if (chip_enable_wifi) {
-  assert(use_SiWx917)
-  import("${chip_root}/src/platform/silabs/SiWx917/wifi_args.gni")
-  import("SiWx917/rs911x.gni")
-}
+assert(chip_enable_wifi)
+assert(use_SiWx917)
+import("${chip_root}/src/platform/silabs/SiWx917/args.gni")
+import("SiWx917/rs911x.gni")
 
 
 config("chip_examples_project_config") {
