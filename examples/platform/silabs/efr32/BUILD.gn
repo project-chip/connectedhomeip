@@ -30,9 +30,6 @@ declare_args() {
   sl_wfx_config_softap = false
   sl_wfx_config_scan = true
 
-  # Argument to Disable IPv4 for wifi(rs911)
-  chip_enable_wifi_ipv4 = false
-
   # Argument to force enable WPA3 security on rs91x
   rs91x_wpa3_only = false
 
@@ -319,7 +316,7 @@ source_set("efr32-common") {
 
   # Attestation Credentials
   if (chip_build_platform_attestation_credentials_provider) {
-    deps += [ ":efr32-attestation-credentials" ]
+    public_deps += [ ":efr32-attestation-credentials" ]
   }
 
   # Factory Data Provider

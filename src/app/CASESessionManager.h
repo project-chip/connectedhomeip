@@ -85,7 +85,7 @@ public:
                                 Callback::Callback<OnDeviceConnectionFailure> * onFailure
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
                                 ,
-                                uint8_t attemptCount = 1
+                                uint8_t attemptCount = 1, Callback::Callback<OnDeviceConnectionRetry> * onRetry = nullptr
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     );
 

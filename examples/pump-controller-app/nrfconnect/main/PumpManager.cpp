@@ -50,12 +50,12 @@ void PumpManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callba
 
 bool PumpManager::IsActionInProgress()
 {
-    return (mState == kState_StartInitiated || mState == kState_StartInitiated) ? true : false;
+    return (mState == kState_StartInitiated);
 }
 
 bool PumpManager::IsStopped()
 {
-    return (mState == kState_StopCompleted) ? true : false;
+    return (mState == kState_StopCompleted);
 }
 
 void PumpManager::EnableAutoRestart(bool aOn)

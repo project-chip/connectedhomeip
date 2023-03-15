@@ -35,11 +35,13 @@
 #include <lib/support/Base64.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/CASEDestinationId.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/PairingSession.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <protocols/secure_channel/SessionResumptionStorage.h>
+#include <system/SystemClock.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/CryptoContext.h>
 #include <transport/raw/MessageHeader.h>
@@ -174,6 +176,10 @@ public:
     }
 
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
+
+    // Compute our Sigma1 response timeout.  This can give consumers an idea of
+    // how long it will take to detect that our Sigma1 did not get through.
+    static System::Clock::Timeout ComputeSigma1ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig);
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.

@@ -117,6 +117,13 @@
 #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
 
 /**
+ * CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
+ *
+ * Enable recording UTC timestamps.
+ */
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
+
+/**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
  *
  * A size, in bytes, of the individual debug event logging buffer.
@@ -124,7 +131,5 @@
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
 
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
-
-#define CHIP_CONFIG_MAX_DEVICE_ADMINS 4 // 3 fabrics + 1 for rotation slack
 
 #define CHIP_BLE_DEVICE_NAME "MatterLight"

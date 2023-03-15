@@ -94,30 +94,6 @@ enum EmberAfHardwareFaultEnum : uint8_t
     EMBER_ZCL_HARDWARE_FAULT_ENUM_TAMPER_DETECTED           = 10,
 };
 
-// Enum for HueDirection
-enum EmberAfHueDirection : uint8_t
-{
-    EMBER_ZCL_HUE_DIRECTION_SHORTEST_DISTANCE = 0,
-    EMBER_ZCL_HUE_DIRECTION_LONGEST_DISTANCE  = 1,
-    EMBER_ZCL_HUE_DIRECTION_UP                = 2,
-    EMBER_ZCL_HUE_DIRECTION_DOWN              = 3,
-};
-
-// Enum for HueMoveMode
-enum EmberAfHueMoveMode : uint8_t
-{
-    EMBER_ZCL_HUE_MOVE_MODE_STOP = 0,
-    EMBER_ZCL_HUE_MOVE_MODE_UP   = 1,
-    EMBER_ZCL_HUE_MOVE_MODE_DOWN = 3,
-};
-
-// Enum for HueStepMode
-enum EmberAfHueStepMode : uint8_t
-{
-    EMBER_ZCL_HUE_STEP_MODE_UP   = 1,
-    EMBER_ZCL_HUE_STEP_MODE_DOWN = 3,
-};
-
 // Enum for IdentifyEffectIdentifier
 enum EmberAfIdentifyEffectIdentifier : uint8_t
 {
@@ -211,21 +187,6 @@ enum EmberAfRoutingRole : uint8_t
     EMBER_ZCL_ROUTING_ROLE_LEADER            = 6,
 };
 
-// Enum for SaturationMoveMode
-enum EmberAfSaturationMoveMode : uint8_t
-{
-    EMBER_ZCL_SATURATION_MOVE_MODE_STOP = 0,
-    EMBER_ZCL_SATURATION_MOVE_MODE_UP   = 1,
-    EMBER_ZCL_SATURATION_MOVE_MODE_DOWN = 3,
-};
-
-// Enum for SaturationStepMode
-enum EmberAfSaturationStepMode : uint8_t
-{
-    EMBER_ZCL_SATURATION_STEP_MODE_UP   = 1,
-    EMBER_ZCL_SATURATION_STEP_MODE_DOWN = 3,
-};
-
 // Enum for StepMode
 enum EmberAfStepMode : uint8_t
 {
@@ -251,9 +212,3 @@ enum EmberAfStepMode : uint8_t
 #define EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_TIME_OFFSET (2)
 #define EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_START_HUE (8)
 #define EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_START_HUE_OFFSET (3)
-#define EMBER_AF_LEVEL_CONTROL_FEATURE_ON_OFF (1)
-#define EMBER_AF_LEVEL_CONTROL_FEATURE_ON_OFF_OFFSET (0)
-#define EMBER_AF_LEVEL_CONTROL_FEATURE_LIGHTING (2)
-#define EMBER_AF_LEVEL_CONTROL_FEATURE_LIGHTING_OFFSET (1)
-#define EMBER_AF_LEVEL_CONTROL_FEATURE_FREQUENCY (4)
-#define EMBER_AF_LEVEL_CONTROL_FEATURE_FREQUENCY_OFFSET (2)

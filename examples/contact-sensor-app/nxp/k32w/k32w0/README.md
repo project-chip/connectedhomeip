@@ -20,13 +20,13 @@ network.
     -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
 -   [Device UI](#device-ui)
 -   [Building](#building)
-    -   [Known issues](#known-issues)
+    -   [Known issues buiulding](#known-issues-building)
 -   [Manufacturing data](#manufacturing-data)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Pigweed Tokenizer](#pigweed-tokenizer)
     -   [Detokenizer script](#detokenizer-script)
     -   [Notes](#notes)
-    -   [Known issues](#known-issues-1)
+    -   [Known issues tokenizer](#known-issues-tokenizer)
 -   [NXP Ultrafast P256 ECC Library](#nxp-ultrafast-p256-ecc-library)
     -   [Building steps](#building-steps)
 -   [Tinycrypt ECC library](#tinycrypt-ecc-library)
@@ -36,10 +36,10 @@ network.
     -   [Writing the PSECT](#writing-the-psect)
     -   [Writing the application](#writing-the-application)
     -   [OTA Testing](#ota-testing)
-    -   [Known issues](#known-issues-2)
+    -   [Known issues ota](#known-issues-ota)
 -   [Low power](#low-power)
 
-    -   [Known issues](#known-issues-3)
+    -   [Known issues power](#known-issues-low-power)
 
 -   [Removing SSBL Upgrade region](#removing-ssbl-upgrade-region)
 
@@ -177,14 +177,14 @@ In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
 -   Download
-    [K32W061DK6 SDK 2.6.9](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_9_K32W061DK6.zip).
+    [K32W061DK6 SDK 2.6.10](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_10_K32W061DK6.zip).
 
 -   Start building the application either with Secure Element or without
 
     -   without Secure Element
 
     ```
-    user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_9_K32W061DK6/
+    user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_10_K32W061DK6/
     user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
     user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
     user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/contact-sensor-app/nxp/k32w/k32w0
@@ -204,7 +204,7 @@ Secure Element. These can be changed if building without Secure Element
 
     Exactly the same steps as above but set argument build_for_k32w041am=1 in
     the gn command and use
-    [K32W041AMDK6 SDK 2.6.9](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_9_K32W041AMDK6.zip).
+    [K32W041AMDK6 SDK 2.6.10](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_10_K32W041AMDK6.zip).
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
 build argument (chip_with_OM15082) inside the gn build instruction should be set
@@ -233,7 +233,7 @@ pycryptodome           3.9.8
 
 The resulting output file can be found in out/debug/chip-k32w0x-contact-example.
 
-## Known issues
+### Known issues building
 
 -   When using Secure element and cross-compiling on Linux, log messages from
     the Plug&Trust middleware stack may not echo to the console.
@@ -273,8 +273,8 @@ Program the firmware using the official
 [OpenThread Flash Instructions](https://github.com/openthread/ot-nxp/tree/main/src/k32w0/k32w061#flash-binaries).
 
 All you have to do is to replace the Openthread binaries from the above
-documentation with _out/debug/chip-k32w0x-light-example.bin_ if DK6Programmer is
-used or with _out/debug/chip-k32w0x-light-example_ if MCUXpresso is used.
+documentation with _out/debug/chip-k32w0x-contact-example.bin_ if DK6Programmer
+is used or with _out/debug/chip-k32w0x-contact-example_ if MCUXpresso is used.
 
 ## Pigweed tokenizer
 
@@ -325,7 +325,7 @@ detokenizer script to see logs of a contact-sensor app:
 python3 ../../../../../examples/platform/nxp/k32w/k32w0/scripts/detokenizer.py serial -i /dev/ttyACM0 -d out/debug/chip-k32w0x-contact-example-database.bin -o device.txt
 ```
 
-### Known issues
+### Known issues tokenizer
 
 The building process will not update the token database if it already exists. In
 case that new strings are added and the database already exists in the output
@@ -489,12 +489,35 @@ Build the Linux OTA provider application:
 user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota-provider-app chip_config_network_layer_ble=false
 ```
 
-Build OTA image and start the OTA Provider Application:
+Build Linux chip-tool:
 
 ```
-user@computer1:~/connectedhomeip$ : ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 chip-k32w0x-light-example.bin chip-k32w0x-light-example.ota
+user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/chip-tool out/chip-tool-app
+```
+
+Build OTA image:
+
+In order to build an OTA image, use NXP wrapper over the standard tool
+`src/app/ota_image_tool.py`:
+
+-   `scripts/tools/nxp/factory_data_generator/ota_image_tool.py`. The tool can
+    be used to generate an OTA image with the following format:
+    `| OTA image header | TLV1 | TLV2 | ... | TLVn |` where each TLV is in the
+    form `|tag|length|value|`
+
+Note that "standard" TLV format is used. Matter TLV format is only used for
+factory data TLV value. A user can enable the default processors by specifying
+`chip_enable_ota_default_processors=1` in the build command. Please see more in
+the [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
+
+Here is an example that generate an OTA image with factory data and app TLV:
+`user@computer1:~/connectedhomeip$ : ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 -fd --cert_declaration ~/manufacturing/Chip-Test-CD-1037-a220.der -app chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.ota`
+
+Start the OTA Provider Application:
+
+```
 user@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
-user@computer1:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-k32w0x-light-example.ota
+user@computer1:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-k32w0x-contact-example.ota
 ```
 
 A note regarding OTA image header version (`-vn` option). An application binary
@@ -522,7 +545,7 @@ user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool accesscontrol 
 Provision the device and assign node id _2_:
 
 ```
-user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021   3840
+user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021 3840
 ```
 
 Start the OTA process:
@@ -531,7 +554,7 @@ Start the OTA process:
 user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
 ```
 
-## Known issues
+### Known issues ota
 
 -   SRP cache on the openthread border router needs to flushed each time a new
     commissioning process is attempted. For this, factory reset the device, then
@@ -595,7 +618,7 @@ below:
 Please note that that the Power Measurement Tool is not very accurate and
 professional tools must be used if exact power consumption needs to be known.
 
-## Known issues
+### Known issues low power
 
 -   Power Measurement Tool may not work correctly in MCUXpresso versions greater
     that 11.0.1.

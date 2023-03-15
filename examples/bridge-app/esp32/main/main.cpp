@@ -32,6 +32,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/ZclString.h>
+#include <platform/ESP32/ESP32Utils.h>
 
 #include <app/InteractionModelEngine.h>
 #include <app/server/Server.h>
@@ -403,12 +404,26 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
         return;
     }
+    err = esp_event_loop_create_default();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_event_loop_create_default()  failed: %s", esp_err_to_name(err));
+        return;
+    }
 
     CHIP_ERROR chip_err = CHIP_NO_ERROR;
 
     // bridge will have own database named gDevices.
     // Clear database
     memset(gDevices, 0, sizeof(gDevices));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    if (DeviceLayer::Internal::ESP32Utils::InitWiFiStack() != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to initialize the Wi-Fi stack");
+        return;
+    }
+#endif
 
     gLight1.SetReachable(true);
     gLight2.SetReachable(true);

@@ -31,6 +31,7 @@
 #include <lib/core/TLVTypes.h>
 #include <lib/support/FibonacciUtils.h>
 #include <messaging/ReliableMessageMgr.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 
 namespace chip {
 namespace app {
@@ -639,13 +640,7 @@ CHIP_ERROR ReadClient::ProcessAttributePath(AttributePathIB::Parser & aAttribute
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // The ReportData must contain a concrete attribute path
-    err = aAttributePathParser.GetEndpoint(&(aAttributePath.mEndpointId));
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
-    err = aAttributePathParser.GetCluster(&(aAttributePath.mClusterId));
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
-    err = aAttributePathParser.GetAttribute(&(aAttributePath.mAttributeId));
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
-    err = aAttributePathParser.GetListIndex(aAttributePath);
+    err = aAttributePathParser.GetConcreteAttributePath(aAttributePath);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
     return CHIP_NO_ERROR;
 }
@@ -814,11 +809,17 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
         // computing the Ack timeout from the publisher for the ReportData message being sent to us using our IDLE interval as the
         // basis for that computation.
         //
+        // Make sure to use the retransmission computation that includes backoff.  For purposes of that computation, treat us as
+        // active now (since we are right now sending/receiving messages), and use the default "how long are we guaranteed to stay
+        // active" threshold for now.
+        //
         // TODO: We need to find a good home for this logic that will correctly compute this based on transport. For now, this will
         // suffice since we don't use TCP as a transport currently and subscriptions over BLE aren't really a thing.
         //
+        const auto & ourMrpConfig = GetDefaultMRPConfig();
         auto publisherTransmissionTimeout =
-            GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()).mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
+            GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
+                                     System::SystemClock().GetMonotonicTimestamp(), Transport::kMinActiveTime);
         timeout = System::Clock::Seconds16(mMaxInterval) + publisherTransmissionTimeout;
     }
 

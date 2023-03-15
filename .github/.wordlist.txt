@@ -1205,6 +1205,7 @@ SHA
 ShadeConfiguration
 SHAs
 showDocumentation
+showsdks
 shubhamdp
 SIGINT
 SiLabs
@@ -1480,6 +1481,7 @@ xbef
 xc
 xcd
 Xcode
+xcodebuild
 xcodeproj
 xcworkspace
 xd

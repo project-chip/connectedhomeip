@@ -195,19 +195,59 @@ def do_tests(controller_nodeid, device_nodeid, address, timeout, discriminator, 
 
 
 @click.command()
-@click.option("--controller-nodeid", default=TEST_CONTROLLER_NODE_ID, type=int, help="NodeId of the controller.")
-@click.option("--device-nodeid", default=TEST_DEVICE_NODE_ID, type=int, help="NodeId of the device.")
-@click.option("--address", "-a", default='', type=str, help="Skip commissionee discovery, commission the device with the IP directly.")
-@click.option("--timeout", "-t", default=240, type=int, help="The program will return with timeout after specified seconds.")
-@click.option("--discriminator", default=TEST_DISCRIMINATOR, type=int, help="Discriminator of the device.")
-@click.option("--setup-pin", default=TEST_SETUPPIN, type=int, help="Setup pincode of the device.")
-@click.option('--enable-test', default=['all'], type=str, multiple=True, help='The tests to be executed. By default, all tests will be executed, use this option to run a specific set of tests. Use --print-test-list for a list of appliable tests.')
-@click.option('--disable-test', default=[], type=str, multiple=True, help='The tests to be excluded from the set of enabled tests. Use --print-test-list for a list of appliable tests.')
-@click.option('--log-level', default='WARN', type=click.Choice(['ERROR', 'WARN', 'INFO', 'DEBUG']), help="The log level of the test.")
-@click.option('--log-format', default=None, type=str, help="Override logging format")
-@click.option('--print-test-list', is_flag=True, help="Print a list of test cases and test sets that can be toggled via --enable-test and --disable-test, then exit")
-@click.option('--paa-trust-store-path', default='', type=str, help="Path that contains valid and trusted PAA Root Certificates.")
-def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, enable_test, disable_test, log_level, log_format, print_test_list, paa_trust_store_path):
+@click.option("--controller-nodeid",
+              default=TEST_CONTROLLER_NODE_ID,
+              type=int,
+              help="NodeId of the controller.")
+@click.option("--device-nodeid",
+              default=TEST_DEVICE_NODE_ID,
+              type=int,
+              help="NodeId of the device.")
+@click.option("--address", "-a",
+              default='',
+              type=str,
+              help="Skip commissionee discovery, commission the device with the IP directly.")
+@click.option("--timeout", "-t",
+              default=240,
+              type=int,
+              help="The program will return with timeout after specified seconds.")
+@click.option("--discriminator",
+              default=TEST_DISCRIMINATOR,
+              type=int,
+              help="Discriminator of the device.")
+@click.option("--setup-pin",
+              default=TEST_SETUPPIN,
+              type=int,
+              help="Setup pincode of the device.")
+@click.option('--enable-test',
+              default=['all'],
+              type=str,
+              multiple=True,
+              help='The tests to be executed. By default, all tests will be executed, use this option to run a '
+              'specific set of tests. Use --print-test-list for a list of appliable tests.')
+@click.option('--disable-test',
+              default=[],
+              type=str,
+              multiple=True,
+              help='The tests to be excluded from the set of enabled tests. Use --print-test-list for a list of '
+              'appliable tests.')
+@click.option('--log-level',
+              default='WARN',
+              type=click.Choice(['ERROR', 'WARN', 'INFO', 'DEBUG']),
+              help="The log level of the test.")
+@click.option('--log-format',
+              default=None,
+              type=str,
+              help="Override logging format")
+@click.option('--print-test-list',
+              is_flag=True,
+              help="Print a list of test cases and test sets that can be toggled via --enable-test and --disable-test, then exit")
+@click.option('--paa-trust-store-path',
+              default='',
+              type=str,
+              help="Path that contains valid and trusted PAA Root Certificates.")
+def run(controller_nodeid, device_nodeid, address, timeout, discriminator, setup_pin, enable_test, disable_test, log_level,
+        log_format, print_test_list, paa_trust_store_path):
     coloredlogs.install(level=log_level, fmt=log_format, logger=logger)
 
     if print_test_list:

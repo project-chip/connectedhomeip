@@ -31,7 +31,7 @@ declare_args() {
   use_silabs_thread_lib = false
   enable_openthread_cli = true
 
-  kvs_max_entries = 75
+  kvs_max_entries = 255
 
   # Use Silabs factory data provider example.
   # Users can implement their own.
@@ -46,6 +46,9 @@ declare_args() {
 
   # Enable Sleepy end device
   enable_sleepy_device = false
+
+  # Argument to Disable IPv4 for wifi(rs911)
+  chip_enable_wifi_ipv4 = false
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
@@ -76,7 +79,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}",
       "${efr32_sdk_root}/util/plugin/security_manager/",
       "${efr32_sdk_root}/hardware/kit/common/bsp",
-      "${efr32_sdk_root}/app/common/util/app_assert/",
       "${efr32_sdk_root}/hardware/board/inc",
       "${efr32_sdk_root}/hardware/driver/memlcd/inc",
       "${efr32_sdk_root}/hardware/driver/memlcd/src/ls013b7dh03",
@@ -89,7 +91,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/common/inc",
       "${efr32_sdk_root}/platform/emdrv/common/inc",
       "${efr32_sdk_root}/platform/emdrv/gpiointerrupt/inc",
-      "${efr32_sdk_root}/platform/emdrv/dmadrv/config",
       "${efr32_sdk_root}/platform/emdrv/dmadrv/inc",
       "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
       "${efr32_sdk_root}/platform/emdrv/rtcdrv/inc",
@@ -104,15 +105,12 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_pti",
       "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rf_path",
       "${efr32_sdk_root}/platform/service/device_init/inc",
-      "${efr32_sdk_root}/platform/service/hfxo_manager/config/",
       "${efr32_sdk_root}/platform/service/hfxo_manager/inc",
       "${efr32_sdk_root}/platform/service/hfxo_manager/src",
       "${efr32_sdk_root}/platform/service/mpu/inc",
-      "${efr32_sdk_root}/platform/service/power_manager/config/",
       "${efr32_sdk_root}/platform/service/power_manager/inc/",
       "${efr32_sdk_root}/platform/service/power_manager/src/",
       "${efr32_sdk_root}/platform/service/sleeptimer/inc",
-      "${efr32_sdk_root}/platform/service/sleeptimer/config",
       "${efr32_sdk_root}/platform/service/system/inc",
       "${efr32_sdk_root}/platform/service/udelay/inc",
       "${efr32_sdk_root}/platform/service/legacy_hal/inc",
@@ -129,8 +127,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/base/hal/plugin/psstore",
       "${efr32_sdk_root}/platform/base/hal/plugin/antenna",
       "${efr32_sdk_root}/protocol/bluetooth/inc/",
-      "${efr32_sdk_root}/app/bluetooth/common/in_place_ota_dfu/",
-      "${efr32_sdk_root}/app/bluetooth/common/in_place_ota_dfu/config/",
       "${efr32_sdk_root}/util/plugin/plugin-common/fem-control",
       "${efr32_sdk_root}/util/silicon_labs/silabs_core/graphics",
       "${efr32_sdk_root}/util/silicon_labs/silabs_core/memory_manager",
@@ -204,6 +200,9 @@ template("efr32_sdk") {
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
+      if (chip_enable_wifi_ipv4) {
+        defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
+      }
       if (use_rs9116 || use_SiWx917) {
         defines += [
           "SL_HEAP_SIZE=32768",
@@ -348,10 +347,7 @@ template("efr32_sdk") {
       ]
 
       if (!chip_enable_ble_rs911x) {
-        libs += [
-          "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/binapploader.o",
-          "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/libbluetooth.a",
-        ]
+        libs += [ "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG12P/GCC/libbluetooth.a" ]
       }
 
       defines += [ "EFR32MG12" ]
@@ -366,7 +362,6 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG21/GCC/binapploader.o",
         "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG21/GCC/libbluetooth.a",
         "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg21_gcc_release.a",
         "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
@@ -388,7 +383,6 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG24/GCC/libapploader.a",
         "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG24/GCC/libbluetooth.a",
         "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_efr32xg24_gcc_release.a",
         "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
@@ -411,7 +405,6 @@ template("efr32_sdk") {
       ]
 
       libs += [
-        "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG24/GCC/libapploader.a",
         "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG24/GCC/libbluetooth.a",
         "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
         "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
@@ -489,7 +482,6 @@ template("efr32_sdk") {
   source_set(sdk_target_name) {
     sources = [
       "${chip_root}/third_party/mbedtls/repo/include/mbedtls/platform.h",
-      "${efr32_sdk_root}/app/bluetooth/common/in_place_ota_dfu/sl_bt_in_place_ota_dfu.c",
       "${efr32_sdk_root}/hardware/board/src/sl_board_control_gpio.c",
       "${efr32_sdk_root}/hardware/board/src/sl_board_init.c",
       "${efr32_sdk_root}/platform/CMSIS/RTOS2/Source/os_systick.c",
@@ -781,7 +773,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_emu_s1.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_s1.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s1.c",
-        "${efr32_sdk_root}/protocol/bluetooth/src/sl_apploader_util_s1.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM4F/port.c",
       ]
     } else if (silabs_family == "efr32mg21") {
@@ -859,7 +850,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s2.c",
         "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager_hal_s2.c",
-        "${efr32_sdk_root}/protocol/bluetooth/src/sl_apploader_util_s2.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
       ]
@@ -898,7 +888,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_hfxo_mgm24.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfxo_s2.c",
         "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager_hal_s2.c",
-        "${efr32_sdk_root}/protocol/bluetooth/src/sl_apploader_util_s2.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
       ]

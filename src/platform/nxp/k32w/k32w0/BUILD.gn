@@ -28,9 +28,7 @@ static_library("k32w0") {
   sources = [
     "../../../SingletonConfigurationManager.cpp",
     "../common/RamStorage.cpp",
-    "../common/RamStorage.h",
     "../common/RamStorageKey.cpp",
-    "../common/RamStorageKey.h",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
@@ -61,6 +59,8 @@ static_library("k32w0") {
     "${chip_root}/src/credentials/examples/DeviceAttestationCredsExample.h",
     "${chip_root}/src/credentials/examples/ExampleDACs.h",
     "${chip_root}/src/credentials/examples/ExamplePAI.h",
+    "../common/RamStorage.h",
+    "../common/RamStorageKey.h",
   ]
 
   if (chip_with_factory_data == 1) {
@@ -79,10 +79,31 @@ static_library("k32w0") {
   }
 
   if (chip_enable_ota_requestor) {
+    public += [ "../common/OTAImageProcessorImpl.h" ]
+
     sources += [
-      "OTAImageProcessorImpl.cpp",
-      "OTAImageProcessorImpl.h",
+      "../common/OTAImageProcessorImpl.cpp",
+      "../common/OTAImageProcessorImpl.h",
+      "../common/OTATlvProcessor.cpp",
+      "../common/OTATlvProcessor.h",
     ]
+
+    if (chip_enable_ota_default_processors == 1) {
+      sources += [
+        "OTAApplicationProcessor.cpp",
+        "OTAApplicationProcessor.h",
+        "OTABootloaderProcessor.cpp",
+        "OTABootloaderProcessor.h",
+        "OTAHooks.cpp",
+      ]
+
+      if (chip_with_factory_data == 1) {
+        sources += [
+          "OTAFactoryDataProcessor.cpp",
+          "OTAFactoryDataProcessor.h",
+        ]
+      }
+    }
   }
 
   deps = []

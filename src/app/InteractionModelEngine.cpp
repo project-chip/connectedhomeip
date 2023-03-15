@@ -74,6 +74,8 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
 void InteractionModelEngine::Shutdown()
 {
+    mpExchangeMgr->GetSessionManager()->SystemLayer()->CancelTimer(ResumeSubscriptionsTimerCallback, this);
+
     CommandHandlerInterface * handlerIter = mCommandHandlerList;
 
     //
@@ -251,14 +253,18 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
 
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(const ScopedNodeId & aPeerNodeId, SubscriptionId aSubscriptionId)
 {
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    assertChipStackLockedByCurrentThread();
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
     {
+        // Grab the next client now, because we might be about to delete readClient.
+        auto * nextClient = readClient->GetNextClient();
         if (readClient->IsSubscriptionType() && readClient->IsMatchingSubscriptionId(aSubscriptionId) &&
             readClient->GetFabricIndex() == aPeerNodeId.GetFabricIndex() && readClient->GetPeerNodeId() == aPeerNodeId.GetNodeId())
         {
             readClient->Close(CHIP_NO_ERROR);
             return CHIP_NO_ERROR;
         }
+        readClient = nextClient;
     }
 
     return CHIP_ERROR_KEY_NOT_FOUND;
@@ -266,15 +272,18 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscription(const ScopedNodeId & aPe
 
 void InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
 {
+    assertChipStackLockedByCurrentThread();
     ShutdownMatchingSubscriptions(MakeOptional(aFabricIndex), MakeOptional(aPeerNodeId));
 }
 void InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex)
 {
+    assertChipStackLockedByCurrentThread();
     ShutdownMatchingSubscriptions(MakeOptional(aFabricIndex));
 }
 
 void InteractionModelEngine::ShutdownAllSubscriptions()
 {
+    assertChipStackLockedByCurrentThread();
     ShutdownMatchingSubscriptions();
 }
 
@@ -1591,33 +1600,89 @@ CHIP_ERROR InteractionModelEngine::ResumeSubscriptions()
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
     ReturnErrorCodeIf(!mpSubscriptionResumptionStorage, CHIP_NO_ERROR);
 
+    // To avoid the case of a reboot loop causing rapid traffic generation / power consumption, subscription resumption should make
+    // use of the persisted min-interval values, and wait before resumption. Ideally, each persisted subscription should wait their
+    // own min-interval value before resumption, but that both A) potentially runs into a timer resource issue, and B) having a
+    // low-powered device wake many times also has energy use implications. The logic below waits the largest of the persisted
+    // min-interval values before resuming subscriptions.
+
+    // Even though this causes subscription-to-subscription interaction by linking the min-interval values, this is the right thing
+    // to do for now because it's both simple and avoids the timer resource and multiple-wake problems. This issue is to track
+    // future improvements: https://github.com/project-chip/connectedhomeip/issues/25439
+
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
-    auto * iterator = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    auto * iterator           = mpSubscriptionResumptionStorage->IterateSubscriptions();
+    int subscriptionsToResume = 0;
+    uint16_t minInterval      = 0;
     while (iterator->Next(subscriptionInfo))
     {
+        subscriptionsToResume++;
+        minInterval = std::max(minInterval, subscriptionInfo.mMinInterval);
+    }
+    iterator->Release();
+
+    if (subscriptionsToResume)
+    {
+        ChipLogProgress(InteractionModel, "Resuming %d subscriptions in %u seconds", subscriptionsToResume, minInterval);
+        ReturnErrorOnFailure(mpExchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(System::Clock::Seconds16(minInterval),
+                                                                                           ResumeSubscriptionsTimerCallback, this));
+    }
+    else
+    {
+        ChipLogProgress(InteractionModel, "No subscriptions to resume");
+    }
+#endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+
+    return CHIP_NO_ERROR;
+}
+
+void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * apSystemLayer, void * apAppState)
+{
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    VerifyOrReturn(apAppState != nullptr);
+    InteractionModelEngine * imEngine = static_cast<InteractionModelEngine *>(apAppState);
+    SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
+    auto * iterator = imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions();
+    while (iterator->Next(subscriptionInfo))
+    {
+        // If subscription happens between reboot and this timer callback, it's already live and should skip resumption
+        if (Loop::Break == imEngine->mReadHandlers.ForEachActiveObject([&](ReadHandler * handler) {
+                SubscriptionId subscriptionId;
+                handler->GetSubscriptionId(subscriptionId);
+                if (subscriptionId == subscriptionInfo.mSubscriptionId)
+                {
+                    return Loop::Break;
+                }
+                return Loop::Continue;
+            }))
+        {
+            ChipLogProgress(InteractionModel, "Skip resuming live subscriptionId %" PRIu32, subscriptionInfo.mSubscriptionId);
+            continue;
+        }
+
         auto requestedAttributePathCount = subscriptionInfo.mAttributePaths.AllocatedSize();
         auto requestedEventPathCount     = subscriptionInfo.mEventPaths.AllocatedSize();
-        if (!EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, requestedAttributePathCount, requestedEventPathCount))
+        if (!imEngine->EnsureResourceForSubscription(subscriptionInfo.mFabricIndex, requestedAttributePathCount,
+                                                     requestedEventPathCount))
         {
             ChipLogProgress(InteractionModel, "no resource for Subscription resumption");
             iterator->Release();
-            return CHIP_ERROR_NO_MEMORY;
+            return;
         }
 
-        ReadHandler * handler = mReadHandlers.CreateObject(*this);
+        ReadHandler * handler = imEngine->mReadHandlers.CreateObject(*imEngine);
         if (handler == nullptr)
         {
             ChipLogProgress(InteractionModel, "no resource for ReadHandler creation");
             iterator->Release();
-            return CHIP_ERROR_NO_MEMORY;
+            return;
         }
 
-        handler->ResumeSubscription(*mpCASESessionMgr, subscriptionInfo);
+        ChipLogProgress(InteractionModel, "Resuming subscriptionId %" PRIu32, subscriptionInfo.mSubscriptionId);
+        handler->ResumeSubscription(*imEngine->mpCASESessionMgr, subscriptionInfo);
     }
     iterator->Release();
 #endif // CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-
-    return CHIP_NO_ERROR;
 }
 
 } // namespace app

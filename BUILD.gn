@@ -668,10 +668,19 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   if (enable_tizen_lighting_app) {
     group("tizen_lighting_app") {
-      deps = [ "${chip_root}/examples/lighting-app/tizen/(${chip_root}/build/toolchain/tizen:tizen_arm)" ]
+      deps = [ "${chip_root}/examples/lighting-app/tizen(${chip_root}/build/toolchain/tizen:tizen_arm)" ]
     }
 
     extra_build_deps += [ ":tizen_lighting_app" ]
+  }
+
+  if (enable_tizen_builds) {
+    group("check:tizen") {
+      testonly = true
+      deps = [ "${chip_root}/src/test_driver/tizen/integration-tests:check" ]
+    }
+
+    extra_check_deps += [ ":check:tizen" ]
   }
 
   if (enable_mw320_shell_build) {
@@ -703,6 +712,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   }
 
   group("check") {
+    testonly = true
     deps = extra_check_deps
     foreach(_build, builds) {
       deps += [ get_label_info(_build, "dir") + ":check_" +

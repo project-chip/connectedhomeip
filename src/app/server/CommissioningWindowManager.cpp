@@ -25,6 +25,10 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceControlServer.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_THREAD_FTD
+using namespace chip::DeviceLayer;
+#endif
+
 using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
 
@@ -107,6 +111,15 @@ void CommissioningWindowManager::ResetState()
 #endif
 
     UpdateWindowStatus(CommissioningWindowStatusEnum::kWindowNotOpen);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_THREAD_FTD
+    // Recover Router device role.
+    if (mRecoverRouterDeviceRole)
+    {
+        ThreadStackMgr().SetRouterPromotion(true);
+        mRecoverRouterDeviceRole = false;
+    }
+#endif
 
     UpdateOpenerFabricIndex(NullNullable);
     UpdateOpenerVendorId(NullNullable);
@@ -221,6 +234,17 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow(Seconds16 commiss
 
     mCommissioningTimeoutTimerArmed = true;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_DEVICE_CONFIG_THREAD_FTD
+    // Block device role changing into Router if commissioning window opened and device not yet Router.
+    // AdvertiseAndListenForPASE fails doesn't matter, because if it does the callers of OpenCommissioningWindow
+    // will end up calling ResetState, which will reset the boolean.
+    if (ConnectivityManagerImpl().GetThreadDeviceType() == ConnectivityManager::kThreadDeviceType_Router)
+    {
+        ThreadStackMgr().SetRouterPromotion(false);
+        mRecoverRouterDeviceRole = true;
+    }
+#endif
+
     return AdvertiseAndListenForPASE();
 }
 
@@ -239,7 +263,7 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
 #endif
 
     ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
-        Protocols::SecureChannel::MsgType::PBKDFParamRequest, &mPairingSession));
+        Protocols::SecureChannel::MsgType::PBKDFParamRequest, this));
     mListeningForPASE = true;
 
     if (mUseECM)
@@ -582,6 +606,34 @@ void CommissioningWindowManager::UpdateOpenerFabricIndex(Nullable<FabricIndex> a
     }
 
     mOpenerFabricIndex = aNewOpenerFabricIndex;
+}
+
+CHIP_ERROR CommissioningWindowManager::OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
+                                                                    Messaging::ExchangeDelegate *& newDelegate)
+{
+    using Protocols::SecureChannel::MsgType;
+
+    // Must be a PBKDFParamRequest message.  Stop listening to new
+    // PBKDFParamRequest messages and hand it off to mPairingSession.  If
+    // mPairingSession's OnMessageReceived fails, it will call our
+    // OnSessionEstablishmentError, and that will either start listening for a
+    // new PBKDFParamRequest or not, depending on how many failures we had seen.
+    //
+    // It's very important that we stop listening here, so that new incoming
+    // PASE establishment attempts don't interrupt our existing establishment.
+    mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(MsgType::PBKDFParamRequest);
+    newDelegate = &mPairingSession;
+    return CHIP_NO_ERROR;
+}
+
+void CommissioningWindowManager::OnExchangeCreationFailed(Messaging::ExchangeDelegate * delegate)
+{
+    using Protocols::SecureChannel::MsgType;
+
+    // We couldn't create an exchange, so didn't manage to call
+    // OnMessageReceived on mPairingSession.  Just go back to listening for
+    // PBKDFParamRequest messages.
+    mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(MsgType::PBKDFParamRequest, this);
 }
 
 } // namespace chip

@@ -75,7 +75,4 @@
    <xi:include href="draft/electrical-measurement-cluster.xml" />
    <xi:include href="draft/input-output-value-clusters.xml" />
    <xi:include href="draft/onoff-switch-configuration-cluster.xml" />
-   <xi:include href="silabs/ha-devices.xml" />
-   <xi:include href="silabs/lo-devices.xml" />
-   <xi:include href="silabs/zll-devices.xml" />
 </all>

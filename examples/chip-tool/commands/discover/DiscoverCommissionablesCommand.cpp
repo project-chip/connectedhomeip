@@ -17,6 +17,7 @@
  */
 
 #include "DiscoverCommissionablesCommand.h"
+#include <commands/common/DeviceScanner.h>
 #include <commands/common/RemoteDataModelLogger.h>
 #include <lib/support/BytesToHex.h>
 
@@ -30,9 +31,36 @@ void DiscoverCommissionablesCommandBase::OnDiscoveredDevice(const chip::Dnssd::D
     if (mDiscoverOnce.ValueOr(true))
     {
         mCommissioner->RegisterDeviceDiscoveryDelegate(nullptr);
-        mCommissioner->StopCommissionableDiscovery();
-        SetCommandExitStatus(CHIP_NO_ERROR);
+        auto err = mCommissioner->StopCommissionableDiscovery();
+        SetCommandExitStatus(err);
     }
+}
+
+CHIP_ERROR DiscoverCommissionablesStartCommand::RunCommand()
+{
+    VerifyOrReturnError(IsInteractive(), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(GetDeviceScanner().Start());
+
+    SetCommandExitStatus(CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiscoverCommissionablesStopCommand::RunCommand()
+{
+    VerifyOrReturnError(IsInteractive(), CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(GetDeviceScanner().Stop());
+
+    SetCommandExitStatus(CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiscoverCommissionablesListCommand::RunCommand()
+{
+    VerifyOrReturnError(IsInteractive(), CHIP_ERROR_INCORRECT_STATE);
+    GetDeviceScanner().Log();
+
+    SetCommandExitStatus(CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiscoverCommissionablesCommand::RunCommand()

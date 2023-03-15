@@ -18,8 +18,8 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/tools.gni")
 
-java_binary("java-matter-controller") {
-  output_name = "java-matter-controller"
+java_library("java") {
+  output_name = "JavaMatterController.jar"
   deps = [
     "${chip_root}/src/controller/java",
     "${chip_root}/src/setup_payload/java",
@@ -27,43 +27,63 @@ java_binary("java-matter-controller") {
   ]
 
   sources = [
-    "java/src/com/matter/controller/Main.java",
-    "java/src/com/matter/controller/commands/common/Argument.java",
-    "java/src/com/matter/controller/commands/common/ArgumentType.java",
-    "java/src/com/matter/controller/commands/common/Command.java",
-    "java/src/com/matter/controller/commands/common/CommandManager.java",
-    "java/src/com/matter/controller/commands/common/CredentialsIssuer.java",
     "java/src/com/matter/controller/commands/common/FutureResult.java",
-    "java/src/com/matter/controller/commands/common/IPAddress.java",
-    "java/src/com/matter/controller/commands/common/MatterCommand.java",
     "java/src/com/matter/controller/commands/common/RealResult.java",
-    "java/src/com/matter/controller/commands/discover/DiscoverCommand.java",
-    "java/src/com/matter/controller/commands/discover/DiscoverCommissionablesCommand.java",
-    "java/src/com/matter/controller/commands/discover/DiscoverCommissionersCommand.java",
-    "java/src/com/matter/controller/commands/pairing/CloseSessionCommand.java",
-    "java/src/com/matter/controller/commands/pairing/DiscoveryFilterType.java",
-    "java/src/com/matter/controller/commands/pairing/PairAddressPaseCommand.java",
-    "java/src/com/matter/controller/commands/pairing/PairAlreadyDiscoveredCommand.java",
-    "java/src/com/matter/controller/commands/pairing/PairCodeCommand.java",
-    "java/src/com/matter/controller/commands/pairing/PairCodePaseCommand.java",
-    "java/src/com/matter/controller/commands/pairing/PairCodeThreadCommand.java",
-    "java/src/com/matter/controller/commands/pairing/PairCodeWifiCommand.java",
-    "java/src/com/matter/controller/commands/pairing/PairOnNetworkCommand.java",
-    "java/src/com/matter/controller/commands/pairing/PairOnNetworkCommissionerCommand.java",
-    "java/src/com/matter/controller/commands/pairing/PairOnNetworkCommissioningModeCommand.java",
-    "java/src/com/matter/controller/commands/pairing/PairOnNetworkDeviceTypeCommand.java",
-    "java/src/com/matter/controller/commands/pairing/PairOnNetworkFabricCommand.java",
-    "java/src/com/matter/controller/commands/pairing/PairOnNetworkInstanceNameCommand.java",
-    "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongCommand.java",
-    "java/src/com/matter/controller/commands/pairing/PairOnNetworkShortCommand.java",
-    "java/src/com/matter/controller/commands/pairing/PairOnNetworkVendorCommand.java",
-    "java/src/com/matter/controller/commands/pairing/PairingCommand.java",
-    "java/src/com/matter/controller/commands/pairing/PairingModeType.java",
-    "java/src/com/matter/controller/commands/pairing/PairingNetworkType.java",
-    "java/src/com/matter/controller/commands/pairing/UnpairCommand.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
+}
+
+kotlin_binary("java-matter-controller") {
+  output_name = "java-matter-controller"
+  deps = [
+    ":java",
+    "${chip_root}/src/controller/java:tlv_read_write_test",
+    "${chip_root}/src/controller/java:tlv_reader_test",
+    "${chip_root}/src/controller/java:tlv_writer_test",
+    "${chip_root}/third_party/java_deps:kotlin-stdlib",
+  ]
+
+  sources = [
+    "java/src/com/matter/controller/Main.kt",
+    "java/src/com/matter/controller/commands/common/Argument.kt",
+    "java/src/com/matter/controller/commands/common/ArgumentType.kt",
+    "java/src/com/matter/controller/commands/common/Command.kt",
+    "java/src/com/matter/controller/commands/common/CommandManager.kt",
+    "java/src/com/matter/controller/commands/common/CredentialsIssuer.kt",
+    "java/src/com/matter/controller/commands/common/IPAddress.kt",
+    "java/src/com/matter/controller/commands/common/MatterCommand.kt",
+    "java/src/com/matter/controller/commands/discover/DiscoverCommand.kt",
+    "java/src/com/matter/controller/commands/discover/DiscoverCommissionablesCommand.kt",
+    "java/src/com/matter/controller/commands/discover/DiscoverCommissionersCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/CloseSessionCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/DiscoveryFilterType.kt",
+    "java/src/com/matter/controller/commands/pairing/PairAddressPaseCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairAlreadyDiscoveredCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairCodeCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairCodePaseCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairCodeThreadCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairCodeWifiCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkCommissionerCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkCommissioningModeCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkDeviceTypeCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkFabricCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkInstanceNameCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImInvokeCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImReadCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImSubscribeCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImWriteCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkShortCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkVendorCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairingCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairingModeType.kt",
+    "java/src/com/matter/controller/commands/pairing/PairingNetworkType.kt",
+    "java/src/com/matter/controller/commands/pairing/UnpairCommand.kt",
+  ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
 }
 
 group("default") {

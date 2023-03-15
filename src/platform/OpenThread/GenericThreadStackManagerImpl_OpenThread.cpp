@@ -482,7 +482,8 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
         scanResponse.lqi             = aResult->mLqi;
         scanResponse.extendedAddress = Encoding::BigEndian::Get64(aResult->mExtAddress.m8);
         scanResponse.extendedPanId   = Encoding::BigEndian::Get64(aResult->mExtendedPanId.m8);
-        scanResponse.networkNameLen  = strnlen(aResult->mNetworkName.m8, OT_NETWORK_NAME_MAX_SIZE);
+        static_assert(OT_NETWORK_NAME_MAX_SIZE <= UINT8_MAX, "Network name length won't fit");
+        scanResponse.networkNameLen = static_cast<uint8_t>(strnlen(aResult->mNetworkName.m8, OT_NETWORK_NAME_MAX_SIZE));
         memcpy(scanResponse.networkName, aResult->mNetworkName.m8, scanResponse.networkNameLen);
 
         mScanResponseIter.Add(&scanResponse);
@@ -1168,7 +1169,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
                 }
                 else
                 {
-                    lastRssi.SetNonNull(((neighInfo.mLastRssi > 0) ? 0 : neighInfo.mLastRssi));
+                    lastRssi.SetNonNull(min(static_cast<int8_t>(0), neighInfo.mLastRssi));
                 }
 
                 neighborTable.averageRssi      = averageRssi;
@@ -1692,6 +1693,19 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPollPeriod(u
     buf = otLinkGetPollPeriod(mOTInst);
     Impl()->UnlockThreadStack();
     return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetRouterPromotion(bool val)
+{
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+    Impl()->LockThreadStack();
+    if (otThreadGetDeviceRole(DeviceLayer::ThreadStackMgrImpl().OTInstance()) != OT_DEVICE_ROLE_ROUTER)
+    {
+        otThreadSetRouterEligible(DeviceLayer::ThreadStackMgrImpl().OTInstance(), val);
+    }
+    Impl()->UnlockThreadStack();
+#endif
 }
 
 template <class ImplClass>

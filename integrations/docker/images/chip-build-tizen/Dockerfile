@@ -19,6 +19,7 @@ RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
     cpio \
+    libncurses5 \
     obs-build \
     openjdk-8-jre-headless \
     wget \
@@ -30,7 +31,7 @@ RUN set -x \
 
 # ------------------------------------------------------------------------------
 # Install tizen
-ENV TIZEN_VERSION 6.0
+ENV TIZEN_VERSION 7.0
 ENV TIZEN_SDK_ROOT /opt/tizen-sdk
 
 COPY tizen-sdk-installer $TIZEN_SDK_ROOT/files/installer

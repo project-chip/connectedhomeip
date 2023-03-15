@@ -338,9 +338,9 @@ DLL_EXPORT void SetLogFilter(uint8_t category);
 static constexpr uint16_t kMaxModuleNameLen = 3;
 
 #if CHIP_LOG_FILTERING
-DLL_LOCAL bool IsCategoryEnabled(uint8_t category);
+bool IsCategoryEnabled(uint8_t category);
 #else  // CHIP_LOG_FILTERING
-DLL_LOCAL inline bool IsCategoryEnabled(uint8_t category)
+inline bool IsCategoryEnabled(uint8_t category)
 {
     return true;
 }
@@ -395,9 +395,9 @@ DLL_LOCAL inline bool IsCategoryEnabled(uint8_t category)
 #define _IsModuleCategoryEnabled3(DUMMY_ARG, GLOB_CAT) _IsModuleCategoryEnabled4(DUMMY_ARG 0, GLOB_CAT)
 #define _IsModuleCategoryEnabled4(ARG1, ARG2, ...) (ARG2)
 
-DLL_LOCAL void Log(uint8_t module, uint8_t category, const char * msg, ...) ENFORCE_FORMAT(3, 4);
-DLL_LOCAL void LogByteSpan(uint8_t module, uint8_t category, const ByteSpan & span);
-DLL_LOCAL void LogV(uint8_t module, uint8_t category, const char * msg, va_list args) ENFORCE_FORMAT(3, 0);
+void Log(uint8_t module, uint8_t category, const char * msg, ...) ENFORCE_FORMAT(3, 4);
+void LogByteSpan(uint8_t module, uint8_t category, const ByteSpan & span);
+void LogV(uint8_t module, uint8_t category, const char * msg, va_list args) ENFORCE_FORMAT(3, 0);
 
 #if CHIP_SYSTEM_CONFIG_PLATFORM_LOG
 #ifndef ChipPlatformLog

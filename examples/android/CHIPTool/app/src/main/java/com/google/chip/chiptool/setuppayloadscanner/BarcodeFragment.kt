@@ -38,6 +38,8 @@ import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
 import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
+import chip.setuppayload.SetupPayloadParser.SetupPayloadException
+import chip.setuppayload.SetupPayloadParser.InvalidEntryCodeFormatException
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.SelectActionFragment
@@ -181,14 +183,23 @@ class BarcodeFragment : Fragment() {
 
     private fun handleInputQrCode(qrCode: String) {
         lateinit var payload: SetupPayload
+        var isShortDiscriminator = false
         try {
             payload = SetupPayloadParser().parseQrCode(qrCode)
+        } catch (ex: SetupPayloadException) {
+            try {
+                payload = SetupPayloadParser().parseManualEntryCode(qrCode)
+                isShortDiscriminator = true
+            } catch (ex: Exception) {
+                Log.e(TAG, "Unrecognized Manual Pairing Code", ex)
+                Toast.makeText(requireContext(), "Unrecognized Manual Pairing Code", Toast.LENGTH_SHORT).show()
+            }
         } catch (ex: UnrecognizedQrCodeException) {
             Log.e(TAG, "Unrecognized QR Code", ex)
             Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
         }
         FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
-            ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
+            ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload, isShortDiscriminator))
     }
 
     private fun handleScannedQrCode(barcode: Barcode) {

@@ -90,7 +90,7 @@ def get_hdlc_rpc_client(device: str, baudrate: int, output: Any, **kwargs):
 def runner(client) -> int:
     """ Run the tests"""
     def on_error_callback(call_object, error):
-        raise Exception("Error running test RPC: {}".format(status))
+        raise Exception("Error running test RPC: {}".format(error))
 
     rpc = client.client.channel(1).rpcs.chip.rpc.NlTest.Run
     invoke = rpc.invoke(rpc.request(), on_error=on_error_callback)

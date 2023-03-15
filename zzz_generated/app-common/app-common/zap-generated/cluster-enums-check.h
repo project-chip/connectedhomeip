@@ -374,9 +374,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateReques
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(TimeFormatLocalization::CalendarType val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TimeFormatLocalization::CalendarTypeEnum val)
 {
-    using EnumType = TimeFormatLocalization::CalendarType;
+    using EnumType = TimeFormatLocalization::CalendarTypeEnum;
     switch (val)
     {
     case EnumType::kBuddhist:
@@ -396,9 +396,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(TimeFormatLocalization:
         return static_cast<EnumType>(12);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(TimeFormatLocalization::HourFormat val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(TimeFormatLocalization::HourFormatEnum val)
 {
-    using EnumType = TimeFormatLocalization::HourFormat;
+    using EnumType = TimeFormatLocalization::HourFormatEnum;
     switch (val)
     {
     case EnumType::k12hr:
@@ -1762,19 +1762,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::HueDirect
     using EnumType = ColorControl::HueDirection;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kShortestDistance:
     case EnumType::kLongestDistance:
     case EnumType::kUp:
     case EnumType::kDown:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_HUE_DIRECTION_SHORTEST_DISTANCE:
-    case EMBER_ZCL_HUE_DIRECTION_LONGEST_DISTANCE:
-    case EMBER_ZCL_HUE_DIRECTION_UP:
-    case EMBER_ZCL_HUE_DIRECTION_DOWN:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(4);
@@ -1785,17 +1776,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::HueMoveMo
     using EnumType = ColorControl::HueMoveMode;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kStop:
     case EnumType::kUp:
     case EnumType::kDown:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_HUE_MOVE_MODE_STOP:
-    case EMBER_ZCL_HUE_MOVE_MODE_UP:
-    case EMBER_ZCL_HUE_MOVE_MODE_DOWN:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(2);
@@ -1806,15 +1789,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::HueStepMo
     using EnumType = ColorControl::HueStepMode;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kUp:
     case EnumType::kDown:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_HUE_STEP_MODE_UP:
-    case EMBER_ZCL_HUE_STEP_MODE_DOWN:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(0);
@@ -1825,17 +1801,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::Saturatio
     using EnumType = ColorControl::SaturationMoveMode;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kStop:
     case EnumType::kUp:
     case EnumType::kDown:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_SATURATION_MOVE_MODE_STOP:
-    case EMBER_ZCL_SATURATION_MOVE_MODE_UP:
-    case EMBER_ZCL_SATURATION_MOVE_MODE_DOWN:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(2);
@@ -1846,15 +1814,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::Saturatio
     using EnumType = ColorControl::SaturationStepMode;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kUp:
     case EnumType::kDown:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_SATURATION_STEP_MODE_UP:
-    case EMBER_ZCL_SATURATION_STEP_MODE_DOWN:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(0);

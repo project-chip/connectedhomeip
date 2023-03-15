@@ -34,7 +34,7 @@
 
 /* QSPI clock config params */
 #define INTF_PLL_500_CTRL_VALUE 0xD900
-#define INTF_PLL_CLK 160000000 /* PLL out clock 160MHz */
+#define INTF_PLL_CLK 80000000 /* PLL out clock 80 MHz */
 
 #define PMU_GOOD_TIME 31  /*Duration in us*/
 #define XTAL_GOOD_TIME 31 /*Duration in us*/

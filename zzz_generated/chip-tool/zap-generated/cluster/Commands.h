@@ -9677,13 +9677,13 @@ void registerClusterTimeFormatLocalization(Commands & commands, CredentialIssuer
         make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                          //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),                //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                  //
-        make_unique<WriteAttribute<chip::app::Clusters::TimeFormatLocalization::HourFormat>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TimeFormatLocalization::HourFormatEnum>>(
             Id, "hour-format", 0, UINT8_MAX, Attributes::HourFormat::Id, WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::TimeFormatLocalization::CalendarType>>(
+        make_unique<WriteAttribute<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum>>(
             Id, "active-calendar-type", 0, UINT8_MAX, Attributes::ActiveCalendarType::Id, WriteCommandType::kWrite,
             credsIssuerConfig), //
-        make_unique<
-            WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::TimeFormatLocalization::CalendarType>>>(
+        make_unique<WriteAttributeAsComplex<
+            chip::app::DataModel::List<const chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum>>>(
             Id, "supported-calendar-types", Attributes::SupportedCalendarTypes::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(

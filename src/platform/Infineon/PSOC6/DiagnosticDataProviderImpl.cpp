@@ -245,9 +245,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wiFiVersion)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    using app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum;
+
     wl_bss_info_t bss_info;
     whd_security_t security;
     cy_rslt_t result = CY_RSLT_SUCCESS;
@@ -256,27 +257,26 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wiFiVersion)
     if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "whd_wifi_get_ap_info failed: %d", (int) result);
-        SuccessOrExit(CHIP_ERROR_INTERNAL);
+        return CHIP_ERROR_INTERNAL;
     }
 
     /* VHT Capable */
     if (bss_info.vht_cap)
     {
-        wiFiVersion = to_underlying(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kAc);
+        wiFiVersion = WiFiVersionEnum::kAc;
     }
     /* HT Capable */
     else if (bss_info.n_cap)
     {
-        wiFiVersion = to_underlying(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kN);
+        wiFiVersion = WiFiVersionEnum::kN;
     }
     /* 11g Capable */
     else
     {
-        wiFiVersion = to_underlying(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kG);
+        wiFiVersion = WiFiVersionEnum::kG;
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)

@@ -47,7 +47,9 @@ CHIP_ERROR GetConfiguredNetwork(Network & network)
     {
         return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
     }
-    uint8_t length = strnlen(reinterpret_cast<const char *>(ap_info.ssid), DeviceLayer::Internal::kMaxWiFiSSIDLength);
+    static_assert(chip::DeviceLayer::Internal::kMaxWiFiSSIDLength <= UINT8_MAX, "SSID length might not fit in length");
+    uint8_t length =
+        static_cast<uint8_t>(strnlen(reinterpret_cast<const char *>(ap_info.ssid), DeviceLayer::Internal::kMaxWiFiSSIDLength));
     if (length > sizeof(network.networkID))
     {
         return CHIP_ERROR_INTERNAL;
@@ -75,8 +77,17 @@ CHIP_ERROR ESPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     {
         return CHIP_NO_ERROR;
     }
-    mSavedNetwork.credentialsLen = credentialsLen;
-    mSavedNetwork.ssidLen        = ssidLen;
+    if (!CanCastTo<uint8_t>(credentialsLen))
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    mSavedNetwork.credentialsLen = static_cast<uint8_t>(credentialsLen);
+
+    if (!CanCastTo<uint8_t>(ssidLen))
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    mSavedNetwork.ssidLen = static_cast<uint8_t>(ssidLen);
 
     mStagingNetwork        = mSavedNetwork;
     mpScanCallback         = nullptr;
@@ -359,9 +370,14 @@ void ESPWiFiDriver::OnNetworkStatusChange()
             Status::kSuccess, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)), NullOptional);
         return;
     }
+
+    // The disconnect reason for networking status changes is allowed to have
+    // manufacturer-specific values, which is why it's an int32_t, even though
+    // we just store a uint16_t value in it.
+    int32_t lastDisconnectReason = GetLastDisconnectReason();
     mpStatusChangeCallback->OnNetworkingStatusChange(
         Status::kUnknownError, MakeOptional(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)),
-        MakeOptional(GetLastDisconnectReason()));
+        MakeOptional(lastDisconnectReason));
 }
 
 void ESPWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
@@ -386,7 +402,7 @@ CHIP_ERROR ESPWiFiDriver::SetLastDisconnectReason(const ChipDeviceEvent * event)
     return CHIP_NO_ERROR;
 }
 
-int32_t ESPWiFiDriver::GetLastDisconnectReason()
+uint16_t ESPWiFiDriver::GetLastDisconnectReason()
 {
     return mLastDisconnectedReason;
 }

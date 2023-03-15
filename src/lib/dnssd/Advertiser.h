@@ -63,7 +63,7 @@ public:
         mPort = port;
         return *reinterpret_cast<Derived *>(this);
     }
-    uint64_t GetPort() const { return mPort; }
+    uint16_t GetPort() const { return mPort; }
 
     Derived & SetInterfaceId(Inet::InterfaceId interfaceId)
     {

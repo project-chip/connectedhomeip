@@ -257,7 +257,8 @@ def getGlobalTemplatesTargets():
             # a name like <zap-generated/foo.h>
             output_dir = os.path.join(
                 'zzz_generated', 'placeholder', example_name, 'zap-generated')
-            template = 'examples/placeholder/templates/templates.json'
+            template = os.path.join(
+                'examples', 'placeholder', 'linux', 'apps', example_name, 'templates', 'templates.json')
 
             targets.append(ZAPGenerateTarget.MatterIdlTarget(filepath))
             targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir, template=template))
