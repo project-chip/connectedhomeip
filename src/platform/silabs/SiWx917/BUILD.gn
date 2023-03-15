@@ -90,7 +90,7 @@ static_library("SiWx917") {
     ]
   }
 
-  if (chip_enable_wifi) {
+
     sources += [
       "${silabs_platform_dir}/ConnectivityManagerImpl_WIFI.cpp",
       "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.cpp",
@@ -100,5 +100,5 @@ static_library("SiWx917") {
       "wifi/wifi_config.h",
     ]
     public_configs = [ ":siwx917-platform-wifi-config" ]
-  }
+
 }

@@ -19,7 +19,7 @@ import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
 import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
-import("${efr32_sdk_build_root}/efr32_executable.gni")
+import("${efr32_sdk_build_root}/siwx917_executable.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -40,7 +40,7 @@ declare_args() {
   chip_print_memory_usage = false
 }
 
-efr32_sdk("sdk") {
+siwx917_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
     "${examples_plat_dir}/FreeRTOSConfig.h",
@@ -54,10 +54,7 @@ efr32_sdk("sdk") {
     "${examples_common_plat_dir}",
   ]
 
-  defines += [
-    "BOARD_ID=${silabs_board}",
-    "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}",
-  ]
+
 
   defines = []
   if (chip_enable_pw_rpc) {
@@ -69,7 +66,7 @@ efr32_sdk("sdk") {
 }
 
 efr32_executable("lock_app") {
-  output_name = "chip-efr32-lock-example.out"
+  output_name = "chip-siwx917-lock-example.out"
   include_dirs = [ "include" ]
   defines = []
 
@@ -86,7 +83,7 @@ efr32_executable("lock_app") {
 
   deps = [
     ":sdk",
-    "${examples_plat_dir}:efr32-common",
+    "${examples_plat_dir}:siwx917-common",
     app_data_model,
   ]
 
@@ -120,7 +117,7 @@ efr32_executable("lock_app") {
       "${chip_root}/examples/common/pigweed:locking_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:ot_cli_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:thread_service.nanopb_rpc",
-      "${examples_plat_dir}/pw_sys_io:pw_sys_io_efr32",
+      "${examples_plat_dir}/pw_sys_io:pw_sys_io_siwx917",
     ]
 
     deps += pw_build_LINK_DEPS
@@ -155,10 +152,10 @@ efr32_executable("lock_app") {
   output_dir = root_out_dir
 }
 
-group("efr32") {
+group("siwx917") {
   deps = [ ":lock_app" ]
 }
 
 group("default") {
-  deps = [ ":efr32" ]
+  deps = [ ":siwx917" ]
 }

@@ -18,7 +18,7 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
-
+import("${chip_root}/third_party/silabs/silabs_board.gni")
 silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
 
 declare_args() {
@@ -52,6 +52,7 @@ import("${silabs_common_plat_dir}/SiWx917/args.gni")
 assert(chip_enable_wifi)
 assert(use_SiWx917)
 import("${chip_root}/src/platform/silabs/SiWx917/args.gni")
+wisemcu_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
 import("SiWx917/rs911x.gni")
 
 
@@ -238,7 +239,7 @@ source_set("siwx917-common") {
     sources += [ "LEDWidget.cpp" ]
   }
 
-  if (chip_build_libshell) {
+  if (chip_enable_pw_rpc || chip_build_libshell) {
     sources += [ "uart.cpp" ]
   }
 

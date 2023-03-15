@@ -19,7 +19,7 @@ import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
 import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
-import("${efr32_sdk_build_root}/efr32_executable.gni")
+import("${efr32_sdk_build_root}/siwx917_executable.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
@@ -55,6 +55,7 @@ siwx917_sdk("sdk") {
     "${examples_common_plat_dir}",
   ]
 
+  defines = []
   if (chip_enable_pw_rpc) {
     defines += [
       "HAL_VCOM_ENABLE=1",
@@ -64,7 +65,7 @@ siwx917_sdk("sdk") {
 }
 
 
-efr32_executable("lighting_app") {
+siwx917_executable("lighting_app") {
   output_name = "chip-siwx917-lighting-example.out"
   include_dirs = [ "include" ]
   defines = []
