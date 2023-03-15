@@ -93,6 +93,14 @@ const char * StageToString(CommissioningStage stage)
         return "ThreadNetworkSetup";
         break;
 
+    case kFailsafeBeforeWiFiEnable:
+        return "FailsafeBeforeWiFiEnable";
+        break;
+
+    case kFailsafeBeforeThreadEnable:
+        return "FailsafeBeforeThreadEnable";
+        break;
+
     case kWiFiNetworkEnable:
         return "WiFiNetworkEnable";
         break;

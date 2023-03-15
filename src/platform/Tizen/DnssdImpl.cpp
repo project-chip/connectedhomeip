@@ -302,29 +302,41 @@ void GetTextEntries(unsigned short txtLen, uint8_t * txtRecord, std::vector<chip
     }
 }
 
-void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
+gboolean OnResolveFinalize(gpointer userData)
 {
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
-    auto rCtx = reinterpret_cast<chip::Dnssd::ResolveContext *>(data);
-
-    char * name           = nullptr;
-    char * ipv4           = nullptr;
-    char * ipv6           = nullptr;
-    int port              = 0;
-    char * interface      = nullptr;
-    unsigned short txtLen = 0;
-    uint8_t * txtRecord   = nullptr;
-    std::vector<chip::Dnssd::TextEntry> textEntries;
-    chip::Dnssd::DnssdService dnssdService = {};
-    chip::Inet::IPAddress ipAddr;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    auto rCtx = reinterpret_cast<chip::Dnssd::ResolveContext *>(userData);
 
     rCtx->MainLoopQuit();
+
+    {
+        // Lock the stack mutex when calling the callback function, so that the callback
+        // function could safely perform message exchange (e.g. PASE session pairing).
+        chip::DeviceLayer::StackLock lock;
+        rCtx->Finalize(CHIP_NO_ERROR);
+    }
+
+    rCtx->mInstance->RemoveContext(rCtx);
+    return G_SOURCE_REMOVE;
+}
+
+void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
+{
+    ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
+    auto rCtx = reinterpret_cast<chip::Dnssd::ResolveContext *>(userData);
+
+    char * name      = nullptr;
+    char * ipv4      = nullptr;
+    char * ipv6      = nullptr;
+    int port         = 0;
+    char * interface = nullptr;
+    chip::Inet::IPAddress ipAddr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     int ret = dnssd_service_get_name(service, &name);
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_name() failed. ret: %d", ret));
 
-    chip::Platform::CopyString(dnssdService.mName, name);
+    chip::Platform::CopyString(rCtx->mResult.mName, name);
     g_free(name);
 
     ret = dnssd_service_get_ip(service, &ipv4, &ipv6);
@@ -359,43 +371,38 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     ret = dnssd_service_get_port(service, &port);
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_port() failed. ret: %d", ret));
 
-    dnssdService.mPort = static_cast<uint16_t>(port);
+    rCtx->mResult.mPort = static_cast<uint16_t>(port);
 
     ret = dnssd_service_get_interface(service, &interface);
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_interface() failed. ret: %d", ret));
 
-    err = chip::Inet::InterfaceId::InterfaceNameToId(interface, dnssdService.mInterface);
+    err = chip::Inet::InterfaceId::InterfaceNameToId(interface, rCtx->mResult.mInterface);
     VerifyOrExit(
         err == CHIP_NO_ERROR,
         ChipLogError(DeviceLayer, "chip::Inet::InterfaceId::InterfaceNameToId() failed. ret: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    ret = dnssd_service_get_all_txt_record(service, &txtLen, reinterpret_cast<void **>(&txtRecord));
+    ret = dnssd_service_get_all_txt_record(service, &rCtx->mResultTxtRecordLen, reinterpret_cast<void **>(&rCtx->mResultTxtRecord));
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_all_txt_record() failed. ret: %d", ret));
 
-    GetTextEntries(txtLen, txtRecord, textEntries);
-    dnssdService.mTextEntries   = textEntries.empty() ? nullptr : textEntries.data();
-    dnssdService.mTextEntrySize = textEntries.size();
+    rCtx->mResult.mAddress.SetValue(ipAddr);
 
-    { // Lock the stack mutex when calling the callback function, so that the callback
-      // function could safely perform message exchange (e.g. PASE session pairing).
-        chip::DeviceLayer::StackLock lock;
-        rCtx->mCallback(rCtx->mCbContext, &dnssdService, chip::Span<chip::Inet::IPAddress>(&ipAddr, 1), CHIP_NO_ERROR);
+    {
+        // Before calling the Resolve() callback, we need to lock stack mutex.
+        // However, we cannot lock the stack mutex from here, because we might
+        // face lock inversion problem. This callback (OnResolve()) is called
+        // with the NSD internal mutex locked, which is also locked by the
+        // dnssd_create_remote_service() function called in the Resolve(), and
+        // the Resolve() itself is called with the stack mutex locked.
+        auto * sourceIdle = g_idle_source_new();
+        g_source_set_callback(sourceIdle, OnResolveFinalize, rCtx, NULL);
+        g_source_attach(sourceIdle, g_main_loop_get_context(rCtx->mMainLoop));
     }
 
-    g_free(txtRecord);
-
-    rCtx->mInstance->RemoveContext(rCtx);
     return;
 
 exit:
-    if (err == CHIP_NO_ERROR)
-    {
-        rCtx->mCallback(rCtx->mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), GetChipError(ret));
-    }
-    else
-    {
-        rCtx->mCallback(rCtx->mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), err);
-    }
+    rCtx->MainLoopQuit();
+    rCtx->Finalize(ret != DNSSD_ERROR_NONE ? GetChipError(ret) : err);
     rCtx->mInstance->RemoveContext(rCtx);
 }
 
@@ -483,7 +490,25 @@ ResolveContext::ResolveContext(DnssdTizen * instance, const char * name, const c
     mCbContext = context;
 }
 
-ResolveContext::~ResolveContext() {}
+ResolveContext::~ResolveContext()
+{
+    g_free(mResultTxtRecord);
+}
+
+void ResolveContext::Finalize(CHIP_ERROR error)
+{
+    // In case of error, run the callback function with nullptr as the result.
+    VerifyOrReturn(error == CHIP_NO_ERROR, mCallback(mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), error));
+
+    std::vector<chip::Dnssd::TextEntry> textEntries;
+    GetTextEntries(mResultTxtRecordLen, mResultTxtRecord, textEntries);
+    mResult.mTextEntries   = textEntries.empty() ? nullptr : textEntries.data();
+    mResult.mTextEntrySize = textEntries.size();
+
+    chip::Inet::IPAddress ipAddr = mResult.mAddress.Value();
+
+    mCallback(mCbContext, &mResult, chip::Span<chip::Inet::IPAddress>(&ipAddr, 1), CHIP_NO_ERROR);
+}
 
 CHIP_ERROR DnssdTizen::Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context)
 {

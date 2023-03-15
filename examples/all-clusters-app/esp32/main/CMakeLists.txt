@@ -108,20 +108,13 @@ set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
 )
 endif (CONFIG_ENABLE_PW_RPC)
 
-if(("${CONFIG_DEVICE_TYPE_ESP32_DEVKITC}" STREQUAL "y") OR ("${CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM}" STREQUAL "y") OR ("${CONFIG_DEVICE_TYPE_ESP32_C2_DEVKITM}" STREQUAL "y") OR ("${CONFIG_DEVICE_TYPE_ESP32_C6_DEVKITC}" STREQUAL "y"))
-    list(APPEND PRIV_INCLUDE_DIRS_LIST
-                "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/screen-framework/include")
-    set(PRIV_REQUIRES_LIST chip QRCode bt)
-elseif(("${CONFIG_DEVICE_TYPE_M5STACK}" STREQUAL "y") OR ("${CONFIG_DEVICE_TYPE_ESP32_WROVER_KIT}" STREQUAL "y"))
-    set(PRIV_REQUIRES_LIST chip QRCode bt tft spidrier screen-framework)
+set(PRIV_REQUIRES_LIST chip QRCode bt driver app_update nvs_flash spi_flash openthread)
+if(CONFIG_HAVE_DISPLAY)
+    list(APPEND PRIV_REQUIRES_LIST tft spidrier screen-framework)
 endif()
 
-if("${CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM}" STREQUAL "y")
+if(CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM)
     list(APPEND PRIV_REQUIRES_LIST led_strip)
-endif()
-
-if (CONFIG_OPENTHREAD_ENABLED)
-    list(APPEND PRIV_REQUIRES_LIST openthread)
 endif()
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}

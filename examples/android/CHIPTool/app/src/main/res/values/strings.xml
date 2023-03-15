@@ -142,7 +142,6 @@
     <string name="subscribe_dialog_subscribe_btn_text">Subscribe</string>
     <string name="subscribe_dialog_min_interval_hint">Minimum interval (seconds)</string>
     <string name="subscribe_dialog_max_interval_hint">Maximum interval (seconds)</string>
-    <string name="subscribe_dialog_is_urgent_hint">is Urgent Event (bool)</string>
     <string name="subscribe_dialog_keep_subscriptions_hint">keep subscriptions (bool)</string>
     <string name="subscribe_dialog_is_fabric_filtered_hint">is Fabric Filtered (bool)</string>
 
@@ -163,18 +162,32 @@
     <string name="invoke_dialog_im_timeout_hint">Timeout</string>
     <string name="invoke_dialog_user_guide_hint">Usage : [Type]:[Value],[Type]:[Value]\nType:UnsignedInt, Int, Boolean, Float, Double, String, ByteArray(Hex)\nExample:\nLevelControlCluster, moveToLevel : UnsignedInt:100,UnsignedInt:0</string>
 
+    <string name="shutdown_dialog_title_text">Shutdown Subscription</string>
+    <string name="shutdown_dialog_fabric_index_hint">Fabric Index</string>
+    <string name="shutdown_dialog_subscription_id_hint">Subscription Id</string>
+    <string name="shutdown_dialog_shutdown_btn_text">Shutdown</string>
+    <string name="shutdown_dialog_shutdown_all_btn_text">Shutdown All</string>
+
     <string name="endpoint_id_label">Endpoint ID</string>
     <string name="cluster_id_label">Cluster ID</string>
     <string name="attribute_id_label">Attribute ID</string>
     <string name="event_id_label">Event ID</string>
     <string name="command_id_label">Command ID</string>
+    <string name="isUrgent_label">isUrgent</string>
     <string name="wildcard_help_label">Leave blank for wildcard</string>
     <string name="wildcard_subscribe_btn_text">Subscribe</string>
     <string name="wildcard_read_btn_text">Read</string>
     <string name="wildcard_invoke_btn_text">Invoke</string>
     <string name="wildcard_write_btn_text">Write</string>
+    <string name="wildcard_add_attribute_btn_text">Add Attribute</string>
+    <string name="wildcard_add_event_btn_text">Add Event</string>
+    <string name="wildcard_reset_btn_text">Reset</string>
+    <string name="wildcard_send_btn_text">Send</string>
+    <string name="wildcard_shutdown_subscription_btn_text">Shutdown Subscription</string>
     <string name="wildcard_subscribe_event_btn_text">Subscribe Event</string>
     <string name="wildcard_read_event_btn_text">Read Event</string>
+    <string name="wildcard_empty_error_toast_message">Please add it to the list using Add Button.</string>
+    <string name="wildcard_subscribe_established_toast_message">Subscription established</string>
 
     <string name="provision_custom_flow_btn_text">Provision CHIP device with Custom Flow</string>
     <string name="chip_device_info_commissioning_flow_label">Commissioning Flow:</string>

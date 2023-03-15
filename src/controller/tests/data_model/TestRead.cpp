@@ -1831,7 +1831,8 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
         NL_TEST_ASSERT(apSuite, false);
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
 
@@ -1897,7 +1898,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionAppRejection(nlTestSuite *
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
 
@@ -1961,7 +1963,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest1(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient,
+                                                                                    chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
         CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
@@ -2036,7 +2039,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest2(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient,
+                                                                                    chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
         CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
@@ -2111,7 +2115,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest3(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient,
+                                                                                    chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
         CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
@@ -2186,7 +2191,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest4(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
 
@@ -2251,7 +2257,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest5(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient,
+                                                                                    chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
         CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
@@ -2326,7 +2333,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest6(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient,
+                                                                                    chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
         CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
@@ -2401,7 +2409,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest7(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient,
+                                                                                    chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
         CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
@@ -2475,7 +2484,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest8(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
     //
@@ -2538,7 +2548,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest9(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
 
@@ -2648,7 +2659,8 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
     };
 
     auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite, &aCtx, aSubscribeCount, aReadCount,
-                                        &numReadSuccessCalls, &numReadFailureCalls](const app::ReadClient & readClient) {
+                                        &numReadSuccessCalls, &numReadFailureCalls](const app::ReadClient & readClient,
+                                                                                    chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
         if (numSubscriptionEstablishedCalls == aSubscribeCount)
         {
@@ -2745,7 +2757,8 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
         NL_TEST_ASSERT(apSuite, false);
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
 

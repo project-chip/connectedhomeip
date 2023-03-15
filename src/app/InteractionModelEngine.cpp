@@ -253,14 +253,18 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
 
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(const ScopedNodeId & aPeerNodeId, SubscriptionId aSubscriptionId)
 {
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    assertChipStackLockedByCurrentThread();
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
     {
+        // Grab the next client now, because we might be about to delete readClient.
+        auto * nextClient = readClient->GetNextClient();
         if (readClient->IsSubscriptionType() && readClient->IsMatchingSubscriptionId(aSubscriptionId) &&
             readClient->GetFabricIndex() == aPeerNodeId.GetFabricIndex() && readClient->GetPeerNodeId() == aPeerNodeId.GetNodeId())
         {
             readClient->Close(CHIP_NO_ERROR);
             return CHIP_NO_ERROR;
         }
+        readClient = nextClient;
     }
 
     return CHIP_ERROR_KEY_NOT_FOUND;
@@ -268,15 +272,18 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscription(const ScopedNodeId & aPe
 
 void InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
 {
+    assertChipStackLockedByCurrentThread();
     ShutdownMatchingSubscriptions(MakeOptional(aFabricIndex), MakeOptional(aPeerNodeId));
 }
 void InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex)
 {
+    assertChipStackLockedByCurrentThread();
     ShutdownMatchingSubscriptions(MakeOptional(aFabricIndex));
 }
 
 void InteractionModelEngine::ShutdownAllSubscriptions()
 {
+    assertChipStackLockedByCurrentThread();
     ShutdownMatchingSubscriptions();
 }
 

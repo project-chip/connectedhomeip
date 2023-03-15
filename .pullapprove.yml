@@ -144,14 +144,20 @@ groups:
             teams: [reviewers-samsung]
         reviews:
             request: 10
-    shared-reviewers-signify:
-        type: optional
-        conditions:
-            - files.include('*')
-        reviewers:
-            teams: [reviewers-signify]
-        reviews:
-            request: 10
+    # shared-reviewers-signify disabled for now, because the reviewers-signify
+    # team is empty and pullapprove seems to mis-handle that badly and treats
+    # _all_ reviewers as being in this group.
+    #
+    # See https://github.com/dropseed/pullapprove/issues/71
+    #
+    # shared-reviewers-signify:
+    #     type: optional
+    #     conditions:
+    #         - files.include('*')
+    #     reviewers:
+    #         teams: [reviewers-signify]
+    #     reviews:
+    #         request: 10
     shared-reviewers-silabs:
         type: optional
         conditions:

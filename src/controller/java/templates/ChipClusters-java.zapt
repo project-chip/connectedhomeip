@@ -21,44 +21,44 @@ public class ChipClusters {
     void onSuccess(String value);
     void onError(Exception error);
     {{! TODO: use SubscriptionEstablishedCallback instead, here and below. }}
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface OctetStringAttributeCallback {
     /** Indicates a successful read for an OCTET_STRING attribute. */
     void onSuccess(byte[] value);
     void onError(Exception error);
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface IntegerAttributeCallback {
     void onSuccess(int value);
     void onError(Exception error);
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface LongAttributeCallback {
     void onSuccess(long value);
     void onError(Exception error);
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface BooleanAttributeCallback {
     void onSuccess(boolean value);
     void onError(Exception error);
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface FloatAttributeCallback {
     void onSuccess(float value);
     void onError(Exception error);
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface DoubleAttributeCallback {
     void onSuccess(double value);
     void onError(Exception error);
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public static abstract class BaseChipCluster {
@@ -152,13 +152,13 @@ public class ChipClusters {
       public interface {{asUpperCamelCase name}}AttributeCallback {
         void onSuccess({{#if isNullable}}@Nullable{{/if}} List<{{>asJavaTypeForEntry isArray=false}}> valueList);
         void onError(Exception ex);
-        default void onSubscriptionEstablished() {}
+        default void onSubscriptionEstablished(long subscriptionId) {}
       }
     {{else}}
       public interface {{asUpperCamelCase name}}AttributeCallback {
         void onSuccess({{#if isNullable}}@Nullable{{/if}} {{>asJavaTypeForEntry isArray=false}} value);
         void onError(Exception ex);
-        default void onSubscriptionEstablished() {}
+        default void onSubscriptionEstablished(long subscriptionId) {}
       }
     {{/if}}
   {{/if_basic_global_response}}

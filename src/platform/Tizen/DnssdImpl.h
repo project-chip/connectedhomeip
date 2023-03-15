@@ -108,9 +108,16 @@ struct ResolveContext : public GenericContext
     dnssd_service_h mServiceHandle = 0;
     bool mIsResolving              = false;
 
+    // Resolved service
+    DnssdService mResult               = {};
+    uint8_t * mResultTxtRecord         = nullptr;
+    unsigned short mResultTxtRecordLen = 0;
+
     ResolveContext(DnssdTizen * instance, const char * name, const char * type, uint32_t interfaceId, DnssdResolveCallback callback,
                    void * context);
     ~ResolveContext() override;
+
+    void Finalize(CHIP_ERROR error);
 };
 
 class DnssdTizen

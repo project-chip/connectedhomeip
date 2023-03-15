@@ -89,6 +89,11 @@ menu "Demo"
         default 3 if DEVICE_TYPE_M5STACK
         default 4 if DEVICE_TYPE_ESP32_WROVER_KIT
 
+    config HAVE_DISPLAY
+        bool
+        default y if DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT
+        default n if !(DEVICE_TYPE_M5STACK || DEVICE_TYPE_ESP32_WROVER_KIT)
+
     config RENDEZVOUS_MODE
        int
        range 0 8

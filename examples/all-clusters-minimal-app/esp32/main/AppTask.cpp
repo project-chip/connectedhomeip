@@ -21,7 +21,9 @@
 #include "DeviceWithDisplay.h"
 #include "Globals.h"
 #include "LEDWidget.h"
+#if CONFIG_HAVE_DISPLAY
 #include "ScreenManager.h"
+#endif
 #include "driver/gpio.h"
 #include "esp_idf_version.h"
 #include "esp_log.h"

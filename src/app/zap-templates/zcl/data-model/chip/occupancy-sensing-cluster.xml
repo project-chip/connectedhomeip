@@ -53,13 +53,13 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="OCCUPANCY_SENSOR_TYPE" type="OccupancySensorTypeEnum" min="0x00" max="0xFE" writable="false" optional="false">OccupancySensorType</attribute>
     <attribute side="server" code="0x0002" define="OCCUPANCY_SENSOR_TYPE_BITMAP" type="OccupancySensorTypeBitmap" min="0x00" max="0x07" writable="false" optional="false">OccupancySensorTypeBitmap</attribute>
 
-    <attribute side="server" code="0x0010" define="PIR_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+    <attribute side="server" code="0x0010" define="PIR_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" writable="true" default="0x0000" optional="true">
       <description>PIROccupiedToUnoccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
 
-    <attribute side="server" code="0x0011" define="PIR_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+    <attribute side="server" code="0x0011" define="PIR_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" writable="true" default="0x0000" optional="true">
       <description>PIRUnoccupiedToOccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
@@ -71,13 +71,13 @@ limitations under the License.
       <access op="write" role="manage"/>
     </attribute>
 
-    <attribute side="server" code="0x0020" define="ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+    <attribute side="server" code="0x0020" define="ULTRASONIC_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" writable="true" default="0x0000" optional="true">
       <description>UltrasonicOccupiedToUnoccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
 
-    <attribute side="server" code="0x0021" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+    <attribute side="server" code="0x0021" define="ULTRASONIC_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" writable="true" default="0x0000" optional="true">
       <description>UltrasonicUnoccupiedToOccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
@@ -89,13 +89,13 @@ limitations under the License.
       <access op="write" role="manage"/>
     </attribute>
 
-    <attribute side="server" code="0x0030" define="PHYSICAL_CONTACT_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+    <attribute side="server" code="0x0030" define="PHYSICAL_CONTACT_OCCUPIED_TO_UNOCCUPIED_DELAY" type="INT16U" writable="true" default="0x0000" optional="true">
       <description>PhysicalContactOccupiedToUnoccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
     </attribute>
 
-    <attribute side="server" code="0x0031" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" min="0x0000" max="0xFFFE" writable="true" default="0x0000" optional="true">
+    <attribute side="server" code="0x0031" define="PHYSICAL_CONTACT_UNOCCUPIED_TO_OCCUPIED_DELAY" type="INT16U" writable="true" default="0x0000" optional="true">
       <description>PhysicalContactUnoccupiedToOccupiedDelay</description>
       <access op="read" role="view"/>
       <access op="write" role="manage"/>
