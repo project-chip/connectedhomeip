@@ -244,23 +244,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceControllerStartupParams (Deprecated)
 
-@property (nonatomic, assign, readonly) uint64_t fabricId API_DEPRECATED(
+@property (nonatomic, assign, readonly) uint64_t fabricId MTR_DEPRECATED(
     "Please use fabricID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
-@property (nonatomic, copy, nullable) NSNumber * vendorId API_DEPRECATED(
+@property (nonatomic, copy, nullable) NSNumber * vendorId MTR_DEPRECATED(
     "Please use vendorID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 @property (nonatomic, copy, nullable)
-    NSNumber * nodeId API_DEPRECATED("Please use nodeID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+    NSNumber * nodeId MTR_DEPRECATED("Please use nodeID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner
                               fabricId:(uint64_t)fabricId
-                                   ipk:(NSData *)ipk API_DEPRECATED("Please use initWithIPK:fabricID:nocSigner:", ios(16.1, 16.4),
+                                   ipk:(NSData *)ipk MTR_DEPRECATED("Please use initWithIPK:fabricID:nocSigner:", ios(16.1, 16.4),
                                            macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (instancetype)initWithOperationalKeypair:(id<MTRKeypair>)operationalKeypair
                     operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
                    intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
                            rootCertificate:(MTRCertificateDERBytes)rootCertificate
                                        ipk:(NSData *)ipk
-    API_DEPRECATED("Please use initWithIPK:operationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:",
+    MTR_DEPRECATED("Please use initWithIPK:operationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end

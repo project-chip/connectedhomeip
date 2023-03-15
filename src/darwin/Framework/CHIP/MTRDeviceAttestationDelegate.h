@@ -95,13 +95,13 @@ NS_ASSUME_NONNULL_BEGIN
        completedForDevice:(void *)device
     attestationDeviceInfo:(MTRDeviceAttestationDeviceInfo *)attestationDeviceInfo
                     error:(NSError * _Nullable)error
-    API_DEPRECATED("Please implement deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error:",
+    MTR_DEPRECATED("Please implement deviceAttestationCompletedForController:opaqueDeviceHandle:attestationDeviceInfo:error:",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (void)deviceAttestation:(MTRDeviceController *)controller
           failedForDevice:(void *)device
                     error:(NSError * _Nonnull)error
-    API_DEPRECATED("Please implement deviceAttestationFailedForController:opaqueDeviceHandle:error:", ios(16.1, 16.4),
+    MTR_DEPRECATED("Please implement deviceAttestationFailedForController:opaqueDeviceHandle:error:", ios(16.1, 16.4),
         macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end

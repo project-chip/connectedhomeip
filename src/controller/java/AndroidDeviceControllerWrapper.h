@@ -41,6 +41,7 @@
 #endif // JAVA_MATTER_CONTROLLER_TEST
 
 #include "AndroidOperationalCredentialsIssuer.h"
+#include "AttestationTrustStoreBridge.h"
 #include "DeviceAttestationDelegateBridge.h"
 
 /**
@@ -181,21 +182,12 @@ public:
         return mOpCredsIssuer.get();
     }
 
-    void SetDeviceAttestationDelegateBridge(DeviceAttestationDelegateBridge * deviceAttestationDelegateBridge)
-    {
-        mDeviceAttestationDelegateBridge = deviceAttestationDelegateBridge;
-    }
-
     DeviceAttestationDelegateBridge * GetDeviceAttestationDelegateBridge() { return mDeviceAttestationDelegateBridge; }
 
-    void ClearDeviceAttestationDelegateBridge()
-    {
-        if (mDeviceAttestationDelegateBridge != nullptr)
-        {
-            delete mDeviceAttestationDelegateBridge;
-            mDeviceAttestationDelegateBridge = nullptr;
-        }
-    }
+    CHIP_ERROR UpdateDeviceAttestationDelegateBridge(jobject deviceAttestationDelegate, chip::Optional<uint16_t> expiryTimeoutSecs,
+                                                     bool shouldWaitAfterDeviceAttestation);
+
+    CHIP_ERROR UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate);
 
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
@@ -235,7 +227,9 @@ private:
 
     chip::Credentials::PartialDACVerifier mPartialDACVerifier;
 
-    DeviceAttestationDelegateBridge * mDeviceAttestationDelegateBridge = nullptr;
+    DeviceAttestationDelegateBridge * mDeviceAttestationDelegateBridge        = nullptr;
+    AttestationTrustStoreBridge * mAttestationTrustStoreBridge                = nullptr;
+    chip::Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller,
 #ifdef JAVA_MATTER_CONTROLLER_TEST

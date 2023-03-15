@@ -57,7 +57,7 @@ public class FutureResult {
       }
     }
     if (!realResult.get().getResult()) {
-      logger.log(Level.INFO, "error: %s", realResult.get().getError());
+      logger.log(Level.INFO, "error: " + realResult.get().getError());
       throw new RuntimeException("received failure test result");
     }
   }

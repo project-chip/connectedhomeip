@@ -263,6 +263,15 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error)
     mConnectionFailure.DequeueAll(failureReady);
     mConnectionSuccess.DequeueAll(successReady);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    // Clear out mConnectionRetry, so that those cancelables are not holding
+    // pointers to us, since we're about to go away.
+    while (auto * cb = mConnectionRetry.First())
+    {
+        cb->Cancel();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
     //
     // If we encountered no error, go ahead and call all success callbacks. Otherwise,
     // call the failure callbacks.
@@ -304,13 +313,23 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error)
 
 void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
 {
-    VerifyOrReturn(mState != State::Uninitialized && mState != State::NeedsAddress,
-                   ChipLogError(Discovery, "HandleCASEConnectionFailure was called while the device was not initialized"));
+    VerifyOrReturn(mState == State::Connecting,
+                   ChipLogError(Discovery, "OnSessionEstablishmentError was called while we were not connecting"));
 
     if (CHIP_ERROR_TIMEOUT == error)
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+        // Make a copy of the ReliableMessageProtocolConfig, since our
+        // mCaseClient is about to go away.
+        ReliableMessageProtocolConfig remoteMprConfig = mCASEClient->GetRemoteMRPIntervals();
+#endif
+
         if (CHIP_NO_ERROR == Resolver::Instance().TryNextResult(mAddressLookupHandle))
         {
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+            // Our retry is going to be immediate, once the event loop spins.
+            NotifyRetryHandlers(error, remoteMprConfig, System::Clock::kZero);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
             MoveToState(State::ResolvingAddress);
             return;
         }
@@ -318,9 +337,11 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
         if (mRemainingAttempts > 0)
         {
-            CHIP_ERROR err = ScheduleSessionSetupReattempt();
+            System::Clock::Seconds16 reattemptDelay;
+            CHIP_ERROR err = ScheduleSessionSetupReattempt(reattemptDelay);
             if (err == CHIP_NO_ERROR)
             {
+                NotifyRetryHandlers(error, remoteMprConfig, reattemptDelay);
                 return;
             }
         }
@@ -333,8 +354,8 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
 
 void OperationalSessionSetup::OnSessionEstablished(const SessionHandle & session)
 {
-    VerifyOrReturn(mState != State::Uninitialized,
-                   ChipLogError(Discovery, "HandleCASEConnected was called while the device was not initialized"));
+    VerifyOrReturn(mState == State::Connecting,
+                   ChipLogError(Discovery, "OnSessionEstablished was called while we were not connecting"));
 
     if (!mSecureSession.Grab(session))
         return; // Got an invalid session, do not change any state
@@ -489,7 +510,7 @@ void OperationalSessionSetup::UpdateAttemptCount(uint8_t attemptCount)
     }
 }
 
-CHIP_ERROR OperationalSessionSetup::ScheduleSessionSetupReattempt()
+CHIP_ERROR OperationalSessionSetup::ScheduleSessionSetupReattempt(System::Clock::Seconds16 & timerDelay)
 {
     VerifyOrDie(mRemainingAttempts > 0);
     // Try again, but not if things are in shutdown such that we can't get
@@ -500,7 +521,6 @@ CHIP_ERROR OperationalSessionSetup::ScheduleSessionSetupReattempt()
     }
 
     MoveToState(State::NeedsAddress);
-    System::Clock::Seconds16 timerDelay;
     // Stop exponential backoff before our delays get too large.
     //
     // Note that mAttemptsDone is always > 0 here, because we have
@@ -544,6 +564,27 @@ void OperationalSessionSetup::TrySetupAgain(System::Layer * systemLayer, void * 
     // Give up; we're either in a bad state or could not start a lookup.
     self->DequeueConnectionCallbacks(err);
     // Do not touch `self` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
+}
+
+void OperationalSessionSetup::AddRetryHandler(Callback::Callback<OnDeviceConnectionRetry> * onRetry)
+{
+    mConnectionRetry.Enqueue(onRetry->Cancel());
+}
+
+void OperationalSessionSetup::NotifyRetryHandlers(CHIP_ERROR error, const ReliableMessageProtocolConfig & remoteMrpConfig,
+                                                  System::Clock::Seconds16 retryDelay)
+{
+    // Compute the time we are likely to need to detect that the retry has
+    // failed.
+    System::Clock::Timeout messageTimeout = CASESession::ComputeSigma1ResponseTimeout(remoteMrpConfig);
+    auto timeoutSecs                      = std::chrono::duration_cast<System::Clock::Seconds16>(messageTimeout);
+    // Add 1 second in case we had fractional milliseconds in messageTimeout.
+    timeoutSecs += System::Clock::Seconds16(1);
+    for (auto * item = mConnectionRetry.First(); item && item != &mConnectionRetry; item = item->mNext)
+    {
+        auto cb = Callback::Callback<OnDeviceConnectionRetry>::FromCancelable(item);
+        cb->mCall(cb->mContext, mPeerId, error, timeoutSecs + retryDelay);
+    }
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 

@@ -257,9 +257,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wifiVersion)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion)
 {
-    wifiVersion = 0;
+    // TODO: Keeping existing behavior, but this looks broken.
+    // https://github.com/project-chip/connectedhomeip/issues/25546
+    wifiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kA;
     return CHIP_NO_ERROR;
 }
 

@@ -29,6 +29,7 @@ from colorama import Fore, Style
 from java.base import DumpProgramOutputToQueue
 from java.commissioning_test import CommissioningTest
 from java.discover_test import DiscoverTest
+from java.im_test import IMTest
 
 
 @click.command()
@@ -102,6 +103,15 @@ def main(app: str, app_args: str, tool_path: str, tool_cluster: str, tool_args: 
         logging.info("Testing discover cluster")
 
         test = DiscoverTest(log_cooking_threads, log_queue, command, tool_args)
+        try:
+            test.RunTest()
+        except Exception as e:
+            logging.error(e)
+            sys.exit(1)
+    elif tool_cluster == 'im':
+        logging.info("Testing IM")
+
+        test = IMTest(log_cooking_threads, log_queue, command, tool_args)
         try:
             test.RunTest()
         except Exception as e:

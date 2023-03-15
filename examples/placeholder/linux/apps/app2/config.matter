@@ -42,7 +42,13 @@ server cluster Identify = 3 {
     INT16U identifyTime = 0;
   }
 
+  request struct TriggerEffectRequest {
+    IdentifyEffectIdentifier effectIdentifier = 0;
+    IdentifyEffectVariant effectVariant = 1;
+  }
+
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
+  command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
 server cluster Groups = 4 {
@@ -370,6 +376,10 @@ server cluster LevelControl = 8 {
   }
 
   readonly attribute nullable int8u currentLevel = 0;
+  readonly attribute int16u remainingTime = 1;
+  attribute LevelControlOptions options = 15;
+  attribute nullable int8u onLevel = 17;
+  attribute access(write: manage) nullable int8u startUpCurrentLevel = 16384;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3585,19 +3595,27 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type anonymousEndpointType = 258, version 1;
+  device type anonymousEndpointType = 257, version 1;
   binding cluster OnOff;
   binding cluster FixedLabel;
 
   server cluster Identify {
     ram      attribute identifyTime;
     ram      attribute identifyType;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 4;
   }
 
   server cluster Groups {
     ram      attribute nameSupport;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 4;
   }
@@ -3608,20 +3626,53 @@ endpoint 1 {
     ram      attribute currentGroup;
     ram      attribute sceneValid;
     ram      attribute nameSupport;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 4;
   }
 
   server cluster OnOff {
     ram      attribute onOff;
+    ram      attribute globalSceneControl default = 1;
+    ram      attribute onTime;
+    ram      attribute offWaitTime;
+    ram      attribute startUpOnOff;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 4;
   }
 
   server cluster LevelControl {
     ram      attribute currentLevel;
+    ram      attribute remainingTime;
+    ram      attribute options;
+    ram      attribute onLevel;
+    ram      attribute startUpCurrentLevel;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 5;
+  }
+
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster BasicInformation {

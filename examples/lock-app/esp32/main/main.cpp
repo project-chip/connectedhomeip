@@ -30,6 +30,7 @@
 #include <common/Esp32AppServer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <platform/ESP32/ESP32Utils.h>
 
 #include <cmath>
 #include <cstdio>
@@ -92,7 +93,12 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
         return;
     }
-
+    err = esp_event_loop_create_default();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_event_loop_create_default() failed: %s", esp_err_to_name(err));
+        return;
+    }
 #if CONFIG_ENABLE_PW_RPC
     chip::rpc::Init();
 #endif
@@ -100,7 +106,13 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "==================================================");
     ESP_LOGI(TAG, "chip-esp32-lock-example starting");
     ESP_LOGI(TAG, "==================================================");
-
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    if (DeviceLayer::Internal::ESP32Utils::InitWiFiStack() != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to initialize Wi-Fi stack");
+        return;
+    }
+#endif
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
 #endif

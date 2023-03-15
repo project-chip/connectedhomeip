@@ -23,6 +23,7 @@ import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCal
 import chip.devicecontroller.model.AttributeWriteRequest;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
+import chip.devicecontroller.model.InvokeElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -103,6 +104,19 @@ public class ChipDeviceController {
       int failSafeExpiryTimeoutSecs, DeviceAttestationDelegate deviceAttestationDelegate) {
     setDeviceAttestationDelegate(
         deviceControllerPtr, failSafeExpiryTimeoutSecs, deviceAttestationDelegate);
+  }
+
+  /**
+   * Set the delegate of attestation trust store for device attestation.
+   *
+   * <p>It will replace the built-in attestation trust store, please make sure you have the required
+   * paa certificates before commissioning.
+   *
+   * @param attestationTrustStoreDelegate Delegate for attestation trust store
+   */
+  public void setAttestationTrustStoreDelegate(
+      AttestationTrustStoreDelegate attestationTrustStoreDelegate) {
+    setAttestationTrustStoreDelegate(deviceControllerPtr, attestationTrustStoreDelegate);
   }
 
   public void pairDevice(
@@ -474,9 +488,44 @@ public class ChipDeviceController {
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode, callback);
   }
 
-  /* Shutdown all cluster attribute subscriptions for a given device */
-  public void shutdownSubscriptions(long devicePtr) {
-    shutdownSubscriptions(deviceControllerPtr, devicePtr);
+  public int getFabricIndex() {
+    return getFabricIndex(deviceControllerPtr);
+  }
+
+  /* Shuts down all active subscriptions. */
+  public void shutdownSubscriptions() {
+    shutdownSubscriptions(deviceControllerPtr, null, null, null);
+  }
+
+  /* Shuts down all active subscriptions for the fabric at the given fabricIndex */
+  public void shutdownSubscriptions(int fabricIndex) {
+    shutdownSubscriptions(deviceControllerPtr, Integer.valueOf(fabricIndex), null, null);
+  }
+
+  /**
+   * Shuts down all subscriptions for a particular node.
+   *
+   * @param fabricIndex the fabric index of to which the node belongs
+   * @param peerNodeId the node ID of the device for which subscriptions should be canceled
+   */
+  public void shutdownSubscriptions(int fabricIndex, long peerNodeId) {
+    shutdownSubscriptions(
+        deviceControllerPtr, Integer.valueOf(fabricIndex), Long.valueOf(peerNodeId), null);
+  }
+
+  /**
+   * Shuts down all subscriptions for a particular node.
+   *
+   * @param fabricIndex the fabric index of to which the node belongs
+   * @param peerNodeId the node ID of the device for which subscriptions should be canceled
+   * @param subscriptionId the ID of the subscription on the node which should be canceled
+   */
+  public void shutdownSubscriptions(int fabricIndex, long peerNodeId, long subscriptionId) {
+    shutdownSubscriptions(
+        deviceControllerPtr,
+        Integer.valueOf(fabricIndex),
+        Long.valueOf(peerNodeId),
+        Long.valueOf(subscriptionId));
   }
 
   /**
@@ -490,14 +539,29 @@ public class ChipDeviceController {
     return getAttestationChallenge(deviceControllerPtr, devicePtr);
   }
 
-  /** Subscribe to the given attribute path. */
+  /**
+   * @brief Auto-Resubscribe to the given attribute path with keepSubscriptions and isFabricFiltered
+   * @param SubscriptionEstablishedCallback Callback when a subscribe response has been received and
+   *     processed
+   * @param ResubscriptionAttemptCallback Callback when a resubscirption haoppens, the termination
+   *     cause is provided to help inform subsequent re-subscription logic.
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param attributePaths a list of attribute paths
+   * @param minInterval the requested minimum interval boundary floor in seconds
+   * @param maxInterval the requested maximum interval boundary ceiling in seconds
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
   public void subscribeToAttributePath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ReportCallback reportCallback,
       long devicePtr,
       List<ChipAttributePath> attributePaths,
       int minInterval,
-      int maxInterval) {
+      int maxInterval,
+      int imTimeoutMs) {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
     subscribe(
@@ -510,17 +574,33 @@ public class ChipDeviceController {
         maxInterval,
         false,
         false,
+        imTimeoutMs,
         null);
   }
 
-  /** Subscribe to the given event path */
+  /**
+   * @brief Auto-Resubscribe to the given event path with keepSubscriptions and isFabricFiltered
+   * @param SubscriptionEstablishedCallback Callback when a subscribe response has been received and
+   *     processed
+   * @param ResubscriptionAttemptCallback Callback when a resubscirption haoppens, the termination
+   *     cause is provided to help inform subsequent re-subscription logic.
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param eventPaths a list of event paths
+   * @param minInterval the requested minimum interval boundary floor in seconds
+   * @param maxInterval the requested maximum interval boundary ceiling in seconds
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
   public void subscribeToEventPath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ReportCallback reportCallback,
       long devicePtr,
       List<ChipEventPath> eventPaths,
       int minInterval,
-      int maxInterval) {
+      int maxInterval,
+      int imTimeoutMs) {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
     subscribe(
@@ -533,6 +613,7 @@ public class ChipDeviceController {
         maxInterval,
         false,
         false,
+        imTimeoutMs,
         null);
   }
 
@@ -543,6 +624,7 @@ public class ChipDeviceController {
       List<ChipEventPath> eventPaths,
       int minInterval,
       int maxInterval,
+      int imTimeoutMs,
       @Nullable Long eventMin) {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
@@ -556,10 +638,30 @@ public class ChipDeviceController {
         maxInterval,
         false,
         false,
+        imTimeoutMs,
         eventMin);
   }
 
-  /** Subscribe to the given attribute/event path with keepSubscriptions and isFabricFiltered. */
+  /**
+   * @brief Auto-Resubscribe to the given attribute/event path with keepSubscriptions and
+   *     isFabricFiltered
+   * @param SubscriptionEstablishedCallback Callback when a subscribe response has been received and
+   *     processed
+   * @param ResubscriptionAttemptCallback Callback when a resubscirption haoppens, the termination
+   *     cause is provided to help inform subsequent re-subscription logic.
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param attributePaths a list of attribute paths
+   * @param eventPaths a list of event paths
+   * @param minInterval the requested minimum interval boundary floor in seconds
+   * @param maxInterval the requested maximum interval boundary ceiling in seconds
+   * @param keepSubscriptions If KeepSubscriptions is FALSE, all existing or pending subscriptions
+   *     on the publisher for this subscriber SHALL be terminated.
+   * @param isFabricFiltered limits the data read within fabric-scoped lists to the accessing fabric
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
   public void subscribeToPath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ResubscriptionAttemptCallback resubscriptionAttemptCallback,
@@ -570,12 +672,11 @@ public class ChipDeviceController {
       int minInterval,
       int maxInterval,
       boolean keepSubscriptions,
-      boolean isFabricFiltered) {
-    // TODO: pass resubscriptionAttemptCallback to ReportCallbackJni since jni layer
-    // is not ready
-    // for auto-resubscribe
+      boolean isFabricFiltered,
+      int imTimeoutMs) {
     ReportCallbackJni jniCallback =
-        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
+        new ReportCallbackJni(
+            subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
     subscribe(
         deviceControllerPtr,
         jniCallback.getCallbackHandle(),
@@ -586,6 +687,7 @@ public class ChipDeviceController {
         maxInterval,
         keepSubscriptions,
         isFabricFiltered,
+        imTimeoutMs,
         null);
   }
 
@@ -600,6 +702,7 @@ public class ChipDeviceController {
       int maxInterval,
       boolean keepSubscriptions,
       boolean isFabricFiltered,
+      int imTimeoutMs,
       @Nullable Long eventMin) {
     // TODO: pass resubscriptionAttemptCallback to ReportCallbackJni since jni layer is not ready
     // for auto-resubscribe
@@ -615,12 +718,24 @@ public class ChipDeviceController {
         maxInterval,
         keepSubscriptions,
         isFabricFiltered,
+        imTimeoutMs,
         eventMin);
   }
 
-  /** Read the given attribute path. */
+  /**
+   * @brief read the given attribute path with isFabricFiltered
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param attributePaths a list of attribute paths
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
   public void readAttributePath(
-      ReportCallback callback, long devicePtr, List<ChipAttributePath> attributePaths) {
+      ReportCallback callback,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths,
+      int imTimeoutMs) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
     read(
         deviceControllerPtr,
@@ -629,12 +744,21 @@ public class ChipDeviceController {
         attributePaths,
         null,
         true,
+        imTimeoutMs,
         null);
   }
 
-  /** Read the given event path. */
+  /**
+   * @brief read the given event path with isFabricFiltered
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param eventPaths a list of event paths
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
   public void readEventPath(
-      ReportCallback callback, long devicePtr, List<ChipEventPath> eventPaths) {
+      ReportCallback callback, long devicePtr, List<ChipEventPath> eventPaths, int imTimeoutMs) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
     read(
         deviceControllerPtr,
@@ -643,6 +767,7 @@ public class ChipDeviceController {
         null,
         eventPaths,
         true,
+        imTimeoutMs,
         null);
   }
 
@@ -651,6 +776,7 @@ public class ChipDeviceController {
       ReportCallback callback,
       long devicePtr,
       List<ChipEventPath> eventPaths,
+      int imTimeoutMs,
       @Nullable Long eventMin) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
     read(
@@ -660,16 +786,27 @@ public class ChipDeviceController {
         null,
         eventPaths,
         true,
+        imTimeoutMs,
         eventMin);
   }
 
-  /** Read the given attribute/event path with isFabricFiltered flag. */
+  /**
+   * @brief read the given attribute/event path with isFabricFiltered
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param attributePaths a list of attribute paths
+   * @param eventPaths a list of event paths
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
   public void readPath(
       ReportCallback callback,
       long devicePtr,
       List<ChipAttributePath> attributePaths,
       List<ChipEventPath> eventPaths,
-      boolean isFabricFiltered) {
+      boolean isFabricFiltered,
+      int imTimeoutMs) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
     read(
         deviceControllerPtr,
@@ -678,6 +815,7 @@ public class ChipDeviceController {
         attributePaths,
         eventPaths,
         isFabricFiltered,
+        imTimeoutMs,
         null);
   }
 
@@ -688,6 +826,7 @@ public class ChipDeviceController {
       List<ChipAttributePath> attributePaths,
       List<ChipEventPath> eventPaths,
       boolean isFabricFiltered,
+      int imTimeoutMs,
       @Nullable Long eventMin) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
     read(
@@ -697,6 +836,7 @@ public class ChipDeviceController {
         attributePaths,
         eventPaths,
         isFabricFiltered,
+        imTimeoutMs,
         eventMin);
   }
 
@@ -727,12 +867,46 @@ public class ChipDeviceController {
   }
 
   /**
+   * @brief Invoke command to target device
+   * @param InvokeCallback Callback when an invoke response has been received and processed for the
+   *     given invoke command.
+   * @param devicePtr connected device pointer
+   * @param invokeElement invoke command's path and arguments
+   * @param timedRequestTimeoutMs this is timed request if this value is larger than 0
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
+  public void invoke(
+      InvokeCallback callback,
+      long devicePtr,
+      InvokeElement invokeElement,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs) {
+    InvokeCallbackJni jniCallback = new InvokeCallbackJni(callback);
+    invoke(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        invokeElement,
+        timedRequestTimeoutMs,
+        imTimeoutMs);
+  }
+
+  /**
    * Converts a given X.509v3 certificate into a Matter certificate.
    *
    * @throws ChipDeviceControllerException if there was an issue during encoding (e.g. out of
    *     memory, invalid certificate format)
    */
   public native byte[] convertX509CertToMatterCert(byte[] x509Cert);
+
+  /**
+   * Extract skid from paa cert.
+   *
+   * @param paaCert The product attestation authority (PAA) cert
+   * @return The subject key identifier (SKID)
+   */
+  public native byte[] extractSkidFromPaaCert(byte[] paaCert);
 
   /**
    * Generates a new PASE verifier for the given setup PIN code.
@@ -764,7 +938,8 @@ public class ChipDeviceController {
       int maxInterval,
       boolean keepSubscriptions,
       boolean isFabricFiltered,
-      Long eventMin);
+      int imTimeoutMs,
+      @Nullable Long eventMin);
 
   private native void read(
       long deviceControllerPtr,
@@ -773,7 +948,8 @@ public class ChipDeviceController {
       List<ChipAttributePath> attributePaths,
       List<ChipEventPath> eventPaths,
       boolean isFabricFiltered,
-      Long eventMin);
+      int imTimeoutMs,
+      @Nullable Long eventMin);
 
   private native void write(
       long deviceControllerPtr,
@@ -783,10 +959,21 @@ public class ChipDeviceController {
       int timedRequestTimeoutMs,
       int imTimeoutMs);
 
+  private native void invoke(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      InvokeElement invokeElement,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs);
+
   private native long newDeviceController(ControllerParams params);
 
   private native void setDeviceAttestationDelegate(
       long deviceControllerPtr, int failSafeExpiryTimeoutSecs, DeviceAttestationDelegate delegate);
+
+  private native void setAttestationTrustStoreDelegate(
+      long deviceControllerPtr, AttestationTrustStoreDelegate delegate);
 
   private native void pairDevice(
       long deviceControllerPtr,
@@ -876,7 +1063,13 @@ public class ChipDeviceController {
 
   private native int onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
 
-  private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
+  private native int getFabricIndex(long deviceControllerPtr);
+
+  private native void shutdownSubscriptions(
+      long deviceControllerPtr,
+      @Nullable Integer fabricIndex,
+      @Nullable Long peerNodeId,
+      @Nullable Long subscriptionId);
 
   private native void shutdownCommissioning(long deviceControllerPtr);
 

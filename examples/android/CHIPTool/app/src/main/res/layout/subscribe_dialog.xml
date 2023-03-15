@@ -35,28 +35,6 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/minIntervalEd" />
   <TextView
-      android:id="@+id/titleisUrgent"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:text="@string/subscribe_dialog_is_urgent_hint"
-      android:textSize="16sp"
-      android:layout_marginTop="8dp"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/maxIntervalEd"
-      />
-  <Spinner
-      android:id="@+id/isUrgentSp"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:hint="@string/subscribe_dialog_is_urgent_hint"
-      android:entries="@array/chip_select_menu"
-      android:inputType="text"
-      android:spinnerMode="dropdown"
-      android:textSize="16sp"
-      android:layout_marginTop="8dp"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/titleisUrgent" />
-  <TextView
       android:id="@+id/titleKeepSubscriptions"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -64,7 +42,7 @@
       android:textSize="16sp"
       android:layout_marginTop="8dp"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/isUrgentSp"
+      app:layout_constraintTop_toBottomOf="@id/maxIntervalEd"
       />
   <Spinner
       android:id="@+id/keepSubscriptionsSp"

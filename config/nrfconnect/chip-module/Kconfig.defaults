@@ -161,6 +161,11 @@ config BT_DEVICE_NAME_GATT_WRITABLE
 config CHIP_NFC_COMMISSIONING
     default y
 
+# Disable not needed NFC callback to save flash
+config NFC_THREAD_CALLBACK
+    bool
+    default n
+
 config CHIP_OTA_REQUESTOR
     default y
 
@@ -230,6 +235,9 @@ config NET_IF_MCAST_IPV6_ADDR_COUNT
 config NET_SOCKETS_POSIX_NAMES
     default n
 
+config NET_SOCKETS_POLL_MAX
+    default 4
+
 config MBEDTLS_SSL_OUT_CONTENT_LEN
     default 900
 
@@ -246,6 +254,9 @@ config SHELL_STACK_SIZE
 
 config HEAP_MEM_POOL_SIZE
     default 200000
+
+config CHIP_MALLOC_SYS_HEAP_SIZE
+    default 28672 # 28 kB
 
 endif
 
@@ -368,6 +379,18 @@ config PSA_WANT_ALG_OFB
 
 # Disable not used shell modules
 
+config SHELL_WILDCARD
+    default n
+
+config SHELL_VT100_COLORS
+    default n
+
+config SHELL_STATS
+    default n
+
+config KERNEL_SHELL
+    default n
+
 config SENSOR_SHELL
     default n
 
@@ -388,6 +411,18 @@ config CLOCK_CONTROL_NRF_SHELL
 
 config FLASH_SHELL
     default n
+
+if MPSL_FEM
+
+config MPSL_FEM_NRF21540_RUNTIME_PA_GAIN_CONTROL
+	default y
+
+endif # MPSL_FEM
+
+config OPENTHREAD_DEFAULT_TX_POWER
+	default 20 if MPSL_FEM
+	default 3 if SOC_SERIES_NRF53X && !MPSL_FEM
+	default 8 if SOC_SERIES_NRF52X && !MPSL_FEM
 
 # SoC series related configuration
 

@@ -26,11 +26,11 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include <platform/Zephyr/BLEAdvertisingArbiter.h>
+
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/bluetooth/conn.h>
 #include <zephyr/bluetooth/gatt.h>
-
-#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -103,12 +103,13 @@ private:
     bt_gatt_indicate_params mIndicateParams[CONFIG_BT_MAX_CONN];
     bt_conn_cb mConnCallbacks;
     bt_conn * mconId;
+    BLEAdvertisingArbiter::Request mAdvertisingRequest = {};
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     PacketBufferHandle c3CharDataBufferHandle;
 #endif
 
     void DriveBLEState(void);
-    CHIP_ERROR ConfigureAdvertising(void);
+    CHIP_ERROR PrepareAdvertisingRequest(void);
     CHIP_ERROR StartAdvertising(void);
     CHIP_ERROR StopAdvertising(void);
     CHIP_ERROR HandleGAPConnect(const ChipDeviceEvent * event);
@@ -129,7 +130,7 @@ private:
     CHIP_ERROR HandleOperationalNetworkEnabled(const ChipDeviceEvent * event);
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    CHIP_ERROR PrepareC3CharData();
+    CHIP_ERROR PrepareC3CharData(void);
 #endif
     bool IsSubscribed(bt_conn * conn);
     bool SetSubscribed(bt_conn * conn);

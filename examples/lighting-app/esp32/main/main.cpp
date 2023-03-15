@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <platform/ESP32/ESP32Utils.h>
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 #include <platform/ESP32/ESP32FactoryDataProvider.h>
@@ -44,6 +45,8 @@
 #if CONFIG_ENABLE_PW_RPC
 #include "Rpc.h"
 #endif
+
+#include "DeviceWithDisplay.h"
 
 #if CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 #include <platform/ESP32/ESP32DeviceInfoProvider.h>
@@ -59,6 +62,7 @@ using namespace ::chip::DeviceLayer;
 static const char * TAG = "light-app";
 
 static AppDeviceCallbacks EchoCallbacks;
+static AppDeviceCallbacksDelegate sAppDeviceCallbacksDelegate;
 
 namespace {
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
@@ -77,6 +81,7 @@ static void InitServer(intptr_t context)
     // Print QR Code URL
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
+    DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 }
 
@@ -87,6 +92,12 @@ extern "C" void app_main()
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "nvs_flash_init() failed: %s", esp_err_to_name(err));
+        return;
+    }
+    err = esp_event_loop_create_default();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "esp_event_loop_create_default() failed: %s", esp_err_to_name(err));
         return;
     }
 #if CONFIG_ENABLE_PW_RPC
@@ -100,6 +111,13 @@ extern "C" void app_main()
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    if (Internal::ESP32Utils::InitWiFiStack() != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to initialize WiFi stack");
+        return;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 

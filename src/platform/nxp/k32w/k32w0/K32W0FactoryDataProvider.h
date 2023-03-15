@@ -23,9 +23,31 @@
 #include "CHIPPlatformConfig.h"
 #include "K32W0Config.h"
 #include <platform/internal/GenericConfigurationManagerImpl.h>
+#include <src/lib/core/CHIPError.h>
+
+#include "OtaUtils.h"
+#include "SecLib.h"
+
+/* Grab symbol for the base address from the linker file. */
+extern uint32_t __FACTORY_DATA_START[];
+extern uint32_t __FACTORY_DATA_SIZE[];
 
 namespace chip {
 namespace DeviceLayer {
+
+#define CHIP_FACTORY_DATA_ERROR(e)                                                                                                 \
+    ChipError(ChipError::Range::kLastRange, ((uint8_t) ChipError::Range::kLastRange << 2) | e, __FILE__, __LINE__)
+
+#define CHIP_FACTORY_DATA_SHA_CHECK CHIP_FACTORY_DATA_ERROR(0x01)
+#define CHIP_FACTORY_DATA_HEADER_READ CHIP_FACTORY_DATA_ERROR(0x02)
+#define CHIP_FACTORY_DATA_HASH_ID CHIP_FACTORY_DATA_ERROR(0x03)
+#define CHIP_FACTORY_DATA_PDM_RESTORE CHIP_FACTORY_DATA_ERROR(0x04)
+#define CHIP_FACTORY_DATA_NULL CHIP_FACTORY_DATA_ERROR(0x05)
+#define CHIP_FACTORY_DATA_FLASH_ERASE CHIP_FACTORY_DATA_ERROR(0x06)
+#define CHIP_FACTORY_DATA_FLASH_PROGRAM CHIP_FACTORY_DATA_ERROR(0x07)
+#define CHIP_FACTORY_DATA_INTERNAL_FLASH_READ CHIP_FACTORY_DATA_ERROR(0x08)
+#define CHIP_FACTORY_DATA_PDM_SAVE_RECORD CHIP_FACTORY_DATA_ERROR(0x09)
+#define CHIP_FACTORY_DATA_PDM_READ_RECORD CHIP_FACTORY_DATA_ERROR(0x0A)
 
 /**
  * @brief This class provides Commissionable data, Device Attestation Credentials,
@@ -37,6 +59,13 @@ class K32W0FactoryDataProvider : public DeviceInstanceInfoProvider,
                                  public Credentials::DeviceAttestationCredentialsProvider
 {
 public:
+    struct Header
+    {
+        uint32_t hashId;
+        uint32_t size;
+        uint8_t hash[4];
+    };
+
     // Default factory data IDs
     enum FactoryDataId
     {
@@ -58,6 +87,9 @@ public:
         kHardwareVersionId,
         kHardwareVersionStrId,
         kUniqueId,
+        kPartNumber,
+        kProductURL,
+        kProductLabel,
         kMaxId
     };
 
@@ -69,13 +101,26 @@ public:
 #else
     static constexpr uint16_t kNumberOfIds = FactoryDataId::kMaxId;
 #endif
+    static uint32_t kFactoryDataStart;
+    static uint32_t kFactoryDataSize;
+    static uint32_t kFactoryDataPayloadStart;
+    static constexpr uint32_t kLengthOffset = 1;
+    static constexpr uint32_t kValueOffset  = 3;
+    static constexpr uint32_t kHashLen      = 4;
+    static constexpr size_t kHashId         = 0xCE47BA5E;
+
+    typedef otaUtilsResult_t (*OtaUtils_EEPROM_ReadData)(uint16_t nbBytes, uint32_t address, uint8_t * pInbuf);
+    static uint8_t ReadDataMemcpy(uint16_t num, uint32_t src, uint8_t * dst);
 
     static K32W0FactoryDataProvider & GetDefaultInstance();
 
     K32W0FactoryDataProvider();
 
     CHIP_ERROR Init();
-    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length);
+    CHIP_ERROR Validate();
+    CHIP_ERROR Restore();
+    CHIP_ERROR UpdateData(uint8_t * pBuf);
+    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length, uint32_t * offset = nullptr);
 
     // Custom factory data providers must implement this method in order to define
     // their own custom IDs.
@@ -113,6 +158,7 @@ public:
 
 protected:
     uint16_t maxLengths[kNumberOfIds];
+    Header mHeader;
 };
 
 } // namespace DeviceLayer
