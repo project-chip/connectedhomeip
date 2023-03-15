@@ -1141,8 +1141,6 @@ CHIP_ERROR CASESession::SendSigma3a()
 
     ChipLogDetail(SecureChannel, "Sending Sigma3");
 
-    ChipLogError(DeviceLayer, "@@@@@@@@@@ SendSigma3a");
-
     auto * workPtr = Platform::New<SendSigma3Work>();
     VerifyOrExit(workPtr != nullptr, err = CHIP_ERROR_NO_MEMORY);
     {
@@ -1202,10 +1200,6 @@ void CASESession::SendSigma3b(SendSigma3Work & work)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogError(DeviceLayer, "@@@@@@@@@@ SendSigma3b");
-
-    // TODO SignWithOpKeypair has moved here but check for race condition etc.
-
     // Generate a signature
     err = work.fabricTable->SignWithOpKeypair(work.fabricIndex, ByteSpan{ work.msg_R3_Signed.Get(), work.msg_r3_signed_len }, work.tbsData3Signature);
     SuccessOrExit(err);
@@ -1261,7 +1255,8 @@ exit:
 
 CHIP_ERROR CASESession::SendSigma3c(SendSigma3Work & work)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    bool ignoreFailure = true;
 
     System::PacketBufferHandle msg_R3;
     size_t data_len;
@@ -1270,15 +1265,13 @@ CHIP_ERROR CASESession::SendSigma3c(SendSigma3Work & work)
 
     AutoReleaseSessionKey sr3k(*mSessionManager->GetSessionKeystore());
 
-    ChipLogError(DeviceLayer, "@@@@@@@@@@ SendSigma3c %d", (int)work.status.AsInteger());
-
-    // TODO add checks here (ignoreFailure?)
-
     // Special case: if for whatever reason not in expected state or sequence,
     // don't do anything, including sending a status report or aborting the
     // pending establish.
     VerifyOrExit(mState == State::kSendSigma3BackgroundPending, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mSequence == work.sequence, err = CHIP_ERROR_INCORRECT_STATE);
+
+    ignoreFailure = false;
 
     SuccessOrExit(err = work.status);
 
@@ -1336,11 +1329,7 @@ CHIP_ERROR CASESession::SendSigma3c(SendSigma3Work & work)
 exit:
     Platform::Delete(&work);
 
-    // TODO might need ignoreFailure to handle some paths
-
-    ChipLogError(DeviceLayer, "@@@@@@@@@@ SendSigma3c DONE %d", (int)err.AsInteger());
-
-    if (err != CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR && !ignoreFailure)
     {
         SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
         mState = State::kInitialized;
