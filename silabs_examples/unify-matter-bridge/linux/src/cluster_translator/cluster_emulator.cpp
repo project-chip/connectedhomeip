@@ -19,6 +19,7 @@
 #include "emulate_identify.hpp"
 #include "emulate_level.hpp"
 #include "emulate_groups.hpp"
+#include <app/clusters/identify-server/identify-server.h>
 
 #define LOG_TAG "cluster_emulator"
 
@@ -28,7 +29,7 @@
  * @brief Use default values for external attribute storage, this functions overrides a _weak_ symbol on the ember framework.
  * 
  * All attributes which has meta data with ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) and is not overridden by an attribute access interface,
- * will be read though this function. Right now this only applies to the attriutes in the Group cluster.
+ * will be read though this function. Right now this only applies to the attriutes in the Group cluster
  * 
  * @param endpoint 
  * @param clusterId 
@@ -39,10 +40,46 @@
  */
 EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
                                      uint8_t * buffer, uint16_t maxReadLength) {
+  sl_log_debug(LOG_TAG, "emberAfExternalAttributeReadCallback: endpoint: %d cluster: %d attribute: %d\n", endpoint, clusterId, attributeMetadata->attributeId); 
   memcpy(buffer, &attributeMetadata->defaultValue, attributeMetadata->size);
   return EMBER_ZCL_STATUS_SUCCESS;
 }
 
+void OnIdentifyStart(::Identify *)
+{
+    sl_log_debug(LOG_TAG, "Identify started\n");
+}
+
+void OnIdentifyStop(::Identify *)
+{
+    sl_log_debug(LOG_TAG, "Identify stopped\n");
+}
+
+void OnTriggerEffect(::Identify * identify)
+{
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+        sl_log_debug(LOG_TAG, "Blink\n");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+        sl_log_debug(LOG_TAG, "Breathe\n");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+        sl_log_debug(LOG_TAG, "Okay\n");
+        break;
+    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
+        sl_log_debug(LOG_TAG, "Channel Change\n");
+        break;
+    default:
+        sl_log_debug(LOG_TAG, "No identifier effect\n");
+        return;
+    }
+}
+
+static Identify gIdentify1 = {
+    chip::EndpointId{ 1 }, OnIdentifyStart, OnIdentifyStop, EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, OnTriggerEffect,
+};
 
 namespace unify::matter_bridge {
 
