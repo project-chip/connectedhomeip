@@ -33,8 +33,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
-
-#include "MainLoop.h"
+#include <platform/PlatformManager.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -144,29 +143,28 @@ gboolean ChipDeviceScanner::TimerExpiredCb(gpointer userData)
     return G_SOURCE_REMOVE;
 }
 
-gboolean ChipDeviceScanner::TriggerScan(GMainLoop * mainLoop, gpointer userData)
+CHIP_ERROR ChipDeviceScanner::TriggerScan(gpointer userData)
 {
-    auto self = reinterpret_cast<ChipDeviceScanner *>(userData);
-    int ret   = BT_ERROR_NONE;
+    auto self      = reinterpret_cast<ChipDeviceScanner *>(userData);
+    CHIP_ERROR err = CHIP_NO_ERROR;
     GSource * idleSource;
+    int ret;
 
-    self->mAsyncLoop = mainLoop;
-
-    // All set, trigger LE Scan
+    // Trigger LE Scan
     ret = bt_adapter_le_start_scan(LeScanResultCb, userData);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_le_start_scan() failed: %s", get_error_message(ret)));
-    ChipLogProgress(DeviceLayer, "Scan started");
+    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_le_start_scan() failed: %s", get_error_message(ret));
+                 err = CHIP_ERROR_INTERNAL);
+    self->mIsScanning = true;
 
-    // Start Timer
+    // Setup timer for scan timeout
     idleSource = g_timeout_source_new(self->mScanTimeoutMs);
     g_source_set_callback(idleSource, TimerExpiredCb, userData, nullptr);
     g_source_set_priority(idleSource, G_PRIORITY_HIGH_IDLE);
-    g_source_attach(idleSource, g_main_loop_get_context(self->mAsyncLoop));
+    g_source_attach(idleSource, g_main_context_get_thread_default());
     g_source_unref(idleSource);
-    return true;
 
 exit:
-    return false;
+    return err;
 }
 
 static bool __IsScanFilterSupported()
@@ -212,14 +210,9 @@ CHIP_ERROR ChipDeviceScanner::StartChipScan(System::Clock::Timeout timeout, Scan
 
     // All set to trigger LE Scan
     ChipLogProgress(DeviceLayer, "Start CHIP BLE scan: timeout=%ums", mScanTimeoutMs);
-    if (MainLoop::Instance().AsyncRequest(TriggerScan, this) == false)
-    {
-        ChipLogError(DeviceLayer, "Failed to trigger Scan...");
-        err = CHIP_ERROR_INTERNAL;
-        goto exit;
-    }
+    err = PlatformMgrImpl().GLibMatterContextInvoke(TriggerScan, this);
+    SuccessOrExit(err);
 
-    mIsScanning = true; // optimistic, to allow all callbacks to check this
     return CHIP_NO_ERROR;
 
 exit:
@@ -240,7 +233,6 @@ CHIP_ERROR ChipDeviceScanner::StopChipScan()
         ChipLogError(DeviceLayer, "bt_adapter_le_stop_scan() failed: %s", get_error_message(ret));
     }
 
-    g_main_loop_quit(mAsyncLoop);
     ChipLogProgress(DeviceLayer, "CHIP Scanner Async Thread Quit Done..Wait for Thread Windup...!");
 
     UnRegisterScanFilter();
