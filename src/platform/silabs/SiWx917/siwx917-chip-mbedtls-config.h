@@ -126,11 +126,11 @@ typedef void mbedtls_ecp_restart_ctx;
 #define MBEDTLS_X509_CSR_PARSE_C
 #define MBEDTLS_X509_USE_C
 
-#define MBEDTLS_MPI_WINDOW_SIZE 1       /**< Maximum windows size used. */
+#define MBEDTLS_MPI_WINDOW_SIZE 1 /**< Maximum windows size used. */
 #ifdef DIC_ENABLE
-#define MBEDTLS_MPI_MAX_SIZE 512        /**< Maximum number of bytes for usable MPIs. */
+#define MBEDTLS_MPI_MAX_SIZE 512 /**< Maximum number of bytes for usable MPIs. */
 #else
-#define MBEDTLS_MPI_MAX_SIZE 32         /**< Maximum number of bytes for usable MPIs. */
+#define MBEDTLS_MPI_MAX_SIZE 32 /**< Maximum number of bytes for usable MPIs. */
 #endif
 #define MBEDTLS_ECP_MAX_BITS 256        /**< Maximum bit size of groups */
 #define MBEDTLS_ECP_WINDOW_SIZE 2       /**< Maximum window size used */
@@ -144,7 +144,7 @@ typedef void mbedtls_ecp_restart_ctx;
 #define MBEDTLS_SSL_MAX_CONTENT_LEN 5120 /**< Maxium fragment length in bytes */
 #else
 #define MBEDTLS_SSL_MAX_CONTENT_LEN 768 /**< Maxium fragment length in bytes */
-#endif //DIC
+#endif                                  // DIC
 #endif
 
 #ifdef DIC_ENABLE

@@ -41,8 +41,8 @@
 #define mem_clib_free vPortFree
 #define mem_clib_malloc pvPortMalloc
 #ifdef DIC_ENABLE
-#define MEM_SIZE    5632
-#endif //DIC
+#define MEM_SIZE 5632
+#endif // DIC
 #else
 #define MEM_LIBC_MALLOC (0)
 #endif
