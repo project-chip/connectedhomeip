@@ -94,15 +94,9 @@
     "manufacturersXml": "../../../../src/app/zap-templates/zcl/data-model/manufacturers.xml",
     "options": {
         "text": {
-            "defaultResponsePolicy": [
-                "Always",
-                "Conditional",
-                "Never"
-            ]
+            "defaultResponsePolicy": ["Always", "Conditional", "Never"]
         },
-        "bool": [
-            "commandDiscovery"
-        ]
+        "bool": ["commandDiscovery"]
     },
     "defaults": {
         "text": {
@@ -145,9 +139,7 @@
             "UniqueID",
             "CapabilityMinima"
         ],
-        "Descriptor": [
-            "ClusterRevision"
-        ],
+        "Descriptor": ["ClusterRevision"],
         "Ethernet Network Diagnostics": [
             "PHYRate",
             "FullDuplex",
@@ -278,14 +270,7 @@
         ]
     },
     "defaultReportingPolicy": "mandatory",
-    "ZCLDataTypes": [
-        "ARRAY",
-        "BITMAP",
-        "ENUM",
-        "NUMBER",
-        "STRING",
-        "STRUCT"
-    ],
+    "ZCLDataTypes": ["ARRAY", "BITMAP", "ENUM", "NUMBER", "STRING", "STRUCT"],
     "fabricHandling": {
         "automaticallyCreateFields": true,
         "indexFieldId": 254,
