@@ -48,6 +48,11 @@
 #define MBEDTLS_ENTROPY_C
 #define MBEDTLS_SHA224_C
 #define MBEDTLS_SHA256_C
+#ifdef DIC_ENABLE
+#define MBEDTLS_PKCS1_V15
+#define MBEDTLS_RSA_NO_CRT
+#define MBEDTLS_CIPHER_MODE_CBC
+#endif //DIC
 
 #define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf
 
@@ -75,6 +80,10 @@
 #define MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
 #define MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED
 #define MBEDTLS_KEY_EXCHANGE_PSK_ENABLED
+#ifdef DIC_ENABLE
+#define MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
+#define MBEDTLS_RSA_C
+#endif //DIC
 #define MBEDTLS_MD_C
 #define MBEDTLS_NO_PLATFORM_ENTROPY
 #define MBEDTLS_OID_C
@@ -119,7 +128,11 @@
 #define MBEDTLS_X509_USE_C
 
 #define MBEDTLS_MPI_WINDOW_SIZE 1       /**< Maximum windows size used. */
+#ifdef DIC_ENABLE
+#define MBEDTLS_MPI_MAX_SIZE 512        /**< Maximum number of bytes for usable MPIs. */
+#else
 #define MBEDTLS_MPI_MAX_SIZE 32         /**< Maximum number of bytes for usable MPIs. */
+#endif
 #define MBEDTLS_ECP_MAX_BITS 256        /**< Maximum bit size of groups */
 #define MBEDTLS_ECP_WINDOW_SIZE 2       /**< Maximum window size used */
 #define MBEDTLS_ECP_FIXED_POINT_OPTIM 0 /**< Enable fixed-point speed-up */
@@ -129,6 +142,11 @@
 #define MBEDTLS_SSL_MAX_CONTENT_LEN 900 /**< Maxium fragment length in bytes */
 #else
 #define MBEDTLS_SSL_MAX_CONTENT_LEN 768 /**< Maxium fragment length in bytes */
+#endif
+
+#ifdef DIC_ENABLE
+#define MBEDTLS_SSL_IN_CONTENT_LEN 5120
+#define MBEDTLS_SSL_OUT_CONTENT_LEN 1560
 #endif
 
 #define MBEDTLS_SSL_CIPHERSUITES MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8

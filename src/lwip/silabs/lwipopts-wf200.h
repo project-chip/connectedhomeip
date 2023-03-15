@@ -40,6 +40,9 @@
 #define MEM_LIBC_MALLOC (1)
 #define mem_clib_free vPortFree
 #define mem_clib_malloc pvPortMalloc
+#ifdef DIC_ENABLE
+#define MEM_SIZE    5632
+#endif //DIC
 #else
 #define MEM_LIBC_MALLOC (0)
 #endif
@@ -64,6 +67,13 @@
 #define TCPIP_THREAD_NAME "LWIP"
 
 #define LWIP_SOCKET 0
+
+#ifdef DIC_ENABLE
+#define LWIP_ALTCP 1
+#define LWIP_ALTCP_TLS 1
+#define LWIP_ALTCP_TLS_MBEDTLS 1
+#define MEMP_ALTCP_PCB 1
+#endif
 
 #define LWIP_FREERTOS_USE_STATIC_TCPIP_TASK 1
 
