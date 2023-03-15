@@ -2122,7 +2122,7 @@
               "name": "TestEventTrigger",
               "code": 0,
               "mfgCode": null,
-              "source": "client",
+              "source": "server",
               "incoming": 1,
               "outgoing": 0
             }
@@ -6014,6 +6014,22 @@
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "type": "bitmap32",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {

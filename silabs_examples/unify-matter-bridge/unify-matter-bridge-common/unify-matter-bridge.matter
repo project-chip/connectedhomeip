@@ -1282,6 +1282,7 @@ endpoint 1 {
 
   server cluster Groups {
     ram      attribute nameSupport;
+    ram      attribute featureMap;
     ram      attribute clusterRevision default = 4;
   }
 
