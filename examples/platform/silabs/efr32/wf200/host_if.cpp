@@ -496,7 +496,7 @@ static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
  * @param[in]  mac:
  *****************************************************************************/
 static void sl_wfx_ap_client_disconnected_callback(uint32_t status, uint8_t * mac)
-{
+{-0opl1205.1300
     // TODO
     SILABS_LOG("Client disconnected, reason: %d, MAC: %02X:%02X:%02X:%02X:%02X:%02X\r\n", (int) status, mac[0], mac[1], mac[2],
                mac[3], mac[4], mac[5]);
@@ -578,18 +578,11 @@ static void wfx_events_task(void * p_arg)
                 {
                     wfx_ipv6_notify(1);
                     hasNotifiedIPV6 = true;
-#if 0
-                    sl_wfx_set_power_mode(WFM_PM_MODE_ACTIVE, WFM_PM_POLL_UAPSD, BEACON_1);
-                    sl_wfx_disable_device_power_save();
-#elif 1
+
+                    // send device to power save mode
                     sl_wfx_set_power_mode(WFM_PM_MODE_DTIM, WFM_PM_POLL_FAST_PS, 0);
-                    // sl_wfx_enable_device_power_save();
                     sl_wfx_disable_device_power_save();
-#endif
-#if 0
-                    sl_wfx_set_power_mode(WFM_PM_MODE_ACTIVE, WFM_PM_POLL_FAST_PS, 0);
-                    sl_wfx_enable_device_power_save();
-#endif
+
                     if (!hasNotifiedWifiConnectivity)
                     {
                         wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &ap_mac);
