@@ -14,12 +14,12 @@ typedef void (*CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase nam
 
 {{! TODO: global response types?}}
 
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server}}
 {{#if isArray}}
 typedef void (*CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType)(void *, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo::DecodableType &);
 {{else}}
 typedef void (*CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType)(void *, chip::app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo::DecodableArgType);
 {{/if}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 {{/chip_client_clusters}}
 {{/if}}

@@ -697,8 +697,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedScenesClusterCurrentGroupAttributeCallback
-      implements ChipClusters.ScenesCluster.CurrentGroupAttributeCallback,
+  public static class DelegatedScenesClusterLastConfiguredByAttributeCallback
+      implements ChipClusters.ScenesCluster.LastConfiguredByAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -708,9 +708,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer value) {
+    public void onSuccess(@Nullable Long value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
       responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }

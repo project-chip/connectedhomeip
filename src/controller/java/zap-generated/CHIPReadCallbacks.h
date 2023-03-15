@@ -627,27 +627,28 @@ private:
     bool keepAlive;
 };
 
-class CHIPScenesCurrentGroupAttributeCallback : public chip::Callback::Callback<CHIPScenesClusterCurrentGroupAttributeCallbackType>
+class CHIPScenesLastConfiguredByAttributeCallback
+    : public chip::Callback::Callback<CHIPScenesClusterLastConfiguredByAttributeCallbackType>
 {
 public:
-    CHIPScenesCurrentGroupAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPScenesLastConfiguredByAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPScenesCurrentGroupAttributeCallback();
+    ~CHIPScenesLastConfiguredByAttributeCallback();
 
-    static void maybeDestroy(CHIPScenesCurrentGroupAttributeCallback * callback)
+    static void maybeDestroy(CHIPScenesLastConfiguredByAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPScenesCurrentGroupAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPScenesLastConfiguredByAttributeCallback>(callback);
         }
     }
 
-    static void CallbackFn(void * context, chip::GroupId value);
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::NodeId> & value);
     static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPScenesCurrentGroupAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
+            reinterpret_cast<CHIPScenesLastConfiguredByAttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
