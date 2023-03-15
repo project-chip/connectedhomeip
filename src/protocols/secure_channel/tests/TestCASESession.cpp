@@ -66,8 +66,8 @@ void ServiceEvents(TestContext & ctx)
     {
         ctx.DrainAndServiceIO();
 
-        chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); },
-                                                    (intptr_t) nullptr);
+        chip::DeviceLayer::PlatformMgr().ScheduleWork(
+            [](intptr_t) -> void { chip::DeviceLayer::PlatformMgr().StopEventLoopTask(); }, (intptr_t) nullptr);
         chip::DeviceLayer::PlatformMgr().RunEventLoop();
     }
 }
