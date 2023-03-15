@@ -32,6 +32,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Darwin/BleConnectionDelegate.h>
+#include <platform/Darwin/BleScannerDelegate.h>
 #include <platform/LockTracker.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -40,8 +41,15 @@
 using namespace chip::Ble;
 
 constexpr uint64_t kScanningWithDiscriminatorTimeoutInSeconds = 60;
-constexpr uint64_t kScanningWithoutDiscriminatorTimeoutInSeconds = 120;
+constexpr uint64_t kScanningWithoutDelegateTimeoutInSeconds = 120;
 constexpr const char * kBleWorkQueueName = "org.csa-iot.matter.framework.ble.workqueue";
+
+typedef NS_ENUM(uint8_t, BleConnectionMode) {
+    kUndefined = 0,
+    kScanningWithoutDelegate,
+    kScanning,
+    kConnecting,
+};
 
 @interface BleConnection : NSObject <CBCentralManagerDelegate, CBPeripheralDelegate>
 
@@ -51,23 +59,28 @@ constexpr const char * kBleWorkQueueName = "org.csa-iot.matter.framework.ble.wor
 @property (strong, nonatomic) CBPeripheral * peripheral;
 @property (strong, nonatomic) CBUUID * shortServiceUUID;
 @property (nonatomic, readonly, nullable) dispatch_source_t timer;
+@property (nonatomic, readonly) BleConnectionMode currentMode;
 @property (strong, nonatomic) NSMutableDictionary * cachedPeripherals;
-@property (unsafe_unretained, nonatomic) bool hasDeviceDiscriminator;
 @property (unsafe_unretained, nonatomic) bool found;
 @property (unsafe_unretained, nonatomic) chip::SetupDiscriminator deviceDiscriminator;
 @property (unsafe_unretained, nonatomic) void * appState;
 @property (unsafe_unretained, nonatomic) BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete;
 @property (unsafe_unretained, nonatomic) BleConnectionDelegate::OnConnectionErrorFunct onConnectionError;
+@property (unsafe_unretained, nonatomic) chip::DeviceLayer::BleScannerDelegate * scannerDelegate;
 @property (unsafe_unretained, nonatomic) chip::Ble::BleLayer * mBleLayer;
 
 - (id)initWithQueue:(dispatch_queue_t)queue;
+- (id)initWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate queue:(dispatch_queue_t)queue;
 - (id)initWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator queue:(dispatch_queue_t)queue;
 - (void)setBleLayer:(chip::Ble::BleLayer *)bleLayer;
 - (void)start;
 - (void)stop;
-- (BOOL)hasDiscriminator;
+- (void)updateWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate;
 - (void)updateWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator;
-- (void)update;
+- (void)updateWithPeripheral:(CBPeripheral *)peripheral;
+- (BOOL)isScanningWithoutDelegate;
+- (BOOL)isScanning;
+- (BOOL)isConnecting;
 
 @end
 
@@ -88,9 +101,9 @@ namespace DeviceLayer {
             }
 
             dispatch_async(bleWorkQueue, ^{
-                // If the previous connection delegate was a scan without a discriminator, just reuse it instead of
+                // If the previous connection delegate was not a try to connect to something, just reuse it instead of
                 // creating a brand new connection but update the discriminator and the ble layer members.
-                if (ble and ![ble hasDiscriminator]) {
+                if (ble and ![ble isConnecting]) {
                     [ble setBleLayer:bleLayer];
                     ble.appState = appState;
                     ble.onConnectionComplete = OnConnectionComplete;
@@ -109,29 +122,67 @@ namespace DeviceLayer {
             });
         }
 
-        void BleConnectionDelegateImpl::PrepareConnection()
+        void BleConnectionDelegateImpl::NewConnection(Ble::BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj)
         {
             assertChipStackLockedByCurrentThread();
 
             ChipLogProgress(Ble, "%s", __FUNCTION__);
+
             if (!bleWorkQueue) {
                 bleWorkQueue = dispatch_queue_create(kBleWorkQueueName, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
             }
 
             dispatch_async(bleWorkQueue, ^{
-                // If the previous connection delegate was a scan without a discriminator, just reuse it instead of
-                // creating a brand new connection but clear the cache and reset the timer.
-                if (ble and ![ble hasDiscriminator]) {
-                    [ble update];
+                // The BLE_CONNECTION_OBJECT represent a CBPeripheral object. In order for it to be valid the central
+                // manager needs to still be running.
+                if (!ble || [ble isConnecting]) {
+                    if (OnConnectionError) {
+                        auto workQueue = chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue();
+                        dispatch_async(workQueue, ^{
+                            OnConnectionError(appState, CHIP_ERROR_INCORRECT_STATE);
+                        });
+                    }
+                    return;
+                }
+
+                [ble setBleLayer:bleLayer];
+                ble.appState = appState;
+                ble.onConnectionComplete = OnConnectionComplete;
+                ble.onConnectionError = OnConnectionError;
+                [ble updateWithPeripheral:(__bridge CBPeripheral *) connObj];
+            });
+        }
+
+        void BleConnectionDelegateImpl::StartScan(BleScannerDelegate * delegate)
+        {
+            assertChipStackLockedByCurrentThread();
+
+            ChipLogProgress(Ble, "%s", __FUNCTION__);
+
+            if (!bleWorkQueue) {
+                bleWorkQueue = dispatch_queue_create(kBleWorkQueueName, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+            }
+
+            dispatch_async(bleWorkQueue, ^{
+                // If the previous connection delegate was not a try to connect to something, just reuse it instead of
+                // creating a brand new connection but update the discriminator and the ble layer members.
+                if (ble and ![ble isConnecting]) {
+                    [ble updateWithDelegate:delegate];
                     return;
                 }
 
                 [ble stop];
-                ble = [[BleConnection alloc] initWithQueue:bleWorkQueue];
+                ble = [[BleConnection alloc] initWithDelegate:delegate queue:bleWorkQueue];
                 ble.onConnectionComplete = OnConnectionComplete;
                 ble.onConnectionError = OnConnectionError;
                 ble.centralManager = [ble.centralManager initWithDelegate:ble queue:bleWorkQueue];
             });
+        }
+
+        void BleConnectionDelegateImpl::StopScan()
+        {
+            assertChipStackLockedByCurrentThread();
+            CancelConnection();
         }
 
         CHIP_ERROR BleConnectionDelegateImpl::CancelConnection()
@@ -171,13 +222,23 @@ namespace DeviceLayer {
         _centralManager = [CBCentralManager alloc];
         _found = false;
         _cachedPeripherals = [[NSMutableDictionary alloc] init];
-        _hasDeviceDiscriminator = false;
+        _currentMode = kUndefined;
 
         dispatch_source_set_event_handler(_timer, ^{
             [self stop];
             [self dispatchConnectionError:BLE_ERROR_APP_CLOSED_CONNECTION];
         });
+    }
 
+    return self;
+}
+
+- (id)initWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate queue:(dispatch_queue_t)queue
+{
+    self = [self initWithQueue:queue];
+    if (self) {
+        _scannerDelegate = delegate;
+        _currentMode = (delegate == nullptr) ? kScanningWithoutDelegate : kScanning;
         [self resetTimer];
     }
 
@@ -189,19 +250,43 @@ namespace DeviceLayer {
     self = [self initWithQueue:queue];
     if (self) {
         _deviceDiscriminator = deviceDiscriminator;
-        _hasDeviceDiscriminator = true;
+        _currentMode = kConnecting;
         [self resetTimer];
     }
 
     return self;
 }
 
+- (BOOL)isScanningWithoutDelegate
+{
+    return _currentMode == kScanningWithoutDelegate;
+}
+
+- (BOOL)isScanning
+{
+    return _currentMode == kScanning;
+}
+
+- (BOOL)isConnecting
+{
+    return _currentMode == kConnecting;
+}
+
 - (void)resetTimer
 {
-    auto timeout =
-        [self hasDiscriminator] ? kScanningWithDiscriminatorTimeoutInSeconds : kScanningWithoutDiscriminatorTimeoutInSeconds;
-    dispatch_source_set_timer(
-        _timer, dispatch_walltime(nullptr, static_cast<int64_t>(timeout * NSEC_PER_SEC)), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
+    if ([self isConnecting]) {
+        auto timeout = static_cast<int64_t>(kScanningWithDiscriminatorTimeoutInSeconds * NSEC_PER_SEC);
+        dispatch_source_set_timer(_timer, dispatch_walltime(nullptr, timeout), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
+    } else if ([self isScanningWithoutDelegate]) {
+        auto timeout = static_cast<int64_t>(kScanningWithoutDelegateTimeoutInSeconds * NSEC_PER_SEC);
+        dispatch_source_set_timer(_timer, dispatch_walltime(nullptr, timeout), DISPATCH_TIME_FOREVER, 5 * NSEC_PER_SEC);
+    } else if ([self isScanning]) {
+        dispatch_source_cancel(_timer);
+    } else {
+        // It should not happens.
+        [self stop];
+        [self dispatchConnectionError:CHIP_ERROR_INCORRECT_STATE];
+    }
 }
 
 // All our callback dispatch must happen on _chipWorkQueue
@@ -258,39 +343,52 @@ namespace DeviceLayer {
                      RSSI:(NSNumber *)RSSI
 {
     NSNumber * isConnectable = [advertisementData objectForKey:CBAdvertisementDataIsConnectable];
-    if ([isConnectable boolValue]) {
-        NSDictionary * servicesData = [advertisementData objectForKey:CBAdvertisementDataServiceDataKey];
-        for (CBUUID * serviceUUID in servicesData) {
-            if ([serviceUUID.data isEqualToData:_shortServiceUUID.data]) {
-                NSData * serviceData = [servicesData objectForKey:serviceUUID];
+    if ([isConnectable boolValue] == NO) {
+        return;
+    }
 
-                NSUInteger length = [serviceData length];
-                if (length == 8) {
-                    const uint8_t * bytes = (const uint8_t *) [serviceData bytes];
-                    uint8_t opCode = bytes[0];
-                    uint16_t discriminator = (bytes[1] | (bytes[2] << 8)) & 0xfff;
-
-                    if (opCode == 0 || opCode == 1) {
-                        if (![self hasDiscriminator]) {
-                            ChipLogProgress(Ble, "Storing device %p with discriminator: %d", peripheral, discriminator);
-                            _cachedPeripherals[@(discriminator)] = peripheral;
-                        } else if ([self checkDiscriminator:discriminator]) {
-                            ChipLogProgress(Ble, "Connecting to device %p with discriminator: %d", peripheral, discriminator);
-                            [self connect:peripheral];
-                            [self stopScanning];
-                        }
-                    }
-                }
-
-                break;
-            }
+    NSDictionary * servicesData = [advertisementData objectForKey:CBAdvertisementDataServiceDataKey];
+    NSData * serviceData;
+    for (CBUUID * serviceUUID in servicesData) {
+        if ([serviceUUID.data isEqualToData:_shortServiceUUID.data]) {
+            serviceData = [servicesData objectForKey:serviceUUID];
+            break;
         }
     }
-}
 
-- (BOOL)hasDiscriminator
-{
-    return _hasDeviceDiscriminator;
+    if (!serviceData || [serviceData length] != 8) {
+        return;
+    }
+
+    const uint8_t * bytes = (const uint8_t *) [serviceData bytes];
+    uint8_t opCode = bytes[0];
+    if (opCode != 0 && opCode != 1) {
+        return;
+    }
+
+    uint16_t discriminator = (bytes[1] | (bytes[2] << 8)) & 0xfff;
+
+    if ([self isConnecting] and [self checkDiscriminator:discriminator]) {
+        ChipLogProgress(Ble, "Connecting to device %p with discriminator: %d", peripheral, discriminator);
+        [self connect:peripheral];
+        [self stopScanning];
+        return;
+    }
+
+    if (![self isConnecting]) {
+        if ([_cachedPeripherals objectForKey:peripheral] == nil) {
+            ChipLogProgress(Ble, "Storing device %p with discriminator: %d", peripheral, discriminator);
+            if (_scannerDelegate) {
+                dispatch_async(_chipWorkQueue, ^{
+                    ChipBLEDeviceIdentificationInfo info;
+                    memcpy(&info, bytes, sizeof(info));
+                    _scannerDelegate->OnBleScanResult((__bridge void *) peripheral, info);
+                });
+            }
+        }
+
+        _cachedPeripherals[peripheral] = serviceData;
+    }
 }
 
 - (BOOL)checkDiscriminator:(uint16_t)discriminator
@@ -428,12 +526,20 @@ namespace DeviceLayer {
 - (void)start
 {
     dispatch_resume(_timer);
-    [self startScanning];
+
+    // If a peripheral has already been found, try to connect to it once BLE starts,
+    // otherwise start scanning to find the peripheral to connect to.
+    if (_peripheral != nil) {
+        [self connect:_peripheral];
+    } else {
+        [self startScanning];
+    }
 }
 
 - (void)stop
 {
     [self stopScanning];
+    _scannerDelegate = nil;
     [_cachedPeripherals removeAllObjects];
     _cachedPeripherals = nil;
 
@@ -486,27 +592,42 @@ namespace DeviceLayer {
     [_centralManager connectPeripheral:peripheral options:nil];
 }
 
-- (void)update
+- (void)updateWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate
 {
     [_cachedPeripherals removeAllObjects];
+    _scannerDelegate = delegate;
+    _currentMode = (delegate == nullptr) ? kScanningWithoutDelegate : kScanning;
+
+    if (_currentMode == kScanning) {
+        for (CBPeripheral * cachedPeripheral in _cachedPeripherals) {
+            NSData * serviceData = _cachedPeripherals[cachedPeripheral];
+            dispatch_async(_chipWorkQueue, ^{
+                ChipBLEDeviceIdentificationInfo info;
+                memcpy(&info, [serviceData bytes], sizeof(info));
+                _scannerDelegate->OnBleScanResult((__bridge void *) cachedPeripheral, info);
+            });
+        }
+    }
+
     [self resetTimer];
 }
 
 - (void)updateWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator
 {
     _deviceDiscriminator = deviceDiscriminator;
-    _hasDeviceDiscriminator = true;
+    _scannerDelegate = nil;
+    _currentMode = kConnecting;
 
     CBPeripheral * peripheral = nil;
-    if (deviceDiscriminator.IsShortDiscriminator()) {
-        for (NSNumber * longDiscriminator in _cachedPeripherals) {
-            if ([self checkDiscriminator:[longDiscriminator unsignedShortValue]]) {
-                peripheral = _cachedPeripherals[longDiscriminator];
-                break;
-            }
+    for (CBPeripheral * cachedPeripheral in _cachedPeripherals) {
+        NSData * serviceData = _cachedPeripherals[cachedPeripheral];
+        ChipBLEDeviceIdentificationInfo info;
+        memcpy(&info, [serviceData bytes], sizeof(info));
+
+        if ([self checkDiscriminator:info.GetDeviceDiscriminator()]) {
+            peripheral = cachedPeripheral;
+            break;
         }
-    } else {
-        peripheral = _cachedPeripherals[@(deviceDiscriminator.GetLongValue())];
     }
 
     if (peripheral) {
@@ -516,6 +637,16 @@ namespace DeviceLayer {
     } else {
         [self resetTimer];
     }
+}
+
+- (void)updateWithPeripheral:(CBPeripheral *)peripheral
+{
+    _scannerDelegate = nil;
+    _currentMode = kConnecting;
+
+    ChipLogProgress(Ble, "Connecting to device: %p", peripheral);
+    [self connect:peripheral];
+    [self stopScanning];
 }
 
 /**

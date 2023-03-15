@@ -18,6 +18,7 @@
 
 #include "PairingCommand.h"
 #include "platform/PlatformManager.h"
+#include <commands/common/DeviceScanner.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -77,6 +78,9 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         break;
     case PairingMode::AlreadyDiscovered:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort, mRemoteAddr.interfaceId));
+        break;
+    case PairingMode::AlreadyDiscoveredByIndex:
+        err = PairWithMdnsOrBleByIndex(remoteId, mIndex);
         break;
     }
 
@@ -153,6 +157,27 @@ CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
 {
     auto params = RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (mPaseOnly.ValueOr(false))
+    {
+        err = CurrentCommissioner().EstablishPASEConnection(remoteId, params);
+    }
+    else
+    {
+        auto commissioningParams = GetCommissioningParameters();
+        err                      = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
+    }
+    return err;
+}
+
+CHIP_ERROR PairingCommand::PairWithMdnsOrBleByIndex(NodeId remoteId, uint16_t index)
+{
+    VerifyOrReturnError(IsInteractive(), CHIP_ERROR_INCORRECT_STATE);
+
+    RendezvousParameters params;
+    ReturnErrorOnFailure(GetDeviceScanner().Get(index, params));
+    params.SetSetupPINCode(mSetupPINCode);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (mPaseOnly.ValueOr(false))
