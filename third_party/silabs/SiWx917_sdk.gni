@@ -42,6 +42,9 @@ declare_args() {
   use_system_view = false
 
   silabs_log_enabled = true
+
+  # Argument to Disable IPv4 for wifi(rs911)
+  chip_enable_wifi_ipv4 = false
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
@@ -142,6 +145,10 @@ template("efr32_sdk") {
     }
 
     defines += board_defines
+
+    if (chip_enable_wifi_ipv4) {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
+    }
 
     # Enabling led interface
     if (use_wstk_leds) {
