@@ -40,8 +40,10 @@ the 64-bit version of Raspberry Pi OS Bullseye.
     - [Using the chip-tool to Commission](#using-the-chip-tool-to-commission)
     - [Toggle an OnOff device](#toggle-an-onoff-device)
   - [Toggle a Group of OnOff Devices](#toggle-a-group-of-onoff-devices)
-  - [Running the matter bridge in none specification compliant mode](#running-the-matter-bridge-in-none-specification-compliant-mode)
+  - [Running the matter bridge in strict device mapping mode](#running-the-matter-bridge-in-strict-device-mapping-mode)
   - [Command Line Arguments](#command-line-arguments)
+  - [Running chip-tool tests on Unify Matter Bridge endpoints](#running-chip-tool-tests-on-unify-matter-bridge-endpoints)
+    - [Troubleshooting](#troubleshooting)
 
 ## Running the Matter Bridge
 
@@ -125,15 +127,20 @@ The commissioning procedure requires use of a pairing code. This pairing code is
 written to the console when running the Matter Bridge. Look for something
 similar to '`MT:-24J029Q00KA0648G00`', used as the pairing code in the following
 example. This code can be used when commissioning with the CLI commissioning
-tool `chip-tool`.
-
+tool `chip-tool`. 
 ```bash
 [1659615301.367669][1967:1967] CHIP:SVR: SetupQRCode: [MT:-24J029Q00KA0648G00]
 ```
 
-A simpler, more user-friendly way of commissioning is to use the Google Home App
-with a QR code containing the pairing code. The QR code can be obtained by
-following the link seen in the console, similar to the line below:
+Additionally the pairing code will be published on the MQTT Broker on the topic
+ucl/SmartStart/CommissionableDevice/MT:-24J029Q00KA0648G00. The Unify Developer
+GUI has a page which display the QRCodes of all comissionable bridge which are
+connected to the broker, ready to be scaned with a Google Home App or similar.
+
+Another way to get the QR code is to look for an url in the console log similar
+to and copy the link into a browser. Note that two codes a printed at startup
+one for _Standard Comissioning flow_  and one for custom comissioning flow. 
+Be sure to use the standard flow with Eco system devices. 
 
 ```bash
 [1659615301.367723][1967:1967] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J029Q00KA0648G00
