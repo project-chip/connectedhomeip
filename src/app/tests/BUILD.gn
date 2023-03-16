@@ -91,7 +91,9 @@ source_set("scenes-table-test-srcs") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core",
   ]
 }

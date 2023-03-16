@@ -110,7 +110,7 @@ CHIP_ERROR ExtensionFieldSetsImpl::InsertFieldSet(const ExtensionFieldSet & fiel
     return CHIP_ERROR_NO_MEMORY;
 }
 
-CHIP_ERROR ExtensionFieldSetsImpl::GetFieldSetAtPosition(ExtensionFieldSet & fieldSet, uint8_t position)
+CHIP_ERROR ExtensionFieldSetsImpl::GetFieldSetAtPosition(ExtensionFieldSet & fieldSet, uint8_t position) const
 {
     VerifyOrReturnError(position < mFieldSetsCount, CHIP_ERROR_BUFFER_TOO_SMALL);
 

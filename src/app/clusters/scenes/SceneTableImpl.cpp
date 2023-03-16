@@ -16,6 +16,7 @@
  */
 
 #include <app/clusters/scenes/SceneTableImpl.h>
+#include <app/util/attribute-storage.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <stdlib.h>
 
@@ -314,6 +315,7 @@ CHIP_ERROR DefaultSceneTableImpl::Init(PersistentStorageDelegate * storage)
 
 void DefaultSceneTableImpl::Finish()
 {
+    UnregisterAllHandlers();
     mSceneEntryIterators.ReleaseAll();
 }
 
@@ -329,6 +331,7 @@ CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(FabricIndex fabric_index, c
 
     return fabric.SaveScene(mStorage, entry);
 }
+
 CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry)
 {
     FabricSceneData fabric(fabric_index);
@@ -343,6 +346,7 @@ CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, S
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id)
 {
     FabricSceneData fabric(fabric_index);
@@ -371,105 +375,64 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntryAtPosition(FabricIndex fa
     return fabric.RemoveScene(mStorage, scene.mStorageId);
 }
 
-/// @brief Register a handler in the handler list
+/// @brief Register a handler in the handler linked list
 /// @param handler Cluster specific handler for extension field sets interaction
-/// @return CHIP_NO_ERROR if handler was registered, CHIP_ERROR_NO_MEMORY if the handler list is full
-CHIP_ERROR DefaultSceneTableImpl::RegisterHandler(SceneHandler * handler)
+void DefaultSceneTableImpl::RegisterHandler(SceneHandler * handler)
 {
-    uint8_t firstEmptyPosition = kInvalidPosition;
 
-    for (uint8_t i = 0; i < kMaxSceneHandlers; i++)
-    {
-        if (this->mHandlers[i] == handler)
-        {
-            this->mHandlers[i] = handler;
-            return CHIP_NO_ERROR;
-        }
-        if (this->mHandlers[i] == nullptr && firstEmptyPosition == kInvalidPosition)
-        {
-            firstEmptyPosition = i;
-        }
-    }
-
-    // if found, insert at found position, otherwise at first free possition, otherwise return error
-    if (firstEmptyPosition < kMaxSceneHandlers)
-    {
-        this->mHandlers[firstEmptyPosition] = handler;
-        this->mNumHandlers++;
-        return CHIP_NO_ERROR;
-    }
-
-    return CHIP_ERROR_NO_MEMORY;
+    mHandlerList.PushFront(handler);
+    mNumHandlers++;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::UnregisterHandler(SceneHandler * handler)
+void DefaultSceneTableImpl::UnregisterHandler(SceneHandler * handler)
 {
-    uint8_t position = kInvalidPosition;
-
     // Verify list is populated and handler is not null
-    VerifyOrReturnValue(!this->HandlerListEmpty() && !(handler == nullptr), CHIP_NO_ERROR);
-
-    // Finds the position of the Handler to unregister
-    for (uint8_t i = 0; i < this->mNumHandlers; i++)
-    {
-        if (this->mHandlers[i] == handler)
-        {
-            position = i;
-            break;
-        }
-    }
-
-    // Verify Handler was found
-    VerifyOrReturnValue(position < kMaxSceneHandlers, CHIP_NO_ERROR);
-
-    uint8_t nextPos = static_cast<uint8_t>(position + 1);
-    uint8_t moveNum = static_cast<uint8_t>(kMaxSceneHandlers - nextPos);
-
-    // TODO: Implement general array management methods
-    // Compress array after removal
-    if (moveNum)
-    {
-        memmove(&this->mHandlers[position], &this->mHandlers[nextPos], sizeof(this->mHandlers[position]) * moveNum);
-    }
-
-    this->mNumHandlers--;
-    // Clear last occupied position
-    this->mHandlers[mNumHandlers] = nullptr;
-
-    return CHIP_NO_ERROR;
+    VerifyOrReturn(!this->HandlerListEmpty() && !(handler == nullptr));
+    mHandlerList.Remove(handler);
+    mNumHandlers--;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::UnregisterAllHandlers()
+void DefaultSceneTableImpl::UnregisterAllHandlers()
 {
-    for (uint8_t i = 0; i < this->mNumHandlers; i++)
+    while (!mHandlerList.Empty())
     {
-        ReturnErrorOnFailure(this->UnregisterHandler(this->mHandlers[0]));
+        IntrusiveList<SceneHandler>::Iterator foo = mHandlerList.begin();
+        SceneHandler * handle                     = &(*foo);
+        mHandlerList.Remove((handle));
+        mNumHandlers--;
     }
-
-    return CHIP_NO_ERROR;
 }
 
+/// @brief Gets the field sets for the clusters implemented on a specific endpoint and store them in an EFS (extension field set).
+/// Does so by going through the SceneHandler list and calling the first handler the list find for each specific clusters.
+/// @param scene Scene in which the EFS gets populated
 CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 {
+
     if (!this->HandlerListEmpty())
     {
-        for (uint8_t i = 0; i < this->mNumHandlers; i++)
+        uint8_t clusterCount = 0;
+        clusterId cArray[kMaxClusterPerScenes];
+        Span<clusterId> cSpan(cArray);
+        clusterCount = GetClustersFromEndpoint(scene.mStorageId.mEndpointId, cArray, kMaxClusterPerScenes);
+        cSpan.reduce_size(clusterCount);
+        for (clusterId cluster : cSpan)
         {
-            clusterId cArray[kMaxClusterPerScenes];
-            Span<clusterId> cSpan(cArray);
-            if (this->mHandlers[i] != nullptr)
-            {
-                this->mHandlers[i]->GetSupportedClusters(scene.mStorageId.mEndpointId, cSpan);
-                for (clusterId cluster : cSpan)
-                {
-                    ExtensionFieldSet EFS;
-                    MutableByteSpan EFSSpan = MutableByteSpan(EFS.mBytesBuffer, kMaxFieldBytesPerCluster);
+            ExtensionFieldSet EFS;
+            MutableByteSpan EFSSpan = MutableByteSpan(EFS.mBytesBuffer, kMaxFieldBytesPerCluster);
+            EFS.mID                 = cluster;
 
-                    EFS.mID = cluster;
-                    ReturnErrorOnFailure(this->mHandlers[i]->SerializeSave(scene.mStorageId.mEndpointId, EFS.mID, EFSSpan));
+            IntrusiveList<SceneHandler>::Iterator iter = mHandlerList.begin();
+            while (iter != mHandlerList.end())
+            {
+                if (iter->SupportsCluster(scene.mStorageId.mEndpointId, cluster))
+                {
+                    ReturnErrorOnFailure(iter->SerializeSave(scene.mStorageId.mEndpointId, EFS.mID, EFSSpan));
                     EFS.mUsedBytes = static_cast<uint8_t>(EFSSpan.size());
                     ReturnErrorOnFailure(scene.mStorageData.mExtensionFieldSets.InsertFieldSet(EFS));
+                    break;
                 }
+                iter++;
             }
         }
     }
@@ -477,17 +440,15 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(FabricIndex fabric_index, const SceneStorageId & scene_id)
+/// @brief Retrieves the values of extension field sets on a scene and applies them to each cluster on the endpoint of the scene.
+/// Does so by iterating through mHandlerList for each cluster in the EFS and calling the FIRST handler found that supports the
+/// cluster. Does so by going through the SceneHandler list and calling the first handler the list find for each specific clusters.
+/// @param scene Scene providing the EFSs (extension field sets)
+CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(const SceneTableEntry & scene)
 {
-    FabricSceneData fabric(fabric_index);
-    SceneTableData scene(fabric_index);
     ExtensionFieldSet EFS;
     TransitionTimeMs time;
     clusterId cluster;
-
-    ReturnErrorOnFailure(fabric.Load(mStorage));
-    VerifyOrReturnError(fabric.Find(scene_id, scene.index) == CHIP_NO_ERROR, CHIP_ERROR_NOT_FOUND);
-    ReturnErrorOnFailure(scene.Load(mStorage));
 
     if (!this->HandlerListEmpty())
     {
@@ -500,9 +461,14 @@ CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(FabricIndex fabric_index, const 
 
             if (!EFS.IsEmpty())
             {
-                for (uint8_t j = 0; j < this->mNumHandlers; j++)
+                IntrusiveList<SceneHandler>::Iterator iter = mHandlerList.begin();
+                while (iter != mHandlerList.end())
                 {
-                    ReturnErrorOnFailure(this->mHandlers[j]->ApplyScene(scene.mStorageId.mEndpointId, cluster, EFSSpan, time));
+                    if (iter->SupportsCluster(scene.mStorageId.mEndpointId, cluster))
+                    {
+                        ReturnErrorOnFailure(iter->ApplyScene(scene.mStorageId.mEndpointId, cluster, EFSSpan, time));
+                        break;
+                    }
                 }
             }
         }
@@ -527,6 +493,13 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 
     // Remove fabric
     return fabric.Delete(mStorage);
+}
+
+/// @brief wrapper function around emberAfGetClustersFromEndpoint to allow testing, shimed in test configuration because
+/// emberAfGetClusterFromEndpoint relies on <app/util/attribute-storage.h>, which relies on zap generated files
+uint8_t DefaultSceneTableImpl::GetClustersFromEndpoint(EndpointId endpoint, ClusterId * clusterList, uint8_t listLen)
+{
+    return emberAfGetClustersFromEndpoint(endpoint, clusterList, listLen, true);
 }
 
 DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneEntries(FabricIndex fabric_index)

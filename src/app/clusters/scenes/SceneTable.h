@@ -20,6 +20,7 @@
 #include <app/clusters/scenes/ExtensionFieldSets.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CommonIterator.h>
+#include <lib/support/IntrusiveList.h>
 #include <lib/support/PersistentData.h>
 #include <lib/support/Span.h>
 
@@ -39,16 +40,15 @@ static constexpr uint8_t kMaxScenePerFabric = CHIP_CONFIG_SCENES_MAX_PER_FABRIC;
 static constexpr size_t kIteratorsMax       = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
 static constexpr size_t kSceneNameMax       = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
 
-// Handler's are meant to retrieve a single cluster's extension field set, therefore the maximum number allowed is the maximal
-// number of extension field set.
-static constexpr uint8_t kMaxSceneHandlers = CHIP_CONFIG_SCENES_MAX_SCENE_HANDLERS;
-
 /// @brief Abstract class allowing different Endpoints interactions with the ExtensionFieldSets added to and retrieved from the
 /// scene Table. The Scene Handler's are meant as interface between various clusters and the Scene table. The expected behaviour of
 /// the table with the handler is: Once a scene command involving extension field set is received, the Scene Table will go through
 /// the list of handlers to either retrieve, populate or apply Extension field sets. Each handler is meant to retrieve an extension
 /// field set for a single cluster however it is also possible to use a single generic handler that handles all of them.
-class SceneHandler
+///
+/// @note If more than one handler is implemented for a specific <endpoint, cluster> pair, ONLY THE FIRST HANDLER FOR THAT SPECIFIC
+/// PAIR will get called on executing extension field sets related ations on the scene table.
+class SceneHandler : public IntrusiveListNodeBase<>
 {
 public:
     SceneHandler(){};
@@ -258,13 +258,13 @@ public:
     virtual CHIP_ERROR RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scene_idx)                = 0;
 
     // SceneHandlers
-    virtual CHIP_ERROR RegisterHandler(SceneHandler * handler)   = 0;
-    virtual CHIP_ERROR UnregisterHandler(SceneHandler * handler) = 0;
-    virtual CHIP_ERROR UnregisterAllHandlers()                   = 0;
+    virtual void RegisterHandler(SceneHandler * handler)   = 0;
+    virtual void UnregisterHandler(SceneHandler * handler) = 0;
+    virtual void UnregisterAllHandlers()                   = 0;
 
     // Extension field sets operation
-    virtual CHIP_ERROR SceneSaveEFS(SceneTableEntry & scene)                                    = 0;
-    virtual CHIP_ERROR SceneApplyEFS(FabricIndex fabric_index, const SceneStorageId & scene_id) = 0;
+    virtual CHIP_ERROR SceneSaveEFS(SceneTableEntry & scene)        = 0;
+    virtual CHIP_ERROR SceneApplyEFS(const SceneTableEntry & scene) = 0;
 
     // Fabrics
     virtual CHIP_ERROR RemoveFabric(FabricIndex fabric_index) = 0;
@@ -276,11 +276,11 @@ public:
 
     // Handlers
     virtual bool HandlerListEmpty() { return (mNumHandlers == 0); }
-    virtual bool HandlerListFull() { return (mNumHandlers >= kMaxSceneHandlers); }
     virtual uint8_t GetHandlerNum() { return this->mNumHandlers; }
 
-    SceneHandler * mHandlers[kMaxSceneHandlers] = { nullptr };
-    uint8_t mNumHandlers                        = 0;
+    // SceneHandler * mHandlers[kMaxSceneHandlers] = { nullptr };
+    IntrusiveList<SceneHandler> mHandlerList;
+    uint8_t mNumHandlers = 0;
 };
 
 } // namespace scenes

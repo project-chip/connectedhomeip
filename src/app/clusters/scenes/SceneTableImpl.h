@@ -200,13 +200,14 @@ public:
     CHIP_ERROR RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scene_idx) override;
 
     // SceneHandlers
-    CHIP_ERROR RegisterHandler(SceneHandler * handler) override;
-    CHIP_ERROR UnregisterHandler(SceneHandler * handler) override;
-    CHIP_ERROR UnregisterAllHandlers() override;
+    void RegisterHandler(SceneHandler * handler) override;
+    void UnregisterHandler(SceneHandler * handler) override;
+    void UnregisterAllHandlers() override;
 
     // Extension field sets operation
+
     CHIP_ERROR SceneSaveEFS(SceneTableEntry & scene) override;
-    CHIP_ERROR SceneApplyEFS(FabricIndex fabric_index, const SceneStorageId & scene_id) override;
+    CHIP_ERROR SceneApplyEFS(const SceneTableEntry & scene) override;
 
     // Fabrics
     CHIP_ERROR RemoveFabric(FabricIndex fabric_index) override;
@@ -215,6 +216,9 @@ public:
     SceneEntryIterator * IterateSceneEntries(FabricIndex fabric_index) override;
 
 protected:
+    // wrapper function around emberAfGetClustersFromEndpoint to allow override when testing
+    virtual uint8_t GetClustersFromEndpoint(EndpointId endpoint, ClusterId * clusterList, uint8_t listLen);
+
     class SceneEntryIteratorImpl : public SceneEntryIterator
     {
     public:

@@ -136,7 +136,7 @@ public:
     uint8_t GetFieldSetCount() const override { return mFieldSetsCount; };
 
     CHIP_ERROR InsertFieldSet(const ExtensionFieldSet & field);
-    CHIP_ERROR GetFieldSetAtPosition(ExtensionFieldSet & field, uint8_t position);
+    CHIP_ERROR GetFieldSetAtPosition(ExtensionFieldSet & field, uint8_t position) const;
     CHIP_ERROR RemoveFieldAtPosition(uint8_t position);
 
     // implementation
