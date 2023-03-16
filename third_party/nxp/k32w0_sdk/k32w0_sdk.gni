@@ -249,14 +249,8 @@ template("k32w0_sdk") {
       "${k32w0_sdk_root}/middleware/wireless/ieee-802.15.4/lib/libMiniMac_Sched.a",
       "${k32w0_sdk_root}/middleware/wireless/framework/PDM/Library/libPDM_extFlash.a",
       "${k32w0_sdk_root}/middleware/wireless/framework/XCVR/lib/libRadio.a",
+      "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4.a"
     ]
-
-    if (chip_crypto == "platform" &&
-        chip_crypto_flavor == "NXP-Ultrafast-P256") {
-      libs += [ "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4_dspext.a" ]
-    } else {
-      libs += [ "${k32w0_sdk_root}/middleware/wireless/framework/SecLib/lib_crypto_m4.a" ]
-    }
 
     defines = [
       "gPWR_CpuClk_48MHz=1",
