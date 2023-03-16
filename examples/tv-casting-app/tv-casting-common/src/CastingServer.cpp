@@ -153,13 +153,13 @@ chip::Inet::IPAddress * CastingServer::getIpAddressForUDCRequest(chip::Inet::IPA
         if (ipAddresses[i].IsIPv4())
         {
             ipIndexToUse = i;
-            ChipLogProgress(AppServer, "Found iPv4 address at index: %lu", ipIndexToUse);
+            ChipLogProgress(AppServer, "Found IPv4 address at index: %lu - prioritizing use of IPv4", ipIndexToUse);
             break;
         }
 
         if (i == (numIPs - 1))
         {
-            ChipLogProgress(AppServer, "Could not find an iPv4 address, defaulting to the first address in IP list");
+            ChipLogProgress(AppServer, "Could not find an IPv4 address, defaulting to the first address in IP list");
         }
     }
 
