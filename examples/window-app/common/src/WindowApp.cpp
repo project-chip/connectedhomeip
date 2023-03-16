@@ -605,22 +605,22 @@ void WindowApp::Cover::UpdateTargetPosition(OperationalState direction, bool isT
     if (isTilt)
     {
         status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
-        if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull()){
+        if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+        {
 
             target = ComputePercent100thsStep(direction, current.Value(), TILT_DELTA);
-            (void)Attributes::TargetPositionTiltPercent100ths::Set(mEndpoint, target);
+            (void) Attributes::TargetPositionTiltPercent100ths::Set(mEndpoint, target);
         }
     }
     else
     {
         status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
-        if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull()){
+        if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+        {
 
             target = ComputePercent100thsStep(direction, current.Value(), LIFT_DELTA);
-            (void)Attributes::TargetPositionLiftPercent100ths::Set(mEndpoint, target);
-
+            (void) Attributes::TargetPositionLiftPercent100ths::Set(mEndpoint, target);
         }
-
     }
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
