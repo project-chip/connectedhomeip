@@ -1095,7 +1095,8 @@ void ReadClient::HandleDeviceConnectionFailure(void * context, const ScopedNodeI
     _this->Close(err);
 }
 
-void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState)
+void ReadClient::OnResubscribeTimerCallback(System::Layer * /* If this starts being used, fix callers that pass nullptr */,
+                                            void * apAppState)
 {
     ReadClient * const _this = static_cast<ReadClient *>(apAppState);
     VerifyOrDie(_this != nullptr);
@@ -1174,5 +1175,18 @@ CHIP_ERROR ReadClient::GetMinEventNumber(const ReadPrepareParams & aReadPrepareP
     }
     return CHIP_NO_ERROR;
 }
+
+void ReadClient::TriggerResubscribeIfScheduled(const char * reason)
+{
+    if (!mIsResubscriptionScheduled)
+    {
+        return;
+    }
+
+    ChipLogDetail(DataManagement, "ReadClient[%p] triggering resubscribe, reason: %s", this, reason);
+    CancelResubscribeTimer();
+    OnResubscribeTimerCallback(nullptr, this);
+}
+
 } // namespace app
 } // namespace chip
