@@ -665,6 +665,17 @@
     });
 }
 
+- (void)purgeCache:(dispatch_queue_t _Nonnull)clientQueue responseHandler:(void (^)(MatterError * _Nonnull))responseHandler
+{
+    dispatch_sync(_chipWorkQueue, ^{
+        CHIP_ERROR err = CastingServer::GetInstance()->PurgeCache();
+        dispatch_async(clientQueue, ^{
+            responseHandler([[MatterError alloc] initWithCode:err.AsInteger()
+                                                      message:[NSString stringWithUTF8String:err.AsString()]]);
+        });
+    });
+}
+
 - (void)contentLauncher_launchUrl:(ContentApp * _Nonnull)contentApp
                        contentUrl:(NSString * _Nonnull)contentUrl
                 contentDisplayStr:(NSString * _Nonnull)contentDisplayStr
