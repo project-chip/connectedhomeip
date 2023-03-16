@@ -66,10 +66,12 @@ void rsi_hal_config_gpio(uint8_t gpio_number, uint8_t mode, uint8_t value)
     case RSI_HAL_LP_SLEEP_CONFIRM_PIN:
         GPIO_PinModeSet(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin, gpioModeWiredOrPullDown, PINOUT_SET);
         break;
-#ifndef LOGGING_STATS
     case RSI_HAL_WAKEUP_INDICATION_PIN:
+#ifndef LOGGING_STATS
         GPIO_PinModeSet(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin, gpioModeWiredOrPullDown, PINOUT_CLEAR);
         break;
+#else
+        GPIO_PinModeSet(LOGGING_WAKE_INDICATOR_PIN.port, LOGGING_WAKE_INDICATOR_PIN.pin, gpioModeWiredOrPullDown, PINOUT_CLEAR);
 #endif
     case RSI_HAL_RESET_PIN:
         GPIO_PinModeSet(WFX_RESET_PIN.port, WFX_RESET_PIN.pin, gpioModePushPull, PINOUT_SET);
@@ -96,12 +98,11 @@ void rsi_hal_set_gpio(uint8_t gpio_number)
     case RSI_HAL_LP_SLEEP_CONFIRM_PIN:
         GPIO_PinModeSet(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin, gpioModeWiredOrPullDown, PINOUT_SET);
         break;
-#ifndef LOGGING_STATS
     case RSI_HAL_WAKEUP_INDICATION_PIN:
+#ifndef LOGGING_STATS
         GPIO_PinModeSet(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin, gpioModeInput, PINOUT_SET);
         break;
 #else
-    case RSI_HAL_WAKEUP_INDICATION_PIN:
         GPIO_PinModeSet(LOGGING_WAKE_INDICATOR_PIN.port, LOGGING_WAKE_INDICATOR_PIN.pin, gpioModeInput, PINOUT_SET);
         break;
 #endif
@@ -128,11 +129,10 @@ uint8_t rsi_hal_get_gpio(uint8_t gpio_number)
     case RSI_HAL_SLEEP_CONFIRM_PIN:
     case RSI_HAL_LP_SLEEP_CONFIRM_PIN:
         return GPIO_PinInGet(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin);
-#ifndef LOGGING_STATS
     case RSI_HAL_WAKEUP_INDICATION_PIN:
+#ifndef LOGGING_STATS
         return GPIO_PinInGet(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin);
 #else
-    case RSI_HAL_WAKEUP_INDICATION_PIN:
         return GPIO_PinInGet(LOGGING_WAKE_INDICATOR_PIN.port, LOGGING_WAKE_INDICATOR_PIN.pin);
 #endif
     case RSI_HAL_RESET_PIN:
@@ -161,12 +161,11 @@ void rsi_hal_clear_gpio(uint8_t gpio_number)
     case RSI_HAL_LP_SLEEP_CONFIRM_PIN:
         GPIO_PinOutClear(WFX_SLEEP_CONFIRM_PIN.port, WFX_SLEEP_CONFIRM_PIN.pin);
         break;
-#ifndef LOGGING_STATS
     case RSI_HAL_WAKEUP_INDICATION_PIN:
+#ifndef LOGGING_STATS
         GPIO_PinOutClear(WAKE_INDICATOR_PIN.port, WAKE_INDICATOR_PIN.pin);
         break;
 #else
-    case RSI_HAL_WAKEUP_INDICATION_PIN:
         GPIO_PinOutClear(LOGGING_WAKE_INDICATOR_PIN.port, LOGGING_WAKE_INDICATOR_PIN.pin);
         break;
 #endif
