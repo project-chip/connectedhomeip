@@ -408,7 +408,7 @@ template("efr32_sdk") {
         "${sdk_support_root}/protocol/bluetooth/lib/EFR32MG24/GCC/libbluetooth.a",
         "${sdk_support_root}/platform/radio/rail_lib/autogen/librail_release/librail_multiprotocol_module_efr32xg24_gcc_release.a",
         "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM33_gcc.a",
-        "${efr32_sdk_root}/protocol/openthread/libs/libsl_openthread_efr32mg2x_gcc.a",
+        "${sdk_support_root}/protocol/openthread/libs/libsl_openthread_efr32mg2x_gcc.a",
       ]
 
       if (silabs_mcu == "MGM240PB32VNA") {
