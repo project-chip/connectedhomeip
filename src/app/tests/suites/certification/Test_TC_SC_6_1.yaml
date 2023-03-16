@@ -33,7 +33,6 @@ tests:
 
     - label: "Precondition"
       verification: |
-          Group Member is commissioned with Admin
           Execute this step before executing the test steps.
 
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]' 1 0
