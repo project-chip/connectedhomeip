@@ -25,46 +25,67 @@
 static uint16_t kTestVendorId1 = 0xFFF1u;
 static uint16_t kTestVendorId2 = 0xFFF2u;
 
-// Macro so that we get useful line numbers
-#define CHECK_FABRIC_INFO(fabricInfoList, expected)                                                                                \
-    do {                                                                                                                           \
-        XCTAssertEqual([fabricInfoList count], [expected count]);                                                                  \
-        for (size_t i = 0; i < [fabricInfoList count]; ++i) {                                                                      \
-            __auto_type * info = fabricInfoList[i];                                                                                \
-            XCTAssertEqualObjects(info.rootPublicKey, expected[i][@"rootPublicKey"]);                                              \
-            XCTAssertEqualObjects(info.vendorID, expected[i][@"vendorID"]);                                                        \
-            XCTAssertEqualObjects(info.fabricID, expected[i][@"fabricID"]);                                                        \
-            XCTAssertEqualObjects(info.nodeID, expected[i][@"nodeID"]);                                                            \
-            XCTAssertEqualObjects(info.label, expected[i][@"label"]);                                                              \
-            XCTAssertNotNil(info.rootCertificate);                                                                                 \
-            XCTAssertNotNil(info.rootCertificateTLV);                                                                              \
-            XCTAssertEqualObjects([MTRCertificates convertX509Certificate:info.rootCertificate], info.rootCertificateTLV);         \
-            XCTAssertEqualObjects([MTRCertificates convertMatterCertificate:info.rootCertificateTLV], info.rootCertificate);       \
-            XCTAssertEqual((info.intermediateCertificate == nil), (info.intermediateCertificateTLV == nil));                       \
-            XCTAssertEqualObjects(@(info.intermediateCertificate != nil), expected[i][@"hasIntermediateCertificate"]);             \
-            XCTAssertEqualObjects(                                                                                                 \
-                [MTRCertificates convertX509Certificate:info.intermediateCertificate], info.intermediateCertificateTLV);           \
-            XCTAssertEqualObjects(                                                                                                 \
-                [MTRCertificates convertMatterCertificate:info.intermediateCertificateTLV], info.intermediateCertificate);         \
-            XCTAssertNotNil(info.operationalCertificate);                                                                          \
-            XCTAssertNotNil(info.operationalCertificateTLV);                                                                       \
-            XCTAssertEqualObjects(                                                                                                 \
-                [MTRCertificates convertX509Certificate:info.operationalCertificate], info.operationalCertificateTLV);             \
-            XCTAssertEqualObjects(                                                                                                 \
-                [MTRCertificates convertMatterCertificate:info.operationalCertificateTLV], info.operationalCertificate);           \
-            __auto_type * certInfo = [[MTRCertificateInfo alloc] initWithTLVBytes:info.operationalCertificateTLV];                 \
-            XCTAssertNotNil(certInfo);                                                                                             \
-            XCTAssertEqualObjects(certInfo.subject.nodeID, info.nodeID);                                                           \
-            XCTAssertEqualObjects(certInfo.subject.fabricID, info.fabricID);                                                       \
-            XCTAssertEqualObjects(info.fabricIndex, expected[i][@"fabricIndex"]);                                                  \
-        }                                                                                                                          \
-    } while (0)
+void CheckFabricInfo(NSArray<MTRFabricInfo *> * fabricInfoList, NSMutableSet<NSDictionary *> * expectedSet)
+{
+    XCTAssertEqual([fabricInfoList count], [expectedSet count]);
+    for (size_t i = 0; i < [fabricInfoList count]; ++i) {
+        __auto_type * info = fabricInfoList[i];
+        NSSet<NSDictionary *> * expectedInfoForIndex = [expectedSet objectsPassingTest:^(NSDictionary * obj, BOOL * stop) {
+            return [info.fabricIndex isEqual:obj[@"fabricIndex"]];
+        }];
+        XCTAssertEqual([expectedInfoForIndex count], 1);
+        __auto_type * expected = [expectedInfoForIndex anyObject];
+        XCTAssertEqualObjects(info.rootPublicKey, expected[@"rootPublicKey"]);
+        XCTAssertEqualObjects(info.vendorID, expected[@"vendorID"]);
+        XCTAssertEqualObjects(info.fabricID, expected[@"fabricID"]);
+        XCTAssertEqualObjects(info.nodeID, expected[@"nodeID"]);
+        XCTAssertEqualObjects(info.label, expected[@"label"]);
+        XCTAssertNotNil(info.rootCertificate);
+        XCTAssertNotNil(info.rootCertificateTLV);
+        XCTAssertEqualObjects([MTRCertificates convertX509Certificate:info.rootCertificate], info.rootCertificateTLV);
+        XCTAssertEqualObjects([MTRCertificates convertMatterCertificate:info.rootCertificateTLV], info.rootCertificate);
+        XCTAssertEqual((info.intermediateCertificate == nil), (info.intermediateCertificateTLV == nil));
+        XCTAssertEqualObjects(@(info.intermediateCertificate != nil), expected[@"hasIntermediateCertificate"]);
+        if (info.intermediateCertificate != nil) {
+            XCTAssertEqualObjects(
+                [MTRCertificates convertX509Certificate:info.intermediateCertificate], info.intermediateCertificateTLV);
+            XCTAssertEqualObjects(
+                [MTRCertificates convertMatterCertificate:info.intermediateCertificateTLV], info.intermediateCertificate);
+        }
+        XCTAssertNotNil(info.operationalCertificate);
+        XCTAssertNotNil(info.operationalCertificateTLV);
+        XCTAssertEqualObjects([MTRCertificates convertX509Certificate:info.operationalCertificate], info.operationalCertificateTLV);
+        XCTAssertEqualObjects(
+            [MTRCertificates convertMatterCertificate:info.operationalCertificateTLV], info.operationalCertificate);
+        __auto_type * certInfo = [[MTRCertificateInfo alloc] initWithTLVBytes:info.operationalCertificateTLV];
+        XCTAssertNotNil(certInfo);
+        XCTAssertEqualObjects(certInfo.subject.nodeID, info.nodeID);
+        XCTAssertEqualObjects(certInfo.subject.fabricID, info.fabricID);
+        XCTAssertEqualObjects(info.fabricIndex, expected[@"fabricIndex"]);
+        [expectedSet removeObject:expected];
+    }
+}
 
 @interface MTRFabricInfoTests : XCTestCase
 
 @end
 
 @implementation MTRFabricInfoTests
+
+/**
+ * Override recordIssue to log things better.
+ */
+- (void)recordIssue:(XCTIssue *)issue
+{
+    for (XCTSourceCodeFrame * stackFrame in issue.sourceCodeContext.callStack) {
+        __auto_type * location = stackFrame.symbolInfo.location;
+        if (location != nil) {
+            fprintf(stderr, "  %s:%llu\n", location.fileURL.path.UTF8String, (unsigned long long) location.lineNumber);
+        }
+    }
+
+    [super recordIssue:issue];
+}
 
 - (void)testFabricInfoNoFabrics
 {
@@ -78,7 +99,7 @@ static uint16_t kTestVendorId2 = 0xFFF2u;
     XCTAssertTrue([factory isRunning]);
 
     __auto_type * fabricInfoList = [factory knownFabrics];
-    CHECK_FABRIC_INFO(fabricInfoList, @[]);
+    CheckFabricInfo(fabricInfoList, [NSMutableSet set]);
 
     [factory stopControllerFactory];
     XCTAssertFalse([factory isRunning]);
@@ -113,7 +134,7 @@ static uint16_t kTestVendorId2 = 0xFFF2u;
     __auto_type * nodeID = [controller controllerNodeID];
 
     __auto_type * fabricInfoList = [factory knownFabrics];
-    CHECK_FABRIC_INFO(fabricInfoList, (@[ @{
+    CheckFabricInfo(fabricInfoList, [NSMutableSet setWithArray:@[ @{
         @"rootPublicKey" : [testKeys publicKeyData],
         @"vendorID" : @(kTestVendorId1),
         @"fabricID" : @(fabricID),
@@ -121,14 +142,14 @@ static uint16_t kTestVendorId2 = 0xFFF2u;
         @"label" : @"",
         @"hasIntermediateCertificate" : @(NO),
         @"fabricIndex" : @(1)
-    } ]));
+    } ]]);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 
     // Should still know about the fabric.
     __auto_type * fabricInfoList2 = [factory knownFabrics];
-    CHECK_FABRIC_INFO(fabricInfoList2, (@[ @{
+    CheckFabricInfo(fabricInfoList2, [NSMutableSet setWithArray:@[ @{
         @"rootPublicKey" : [testKeys publicKeyData],
         @"vendorID" : @(kTestVendorId1),
         @"fabricID" : @(fabricID),
@@ -136,7 +157,7 @@ static uint16_t kTestVendorId2 = 0xFFF2u;
         @"label" : @"",
         @"hasIntermediateCertificate" : @(NO),
         @"fabricIndex" : @(1)
-    } ]));
+    } ]]);
 
     [factory stopControllerFactory];
     XCTAssertFalse([factory isRunning]);
@@ -201,7 +222,7 @@ static uint16_t kTestVendorId2 = 0xFFF2u;
     __auto_type * nodeID2 = [controller2 controllerNodeID];
 
     __auto_type * fabricInfoList = [factory knownFabrics];
-    CHECK_FABRIC_INFO(fabricInfoList, (@[
+    CheckFabricInfo(fabricInfoList, [NSMutableSet setWithArray:@[
         @{
             @"rootPublicKey" : [testKeys1 publicKeyData],
             @"vendorID" : @(kTestVendorId1),
@@ -220,7 +241,7 @@ static uint16_t kTestVendorId2 = 0xFFF2u;
             @"hasIntermediateCertificate" : @(YES),
             @"fabricIndex" : @(2)
         }
-    ]));
+    ]]);
 
     [controller1 shutdown];
     XCTAssertFalse([controller1 isRunning]);
@@ -228,7 +249,7 @@ static uint16_t kTestVendorId2 = 0xFFF2u;
 
     // Should still know about the fabrics.
     __auto_type * fabricInfoList2 = [factory knownFabrics];
-    CHECK_FABRIC_INFO(fabricInfoList2, (@[
+    CheckFabricInfo(fabricInfoList2, [NSMutableSet setWithArray:@[
         @{
             @"rootPublicKey" : [testKeys1 publicKeyData],
             @"vendorID" : @(kTestVendorId1),
@@ -247,7 +268,7 @@ static uint16_t kTestVendorId2 = 0xFFF2u;
             @"hasIntermediateCertificate" : @(YES),
             @"fabricIndex" : @(2)
         }
-    ]));
+    ]]);
 
     [controller2 shutdown];
     XCTAssertFalse([controller1 isRunning]);
@@ -255,7 +276,7 @@ static uint16_t kTestVendorId2 = 0xFFF2u;
 
     // Should still know about the fabrics.
     __auto_type * fabricInfoList3 = [factory knownFabrics];
-    CHECK_FABRIC_INFO(fabricInfoList3, (@[
+    CheckFabricInfo(fabricInfoList3, [NSMutableSet setWithArray:@[
         @{
             @"rootPublicKey" : [testKeys1 publicKeyData],
             @"vendorID" : @(kTestVendorId1),
@@ -274,7 +295,7 @@ static uint16_t kTestVendorId2 = 0xFFF2u;
             @"hasIntermediateCertificate" : @(YES),
             @"fabricIndex" : @(2)
         }
-    ]));
+    ]]);
 
     [factory stopControllerFactory];
     XCTAssertFalse([factory isRunning]);

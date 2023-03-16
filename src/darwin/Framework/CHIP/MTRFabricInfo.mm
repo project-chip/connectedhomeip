@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#import "MTRFabricInfo_internal.h"
+#import "MTRFabricInfo_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"

@@ -34,67 +34,67 @@ MTR_NEWLY_AVAILABLE
 /**
  * Root public key for the fabric.
  */
-@property (readonly, nonatomic) NSData * rootPublicKey MTR_NEWLY_AVAILABLE;
+@property (readonly, nonatomic) NSData * rootPublicKey;
 
 /**
  * Vendor identifier for the fabric.
  */
-@property (readonly, nonatomic) NSNumber * vendorID MTR_NEWLY_AVAILABLE;
+@property (readonly, nonatomic) NSNumber * vendorID;
 
 /**
  * Fabric identifier (scoped to the root public key) for the fabric.
  */
-@property (readonly, nonatomic) NSNumber * fabricID MTR_NEWLY_AVAILABLE;
+@property (readonly, nonatomic) NSNumber * fabricID;
 
 /**
  * Node identifier for the given node on the fabric.
  */
-@property (readonly, nonatomic) NSNumber * nodeID MTR_NEWLY_AVAILABLE;
+@property (readonly, nonatomic) NSNumber * nodeID;
 
 /**
  * The string label for the fabric.  May be empty.
  */
-@property (readonly, nonatomic) NSString * label MTR_NEWLY_AVAILABLE;
+@property (readonly, nonatomic) NSString * label;
 
 /**
  * The root certificate for the fabric.  This might be nil if a root
  * certificate is not available (e.g. if this is information about some remote
  * node that we don't have root certificate information for).
  */
-@property (readonly, nonatomic, nullable) MTRCertificateDERBytes rootCertificate MTR_NEWLY_AVAILABLE;
+@property (readonly, nonatomic, nullable) MTRCertificateDERBytes rootCertificate;
 
 /**
  * The same root certificate as rootCertificate, in Matter TLV format.
  */
-@property (readonly, nonatomic, nullable) MTRCertificateTLVBytes rootCertificateTLV MTR_NEWLY_AVAILABLE;
+@property (readonly, nonatomic, nullable) MTRCertificateTLVBytes rootCertificateTLV;
 
 /**
  * The intermediate certificate for the node.  This might be nil if there is
  * no intermediate certificate, or if the node is not on a fabric we have
  * access to.
  */
-@property (readonly, nonatomic, nullable) MTRCertificateDERBytes intermediateCertificate MTR_NEWLY_AVAILABLE;
+@property (readonly, nonatomic, nullable) MTRCertificateDERBytes intermediateCertificate;
 
 /**
  * The same intermediate certificate as intermediateCertificate, in Matter TLV format.
  */
-@property (readonly, nonatomic, nullable) MTRCertificateTLVBytes intermediateCertificateTLV MTR_NEWLY_AVAILABLE;
+@property (readonly, nonatomic, nullable) MTRCertificateTLVBytes intermediateCertificateTLV;
 
 /**
  * The operational certificate for the node.  This might be nil if
  * the node is not on a fabric we have access to.
  */
-@property (readonly, nonatomic, nullable) MTRCertificateDERBytes operationalCertificate MTR_NEWLY_AVAILABLE;
+@property (readonly, nonatomic, nullable) MTRCertificateDERBytes operationalCertificate;
 
 /**
  * The same operational certificate as operationalCertificate, in Matter TLV format.
  */
-@property (readonly, nonatomic, nullable) MTRCertificateTLVBytes operationalCertificateTLV MTR_NEWLY_AVAILABLE;
+@property (readonly, nonatomic, nullable) MTRCertificateTLVBytes operationalCertificateTLV;
 
 /**
  * The fabric index which identifies the fabric on the node.
  */
-@property (readonly, nonatomic) NSNumber * fabricIndex MTR_NEWLY_AVAILABLE;
+@property (readonly, nonatomic) NSNumber * fabricIndex;
 
 @end
 
