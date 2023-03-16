@@ -8,13 +8,6 @@ the setup payload or performing discovery actions.
 
 <hr>
 
--   [Source files](#source-files)
--   [Building and running the CHIP Tool](#building-and-running-the-chip-tool)
--   [Using the CHIP Tool for Matter device testing](#using-chip-tool-for-matter-device-testing)
--   [Supported commands and options](#supported-commands-and-options)
-
-<hr>
-
 ## Source files
 
 You can find source files of the CHIP Tool in the `examples/chip-tool`
@@ -110,9 +103,9 @@ such as Thread or Wi-Fi.
 
 The Matter specification does not define the preferred way of how the network
 credentials are to be obtained by controller. In this guide, we are going to
-obtain Thread network credentials.
+provide steps for obtaining Thread and Wi-Fi network credentials.
 
-#### Thread network credentials
+#### Obtaining Thread network credentials
 
 Fetch and store the current Active Operational Dataset from the Thread Border
 Router. This step may vary depending on the Thread Border Router implementation.
@@ -140,10 +133,10 @@ If you are using
 For Thread, you might also use a different out-of-band method to fetch the
 network credentials.
 
-#### Wi-Fi network credentials
+#### Obtaining Wi-Fi network credentials
 
 You must get the following Wi-Fi network credentials to commission the Matter
-device to the Wi-Fi network in the following steps:
+device to the Wi-Fi network:
 
 -   Wi-Fi SSID
 -   Wi-Fi password
@@ -171,10 +164,10 @@ I: 278 [DL] Manufacturing Date: (not set)
 I: 281 [DL] Device Type: 65535 (0xFFFF)
 ```
 
-In above printout, the _discriminator_ is `3840 (0xF00)` and the _setup PIN
-code_ is equal to `20202021`.
+In this printout, the _discriminator_ is `3840 (0xF00)` and the _setup PIN code_
+is equal to `20202021`.
 
-### Step 6: Commission Matter device into existing IP network
+### Step 6: Commission Matter device into an existing IP network
 
 Before communicating with the Matter device, first it must join an existing IP
 network.
@@ -190,17 +183,17 @@ protocol.
 This section describes how your device can join the existing IP network over
 Bluetooth LE and then be commissioned into a Matter network.
 
-After connecting the device over Bluetooth LE, the controller will print the
+After connecting the device over Bluetooth LE, the controller prints the
 following log:
 
 ```
 Secure Session to Device Established
 ```
 
-This log will mean that the PASE (Password-Authenticated Session Establishment)
-session using SPAKE2+ protocol has been established.
+This log message means that the PASE (Password-Authenticated Session
+Establishment) session using SPAKE2+ protocol has been established.
 
-##### Commissioning into Thread network over Bluetooth LE
+##### Commissioning into a Thread network over Bluetooth LE
 
 To commission the device to the existing Thread network, use the following
 command pattern:
@@ -218,7 +211,7 @@ In this command:
     the
     [step 5](#step-5-determine-matter-devices-discriminator-and-setup-pin-code).
 
-##### Commissioning into Wi-Fi network over Bluetooth LE
+##### Commissioning into a Wi-Fi network over Bluetooth LE
 
 To commission the device to the existing Wi-Fi network, use the following
 command pattern:
@@ -695,15 +688,15 @@ Here, _<payload\>_ is the ID of the payload to be parsed.
 
 -   Setup QR code payload:
 
-        ```
-        $ ./chip-tool payload parse-setup-payload MT:6FCJ142C00KA0648G00
-        ```
+    ```
+    $ ./chip-tool payload parse-setup-payload MT:6FCJ142C00KA0648G00
+    ```
 
 -   Manual pairing code:
 
-        ```
-        $ ./chip-tool payload parse-setup-payload 34970112332
-        ```
+    ```
+    $ ./chip-tool payload parse-setup-payload 34970112332
+    ```
 
 ### Parsing additional data payload
 
