@@ -1394,13 +1394,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @brief The maximum number of handlers used for extension field sets per scene.
- */
-#ifndef CHIP_CONFIG_SCENES_MAX_SCENE_HANDLERS
-#define CHIP_CONFIG_SCENES_MAX_SCENE_HANDLERS 3
-#endif
-
-/**
  * @brief The maximum size of a single extension field set for a single cluster
  */
 #ifndef CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER

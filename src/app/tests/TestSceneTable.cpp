@@ -368,10 +368,26 @@ public:
     }
 };
 
+class TestSceneTableImpl : public SceneTableImpl
+{
+    uint8_t GetClustersFromEndpoint(EndpointId endpoint, ClusterId * clusterList, uint8_t listLen) override
+    {
+        if (listLen >= 3)
+        {
+            clusterList[0] = kOnOffClusterId;
+            clusterList[1] = kLevelControlClusterId;
+            clusterList[2] = kColorControlClusterId;
+            return 3;
+        }
+
+        return 0;
+    }
+};
+
 // Storage
 static chip::TestPersistentStorageDelegate testStorage;
 // Scene
-static SceneTableImpl sSceneTable;
+static TestSceneTableImpl sSceneTable;
 static TestSceneHandler sHandler;
 
 void ResetSceneTable(SceneTable * sceneTable)
@@ -383,56 +399,41 @@ void ResetSceneTable(SceneTable * sceneTable)
 void TestHandlerRegistration(nlTestSuite * aSuite, void * aContext)
 {
     SceneTable * sceneTable = &sSceneTable;
-    TestSceneHandler tmpHandler[scenes::kMaxSceneHandlers];
+    TestSceneHandler tmpHandler[scenes::kMaxClusterPerScenes];
 
-    for (uint8_t i = 0; i < scenes::kMaxSceneHandlers; i++)
+    for (uint8_t i = 0; i < scenes::kMaxClusterPerScenes; i++)
     {
         NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == i);
-        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RegisterHandler(&tmpHandler[i]));
+        sceneTable->RegisterHandler(&tmpHandler[i]);
     }
     // Hanlder order in table : [H0, H1, H2]
 
-    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == scenes::kMaxSceneHandlers);
+    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == scenes::kMaxClusterPerScenes);
     // Removal at beginning
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(&tmpHandler[0]));
-    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 1));
-    // Confirm array was compressed and last position is now null
-    NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[scenes::kMaxSceneHandlers - 1]);
+    sceneTable->UnregisterHandler(&tmpHandler[0]);
+    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxClusterPerScenes - 1));
     // Re-insert
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RegisterHandler(&tmpHandler[0]));
-    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxSceneHandlers));
-    // Hanlder order in table : [H1, H2, H0]
+    sceneTable->RegisterHandler(&tmpHandler[0]);
+    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxClusterPerScenes));
+    // Hanlder order in table : [H0, H1, H2]
 
     // Removal at the middle
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(&tmpHandler[2]));
-    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 1));
-    // Confirm array was compressed and last position is now null
-    NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[scenes::kMaxSceneHandlers - 1]);
+    sceneTable->UnregisterHandler(&tmpHandler[2]);
+    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxClusterPerScenes - 1));
     // Re-insert
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RegisterHandler(&tmpHandler[2]));
-    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxSceneHandlers));
+    sceneTable->RegisterHandler(&tmpHandler[2]);
+    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxClusterPerScenes));
     // Hanlder order in table : [H1, H0, H2]
 
     // Removal at the end
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(&tmpHandler[2]));
-    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxSceneHandlers - 1));
-    NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[scenes::kMaxSceneHandlers - 1]);
+    sceneTable->UnregisterHandler(&tmpHandler[2]);
+    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxClusterPerScenes - 1));
 
     // Emptying Handler array
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterAllHandlers());
-    for (uint8_t i = 0; i < scenes::kMaxSceneHandlers; i++)
-    {
-        NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->UnregisterHandler(&tmpHandler[i]));
-    }
+    sceneTable->UnregisterAllHandlers();
 
     // Verify the handler num has been updated properly
     NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == 0);
-
-    // Verify all array is empty
-    for (uint8_t i = 0; i < scenes::kMaxSceneHandlers; i++)
-    {
-        NL_TEST_ASSERT(aSuite, nullptr == sceneTable->mHandlers[i]);
-    }
 }
 
 void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
@@ -533,7 +534,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
     CC_buffer_serialized_length = writer.GetLengthWritten();
 
     // Test Registering SceneHandler
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RegisterHandler(&sHandler));
+    sceneTable->RegisterHandler(&sHandler);
     NL_TEST_ASSERT(aSuite, sceneTable->GetHandlerNum() == 1);
 
     // Setup the On Off Extension field set in the expected state from a command
@@ -678,19 +679,19 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
     // Get test
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId1, scene));
     NL_TEST_ASSERT(aSuite, scene == scene1);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneApplyEFS(kFabric1, scene1.mStorageId));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneApplyEFS(scene));
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId2, scene));
     NL_TEST_ASSERT(aSuite, scene == scene2);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneApplyEFS(kFabric1, scene2.mStorageId));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneApplyEFS(scene));
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId3, scene));
     NL_TEST_ASSERT(aSuite, scene == scene3);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneApplyEFS(kFabric1, scene3.mStorageId));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneApplyEFS(scene));
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId4, scene));
     NL_TEST_ASSERT(aSuite, scene == scene4);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneApplyEFS(kFabric1, scene4.mStorageId));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneApplyEFS(scene));
 
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId5, scene));
     NL_TEST_ASSERT(aSuite, scene == scene5);
@@ -700,7 +701,7 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, scene == scene7);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId8, scene));
     NL_TEST_ASSERT(aSuite, scene == scene8);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneApplyEFS(kFabric1, scene8.mStorageId));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneApplyEFS(scene));
 }
 
 void TestOverwriteScenes(nlTestSuite * aSuite, void * aContext)
