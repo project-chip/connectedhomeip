@@ -289,7 +289,7 @@ tests:
                 value: { CredentialType: 1, CredentialIndex: 1 }
 
     - label: "TH sends Get Credential Status Command to DUT"
-      PICS: DRLK.S.F08 && DRLK.S.C24.Rsp
+      PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
           values:
@@ -366,7 +366,7 @@ tests:
                 value: { CredentialType: 1, CredentialIndex: 65534 }
 
     - label: "TH sends Get Credential Status Command"
-      PICS: DRLK.S.F08 && DRLK.S.C24.Rsp
+      PICS: DRLK.S.F08 && DRLK.S.C24.Rsp && && DRLK.S.C25.Tx
       command: "GetCredentialStatus"
       arguments:
           values:
