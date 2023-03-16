@@ -92,7 +92,7 @@ tests:
           "Step 3 & 4: TH1 puts DUT into commissioning mode, TH2 commissions DUT
           using admin node ID N2"
       verification: |
-          Open a commissioning window On TH1(Chiptool)using below command 
+          Open a commissioning window On TH1(Chiptool)using below command
 
           ./chip-tool  pairing open-commissioning-window 1 1 400 2000 3841
 

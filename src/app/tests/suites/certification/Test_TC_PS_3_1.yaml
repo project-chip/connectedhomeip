@@ -38,11 +38,11 @@ tests:
           a manufacturer specific order"
       PICS: PS.C.AM-READ
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool powersource read status 1 1
 
-          verify the " status response" on the TH (all-cluster-app) log: 
+          verify the " status response" on the TH (all-cluster-app) log:
 
 
           [1646155382.977445][33190:33190] CHIP:EM: Received message of type 0x2 with protocolId (0, 1) and MessageCounter:685127 on exchange 16568r
@@ -58,10 +58,10 @@ tests:
           [1646155382.978459][33190:33190] CHIP:DMG:                         Cluster = 0x2f,
           [1646155382.978513][33190:33190] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1646155382.978545][33190:33190] CHIP:DMG:                 }
-          [1646155382.978767][33190:33190] CHIP:DMG:                         
+          [1646155382.978767][33190:33190] CHIP:DMG:
           [1646155382.978804][33190:33190] CHIP:DMG:         ],
-          [1646155382.978836][33190:33190] CHIP:DMG:                 
-          [1646155382.978872][33190:33190] CHIP:DMG:         isFabricFiltered = false, 
+          [1646155382.978836][33190:33190] CHIP:DMG:
+          [1646155382.978872][33190:33190] CHIP:DMG:         isFabricFiltered = false,
           [1646155382.978901][33190:33190] CHIP:DMG:         InteractionModelRevision = 1
           [1646155382.978927][33190:33190] CHIP:DMG: },
           [1646155382.978998][33190:33190] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -72,7 +72,7 @@ tests:
 
           ./chip-tool powersource read order 1 1
 
-          verify the " order response" on the TH (all-cluster-app) log: 
+          verify the " order response" on the TH (all-cluster-app) log:
 
           [1653395573.862606][19412:19412] CHIP:IM: Received Read request
           [1653395573.862690][19412:19412] CHIP:DMG: ReadRequestMessage =
@@ -85,18 +85,18 @@ tests:
           [1653395573.863037][19412:19412] CHIP:DMG:                         Cluster = 0x2f,
           [1653395573.863101][19412:19412] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1653395573.863161][19412:19412] CHIP:DMG:                 }
-          [1653395573.863217][19412:19412] CHIP:DMG:                         
+          [1653395573.863217][19412:19412] CHIP:DMG:
           [1653395573.863267][19412:19412] CHIP:DMG:         ],
-          [1653395573.863319][19412:19412] CHIP:DMG:                 
-          [1653395573.863367][19412:19412] CHIP:DMG:         isFabricFiltered = true, 
+          [1653395573.863319][19412:19412] CHIP:DMG:
+          [1653395573.863367][19412:19412] CHIP:DMG:         isFabricFiltered = true,
           [1653395573.863413][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
           [1653395573.863456][19412:19412] CHIP:DMG: },
           [1653395573.863589][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1653395573.863720][19412:19412] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 
+          [1653395573.863720][19412:19412] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0
 
           ./chip-tool powersource read description 1 1
 
-          verify the " description response" on the TH (all-cluster-app) log: 
+          verify the " description response" on the TH (all-cluster-app) log:
 
           CHIP:IM: Received Read request
           [1653395620.020314][19412:19412] CHIP:DMG: ReadRequestMessage =
@@ -109,10 +109,10 @@ tests:
           [1653395620.020703][19412:19412] CHIP:DMG:                         Cluster = 0x2f,
           [1653395620.020770][19412:19412] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1653395620.020833][19412:19412] CHIP:DMG:                 }
-          [1653395620.020893][19412:19412] CHIP:DMG:                         
+          [1653395620.020893][19412:19412] CHIP:DMG:
           [1653395620.020945][19412:19412] CHIP:DMG:         ],
-          [1653395620.020999][19412:19412] CHIP:DMG:                 
-          [1653395620.021052][19412:19412] CHIP:DMG:         isFabricFiltered = true, 
+          [1653395620.020999][19412:19412] CHIP:DMG:
+          [1653395620.021052][19412:19412] CHIP:DMG:         isFabricFiltered = true,
           [1653395620.021104][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
           [1653395620.021153][19412:19412] CHIP:DMG: },
           [1653395620.021252][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -133,10 +133,10 @@ tests:
           [1663140804.059913][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
           [1663140804.059946][2414:2414] CHIP:DMG:                         Attribute = 0x0000_000E,
           [1663140804.059976][2414:2414] CHIP:DMG:                 }
-          [1663140804.060006][2414:2414] CHIP:DMG:                         
+          [1663140804.060006][2414:2414] CHIP:DMG:
           [1663140804.060033][2414:2414] CHIP:DMG:         ],
-          [1663140804.060060][2414:2414] CHIP:DMG:                 
-          [1663140804.060087][2414:2414] CHIP:DMG:         isFabricFiltered = true, 
+          [1663140804.060060][2414:2414] CHIP:DMG:
+          [1663140804.060087][2414:2414] CHIP:DMG:         isFabricFiltered = true,
           [1663140804.060111][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
           [1663140804.060136][2414:2414] CHIP:DMG: },
 
@@ -156,10 +156,10 @@ tests:
           [1663141268.348637][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
           [1663141268.348685][2414:2414] CHIP:DMG:                         Attribute = 0x0000_000F,
           [1663141268.348735][2414:2414] CHIP:DMG:                 }
-          [1663141268.348774][2414:2414] CHIP:DMG:                         
+          [1663141268.348774][2414:2414] CHIP:DMG:
           [1663141268.348820][2414:2414] CHIP:DMG:         ],
-          [1663141268.348857][2414:2414] CHIP:DMG:                 
-          [1663141268.348904][2414:2414] CHIP:DMG:         isFabricFiltered = true, 
+          [1663141268.348857][2414:2414] CHIP:DMG:
+          [1663141268.348904][2414:2414] CHIP:DMG:         isFabricFiltered = true,
           [1663141268.348938][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
           [1663141268.348982][2414:2414] CHIP:DMG: },
           [1663141268.349086][2414:2414] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -182,10 +182,10 @@ tests:
           [1663141378.116208][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
           [1663141378.116247][2414:2414] CHIP:DMG:                         Attribute = 0x0000_0010,
           [1663141378.116294][2414:2414] CHIP:DMG:                 }
-          [1663141378.116330][2414:2414] CHIP:DMG:                         
+          [1663141378.116330][2414:2414] CHIP:DMG:
           [1663141378.116372][2414:2414] CHIP:DMG:         ],
-          [1663141378.116407][2414:2414] CHIP:DMG:                 
-          [1663141378.116450][2414:2414] CHIP:DMG:         isFabricFiltered = true, 
+          [1663141378.116407][2414:2414] CHIP:DMG:
+          [1663141378.116450][2414:2414] CHIP:DMG:         isFabricFiltered = true,
           [1663141378.116481][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
           [1663141378.116521][2414:2414] CHIP:DMG: },
           [1663141378.116621][2414:2414] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -285,7 +285,7 @@ tests:
           ./chip-tool powersource read bat-iecdesignation 1 1
 
           Verify on the TH Log:
-          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)  
+          General error: 0x86 (UNSUPPORTED_ATTRIBUTE)
 
           ./chip-tool powersource read bat-approved-chemistry 1 1
 
@@ -353,10 +353,10 @@ tests:
           AttributeList. Commission DUT to TH again"
       PICS: ""
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
           ./chip-tool powersource read feature-map 1 1
-          verify the " feature-map  response" on the TH (all-cluster-minimal-app) log: 
+          verify the " feature-map  response" on the TH (all-cluster-minimal-app) log:
           [1678873672.092602][348369:348369] CHIP:IM: Received Read request
           [1678873672.092651][348369:348369] CHIP:DMG: ReadRequestMessage =
           [1678873672.092660][348369:348369] CHIP:DMG: {
@@ -368,19 +368,19 @@ tests:
           [1678873672.092735][348369:348369] CHIP:DMG:                         Cluster = 0x2f,
           [1678873672.092747][348369:348369] CHIP:DMG:                         Attribute = 0x0000_FFFC,
           [1678873672.092757][348369:348369] CHIP:DMG:                 }
-          [1678873672.092770][348369:348369] CHIP:DMG:                         
+          [1678873672.092770][348369:348369] CHIP:DMG:
           [1678873672.092777][348369:348369] CHIP:DMG:         ],
-          [1678873672.092791][348369:348369] CHIP:DMG:                 
-          [1678873672.092800][348369:348369] CHIP:DMG:         isFabricFiltered = true, 
+          [1678873672.092791][348369:348369] CHIP:DMG:
+          [1678873672.092800][348369:348369] CHIP:DMG:         isFabricFiltered = true,
           [1678873672.092810][348369:348369] CHIP:DMG:         InteractionModelRevision = 1
           [1678873672.092818][348369:348369] CHIP:DMG: },
           [1678873672.092858][348369:348369] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1678873672.092892][348369:348369] CHIP:DMG: Building Reports for ReadHandler 
+          [1678873672.092892][348369:348369] CHIP:DMG: Building Reports for ReadHandler
 
 
           ./chip-tool powersource read attribute-list 1 0
 
-          verify the " attribute-list response" on the TH (all-cluster-minimal-app) log: 
+          verify the " attribute-list response" on the TH (all-cluster-minimal-app) log:
 
           [1659596771.124636][2409:2409] CHIP:IM: Received Read request
           [1659596771.124765][2409:2409] CHIP:DMG: ReadRequestMessage =
@@ -393,10 +393,10 @@ tests:
           [1659596771.124963][2409:2409] CHIP:DMG:                         Cluster = 0x2f,
           [1659596771.124989][2409:2409] CHIP:DMG:                         Attribute = 0x0000_FFFB,
           [1659596771.125020][2409:2409] CHIP:DMG:                 }
-          [1659596771.125045][2409:2409] CHIP:DMG:                         
+          [1659596771.125045][2409:2409] CHIP:DMG:
           [1659596771.125077][2409:2409] CHIP:DMG:         ],
-          [1659596771.125102][2409:2409] CHIP:DMG:                 
-          [1659596771.125134][2409:2409] CHIP:DMG:         isFabricFiltered = true, 
+          [1659596771.125102][2409:2409] CHIP:DMG:
+          [1659596771.125134][2409:2409] CHIP:DMG:         isFabricFiltered = true,
           [1659596771.125156][2409:2409] CHIP:DMG:         InteractionModelRevision = 1
           [1659596771.125177][2409:2409] CHIP:DMG: },
 
@@ -404,7 +404,7 @@ tests:
 
           ./chip-tool powersource read status 1 1
 
-          verify the " status response" on the TH (all-cluster-minimal-app) log: 
+          verify the " status response" on the TH (all-cluster-minimal-app) log:
 
           [1646155382.977534][33190:33190] CHIP:EM: Handling via exchange: 16568r, Delegate: 0xaaaace1730c8
           [1646155382.978021][33190:33190] CHIP:IM: Received Read request
@@ -418,10 +418,10 @@ tests:
           [1646155382.978459][33190:33190] CHIP:DMG:                         Cluster = 0x2f,
           [1646155382.978513][33190:33190] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1646155382.978545][33190:33190] CHIP:DMG:                 }
-          [1646155382.978767][33190:33190] CHIP:DMG:                         
+          [1646155382.978767][33190:33190] CHIP:DMG:
           [1646155382.978804][33190:33190] CHIP:DMG:         ],
-          [1646155382.978836][33190:33190] CHIP:DMG:                 
-          [1646155382.978872][33190:33190] CHIP:DMG:         isFabricFiltered = false, 
+          [1646155382.978836][33190:33190] CHIP:DMG:
+          [1646155382.978872][33190:33190] CHIP:DMG:         isFabricFiltered = false,
           [1646155382.978901][33190:33190] CHIP:DMG:         InteractionModelRevision = 1
           [1646155382.978927][33190:33190] CHIP:DMG: },
           [1646155382.978998][33190:33190] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -432,7 +432,7 @@ tests:
 
           ./chip-tool powersource read order 1 1
 
-          verify the " order response" on the TH (all-cluster-minimal-app) log: 
+          verify the " order response" on the TH (all-cluster-minimal-app) log:
 
           [1653395573.862606][19412:19412] CHIP:IM: Received Read request
           [1653395573.862690][19412:19412] CHIP:DMG: ReadRequestMessage =
@@ -445,18 +445,18 @@ tests:
           [1653395573.863037][19412:19412] CHIP:DMG:                         Cluster = 0x2f,
           [1653395573.863101][19412:19412] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1653395573.863161][19412:19412] CHIP:DMG:                 }
-          [1653395573.863217][19412:19412] CHIP:DMG:                         
+          [1653395573.863217][19412:19412] CHIP:DMG:
           [1653395573.863267][19412:19412] CHIP:DMG:         ],
-          [1653395573.863319][19412:19412] CHIP:DMG:                 
-          [1653395573.863367][19412:19412] CHIP:DMG:         isFabricFiltered = true, 
+          [1653395573.863319][19412:19412] CHIP:DMG:
+          [1653395573.863367][19412:19412] CHIP:DMG:         isFabricFiltered = true,
           [1653395573.863413][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
           [1653395573.863456][19412:19412] CHIP:DMG: },
           [1653395573.863589][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1653395573.863720][19412:19412] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 
+          [1653395573.863720][19412:19412] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0
 
           ./chip-tool powersource read description 1 1
 
-          verify the " description response" on the TH (all-cluster-minimal-app) log: 
+          verify the " description response" on the TH (all-cluster-minimal-app) log:
 
           CHIP:IM: Received Read request
           [1653395620.020314][19412:19412] CHIP:DMG: ReadRequestMessage =
@@ -469,10 +469,10 @@ tests:
           [1653395620.020703][19412:19412] CHIP:DMG:                         Cluster = 0x2f,
           [1653395620.020770][19412:19412] CHIP:DMG:                         Attribute = 0x0000_0002,
           [1653395620.020833][19412:19412] CHIP:DMG:                 }
-          [1653395620.020893][19412:19412] CHIP:DMG:                         
+          [1653395620.020893][19412:19412] CHIP:DMG:
           [1653395620.020945][19412:19412] CHIP:DMG:         ],
-          [1653395620.020999][19412:19412] CHIP:DMG:                 
-          [1653395620.021052][19412:19412] CHIP:DMG:         isFabricFiltered = true, 
+          [1653395620.020999][19412:19412] CHIP:DMG:
+          [1653395620.021052][19412:19412] CHIP:DMG:         isFabricFiltered = true,
           [1653395620.021104][19412:19412] CHIP:DMG:         InteractionModelRevision = 1
           [1653395620.021153][19412:19412] CHIP:DMG: },
           [1653395620.021252][19412:19412] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -493,10 +493,10 @@ tests:
           [1663140804.059913][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
           [1663140804.059946][2414:2414] CHIP:DMG:                         Attribute = 0x0000_000E,
           [1663140804.059976][2414:2414] CHIP:DMG:                 }
-          [1663140804.060006][2414:2414] CHIP:DMG:                         
+          [1663140804.060006][2414:2414] CHIP:DMG:
           [1663140804.060033][2414:2414] CHIP:DMG:         ],
-          [1663140804.060060][2414:2414] CHIP:DMG:                 
-          [1663140804.060087][2414:2414] CHIP:DMG:         isFabricFiltered = true, 
+          [1663140804.060060][2414:2414] CHIP:DMG:
+          [1663140804.060087][2414:2414] CHIP:DMG:         isFabricFiltered = true,
           [1663140804.060111][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
           [1663140804.060136][2414:2414] CHIP:DMG: },
 
@@ -516,10 +516,10 @@ tests:
           [1663141268.348637][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
           [1663141268.348685][2414:2414] CHIP:DMG:                         Attribute = 0x0000_000F,
           [1663141268.348735][2414:2414] CHIP:DMG:                 }
-          [1663141268.348774][2414:2414] CHIP:DMG:                         
+          [1663141268.348774][2414:2414] CHIP:DMG:
           [1663141268.348820][2414:2414] CHIP:DMG:         ],
-          [1663141268.348857][2414:2414] CHIP:DMG:                 
-          [1663141268.348904][2414:2414] CHIP:DMG:         isFabricFiltered = true, 
+          [1663141268.348857][2414:2414] CHIP:DMG:
+          [1663141268.348904][2414:2414] CHIP:DMG:         isFabricFiltered = true,
           [1663141268.348938][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
           [1663141268.348982][2414:2414] CHIP:DMG: },
           [1663141268.349086][2414:2414] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -542,10 +542,10 @@ tests:
           [1663141378.116208][2414:2414] CHIP:DMG:                         Cluster = 0x2f,
           [1663141378.116247][2414:2414] CHIP:DMG:                         Attribute = 0x0000_0010,
           [1663141378.116294][2414:2414] CHIP:DMG:                 }
-          [1663141378.116330][2414:2414] CHIP:DMG:                         
+          [1663141378.116330][2414:2414] CHIP:DMG:
           [1663141378.116372][2414:2414] CHIP:DMG:         ],
-          [1663141378.116407][2414:2414] CHIP:DMG:                 
-          [1663141378.116450][2414:2414] CHIP:DMG:         isFabricFiltered = true, 
+          [1663141378.116407][2414:2414] CHIP:DMG:
+          [1663141378.116450][2414:2414] CHIP:DMG:         isFabricFiltered = true,
           [1663141378.116481][2414:2414] CHIP:DMG:         InteractionModelRevision = 1
           [1663141378.116521][2414:2414] CHIP:DMG: },
           [1663141378.116621][2414:2414] CHIP:DMG: IM RH moving to [GeneratingReports]
@@ -556,7 +556,7 @@ tests:
           a manufacturer specific order"
       PICS: PS.C.AO-READ
       verification: |
-          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client) 
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
 
 

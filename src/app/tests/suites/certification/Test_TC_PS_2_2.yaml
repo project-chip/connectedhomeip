@@ -63,7 +63,7 @@ tests:
 
           [1678874350.531309][348369:348369] CHIP:DMG: SubscribeRequestMessage =
           [1678874350.531317][348369:348369] CHIP:DMG: {
-          [1678874350.531323][348369:348369] CHIP:DMG:         KeepSubscriptions = false, 
+          [1678874350.531323][348369:348369] CHIP:DMG:         KeepSubscriptions = false,
           [1678874350.531331][348369:348369] CHIP:DMG:         MinIntervalFloorSeconds = 0x2,
           [1678874350.531339][348369:348369] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x14,
           [1678874350.531345][348369:348369] CHIP:DMG:         EventPathIBs =
@@ -74,10 +74,10 @@ tests:
           [1678874350.531391][348369:348369] CHIP:DMG:                         Cluster = 0x2f,
           [1678874350.531399][348369:348369] CHIP:DMG:                         Event = 0x0,
           [1678874350.531406][348369:348369] CHIP:DMG:                 },
-          [1678874350.531415][348369:348369] CHIP:DMG:                 
+          [1678874350.531415][348369:348369] CHIP:DMG:
           [1678874350.531421][348369:348369] CHIP:DMG:         ],
-          [1678874350.531432][348369:348369] CHIP:DMG:         
-          [1678874350.531440][348369:348369] CHIP:DMG:         isFabricFiltered = true, 
+          [1678874350.531432][348369:348369] CHIP:DMG:
+          [1678874350.531440][348369:348369] CHIP:DMG:         isFabricFiltered = true,
           [1678874350.531449][348369:348369] CHIP:DMG:         InteractionModelRevision = 1
           [1678874350.531455][348369:348369] CHIP:DMG: },
           [1678874350.531490][348369:348369] CHIP:DMG: Final negotiated min/max parameters: Min = 2s, Max = 20s
@@ -144,7 +144,7 @@ tests:
 
           [1678874454.354931][348369:348369] CHIP:DMG: SubscribeRequestMessage =
           [1678874454.354939][348369:348369] CHIP:DMG: {
-          [1678874454.354947][348369:348369] CHIP:DMG:         KeepSubscriptions = false, 
+          [1678874454.354947][348369:348369] CHIP:DMG:         KeepSubscriptions = false,
           [1678874454.354955][348369:348369] CHIP:DMG:         MinIntervalFloorSeconds = 0x0,
           [1678874454.354962][348369:348369] CHIP:DMG:         MaxIntervalCeilingSeconds = 0x64,
           [1678874454.354972][348369:348369] CHIP:DMG:         EventPathIBs =
@@ -155,10 +155,10 @@ tests:
           [1678874454.355016][348369:348369] CHIP:DMG:                         Cluster = 0x2f,
           [1678874454.355024][348369:348369] CHIP:DMG:                         Event = 0x1,
           [1678874454.355031][348369:348369] CHIP:DMG:                 },
-          [1678874454.355039][348369:348369] CHIP:DMG:                 
+          [1678874454.355039][348369:348369] CHIP:DMG:
           [1678874454.355046][348369:348369] CHIP:DMG:         ],
-          [1678874454.355053][348369:348369] CHIP:DMG:         
-          [1678874454.355061][348369:348369] CHIP:DMG:         isFabricFiltered = true, 
+          [1678874454.355053][348369:348369] CHIP:DMG:
+          [1678874454.355061][348369:348369] CHIP:DMG:         isFabricFiltered = true,
           [1678874454.355068][348369:348369] CHIP:DMG:         InteractionModelRevision = 1
           [1678874454.355074][348369:348369] CHIP:DMG: },
           [1678874454.355109][348369:348369] CHIP:DMG: Final negotiated min/max parameters: Min = 0s, Max = 100s
@@ -222,7 +222,7 @@ tests:
 
           [1678874515.570452][348369:348369] CHIP:DMG: SubscribeRequestMessage =
           [1678874515.570455][348369:348369] CHIP:DMG: {
-          [1678874515.570457][348369:348369] CHIP:DMG: 	KeepSubscriptions = false, 
+          [1678874515.570457][348369:348369] CHIP:DMG: 	KeepSubscriptions = false,
           [1678874515.570460][348369:348369] CHIP:DMG: 	MinIntervalFloorSeconds = 0x64,
           [1678874515.570464][348369:348369] CHIP:DMG: 	MaxIntervalCeilingSeconds = 0x3e8,
           [1678874515.570466][348369:348369] CHIP:DMG: 	EventPathIBs =
@@ -233,10 +233,10 @@ tests:
           [1678874515.570481][348369:348369] CHIP:DMG: 			Cluster = 0x2f,
           [1678874515.570484][348369:348369] CHIP:DMG: 			Event = 0x2,
           [1678874515.570487][348369:348369] CHIP:DMG: 		},
-          [1678874515.570490][348369:348369] CHIP:DMG: 		
+          [1678874515.570490][348369:348369] CHIP:DMG:
           [1678874515.570492][348369:348369] CHIP:DMG: 	],
-          [1678874515.570495][348369:348369] CHIP:DMG: 	
-          [1678874515.570498][348369:348369] CHIP:DMG: 	isFabricFiltered = true, 
+          [1678874515.570495][348369:348369] CHIP:DMG:
+          [1678874515.570498][348369:348369] CHIP:DMG: 	isFabricFiltered = true,
           [1678874515.570501][348369:348369] CHIP:DMG: 	InteractionModelRevision = 1
           [1678874515.570503][348369:348369] CHIP:DMG: },
           [1678874515.570517][348369:348369] CHIP:DMG: Final negotiated min/max parameters: Min = 100s, Max = 1000s

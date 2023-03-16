@@ -43,27 +43,27 @@ tests:
           timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.S.C01.Rsp
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000 
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
           Verify success response On TH_CR1(chip-tool) Log
 
 
           [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:                                 
+          [1650278416.249430][11064:11069] CHIP:DMG:
           [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
           [1650278416.249581][11064:11069] CHIP:DMG:                                 {
           [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:                                 
+          [1650278416.249823][11064:11069] CHIP:DMG:
           [1650278416.249889][11064:11069] CHIP:DMG:                         },
       disabled: true
 
     - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
       PICS: CADMIN.S.A0000
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
            ./chip-tool administratorcommissioning read window-status 1 0
 
@@ -78,7 +78,7 @@ tests:
     - label: "TH_CR1 reads AdminFabricIndex attribute from DUT_CE"
       PICS: CADMIN.S.A0001
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
           ./chip-tool administratorcommissioning read admin-fabric-index  1 0
 
@@ -142,7 +142,7 @@ tests:
 
     - label: "DNS-SD records shows DUT_CE advertising"
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
           avahi-browse -rt _matterc._udp
           + wlp5s0 IPv6 C326228BDB082BF4                              _matterc._udp        local
           + wlp5s0 IPv6 7B6545A75C5330BE                              _matterc._udp        local
@@ -157,7 +157,7 @@ tests:
     - label: "TH_CR3 Commissions with DUT_CE"
       PICS: CADMIN.S
       verification: |
-          On TH_CR3 send the below command  
+          On TH_CR3 send the below command
 
            ./chip-tool pairing onnetwork 3 20202021  --commissioner-name gamma
 
@@ -171,14 +171,14 @@ tests:
           Commissions with DUT_CE"
       PICS: CADMIN.S.C01.Rsp
       verification: |
-          On TH_CR1 send the below command  
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000 
+          On TH_CR1 send the below command
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
           Verify success response On TH_CR1(chip-tool) Log
 
           CHIP:DMG: InvokeResponseMessage =
           [1650278416.248379][11064:11069] CHIP:DMG: {
-          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false, 
+          [1650278416.248436][11064:11069] CHIP:DMG:         suppressResponse = false,
           [1650278416.248495][11064:11069] CHIP:DMG:         InvokeResponseIBs =
           [1650278416.248570][11064:11069] CHIP:DMG:         [
           [1650278416.248630][11064:11069] CHIP:DMG:                 InvokeResponseIB =
@@ -191,18 +191,18 @@ tests:
           [1650278416.249186][11064:11069] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650278416.249268][11064:11069] CHIP:DMG:                                         CommandId = 0x1,
           [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:                                 
+          [1650278416.249430][11064:11069] CHIP:DMG:
           [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
           [1650278416.249581][11064:11069] CHIP:DMG:                                 {
           [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:                                 
+          [1650278416.249823][11064:11069] CHIP:DMG:
           [1650278416.249889][11064:11069] CHIP:DMG:                         },
-          [1650278416.249969][11064:11069] CHIP:DMG:                         
+          [1650278416.249969][11064:11069] CHIP:DMG:
           [1650278416.250035][11064:11069] CHIP:DMG:                 },
-          [1650278416.250113][11064:11069] CHIP:DMG:                 
+          [1650278416.250113][11064:11069] CHIP:DMG:
           [1650278416.250169][11064:11069] CHIP:DMG:         ],
-          [1650278416.250241][11064:11069] CHIP:DMG:         
+          [1650278416.250241][11064:11069] CHIP:DMG:
           [1650278416.250298][11064:11069] CHIP:DMG:         InteractionModelRevision = 1
           [1650278416.250355][11064:11069] CHIP:DMG: },
           [1650278416.250535][11064:11069] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x0
@@ -221,20 +221,20 @@ tests:
           timeout of PIXIT.CADMIN.CwDuration seconds using BCM"
       PICS: CADMIN.S.C01.Rsp
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
-          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000 
+          ./chip-tool administratorcommissioning open-basic-commissioning-window 500 1 0 --timedInteractionTimeoutMs 1000
 
           Verify success response On TH_CR2(chip-tool) Log
 
 
           [1650278416.249347][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249430][11064:11069] CHIP:DMG:                                 
+          [1650278416.249430][11064:11069] CHIP:DMG:
           [1650278416.249501][11064:11069] CHIP:DMG:                                 StatusIB =
           [1650278416.249581][11064:11069] CHIP:DMG:                                 {
           [1650278416.249664][11064:11069] CHIP:DMG:                                         status = 0x00 (SUCCESS),
           [1650278416.249738][11064:11069] CHIP:DMG:                                 },
-          [1650278416.249823][11064:11069] CHIP:DMG:                                 
+          [1650278416.249823][11064:11069] CHIP:DMG:
           [1650278416.249889][11064:11069] CHIP:DMG:                         },
       disabled: true
 
@@ -244,7 +244,7 @@ tests:
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
           ./chip-tool pairing open-commissioning-window 1 1 200 1000 3840
 
@@ -253,7 +253,7 @@ tests:
 
           CHIP:DMG: InvokeResponseMessage =
           [1650527622.373450][15824:15829] CHIP:DMG: {
-          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false, 
+          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false,
           [1650527622.373628][15824:15829] CHIP:DMG:         InvokeResponseIBs =
           [1650527622.373734][15824:15829] CHIP:DMG:         [
           [1650527622.373817][15824:15829] CHIP:DMG:                 InvokeResponseIB =
@@ -266,19 +266,19 @@ tests:
           [1650527622.374490][15824:15829] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650527622.374593][15824:15829] CHIP:DMG:                                         CommandId = 0x1,
           [1650527622.374682][15824:15829] CHIP:DMG:                                 },
-          [1650527622.374799][15824:15829] CHIP:DMG:                                 
+          [1650527622.374799][15824:15829] CHIP:DMG:
           [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
           [1650527622.374979][15824:15829] CHIP:DMG:                                 {
           [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
           [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x2,
           [1650527622.375320][15824:15829] CHIP:DMG:                                 },
-          [1650527622.375426][15824:15829] CHIP:DMG:                                 
+          [1650527622.375426][15824:15829] CHIP:DMG:
           [1650527622.375527][15824:15829] CHIP:DMG:                         },
-          [1650527622.375616][15824:15829] CHIP:DMG:                         
+          [1650527622.375616][15824:15829] CHIP:DMG:
           [1650527622.375704][15824:15829] CHIP:DMG:                 },
-          [1650527622.375786][15824:15829] CHIP:DMG:                 
+          [1650527622.375786][15824:15829] CHIP:DMG:
           [1650527622.375864][15824:15829] CHIP:DMG:         ],
-          [1650527622.375940][15824:15829] CHIP:DMG:         
+          [1650527622.375940][15824:15829] CHIP:DMG:
           [1650527622.376000][15824:15829] CHIP:DMG:         InteractionModelRevision = 1
           [1650527622.376058][15824:15829] CHIP:DMG: },
           [1650527622.376202][15824:15829] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x1
@@ -288,7 +288,7 @@ tests:
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
       PICS: OPCREDS.S.A0001
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
           ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
 
@@ -301,7 +301,7 @@ tests:
           [1650527361.426923][15792:15797] CHIP:TOO:       VendorId: 65521
           [1650527361.426979][15792:15797] CHIP:TOO:       FabricId: 1
           [1650527361.427033][15792:15797] CHIP:TOO:       NodeId: 1
-          [1650527361.427088][15792:15797] CHIP:TOO:       Label: 
+          [1650527361.427088][15792:15797] CHIP:TOO:       Label:
           [1650527361.427166][15792:15797] CHIP:TOO:       FabricIndex: 1
           [1650527361.427376][15792:15797] CHIP:TOO:      }
           [1650527361.427464][15792:15797] CHIP:TOO:     [2]: {
@@ -309,7 +309,7 @@ tests:
           [1650527361.427595][15792:15797] CHIP:TOO:       VendorId: 65521
           [1650527361.427649][15792:15797] CHIP:TOO:       FabricId: 1
           [1650527361.427703][15792:15797] CHIP:TOO:       NodeId: 3
-          [1650527361.427756][15792:15797] CHIP:TOO:       Label: 
+          [1650527361.427756][15792:15797] CHIP:TOO:       Label:
           [1650527361.427811][15792:15797] CHIP:TOO:       FabricIndex: 2
           [1650527361.427868][15792:15797] CHIP:TOO:      }
           [1650527361.427943][15792:15797] CHIP:TOO:     [3]: {
@@ -317,7 +317,7 @@ tests:
           [1650527361.428067][15792:15797] CHIP:TOO:       VendorId: 65521
           [1650527361.428122][15792:15797] CHIP:TOO:       FabricId: 1
           [1650527361.428176][15792:15797] CHIP:TOO:       NodeId: 2
-          [1650527361.428229][15792:15797] CHIP:TOO:       Label: 
+          [1650527361.428229][15792:15797] CHIP:TOO:       Label:
           [1650527361.428282][15792:15797] CHIP:TOO:       FabricIndex: 3
           [1650527361.428335][15792:15797] CHIP:TOO:      }
       disabled: true
@@ -334,7 +334,7 @@ tests:
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
 
           ./chip-tool pairing open-commissioning-window 1 1 200 1000 3840
@@ -356,7 +356,7 @@ tests:
     - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
       PICS: CADMIN.S.A0001
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
            ./chip-tool administratorcommissioning read window-status 1 0
 
@@ -370,7 +370,7 @@ tests:
 
     - label: "DNS-SD records shows DUT_CE advertising"
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
           avahi-browse -rt _matterc._udp
           + wlp5s0 IPv6 C326228BDB082BF4                              _matterc._udp        local
           + wlp5s0 IPv6 7B6545A75C5330BE                              _matterc._udp        local
@@ -393,7 +393,7 @@ tests:
           commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
       verification: |
-          On TH_CR3 send the below command  
+          On TH_CR3 send the below command
 
           ./chip-tool pairing open-commissioning-window 3 1 200 1000 3840  --commissioner-name gamma
 
@@ -401,7 +401,7 @@ tests:
 
           CHIP:DMG: InvokeResponseMessage =
           [1650527622.373450][15824:15829] CHIP:DMG: {
-          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false, 
+          [1650527622.373531][15824:15829] CHIP:DMG:         suppressResponse = false,
           [1650527622.373628][15824:15829] CHIP:DMG:         InvokeResponseIBs =
           [1650527622.373734][15824:15829] CHIP:DMG:         [
           [1650527622.373817][15824:15829] CHIP:DMG:                 InvokeResponseIB =
@@ -414,19 +414,19 @@ tests:
           [1650527622.374490][15824:15829] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650527622.374593][15824:15829] CHIP:DMG:                                         CommandId = 0x1,
           [1650527622.374682][15824:15829] CHIP:DMG:                                 },
-          [1650527622.374799][15824:15829] CHIP:DMG:                                 
+          [1650527622.374799][15824:15829] CHIP:DMG:
           [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
           [1650527622.374979][15824:15829] CHIP:DMG:                                 {
           [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
           [1650527622.375236][15824:15829] CHIP:DMG:                                         cluster-status = 0x2,
           [1650527622.375320][15824:15829] CHIP:DMG:                                 },
-          [1650527622.375426][15824:15829] CHIP:DMG:                                 
+          [1650527622.375426][15824:15829] CHIP:DMG:
           [1650527622.375527][15824:15829] CHIP:DMG:                         },
-          [1650527622.375616][15824:15829] CHIP:DMG:                         
+          [1650527622.375616][15824:15829] CHIP:DMG:
           [1650527622.375704][15824:15829] CHIP:DMG:                 },
-          [1650527622.375786][15824:15829] CHIP:DMG:                 
+          [1650527622.375786][15824:15829] CHIP:DMG:
           [1650527622.375864][15824:15829] CHIP:DMG:         ],
-          [1650527622.375940][15824:15829] CHIP:DMG:         
+          [1650527622.375940][15824:15829] CHIP:DMG:
           [1650527622.376000][15824:15829] CHIP:DMG:         InteractionModelRevision = 1
           [1650527622.376058][15824:15829] CHIP:DMG: },
           [1650527622.376202][15824:15829] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0001 Status=0x1
@@ -436,7 +436,7 @@ tests:
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
       PICS: OPCREDS.S.A0001
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
           ./chip-tool operationalcredentials read fabrics 1 0 --fabric-filtered 0
 
@@ -449,7 +449,7 @@ tests:
           [1650527361.426923][15792:15797] CHIP:TOO:       VendorId: 65521
           [1650527361.426979][15792:15797] CHIP:TOO:       FabricId: 1
           [1650527361.427033][15792:15797] CHIP:TOO:       NodeId: 1
-          [1650527361.427088][15792:15797] CHIP:TOO:       Label: 
+          [1650527361.427088][15792:15797] CHIP:TOO:       Label:
           [1650527361.427166][15792:15797] CHIP:TOO:       FabricIndex: 1
           [1650527361.427376][15792:15797] CHIP:TOO:      }
           [1650527361.427464][15792:15797] CHIP:TOO:     [2]: {
@@ -457,7 +457,7 @@ tests:
           [1650527361.427595][15792:15797] CHIP:TOO:       VendorId: 65521
           [1650527361.427649][15792:15797] CHIP:TOO:       FabricId: 1
           [1650527361.427703][15792:15797] CHIP:TOO:       NodeId: 3
-          [1650527361.427756][15792:15797] CHIP:TOO:       Label: 
+          [1650527361.427756][15792:15797] CHIP:TOO:       Label:
           [1650527361.427811][15792:15797] CHIP:TOO:       FabricIndex: 2
           [1650527361.427868][15792:15797] CHIP:TOO:      }
           [1650527361.427943][15792:15797] CHIP:TOO:     [3]: {
@@ -465,7 +465,7 @@ tests:
           [1650527361.428067][15792:15797] CHIP:TOO:       VendorId: 65521
           [1650527361.428122][15792:15797] CHIP:TOO:       FabricId: 1
           [1650527361.428176][15792:15797] CHIP:TOO:       NodeId: 2
-          [1650527361.428229][15792:15797] CHIP:TOO:       Label: 
+          [1650527361.428229][15792:15797] CHIP:TOO:       Label:
           [1650527361.428282][15792:15797] CHIP:TOO:       FabricIndex: 3
           [1650527361.428335][15792:15797] CHIP:TOO:      }
       disabled: true
@@ -481,7 +481,7 @@ tests:
           "TH_CR1 opens a commissioning window on DUT_CE using a commissioning
           timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
           ./chip-tool pairing open-commissioning-window 1 1 180 1000 3840
 
@@ -505,7 +505,7 @@ tests:
           a commissioning timeout of PIXIT.CADMIN.CwDuration seconds using ECM"
       PICS: CADMIN.S.C00.Rsp
       verification: |
-          On TH_CR2 send the below command  
+          On TH_CR2 send the below command
 
           ./chip-tool pairing open-commissioning-window 2 1 180 1000 3840  --commissioner-name beta
 
@@ -514,7 +514,7 @@ tests:
           [1650527622.374490][15824:15829] CHIP:DMG:                                         ClusterId = 0x3c,
           [1650527622.374593][15824:15829] CHIP:DMG:                                         CommandId = 0x1,
           [1650527622.374682][15824:15829] CHIP:DMG:                                 },
-          [1650527622.374799][15824:15829] CHIP:DMG:                                 
+          [1650527622.374799][15824:15829] CHIP:DMG:
           [1650527622.374896][15824:15829] CHIP:DMG:                                 StatusIB =
           [1650527622.374979][15824:15829] CHIP:DMG:                                 {
           [1650527622.375086][15824:15829] CHIP:DMG:                                         status = 0x01 (FAILURE),
@@ -532,7 +532,7 @@ tests:
     - label: "TH_CR1 reads WindowStatus attribute from DUT_CE"
       PICS: CADMIN.S.A0000
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
           ./chip-tool administratorcommissioning read window-status 1 0
 
@@ -546,7 +546,7 @@ tests:
     - label: "TH_CR1 reads AdminFabricIndex attribute from DUT_CE"
       PICS: CADMIN.S.A0001
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
           ./chip-tool administratorcommissioning read admin-fabric-index  1 0
 
@@ -561,7 +561,7 @@ tests:
     - label: "TH_CR1 reads AdminVendorId attribute from DUT_CE"
       PICS: CADMIN.S.A0002
       verification: |
-          On TH_CR1 send the below command  
+          On TH_CR1 send the below command
 
           ./chip-tool administratorcommissioning read admin-vendor-id 1 0
 

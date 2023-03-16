@@ -247,7 +247,7 @@ tests:
           Commissionee provides DAC with validity period that is not in range of PAA/PAI
           Use the folder  - connectedhomeip/credentials/development/commissioner_dut/struct_dac_valid_in_past & use the sample json test_case_vector.json
 
-          Commission TH to DUT by using --dac_provider parameter  
+          Commission TH to DUT by using --dac_provider parameter
 
 
           execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform

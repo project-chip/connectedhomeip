@@ -148,7 +148,7 @@ tests:
 
 
           Example tv-app log file shows receipt of launchurl command:
-          [1678790163.014705][324821:324821] CHIP:DL: GetContentAppByEndpointId() - endpoint 1 not found 
+          [1678790163.014705][324821:324821] CHIP:DL: GetContentAppByEndpointId() - endpoint 1 not found
           [1678790163.014707][324821:324821] CHIP:ZCL: Content Launcher NOT returning ContentApp delegate for endpoint:1
           [1678790163.014711][324821:324821] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl
           [1678790163.014713][324821:324821] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://csa-iot.org/badauth DisplayString= BrandingInformation.ProviderName=exampleName

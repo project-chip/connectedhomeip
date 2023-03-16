@@ -400,7 +400,7 @@ tests:
 
           On DUT_CR2 send the below command
 
-          ./chip-tool  pairing open-commissioning-window 2 1 400 2000 3841 --commissioner-name beta 
+          ./chip-tool  pairing open-commissioning-window 2 1 400 2000 3841 --commissioner-name beta
           Verify the Commissioning window is opened in TH_CE(all-clusters-app) Log
 
           [1660901022.112296][3045:3045] CHIP:DIS: mDNS service published: _matterc._udp
