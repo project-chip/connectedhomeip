@@ -213,9 +213,9 @@ SECTIONS {
     /* End of executable code/data, NVS is not part of the OTA image */
     PROVIDE (_flash_end_address = .);
 
-    /* Two pages of NV Memory (0x800 each) offset by 1 page for BIM/CCFG */
+    /* 5 pages of NV Memory (0x800 each) offset by 1 page for BIM/CCFG */
     /*.nvs (NOLOAD) : ALIGN(0x2000) { */
-    .nvs (0xFA000) (NOLOAD) : AT (0xFA000) ALIGN(0x2000) {
+    .nvs (0xFB800) (NOLOAD) : AT (0xFB800) ALIGN(0x800) {
         *(.nvs)
     } > REGION_TEXT
 

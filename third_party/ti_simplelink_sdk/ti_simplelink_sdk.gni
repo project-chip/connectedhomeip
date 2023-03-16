@@ -321,6 +321,7 @@ template("ti_simplelink_sdk") {
         "-Wno-address-of-packed-member",
         "-Wno-implicit-fallthrough",
         "-Wno-unused-label",
+        "-Wno-shadow"
       ]
       public_deps = [
         ":${sdk_target_name}_freertos",
@@ -383,7 +384,7 @@ template("ti_simplelink_sdk") {
       ]
 
 
-           defines += [
+       defines += [
         "FLASH_ROM_BUILD",
         "ONE_BLE_LIB_SIZE_OPTIMIZATION",
         "STACK_LIBRARY",
@@ -447,6 +448,7 @@ template("ti_simplelink_sdk") {
       ]
       defines += [
         "ONE_BLE_LIB_SIZE_OPTIMIZATION",
+        "NVOCMP_NVPAGES=5",
         "NVOCMP_NWSAMEITEM=1",
         "CC13X2P",
         "SYSCFG",
@@ -510,6 +512,7 @@ template("ti_simplelink_sdk") {
     cflags = [
       "-Wno-conversion",
       "-Wno-comment",
+      "-Wno-shadow",
       "@" + rebase_path(ti_simplelink_sdk_root +
                             "/source/ti/ble5stack/config/build_components.opt",
                         root_build_dir),
