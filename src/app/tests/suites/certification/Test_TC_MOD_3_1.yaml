@@ -27,6 +27,8 @@ tests:
     - label: "Note"
       verification: |
           To execute this test case set onmode to any integer value because as default it value has null.
+
+          ./chip-tool modeselect write on-mode 0 1 1
       disabled: true
 
     - label: "Precondition"
