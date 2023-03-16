@@ -210,7 +210,7 @@ void WiFiManager::_ScanFinishedCb(wifi_manager_error_e wifiErr, void * userData)
         foundAp = sInstance._WiFiGetFoundAP();
         if (foundAp != nullptr)
         {
-            PlatformMgrImpl().GLibMatterContextInvoke(_WiFiConnect, foundAp);
+            PlatformMgrImpl().GLibMatterContextInvokeSynchronous(_WiFiConnect, foundAp);
         }
     }
     else
@@ -553,7 +553,7 @@ void WiFiManager::Init()
     sInstance.mModuleState     = WIFI_MANAGER_MODULE_STATE_DETACHED;
     sInstance.mConnectionState = WIFI_MANAGER_CONNECTION_STATE_DISCONNECTED;
 
-    PlatformMgrImpl().GLibMatterContextInvoke(_WiFiInitialize, nullptr);
+    PlatformMgrImpl().GLibMatterContextInvokeSynchronous(_WiFiInitialize, nullptr);
 }
 
 void WiFiManager::Deinit()
@@ -577,7 +577,7 @@ CHIP_ERROR WiFiManager::Activate()
     VerifyOrExit((err = IsActivated(&isWiFiActivated)) == CHIP_NO_ERROR, );
     VerifyOrExit(isWiFiActivated == false, ChipLogProgress(DeviceLayer, "WiFi is already activated"));
 
-    err = PlatformMgrImpl().GLibMatterContextInvoke(_WiFiActivate, nullptr);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSynchronous(_WiFiActivate, nullptr);
     SuccessOrExit(err);
 
 exit:
@@ -592,7 +592,7 @@ CHIP_ERROR WiFiManager::Deactivate()
     VerifyOrExit((err = IsActivated(&isWiFiActivated)) == CHIP_NO_ERROR, );
     VerifyOrExit(isWiFiActivated == true, ChipLogProgress(DeviceLayer, "WiFi is already deactivated"));
 
-    err = PlatformMgrImpl().GLibMatterContextInvoke(_WiFiDeactivate, nullptr);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSynchronous(_WiFiDeactivate, nullptr);
     SuccessOrExit(err);
 
 exit:
@@ -620,12 +620,12 @@ CHIP_ERROR WiFiManager::Connect(const char * ssid, const char * key,
     foundAp = sInstance._WiFiGetFoundAP();
     if (foundAp != nullptr)
     {
-        err = PlatformMgrImpl().GLibMatterContextInvoke(_WiFiConnect, foundAp);
+        err = PlatformMgrImpl().GLibMatterContextInvokeSynchronous(_WiFiConnect, foundAp);
         SuccessOrExit(err);
     }
     else
     {
-        err = PlatformMgrImpl().GLibMatterContextInvoke(_WiFiScan, nullptr);
+        err = PlatformMgrImpl().GLibMatterContextInvokeSynchronous(_WiFiScan, nullptr);
         SuccessOrExit(err);
     }
 

@@ -589,7 +589,7 @@ CHIP_ERROR DnssdTizen::RegisterService(const DnssdService & service, DnssdPublis
                      err = GetChipError(ret));
     }
 
-    err = DeviceLayer::PlatformMgrImpl().GLibMatterContextInvoke(RegisterAsync, serviceCtx);
+    err = DeviceLayer::PlatformMgrImpl().GLibMatterContextInvokeSynchronous(RegisterAsync, serviceCtx);
     SuccessOrExit(err);
 
 exit:
@@ -628,7 +628,7 @@ CHIP_ERROR DnssdTizen::Browse(const char * type, Dnssd::DnssdServiceProtocol pro
 
     auto browseCtx = CreateBrowseContext(fullType.c_str(), protocol, interfaceId, callback, context);
 
-    err = DeviceLayer::PlatformMgrImpl().GLibMatterContextInvoke(BrowseAsync, browseCtx);
+    err = DeviceLayer::PlatformMgrImpl().GLibMatterContextInvokeSynchronous(BrowseAsync, browseCtx);
     SuccessOrExit(err);
 
 exit:
@@ -669,7 +669,7 @@ CHIP_ERROR DnssdTizen::Resolve(const DnssdService & browseResult, chip::Inet::In
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_create_remote_service() failed. ret: %d", ret);
                  err = GetChipError(ret));
 
-    err = DeviceLayer::PlatformMgrImpl().GLibMatterContextInvoke(ResolveAsync, resolveCtx);
+    err = DeviceLayer::PlatformMgrImpl().GLibMatterContextInvokeSynchronous(ResolveAsync, resolveCtx);
     SuccessOrExit(err);
 
 exit:

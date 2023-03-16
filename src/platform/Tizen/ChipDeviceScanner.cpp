@@ -210,7 +210,7 @@ CHIP_ERROR ChipDeviceScanner::StartChipScan(System::Clock::Timeout timeout, Scan
 
     // All set to trigger LE Scan
     ChipLogProgress(DeviceLayer, "Start CHIP BLE scan: timeout=%ums", mScanTimeoutMs);
-    err = PlatformMgrImpl().GLibMatterContextInvoke(TriggerScan, this);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSynchronous(TriggerScan, this);
     SuccessOrExit(err);
 
     return CHIP_NO_ERROR;

@@ -61,7 +61,7 @@ public:
      * @param[in] userData User data to pass to the function.
      * @returns The result of the function.
      */
-    CHIP_ERROR GLibMatterContextInvoke(CHIP_ERROR (*func)(void *), void * userData);
+    CHIP_ERROR GLibMatterContextInvokeSynchronous(CHIP_ERROR (*func)(void *), void * userData);
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.

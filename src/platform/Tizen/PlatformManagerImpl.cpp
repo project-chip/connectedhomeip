@@ -103,7 +103,7 @@ void PlatformManagerImpl::_Shutdown()
     g_thread_join(mGLibMainLoopThread);
 }
 
-CHIP_ERROR PlatformManagerImpl::GLibMatterContextInvoke(CHIP_ERROR (*func)(void *), void * userData)
+CHIP_ERROR PlatformManagerImpl::GLibMatterContextInvokeSynchronous(CHIP_ERROR (*func)(void *), void * userData)
 {
     GLibMatterContextInvokeData invokeData{ func, userData };
 
