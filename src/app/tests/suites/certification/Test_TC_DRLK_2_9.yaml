@@ -193,6 +193,7 @@ tests:
               - name: "UserIndex"
                 value: null
 
+    # Need OR condition support
     - label:
           "TH sends Set Credential Command to DUT and Verify that the DUT sends
           Set Credential Response command with status as DUPLICATE or OCCUPIED"
