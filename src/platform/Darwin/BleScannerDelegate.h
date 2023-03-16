@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,22 +18,20 @@
 
 #pragma once
 
-#include <ble/BleConnectionDelegate.h>
+#include <ble/CHIPBleServiceData.h>
+#include <lib/support/DLLUtil.h>
 
 namespace chip {
 namespace DeviceLayer {
-namespace Internal {
 
-class BleConnectionDelegateImpl : public Ble::BleConnectionDelegate
+class DLL_EXPORT BleScannerDelegate
 {
 public:
-    void StartScan(BleScannerDelegate * delegate = nullptr);
-    void StopScan();
-    virtual void NewConnection(Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator);
-    virtual void NewConnection(Ble::BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj);
-    virtual CHIP_ERROR CancelConnection();
+    virtual ~BleScannerDelegate() {}
+
+    // Called when a scan result is available.
+    virtual void OnBleScanResult(BLE_CONNECTION_OBJECT connObj, const Ble::ChipBLEDeviceIdentificationInfo & info) = 0;
 };
 
-} // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

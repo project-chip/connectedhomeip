@@ -55,6 +55,10 @@ public:
     // out of a peripheral that matches the given discriminator.
     virtual void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) = 0;
 
+    // Call this function to delegate the connection steps required to get a connected BLE_CONNECTION_OBJECT
+    // out of a disconnected BLE_CONNECTION_OBJECT.
+    virtual void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) = 0;
+
     // Call this function to stop the connection
     virtual CHIP_ERROR CancelConnection() = 0;
 };
