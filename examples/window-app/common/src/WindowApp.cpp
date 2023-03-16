@@ -253,7 +253,7 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
                 target = ComputePercent100thsStep(OperationalState::MovingUpOrOpen, current.Value(), LIFT_DELTA);
                 (void)Attributes::TargetPositionLiftPercent100ths::Set(endId, target);
             }          
-            else
+            else if((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull() && mTiltMode)
             {
                 target = ComputePercent100thsStep(OperationalState::MovingUpOrOpen, current.Value(), TILT_DELTA);
                 (void)Attributes::TargetPositionTiltPercent100ths::Set(endId, target);
@@ -301,12 +301,12 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
             status = Attributes::CurrentPositionLiftPercent100ths::Get(endId, current); 
             if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull() && !mTiltMode)
             {
-                target = ComputePercent100thsStep(OperationalState::MovingUpOrOpen, current.Value(), LIFT_DELTA);
+                target = ComputePercent100thsStep(OperationalState::MovingDownOrClose, current.Value(), LIFT_DELTA);
                 (void)Attributes::TargetPositionLiftPercent100ths::Set(endId, target);
             }          
-            else
+            else if((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull() && mTiltMode)
             {
-                target = ComputePercent100thsStep(OperationalState::MovingUpOrOpen, current.Value(), TILT_DELTA);
+                target = ComputePercent100thsStep(OperationalState::MovingDownOrClose, current.Value(), TILT_DELTA);
                 (void)Attributes::TargetPositionTiltPercent100ths::Set(endId, target);
             }
             chip::DeviceLayer::PlatformMgr().UnlockChipStack();
