@@ -805,7 +805,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"contentLauncher_subscribeSupportedStreamingProtocols"];
                 callback();
@@ -912,7 +912,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"levelControl_subscribeCurrentLevel"];
                 callback();
@@ -957,7 +957,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"levelControl_subscribeMinLevel"];
                 callback();
@@ -1002,7 +1002,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"levelControl_subscribeMaxLevel"];
                 callback();
@@ -1319,7 +1319,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"mediaPlayback_subscribeCurrentState"];
                 callback();
@@ -1364,7 +1364,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"mediaPlayback_subscribeStartTime"];
                 callback();
@@ -1409,7 +1409,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"mediaPlayback_subscribeDuration"];
                 callback();
@@ -1469,7 +1469,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"mediaPlayback_subscribeSampledPosition"];
                 callback();
@@ -1516,7 +1516,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"mediaPlayback_subscribePlaybackSpeed"];
                 callback();
@@ -1563,7 +1563,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"mediaPlayback_subscribeSeekRangeEnd"];
                 callback();
@@ -1610,7 +1610,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"mediaPlayback_subscribeSeekRangeStart"];
                 callback();
@@ -1795,7 +1795,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"targetNavigator_subscribeTargetList"];
                 callback();
@@ -1842,7 +1842,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"targetNavigator_subscribeCurrentTarget"];
                 callback();
@@ -1916,7 +1916,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"applicationBasic_subscribeVendorName"];
                 callback();
@@ -1962,7 +1962,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"applicationBasic_subscribeVendorID"];
                 callback();
@@ -2010,7 +2010,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"applicationBasic_subscribeApplicationName"];
                 callback();
@@ -2056,7 +2056,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"applicationBasic_subscribeProductID"];
                 callback();
@@ -2105,7 +2105,7 @@
                 callback([[MatterError alloc] initWithCode:err.AsInteger() message:[NSString stringWithUTF8String:err.AsString()]]);
             },
             minInterval, maxInterval,
-            [](void * context) {
+            [](void * context, chip::SubscriptionId subscriptionId) {
                 void (^callback)() = [[CastingServerBridge getSharedInstance].subscriptionEstablishedCallbacks
                     objectForKey:@"applicationBasic_subscribeApplicationVersion"];
                 callback();
