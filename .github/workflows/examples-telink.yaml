@@ -130,6 +130,21 @@ jobs:
             - name: clean out build output
               run: rm -rf ./out
 
+            - name: Build example Telink Lighting App with Factory Data
+              run: |
+                  ./scripts/checkout_submodules.py --shallow --platform linux
+                  ./scripts/build/gn_gen.sh
+                  ./scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE chip-cert chip-tool spake2p"
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light-factory-data' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9518adk80d lighting-app-factory-data \
+                    out/telink-tlsr9518adk80d-light-factory-data/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output
+              run: rm -rf ./out
+
             - name: Build example Telink Light Switch App
               run: |
                   ./scripts/run_in_build_env.sh \
