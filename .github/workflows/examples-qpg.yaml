@@ -83,7 +83,7 @@ jobs:
               timeout-minutes: 20
               run: |
                   ./scripts/run_in_build_env.sh \
-                     "CHIP_ROOT=$PWD ./scripts/build/build_examples.py \
+                     "./scripts/build/build_examples.py \
                         --enable-flashbundle \
                         --target qpg-qpg6105-lock \
                         --target qpg-qpg6105-light \
