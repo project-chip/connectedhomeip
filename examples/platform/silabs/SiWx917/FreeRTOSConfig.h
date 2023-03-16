@@ -193,7 +193,7 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configTOTAL_HEAP_SIZE ((size_t)(44 * 1024))
 #else
 #define configTOTAL_HEAP_SIZE ((size_t)(34 * 1024))
-#endif // DIC
+#endif // DIC_ENABLE
 #endif // configTOTAL_HEAP_SIZE
 
 /* Optional functions - most linkers will remove unused functions anyway. */
