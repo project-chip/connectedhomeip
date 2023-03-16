@@ -131,8 +131,8 @@
 #ifdef DIC_ENABLE
 #define MBEDTLS_MPI_MAX_SIZE 512 /**< Maximum number of bytes for usable MPIs. */
 #else
-#define MBEDTLS_MPI_MAX_SIZE 32 /**< Maximum number of bytes for usable MPIs. */
-#endif // DIC_ENABLE
+#define MBEDTLS_MPI_MAX_SIZE 32         /**< Maximum number of bytes for usable MPIs. */
+#endif                                  // DIC_ENABLE
 #define MBEDTLS_ECP_MAX_BITS 256        /**< Maximum bit size of groups */
 #define MBEDTLS_ECP_WINDOW_SIZE 2       /**< Maximum window size used */
 #define MBEDTLS_ECP_FIXED_POINT_OPTIM 0 /**< Enable fixed-point speed-up */
@@ -147,7 +147,7 @@
 #ifdef DIC_ENABLE
 #define MBEDTLS_SSL_IN_CONTENT_LEN 5120
 #define MBEDTLS_SSL_OUT_CONTENT_LEN 1560
-#endif  // DIC_ENABLE
+#endif // DIC_ENABLE
 
 #define MBEDTLS_SSL_CIPHERSUITES MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
 
