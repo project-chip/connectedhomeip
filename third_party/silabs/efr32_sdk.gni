@@ -200,7 +200,7 @@ template("efr32_sdk") {
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
-      if (use_mqtt) {
+      if (enable_dic) {
         defines += [ "DIC_ENABLE=1" ]
       }
       if (chip_enable_wifi_ipv4) {
@@ -333,7 +333,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
       ]
     }
-    if (invoker.use_mqtt) {
+    if (invoker.enable_dic) {
       _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
     }
     if (silabs_family == "efr32mg12") {
@@ -656,7 +656,7 @@ template("efr32_sdk") {
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_device_init_clocks.c",
       "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_event_handler.c",
     ]
-    if (use_mqtt) {
+    if (enable_dic) {
       sources += [
         "${chip_root}/third_party/silabs/mqtt/stack/mqtt.c",
         "${efr32_sdk_root}/util/third_party/mbedtls/library/rsa_alt_helpers.c",

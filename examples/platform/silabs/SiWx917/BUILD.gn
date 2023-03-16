@@ -42,7 +42,7 @@ config("chip_examples_project_config") {
   ]
 }
 
-if (use_mqtt) {
+if (enable_dic) {
   config("efr32_dic_config") {
     include_dirs = [
       "${chip_root}/third_party/silabs/mqtt/stack",

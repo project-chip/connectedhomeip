@@ -150,7 +150,7 @@ template("efr32_sdk") {
     if (chip_enable_wifi_ipv4) {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
     }
-    if (invoker.use_mqtt) {
+    if (invoker.enable_dic) {
       _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
     }
 
@@ -344,7 +344,7 @@ template("efr32_sdk") {
     if (defined(invoker.sources)) {
       sources += invoker.sources
     }
-    if (invoker.use_mqtt) {
+    if (invoker.enable_dic) {
       sources += [
         "${chip_root}/third_party/mbedtls/repo/library/base64.c",
         "${chip_root}/third_party/mbedtls/repo/library/debug.c",
