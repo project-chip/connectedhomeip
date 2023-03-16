@@ -155,6 +155,11 @@ arguments
 
 -   Or with the Ozone debugger, just load the .out file.
 
+All EFR32 boards require a bootloader, see Silicon Labs documentation for more
+info. Pre-built bootloader binaries are available in the Assets section of the
+Releases page on
+[Silabs Matter Github](https://github.com/SiliconLabs/matter/releases) .
+
 ## Viewing Logging Output
 
 The example application is built to use the SEGGER Real Time Transfer (RTT)
