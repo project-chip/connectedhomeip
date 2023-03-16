@@ -66,9 +66,9 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
     ```
     $ cd ~
-    $ wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.14.0.2667/sysconfig-1.14.0_2667-setup.run
-    $ chmod +x sysconfig-1.14.0_2667-setup.run
-    $ ./sysconfig-1.14.0_2667-setup.run
+    $ wget [recommended version][sysconfig_recommended] 
+    $ chmod +x sysconfig-1.1*-setup.run
+    $ ./sysconfig-1.1*-setup.run
     ```
 
 -   Run the bootstrap script to setup the build environment.
@@ -95,13 +95,15 @@ Ninja to build the executable.
 -   Run the build to produce a default executable. By default on Linux both the
     TI SimpleLink SDK and Sysconfig are located in a `ti` folder in the user's
     home directory, and you must provide the absolute path to them. For example
-    `/home/username/ti/sysconfig_1.14.0`. On Windows the default directory is
+    `/home/username/ti/sysconfig_1.15.0`. On Windows the default directory is
     `C:\ti`. Take note of this install path, as it will be used in the next
     step.
 
     ```
     $ cd ~/connectedhomeip/examples/lock-app/cc13x2x7_26x2x7
-    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.14.0\""
+    OR
+    $ cd ~/connectedhomeip/examples/lock-app/cc13x4_26x4
+    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15"
     $ ninja -C out/debug
 
     ```
@@ -111,7 +113,7 @@ Ninja to build the executable.
 
 
     ```
-    gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.14.0\" target_defines=[\"CC13X2_26X2_ATTESTATION_CREDENTIALS=1\"]"
+    gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15.0\" target_defines=[\"CC13X2_26X2_ATTESTATION_CREDENTIALS=1\"]"
     ```
 
 ## Programming
@@ -178,7 +180,7 @@ Note that programming the device through JTAG sets the Halt-in-Boot flag and may
 cause issues when performing a software reset. This flag can be reset by
 power-cycling the LaunchPad.
 
-## Viewing Logging Output
+## Running the Example
 
 By default the log output will be sent to the Application/User UART. Open a
 terminal emulator to that port to see the output with the following options:
@@ -194,12 +196,90 @@ terminal emulator to that port to see the output with the following options:
 ## Running the Example
 
 Once a device has been flashed with this example, it can now join and operate in
-an existing Thread network. The following sections assume that a Thread network
+an existing Matter network. The following sections assume that a Matter network
 is already active, and has at least one [OpenThread Border
 Router][ot_border_router_setup].
 
 For insight into what other components are needed to run this example, please
 refer to our [Matter Getting Started Guide][matter-e2e-faq].
+
+The steps below should be followed to commission the device onto the 
+network and control it once it has been commissioned. 
+
+**Step 0** 
+
+Set up the CHIP tool by following the instructions outlined in our 
+[Matter Getting Started Guide][matter-e2e-faq].
+
+**Step 1**
+
+Commission the device onto the Matter network. Run the following command 
+on the CHIP tool: 
+
+```
+
+./chip-tool pairing ble-thread <nodeID - e.g. 1> hex:<complete dataset from starting the OTBR> 20202021 3840 
+
+```
+
+Interacting with the application begins by enabling BLE advertisements and then 
+pairing the device into a Thread network. To provision this example onto a Matter 
+network, the device must be discoverable over Bluetooth LE. 
+
+On the LaunchPad, press and hold the right button, labeled `BTN-2`, for more than 
+1 second. Upon release, the Bluetooth LE advertising will begin. Once the device is
+fully provisioned, BLE advertising will stop.
+
+
+Once the device has been successfully commissioned, you will see the following message on the CHIP tool output: 
+
+```
+
+[1677648218.370754][39785:39790] CHIP:CTL: Received CommissioningComplete response, errorCode=0
+[1677648218.370821][39785:39790] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+
+```
+
+An accompanying message will be seen from the device: 
+
+```
+
+Commissioning complete, notify platform driver to persist network credentials. 
+
+```
+
+
+**Step 2**
+The example Doorlock cluster operations have the following format:
+
+```
+./chip-tool doorlock   <attribute-name> <attribute-values> <destination-id> <endpoint-id-ignored-for-group-commands>
+./chip-tool doorlock set-user <OperationType> <UserIndex> <UserName> <UserUniqueId> <UserStatus> <UserType> <CredentialRule> <destination-id> <endpoint-id-ignored-for-group-commands>
+./chip-tool <doorlock set-credential> <OperationType> <Credential> <CredentialData> <UserIndex> <UserStatus> <UserType> <destination-id> <endpoint-id-ignored-for-group-commands>
+```
+
+Send commands to the lock-app. Here are some example commands:
+
+Set a new user "TST" with user index of 1 with a default pin of 123456
+
+```
+./chip-tool doorlock set-user 0 1 TST 6452 1 0 0 1 1  --timedInteractionTimeoutMs 1000		
+./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
+```
+Require a pin mode for lock operations:
+```
+./chip-tool doorlock write require-pinfor-remote-operation 1 1 1
+```
+
+Lock the Door
+```
+./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
+```
+
+Unlock the door
+```
+./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
+```
 
 ### Provisioning
 
@@ -242,7 +322,7 @@ Additionally, we welcome any feedback.
     https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum/1082428/faq-cc2652r7-matter----getting-started-guide
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
 [sysconfig_recommended]:
-    https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.14.0.2667/sysconfig-1.14.0_2667-setup.run
+    https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.15.0.2826/sysconfig-1.15.0_2826-setup.run
 [ti_thread_dnd]:
     https://www.ti.com/wireless-connectivity/thread/design-development.html
 [ot_border_router_setup]: https://openthread.io/guides/border-router/build

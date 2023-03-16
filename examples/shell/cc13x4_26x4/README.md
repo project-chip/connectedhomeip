@@ -17,9 +17,9 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
     ```
     $ cd ~
-    $ wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.14.0.2667/sysconfig-1.14.0_2667-setup.run
-    $ chmod +x sysconfig-1.14.0_2667-setup.run
-    $ ./sysconfig-1.14.0_2667-setup.run
+    $ wget [recommended version][sysconfig_recommended] 
+    $ chmod +x sysconfig-1.1*-setup.run
+    $ ./sysconfig-1.1*-setup.run
     ```
 
 -   Run the bootstrap script to setup the build environment.
@@ -46,15 +46,22 @@ Ninja to build the executable.
 -   Run the build to produce a default executable. By default on Linux both the
     TI SimpleLink SDK and Sysconfig are located in a `ti` folder in the user's
     home directory, and you must provide the absolute path to them. For example
-    `/home/username/ti/sysconfig_1.14.0`. On Windows the default directory is
+    `/home/username/ti/sysconfig_1.15.0`. On Windows the default directory is
     `C:\ti`. Take note of this install path, as it will be used in the next
     step.
 
     ```
     $ cd ~/connectedhomeip/examples/shell/cc13x2x7_26x2x7
-    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.14.0\""
+    OR
+    $ cd ~/connectedhomeip/examples/shell/cc13x4_26x4
+    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15"
     $ ninja -C out/debug
 
+    ```
+    If you would like to define arguments on the command line you may add them
+    to the GN call.
+    ```
+    gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15.0\" target_defines=[\"CC13X4_26X4_ATTESTATION_CREDENTIALS=1\"]"
     ```
 
 ## Programming
@@ -137,7 +144,7 @@ terminal emulator to that port to see the output with the following options:
 ## Running the Example
 
 Once a device has been flashed with this example, it can now join and operate in
-an existing Thread network. The following sections assume that a Thread network
+an existing Matter network. The following sections assume that a Matter network
 is already active, and has at least one [OpenThread Border
 Router][ot_border_router_setup].
 
@@ -152,6 +159,7 @@ For help with the shell itself, refer to the
 For technical support, please consider creating a post on TI's [E2E forum][e2e].
 Additionally, we welcome any feedback.
 
+[matter]: https://github.com/project-chip/connectedhomeip
 [ccs]: https://www.ti.com/tool/CCSTUDIO
 [ccs_after_launch]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#after-launch
@@ -161,8 +169,14 @@ Additionally, we welcome any feedback.
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-launch
 [ccs_manual_method]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-method
+[cc1352r1_launchxl]: https://www.ti.com/tool/LAUNCHXL-CC1352R1
 [e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-and-thread
+[matter-e2e-faq]:
+    https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum/1082428/faq-cc2652r7-matter----getting-started-guide
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
 [sysconfig_recommended]:
-    https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.14.0.2667/sysconfig-1.14.0_2667-setup.run
+    https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.15.0.2826/sysconfig-1.15.0_2826-setup.run
+[ti_thread_dnd]:
+    https://www.ti.com/wireless-connectivity/thread/design-development.html
+[ot_border_router_setup]: https://openthread.io/guides/border-router/build
 [uniflash]: https://www.ti.com/tool/download/UNIFLASH
