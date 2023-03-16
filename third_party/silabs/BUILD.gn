@@ -46,7 +46,7 @@ config("silabs_config") {
 
 if (silabs_board == "BRD4325B") {  # CCP board
   assert(siwx917_sdk_target != "", "siwx917_sdk_target must be specified")
-  group("siwx917_sdk") {
+  group("efr32_sdk") {
     public_deps = [siwx917_sdk_target ]
     public_configs = [ ":silabs_config" ]
   }

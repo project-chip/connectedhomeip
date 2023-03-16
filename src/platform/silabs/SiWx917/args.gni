@@ -23,9 +23,9 @@ import("${chip_root}/src/crypto/crypto.gni")
 # ARM architecture flags will be set based on silabs_family.
 arm_platform_config = "${efr32_sdk_build_root}/efr32_arm.gni"
 
-mbedtls_target = "${efr32_sdk_build_root}:siwx917_sdk"
+mbedtls_target = "${efr32_sdk_build_root}:efr32_sdk"
 
-chip_crypto = "mbedtls"
+chip_crypto = "platform"
 
 # Transitional CommissionableDataProvider not used anymore
 # examples/platform/efr32/EFR32DeviceDataProvider is now used.

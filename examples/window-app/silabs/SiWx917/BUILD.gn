@@ -34,7 +34,7 @@ declare_args() {
   chip_print_memory_usage = false
 }
 
-siwx917_sdk("sdk") {
+efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
     "${examples_plat_dir}/FreeRTOSConfig.h",
@@ -52,7 +52,7 @@ siwx917_sdk("sdk") {
 
 }
 
-efr32_executable("window_app") {
+siwx917_executable("window_app") {
   output_name = "chip-efr32-window-example.out"
   output_dir = root_out_dir
   include_dirs = [

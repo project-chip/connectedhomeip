@@ -45,7 +45,7 @@ declare_args() {
 # Parameters:
 #   wisemcu_sdk_root - The location of the wisemcu SDK.
 #   sources - The sources files to build.
-template("siwx917_sdk") {
+template("efr32_sdk") {
 
   sdk_target_name = target_name
 

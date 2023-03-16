@@ -40,7 +40,7 @@ declare_args() {
   chip_print_memory_usage = false
 }
 
-siwx917_sdk("sdk") {
+efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
     "${examples_plat_dir}/FreeRTOSConfig.h",
@@ -65,7 +65,7 @@ siwx917_sdk("sdk") {
   }
 }
 
-efr32_executable("lock_app") {
+siwx917_executable("lock_app") {
   output_name = "chip-siwx917-lock-example.out"
   include_dirs = [ "include" ]
   defines = []

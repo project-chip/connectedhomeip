@@ -41,7 +41,7 @@ declare_args() {
   chip_print_memory_usage = false
 }
 
-siwx917_sdk("sdk") {
+efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
     "${examples_plat_dir}/FreeRTOSConfig.h",

@@ -42,7 +42,7 @@ declare_args() {
   chip_print_memory_usage = false
 }
 
-siwx917_sdk("sdk") {
+efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",
     "${examples_plat_dir}/FreeRTOSConfig.h",
@@ -62,32 +62,6 @@ siwx917_sdk("sdk") {
       "HAL_VCOM_ENABLE=1",
       "PW_RPC_ENABLED",
     ]
-  }
-
-  # WiFi Settings
-  if (chip_enable_wifi) {
-    if (use_SiWx917) {
-      defines += rs911x_defs
-      include_dirs += rs911x_plat_incs
-    } else if (use_wf200) {
-      defines += wf200_defs
-      include_dirs += wf200_plat_incs
-    }
-
-    if (use_rs911x_sockets) {
-      include_dirs += [ "${examples_plat_dir}/wifi/rsi-sockets" ]
-      defines += rs911x_sock_defs
-    } else {
-      # Using LWIP instead of the native TCP/IP stack
-      defines += efr32_lwip_defs
-    }
-
-    if (sl_wfx_config_softap) {
-      defines += [ "SL_WFX_CONFIG_SOFTAP" ]
-    }
-    if (sl_wfx_config_scan) {
-      defines += [ "SL_WFX_CONFIG_SCAN" ]
-    }
   }
 }
 
