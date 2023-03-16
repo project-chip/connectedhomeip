@@ -163,7 +163,7 @@ void rsi_hal_board_init(void)
 }
 
 /*****************************************************************************
- *@fn static bool tx_rx_dma_complete(unsigned int channel, unsigned int sequenceNo, void *userParam)
+ *@fn static bool dma_complete_cb(unsigned int channel, unsigned int sequenceNo, void *userParam)
  *
  *@brief
  *    DMA transfer completion callback. Called by the DMA interrupt handler.
@@ -176,7 +176,7 @@ void rsi_hal_board_init(void)
  * @return
  *    None
  ******************************************************************************/
-static bool tx_rx_dma_complete(unsigned int channel, unsigned int sequenceNo, void * userParam)
+static bool dma_complete_cb(unsigned int channel, unsigned int sequenceNo, void * userParam)
 {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
     // uint8_t *buf = (void *)userParam;
@@ -220,7 +220,7 @@ static void receiveDMA(uint8_t * rx_buf, uint16_t xlen)
 
     // Start receive DMA
     DMADRV_PeripheralMemory(rx_dma_channel, MY_USART_RX_SIGNAL, (void *) rx_buf, (void *) &(MY_USART->RXDATA), true, xlen,
-                            dmadrvDataSize1, tx_rx_dma_complete, NULL);
+                            dmadrvDataSize1, dma_complete_cb, NULL);
 
     // Start transmit DMA.
     DMADRV_MemoryPeripheral(tx_dma_channel, MY_USART_TX_SIGNAL, (void *) &(MY_USART->TXDATA), (void *) &(dummy_data), false, xlen,
@@ -268,7 +268,7 @@ static void transmitDMA(uint8_t * rx_buf, uint8_t * tx_buf, uint16_t xlen)
 
     // Start receive DMA
     DMADRV_PeripheralMemory(rx_dma_channel, MY_USART_RX_SIGNAL, buf, (void *) &(MY_USART->RXDATA), srcinc, xlen, dmadrvDataSize1,
-                            tx_rx_dma_complete, buf);
+                            dma_complete_cb, buf);
     // Start transmit DMA.
     DMADRV_MemoryPeripheral(tx_dma_channel, MY_USART_TX_SIGNAL, (void *) &(MY_USART->TXDATA), (void *) tx_buf, true, xlen,
                             dmadrvDataSize1, NULL, NULL);
@@ -308,7 +308,7 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
          * receiveDMA() and transmitDMA() are asynchronous
          * Our application design assumes that this function is synchronous
          * To make it synchronous, we wait to re-acquire the semaphore before exiting this function
-         * tx_rx_dma_complete() gives back the semaphore when the SPI transfer is done
+         * dma_complete_cb() gives back the semaphore when the SPI transfer is done
          */
         if (xSemaphoreTake(spi_sem, pdMS_TO_TICKS(RSI_SEM_BLOCK_MIN_TIMER_VALUE_MS)) == pdTRUE)
         {
