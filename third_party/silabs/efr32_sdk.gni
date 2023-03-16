@@ -952,6 +952,14 @@ template("efr32_sdk") {
       ]
     }
 
+    if (!use_slc_files && !generate_slc) {
+      if (silabs_board == "BRD4186A" || silabs_board == "BRD4186C" ||
+          silabs_board == "BRD4187A" || silabs_board == "BRD4187C" ||
+          silabs_board == "BRD2704A") {
+        sources += [ "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dpll_s2.c" ]
+      }
+    }
+
     if (silabs_board == "BRD2704A" || silabs_board == "BRD4318A") {
       sources += [
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/fem_util/sl_fem_util.c",
@@ -968,10 +976,6 @@ template("efr32_sdk") {
 
     if (defined(invoker.sources)) {
       sources += invoker.sources
-    }
-
-    if (defined(invoker.public_deps)) {
-      public_deps += invoker.public_deps
     }
 
     public_configs = [ ":${sdk_target_name}_config" ]
