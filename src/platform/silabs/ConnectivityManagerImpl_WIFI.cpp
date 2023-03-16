@@ -226,7 +226,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetSEDIntervalsConfig(ConnectivityManager::
     // For now Wi-Fi uses DTIM power save mode so it varies from AP to AP
     // TODO: Change this to DTIM read from DUT once it is done. For now hardcoding it
     SEDIntervalsConfig.ActiveIntervalMS = CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL;
-    SEDIntervalsConfig.IdleIntervalMS = CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL;
+    SEDIntervalsConfig.IdleIntervalMS   = CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL;
     return CHIP_NO_ERROR;
 }
 
