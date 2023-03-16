@@ -17,7 +17,7 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
     ```
     $ cd ~
-    $ wget [recommended version][sysconfig_recommended] 
+    $ wget [recommended version][sysconfig_recommended]
     $ chmod +x sysconfig-1.1*-setup.run
     $ ./sysconfig-1.1*-setup.run
     ```

@@ -68,7 +68,7 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
     ```
     $ cd ~
-    $ wget [recommended version][sysconfig_recommended] 
+    $ wget [recommended version][sysconfig_recommended]
     $ chmod +x sysconfig-1.1*-setup.run
     $ ./sysconfig-1.1*-setup.run
     ```
@@ -201,35 +201,35 @@ Router][ot_border_router_setup].
 For insight into what other components are needed to run this example, please
 refer to our [Matter Getting Started Guide][matter-e2e-faq].
 
-The steps below should be followed to commission the device onto the 
-network and control it once it has been commissioned. 
+The steps below should be followed to commission the device onto the
+network and control it once it has been commissioned.
 
-**Step 0** 
+**Step 0**
 
-Set up the CHIP tool by following the instructions outlined in our 
+Set up the CHIP tool by following the instructions outlined in our
 [Matter Getting Started Guide][matter-e2e-faq].
 
 **Step 1**
 
-Commission the device onto the Matter network. Run the following command 
-on the CHIP tool: 
+Commission the device onto the Matter network. Run the following command
+on the CHIP tool:
 
 ```
 
-./chip-tool pairing ble-thread <nodeID - e.g. 1> hex:<complete dataset from starting the OTBR> 20202021 3840 
+./chip-tool pairing ble-thread <nodeID - e.g. 1> hex:<complete dataset from starting the OTBR> 20202021 3840
 
 ```
 
-Interacting with the application begins by enabling BLE advertisements and then 
-pairing the device into a Thread network. To provision this example onto a Matter 
-network, the device must be discoverable over Bluetooth LE. 
+Interacting with the application begins by enabling BLE advertisements and then
+pairing the device into a Thread network. To provision this example onto a Matter
+network, the device must be discoverable over Bluetooth LE.
 
-On the LaunchPad, press and hold the right button, labeled `BTN-1`, for more than 
+On the LaunchPad, press and hold the right button, labeled `BTN-1`, for more than
 1 second. Upon release, the Bluetooth LE advertising will begin. Once the device is
 fully provisioned, BLE advertising will stop.
 
 
-Once the device has been successfully commissioned, you will see the following message on the CHIP tool output: 
+Once the device has been successfully commissioned, you will see the following message on the CHIP tool output:
 
 ```
 
@@ -238,11 +238,11 @@ Once the device has been successfully commissioned, you will see the following m
 
 ```
 
-An accompanying message will be seen from the device: 
+An accompanying message will be seen from the device:
 
 ```
 
-Commissioning complete, notify platform driver to persist network credentials. 
+Commissioning complete, notify platform driver to persist network credentials.
 
 ```
 
