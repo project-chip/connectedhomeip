@@ -72,6 +72,7 @@ void rsi_hal_config_gpio(uint8_t gpio_number, uint8_t mode, uint8_t value)
         break;
 #else
         GPIO_PinModeSet(LOGGING_WAKE_INDICATOR_PIN.port, LOGGING_WAKE_INDICATOR_PIN.pin, gpioModeWiredOrPullDown, PINOUT_CLEAR);
+        break;
 #endif
     case RSI_HAL_RESET_PIN:
         GPIO_PinModeSet(WFX_RESET_PIN.port, WFX_RESET_PIN.pin, gpioModePushPull, PINOUT_SET);
