@@ -221,7 +221,7 @@ class Efr32Builder(GnBuilder):
         if "GSDK_ROOT" in os.environ:
             # EFR32 SDK is very large. If the SDK path is already known (the
             # case for pre-installed images), use it directly.
-            self.extra_gn_options['efr32_sdk_root'] = os.environ['GSDK_ROOT']
+            self.extra_gn_options.append(f"efr32_sdk_root=\"{os.environ['GSDK_ROOT']}\"")
 
     def GnBuildArgs(self):
         return self.extra_gn_options
