@@ -40,13 +40,13 @@ namespace AppPlatform {
 
 // The AppPlatform overrides emberAfExternalAttributeReadCallback to handle external attribute reads for ContentApps.
 // This callback can be used to handle external attribute reads for attributes belonging to static endpoints.
-EmberAfStatus AppPlatformAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+EmberAfStatus AppPlatformExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
                                                    uint16_t maxReadLength);
 
 // The AppPlatform overrides emberAfExternalAttributeWriteCallback to handle external attribute writes for ContentApps.
 // This callback can be used to handle external attribute writes for attributes belonging to static endpoints.
-EmberAfStatus AppPlatformAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+EmberAfStatus AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
                                                     const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
 
 constexpr EndpointId kTargetBindingClusterEndpointId = 0;

@@ -94,7 +94,7 @@ namespace chip {
 namespace AppPlatform {
 
 EmberAfStatus __attribute__((weak))
-AppPlatformAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+AppPlatformExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
                                                    uint16_t maxReadLength)
 {
@@ -102,7 +102,7 @@ AppPlatformAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId cluste
 }
 
 EmberAfStatus __attribute__((weak))
-AppPlatformAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
                                                     const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
     return(EMBER_ZCL_STATUS_FAILURE);
