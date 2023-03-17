@@ -46,7 +46,7 @@
 
   {{/zcl_events}}
   {{#chip_server_cluster_attributes}}
-    {{>idl_cluster_attribute}}
+    {{>idl_cluster_attribute~}}
   {{/chip_server_cluster_attributes~}}
 
   {{~!--Global attributes: spec 7.13 describes these as mandatory --}}
