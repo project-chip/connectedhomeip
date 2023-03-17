@@ -12,13 +12,15 @@
   {{~/chip_access_elements~}}
   {{~#if isNullable~}}
     nullable {{!marker to place a space even with whitespace removal~}}
-  {{~/if~}} {{type}}
+  {{~/if~}} {{#if entryType}}{{entryType}}{{else}}{{type}}{{/if}}
   {{~#unless isArray~}}
-    {{~#if (isString type)~}}
-      {{~#if maxLength~}}
-        <{{maxLength}}>
+    {{~#unless entryType~}}
+      {{~#if (isString type)~}}
+        {{~#if maxLength~}}
+          <{{maxLength}}>
+        {{~/if~}}
       {{~/if~}}
-    {{~/if~}}
+    {{~/unless~}}
   {{/unless}} {{asLowerCamelCase name~}}
-  {{~#if isArray~}} [] {{~/if}} = {{code~}}
+  {{~#if entryType~}} [] {{~else}} {{~#if isArray~}} [] {{~/if}} {{~/if}} = {{code~}}
   ;
