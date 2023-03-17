@@ -62,7 +62,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     }
     else
     {
-        ret = AppPlatformAfExternalAttributeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+        ret = AppPlatformExternalAttributeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
     }
 
     return ret;
@@ -84,7 +84,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
     }
     else
     {
-        ret = AppPlatformAfExternalAttributeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+        ret = AppPlatformExternalAttributeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
     }
 
     return ret;
