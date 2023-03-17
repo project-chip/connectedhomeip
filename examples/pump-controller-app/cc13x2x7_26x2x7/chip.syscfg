@@ -61,7 +61,6 @@ const Button2     = Button.addInstance();
 const LED         = scripting.addModule("/ti/drivers/apps/LED");
 const LED1        = LED.addInstance();
 const LED2        = LED.addInstance();
-const thread      = scripting.addModule("/ti/thread/thread");
 
 /**
  * Write custom configuration values to the imported modules.
