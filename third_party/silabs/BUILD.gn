@@ -32,23 +32,21 @@ declare_args() {
   sl_matter_version_str = ""
   sl_matter_version = 1
   sl_hardware_version = 1
-
 }
 
 assert(efr32_sdk_target != "", "efr32_sdk_target must be specified")
 
 config("silabs_config") {
   defines = []
-  if (sl_matter_version_str != ""){
+  if (sl_matter_version_str != "") {
     defines += [ "SL_MATTER_VERSION_STRING=\"${sl_matter_version_str}\"" ]
   }
-  if (sl_matter_version != 1){
+  if (sl_matter_version != 1) {
     defines += [ "SL_MATTER_VERSION=${sl_matter_version}" ]
   }
-  if (sl_hardware_version != 1){
+  if (sl_hardware_version != 1) {
     defines += [ "SL_HARDWARE_VERSION=${sl_hardware_version}" ]
   }
-
 }
 
 group("efr32_sdk") {
