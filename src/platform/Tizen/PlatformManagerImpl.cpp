@@ -111,9 +111,13 @@ CHIP_ERROR PlatformManagerImpl::GLibMatterContextInvokeSynchronous(CHIP_ERROR (*
         g_main_loop_get_context(mGLibMainLoop), G_PRIORITY_HIGH_IDLE,
         [](void * userData_) {
             auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
-            data->mDoneMutex.lock();
+            VerifyOrExit(g_main_context_get_thread_default() != nullptr,
+                         ChipLogError(DeviceLayer, "GLib thread default main context is not set");
+                         data->mFuncResult = CHIP_ERROR_INCORRECT_STATE);
             data->mFuncResult = data->mFunc(data->mFuncUserData);
-            data->mDone       = true;
+        exit:
+            data->mDoneMutex.lock();
+            data->mDone = true;
             data->mDoneMutex.unlock();
             data->mDoneCond.notify_one();
             return G_SOURCE_REMOVE;
