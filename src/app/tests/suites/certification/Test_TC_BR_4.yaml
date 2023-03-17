@@ -3654,7 +3654,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 6
 
-            Verify in TH(bridge-app) Log:
+            Verify the DeviceTypeList attribute  with endpoint 6 On TH(bridge-app) Log:
             [1666961312.435864][218195:218195] CHIP:IM: Received Read request
             [1666961312.435907][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666961312.435918][218195:218195] CHIP:DMG: {
@@ -3756,7 +3756,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 7
 
-            Verify in TH(bridge-app) Log:
+            Verify the DeviceTypeList attribute  with endpoint 7 On TH(bridge-app) Log:
             [1666961364.286140][218195:218195] CHIP:IM: Received Read request
             [1666961364.286177][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666961364.286185][218195:218195] CHIP:DMG: {
@@ -3857,7 +3857,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 8
 
-            Verify in TH(bridge-app) Log:
+            Verify the DeviceTypeList attribute  with endpoint 8 On TH(bridge-app) Log:
             [1666961419.607662][218195:218195] CHIP:IM: Received Read request
             [1666961419.607690][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666961419.607697][218195:218195] CHIP:DMG: {
@@ -3958,7 +3958,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 9
 
-            Verify in TH(bridge-app) Log:
+            Verify the DeviceTypeList attribute  with endpoint 9 On TH(bridge-app) Log:
             [1666961467.313086][218195:218195] CHIP:IM: Received Read request
             [1666961467.313117][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666961467.313124][218195:218195] CHIP:DMG: {
@@ -4060,7 +4060,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 10
 
-            Verify in TH(bridge-app) Log:
+            Verify the DeviceTypeList attribute  with endpoint 10 On TH(bridge-app) Log:
             [1666961546.940423][218195:218195] CHIP:IM: Received Read request
             [1666961546.940503][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666961546.940529][218195:218195] CHIP:DMG: {
@@ -4184,7 +4184,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 11
 
-            Verify in TH(bridge-app) Log:
+            Verify the DeviceTypeList attribute  with endpoint 11 On TH(bridge-app) Log:
             [1666961579.870142][218195:218195] CHIP:IM: Received Read request
             [1666961579.870175][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666961579.870183][218195:218195] CHIP:DMG: {
@@ -4305,8 +4305,134 @@ tests:
             [1666961579.871759][218195:218195] CHIP:DMG:         InteractionModelRevision = 1
             [1666961579.871767][218195:218195] CHIP:DMG: }
 
+          ./chip-tool  descriptor read device-type-list 1 12
+
+            Verify the DeviceTypeList attribute  with endpoint 12 On TH(bridge-app) Log:
+
+            [1666961637.024382][218195:218195] CHIP:EM: Handling via exchange: 24264r, Delegate: 0x559dd6ddf8c8
+            [1666961637.024406][218195:218195] CHIP:IM: Received Read request
+            [1666961637.024459][218195:218195] CHIP:DMG: ReadRequestMessage =
+            [1666961637.024477][218195:218195] CHIP:DMG: {
+            [1666961637.024487][218195:218195] CHIP:DMG:         AttributePathIBs =
+            [1666961637.024501][218195:218195] CHIP:DMG:         [
+            [1666961637.024514][218195:218195] CHIP:DMG:                 AttributePathIB =
+            [1666961637.024528][218195:218195] CHIP:DMG:                 {
+            [1666961637.024542][218195:218195] CHIP:DMG:                         Endpoint = 0xc,
+            [1666961637.024555][218195:218195] CHIP:DMG:                         Cluster = 0x1d,
+            [1666961637.024569][218195:218195] CHIP:DMG:                         Attribute = 0x0000_0000,
+            [1666961637.024588][218195:218195] CHIP:DMG:                 }
+            [1666961637.024599][218195:218195] CHIP:DMG:
+            [1666961637.024608][218195:218195] CHIP:DMG:         ],
+            [1666961637.024624][218195:218195] CHIP:DMG:
+            [1666961637.024641][218195:218195] CHIP:DMG:         isFabricFiltered = true,
+            [1666961637.024651][218195:218195] CHIP:DMG:         InteractionModelRevision = 1
+            [1666961637.024665][218195:218195] CHIP:DMG: },
+            [1666961637.024707][218195:218195] CHIP:DMG: IM RH moving to [GeneratingReports]
+            [1666961637.024758][218195:218195] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+            [1666961637.024774][218195:218195] CHIP:DMG: <RE:Run> Cluster 1d, Attribute 0 is dirty
+            [1666961637.024785][218195:218195] CHIP:DMG: Reading attribute: Cluster=0x0000_001D Endpoint=c AttributeId=0x0000_0000 (expanded=0)
+            [1666961637.024802][218195:218195] CHIP:DMG: AccessControl: checking f=1 a=c s=0x000000000001B669 t= c=0x0000_001D e=12 p=v
+            [1666961637.024821][218195:218195] CHIP:DMG: AccessControl: allowed
+            [1666961637.024865][218195:218195] CHIP:DMG: <RE> Sending report (payload has 105 bytes)...
+            [1666961637.025090][218195:218195] CHIP:EM: <<< [E:24264r M:129383321 (Ack:149091728)] (S) Msg TX to 1:000000000001B669 [E0A2] --- Type 0001:05 (IM:ReportData)
+            [1666961637.025123][218195:218195] CHIP:IN: (S) Sending msg 129383321 on secure session with LSID: 51710
+            [1666961637.025575][218195:218195] CHIP:DMG: >> to UDP:[fe80::485c:bace:6107:3682%wlp3s0]:33508 | 129383321 | [Interaction Model  (1) / Report Data (0x05) / Session = 47615 / Exchange = 24264]
+            [1666961637.025615][218195:218195] CHIP:DMG: Header Flags =
+            [1666961637.025630][218195:218195] CHIP:DMG: {
+            [1666961637.025654][218195:218195] CHIP:DMG:     Exchange (0x06) =
+            [1666961637.025666][218195:218195] CHIP:DMG:     {
+            [1666961637.025680][218195:218195] CHIP:DMG:         AckMsg = 149091728
+            [1666961637.025692][218195:218195] CHIP:DMG:         NeedsAck = true
+            [1666961637.025703][218195:218195] CHIP:DMG:     }
+            [1666961637.025722][218195:218195] CHIP:DMG: }
+            [1666961637.025733][218195:218195] CHIP:DMG:
+            [1666961637.025754][218195:218195] CHIP:DMG: Encrypted Payload (139 bytes) =
+            [1666961637.025766][218195:218195] CHIP:DMG: {
+            [1666961637.025779][218195:218195] CHIP:DMG:     data = 00ffb900993bb607eb7a6237df23556ef55553d6bdb002eca4dec5b0286b803f131401a010db1aacec9934e01a4728a9e89e4d2474216e665d12fb28265cdb5e9f09d88aa8a7806960884a21b7f21a52c57cac7dd797cdb01ff66e27a1c177ddea3bf84a046a5d4245c3afec579722a901f988a639716e0d4b295494ec005278cca871ae42cb62e25adecf
+            [1666961637.025796][218195:218195] CHIP:DMG:     buffer_ptr = 94136416760928
+            [1666961637.025807][218195:218195] CHIP:DMG: }
+            [1666961637.025822][218195:218195] CHIP:DMG:
+            [1666961637.025845][218195:218195] CHIP:DMG: Decrypted Payload (105 bytes) =
+            [1666961637.025858][218195:218195] CHIP:DMG: {
+            [1666961637.025871][218195:218195] CHIP:DMG:     data = 153601153501260083c07f68370124020c24031d240400183602181818153501260083c07f68370124020c24031d240400340518350225000001240101181818153501260083c07f68370124020c24031d240400340518350224001324010118181818290424ff0118
+            [1666961637.025885][218195:218195] CHIP:DMG: }
+            [1666961637.025899][218195:218195] CHIP:DMG:
+            [1666961637.025985][218195:218195] CHIP:DMG: ReportDataMessage =
+            [1666961637.026005][218195:218195] CHIP:DMG: {
+            [1666961637.026020][218195:218195] CHIP:DMG:         AttributeReportIBs =
+            [1666961637.026041][218195:218195] CHIP:DMG:         [
+            [1666961637.026055][218195:218195] CHIP:DMG:                 AttributeReportIB =
+            [1666961637.026076][218195:218195] CHIP:DMG:                 {
+            [1666961637.026089][218195:218195] CHIP:DMG:                         AttributeDataIB =
+            [1666961637.026106][218195:218195] CHIP:DMG:                         {
+            [1666961637.026122][218195:218195] CHIP:DMG:                                 DataVersion = 0x687fc083,
+            [1666961637.026138][218195:218195] CHIP:DMG:                                 AttributePathIB =
+            [1666961637.026155][218195:218195] CHIP:DMG:                                 {
+            [1666961637.026171][218195:218195] CHIP:DMG:                                         Endpoint = 0xc,
+            [1666961637.026187][218195:218195] CHIP:DMG:                                         Cluster = 0x1d,
+            [1666961637.026205][218195:218195] CHIP:DMG:                                         Attribute = 0x0000_0000,
+            [1666961637.026219][218195:218195] CHIP:DMG:                                 }
+            [1666961637.026238][218195:218195] CHIP:DMG:
+            [1666961637.026254][218195:218195] CHIP:DMG:                                 Data = [
+            [1666961637.026270][218195:218195] CHIP:DMG:
+            [1666961637.026288][218195:218195] CHIP:DMG:                                 ],
+            [1666961637.026303][218195:218195] CHIP:DMG:                         },
+            [1666961637.026323][218195:218195] CHIP:DMG:
+            [1666961637.026338][218195:218195] CHIP:DMG:                 },
+            [1666961637.026366][218195:218195] CHIP:DMG:
+            [1666961637.026382][218195:218195] CHIP:DMG:                 AttributeReportIB =
+            [1666961637.026405][218195:218195] CHIP:DMG:                 {
+            [1666961637.026419][218195:218195] CHIP:DMG:                         AttributeDataIB =
+            [1666961637.026435][218195:218195] CHIP:DMG:                         {
+            [1666961637.026452][218195:218195] CHIP:DMG:                                 DataVersion = 0x687fc083,
+            [1666961637.026467][218195:218195] CHIP:DMG:                                 AttributePathIB =
+            [1666961637.026483][218195:218195] CHIP:DMG:                                 {
+            [1666961637.026500][218195:218195] CHIP:DMG:                                         Endpoint = 0xc,
+            [1666961637.026518][218195:218195] CHIP:DMG:                                         Cluster = 0x1d,
+            [1666961637.026536][218195:218195] CHIP:DMG:                                         Attribute = 0x0000_0000,
+            [1666961637.026553][218195:218195] CHIP:DMG:                                         ListIndex = Null,
+            [1666961637.026568][218195:218195] CHIP:DMG:                                 }
+            [1666961637.026588][218195:218195] CHIP:DMG:
+            [1666961637.026605][218195:218195] CHIP:DMG:                                 Data =
+            [1666961637.026622][218195:218195] CHIP:DMG:                                 {
+            [1666961637.026640][218195:218195] CHIP:DMG:                                         0x0 = 256,
+            [1666961637.026658][218195:218195] CHIP:DMG:                                         0x1 = 1,
+            [1666961637.026675][218195:218195] CHIP:DMG:                                 },
+            [1666961637.026690][218195:218195] CHIP:DMG:                         },
+            [1666961637.026711][218195:218195] CHIP:DMG:
+            [1666961637.026726][218195:218195] CHIP:DMG:                 },
+            [1666961637.026754][218195:218195] CHIP:DMG:
+            [1666961637.026766][218195:218195] CHIP:DMG:                 AttributeReportIB =
+            [1666961637.026784][218195:218195] CHIP:DMG:                 {
+            [1666961637.026797][218195:218195] CHIP:DMG:                         AttributeDataIB =
+            [1666961637.026812][218195:218195] CHIP:DMG:                         {
+            [1666961637.026824][218195:218195] CHIP:DMG:                                 DataVersion = 0x687fc083,
+            [1666961637.026835][218195:218195] CHIP:DMG:                                 AttributePathIB =
+            [1666961637.026847][218195:218195] CHIP:DMG:                                 {
+            [1666961637.026859][218195:218195] CHIP:DMG:                                         Endpoint = 0xc,
+            [1666961637.026873][218195:218195] CHIP:DMG:                                         Cluster = 0x1d,
+            [1666961637.026951][218195:218195] CHIP:DMG:                                         Attribute = 0x0000_0000,
+            [1666961637.027020][218195:218195] CHIP:DMG:                                         ListIndex = Null,
+            [1666961637.027109][218195:218195] CHIP:DMG:                                 }
+            [1666961637.027177][218195:218195] CHIP:DMG:
+            [1666961637.027238][218195:218195] CHIP:DMG:                                 Data =
+            [1666961637.027299][218195:218195] CHIP:DMG:                                 {
+            [1666961637.027360][218195:218195] CHIP:DMG:                                         0x0 = 19,
+            [1666961637.027423][218195:218195] CHIP:DMG:                                         0x1 = 1,
+            [1666961637.027435][218195:218195] CHIP:DMG:                                 },
+            [1666961637.027444][218195:218195] CHIP:DMG:                         },
+            [1666961637.027459][218195:218195] CHIP:DMG:
+            [1666961637.027469][218195:218195] CHIP:DMG:                 },
+            [1666961637.027483][218195:218195] CHIP:DMG:
+            [1666961637.027492][218195:218195] CHIP:DMG:         ],
+            [1666961637.027515][218195:218195] CHIP:DMG:
+            [1666961637.027526][218195:218195] CHIP:DMG:         SuppressResponse = true,
+            [1666961637.027535][218195:218195] CHIP:DMG:         InteractionModelRevision = 1
+            [1666961637.027543][218195:218195] CHIP:DMG: }
+
           ./chip-tool  descriptor read device-type-list 1 13
-            Verify in TH(bridge-app) Log:
+
+            Verify the DeviceTypeList attribute  with endpoint 13 On TH(bridge-app) Log:
             [1666961681.323410][218195:218195] CHIP:IM: Received Read request
             [1666961681.323440][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666961681.323447][218195:218195] CHIP:DMG: {
@@ -4428,7 +4554,7 @@ tests:
             [1666961681.324724][218195:218195] CHIP:DMG: }
 
           ./chip-tool  descriptor read parts-list 1 0
-            Verify in TH(bridge-app) Log:
+            Verify the PartList attribute  with endpoint 0 On TH(bridge-app) Log:
             1666962087.594430][218195:218195] CHIP:IM: Received Read request
             [1666962087.594452][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666962087.594457][218195:218195] CHIP:DMG: {
@@ -4723,7 +4849,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 1
 
-            Verify in TH(bridge-app) Log:
+            Verify the PartList attribute  with endpoint 1 On TH(bridge-app) Log:
             [1666962024.475117][218195:218195] CHIP:IM: Received Read request
             [1666962024.475146][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666962024.475155][218195:218195] CHIP:DMG: {
@@ -5000,7 +5126,7 @@ tests:
             [1666962024.477789][218195:218195] CHIP:DMG:
 
           ./chip-tool  descriptor read parts-list 1 2
-            Verify in TH(bridge-app) Log:
+            Verify the PartList attribute  with endpoint 2 On TH(bridge-app) Log:
             [1666962122.075925][218195:218195] CHIP:IM: Received Read request
             [1666962122.075953][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666962122.075960][218195:218195] CHIP:DMG: {
@@ -5077,7 +5203,7 @@ tests:
             [1666962122.076769][218195:218195] CHIP:DMG: }
 
           ./chip-tool  descriptor read parts-list 1 3
-            Verify in TH(bridge-app) Log:
+            Verify the PartList attribute  with endpoint 3 On TH(bridge-app) Log:
             [1666962181.272370][218195:218195] CHIP:IM: Received Read request
             [1666962181.272431][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666962181.272451][218195:218195] CHIP:DMG: {
@@ -5156,7 +5282,7 @@ tests:
             [1666962181.274354][218195:218195] CHIP:DMG:
 
           ./chip-tool  descriptor read parts-list 1 4
-            Verify in TH(bridge-app) Log:
+            Verify the PartList attribute  with endpoint 4 On TH(bridge-app) Log:
 
             [1666962226.211067][218195:218195] CHIP:IM: Received Read request
             [1666962226.211160][218195:218195] CHIP:DMG: ReadRequestMessage =
@@ -5235,7 +5361,7 @@ tests:
             [1666962226.211991][218195:218195] CHIP:DMG: }
 
           ./chip-tool  descriptor read parts-list 1 5
-            Verify in TH(bridge-app) Log:
+            Verify the PartList attribute  with endpoint 5 On TH(bridge-app) Log:
             [1666962275.528464][218195:218195] CHIP:IM: Received Read request
             [1666962275.528514][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666962275.528527][218195:218195] CHIP:DMG: {
@@ -5313,7 +5439,7 @@ tests:
             [1666962275.533543][218195:218195] CHIP:DMG: }
 
           ./chip-tool  descriptor read parts-list 1 6
-            Verify in TH(bridge-app) Log:
+            Verify the PartList attribute  with endpoint 6 On TH(bridge-app) Log:
             [1666962322.069585][218195:218195] CHIP:IM: Received Read request
             [1666962322.069620][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666962322.069628][218195:218195] CHIP:DMG: {
@@ -5447,7 +5573,7 @@ tests:
 
           ./chip-tool  descriptor read parts-list 1 7
 
-            Verify in TH(bridge-app) Log:
+            Verify the PartList attribute  with endpoint 7 On TH(bridge-app) Log:
             [1666962362.557106][218195:218195] CHIP:IM: Received Read request
             [1666962362.557147][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666962362.557158][218195:218195] CHIP:DMG: {
@@ -5525,7 +5651,7 @@ tests:
             [1666962362.558321][218195:218195] CHIP:DMG: }
 
           ./chip-tool  descriptor read parts-list 1 8
-            Verify in TH(bridge-app) Log:
+            Verify the PartList attribute  with endpoint 8 On TH(bridge-app) Log:
             [1666962423.861269][218195:218195] CHIP:IM: Received Read request
             [1666962423.861296][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666962423.861303][218195:218195] CHIP:DMG: {
@@ -5604,7 +5730,8 @@ tests:
             [1666962423.862063][218195:218195] CHIP:DMG:
 
           ./chip-tool  descriptor read parts-list 1 9
-            Verify in TH(bridge-app) Log:
+
+            Verify the PartList attribute  with endpoint 9 On TH(bridge-app) Log:
             [1666962496.027253][218195:218195] CHIP:IM: Received Read request
             [1666962496.027291][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666962496.027300][218195:218195] CHIP:DMG: {
@@ -5682,7 +5809,9 @@ tests:
             [1666962496.028498][218195:218195] CHIP:DMG: }
 
           ./chip-tool  descriptor read parts-list 1 10
-            Verify in TH(bridge-app) Log:
+
+            Verify the PartList attribute  with endpoint 10 On TH(bridge-app) Log:
+
             [1666962545.266945][218195:218195] CHIP:IM: Received Read request
             [1666962545.266979][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666962545.266986][218195:218195] CHIP:DMG: {
@@ -5760,7 +5889,9 @@ tests:
             [1666962545.267959][218195:218195] CHIP:DMG: }
 
           ./chip-tool  descriptor read parts-list 1 11
-            Verify in TH(bridge-app) Log:
+
+            Verify the PartList attribute  with endpoint 11 On TH(bridge-app) Log:
+
             [1666962605.941370][218195:218195] CHIP:IM: Received Read request
             [1666962605.941421][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666962605.941433][218195:218195] CHIP:DMG: {
@@ -5839,7 +5970,9 @@ tests:
             [1666962605.947147][218195:218195] CHIP:DMG:
 
           ./chip-tool  descriptor read parts-list 1 12
-            Verify in TH(bridge-app) Log:
+
+            Verify the PartList attribute  with endpoint 12 On TH(bridge-app) Log:
+
             [1666962633.918167][218195:218195] CHIP:IM: Received Read request
             [1666962633.918280][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666962633.918309][218195:218195] CHIP:DMG: {
@@ -5918,7 +6051,9 @@ tests:
             [1666962633.921723][218195:218195] CHIP:DMG:
 
           ./chip-tool  descriptor read parts-list 1 13
-            Verify in TH(bridge-app) Log:
+
+            Verify the PartList attribute  with endpoint 13 On TH(bridge-app) Log:
+
             [1666962673.106887][218195:218195] CHIP:IM: Received Read request
             [1666962673.106920][218195:218195] CHIP:DMG: ReadRequestMessage =
             [1666962673.106927][218195:218195] CHIP:DMG: {
@@ -6000,13 +6135,13 @@ tests:
           "Verify DUT has (during step 1a) read the NodeLabel attribute from the
           Bridged Device Basic Information cluster on various endpoints,Verify
           DUT contains the names for the (supported) devices from the above list"
-      PICS: MCORE.DEVLIST.UseDeviceState
+      PICS: MCORE.DEVLIST.UseDeviceName
       verification: |
           NodeLabel is supported for endpoints 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
 
           ./chip-tool bridgeddevicebasicinformation read node-label 1 3
 
-            Verify in TH(bridge-app) Log:
+            Verify the node-label  with endpoint 3 On TH(bridge-app) Log:
 
             [1663916825.766885][1588:1588] CHIP:DMG: ReportDataMessage =
             [1663916825.766934][1588:1588] CHIP:DMG: {
@@ -6019,9 +6154,9 @@ tests:
             [1663916825.767283][1588:1588] CHIP:DMG:                                 DataVersion = 0x6bd99dc9,
             [1663916825.767309][1588:1588] CHIP:DMG:                                 AttributePathIB =
             [1663916825.767388][1588:1588] CHIP:DMG:                                 {
-            [1663916825.767423][1588:1588] CHIP:DMG:                                         Endpoint = 0xd,
-            [1663916825.767456][1588:1588] CHIP:DMG:                                         Cluster = 0x1d,
-            [1663916825.767502][1588:1588] CHIP:DMG:                                         Attribute = 0x0000_0003,
+            [1663916825.767423][1588:1588] CHIP:DMG:                                         Endpoint = 0x3,
+            [1663916825.767456][1588:1588] CHIP:DMG:                                         Cluster = 0x39,
+            [1663916825.767502][1588:1588] CHIP:DMG:                                         Attribute = 0x0000_0005,
             [1663916825.767578][1588:1588] CHIP:DMG:                                 }
             [1663916825.767614][1588:1588] CHIP:DMG:
             [1663916825.767641][1588:1588] CHIP:DMG:                                 Data = [
@@ -6044,7 +6179,7 @@ tests:
 
           ./chip-tool bridgeddevicebasicinformation read node-label 1 4
 
-            Verify in TH(bridge-app) Log:
+            Verify the node-label  with endpoint 4 On TH(bridge-app) Log:
 
             [1663916874.414183][1588:1588] CHIP:DMG:
             [1663916874.414304][1588:1588] CHIP:DMG: ReportDataMessage =
@@ -6083,10 +6218,10 @@ tests:
 
           ./chip-tool bridgeddevicebasicinformation read node-label 1 5
 
-            Verify in TH(bridge-app) Log:
+            Verify the node-label  with endpoint 5 On TH(bridge-app) Log:
 
             [1663925132.199931][1588:1588] CHIP:DMG:
-            [1663925132.200086][1588:1588] CHIP:DMG: ReportDataMessage =
+            [1663925132.200086][1588:1588] CHIP:DMG: Verify in TH(bridge-app) Log:ReportDataMessage =
             [1663925132.200117][1588:1588] CHIP:DMG: {
             [1663925132.200153][1588:1588] CHIP:DMG:         AttributeReportIBs =
             [1663925132.200190][1588:1588] CHIP:DMG:         [
@@ -6122,7 +6257,7 @@ tests:
 
           ./chip-tool bridgeddevicebasicinformation read node-label 1 6
 
-            Verify in TH(bridge-app) Log:
+            Verify the node-label with endpoint 6 On TH(bridge-app) Log:
 
             [1663925170.922635][1588:1588] CHIP:DMG: }
             [1663925170.922652][1588:1588] CHIP:DMG:
@@ -6161,7 +6296,7 @@ tests:
 
           ./chip-tool bridgeddevicebasicinformation read node-label 1 7
 
-            Verify in TH(bridge-app) Log:
+            Verify the node-label with endpoint 7 On TH(bridge-app) Log:
 
             [1663925266.540251][1588:1588] CHIP:DMG:
             [1663925266.540311][1588:1588] CHIP:DMG: ReportDataMessage =
@@ -6198,7 +6333,7 @@ tests:
 
           ./chip-tool bridgeddevicebasicinformation read node-label 1 8
 
-            Verify in TH(bridge-app) Log:
+            Verify the node-label with endpoint 8 On TH(bridge-app) Log:
 
             [1663925300.298779][1588:1588] CHIP:DMG:
             [1663925300.298852][1588:1588] CHIP:DMG: ReportDataMessage =
@@ -6237,7 +6372,7 @@ tests:
 
           ./chip-tool bridgeddevicebasicinformation read node-label 1 9
 
-            Verify in TH(bridge-app) Log:
+            Verify the node-label with endpoint 9 On TH(bridge-app) Log:
 
             [[1666958851.515530][218195:218195] CHIP:IM: Received Read request
             [1666958851.515565][218195:218195] CHIP:DMG: ReadRequestMessage =
@@ -6318,7 +6453,7 @@ tests:
 
           ./chip-tool bridgeddevicebasicinformation read node-label 1 10
 
-            Verify in TH(bridge-app) Log:
+            Verify the node-label with endpoint 10 On TH(bridge-app) Log:
 
             [1663925401.539430][1588:1588] CHIP:DMG: ReportDataMessage =
             [1663925401.539454][1588:1588] CHIP:DMG: {
@@ -6356,7 +6491,7 @@ tests:
 
           ./chip-tool bridgeddevicebasicinformation read node-label 1 11
 
-            Verify in TH(bridge-app) Log:
+            Verify the node-label with endpoint 11 On TH(bridge-app) Log:
 
             [1663925451.561534][1588:1588] CHIP:DMG:
             [1663925451.561598][1588:1588] CHIP:DMG: ReportDataMessage =
@@ -6392,7 +6527,7 @@ tests:
 
           ./chip-tool bridgeddevicebasicinformation read node-label 1 12
 
-            Verify in TH(bridge-app) Log:
+            Verify the node-label with endpoint 12 On TH(bridge-app) Log:
 
             [1663925487.322435][1588:1588] CHIP:DMG:
             [1663925487.322496][1588:1588] CHIP:DMG: ReportDataMessage =
@@ -6428,7 +6563,7 @@ tests:
 
           ./chip-tool bridgeddevicebasicinformation read node-label 1 13
 
-            Verify in TH(bridge-app) Log:
+            Verify the node-label with endpoint 13 On TH(bridge-app) Log:
 
             [1663925529.771162][1588:1588] CHIP:DMG: }
             [1663925529.771179][1588:1588] CHIP:DMG:
@@ -6555,9 +6690,16 @@ tests:
 
     - label:
           "Use TH/bridge-app to change the on/off state of one or more of the
-          bridged On/Off lights (use key ''c'' in the console to bridge-app)"
+          bridged On/Off lights (use key 'c' in the console to bridge-app)"
       PICS: MCORE.DEVLIST.UseDeviceState
       verification: |
+          Press c on bridge-app to change the state
+
+          Verify on TH(bridge-app) Log
+          c
+          [1678950518.634668][30220:30222] CHIP:DL: Device[Light 1b]: ON
+          [1678950518.634817][30220:30220] CHIP:DMG: Endpoint 3, Cluster 0x0000_0006 update version to e7d4a040
+
           Verify on TH(bridge-app) Log:
           ./chip-tool onoff read on-off 1 3
 
@@ -6625,7 +6767,7 @@ tests:
           [1666957963.876860][218195:218195] CHIP:DMG:                                         Attribute = 0x0000_0000,
           [1666957963.876869][218195:218195] CHIP:DMG:                                 }
           [1666957963.876879][218195:218195] CHIP:DMG:
-          [1666957963.876888][218195:218195] CHIP:DMG:                                 Data = false,
+          [1666957963.876888][218195:218195] CHIP:DMG:                                 Data = True,
           [1666957963.876894][218195:218195] CHIP:DMG:                         },
           [1666957963.876904][218195:218195] CHIP:DMG:
           [1666957963.876912][218195:218195] CHIP:DMG:                 },
@@ -6684,11 +6826,11 @@ tests:
 
     - label:
           "Use TH/bridge-app to change the simulated temperature level of the
-          simulated temperature sensors (use key ''<tbd>'' in the console to
+          simulated temperature sensors (use key '<tbd>' in the console to
           bridge-app)"
       PICS: MCORE.DEVLIST.UseDeviceState
       verification: |
-          Press a key "tbd" on bridge-app to change the simulated temperature
+          Press a key 'tbd' on bridge-app to change the simulated temperature
 
 
           ./chip-tool temperaturemeasurement read measured-value 1 4
@@ -6803,8 +6945,9 @@ tests:
       disabled: true
 
     - label:
-          "Use TH/bridge-app to rename a bridged light (use key ''b'' in the
+          "Use TH/bridge-app to rename a bridged light (use key 'b' in the
           console to bridge-app to rename Light 1 to Light 1b)"
+      PICS: MCORE.DEVLIST.UseDeviceName
       verification: |
           ./chip-tool bridgeddevicebasicinformation  read node-label 1 3
 
@@ -6882,6 +7025,7 @@ tests:
       disabled: true
 
     - label: "Verify DUT contains the updated name for the renamed device"
+      PICS: MCORE.DEVLIST.UseDeviceName
       verification: |
           Verify on TH(bridge-app) Log
           b
@@ -6889,10 +7033,10 @@ tests:
       disabled: true
 
     - label:
-          "Use TH/bridge-app to add a bridged light (use key ''2''' in the
-          console to bridge-app to add Light 2)"
+          "Use TH/bridge-app to add a bridged light (use key '2' in the console
+          to bridge-app to add Light 2)"
       verification: |
-          Press "2" on TH(bridge-app) Log
+          Press '2' on TH(bridge-app) Log
 
           ./chip-tool  descriptor read parts-list 1 0
 
@@ -7009,7 +7153,7 @@ tests:
       disabled: true
 
     - label:
-          "Use TH/bridge-app to remove a bridged light (use key ''4'' in the
+          "Use TH/bridge-app to remove a bridged light (use key '4' in the
           console to bridge-app to remove Light 1b)"
       verification: |
           ./chip-tool  descriptor read parts-list 1 0
@@ -7549,5 +7693,4 @@ tests:
           [1659352426.184434][14237:14242] CHIP:DMG: Endpoint 1, Cluster 0x0000_001D update version to 7e918baf
           [1659352426.184489][14237:14242] CHIP:DMG: Endpoint 0, Cluster 0x0000_001D update version to 7561f372
           [1659352426.184512][14237:14242] CHIP:DL: Removed device Light 1b from dynamic endpoint 3 (index=0)
-
       disabled: true
