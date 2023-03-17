@@ -849,8 +849,8 @@ private:
 
 template <typename DecodableValueType> class BufferedMultipleReadClientCallback final : public app::ReadClient::Callback {
 public:
-    using OnSuccessAttributeCallbackType
-        = std::function<void(const app::ConcreteClusterPath & aPath, const AttributeId aAttributeId, const DecodableValueType & aData)>;
+    using OnSuccessAttributeCallbackType = std::function<void(
+        const app::ConcreteClusterPath & aPath, const AttributeId aAttributeId, const DecodableValueType & aData)>;
     using OnSuccessEventCallbackType
         = std::function<void(const app::ConcreteClusterPath & aPath, const EventId aEventId, const DecodableValueType & aData)>;
     using OnErrorCallbackType
@@ -858,8 +858,8 @@ public:
     using OnDoneCallbackType = std::function<void(BufferedMultipleReadClientCallback * callback)>;
     using OnSubscriptionEstablishedCallbackType = std::function<void()>;
 
-    BufferedMultipleReadClientCallback(OnSuccessAttributeCallbackType aOnAttributeSuccess, OnSuccessEventCallbackType aOnEventSuccess,
-        OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
+    BufferedMultipleReadClientCallback(OnSuccessAttributeCallbackType aOnAttributeSuccess,
+        OnSuccessEventCallbackType aOnEventSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
         OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr)
         : mOnAttributeSuccess(aOnAttributeSuccess)
         , mOnEventSuccess(aOnEventSuccess)
@@ -1059,145 +1059,136 @@ private:
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
             MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        // interactionStatus tracks whether the whole read interaction has failed.
-        //
-        // Make sure interactionStatus survives even if this block scope is destroyed.
-        auto interactionStatus = std::make_shared<CHIP_ERROR>(CHIP_NO_ERROR);
+            // interactionStatus tracks whether the whole read interaction has failed.
+            //
+            // Make sure interactionStatus survives even if this block scope is destroyed.
+            auto interactionStatus = std::make_shared<CHIP_ERROR>(CHIP_NO_ERROR);
 
-        auto resultArray = [[NSMutableArray alloc] init];
-        auto onAttributeSuccessCb = [resultArray](const app::ConcreteClusterPath & clusterPath, const AttributeId aAttributeId,
-                               const MTRDataValueDictionaryDecodableType & aData) {
-            app::ConcreteAttributePath attribPath(clusterPath.mEndpointId, clusterPath.mClusterId, aAttributeId);
-            [resultArray addObject:@ {
-                MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath],
-                MTRDataKey : aData.GetDecodedObject()
-            }];
-        };
-
-        auto onEventSuccessCb = [resultArray](const app::ConcreteClusterPath & clusterPath, const EventId aEventId,
-                               const MTRDataValueDictionaryDecodableType & aData) {
-            app::ConcreteEventPath eventPath(clusterPath.mEndpointId, clusterPath.mClusterId, aEventId);
-            [resultArray addObject:@ {
-                MTREventPathKey : [[MTREventPath alloc] initWithPath:eventPath],
-                MTRDataKey : aData.GetDecodedObject()
-            }];
-        };
-
-        auto onFailureCb = [resultArray, interactionStatus](
-                               const app::ConcreteClusterPath * clusterPath, const uint32_t aValueId, CHIP_ERROR aError) {
-            if (clusterPath) {
-                app::ConcreteAttributePath attribPath(clusterPath->mEndpointId, clusterPath->mClusterId, aValueId);
+            auto resultArray = [[NSMutableArray alloc] init];
+            auto onAttributeSuccessCb = [resultArray](const app::ConcreteClusterPath & clusterPath, const AttributeId aAttributeId,
+                                            const MTRDataValueDictionaryDecodableType & aData) {
+                app::ConcreteAttributePath attribPath(clusterPath.mEndpointId, clusterPath.mClusterId, aAttributeId);
                 [resultArray addObject:@ {
                     MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath],
-                    MTRErrorKey : [MTRError errorForCHIPErrorCode:aError]
+                    MTRDataKey : aData.GetDecodedObject()
                 }];
-            } else {
-                // This will only happen once per read interaction, and
-                // after that there will be no more calls to onFailureCb or
-                // onSuccessCb.
-                *interactionStatus = aError;
+            };
+
+            auto onEventSuccessCb = [resultArray](const app::ConcreteClusterPath & clusterPath, const EventId aEventId,
+                                        const MTRDataValueDictionaryDecodableType & aData) {
+                app::ConcreteEventPath eventPath(clusterPath.mEndpointId, clusterPath.mClusterId, aEventId);
+                [resultArray addObject:@ {
+                    MTREventPathKey : [[MTREventPath alloc] initWithPath:eventPath],
+                    MTRDataKey : aData.GetDecodedObject()
+                }];
+            };
+
+            auto onFailureCb = [resultArray, interactionStatus](
+                                   const app::ConcreteClusterPath * clusterPath, const uint32_t aValueId, CHIP_ERROR aError) {
+                if (clusterPath) {
+                    app::ConcreteAttributePath attribPath(clusterPath->mEndpointId, clusterPath->mClusterId, aValueId);
+                    [resultArray addObject:@ {
+                        MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath],
+                        MTRErrorKey : [MTRError errorForCHIPErrorCode:aError]
+                    }];
+                } else {
+                    // This will only happen once per read interaction, and
+                    // after that there will be no more calls to onFailureCb or
+                    // onSuccessCb.
+                    *interactionStatus = aError;
+                }
+            };
+
+            std::vector<app::AttributePathParams> attributePathParamsList;
+            std::vector<app::EventPathParams> eventPathParamsList;
+
+            if (attributePaths != nil) {
+                for (uint8_t i = 0; i < [attributePaths count]; i++) {
+                    chip::EndpointId endpointId = kInvalidEndpointId;
+                    chip::ClusterId clusterId = kInvalidClusterId;
+                    chip::AttributeId attributeId = kInvalidAttributeId;
+
+                    if ([attributePaths[i] endpoint]) {
+                        endpointId = static_cast<chip::EndpointId>([[attributePaths[i] endpoint] unsignedShortValue]);
+                    }
+
+                    if ([attributePaths[i] cluster]) {
+                        clusterId = static_cast<chip::ClusterId>([[attributePaths[i] cluster] unsignedLongValue]);
+                    }
+
+                    if ([attributePaths[i] attribute]) {
+                        attributeId = static_cast<chip::AttributeId>([[attributePaths[i] attribute] unsignedLongValue]);
+                    }
+                    attributePathParamsList.push_back(app::AttributePathParams(endpointId, clusterId, attributeId));
+                }
             }
-        };
 
-        std::vector<app::AttributePathParams> attributePathParamsList;
-        std::vector<app::EventPathParams> eventPathParamsList;
+            if (eventPaths != nil) {
+                for (uint8_t i = 0; i < [eventPaths count]; i++) {
+                    chip::EndpointId endpointId = kInvalidEndpointId;
+                    chip::ClusterId clusterId = kInvalidClusterId;
+                    chip::EventId eventId = kInvalidEventId;
 
-        if (attributePaths != nil)
-        {
-            for (uint8_t i = 0 ; i < [attributePaths count] ; i++)
-            {
-                chip::EndpointId endpointId = kInvalidEndpointId;
-                chip::ClusterId clusterId = kInvalidClusterId;
-                chip::AttributeId attributeId = kInvalidAttributeId;
+                    if ([eventPaths[i] endpoint]) {
+                        endpointId = static_cast<chip::EndpointId>([[eventPaths[i] endpoint] unsignedShortValue]);
+                    }
 
-                if ([attributePaths[i] endpoint])
-                {
-                    endpointId = static_cast<chip::EndpointId>([[attributePaths[i] endpoint] unsignedShortValue]);
+                    if ([eventPaths[i] cluster]) {
+                        clusterId = static_cast<chip::ClusterId>([[eventPaths[i] cluster] unsignedLongValue]);
+                    }
+
+                    if ([eventPaths[i] event]) {
+                        eventId = static_cast<chip::EventId>([[eventPaths[i] event] unsignedLongValue]);
+                    }
+                    eventPathParamsList.push_back(app::EventPathParams(endpointId, clusterId, eventId));
                 }
-
-                if ([attributePaths[i] cluster])
-                {
-                    clusterId = static_cast<chip::ClusterId>([[attributePaths[i] cluster] unsignedLongValue]);
-                }
-
-                if ([attributePaths[i] attribute])
-                {
-                    attributeId = static_cast<chip::AttributeId>([[attributePaths[i] attribute] unsignedLongValue]);
-                }
-                attributePathParamsList.push_back(app::AttributePathParams(endpointId, clusterId, attributeId));
             }
-        }
 
-        if (eventPaths != nil)
-        {
-            for (uint8_t i = 0 ; i < [eventPaths count] ; i++)
-            {
-                chip::EndpointId endpointId = kInvalidEndpointId;
-                chip::ClusterId clusterId = kInvalidClusterId;
-                chip::EventId eventId = kInvalidEventId;
+            app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
+            CHIP_ERROR err = CHIP_NO_ERROR;
 
-                if ([eventPaths[i] endpoint])
-                {
-                    endpointId = static_cast<chip::EndpointId>([[eventPaths[i] endpoint] unsignedShortValue]);
+            chip::app::ReadPrepareParams readParams(session);
+            [params toReadPrepareParams:readParams];
+            readParams.mpAttributePathParamsList = attributePathParamsList.data();
+            readParams.mAttributePathParamsListSize = attributePathParamsList.size();
+            readParams.mpEventPathParamsList = eventPathParamsList.data();
+            readParams.mEventPathParamsListSize = eventPathParamsList.size();
+
+            auto onDone = [resultArray, interactionStatus, bridge, successCb, failureCb](
+                              BufferedMultipleReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
+                if (*interactionStatus != CHIP_NO_ERROR) {
+                    // Failure
+                    failureCb(bridge, *interactionStatus);
+                } else {
+                    // Success
+                    successCb(bridge, resultArray);
                 }
+                chip::Platform::Delete(callback);
+            };
 
-                if ([eventPaths[i] cluster])
-                {
-                    clusterId = static_cast<chip::ClusterId>([[eventPaths[i] cluster] unsignedLongValue]);
-                }
+            auto callback = chip::Platform::MakeUnique<BufferedMultipleReadClientCallback<MTRDataValueDictionaryDecodableType>>(
+                onAttributeSuccessCb, onEventSuccessCb, onFailureCb, onDone, nullptr);
+            VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
-                if ([eventPaths[i] event])
-                {
-                    eventId = static_cast<chip::EventId>([[eventPaths[i] event] unsignedLongValue]);
-                }
-                eventPathParamsList.push_back(app::EventPathParams(endpointId, clusterId, eventId));
+            auto readClient = chip::Platform::MakeUnique<app::ReadClient>(
+                engine, &exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+            VerifyOrReturnError(readClient != nullptr, CHIP_ERROR_NO_MEMORY);
+
+            err = readClient->SendRequest(readParams);
+
+            if (err != CHIP_NO_ERROR) {
+                return err;
             }
-        }
 
-        app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        chip::app::ReadPrepareParams readParams(session);
-        [params toReadPrepareParams:readParams];
-        readParams.mpAttributePathParamsList = attributePathParamsList.data();
-        readParams.mAttributePathParamsListSize = attributePathParamsList.size();
-        readParams.mpEventPathParamsList = eventPathParamsList.data();
-        readParams.mEventPathParamsListSize = eventPathParamsList.size();
-
-        auto onDone = [resultArray, interactionStatus, bridge, successCb, failureCb](
-                          BufferedMultipleReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
-            if (*interactionStatus != CHIP_NO_ERROR) {
-                // Failure
-                failureCb(bridge, *interactionStatus);
-            } else {
-                // Success
-                successCb(bridge, resultArray);
-            }
-            chip::Platform::Delete(callback);
-        };
-
-        auto callback = chip::Platform::MakeUnique<BufferedMultipleReadClientCallback<MTRDataValueDictionaryDecodableType>>(onAttributeSuccessCb, onEventSuccessCb, onFailureCb, onDone, nullptr);
-        VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
-
-        auto readClient = chip::Platform::MakeUnique<app::ReadClient>(
-            engine, &exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
-        VerifyOrReturnError(readClient != nullptr, CHIP_ERROR_NO_MEMORY);
-
-        err = readClient->SendRequest(readParams);
-
-        if (err != CHIP_NO_ERROR) {
+            //
+            // At this point, we'll get a callback through the OnDone callback above regardless of success or failure
+            // of the read operation to permit us to free up the callback object. So, release ownership of the callback
+            // object now to prevent it from being reclaimed at the end of this scoped block.
+            //
+            callback->AdoptReadClient(std::move(readClient));
+            callback.release();
             return err;
-        }
-
-        //
-        // At this point, we'll get a callback through the OnDone callback above regardless of success or failure
-        // of the read operation to permit us to free up the callback object. So, release ownership of the callback
-        // object now to prevent it from being reclaimed at the end of this scoped block.
-        //
-        callback->AdoptReadClient(std::move(readClient));
-        callback.release();
-        return err;
-    });
+        });
     std::move(*bridge).DispatchAction(self);
 }
 
@@ -1224,177 +1215,174 @@ private:
     [self.deviceController
         getSessionForNode:self.nodeID
                completion:^(ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session,
-                            NSError * _Nullable error) {
-        if (error != nil) {
-            if (reportHandler) {
-                dispatch_async(queue, ^{
-                    reportHandler(nil, error);
-                });
-            }
-            return;
-        }
+                   NSError * _Nullable error) {
+                   if (error != nil) {
+                       if (reportHandler) {
+                           dispatch_async(queue, ^{
+                               reportHandler(nil, error);
+                           });
+                       }
+                       return;
+                   }
 
-        auto onAttributeReportCb = [queue, reportHandler](const app::ConcreteClusterPath & clusterPath, const AttributeId aAttributeId,
-                                                 const MTRDataValueDictionaryDecodableType & data) {
-            id valueObject = data.GetDecodedObject();
-            app::ConcreteAttributePath pathCopy(clusterPath.mEndpointId, clusterPath.mClusterId, aAttributeId);
-            dispatch_async(queue, ^{
-                reportHandler(@[ @ {
-                    MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:pathCopy],
-                    MTRDataKey : valueObject
-                } ],
-                              nil);
-            });
-        };
+                   auto onAttributeReportCb
+                       = [queue, reportHandler](const app::ConcreteClusterPath & clusterPath, const AttributeId aAttributeId,
+                             const MTRDataValueDictionaryDecodableType & data) {
+                             id valueObject = data.GetDecodedObject();
+                             app::ConcreteAttributePath pathCopy(clusterPath.mEndpointId, clusterPath.mClusterId, aAttributeId);
+                             dispatch_async(queue, ^{
+                                 reportHandler(@[ @ {
+                                     MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:pathCopy],
+                                     MTRDataKey : valueObject
+                                 } ],
+                                     nil);
+                             });
+                         };
 
-        auto onEventReportCb = [queue, reportHandler](const app::ConcreteClusterPath & clusterPath, const EventId aEventId,
-                                                 const MTRDataValueDictionaryDecodableType & data) {
-            id valueObject = data.GetDecodedObject();
-            app::ConcreteEventPath pathCopy(clusterPath.mEndpointId, clusterPath.mClusterId, aEventId);
-            dispatch_async(queue, ^{
-                reportHandler(@[ @ {
-                    MTREventPathKey : [[MTREventPath alloc] initWithPath:pathCopy],
-                    MTRDataKey : valueObject
-                } ],
-                              nil);
-            });
-        };
+                   auto onEventReportCb = [queue, reportHandler](const app::ConcreteClusterPath & clusterPath,
+                                              const EventId aEventId, const MTRDataValueDictionaryDecodableType & data) {
+                       id valueObject = data.GetDecodedObject();
+                       app::ConcreteEventPath pathCopy(clusterPath.mEndpointId, clusterPath.mClusterId, aEventId);
+                       dispatch_async(queue, ^{
+                           reportHandler(
+                               @[ @ { MTREventPathKey : [[MTREventPath alloc] initWithPath:pathCopy], MTRDataKey : valueObject } ],
+                               nil);
+                       });
+                   };
 
-        auto establishedOrFailed = chip::Platform::MakeShared<BOOL>(NO);
-        auto onFailureCb = [establishedOrFailed, queue, subscriptionEstablished, reportHandler](
-                                                                                                const app::ConcreteClusterPath * clusterPath, const uint32_t aValueId, CHIP_ERROR error) {
-                                                                                                    if (!(*establishedOrFailed)) {
-                                                                                                        *establishedOrFailed = YES;
-                                                                                                        if (subscriptionEstablished) {
-                                                                                                            dispatch_async(queue, subscriptionEstablished);
-                                                                                                        }
-                                                                                                    }
-                                                                                                    if (reportHandler) {
-                                                                                                        dispatch_async(queue, ^{
-                                                                                                            reportHandler(nil, [MTRError errorForCHIPErrorCode:error]);
-                                                                                                        });
-                                                                                                    }
-                                                                                                };
+                   auto establishedOrFailed = chip::Platform::MakeShared<BOOL>(NO);
+                   auto onFailureCb = [establishedOrFailed, queue, subscriptionEstablished, reportHandler](
+                                          const app::ConcreteClusterPath * clusterPath, const uint32_t aValueId, CHIP_ERROR error) {
+                       if (!(*establishedOrFailed)) {
+                           *establishedOrFailed = YES;
+                           if (subscriptionEstablished) {
+                               dispatch_async(queue, subscriptionEstablished);
+                           }
+                       }
+                       if (reportHandler) {
+                           dispatch_async(queue, ^{
+                               reportHandler(nil, [MTRError errorForCHIPErrorCode:error]);
+                           });
+                       }
+                   };
 
-        auto onEstablishedCb = [establishedOrFailed, queue, subscriptionEstablished]() {
-            if (*establishedOrFailed) {
-                return;
-            }
-            *establishedOrFailed = YES;
-            if (subscriptionEstablished) {
-                dispatch_async(queue, subscriptionEstablished);
-            }
-        };
+                   auto onEstablishedCb = [establishedOrFailed, queue, subscriptionEstablished]() {
+                       if (*establishedOrFailed) {
+                           return;
+                       }
+                       *establishedOrFailed = YES;
+                       if (subscriptionEstablished) {
+                           dispatch_async(queue, subscriptionEstablished);
+                       }
+                   };
 
-        MTRReadClientContainer * container = [[MTRReadClientContainer alloc] init];
-        container.deviceID = self.nodeID;
+                   MTRReadClientContainer * container = [[MTRReadClientContainer alloc] init];
+                   container.deviceID = self.nodeID;
 
-        if (attributePaths != nil)
-        {
-            container.pathParamsSize = [attributePaths count];
-            container.pathParams = static_cast<app::AttributePathParams *>(Platform::MemoryCalloc(sizeof(app::AttributePathParams), container.pathParamsSize));
-            for (uint8_t i = 0 ; i < container.pathParamsSize ; i++)
-            {
-                container.pathParams[i].mEndpointId = kInvalidEndpointId;
-                container.pathParams[i].mClusterId = kInvalidClusterId;
-                container.pathParams[i].mAttributeId = kInvalidAttributeId;
+                   if (attributePaths != nil) {
+                       container.pathParamsSize = [attributePaths count];
+                       container.pathParams = static_cast<app::AttributePathParams *>(
+                           Platform::MemoryCalloc(sizeof(app::AttributePathParams), container.pathParamsSize));
+                       for (uint8_t i = 0; i < container.pathParamsSize; i++) {
+                           container.pathParams[i].mEndpointId = kInvalidEndpointId;
+                           container.pathParams[i].mClusterId = kInvalidClusterId;
+                           container.pathParams[i].mAttributeId = kInvalidAttributeId;
 
-                if ([attributePaths[i] endpoint])
-                {
-                    container.pathParams[i].mEndpointId = static_cast<chip::EndpointId>([[attributePaths[i] endpoint] unsignedShortValue]);
-                }
+                           if ([attributePaths[i] endpoint]) {
+                               container.pathParams[i].mEndpointId
+                                   = static_cast<chip::EndpointId>([[attributePaths[i] endpoint] unsignedShortValue]);
+                           }
 
-                if ([attributePaths[i] cluster])
-                {
-                    container.pathParams[i].mClusterId = static_cast<chip::ClusterId>([[attributePaths[i] cluster] unsignedLongValue]);
-                }
+                           if ([attributePaths[i] cluster]) {
+                               container.pathParams[i].mClusterId
+                                   = static_cast<chip::ClusterId>([[attributePaths[i] cluster] unsignedLongValue]);
+                           }
 
-                if ([attributePaths[i] attribute])
-                {
-                    container.pathParams[i].mAttributeId = static_cast<chip::AttributeId>([[attributePaths[i] attribute] unsignedLongValue]);
-                }
-            }
-        }
-        if (eventPaths != nil)
-        {
-            container.eventPathParamsSize = [eventPaths count];
-            container.eventPathParams = static_cast<app::EventPathParams *>(Platform::MemoryCalloc(sizeof(app::EventPathParams), container.eventPathParamsSize));
-            for (uint8_t i = 0 ; i < container.eventPathParamsSize ; i++)
-            {
-                container.eventPathParams[i].mEndpointId = kInvalidEndpointId;
-                container.eventPathParams[i].mClusterId = kInvalidClusterId;
-                container.eventPathParams[i].mEventId = kInvalidEventId;
+                           if ([attributePaths[i] attribute]) {
+                               container.pathParams[i].mAttributeId
+                                   = static_cast<chip::AttributeId>([[attributePaths[i] attribute] unsignedLongValue]);
+                           }
+                       }
+                   }
+                   if (eventPaths != nil) {
+                       container.eventPathParamsSize = [eventPaths count];
+                       container.eventPathParams = static_cast<app::EventPathParams *>(
+                           Platform::MemoryCalloc(sizeof(app::EventPathParams), container.eventPathParamsSize));
+                       for (uint8_t i = 0; i < container.eventPathParamsSize; i++) {
+                           container.eventPathParams[i].mEndpointId = kInvalidEndpointId;
+                           container.eventPathParams[i].mClusterId = kInvalidClusterId;
+                           container.eventPathParams[i].mEventId = kInvalidEventId;
 
-                if ([eventPaths[i] endpoint])
-                {
-                    container.eventPathParams[i].mEndpointId = static_cast<chip::EndpointId>([[eventPaths[i] endpoint] unsignedShortValue]);
-                }
+                           if ([eventPaths[i] endpoint]) {
+                               container.eventPathParams[i].mEndpointId
+                                   = static_cast<chip::EndpointId>([[eventPaths[i] endpoint] unsignedShortValue]);
+                           }
 
-                if ([eventPaths[i] cluster])
-                {
-                    container.eventPathParams[i].mClusterId = static_cast<chip::ClusterId>([[eventPaths[i] cluster] unsignedLongValue]);
-                }
+                           if ([eventPaths[i] cluster]) {
+                               container.eventPathParams[i].mClusterId
+                                   = static_cast<chip::ClusterId>([[eventPaths[i] cluster] unsignedLongValue]);
+                           }
 
-                if ([eventPaths[i] event])
-                {
-                    container.eventPathParams[i].mEventId = static_cast<chip::EventId>([[eventPaths[i] event] unsignedLongValue]);
-                }
-            }
-        }
+                           if ([eventPaths[i] event]) {
+                               container.eventPathParams[i].mEventId
+                                   = static_cast<chip::EventId>([[eventPaths[i] event] unsignedLongValue]);
+                           }
+                       }
+                   }
 
-        app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-        CHIP_ERROR err = CHIP_NO_ERROR;
+                   app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
+                   CHIP_ERROR err = CHIP_NO_ERROR;
 
-        chip::app::ReadPrepareParams readParams(session.Value());
-        [params toReadPrepareParams:readParams];
-        readParams.mpAttributePathParamsList = container.pathParams;
-        readParams.mAttributePathParamsListSize = container.pathParamsSize;
-        readParams.mpEventPathParamsList = container.eventPathParams;
-        readParams.mEventPathParamsListSize = container.eventPathParamsSize;
+                   chip::app::ReadPrepareParams readParams(session.Value());
+                   [params toReadPrepareParams:readParams];
+                   readParams.mpAttributePathParamsList = container.pathParams;
+                   readParams.mAttributePathParamsListSize = container.pathParamsSize;
+                   readParams.mpEventPathParamsList = container.eventPathParams;
+                   readParams.mEventPathParamsListSize = container.eventPathParamsSize;
 
-        auto onDone = [container](BufferedMultipleReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
-            [container onDone];
-            // Make sure we delete callback last, because doing that actually destroys our
-            // lambda, so we can't access captured values after that.
-            chip::Platform::Delete(callback);
-        };
+                   auto onDone = [container](BufferedMultipleReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
+                       [container onDone];
+                       // Make sure we delete callback last, because doing that actually destroys our
+                       // lambda, so we can't access captured values after that.
+                       chip::Platform::Delete(callback);
+                   };
 
-        auto callback = chip::Platform::MakeUnique<BufferedMultipleReadClientCallback<MTRDataValueDictionaryDecodableType>>(onAttributeReportCb, onEventReportCb, onFailureCb, onDone, onEstablishedCb);
+                   auto callback
+                       = chip::Platform::MakeUnique<BufferedMultipleReadClientCallback<MTRDataValueDictionaryDecodableType>>(
+                           onAttributeReportCb, onEventReportCb, onFailureCb, onDone, onEstablishedCb);
 
-        auto readClient = Platform::New<app::ReadClient>(
-            engine, exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
+                   auto readClient = Platform::New<app::ReadClient>(
+                       engine, exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
 
-        if (!params.resubscribeAutomatically) {
-            err = readClient->SendRequest(readParams);
-        } else {
-            err = readClient->SendAutoResubscribeRequest(std::move(readParams));
-        }
+                   if (!params.resubscribeAutomatically) {
+                       err = readClient->SendRequest(readParams);
+                   } else {
+                       err = readClient->SendAutoResubscribeRequest(std::move(readParams));
+                   }
 
-        if (err != CHIP_NO_ERROR) {
-            if (reportHandler) {
-                dispatch_async(queue, ^{
-                    reportHandler(nil, [MTRError errorForCHIPErrorCode:err]);
-                });
-            }
-            Platform::Delete(readClient);
-            if (container.pathParams != nullptr)
-            {
-                Platform::Delete(container.pathParams);
-            }
+                   if (err != CHIP_NO_ERROR) {
+                       if (reportHandler) {
+                           dispatch_async(queue, ^{
+                               reportHandler(nil, [MTRError errorForCHIPErrorCode:err]);
+                           });
+                       }
+                       Platform::Delete(readClient);
+                       if (container.pathParams != nullptr) {
+                           Platform::Delete(container.pathParams);
+                       }
 
-            if (container.eventPathParams != nullptr)
-            {
-                Platform::Delete(container.eventPathParams);
-            }
-            container.pathParams = nullptr;
-            return;
-        }
+                       if (container.eventPathParams != nullptr) {
+                           Platform::Delete(container.eventPathParams);
+                       }
+                       container.pathParams = nullptr;
+                       return;
+                   }
 
-        // Read clients will be purged when deregistered.
-        container.readClientPtr = readClient;
-        AddReadClientContainer(container.deviceID, container);
-        callback.release();
-    }];
+                   // Read clients will be purged when deregistered.
+                   container.readClientPtr = readClient;
+                   AddReadClientContainer(container.deviceID, container);
+                   callback.release();
+               }];
 }
 
 - (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
