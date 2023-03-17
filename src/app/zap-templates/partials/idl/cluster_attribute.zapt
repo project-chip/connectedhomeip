@@ -3,9 +3,7 @@
   readonly {{!marker to place a space even with whitespace removal~}}
 {{~/unless~}}
 {{~!TODO: write only attributes should also be supported~}}
-{{~#unless isReportableAttribute~}}
-  nosubscribe {{!marker to place a space even with whitespace removal~}}
-{{~/unless~}}
+{{~!TODO: non-reportable (nosubscribe) attributes should also be supported ~}}
 {{~!Removes spaces~}} attribute {{!ensure space}}
   {{~#chip_access_elements entity="attribute"~}}
     {{~#first~}}access({{~/first~}}
