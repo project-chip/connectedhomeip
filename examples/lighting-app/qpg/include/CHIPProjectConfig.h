@@ -111,12 +111,22 @@
  */
 #define CHIP_IM_MAX_NUM_WRITE_CLIENT 2
 
-#define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
-
+/**
+ * @def CHIP_DEVICE_CONFIG_ENABLE_SED
+ *
+ * @brief Defines if a matter device is acting as a Sleepy End Device(SED)
+ */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_SED
 #define CHIP_DEVICE_CONFIG_ENABLE_SED 0
 #endif
 
+/**
+ * @def CHIP_DEVICE_CONFIG_THREAD_FTD
+ *
+ * @brief Defines if a matter device is acting as Full Thread Device (FTD)
+ */
 #ifndef CHIP_DEVICE_CONFIG_THREAD_FTD
 #define CHIP_DEVICE_CONFIG_THREAD_FTD 1
 #endif
+
+#define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
