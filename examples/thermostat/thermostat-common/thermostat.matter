@@ -6,7 +6,6 @@ struct LabelStruct {
     char_string<16> value = 1;
 }
 
-
 client cluster Identify = 3 {
   enum IdentifyEffectIdentifier : ENUM8 {
     kBlink = 0;

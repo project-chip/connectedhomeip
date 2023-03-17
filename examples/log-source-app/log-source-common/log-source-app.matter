@@ -1,7 +1,6 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-
 server cluster AccessControl = 31 {
   enum AccessControlEntryAuthModeEnum : ENUM8 {
     kPase = 1;

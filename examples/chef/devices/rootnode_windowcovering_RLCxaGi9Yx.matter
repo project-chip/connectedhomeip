@@ -1,7 +1,6 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-
 server cluster Identify = 3 {
   enum IdentifyEffectIdentifier : ENUM8 {
     kBlink = 0;

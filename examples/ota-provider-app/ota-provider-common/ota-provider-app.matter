@@ -6,7 +6,6 @@ struct LabelStruct {
     char_string<16> value = 1;
 }
 
-
 server cluster Descriptor = 29 {
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;

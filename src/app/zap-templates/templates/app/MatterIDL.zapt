@@ -5,9 +5,8 @@
 {{>idl_structure_definition extraIndent=0}}
 
 {{/chip_shared_structs}}
-
 {{#chip_clusters}}
-  {{~side}} cluster {{asUpperCamelCase name}} = {{code}} {
+{{~side}} cluster {{asUpperCamelCase name}} = {{code}} {
   {{#zcl_enums}}
   enum {{asUpperCamelCase name}} : ENUM{{multiply size 8}} {
     {{#zcl_enum_items}}
