@@ -11,6 +11,7 @@ struct ApplicationStruct {
     char_string applicationID = 1;
 }
 
+
 server cluster Identify = 3 {
   enum IdentifyEffectIdentifier : ENUM8 {
     kBlink = 0;

@@ -11,6 +11,7 @@ struct ApplicationStruct {
     char_string applicationID = 1;
 }
 
+
 server cluster OnOff = 6 {
   enum OnOffDelayedAllOffEffectVariant : ENUM8 {
     kFadeToOffIn0p8Seconds = 0;

@@ -45,17 +45,17 @@
 
   {{/zcl_events}}
   {{#if (is_client side)}}
-  {{#zcl_attributes_server}}
-    {{~#if clusterRef}}{{!Using `ClusterRef` to detect global attributes~}}
-      {{>idl_cluster_attribute~}}
-    {{~/if~}}
-  {{/zcl_attributes_server~}}
+    {{#zcl_attributes_server}}
+      {{~#if clusterRef}}{{!Using `ClusterRef` to detect global attributes~}}
+        {{~>idl_cluster_attribute~}}
+      {{~/if~}}
+    {{/zcl_attributes_server~}}
   {{else}}
-  {{#chip_server_cluster_attributes}}
-  {{~#unless isGlobalAttribute~}}
-  {{>idl_cluster_attribute~}}
-  {{~/unless~}}
-  {{/chip_server_cluster_attributes~}}
+    {{#chip_server_cluster_attributes}}
+      {{~#unless isGlobalAttribute~}}
+        {{~>idl_cluster_attribute~}}
+      {{~/unless~}}
+    {{/chip_server_cluster_attributes~}}
   {{/if~}}
 
   {{~!--Global attributes: spec 7.13 describes these as mandatory --}}
