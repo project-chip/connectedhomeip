@@ -94,6 +94,27 @@ void MTRDeviceControllerDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
     // This is never actually called; just do nothing.
 }
 
+void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info)
+{
+    chip::VendorId vendorId = info.basic.vendorId;
+    uint16_t productId = info.basic.productId;
+    chip::EndpointId wifiEndpointId = info.network.wifi.endpoint;
+    chip::EndpointId threadEndpointId = info.network.thread.endpoint;
+
+    MTR_LOG_DEFAULT("DeviceControllerDelegate Read Commissioning Info. VendorId %u ProductId %u", vendorId, productId);
+
+    id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
+    MTRDeviceController * strongController = mController;
+    if (strongDelegate && mQueue && strongController) {
+        if ([strongDelegate respondsToSelector:@selector(controller:readCommissioningInfo:)]) {
+            dispatch_async(mQueue, ^{
+                NSDictionary<NSString *, id> *info = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:vendorId], @"vendorID", [NSNumber numberWithUnsignedShort:productId], @"productID", [NSNumber numberWithUnsignedShort:wifiEndpointId], @"wifiEndpointID", [NSNumber numberWithUnsignedShort:threadEndpointId], @"threadEndpointIDiitittidf", nil];
+                [strongDelegate controller:strongController readCommissioningInfo:info];
+            });
+        }
+    }
+}
+
 void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)
 {
     MTR_LOG_DEFAULT("DeviceControllerDelegate Commissioning complete. NodeId %llu Status %s", nodeId, chip::ErrorStr(error));
@@ -105,6 +126,14 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
             dispatch_async(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
                 [strongDelegate controller:strongController commissioningComplete:nsError];
+            });
+        }
+
+        if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:deviceId:)]) {
+            dispatch_async(mQueue, ^{
+                NSError * nsError = [MTRError errorForCHIPErrorCode:error];
+                NSNumber * deviceId = [NSNumber numberWithUnsignedLongLong:nodeId];
+                [strongDelegate controller:strongController commissioningComplete:nsError deviceId:deviceId];
             });
         }
     }

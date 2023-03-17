@@ -53,6 +53,10 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  */
 - (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error;
 
+- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error
+                                                                  deviceId:(NSNumber * _Nullable)deviceId;
+
+- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(NSDictionary<NSString *, id> * _Nullable)info;
 @end
 
 typedef NS_ENUM(NSUInteger, MTRPairingStatus) {
