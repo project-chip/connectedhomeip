@@ -120,6 +120,8 @@ if [ "$#" == "0" ]; then
             Currently : v1.0-<branchName>-<ShortCommitSha>
         --release
             Remove all logs and debugs features (including the LCD). Yield the smallest image size possible
+        --docker
+            Change GSDK root for docker builds
 
     "
 elif [ "$#" -lt "2" ]; then
@@ -197,6 +199,10 @@ else
                 ;;
             --release)
                 optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
+                shift
+                ;;
+            --docker)
+                optArgs+="efr32_sdk_root=\"$GSDK_ROOT\" openthread_root=\"$GSDK_ROOT/util/third_party/openthread\""
                 shift
                 ;;
             *)
