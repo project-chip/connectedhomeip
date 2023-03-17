@@ -130,6 +130,59 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
     MTRTransportTypeTCP,
 } API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * A path indicating a specific cluster on a device (i.e. without any
+ * wildcards).
+ */
+API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+@interface MTRClusterPath : NSObject <NSCopying>
+@property (nonatomic, readonly, copy) NSNumber * endpoint;
+@property (nonatomic, readonly, copy) NSNumber * cluster;
+
++ (MTRClusterPath *)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+@end
+
+/**
+ * A path indicating a specific attribute on a device (i.e. without any
+ * wildcards).
+ */
+@interface MTRAttributePath : MTRClusterPath
+@property (nonatomic, readonly, copy) NSNumber * attribute;
+
++ (MTRAttributePath *)attributePathWithEndpointID:(NSNumber *)endpointID
+                                        clusterID:(NSNumber *)clusterID
+                                      attributeID:(NSNumber *)attributeID
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@end
+
+/**
+ * A path indicating a specific event that can be emitted on a device
+ * (i.e. without any wildcards).  There can be multiple instances of actual
+ * events for a given event path.
+ */
+@interface MTREventPath : MTRClusterPath
+@property (nonatomic, readonly, copy) NSNumber * event;
+
++ (MTREventPath *)eventPathWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                                  eventID:(NSNumber *)eventID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@end
+
+/**
+ * A path indicating a specific command on a device (i.e. without any
+ * wildcards).
+ */
+@interface MTRCommandPath : MTRClusterPath
+@property (nonatomic, readonly, copy) NSNumber * command;
+
++ (MTRCommandPath *)commandPathWithEndpointID:(NSNumber *)endpointID
+                                    clusterID:(NSNumber *)clusterID
+                                    commandID:(NSNumber *)commandID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@end
+
 @interface MTRBaseDevice : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -229,6 +282,18 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
                           completion:(MTRDeviceResponseHandler)completion
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+- (void)readWithAttributePaths:(NSArray<MTRAttributePath *> * _Nullable)attributePaths
+                    EventPaths:(NSArray<MTREventPath *> * _Nullable)eventPaths
+                        params:(MTRReadParams * _Nullable)params
+                         queue:(dispatch_queue_t)queue
+                    completion:(MTRDeviceResponseHandler)completion;
+
+- (void)subscribeWithAttributePaths:(NSArray<MTRAttributePath *> * _Nullable)attributePaths
+                         EventPaths:(NSArray<MTREventPath *> * _Nullable)eventPaths
+                             params:(MTRSubscribeParams * _Nullable)params
+                              queue:(dispatch_queue_t)queue
+                      reportHandler:(MTRDeviceResponseHandler)reportHandler
+            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished;
 /**
  * Write to attribute in a designated attribute path
  *
@@ -385,59 +450,6 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
                           reportHandler:(MTRDeviceResponseHandler)reportHandler
                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-@end
-
-/**
- * A path indicating a specific cluster on a device (i.e. without any
- * wildcards).
- */
-API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-@interface MTRClusterPath : NSObject <NSCopying>
-@property (nonatomic, readonly, copy) NSNumber * endpoint;
-@property (nonatomic, readonly, copy) NSNumber * cluster;
-
-+ (MTRClusterPath *)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-@end
-
-/**
- * A path indicating a specific attribute on a device (i.e. without any
- * wildcards).
- */
-@interface MTRAttributePath : MTRClusterPath
-@property (nonatomic, readonly, copy) NSNumber * attribute;
-
-+ (MTRAttributePath *)attributePathWithEndpointID:(NSNumber *)endpointID
-                                        clusterID:(NSNumber *)clusterID
-                                      attributeID:(NSNumber *)attributeID
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-@end
-
-/**
- * A path indicating a specific event that can be emitted on a device
- * (i.e. without any wildcards).  There can be multiple instances of actual
- * events for a given event path.
- */
-@interface MTREventPath : MTRClusterPath
-@property (nonatomic, readonly, copy) NSNumber * event;
-
-+ (MTREventPath *)eventPathWithEndpointID:(NSNumber *)endpointID
-                                clusterID:(NSNumber *)clusterID
-                                  eventID:(NSNumber *)eventID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-@end
-
-/**
- * A path indicating a specific command on a device (i.e. without any
- * wildcards).
- */
-@interface MTRCommandPath : MTRClusterPath
-@property (nonatomic, readonly, copy) NSNumber * command;
-
-+ (MTRCommandPath *)commandPathWithEndpointID:(NSNumber *)endpointID
-                                    clusterID:(NSNumber *)clusterID
-                                    commandID:(NSNumber *)commandID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 @end
 
 @interface MTRAttributeReport : NSObject
