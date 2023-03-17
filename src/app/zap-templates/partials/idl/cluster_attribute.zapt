@@ -1,5 +1,5 @@
 {{#unless isGlobalAttribute}}
-  {{! ensure indent }}{{#unless isWritableAttribute~}}
+  {{#unless isWritableAttribute~}}
   readonly {{!marker to place a space even with whitespace removal~}}
 {{~/unless~}}
 {{~!TODO: write only attributes should also be supported~}}
