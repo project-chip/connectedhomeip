@@ -201,6 +201,9 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emdrv/uartdrv/config",
         "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
       ]
+      if (enable_dic) {
+        defines += [ "DIC_ENABLE=1" ]
+      }
     }
 
     libs += [ "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a" ]

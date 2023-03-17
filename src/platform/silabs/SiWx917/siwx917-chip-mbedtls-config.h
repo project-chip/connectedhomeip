@@ -58,6 +58,13 @@ typedef void mbedtls_ecp_restart_ctx;
 #define MBEDTLS_PKCS1_V15
 #define MBEDTLS_RSA_NO_CRT
 #define MBEDTLS_CIPHER_MODE_CBC
+#define MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
+#define MBEDTLS_RSA_C
+#define MBEDTLS_SHA1_C
+#define MBEDTLS_SSL_IN_CONTENT_LEN 5120
+#define MBEDTLS_SSL_OUT_CONTENT_LEN 1560
+#define MBEDTLS_DEBUG_C
+#define MBEDTLS_CIPHER_MODE_WITH_PADDING
 #endif
 #define MBEDTLS_PLATFORM_SNPRINTF_MACRO snprintf
 
@@ -89,10 +96,6 @@ typedef void mbedtls_ecp_restart_ctx;
 #define MBEDTLS_KEY_EXCHANGE_ECDHE_ECDSA_ENABLED
 #define MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED
 #define MBEDTLS_KEY_EXCHANGE_PSK_ENABLED
-#ifdef DIC_ENABLE
-#define MBEDTLS_KEY_EXCHANGE_ECDHE_RSA_ENABLED
-#define MBEDTLS_RSA_C
-#endif
 #define MBEDTLS_MD_C
 #define MBEDTLS_OID_C
 #define MBEDTLS_PEM_PARSE_C
@@ -105,9 +108,6 @@ typedef void mbedtls_ecp_restart_ctx;
 #define MBEDTLS_PLATFORM_MEMORY
 #define MBEDTLS_SHA256_SMALLER
 #define MBEDTLS_SHA512_C
-#ifdef DIC_ENABLE
-#define MBEDTLS_SHA1_C
-#endif
 #define MBEDTLS_SSL_CLI_C
 #define MBEDTLS_SSL_COOKIE_C
 #define MBEDTLS_SSL_DTLS_ANTI_REPLAY
@@ -145,13 +145,6 @@ typedef void mbedtls_ecp_restart_ctx;
 #else
 #define MBEDTLS_SSL_MAX_CONTENT_LEN 768 /**< Maxium fragment length in bytes */
 #endif                                  // DIC
-#endif
-
-#ifdef DIC_ENABLE
-#define MBEDTLS_SSL_IN_CONTENT_LEN 5120
-#define MBEDTLS_SSL_OUT_CONTENT_LEN 1560
-#define MBEDTLS_DEBUG_C
-#define MBEDTLS_CIPHER_MODE_WITH_PADDING
 #endif
 
 #define MBEDTLS_SSL_CIPHERSUITES MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8

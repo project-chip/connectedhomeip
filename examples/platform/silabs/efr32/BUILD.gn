@@ -261,9 +261,6 @@ config("silabs-wifi-config") {
     # TODO: Change this macro once WF200 support is provided
     defines += [ "WIFI_ENABLE_SECURITY_WPA3=1" ]
   }
-  if (enable_dic) {
-    defines += [ "DIC_ENABLE=1" ]
-  }
 }
 
 source_set("efr32-common") {

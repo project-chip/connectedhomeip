@@ -65,13 +65,6 @@
 
 #define LWIP_SOCKET 0
 
-#ifdef DIC_ENABLE
-#define LWIP_ALTCP 1
-#define LWIP_ALTCP_TLS 1
-#define LWIP_ALTCP_TLS_MBEDTLS 1
-#define MEMP_ALTCP_PCB 1
-#endif // DIC_ENABLE
-
 #define LWIP_FREERTOS_USE_STATIC_TCPIP_TASK 1
 
 #define LWIP_RAW 1
