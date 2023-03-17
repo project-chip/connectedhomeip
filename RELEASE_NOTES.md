@@ -23,7 +23,7 @@ www.ti.com/simplelink.
 -   This update adds Matter support for TI's CC1354P10-6 Launchpad. This is the starting point for developing matter application on the CC135x and CC267x platforms. 
 
 ## Bug fixes
--   Updated for FreeRTOS tick time from 1msec to 10usec.
+-   None
 
 ## Known Issues
 - OTA feature for CC1354P10-6 is not supported in this release. This will be added soon. 
