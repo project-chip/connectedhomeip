@@ -35,7 +35,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
+#include <platform/cc13xx_26xx/OTAImageProcessorImpl.h>
 #endif
 
 #include <lib/support/CHIPMem.h>
@@ -171,7 +171,7 @@ int AppTask::Init()
     LED_Params ledParams;
     Button_Params buttonParams;
 
-    cc13x2_26x2LogInit();
+    cc13xx_26xxLogInit();
 
     // Init Chip memory management before the stack
     Platform::MemoryInit();
