@@ -35,8 +35,6 @@ env
 USE_WIFI=false
 USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
-USE_GIT_SHA_FOR_VERSION=false
-XY=""
 
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
 USAGE="./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]"
@@ -101,6 +99,12 @@ if [ "$#" == "0" ]; then
             Periodic query timeout variable for OTA in seconds
         rs91x_wpa3_only
             Support for WPA3 only mode on RS91x
+        sl_matter_version
+            Overwrite Matter software version
+        sl_matter_version_str
+            Overwrite Matter software version string
+        sl_hardware_version
+            Overwrite hardware version
         siwx917_commissionable_data
             Build with the commissionable data given in DeviceConfig.h (only for SiWx917)
         Presets
@@ -118,9 +122,6 @@ if [ "$#" == "0" ]; then
             use the silabs openthread library
         --use_chip_lwip_lib
             use the chip lwip library
-        --no-version
-            Skip the silabs formating for the Matter software version string
-            Currently : v1.0-<branchName>-<ShortCommitSha>
         --release
             Remove all logs and debugs features (including the LCD). Yield the smallest image size possible
         --docker
@@ -196,10 +197,6 @@ else
             #   optArgs+="openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/openthread\" openthread_efr32_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/src/src\""
             #    shift
             #    ;;
-            --no-version)
-                USE_GIT_SHA_FOR_VERSION=false
-                shift
-                ;;
             --release)
                 optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
                 shift
