@@ -218,7 +218,7 @@ class Efr32Builder(GnBuilder):
             self.extra_gn_options.append(
                 'sl_matter_version_str="v1.0-%s-%s"' % (branchName, shortCommitSha))
 
-        if "GSDK_ROOT" not in os.environ:
+        if "GSDK_ROOT" in os.environ:
             # EFR32 SDK is very large. If the SDK path is already known (the
             # case for pre-installed images), use it directly.
             self.extra_gn_options['efr32_sdk_root'] = os.environ['GSDK_ROOT']
