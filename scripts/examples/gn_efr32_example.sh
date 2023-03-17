@@ -35,6 +35,8 @@ env
 USE_WIFI=false
 USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
+USE_GIT_SHA_FOR_VERSION=false
+XY=""
 
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
 USAGE="./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]"
@@ -207,6 +209,13 @@ else
                 USE_DOCKER=true
                 shift
                 ;;
+
+            *"sl_matter_version_str="*)
+                optArgs+="$1 "
+                USE_GIT_SHA_FOR_VERSION=false
+                shift
+                ;;
+
             *)
                 if [ "$1" =~ *"use_rs9116=true"* ] || [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true
