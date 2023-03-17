@@ -38,8 +38,6 @@
  */
 #ifdef SL_MATTER_VERSION_STRING
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING SL_MATTER_VERSION_STRING
-#else
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.0"
 #endif
 
 /**
@@ -49,12 +47,10 @@
  */
 #ifdef SL_MATTER_VERSION
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION SL_MATTER_VERSION
-#else
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 1
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
+ * CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION
  *
  * The hardware version number assigned to device or product by the device vendor.  This
  * number is scoped to the device product id, and typically corresponds to a revision of the
@@ -62,9 +58,7 @@
  * This value is generally *not* incremented for device software versions.
  */
 #ifdef SL_HARDWARE_VERSION
-#define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION SL_HARDWARE_VERSION
-#else
-#define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 1
+#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION SL_HARDWARE_VERSION
 #endif
 
 #if defined(SL_WIFI)

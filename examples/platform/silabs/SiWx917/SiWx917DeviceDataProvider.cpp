@@ -371,13 +371,13 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetHardwareVersion(uint16_t & hardwareVers
     uint32_t hardwareVersion32;
 
     err = SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_HardwareVersion, hardwareVersion32);
-#if defined(CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION)
+#if defined(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        hardwareVersion32 = CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION;
+        hardwareVersion32 = CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION;
         err               = CHIP_NO_ERROR;
     }
-#endif // defined(CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION)
+#endif // defined(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION)
 
     hardwareVersion = static_cast<uint16_t>(hardwareVersion32);
     return err;
