@@ -46,34 +46,7 @@
 
   {{/zcl_events}}
   {{#chip_server_cluster_attributes}}
-  {{#unless isGlobalAttribute}}
-  {{! ensure indent }}{{#unless isWritableAttribute~}}
-    readonly {{!marker to place a space even with whitespace removal~}}
-  {{~/unless~}}
-  {{~!TODO: write only attributes should also be supported~}}
-  {{~#unless isReportableAttribute~}}
-    nosubscribe {{!marker to place a space even with whitespace removal~}}
-  {{~/unless~}}
-  {{~!Removes spaces~}} attribute {{!ensure space}}
-    {{~#chip_access_elements entity="attribute"~}}
-      {{~#first~}}access({{~/first~}}
-      {{~#not_first~}}, {{/not_first~}}
-        {{operation}}: {{role}} 
-      {{~#last}}) {{/last~}}
-    {{~/chip_access_elements~}}
-    {{~#if isNullable~}}
-      nullable {{!marker to place a space even with whitespace removal~}}
-    {{~/if~}} {{type}}
-    {{~#unless isArray~}}
-      {{~#if (isString type)~}}
-        {{~#if maxLength~}} 
-          <{{maxLength}}> 
-        {{~/if~}}
-      {{~/if~}}
-    {{/unless}} {{asLowerCamelCase name~}}
-    {{~#if isArray~}} [] {{~/if}} = {{code~}}
-    ;
-  {{/unless~}}
+    {{>idl_cluster_attribute}}
   {{/chip_server_cluster_attributes~}}
 
   {{~!--Global attributes: spec 7.13 describes these as mandatory --}}

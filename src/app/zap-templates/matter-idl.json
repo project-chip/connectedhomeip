@@ -31,6 +31,10 @@
             "name": "idl_command_response_struct",
             "path": "partials/idl/command_response_struct.zapt"
         }
+        {
+            "name": "idl_cluster_attribute",
+            "path": "partials/idl/cluster_attribute.zapt"
+        },
     ],
     "templates": [
         {
