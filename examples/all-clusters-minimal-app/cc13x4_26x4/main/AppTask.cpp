@@ -216,7 +216,7 @@ int AppTask::Init()
         while (1)
             ;
     }
- 
+
 #ifdef CONFIG_OPENTHREAD_MTD_SED
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
 #elif CONFIG_OPENTHREAD_MTD

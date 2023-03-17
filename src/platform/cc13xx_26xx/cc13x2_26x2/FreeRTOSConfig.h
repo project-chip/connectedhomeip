@@ -64,7 +64,7 @@
 /* FreeRTOS heap size is 0 because currently "bget" heap is the
  only heap available, for both FreeRTOS and application */
 //#define configTOTAL_HEAP_SIZE           ( ( size_t ) ( 0 ) )
-#define configTOTAL_HEAP_SIZE ((size_t)(0))
+#define configTOTAL_HEAP_SIZE ((size_t) (0))
 #define configSUPPORT_STATIC_ALLOCATION 1
 #define configAPPLICATION_ALLOCATED_HEAP 1
 

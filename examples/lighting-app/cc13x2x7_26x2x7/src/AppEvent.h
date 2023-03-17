@@ -45,7 +45,7 @@ struct AppEvent
 
     enum AppEventIdentifyType
     {
-        kAppEventIdentifyType_Blink = 0, 
+        kAppEventIdentifyType_Blink = 0,
         kAppEventIdentifyType_Breathe,
         kAppEventIdentifyType_Okay,
         kAppEventIdentifyType_Finish,
@@ -76,7 +76,7 @@ struct AppEvent
         struct
         {
             enum AppEventIdentifyType Type;
-        }IdentifyEvent;
+        } IdentifyEvent;
     };
 
     EventHandler Handler;

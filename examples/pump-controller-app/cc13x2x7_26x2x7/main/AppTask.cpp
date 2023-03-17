@@ -181,7 +181,6 @@ int AppTask::Init()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
 
-
     // Initialize LEDs
     PLAT_LOG("Initialize LEDs");
     LED_init();

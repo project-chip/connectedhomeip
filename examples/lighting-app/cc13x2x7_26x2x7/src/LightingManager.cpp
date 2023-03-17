@@ -30,8 +30,6 @@ LightingManager LightingManager::sLight;
 
 TimerHandle_t sLightTimer;
 
-
-
 CHIP_ERROR LightingManager::Init()
 {
     // Create FreeRTOS sw timer for light timer.
@@ -51,8 +49,7 @@ CHIP_ERROR LightingManager::Init()
     // read current on/off value on endpoint one.
     OnOffServer::Instance().getOnOffValue(1, &currentLedState);
 
-    mState                 = currentLedState ? kState_OnCompleted : kState_OffCompleted;
-    
+    mState = currentLedState ? kState_OnCompleted : kState_OffCompleted;
 
     return CHIP_NO_ERROR;
 }
@@ -144,9 +141,9 @@ void LightingManager::TimerEventHandler(TimerHandle_t xTimer)
     AppEvent event;
     event.Type               = AppEvent::kEventType_AppEvent;
     event.LightEvent.Context = light;
-  
+
     event.Handler = ActuatorMovementTimerEventHandler;
-    
+
     AppTask::GetAppTask().PostEvent(&event);
 }
 
@@ -172,7 +169,7 @@ void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
     if (actionCompleted != INVALID_ACTION)
     {
         if (light->mActionCompleted_CB)
-        {   
+        {
             light->mActionCompleted_CB(actionCompleted);
         }
     }
