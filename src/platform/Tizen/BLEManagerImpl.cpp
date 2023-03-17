@@ -109,7 +109,8 @@ void BLEManagerImpl::GattConnectionStateChangedCb(int result, bool connected, co
         sInstance.HandleConnectionEvent(connected, remoteAddress);
         break;
     default:
-        ChipLogError(DeviceLayer, "%s", connected ? "Connection req failed" : "Disconnection req failed");
+        ChipLogError(DeviceLayer, "%s: %s", connected ? "Connection req failed" : "Disconnection req failed",
+                     get_error_message(result));
         if (connected)
             sInstance.NotifyHandleConnectFailed(CHIP_ERROR_INTERNAL);
     }
