@@ -108,7 +108,10 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
     if (strongDelegate && mQueue && strongController) {
         if ([strongDelegate respondsToSelector:@selector(controller:readCommissioningInfo:)]) {
             dispatch_async(mQueue, ^{
-                NSDictionary<NSString *, id> *info = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:vendorId], @"vendorID", [NSNumber numberWithUnsignedShort:productId], @"productID", [NSNumber numberWithUnsignedShort:wifiEndpointId], @"wifiEndpointID", [NSNumber numberWithUnsignedShort:threadEndpointId], @"threadEndpointIDiitittidf", nil];
+                NSDictionary<NSString *, id> * info = [NSDictionary
+                    dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:vendorId], @"vendorID",
+                    [NSNumber numberWithUnsignedShort:productId], @"productID", [NSNumber numberWithUnsignedShort:wifiEndpointId],
+                    @"wifiEndpointID", [NSNumber numberWithUnsignedShort:threadEndpointId], @"threadEndpointIDiitittidf", nil];
                 [strongDelegate controller:strongController readCommissioningInfo:info];
             });
         }
