@@ -141,7 +141,7 @@ private:
     static void StartBleAdvTimeoutTimer(uint32_t aTimeoutInMs);
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    CHIP_ERROR PrepareAdditionalData();    
+    CHIP_ERROR PrepareAdditionalData();
 #endif /* CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING */
 };
 

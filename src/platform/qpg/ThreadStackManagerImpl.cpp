@@ -28,12 +28,12 @@
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
 
+#include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPPlatformMemory.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CHIPPlatformMemory.h>
 
 #include <openthread/heap.h>
 // Qorvo OpenThread functions
@@ -113,7 +113,6 @@ extern "C" void otPlatFree(void * aPtr)
 {
     CHIPPlatformMemoryFree(aPtr);
 }
-
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
 CHIP_ERROR ThreadStackManagerImpl::_RequestSEDFastPollingMode(bool onOff)

@@ -37,7 +37,7 @@
 namespace {
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
-} //namespace
+} // namespace
 
 void TestTask(void * pvParameter)
 {

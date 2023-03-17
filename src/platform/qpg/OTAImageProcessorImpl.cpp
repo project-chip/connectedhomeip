@@ -48,8 +48,8 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
 
     if (currentSwVersion != targetVersion)
     {
-        ChipLogError(SoftwareUpdate, "Current software version = %" PRIu32 ", expected software version = %" PRIu32, currentSwVersion,
-                     targetVersion);
+        ChipLogError(SoftwareUpdate, "Current software version = %" PRIu32 ", expected software version = %" PRIu32,
+                     currentSwVersion, targetVersion);
         return CHIP_ERROR_INCORRECT_STATE;
     }
 

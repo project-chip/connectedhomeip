@@ -74,9 +74,8 @@ CHIP_ERROR FactoryDataProvider::SetSetupDiscriminator(uint16_t setupDiscriminato
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-
-#define  DEVICE_ATTESTATION_PRIVATE_KEY_LEN   32
-#define  DEVICE_ATTESTATION_PUBLIC_KEY_LEN    65
+#define DEVICE_ATTESTATION_PRIVATE_KEY_LEN 32
+#define DEVICE_ATTESTATION_PUBLIC_KEY_LEN 65
 
 CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
 {
@@ -97,7 +96,7 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
     status = qvCHIP_FactoryDataGetValue(TAG_ID_DEVICE_ATTESTATION_PRIVATE_KEY, qorvoDacPrivateKey.data(), qorvoDacPrivateKey.size(),
                                         &tlvDataLength);
 
-    VerifyOrReturnError(QV_STATUS_NO_ERROR == status , MapQorvoError(status));
+    VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     ReturnErrorOnFailure(MapQorvoError(status));
 
     VerifyOrReturnError(tlvDataLength <= qorvoDacPrivateKey.size(), CHIP_ERROR_INVALID_LIST_LENGTH);
@@ -127,9 +126,10 @@ CHIP_ERROR FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscrimina
     qvStatus_t status;
     uint32_t tlvDataLength;
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_SETUP_DISCRIMINATOR, (uint8_t *) &setupDiscriminator, sizeof(setupDiscriminator), &tlvDataLength);
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_SETUP_DISCRIMINATOR, (uint8_t *) &setupDiscriminator, sizeof(setupDiscriminator),
+                                        &tlvDataLength);
 
-    VerifyOrReturnError(QV_STATUS_NO_ERROR == status , MapQorvoError(status));
+    VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength == sizeof(setupDiscriminator), CHIP_ERROR_INVALID_LIST_LENGTH);
 
     return CHIP_NO_ERROR;
@@ -140,13 +140,13 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pIterationCount(uint32_t & iterationCou
     qvStatus_t status;
     uint32_t tlvDataLength;
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_SPAKE2_ITERATION_COUNT, (uint8_t *) &iterationCount, sizeof(iterationCount), &tlvDataLength);
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_SPAKE2_ITERATION_COUNT, (uint8_t *) &iterationCount, sizeof(iterationCount),
+                                        &tlvDataLength);
 
-    VerifyOrReturnError(QV_STATUS_NO_ERROR == status , MapQorvoError(status));
+    VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength == sizeof(iterationCount), CHIP_ERROR_INVALID_LIST_LENGTH);
 
     return CHIP_NO_ERROR;
-
 }
 
 CHIP_ERROR FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
@@ -154,14 +154,14 @@ CHIP_ERROR FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
     qvStatus_t status;
     uint32_t tlvDataLength;
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_SPAKE2_SETUP_PASSCODE, (uint8_t *) &setupPasscode, sizeof(setupPasscode), &tlvDataLength);
+    status =
+        qvCHIP_FactoryDataGetValue(TAG_ID_SPAKE2_SETUP_PASSCODE, (uint8_t *) &setupPasscode, sizeof(setupPasscode), &tlvDataLength);
 
-    VerifyOrReturnError(QV_STATUS_NO_ERROR == status , MapQorvoError(status));
+    VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength == sizeof(setupPasscode), CHIP_ERROR_INVALID_LIST_LENGTH);
 
     return CHIP_NO_ERROR;
 }
-
 
 CHIP_ERROR FactoryDataProvider::GetVendorId(uint16_t & vendorId)
 {
@@ -170,7 +170,7 @@ CHIP_ERROR FactoryDataProvider::GetVendorId(uint16_t & vendorId)
 
     status = qvCHIP_FactoryDataGetValue(TAG_ID_VENDOR_ID, (uint8_t *) &vendorId, sizeof(vendorId), &tlvDataLength);
 
-    VerifyOrReturnError(QV_STATUS_NO_ERROR == status , MapQorvoError(status));
+    VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength == sizeof(vendorId), CHIP_ERROR_INVALID_LIST_LENGTH);
 
     return CHIP_NO_ERROR;
@@ -183,7 +183,7 @@ CHIP_ERROR FactoryDataProvider::GetProductId(uint16_t & productId)
 
     status = qvCHIP_FactoryDataGetValue(TAG_ID_PRODUCT_ID, (uint8_t *) &productId, sizeof(productId), &tlvDataLength);
 
-    VerifyOrReturnError(QV_STATUS_NO_ERROR == status , MapQorvoError(status));
+    VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength == sizeof(productId), CHIP_ERROR_INVALID_LIST_LENGTH);
 
     return CHIP_NO_ERROR;
@@ -194,7 +194,8 @@ CHIP_ERROR FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
     qvStatus_t status;
     uint32_t tlvDataLength;
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_HARDWARE_VERSION, (uint8_t *) &hardwareVersion, sizeof(hardwareVersion), &tlvDataLength);
+    status =
+        qvCHIP_FactoryDataGetValue(TAG_ID_HARDWARE_VERSION, (uint8_t *) &hardwareVersion, sizeof(hardwareVersion), &tlvDataLength);
 
     VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength == sizeof(hardwareVersion), CHIP_ERROR_INVALID_LIST_LENGTH);
@@ -215,7 +216,7 @@ CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & 
     VerifyOrReturnError(tlvDataLength == sizeof(buf), CHIP_ERROR_INVALID_LIST_LENGTH);
 
     uint8_t * ptr = buf;
-    year = *(uint16_t *) ptr;
+    year          = *(uint16_t *) ptr;
     ptr += 2;
     month = *ptr;
     ptr += 1;
@@ -246,7 +247,7 @@ CHIP_ERROR FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
 
     status = qvCHIP_FactoryDataGetValue(TAG_ID_VENDOR_NAME, (uint8_t *) buf, bufSize, &tlvDataLength);
 
-    VerifyOrReturnError(QV_STATUS_NO_ERROR == status , MapQorvoError(status));
+    VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength <= bufSize, CHIP_ERROR_INVALID_LIST_LENGTH);
 
     return CHIP_NO_ERROR;
@@ -259,7 +260,7 @@ CHIP_ERROR FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
 
     status = qvCHIP_FactoryDataGetValue(TAG_ID_PRODUCT_NAME, (uint8_t *) buf, bufSize, &tlvDataLength);
 
-    VerifyOrReturnError(QV_STATUS_NO_ERROR == status , MapQorvoError(status));
+    VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength <= bufSize, CHIP_ERROR_INVALID_LIST_LENGTH);
 
     return CHIP_NO_ERROR;
@@ -272,20 +273,18 @@ CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 
     status = qvCHIP_FactoryDataGetValue(TAG_ID_SERIAL_NUMBER, (uint8_t *) buf, bufSize, &tlvDataLength);
 
-    VerifyOrReturnError(QV_STATUS_NO_ERROR == status , MapQorvoError(status));
+    VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength <= bufSize, CHIP_ERROR_INVALID_LIST_LENGTH);
 
     return CHIP_NO_ERROR;
 }
-
-
 
 CHIP_ERROR FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
 {
     qvStatus_t status;
     uint32_t tlvDataLength;
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_HARDWARE_VERSION_STRING, (uint8_t * ) buf, bufSize, &tlvDataLength);
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_HARDWARE_VERSION_STRING, (uint8_t *) buf, bufSize, &tlvDataLength);
 
     VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength <= bufSize, CHIP_ERROR_INVALID_LIST_LENGTH);
@@ -314,7 +313,8 @@ CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & ou
     qvStatus_t status;
     uint32_t tlvDataLength;
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_CERTIFICATION_DECLARATION, outBufferSpan.data(), outBufferSpan.size(), &tlvDataLength);
+    status =
+        qvCHIP_FactoryDataGetValue(TAG_ID_CERTIFICATION_DECLARATION, outBufferSpan.data(), outBufferSpan.size(), &tlvDataLength);
 
     VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength <= outBufferSpan.size(), CHIP_ERROR_INVALID_LIST_LENGTH);
@@ -329,7 +329,8 @@ CHIP_ERROR FactoryDataProvider::GetFirmwareInformation(MutableByteSpan & firmwar
     qvStatus_t status;
     uint32_t tlvDataLength;
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_FIRMWARE_INFORMATION, firmwareInformationSpan.data(), firmwareInformationSpan.size(), &tlvDataLength);
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_FIRMWARE_INFORMATION, firmwareInformationSpan.data(), firmwareInformationSpan.size(),
+                                        &tlvDataLength);
 
     VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength <= firmwareInformationSpan.size(), CHIP_ERROR_INVALID_LIST_LENGTH);
@@ -344,7 +345,8 @@ CHIP_ERROR FactoryDataProvider::GetDeviceAttestationCert(MutableByteSpan & attes
     qvStatus_t status;
     uint32_t tlvDataLength;
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_DEVICE_ATTESTATION_CERTIFICATE, attestationCertSpan.data(), attestationCertSpan.size(), &tlvDataLength);
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_DEVICE_ATTESTATION_CERTIFICATE, attestationCertSpan.data(),
+                                        attestationCertSpan.size(), &tlvDataLength);
 
     VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength <= attestationCertSpan.size(), CHIP_ERROR_INVALID_LIST_LENGTH);
@@ -359,7 +361,8 @@ CHIP_ERROR FactoryDataProvider::GetProductAttestationIntermediateCert(MutableByt
     qvStatus_t status;
     uint32_t tlvDataLength;
 
-    status = qvCHIP_FactoryDataGetValue(TAG_ID_PRODUCT_ATTESTATION_INTERMEDIATE_CERTIFICATE, intermediateCertSpan.data(), intermediateCertSpan.size(), &tlvDataLength);
+    status = qvCHIP_FactoryDataGetValue(TAG_ID_PRODUCT_ATTESTATION_INTERMEDIATE_CERTIFICATE, intermediateCertSpan.data(),
+                                        intermediateCertSpan.size(), &tlvDataLength);
 
     VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength <= intermediateCertSpan.size(), CHIP_ERROR_INVALID_LIST_LENGTH);
@@ -406,7 +409,7 @@ CHIP_ERROR FactoryDataProvider::GetEnableKey(MutableByteSpan & enableKeySpan)
 
     status = qvCHIP_FactoryDataGetValue(TAG_ID_ENABLE_KEY, enableKeySpan.data(), enableKeySpan.size(), &tlvDataLength);
 
-    VerifyOrReturnError(QV_STATUS_NO_ERROR == status , MapQorvoError(status));
+    VerifyOrReturnError(QV_STATUS_NO_ERROR == status, MapQorvoError(status));
     VerifyOrReturnError(tlvDataLength <= enableKeySpan.size(), CHIP_ERROR_INVALID_LIST_LENGTH);
 
     enableKeySpan.reduce_size(tlvDataLength);

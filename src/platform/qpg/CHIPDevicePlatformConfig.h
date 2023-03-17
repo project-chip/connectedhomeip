@@ -67,7 +67,7 @@
 
 // To eliminate impact of random delay required in BLE spec,
 // lower max times to stay in Matter spec ranges.
-#define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX 80 // 50ms
+#define CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX 80  // 50ms
 #define CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX 960 // 600ms
 
 // ========== Platform-specific Cluster Overrides =========

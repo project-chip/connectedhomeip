@@ -105,11 +105,10 @@ CHIP_ERROR BLEManagerImpl::_Init()
     appCbacks.cccCback      = _handleTXCharCCCDWrite;
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    qvCHIP_BleSetUUIDs(chipUUID_CHIPoBLE_Service, chipUUID_CHIPoBLEChar_TX.bytes,
-                       chipUUID_CHIPoBLEChar_RX.bytes, chipUUID_CHIPoBLEChar_C3.bytes);
+    qvCHIP_BleSetUUIDs(chipUUID_CHIPoBLE_Service, chipUUID_CHIPoBLEChar_TX.bytes, chipUUID_CHIPoBLEChar_RX.bytes,
+                       chipUUID_CHIPoBLEChar_C3.bytes);
 #else
-    qvCHIP_BleSetUUIDs(chipUUID_CHIPoBLE_Service, chipUUID_CHIPoBLEChar_TX.bytes,
-                       chipUUID_CHIPoBLEChar_RX.bytes, nullptr);
+    qvCHIP_BleSetUUIDs(chipUUID_CHIPoBLE_Service, chipUUID_CHIPoBLEChar_TX.bytes, chipUUID_CHIPoBLEChar_RX.bytes, nullptr);
 #endif /* CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING */
 
     qvCHIP_BleInit(&appCbacks);
@@ -982,10 +981,9 @@ CHIP_ERROR BLEManagerImpl::PrepareAdditionalData()
                                                                          additionalDataFields);
     SuccessOrExit(err);
 
-    if(!additionalDataHandle.IsNull())
+    if (!additionalDataHandle.IsNull())
     {
         err = MapBLEError(qvCHIP_BleWriteC3Attr(additionalDataHandle->DataLength(), additionalDataHandle->Start()));
-        
     }
 
 exit:
