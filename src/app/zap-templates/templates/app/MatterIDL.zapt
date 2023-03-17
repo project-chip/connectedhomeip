@@ -5,7 +5,7 @@
 {{>idl_structure_definition extraIndent=0}}
 
 {{/chip_shared_structs}}
-{{#chip_clusters}}
+{{#all_user_clusters}}
 {{~side}} cluster {{asUpperCamelCase name}} = {{code}} {
   {{#zcl_enums}}
   enum {{asUpperCamelCase name}} : ENUM{{multiply size 8}} {
@@ -104,7 +104,7 @@
   {{/if}}
 }
 
-{{/chip_clusters}}
+{{/all_user_clusters}}
 {{#user_endpoints}}
 endpoint {{endpointId}} {
   {{#if deviceIdentifier}}
