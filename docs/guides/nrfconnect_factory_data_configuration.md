@@ -22,23 +22,20 @@ For the nRF Connect platform, the factory data is stored by default in a
 separate partition of the internal flash memory. This helps to keep the factory
 data secure by applying hardware write protection.
 
-> Note: Due to hardware limitations, in the nRF Connect platform, protection
+> **Note:** Due to hardware limitations, in the nRF Connect platform, protection
 > against writing can be applied only to the internal memory partition. The
 > [Fprotect](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/libraries/others/fprotect.html)
 > is the hardware flash protection driver, and we used it to ensure write
 > protection of the factory data partition in internal flash memory.
 
-<img src="../../examples/platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
-<img src="../../examples/platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
-
 <hr>
 
 -   [Overview](#overview)
-    -   [Factory data components](#factory-data-component-table)
+    -   [Factory data component table](#factory-data-component-table)
     -   [Factory data format](#factory-data-format)
 -   [Enabling factory data support](#enabling-factory-data-support)
 -   [Generating factory data](#generating-factory-data)
-    -   [Creating factory data JSON file with the first script](#creating-factory-data-json-file-with-the-first-script)
+    -   [Creating the factory data JSON file with the first script](#creating-the-factory-data-json-file-with-the-first-script)
     -   [How to set user data](#how-to-set-user-data)
         -   [How to handle user data](#how-to-handle-user-data)
     -   [Verifying using the JSON Schema tool](#verifying-using-the-json-schema-tool)
@@ -46,7 +43,7 @@ data secure by applying hardware write protection.
         -   [Option 2: Using a website validator](#option-2-using-a-website-validator)
         -   [Option 3: Using the nRF Connect Python script](#option-3-using-the-nrf-connect-python-script)
     -   [Preparing factory data partition on a device](#preparing-factory-data-partition-on-a-device)
-    -   [Creating the factory data partition with the second script](#creating-a-factory-data-partition-with-the-second-script)
+    -   [Creating a factory data partition with the second script](#creating-a-factory-data-partition-with-the-second-script)
 -   [Building an example with factory data](#building-an-example-with-factory-data)
     -   [Providing factory data parameters as a build argument list](#providing-factory-data-parameters-as-a-build-argument-list)
     -   [Setting factory data parameters using interactive Kconfig interfaces](#setting-factory-data-parameters-using-interactive-kconfig-interfaces)
@@ -81,8 +78,8 @@ For more information about preparing a factory data accessor, see the section
 about
 [using own factory data implementation](#using-own-factory-data-implementation).
 
-> Note: Encryption and security of the factory data partition is not provided
-> yet for this feature.
+> **Note:** Encryption and security of the factory data partition is not
+> provided yet for this feature.
 
 ### Factory data component table
 
@@ -181,10 +178,10 @@ partition into the device's flash memory.
 
 You can use the second script without invoking the first one by providing a JSON
 file written in another way. To make sure that the JSON file is correct and the
-device is able to read out parameters, verify the file using the
-[JSON schema](#verifying-using-the-json-schema-tool).
+device is able to read out parameters,
+[verify the file using the JSON schema tool](#verifying-using-the-json-schema-tool).
 
-### Creating factory data JSON file with the first script
+### Creating the factory data JSON file with the first script
 
 A Matter device needs a proper factory data partition stored in the flash memory
 to read out all required parameters during startup. To simplify the factory data
@@ -199,9 +196,9 @@ To use this script, complete the following steps:
 
 2. Run the script with `-h` option to see all possible options:
 
-```
-$ python scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py -h
-```
+    ```
+    $ python scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py -h
+    ```
 
 3. Prepare a list of arguments:
 
@@ -237,18 +234,19 @@ $ python scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py -h
 
     - Automatic:
 
-    ```
-    --chip_cert_path <path to chip-cert executable>
-    ```
+        ```
+        --chip_cert_path <path to chip-cert executable>
+        ```
 
-    > Note: To generate new certificates, you need the `chip-cert` executable.
-    > See the note at the end of this section to learn how to get it.
+    > **Note:** To generate new certificates, you need the `chip-cert`
+    > executable. See the note at the end of this section to learn how to get
+    > it.
 
     - Manual:
 
-    ```
-    --dac_cert <path to DAC certificate>.der --dac_key <path to DAC key>.der --pai_cert <path to PAI certificate>.der
-    ```
+        ```
+        --dac_cert <path to DAC certificate>.der --dac_key <path to DAC key>.der --pai_cert <path to PAI certificate>.der
+        ```
 
     e. (optional) Add the new unique ID for rotating device ID using one of the
     following options:
@@ -289,9 +287,9 @@ $ python scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py -h
 
 4. Run the script using the prepared list of arguments:
 
-```
-$ python generate_nrfconnect_chip_factory_data.py <arguments>
-```
+    ```
+    $ python generate_nrfconnect_chip_factory_data.py <arguments>
+    ```
 
 For example, a final invocation of the Python script can look similar to the
 following one:
@@ -324,11 +322,11 @@ JSON file is verified using the prepared JSON Schema.
 
 If the script finishes successfully, go to the location you provided with the
 `-o` argument. Use the JSON file you find there when
-[generating the factory data partition](#generating-factory-data).
+[generating factory data](#generating-factory-data).
 
-> Note: Generating new certificates is optional if default vendor and product
-> IDs are used and requires providing a path to the `chip-cert` executable. To
-> get it, complete the following steps:
+> **Note:** Generating new certificates is optional if default vendor and
+> product IDs are used and requires providing a path to the `chip-cert`
+> executable. To get it, complete the following steps:
 >
 > 1.  Navigate to the `connectedhomeip` root directory.
 > 2.  In a terminal, run the command:
@@ -337,8 +335,8 @@ If the script finishes successfully, go to the location you provided with the
 > 3.  Add the `connectedhomeip/src/tools/chip-cert/out/chip-cert` path as an
 >     argument of `--chip_cert_path` for the Python script.
 
-> Note: By default, overwriting the existing JSON file is disabled. This means
-> that you cannot create a new JSON file with the same name in the exact
+> **Note:** By default, overwriting the existing JSON file is disabled. This
+> means that you cannot create a new JSON file with the same name in the exact
 > location as an existing file. To allow overwriting, add the `--overwrite`
 > option to the argument list of the Python script.
 
@@ -407,23 +405,23 @@ cast the result to your own purpose.
 The code example of how to read all fields from the JSON example one by one can
 look like follows:
 
-    ```
-    chip::DeviceLayer::FactoryDataProvider factoryDataProvider;
+```
+chip::DeviceLayer::FactoryDataProvider factoryDataProvider;
 
-    factoryDataProvider.Init();
+factoryDataProvider.Init();
 
-    uint8_t user_name[12];
-    size_t name_len = sizeof(user_name);
-    factoryDataProvider.GetUserKey("name", user_name, name_len);
+uint8_t user_name[12];
+size_t name_len = sizeof(user_name);
+factoryDataProvider.GetUserKey("name", user_name, name_len);
 
-    int32_t version;
-    size_t version_len = sizeof(version);
-    factoryDataProvider.GetUserKey("version", &version, version_len);
+int32_t version;
+size_t version_len = sizeof(version);
+factoryDataProvider.GetUserKey("version", &version, version_len);
 
-    uint8_t revision[5];
-    size_t revision_len = sizeof(revision);
-    factoryDataProvider.GetUserKey("revision", revision, revision_len);
-    ```
+uint8_t revision[5];
+size_t revision_len = sizeof(revision);
+factoryDataProvider.GetUserKey("revision", revision, revision_len);
+```
 
 ### Verifying using the JSON Schema tool
 
@@ -439,17 +437,17 @@ machine, complete the following steps:
 
 1. Install the `php-json-schema` package:
 
-```
-$ sudo apt install php-json-schema
-```
+    ```
+    $ sudo apt install php-json-schema
+    ```
 
 2. Run the following command, with _<path_to_JSON_file>_ and
    _<path_to_schema_file>_ replaced with the paths to the JSON file and the
    Schema file, respectively:
 
-```
-$ validate-json <path_to_JSON_file> <path_to_schema_file>
-```
+    ```
+    $ validate-json <path_to_JSON_file> <path_to_schema_file>
+    ```
 
 The tool returns empty output in case of success.
 
@@ -488,11 +486,11 @@ as an additional argument. To do this, complete the following steps:
 2. Run the following command (remember to replace the _<path_to_schema>_
    variable):
 
-```
-$ python generate_nrfconnect_chip_factory_data.py --schema <path_to_schema>
-```
+    ```
+    $ python generate_nrfconnect_chip_factory_data.py --schema <path_to_schema>
+    ```
 
-> Note: To learn more about the JSON schema, visit
+> **Note:** To learn more about the JSON schema, visit
 > [this unofficial JSON Schema tool usage website](https://json-schema.org/understanding-json-schema/).
 
 ### Preparing factory data partition on a device
@@ -585,22 +583,22 @@ to generate the factory data partition:
 1. Navigate to the _connectedhomeip_ root directory
 2. Run the following command pattern:
 
-```
-$ python scripts/tools/nrfconnect/nrfconnect_generate_partition.py -i <path_to_JSON_file> -o <path_to_output> --offset <partition_address_in_memory> --size <partition_size>
-```
+    ```
+    $ python scripts/tools/nrfconnect/nrfconnect_generate_partition.py -i <path_to_JSON_file> -o <path_to_output> --offset <partition_address_in_memory> --size <partition_size>
+    ```
 
-In this command:
+    In this command:
 
--   _<path_to_JSON_file>_ is a path to the JSON file containing appropriate
-    factory data.
--   _<path_to_output>_ is a path to an output file without any prefix. For
-    example, providing `/build/output` as an argument will result in creating
-    `/build/output.hex` and `/build/output.bin`.
--   _<partition_address_in_memory>_ is an address in the device's persistent
-    storage area where a partition data set is to be stored.
--   _<partition_size>_ is a size of partition in the device's persistent storage
-    area. New data is checked according to this value of the JSON data to see if
-    it fits the size.
+    - _<path_to_JSON_file>_ is a path to the JSON file containing appropriate
+      factory data.
+    - _<path_to_output>_ is a path to an output file without any prefix. For
+      example, providing `/build/output` as an argument will result in creating
+      `/build/output.hex` and `/build/output.bin`.
+    - _<partition_address_in_memory>_ is an address in the device's persistent
+      storage area where a partition data set is to be stored.
+    - _<partition_size>_ is a size of partition in the device's persistent
+      storage area. New data is checked according to this value of the JSON data
+      to see if it fits the size.
 
 To see the optional arguments for the script, use the following command:
 
@@ -694,7 +692,7 @@ snippet:
 (91a9c12a7c80700a31ddcfa7fce63e44) A rotating device id unique i
 ```
 
-> Note: To get more information about how to use the interactive Kconfig
+> **Note:** To get more information about how to use the interactive Kconfig
 > interfaces, read the
 > [Kconfig docummentation](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/build/kconfig/menuconfig.html).
 
@@ -766,13 +764,14 @@ $ west flash
 ## Using own factory data implementation
 
 The [factory data generation process](#generating-factory-data) described above
-is only an example valid for the nRF Connect platform. You can well create a HEX
-file containing all [factory data components](#factory-data-component-table) in
-any format and then implement a parser to read out all parameters and pass them
-to a provider. Each manufacturer can implement a factory data set on its own by
-implementing a parser and a factory data accessor inside the Matter stack. Use
-the [nRF Connect Provider](../../src/platform/nrfconnect/FactoryDataProvider.h)
-and [FactoryDataParser](../../src/platform/nrfconnect/FactoryDataParser.h) as
+is only an example valid for the nRF Connect platform. You can also create a HEX
+file containing all components from the
+[factory data component table](#factory-data-component-table) in any format and
+then implement a parser to read out all parameters and pass them to a provider.
+Each manufacturer can implement a factory data set on its own by implementing a
+parser and a factory data accessor inside the Matter stack. Use the
+[nRF Connect Provider](../../src/platform/nrfconnect/FactoryDataProvider.h) and
+[FactoryDataParser](../../src/platform/nrfconnect/FactoryDataParser.h) as
 examples.
 
 You can read the factory data set from the device's flash memory in different
@@ -780,7 +779,7 @@ ways, depending on the purpose and the format. In the nRF Connect example, the
 factory data is stored in the CBOR format. The device uses the
 [Factory Data Parser](../../src/platform/nrfconnect/FactoryDataParser.h) to read
 out raw data, decode it, and store it in the `FactoryData` structure. The
-[Factor Data Provider](../../src/platform/nrfconnect/FactoryDataProvider.c)
+[Factor Data Provider](../../src/platform/nrfconnect/FactoryDataProvider.cpp)
 implementation uses this parser to get all needed factory data parameters and
 provide them to the Matter core.
 
@@ -794,7 +793,7 @@ override the inherited classes, complete the following steps:
 
 1. Override the following methods:
 
-```
+    ```
     // ===== Members functions that implement the DeviceAttestationCredentialsProvider
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & outBuffer) override;
     CHIP_ERROR GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer) override;
@@ -821,7 +820,7 @@ override the inherited classes, complete the following steps:
     CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override;
     CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
-```
+    ```
 
 2. Move the newly created parser and provider files to your project directory.
 3. Add the files to the `CMakeList.txt` file.
@@ -829,11 +828,11 @@ override the inherited classes, complete the following steps:
    factory data providers to start using your own implementation of factory data
    parser and provider. This can be done in one of the following ways:
 
--   Add `CONFIG_FACTORY_DATA_CUSTOM_BACKEND=y` Kconfig setting to `prj.conf`
-    file.
--   Build an example with following option (replace _<build_target>_ with your
-    board name, for example `nrf52840dk_nrf52840`):
+    - Add `CONFIG_FACTORY_DATA_CUSTOM_BACKEND=y` Kconfig setting to `prj.conf`
+      file.
+    - Build an example with following option (replace _<build_target>_ with your
+      board name, for example `nrf52840dk_nrf52840`):
 
-```
-    $ west build -b <build_target> -- -DCONFIG_FACTORY_DATA_CUSTOM_BACKEND=y
-```
+        ```
+        $ west build -b <build_target> -- -DCONFIG_FACTORY_DATA_CUSTOM_BACKEND=y
+        ```

@@ -242,7 +242,7 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
         }
         else
         {
-            GetCover().StepToward(OperationalState::MovingUpOrOpen, mTiltMode);
+            GetCover().UpdateTargetPosition(OperationalState::MovingUpOrOpen, mTiltMode);
         }
         break;
 
@@ -276,7 +276,7 @@ void WindowApp::DispatchEvent(const WindowApp::Event & event)
         }
         else
         {
-            GetCover().StepToward(OperationalState::MovingDownOrClose, mTiltMode);
+            GetCover().UpdateTargetPosition(OperationalState::MovingDownOrClose, mTiltMode);
         }
         break;
     case EventId::AttributeChange:
@@ -592,6 +592,37 @@ void WindowApp::Cover::StepToward(OperationalState direction, bool isTilt)
     {
         LiftStepToward(direction);
     }
+}
+
+void WindowApp::Cover::UpdateTargetPosition(OperationalState direction, bool isTilt)
+{
+    EmberAfStatus status;
+    NPercent100ths current;
+    chip::Percent100ths target;
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+
+    if (isTilt)
+    {
+        status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
+        if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+        {
+
+            target = ComputePercent100thsStep(direction, current.Value(), TILT_DELTA);
+            (void) Attributes::TargetPositionTiltPercent100ths::Set(mEndpoint, target);
+        }
+    }
+    else
+    {
+        status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
+        if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+        {
+
+            target = ComputePercent100thsStep(direction, current.Value(), LIFT_DELTA);
+            (void) Attributes::TargetPositionLiftPercent100ths::Set(mEndpoint, target);
+        }
+    }
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
 Type WindowApp::Cover::CycleType()

@@ -178,11 +178,22 @@ private:
 @property (nonatomic) dispatch_queue_t delegateQueue;
 @property (nonatomic) NSArray<NSDictionary<NSString *, id> *> * unreportedEvents;
 
+/**
+ * If subscriptionActive is true that means that either we are in the middle of
+ * trying to get a CASE session for the publisher or we have a live ReadClient
+ * right now (possibly with a lost subscription and trying to re-subscribe).
+ */
 @property (nonatomic) BOOL subscriptionActive;
 
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS (1)
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS (3600)
 @property (nonatomic) uint32_t lastSubscriptionAttemptWait;
+
+/**
+ * If reattemptingSubscription is true, that means that we have failed to get a
+ * CASE session for the publisher and are now waiting to try again.  In this
+ * state we never have subscriptionActive true or a non-null currentReadClient.
+ */
 @property (nonatomic) BOOL reattemptingSubscription;
 
 // Read cache is attributePath => NSDictionary of value.
@@ -194,6 +205,14 @@ private:
 @property (nonatomic) NSMutableDictionary<MTRAttributePath *, MTRPair<NSDate *, NSDictionary *> *> * expectedValueCache;
 
 @property (nonatomic) BOOL expirationCheckScheduled;
+
+/**
+ * If currentReadClient is non-null, that means that we successfully
+ * called SendAutoResubscribeRequest on the ReadClient and have not yet gotten
+ * an OnDone for that ReadClient.
+ */
+@property (nonatomic) ReadClient * currentReadClient;
+
 @end
 
 @implementation MTRDevice
@@ -256,18 +275,37 @@ private:
 
 - (void)nodeMayBeAdvertisingOperational
 {
-    // TODO: Figure out what to do with that information.  If we're not waiting
-    // to subscribe/resubscribe, do nothing, otherwise perhaps trigger the
-    // subscribe/resubscribe immediately?  We need to have much better tracking
-    // of our internal state for that, and may need to add something on
-    // ReadClient to cancel its outstanding timer and try to resubscribe
-    // immediately....
     MTR_LOG_DEFAULT("%@ saw new operational advertisement", self);
+
+    // We might want to trigger a resubscribe on our existing ReadClient.  Do
+    // that outside the scope of our lock, so we're not calling arbitrary code
+    // we don't control with the lock held.  This is safe, because when
+    // nodeMayBeAdvertisingOperational is called we are running on the Matter
+    // queue, and the ReadClient can't get destroyed while we are on that queue.
+    ReadClient * readClientToResubscribe = nullptr;
+
+    os_unfair_lock_lock(&self->_lock);
+
+    // Don't change state to MTRDeviceStateReachable, since the device might not
+    // in fact be reachable yet; we won't know until we have managed to
+    // establish a CASE session.  And at that point, our subscription will
+    // trigger the state change as needed.
+    if (self.reattemptingSubscription) {
+        [self _reattemptSubscriptionNowIfNeeded];
+    } else {
+        readClientToResubscribe = self->_currentReadClient;
+    }
+    os_unfair_lock_unlock(&self->_lock);
+
+    if (readClientToResubscribe) {
+        readClientToResubscribe->TriggerResubscribeIfScheduled("operational advertisement seen");
+    }
 }
 
 // assume lock is held
 - (void)_changeState:(MTRDeviceState)state
 {
+    os_unfair_lock_assert_owner(&self->_lock);
     MTRDeviceState lastState = _state;
     _state = state;
     if (lastState != state) {
@@ -348,13 +386,23 @@ private:
     MTR_LOG_INFO("%@ scheduling to reattempt subscription in %u seconds", self, _lastSubscriptionAttemptWait);
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_lastSubscriptionAttemptWait * NSEC_PER_SEC)), self.queue, ^{
         os_unfair_lock_lock(&self->_lock);
-        MTR_LOG_INFO("%@ reattempting subscription", self);
-        self.reattemptingSubscription = NO;
-        [self _setupSubscription];
+        [self _reattemptSubscriptionNowIfNeeded];
         os_unfair_lock_unlock(&self->_lock);
     });
 
     os_unfair_lock_unlock(&self->_lock);
+}
+
+- (void)_reattemptSubscriptionNowIfNeeded
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+    if (!self.reattemptingSubscription) {
+        return;
+    }
+
+    MTR_LOG_INFO("%@ reattempting subscription", self);
+    self.reattemptingSubscription = NO;
+    [self _setupSubscription];
 }
 
 - (void)_handleUnsolicitedMessageFromPublisher
@@ -372,7 +420,10 @@ private:
 
     // in case this is called during exponential back off of subscription
     // reestablishment, this starts the attempt right away
-    [self _setupSubscription];
+    // TODO: This doesn't really make sense.  If we _don't_ have a live
+    // ReadClient how did we get this notification and if we _do_ have an active
+    // ReadClient, this call or _setupSubscription would be no-ops.
+    [self _reattemptSubscriptionNowIfNeeded];
 
     os_unfair_lock_unlock(&self->_lock);
 }
@@ -548,6 +599,12 @@ private:
                                       },
                                       ^(void) {
                                           MTR_LOG_INFO("%@ got subscription done", self);
+                                          // Drop our pointer to the ReadClient immediately, since
+                                          // it's about to be destroyed and we don't want to be
+                                          // holding a dangling pointer.
+                                          os_unfair_lock_lock(&self->_lock);
+                                          self->_currentReadClient = nullptr;
+                                          os_unfair_lock_unlock(&self->_lock);
                                           dispatch_async(self.queue, ^{
                                               // OnDone
                                               [self _handleSubscriptionReset];
@@ -587,7 +644,10 @@ private:
                                   }
 
                                   // Callback and ClusterStateCache and ReadClient will be deleted
-                                  // when OnDone is called or an error is encountered.
+                                  // when OnDone is called.
+                                  os_unfair_lock_lock(&self->_lock);
+                                  self->_currentReadClient = readClient.get();
+                                  os_unfair_lock_unlock(&self->_lock);
                                   callback->AdoptReadClient(std::move(readClient));
                                   callback->AdoptClusterStateCache(std::move(clusterStateCache));
                                   callback.release();

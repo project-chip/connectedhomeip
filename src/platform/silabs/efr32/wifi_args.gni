@@ -34,8 +34,11 @@ if (chip_crypto == "") {
 # examples/platform/efr32/EFR32DeviceDataProvider is now used.
 chip_use_transitional_commissionable_data_provider = false
 
-#lwip_platform = "external"
 lwip_platform = "silabs"
+
+# Use GSDK lwip instead of CHIP
+lwip_root = "${efr32_sdk_build_root}"
+
 lwip_ipv6 = true
 lwip_ipv4 = true
 lwip_api = true
