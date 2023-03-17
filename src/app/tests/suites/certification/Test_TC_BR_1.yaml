@@ -315,7 +315,7 @@ tests:
 
           ./chip-tool  descriptor read device-type-list 1 4
 
-          Verify the DeviceTypeList entries with endpoint 1  On TH(chip-tool) Log
+          Verify the DeviceTypeList entries with endpoint 4  On TH(chip-tool) Log
 
           [1666249581.063940][46547:46552] CHIP:TOO: Endpoint: 4 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 1944707282
           [1666249581.064029][46547:46552] CHIP:TOO:   DeviceTypeList: 2 entries
