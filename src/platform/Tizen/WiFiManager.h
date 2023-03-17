@@ -73,7 +73,7 @@ private:
     static CHIP_ERROR _WiFiActivate(gpointer userData);
     static CHIP_ERROR _WiFiDeactivate(gpointer userData);
     static CHIP_ERROR _WiFiScan(gpointer userData);
-    static CHIP_ERROR _WiFiConnect(gpointer userData);
+    static CHIP_ERROR _WiFiConnect(wifi_manager_ap_h ap);
 
     void _WiFiDeinitialize();
     void _WiFiSetStates();

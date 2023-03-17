@@ -374,10 +374,9 @@ CHIP_ERROR WiFiManager::_WiFiScan(gpointer userData)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WiFiManager::_WiFiConnect(gpointer userData)
+CHIP_ERROR WiFiManager::_WiFiConnect(wifi_manager_ap_h ap)
 {
-    wifi_manager_ap_h ap = static_cast<wifi_manager_ap_h>(userData);
-    CHIP_ERROR err       = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     int wifiErr;
 
     wifiErr = wifi_manager_connect(sInstance.mWiFiManagerHandle, ap, _ConnectedCb, nullptr);
@@ -553,7 +552,7 @@ void WiFiManager::Init()
     sInstance.mModuleState     = WIFI_MANAGER_MODULE_STATE_DETACHED;
     sInstance.mConnectionState = WIFI_MANAGER_CONNECTION_STATE_DISCONNECTED;
 
-    PlatformMgrImpl().GLibMatterContextInvokeSynchronous(_WiFiInitialize, nullptr);
+    PlatformMgrImpl().GLibMatterContextInvokeSynchronous(_WiFiInitialize, static_cast<void *>(nullptr));
 }
 
 void WiFiManager::Deinit()
@@ -577,7 +576,7 @@ CHIP_ERROR WiFiManager::Activate()
     VerifyOrExit((err = IsActivated(&isWiFiActivated)) == CHIP_NO_ERROR, );
     VerifyOrExit(isWiFiActivated == false, ChipLogProgress(DeviceLayer, "WiFi is already activated"));
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSynchronous(_WiFiActivate, nullptr);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSynchronous(_WiFiActivate, static_cast<void *>(nullptr));
     SuccessOrExit(err);
 
 exit:
@@ -592,7 +591,7 @@ CHIP_ERROR WiFiManager::Deactivate()
     VerifyOrExit((err = IsActivated(&isWiFiActivated)) == CHIP_NO_ERROR, );
     VerifyOrExit(isWiFiActivated == true, ChipLogProgress(DeviceLayer, "WiFi is already deactivated"));
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSynchronous(_WiFiDeactivate, nullptr);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSynchronous(_WiFiDeactivate, static_cast<void *>(nullptr));
     SuccessOrExit(err);
 
 exit:
@@ -625,7 +624,7 @@ CHIP_ERROR WiFiManager::Connect(const char * ssid, const char * key,
     }
     else
     {
-        err = PlatformMgrImpl().GLibMatterContextInvokeSynchronous(_WiFiScan, nullptr);
+        err = PlatformMgrImpl().GLibMatterContextInvokeSynchronous(_WiFiScan, static_cast<void *>(nullptr));
         SuccessOrExit(err);
     }
 

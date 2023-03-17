@@ -98,7 +98,7 @@ public:
 private:
     static void LeScanResultCb(int result, bt_adapter_le_device_scan_result_info_s * info, void * userData);
     static gboolean TimerExpiredCb(gpointer user_data);
-    static CHIP_ERROR TriggerScan(gpointer userData);
+    static CHIP_ERROR TriggerScan(ChipDeviceScanner * userData);
     void CheckScanFilter(ScanFilterType filterType, ScanFilterData & filterData);
     int RegisterScanFilter(ScanFilterType filterType, ScanFilterData & filterData);
     void UnRegisterScanFilter(void);

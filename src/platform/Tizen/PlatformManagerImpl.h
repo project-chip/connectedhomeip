@@ -61,7 +61,11 @@ public:
      * @param[in] userData User data to pass to the function.
      * @returns The result of the function.
      */
-    CHIP_ERROR GLibMatterContextInvokeSynchronous(CHIP_ERROR (*func)(void *), void * userData);
+    template <typename T>
+    CHIP_ERROR GLibMatterContextInvokeSynchronous(CHIP_ERROR (*func)(T *), T * userData)
+    {
+        return _GLibMatterContextInvokeSynchronous((CHIP_ERROR(*)(void *)) func, (void *) userData);
+    }
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
@@ -76,6 +80,14 @@ private:
     friend class Internal::BLEManagerImpl;
 
     static PlatformManagerImpl sInstance;
+
+    /**
+     * @brief Invoke a function on the Matter GLib context.
+     *
+     * @note This function does not provide type safety for the user data. Please,
+     *       use the GLibMatterContextInvokeSynchronous() template function instead.
+     */
+    CHIP_ERROR _GLibMatterContextInvokeSynchronous(CHIP_ERROR (*func)(void *), void * userData);
 
     GMainLoop * mGLibMainLoop;
     GThread * mGLibMainLoopThread;

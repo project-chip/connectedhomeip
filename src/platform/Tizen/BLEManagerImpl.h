@@ -208,7 +208,7 @@ private:
 
     // ==== Connection.
     // void ConnectHandler(const char * address);
-    static CHIP_ERROR ConnectChipThing(gpointer userData);
+    static CHIP_ERROR ConnectChipThing(const char * userData);
     void NotifyBLEConnectionEstablished(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
     void NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
     void NotifyHandleNewConnection(BLE_CONNECTION_OBJECT conId);

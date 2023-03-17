@@ -143,22 +143,21 @@ gboolean ChipDeviceScanner::TimerExpiredCb(gpointer userData)
     return G_SOURCE_REMOVE;
 }
 
-CHIP_ERROR ChipDeviceScanner::TriggerScan(gpointer userData)
+CHIP_ERROR ChipDeviceScanner::TriggerScan(ChipDeviceScanner * self)
 {
-    auto self      = reinterpret_cast<ChipDeviceScanner *>(userData);
     CHIP_ERROR err = CHIP_NO_ERROR;
     GSource * idleSource;
     int ret;
 
     // Trigger LE Scan
-    ret = bt_adapter_le_start_scan(LeScanResultCb, userData);
+    ret = bt_adapter_le_start_scan(LeScanResultCb, self);
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_adapter_le_start_scan() failed: %s", get_error_message(ret));
                  err = CHIP_ERROR_INTERNAL);
     self->mIsScanning = true;
 
     // Setup timer for scan timeout
     idleSource = g_timeout_source_new(self->mScanTimeoutMs);
-    g_source_set_callback(idleSource, TimerExpiredCb, userData, nullptr);
+    g_source_set_callback(idleSource, TimerExpiredCb, self, nullptr);
     g_source_set_priority(idleSource, G_PRIORITY_HIGH_IDLE);
     g_source_attach(idleSource, g_main_context_get_thread_default());
     g_source_unref(idleSource);

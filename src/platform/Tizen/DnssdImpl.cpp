@@ -108,11 +108,9 @@ void OnRegister(dnssd_error_e result, dnssd_service_h service, void * data)
     rCtx->mCallback(rCtx->mCbContext, rCtx->mType, rCtx->mName, CHIP_NO_ERROR);
 }
 
-CHIP_ERROR RegisterAsync(gpointer userData)
+CHIP_ERROR RegisterAsync(chip::Dnssd::RegisterContext * rCtx)
 {
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
-
-    auto rCtx = reinterpret_cast<chip::Dnssd::RegisterContext *>(userData);
 
     int ret = dnssd_register_local_service(rCtx->mServiceHandle, OnRegister, rCtx);
     VerifyOrReturnValue(ret == DNSSD_ERROR_NONE, GetChipError(ret),
@@ -231,11 +229,10 @@ exit:
     g_free(ifaceName);
 }
 
-CHIP_ERROR BrowseAsync(gpointer userData)
+CHIP_ERROR BrowseAsync(chip::Dnssd::BrowseContext * bCtx)
 {
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
 
-    auto * bCtx      = reinterpret_cast<chip::Dnssd::BrowseContext *>(userData);
     auto interfaceId = bCtx->mInterfaceId;
     int ret;
 
@@ -394,11 +391,9 @@ exit:
     rCtx->mInstance->RemoveContext(rCtx);
 }
 
-CHIP_ERROR ResolveAsync(gpointer userData)
+CHIP_ERROR ResolveAsync(chip::Dnssd::ResolveContext * rCtx)
 {
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
-
-    auto * rCtx = reinterpret_cast<chip::Dnssd::ResolveContext *>(userData);
 
     int ret = dnssd_resolve_service(rCtx->mServiceHandle, OnResolve, rCtx);
     VerifyOrReturnValue(ret == DNSSD_ERROR_NONE, GetChipError(ret),

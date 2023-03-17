@@ -445,9 +445,8 @@ void BLEManagerImpl::HandleConnectionTimeout(System::Layer * layer, void * data)
     sInstance.NotifyHandleConnectFailed(CHIP_ERROR_TIMEOUT);
 }
 
-CHIP_ERROR BLEManagerImpl::ConnectChipThing(void * userData)
+CHIP_ERROR BLEManagerImpl::ConnectChipThing(const char * address)
 {
-    auto address   = reinterpret_cast<const char *>(userData);
     CHIP_ERROR err = CHIP_NO_ERROR;
     int ret;
 
@@ -504,7 +503,7 @@ void BLEManagerImpl::OnChipDeviceScanned(void * device, const Ble::ChipBLEDevice
     mDeviceScanner->StopChipScan();
 
     /* Initiate Connect */
-    PlatformMgrImpl().GLibMatterContextInvokeSynchronous(ConnectChipThing, deviceInfo->remote_address);
+    PlatformMgrImpl().GLibMatterContextInvokeSynchronous(ConnectChipThing, const_cast<const char *>(deviceInfo->remote_address));
 }
 
 void BLEManagerImpl::OnScanComplete()
@@ -956,7 +955,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
     ChipLogProgress(DeviceLayer, "Initialize BLE");
-    err = PlatformMgrImpl().GLibMatterContextInvokeSynchronous(_BleInitialize, nullptr);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSynchronous(_BleInitialize, static_cast<void *>(nullptr));
     SuccessOrExit(err);
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
