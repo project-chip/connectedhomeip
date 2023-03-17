@@ -1,5 +1,4 @@
-{{#unless isGlobalAttribute}}
-  {{#unless isWritableAttribute~}}
+  {{! ensure indent}}{{#unless isWritable~}}
   readonly {{!marker to place a space even with whitespace removal~}}
 {{~/unless~}}
 {{~!TODO: write only attributes should also be supported~}}
@@ -23,4 +22,3 @@
   {{/unless}} {{asLowerCamelCase name~}}
   {{~#if isArray~}} [] {{~/if}} = {{code~}}
   ;
-{{/unless~}}
