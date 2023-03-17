@@ -141,9 +141,9 @@ def _GetZapVersionToUse(project_root):
     # This heuristic may be bad at times, however then you can also override the
     # version in command line parameters
 
-    match_re = re.compile(r'.*ENV\s+ZAP_VERSION=([^# ]*)')
+    match_re = re.compile(r'.*ARG\s+ZAP_VERSION=([^# ]*)')
 
-    docker_path = os.path.join(project_root, "integrations/docker/images/chip-build/Dockerfile")
+    docker_path = os.path.join(project_root, "integrations/docker/images/chip-cert-bins/Dockerfile")
 
     with open(docker_path, 'rt') as f:
         for l in f.readlines():
