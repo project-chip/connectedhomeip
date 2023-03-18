@@ -26,11 +26,7 @@
 #include "FreeRTOS.h"
 #include "Globals.h"
 #include <credentials/DeviceAttestationCredsProvider.h>
-#ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
-#include <platform/cc13x2_26x2/CC13X2_26X2DeviceAttestationCreds.h>
-#else
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#endif
+#include <examples/platform/cc13x2_26x2/CC13X2_26X2DeviceAttestationCreds.h>
 
 #include <DeviceInfoProviderImpl.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -172,7 +168,7 @@ int AppTask::Init()
     LED_Params ledParams;
     Button_Params buttonParams;
 
-    cc13x2_26x2LogInit();
+    cc13xx_26xxLogInit();
 
     // Initialize LEDs
     PLAT_LOG("Initialize LEDs");

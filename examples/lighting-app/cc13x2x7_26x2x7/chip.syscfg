@@ -26,8 +26,8 @@ var LED         = scripting.addModule("/ti/drivers/apps/LED");
 var NVS         = scripting.addModule("/ti/drivers/NVS");
 var RF          = scripting.addModule("/ti/drivers/RF");
 var RFDesign    = scripting.addModule("ti/devices/radioconfig/rfdesign");
+var RFCustom    = scripting.addModule("/ti/devices/radioconfig/custom");
 var TRNG        = scripting.addModule("/ti/drivers/TRNG");
-var Thread      = scripting.addModule("/ti/thread/thread");
 var SHA2        = scripting.addModule("/ti/drivers/SHA2");
 var UART2       = scripting.addModule("/ti/drivers/UART2");
 var ble         = scripting.addModule("/ti/ble5stack/ble");
@@ -54,7 +54,6 @@ var AESCTRDRBG1 = AESCTRDRBG.addInstance();
 var ECDH1       = ECDH.addInstance();
 
 AESCTRDRBG1.$name              = "CONFIG_AESCTRDRBG_0";
-AESCTRDRBG1.aesctrObject.$name = "CONFIG_AESCTR_0";
 
 AESCCM1.$name = "CONFIG_AESCCM0";
 
@@ -109,6 +108,58 @@ for(var setting in rfDesignSettings)
     RFDesign[setting] = rfDesignSettings[setting];
 }
 
+/* Handling for RF frontend characterization */
+if(RFDesign.rfDesign.match(/LP_CC2652PSIP/))
+{
+    RFCustom.ieee = ["ieee154p10"];
+    var rfCodeExportConfig = RFCustom.radioConfigieee154p10.codeExportConfig
+}
+else
+{
+    RFCustom.ieee = ["ieee154"];
+    var rfCodeExportConfig = RFCustom.radioConfigieee154.codeExportConfig
+}
+
+var cmdList = [
+    "cmdIeeeTx",
+    "cmdIeeeRx",
+    "cmdIeeeCsma",
+    "cmdIeeeEdScan",
+    "cmdIeeeRxAck",
+    "cmdTxTest"
+];
+
+rfCodeExportConfig.useConst     = true;
+rfCodeExportConfig.useMulti     = true;
+rfCodeExportConfig.symGenMethod = "Custom";
+
+const deviceId = system.deviceData.deviceId;
+
+// Add high PA options if present
+if(deviceId.match(/CC(265[12]R|2674R|1352R1|1354R)/))
+{
+    cmdList.push("cmdRadioSetup");
+    rfCodeExportConfig.cmdRadioSetup = "RF_cmdIeeeRadioSetup";
+}
+else if(deviceId.match(/CC(265[12]P|2674P|1352P)/))
+{
+    cmdList.push("cmdRadioSetupPa");
+    rfCodeExportConfig.cmdRadioSetupPa = "RF_cmdIeeeRadioSetup";
+    rfCodeExportConfig.paExport = "combined";
+}
+else if(deviceId.match(/CC(265[34]|1354)P/))
+{
+    cmdList.push("cmdRadioSetupPa");
+    rfCodeExportConfig.cmdRadioSetupPa = "RF_cmdIeeeRadioSetup";
+    // currently not characterized for high PA
+}
+else
+{
+    throw new Error("Could not match platform to any known platform types");
+}
+
+rfCodeExportConfig.cmdList_ieee_15_4 = cmdList;
+
 /* Red LED */
 LED1.$name                      = "CONFIG_LED_RED";
 LED1.$hardware                  = system.deviceData.board.components.LED_RED;
@@ -139,10 +190,11 @@ ble.numOfAdvSets                                          = 1;
 ble.lockProject                                           = true;
 ble.oneLibSizeOpt                                         = true;
 ble.maxPDUSize                                            = 255;
-ble.radioConfig.codeExportConfig.$name                    = "ti_devices_radioconfig_code_export_param1";
+ble.radioConfig.codeExportConfig.$name                    = "ti_devices_radioconfig_code_export_param2";
 ble.connUpdateParamsPeripheral.$name                      = "ti_ble5stack_general_ble_conn_update_params0";
 ble.connUpdateParamsPeripheral.reqMinConnInt               = 30;
 ble.connUpdateParamsPeripheral.reqMaxConnInt               = 50;
+
 
 ble.advSet1.$name                                         = "ti_ble5stack_broadcaster_advertisement_set0";
 ble.advSet1.advParam1.$name                               = "ti_ble5stack_broadcaster_advertisement_params0";

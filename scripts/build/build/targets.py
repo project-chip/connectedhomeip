@@ -18,7 +18,7 @@ from typing import List
 
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidApp, AndroidBoard, AndroidBuilder
-from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
+from builders.ti import TIApp, TIBoard, TIBuilder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
 from builders.esp32 import Esp32App, Esp32Board, Esp32Builder
@@ -561,13 +561,23 @@ def K32WTargets():
                         low_power=True, disable_logs=True, release=True).GlobBlacklist("Only on demand build")
 
 
-def cc13x2x7_26x2x7Targets():
-    target = Target('cc13x2x7_26x2x7', cc13x2x7_26x2x7Builder)
+def TITargets():
+    target = Target('ti', TIBuilder)
 
-    yield target.Extend('lock-mtd', app=cc13x2x7_26x2x7App.LOCK, openthread_ftd=False)
-    yield target.Extend('pump', app=cc13x2x7_26x2x7App.PUMP)
-    yield target.Extend('pump-controller', app=cc13x2x7_26x2x7App.PUMP_CONTROLLER)
-    yield target.Extend('all-clusters-minimal', app=cc13x2x7_26x2x7App.ALL_CLUSTERS_MINIMAL)
+    LP_CC2652R7 = target.Extend('LP_CC2652R7', board=TIBoard.LP_CC2652R7)
+    LP_EM_CC1354P10_6 = target.Extend('LP_EM_CC1354P10_6', board=TIBoard.LP_EM_CC1354P10_6)
+
+    #yield LP_CC2652R7.Extend('all-clusters-minimal', app=TIApp.ALL_CLUSTERS_MINIMAL)
+    yield LP_CC2652R7.Extend('lock-mtd', app=TIApp.LOCK, openthread_ftd=False)
+    yield LP_CC2652R7.Extend('pump', app=TIApp.PUMP)
+    yield LP_CC2652R7.Extend('pump-controller', app=TIApp.PUMP_CONTROLLER)
+
+    #yield LP_EM_CC1354P10_6.Extend('all-clusters-app', app=TIApp.ALL_CLUSTERS)
+    yield LP_EM_CC1354P10_6.Extend('all-clusters-minimal', app=TIApp.ALL_CLUSTERS_MINIMAL)
+    yield LP_EM_CC1354P10_6.Extend('lock-ftd', app=TIApp.LOCK, openthread_ftd=True)
+    yield LP_EM_CC1354P10_6.Extend('lock-mtd', app=TIApp.LOCK, openthread_ftd=False)
+    yield LP_EM_CC1354P10_6.Extend('pump', app=TIApp.PUMP)
+    yield LP_EM_CC1354P10_6.Extend('pump-controller', app=TIApp.PUMP_CONTROLLER)
 
 
 def Cyw30739Targets():
@@ -666,7 +676,7 @@ target_generators = [
     InfineonTargets(),
     AmebaTargets(),
     K32WTargets(),
-    cc13x2x7_26x2x7Targets(),
+    TITargets(),
     Cyw30739Targets(),
     QorvoTargets(),
     TizenTargets(),

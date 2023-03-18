@@ -66,7 +66,6 @@ private:
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
 
-
     void CancelTimer(void);
     void StartTimer(uint32_t aTimeoutMs);
 

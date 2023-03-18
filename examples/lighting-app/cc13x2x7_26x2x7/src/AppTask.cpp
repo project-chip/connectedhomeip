@@ -35,7 +35,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <platform/cc13x2_26x2/OTAImageProcessorImpl.h>
+#include <platform/cc13xx_26xx/OTAImageProcessorImpl.h>
 #endif
 
 #include <lib/support/CHIPMem.h>
@@ -64,9 +64,9 @@
 #define APP_TASK_PRIORITY 4
 #define APP_EVENT_QUEUE_SIZE 10
 
-#define IDENTIFY_TRIGGER_EFFECT_BLINK 0 
-#define IDENTIFY_TRIGGER_EFFECT_BREATHE 1 
-#define IDENTIFY_TRIGGER_EFFECT_OKAY 2 
+#define IDENTIFY_TRIGGER_EFFECT_BLINK 0
+#define IDENTIFY_TRIGGER_EFFECT_BREATHE 1
+#define IDENTIFY_TRIGGER_EFFECT_OKAY 2
 #define IDENTIFY_TRIGGER_EFFECT_FINISH_STOP 3
 
 static uint32_t identify_trigger_effect = IDENTIFY_TRIGGER_EFFECT_FINISH_STOP;
@@ -134,7 +134,7 @@ int AppTask::StartAppTask()
     return ret;
 }
 
-//Action initiated callback
+// Action initiated callback
 void uiTurnOn(void)
 {
     PLAT_LOG("Light On initiated");
@@ -142,7 +142,7 @@ void uiTurnOn(void)
     LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
 }
 
-//Action completed callback 
+// Action completed callback
 void uiTurnedOn(void)
 {
     PLAT_LOG("Light On completed");
@@ -150,7 +150,7 @@ void uiTurnedOn(void)
     LED_setOn(sAppRedHandle, LED_BRIGHTNESS_MAX);
 }
 
-//Action initiated callback 
+// Action initiated callback
 void uiTurnOff(void)
 {
     PLAT_LOG("Light Off initiated");
@@ -158,7 +158,7 @@ void uiTurnOff(void)
     LED_startBlinking(sAppRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
 }
 
-//Action completed callback 
+// Action completed callback
 void uiTurnedOff(void)
 {
     PLAT_LOG("Light Off completed");
@@ -171,7 +171,7 @@ int AppTask::Init()
     LED_Params ledParams;
     Button_Params buttonParams;
 
-    cc13x2_26x2LogInit();
+    cc13xx_26xxLogInit();
 
     // Init Chip memory management before the stack
     Platform::MemoryInit();
@@ -264,7 +264,7 @@ int AppTask::Init()
     buttonParams.longPressDuration = 1000U; // ms
     sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
     Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
-        
+
     ret = LightMgr().Init();
 
     if (ret != CHIP_NO_ERROR)
@@ -407,15 +407,15 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
     switch (aEvent->Type)
     {
-    case AppEvent::kEventType_Light:
-    {
-        actor  = aEvent->LightEvent.Actor;
-        LightMgr().IsLightOn() ? LightMgr().InitiateAction(actor, LightingManager::OFF_ACTION): LightMgr().InitiateAction(actor, LightingManager::ON_ACTION);
-    }    
+    case AppEvent::kEventType_Light: {
+        actor = aEvent->LightEvent.Actor;
+        LightMgr().IsLightOn() ? LightMgr().InitiateAction(actor, LightingManager::OFF_ACTION)
+                               : LightMgr().InitiateAction(actor, LightingManager::ON_ACTION);
+    }
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
-            actor  = AppEvent::kEventType_ButtonLeft;
+            actor = AppEvent::kEventType_ButtonLeft;
             LightMgr().InitiateAction(actor, LightingManager::ON_ACTION);
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
@@ -427,7 +427,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonRight:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
-            actor  = AppEvent::kEventType_ButtonRight;
+            actor = AppEvent::kEventType_ButtonRight;
             LightMgr().InitiateAction(actor, LightingManager::OFF_ACTION);
         }
         else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
@@ -454,22 +454,22 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         break;
 
     case AppEvent::kEventType_IdentifyStart:
-        switch(identify_trigger_effect)
+        switch (identify_trigger_effect)
         {
-            case IDENTIFY_TRIGGER_EFFECT_BLINK:
-                LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
-                LED_startBlinking(sAppGreenHandle, 1000, LED_BLINK_FOREVER);
-                break;
-            case IDENTIFY_TRIGGER_EFFECT_BREATHE:
-                LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
-                LED_startBlinking(sAppGreenHandle, 100, LED_BLINK_FOREVER);
-                break;
-            case IDENTIFY_TRIGGER_EFFECT_OKAY:
-                LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
-                LED_startBlinking(sAppGreenHandle, 500, LED_BLINK_FOREVER);
-                break;
-            default:
-                break;
+        case IDENTIFY_TRIGGER_EFFECT_BLINK:
+            LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
+            LED_startBlinking(sAppGreenHandle, 1000, LED_BLINK_FOREVER);
+            break;
+        case IDENTIFY_TRIGGER_EFFECT_BREATHE:
+            LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
+            LED_startBlinking(sAppGreenHandle, 100, LED_BLINK_FOREVER);
+            break;
+        case IDENTIFY_TRIGGER_EFFECT_OKAY:
+            LED_setOn(sAppGreenHandle, LED_BRIGHTNESS_MAX);
+            LED_startBlinking(sAppGreenHandle, 500, LED_BLINK_FOREVER);
+            break;
+        default:
+            break;
         }
         PLAT_LOG("Identify started");
         break;
