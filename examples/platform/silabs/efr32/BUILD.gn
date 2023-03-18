@@ -96,6 +96,33 @@ config("chip_examples_project_config") {
   ]
 }
 
+if (enable_dic) {
+  config("efr32_dic_config") {
+    include_dirs = [
+      "${chip_root}/third_party/silabs/mqtt/stack",
+      "${chip_root}/examples/platform/silabs/DIC/mqtt_transport_interface/include",
+      "${chip_root}/examples/platform/silabs/DIC/matter_abs_interface/include",
+    ]
+  }
+
+  source_set("efr32-dic") {
+    sources = [
+      "${chip_root}/examples/platform/silabs/DIC/matter_abs_interface/src/dic.c",
+      "${chip_root}/examples/platform/silabs/DIC/mqtt_transport_interface/src/MQTT_transport.c",
+      "${chip_root}/examples/platform/silabs/DIC/mqtt_transport_interface/src/altcp.c",
+      "${chip_root}/examples/platform/silabs/DIC/mqtt_transport_interface/src/altcp_alloc.c",
+      "${chip_root}/examples/platform/silabs/DIC/mqtt_transport_interface/src/altcp_tcp.c",
+      "${chip_root}/examples/platform/silabs/DIC/mqtt_transport_interface/src/altcp_tls_mbedtls.c",
+      "${chip_root}/examples/platform/silabs/DIC/mqtt_transport_interface/src/altcp_tls_mbedtls_mem.c",
+    ]
+    public_deps = [
+      "${chip_root}/src/inet",
+      "${chip_root}/src/lwip",
+    ]
+    public_configs = [ ":efr32_dic_config" ]
+  }
+}
+
 source_set("openthread_core_config_efr32_chip_examples") {
   if (chip_enable_openthread) {
     sources = [ "project_include/OpenThreadConfig.h" ]
@@ -243,6 +270,11 @@ source_set("efr32-common") {
     ":efr32-common-config",
     "${efr32_sdk_build_root}:silabs_config",
   ]
+
+  # MQTT
+  if (enable_dic) {
+    deps += [ "${examples_plat_dir}:efr32-dic" ]
+  }
 
   include_dirs = [ "." ]
 

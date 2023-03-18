@@ -65,6 +65,10 @@
 
 #define LWIP_SOCKET 0
 
+#ifdef DIC_ENABLE
+#define MEM_SIZE 5632
+#endif // DIC_ENABLE
+
 #define LWIP_FREERTOS_USE_STATIC_TCPIP_TASK 1
 
 #define LWIP_RAW 1
