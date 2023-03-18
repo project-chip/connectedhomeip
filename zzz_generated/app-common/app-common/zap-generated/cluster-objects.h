@@ -4526,6 +4526,29 @@ public:
 using DecodableType = Type;
 
 } // namespace CapabilityMinimaStruct
+namespace ProductAppearanceStruct {
+enum class Fields : uint8_t
+{
+    kFinish       = 0,
+    kPrimaryColor = 1,
+};
+
+struct Type
+{
+public:
+    ProductFinishEnum finish = static_cast<ProductFinishEnum>(0);
+    DataModel::Nullable<ColorEnum> primaryColor;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace ProductAppearanceStruct
 } // namespace Structs
 
 namespace Commands {
@@ -4823,6 +4846,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CapabilityMinima
+namespace ProductAppearance {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::BasicInformation::Structs::ProductAppearanceStruct::Type;
+    using DecodableType    = chip::app::Clusters::BasicInformation::Structs::ProductAppearanceStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::BasicInformation::Structs::ProductAppearanceStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::BasicInformation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ProductAppearance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ProductAppearance
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -4888,6 +4923,7 @@ struct TypeInfo
         Attributes::Reachable::TypeInfo::DecodableType reachable                     = static_cast<bool>(0);
         Attributes::UniqueID::TypeInfo::DecodableType uniqueID;
         Attributes::CapabilityMinima::TypeInfo::DecodableType capabilityMinima;
+        Attributes::ProductAppearance::TypeInfo::DecodableType productAppearance;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
