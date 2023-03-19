@@ -58,10 +58,16 @@ template("efr32_sdk") {
 
     # Treat these includes as system includes, so warnings in them are not fatal.
     _include_dirs = [
+      "${chip_root}/examples/platform/silabs/SiWx917/SiWx917",
+      "${chip_root}/examples/platform/silabs/SiWx917/SiWx917/hal",
       "${sdk_support_root}/platform/emdrv/nvm3/inc",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/inc",
       "${chip_root}/third_party/mbedtls/repo/include",
       "${chip_root}/third_party/mbedtls/repo/library",
+      "${wisemcu_sdk_root}/platforms/si91x/hal/inc",
+      "${wisemcu_sdk_root}/sapi/include",
+
+      "${chip_root}/src/platform/silabs/SiWx917/bluetooth",
 
       ### CCP includes ###
       "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/inc",
@@ -73,16 +79,11 @@ template("efr32_sdk") {
 
       "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver",
       "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver/CMSIS/Driver/Include",
-      "${wisemcu_sdk_root}/platforms/si91x/boards/brd4325a/inc",
+      "${wisemcu_sdk_root}/platforms/si91x/boards/brd4325x/inc",
       "${wisemcu_sdk_root}/platforms/si91x/core/cmsis",
       "${wisemcu_sdk_root}/third_party/freertos/include",
       "${wisemcu_sdk_root}/third_party/freertos/portable/GCC/ARM_CM4F",
       "${examples_plat_dir}/device/inc",
-
-      "${wisemcu_sdk_root}/sapi/include",
-
-      "${chip_root}/examples/platform/SiWx917/SiWx917",
-      "${chip_root}/examples/platform/SiWx917/SiWx917/hal",
     ]
 
     # Note that we're setting the mbedTLS and PSA configuration files through a
@@ -95,17 +96,15 @@ template("efr32_sdk") {
       "__STARTUP_CLEAR_BSS",
       "HARD_FAULT_LOG_ENABLE",
       "SILABS_LOG_ENABLED=${silabs_log_enabled}",
- 
       "SL_HEAP_SIZE=32768",
       "SL_WIFI=1",
-
+      "SiWx917_WIFI",
       "CCP_SI917_BRINGUP",
       "RS911X_WIFI",
       "RSI_WLAN_ENABLE",
       "RSI_WITH_OS",
       "RSI_M4_INTERFACE",  #Enable CCP bus Interface
       "RSI_WLAN_API_ENABLE",
-
       "LITTLE_ENDIAN_ORDER",
       "_CHIP_9118",
       "NVM3_DEFAULT_NVM_SIZE=40960",
@@ -126,29 +125,16 @@ template("efr32_sdk") {
       "__error_t_defined",
     ]
 
-    defines += [
-      "SL_HEAP_SIZE=32768",
-      "SL_WIFI=1",
-      "SL_WFX_USE_SPI",
-      "EFX32_RS911X=1",
-      "RS911X_WIFI",
-      "SiWx917_WIFI",
-      "RSI_WLAN_ENABLE",
-      "RSI_SPI_INTERFACE",
-      "RSI_WITH_OS",
-    ]
-    #Added this flag only for SiwX917 NCP board
-    #TODO: Remove when rsi_wlan_ext_stats gets implemented using Wisemcu SDK
-    defines += [ "SiWx917_WIFI" ]
+    if (chip_build_libshell) {
+      defines += [ "ENABLE_CHIP_SHELL" ]
+    }
 
     if (!use_rs911x_sockets) {
         import("${chip_root}/src/platform/silabs/SiWx917/args.gni")
-
         defines += [ "LWIP_NETIF_API=1" ]
       if (lwip_ipv4) {
         defines += [
           "LWIP_IPV4=1",
-
           # adds following options to provide
           # them to .cpp source files
           # flags ported from lwipopts file
@@ -200,24 +186,8 @@ template("efr32_sdk") {
       ]
     }
 
-
-    # USART include files
-    if ((defined(invoker.chip_enable_pw_rpc) && invoker.chip_enable_pw_rpc) ||
-        chip_build_libshell ||
-        (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) ||
-        (defined(invoker.show_qr_code) && invoker.show_qr_code) ||
-        (defined(invoker.disable_lcd) && !invoker.disable_lcd) ||
-        (defined(invoker.use_external_flash) && use_external_flash)) {
-      defines += [ "CONFIG_ENABLE_UART" ]
-
-      if (defined(invoker.use_external_flash) && use_external_flash) {
-        defines += [ "CONFIG_USE_EXTERNAL_FLASH" ]
-
-      }
-
-      if (enable_dic) {
-        defines += [ "DIC_ENABLE=1" ]
-      }
+    if (enable_dic) {
+      defines += [ "DIC_ENABLE=1" ]
     }
 
     libs += [ "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a" ]
@@ -230,6 +200,15 @@ template("efr32_sdk") {
     cflags += [
       "-Wno-maybe-uninitialized",
       "-Wno-shadow",
+      "-Wno-empty-body",
+      "-Wno-cpp",
+      "-Wno-missing-braces",
+      "-Wno-sign-compare",
+      "-Wno-error",
+      "-Wno-unknown-warning-option",
+      "-Wno-unused-variable",
+      "-Wno-implicit-function-declaration",
+      "-Wno-unused-function",
     ]
 
     if (defined(invoker.defines)) {
@@ -251,26 +230,49 @@ template("efr32_sdk") {
 
   source_set(sdk_target_name) {
     sources = [
-      "${examples_plat_dir}/device/src/startup_RS1xxxx.c",
-      "${sdk_support_root}/platform/emdrv/nvm3/src/ccp_flash_dev.c",
-      "${sdk_support_root}/platform/emdrv/nvm3/src/ccp_flash_intf.c",
-      "${sdk_support_root}/platform/emdrv/nvm3/src/ccp_flash_prg.c",
-      "${sdk_support_root}/platform/emdrv/nvm3/src/nvm3_default.c",
+      # sapi
+      "${wisemcu_sdk_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
+      "${wisemcu_sdk_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
+      "${wisemcu_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
+      "${wisemcu_sdk_root}/sapi/common/rsi_apis_non_rom.c",
+      "${wisemcu_sdk_root}/sapi/common/rsi_apis_rom.c",
+      "${wisemcu_sdk_root}/sapi/common/rsi_device_init_apis.c",
+      "${wisemcu_sdk_root}/sapi/common/rsi_common_apis.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_common.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_device_init.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_driver_event_handlers.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_driver.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_events_rom.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_events.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_iap.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_nwk_rom.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_nwk.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_pkt_mgmt_rom.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_pkt_mgmt.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_queue_rom.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_queue.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_scheduler_rom.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_scheduler.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_setregion_countryinfo.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_timer.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_utils_rom.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_utils.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_wlan.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_bt_ble.c",
+      "${wisemcu_sdk_root}/sapi/network/socket/rsi_socket.c",
+      "${wisemcu_sdk_root}/sapi/network/socket/rsi_socket_rom.c",
+      "${wisemcu_sdk_root}/sapi/rtos/freertos_wrapper/rsi_os_wrapper.c",
+      "${wisemcu_sdk_root}/sapi/wlan/rsi_wlan_apis.c",
 
-      ### nvm3 for ccp platform ###
-      "${sdk_support_root}/platform/emdrv/nvm3/src/nvm3_hal_flash_ccp.c",
-      "${sdk_support_root}/platform/emdrv/nvm3/src/nvm3_lock.c",
-
-      ######## CCP Platform #########
-      "${wisemcu_sdk_root}/platforms/si91x/boards/brd4325a/src/rsi_board.c",
-
-      #"${wisemcu_sdk_root}/platforms/si91x/boards/brd4325a/src/syscalls.c",
+      # platform
+      "${wisemcu_sdk_root}/platforms/si91x/hal/src/rsi_bootup_config.c",
+      "${wisemcu_sdk_root}/platforms/si91x/hal/src/rsi_hal_mcu_m4_rom.c",
+      "${wisemcu_sdk_root}/platforms/si91x/hal/src/rsi_hal_mcu_interrupt.c",
+      "${wisemcu_sdk_root}/platforms/si91x/boards/brd4325x/src/rsi_board.c",
       "${wisemcu_sdk_root}/platforms/si91x/core/chip/src/rsi_deepsleep_commonflash.c",
       "${wisemcu_sdk_root}/platforms/si91x/core/chip/src/rsi_ps_ram_func.c",
       "${wisemcu_sdk_root}/platforms/si91x/core/chip/src/rsi_system_config.c",
       "${wisemcu_sdk_root}/platforms/si91x/core/chip/src/system_RS1xxxx.c",
-
-      # Bluetooth
       "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/clock_update.c",
       "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_comparator.c",
       "${wisemcu_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_egpio.c",
@@ -286,10 +288,24 @@ template("efr32_sdk") {
       "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_time_period.c",
       "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_ulpss_clk.c",
       "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_wwdt.c",
-      "${wisemcu_sdk_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
-      "${wisemcu_sdk_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
-      "${wisemcu_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
-      "${wisemcu_sdk_root}/sapi/driver/rsi_bt_ble.c",
+
+      # modified hal
+      "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_timer.c",
+      "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_platform_init.c",
+      "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_m4.c",
+
+      # startup
+      "${examples_plat_dir}/device/src/startup_RS1xxxx.c",
+
+      # nvm3
+      "${sdk_support_root}/platform/emdrv/nvm3/src/ccp_flash_dev.c",
+      "${sdk_support_root}/platform/emdrv/nvm3/src/ccp_flash_intf.c",
+      "${sdk_support_root}/platform/emdrv/nvm3/src/ccp_flash_prg.c",
+      "${sdk_support_root}/platform/emdrv/nvm3/src/nvm3_default.c",
+      "${sdk_support_root}/platform/emdrv/nvm3/src/nvm3_hal_flash_ccp.c",
+      "${sdk_support_root}/platform/emdrv/nvm3/src/nvm3_lock.c",
+
+      # freertos
       "${wisemcu_sdk_root}/third_party/freertos/croutine.c",
       "${wisemcu_sdk_root}/third_party/freertos/event_groups.c",
       "${wisemcu_sdk_root}/third_party/freertos/list.c",
@@ -298,10 +314,6 @@ template("efr32_sdk") {
       "${wisemcu_sdk_root}/third_party/freertos/stream_buffer.c",
       "${wisemcu_sdk_root}/third_party/freertos/tasks.c",
       "${wisemcu_sdk_root}/third_party/freertos/timers.c",
-
-      # USART
-      "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver/UDMA.c",
-      "${wisemcu_sdk_root}/platforms/si91x/drivers/cmsis_driver/USART.c",
 
       # mbedtls
       "${chip_root}/third_party/mbedtls/repo/library/aes.c",

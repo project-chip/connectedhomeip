@@ -236,14 +236,14 @@ config("silabs-wifi-config") {
 
   if (chip_default_wifi_ssid != "") {
     defines += [
-      "CHIP_ONNETWORK_PAIRING=1",
-      "CHIP_WIFI_SSID=\"${chip_default_wifi_ssid}\"",
+      "SL_ONNETWORK_PAIRING=1",
+      "SL_WIFI_SSID=\"${chip_default_wifi_ssid}\"",
     ]
   }
   if (chip_default_wifi_psk != "") {
     assert(chip_default_wifi_ssid != "",
            "ssid can't be null if psk is provided")
-    defines += [ "CHIP_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
+    defines += [ "SL_WIFI_PSK=\"${chip_default_wifi_psk}\"" ]
   }
 
   if (sl_wfx_config_softap) {
