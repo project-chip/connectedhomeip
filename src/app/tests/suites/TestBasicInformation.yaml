@@ -77,7 +77,6 @@ tests:
                   17,
                   18,
                   19,
-                  20,
                   0xFFF8, # GeneratedCommandList
                   0xFFF9, # AcceptedCommandList
                   0xFFFB, # AttributeList
@@ -156,10 +155,3 @@ tests:
       attribute: "LocalConfigDisabled"
       arguments:
           value: false
-
-    - label: "Read the ProductApppearance value"
-      command: "readAttribute"
-      attribute: "ProductAppearance"
-      response:
-          # For now all-clusters-app is a satin purple.
-          value: { Finish: 1, PrimaryColor: 5 }

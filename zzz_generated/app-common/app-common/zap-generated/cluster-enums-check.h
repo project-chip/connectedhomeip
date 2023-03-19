@@ -284,54 +284,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Actions::EndpointListTy
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(BasicInformation::ColorEnum val)
-{
-    using EnumType = BasicInformation::ColorEnum;
-    switch (val)
-    {
-    case EnumType::kBlack:
-    case EnumType::kNavy:
-    case EnumType::kGreen:
-    case EnumType::kTeal:
-    case EnumType::kMaroon:
-    case EnumType::kPurple:
-    case EnumType::kOlive:
-    case EnumType::kGray:
-    case EnumType::kBlue:
-    case EnumType::kLime:
-    case EnumType::kAqua:
-    case EnumType::kRed:
-    case EnumType::kFuchsia:
-    case EnumType::kYellow:
-    case EnumType::kWhite:
-    case EnumType::kNickel:
-    case EnumType::kChrome:
-    case EnumType::kBrass:
-    case EnumType::kCopper:
-    case EnumType::kSilver:
-    case EnumType::kGold:
-        return val;
-    default:
-        return static_cast<EnumType>(21);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(BasicInformation::ProductFinishEnum val)
-{
-    using EnumType = BasicInformation::ProductFinishEnum;
-    switch (val)
-    {
-    case EnumType::kMatte:
-    case EnumType::kSatin:
-    case EnumType::kPolished:
-    case EnumType::kRugged:
-    case EnumType::kFabric:
-    case EnumType::kOther:
-        return val;
-    default:
-        return static_cast<EnumType>(5);
-    }
-}
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvider::OTAApplyUpdateAction val)
 {
     using EnumType = OtaSoftwareUpdateProvider::OTAApplyUpdateAction;

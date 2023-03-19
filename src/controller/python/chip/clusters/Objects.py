@@ -4021,7 +4021,6 @@ class BasicInformation(Cluster):
                 ClusterObjectFieldDescriptor(Label="reachable", Tag=0x00000011, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="uniqueID", Tag=0x00000012, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="capabilityMinima", Tag=0x00000013, Type=BasicInformation.Structs.CapabilityMinimaStruct),
-                ClusterObjectFieldDescriptor(Label="productAppearance", Tag=0x00000014, Type=typing.Optional[BasicInformation.Structs.ProductAppearanceStruct]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -4050,55 +4049,12 @@ class BasicInformation(Cluster):
     reachable: 'typing.Optional[bool]' = None
     uniqueID: 'typing.Optional[str]' = None
     capabilityMinima: 'BasicInformation.Structs.CapabilityMinimaStruct' = None
-    productAppearance: 'typing.Optional[BasicInformation.Structs.ProductAppearanceStruct]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
-
-    class Enums:
-        class ColorEnum(MatterIntEnum):
-            kBlack = 0x00
-            kNavy = 0x01
-            kGreen = 0x02
-            kTeal = 0x03
-            kMaroon = 0x04
-            kPurple = 0x05
-            kOlive = 0x06
-            kGray = 0x07
-            kBlue = 0x08
-            kLime = 0x09
-            kAqua = 0x0A
-            kRed = 0x0B
-            kFuchsia = 0x0C
-            kYellow = 0x0D
-            kWhite = 0x0E
-            kNickel = 0x0F
-            kChrome = 0x10
-            kBrass = 0x11
-            kCopper = 0x12
-            kSilver = 0x13
-            kGold = 0x14
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 21,
-
-        class ProductFinishEnum(MatterIntEnum):
-            kMatte = 0x00
-            kSatin = 0x01
-            kPolished = 0x02
-            kRugged = 0x03
-            kFabric = 0x04
-            kOther = 0xFF
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 5,
 
     class Structs:
         @dataclass
@@ -4113,19 +4069,6 @@ class BasicInformation(Cluster):
 
             caseSessionsPerFabric: 'uint' = 0
             subscriptionsPerFabric: 'uint' = 0
-
-        @dataclass
-        class ProductAppearanceStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="finish", Tag=0, Type=BasicInformation.Enums.ProductFinishEnum),
-                        ClusterObjectFieldDescriptor(Label="primaryColor", Tag=1, Type=typing.Union[Nullable, BasicInformation.Enums.ColorEnum]),
-                    ])
-
-            finish: 'BasicInformation.Enums.ProductFinishEnum' = 0
-            primaryColor: 'typing.Union[Nullable, BasicInformation.Enums.ColorEnum]' = NullValue
 
     class Commands:
         @dataclass
@@ -4461,22 +4404,6 @@ class BasicInformation(Cluster):
                 return ClusterObjectFieldDescriptor(Type=BasicInformation.Structs.CapabilityMinimaStruct)
 
             value: 'BasicInformation.Structs.CapabilityMinimaStruct' = field(default_factory=lambda: BasicInformation.Structs.CapabilityMinimaStruct())
-
-        @dataclass
-        class ProductAppearance(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0028
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000014
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[BasicInformation.Structs.ProductAppearanceStruct])
-
-            value: 'typing.Optional[BasicInformation.Structs.ProductAppearanceStruct]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
