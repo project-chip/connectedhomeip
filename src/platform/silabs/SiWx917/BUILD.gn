@@ -90,15 +90,13 @@ static_library("SiWx917") {
     ]
   }
 
-
-    sources += [
-      "${silabs_platform_dir}/ConnectivityManagerImpl_WIFI.cpp",
-      "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.cpp",
-      "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.h",
-      "wifi/wfx_host_events.h",
-      "wifi/wfx_msgs.h",
-      "wifi/wifi_config.h",
-    ]
-    public_configs = [ ":siwx917-platform-wifi-config" ]
-
+  sources += [
+    "${silabs_platform_dir}/ConnectivityManagerImpl_WIFI.cpp",
+    "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.cpp",
+    "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.h",
+    "wifi/wfx_host_events.h",
+    "wifi/wfx_msgs.h",
+    "wifi/wifi_config.h",
+  ]
+  public_configs = [ ":siwx917-platform-wifi-config" ]
 }

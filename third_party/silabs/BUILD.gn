@@ -37,7 +37,6 @@ declare_args() {
   sl_matter_version_str = ""
 }
 
-
 config("silabs_config") {
   if (sl_matter_version_str != "") {
     defines = [ "SL_MATTER_VERSION_STRING=\"${sl_matter_version_str}\"" ]
@@ -47,7 +46,7 @@ config("silabs_config") {
 if (silabs_board == "BRD4325B") {  # CCP board
   assert(siwx917_sdk_target != "", "siwx917_sdk_target must be specified")
   group("efr32_sdk") {
-    public_deps = [siwx917_sdk_target ]
+    public_deps = [ siwx917_sdk_target ]
     public_configs = [ ":silabs_config" ]
   }
 } else {
@@ -128,15 +127,15 @@ if (use_silabs_thread_lib) {
         "${sl_ot_efr32_root}/platform-abstraction/efr32/openthread-core-efr32-config-check.h",
         "${sl_ot_efr32_root}/platform-abstraction/efr32/openthread-core-efr32-config.h",
       ]
-  
+
       public_deps = [
         ":libopenthread-platform",
         "${efr32_sdk_build_root}:efr32_sdk",
       ]
-  
+
       public_configs = [ ":openthread_efr32_config" ]
     }
-  
+
     source_set("ot-efr32-cert") {
       if (enable_openthread_cli) {
         sources = [
@@ -171,12 +170,12 @@ if (use_silabs_thread_lib) {
           "${sl_openthread_root}/src/cli/x509_cert_key.hpp",
         ]
       }
-  
+
       public_configs = [
         ":openthread_efr32_config",
         ":libopenthread-platform_config",
       ]
-  
+
       public_deps = [
         ":libopenthread-platform",
         ":openthread_core_config_efr32",
@@ -184,23 +183,23 @@ if (use_silabs_thread_lib) {
         "${sl_openthread_root}/include/openthread:openthread",
         "${sl_openthread_root}/src/core/:libopenthread_core_headers",
       ]
-  
+
       deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
-  
+
       # selected thread device type FTD or MTD
       XTD = "ftd"
       if (!chip_openthread_ftd) {
         XTD = "mtd"
       }
-  
+
       # Use silabs openthread library stack with or without coap api enabled
       COAP_API = ""
       if (use_thread_coap_lib) {
         COAP_API = "coap_"
       }
-  
+
       public_configs += [ "${sl_openthread_root}:openthread_${XTD}_config" ]
-  
+
       libs = [
         "${sl_ot_efr32_root}/libs/libsl_ot_stack_${XTD}_${COAP_API}${silabs_family}_gcc.a",
         "${sl_ot_efr32_root}/libs/libsl_platform_${XTD}_dmp_${silabs_family}_gcc.a",

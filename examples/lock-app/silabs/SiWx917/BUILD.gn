@@ -54,8 +54,6 @@ efr32_sdk("sdk") {
     "${examples_common_plat_dir}",
   ]
 
-
-
   defines = []
   if (chip_enable_pw_rpc) {
     defines += [

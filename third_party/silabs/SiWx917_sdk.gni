@@ -26,7 +26,6 @@ declare_args() {
   wisemcu_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
   examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 
-
   kvs_max_entries = 255
 
   # Use Silabs factory data provider example.
@@ -46,7 +45,6 @@ declare_args() {
 #   wisemcu_sdk_root - The location of the wisemcu SDK.
 #   sources - The sources files to build.
 template("efr32_sdk") {
-
   sdk_target_name = target_name
 
   config("${sdk_target_name}_config") {
@@ -130,11 +128,12 @@ template("efr32_sdk") {
     }
 
     if (!use_rs911x_sockets) {
-        import("${chip_root}/src/platform/silabs/SiWx917/args.gni")
-        defines += [ "LWIP_NETIF_API=1" ]
+      import("${chip_root}/src/platform/silabs/SiWx917/args.gni")
+      defines += [ "LWIP_NETIF_API=1" ]
       if (lwip_ipv4) {
         defines += [
           "LWIP_IPV4=1",
+
           # adds following options to provide
           # them to .cpp source files
           # flags ported from lwipopts file
@@ -154,7 +153,6 @@ template("efr32_sdk") {
         defines += [ "LWIP_IPV6=0" ]
       }
     }
-
 
     defines += board_defines
 
@@ -181,9 +179,7 @@ template("efr32_sdk") {
     }
 
     if (chip_build_libshell) {  # matter shell
-      defines += [
-        "ENABLE_CHIP_SHELL",
-      ]
+      defines += [ "ENABLE_CHIP_SHELL" ]
     }
 
     if (enable_dic) {
@@ -236,38 +232,35 @@ template("efr32_sdk") {
       "${wisemcu_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
       "${wisemcu_sdk_root}/sapi/common/rsi_apis_non_rom.c",
       "${wisemcu_sdk_root}/sapi/common/rsi_apis_rom.c",
-      "${wisemcu_sdk_root}/sapi/common/rsi_device_init_apis.c",
       "${wisemcu_sdk_root}/sapi/common/rsi_common_apis.c",
+      "${wisemcu_sdk_root}/sapi/common/rsi_device_init_apis.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_bt_ble.c",
       "${wisemcu_sdk_root}/sapi/driver/rsi_common.c",
       "${wisemcu_sdk_root}/sapi/driver/rsi_device_init.c",
-      "${wisemcu_sdk_root}/sapi/driver/rsi_driver_event_handlers.c",
       "${wisemcu_sdk_root}/sapi/driver/rsi_driver.c",
-      "${wisemcu_sdk_root}/sapi/driver/rsi_events_rom.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_driver_event_handlers.c",
       "${wisemcu_sdk_root}/sapi/driver/rsi_events.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_events_rom.c",
       "${wisemcu_sdk_root}/sapi/driver/rsi_iap.c",
-      "${wisemcu_sdk_root}/sapi/driver/rsi_nwk_rom.c",
       "${wisemcu_sdk_root}/sapi/driver/rsi_nwk.c",
-      "${wisemcu_sdk_root}/sapi/driver/rsi_pkt_mgmt_rom.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_nwk_rom.c",
       "${wisemcu_sdk_root}/sapi/driver/rsi_pkt_mgmt.c",
-      "${wisemcu_sdk_root}/sapi/driver/rsi_queue_rom.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_pkt_mgmt_rom.c",
       "${wisemcu_sdk_root}/sapi/driver/rsi_queue.c",
-      "${wisemcu_sdk_root}/sapi/driver/rsi_scheduler_rom.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_queue_rom.c",
       "${wisemcu_sdk_root}/sapi/driver/rsi_scheduler.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_scheduler_rom.c",
       "${wisemcu_sdk_root}/sapi/driver/rsi_setregion_countryinfo.c",
       "${wisemcu_sdk_root}/sapi/driver/rsi_timer.c",
-      "${wisemcu_sdk_root}/sapi/driver/rsi_utils_rom.c",
       "${wisemcu_sdk_root}/sapi/driver/rsi_utils.c",
+      "${wisemcu_sdk_root}/sapi/driver/rsi_utils_rom.c",
       "${wisemcu_sdk_root}/sapi/driver/rsi_wlan.c",
-      "${wisemcu_sdk_root}/sapi/driver/rsi_bt_ble.c",
       "${wisemcu_sdk_root}/sapi/network/socket/rsi_socket.c",
       "${wisemcu_sdk_root}/sapi/network/socket/rsi_socket_rom.c",
       "${wisemcu_sdk_root}/sapi/rtos/freertos_wrapper/rsi_os_wrapper.c",
       "${wisemcu_sdk_root}/sapi/wlan/rsi_wlan_apis.c",
 
       # platform
-      "${wisemcu_sdk_root}/platforms/si91x/hal/src/rsi_bootup_config.c",
-      "${wisemcu_sdk_root}/platforms/si91x/hal/src/rsi_hal_mcu_m4_rom.c",
-      "${wisemcu_sdk_root}/platforms/si91x/hal/src/rsi_hal_mcu_interrupt.c",
       "${wisemcu_sdk_root}/platforms/si91x/boards/brd4325x/src/rsi_board.c",
       "${wisemcu_sdk_root}/platforms/si91x/core/chip/src/rsi_deepsleep_commonflash.c",
       "${wisemcu_sdk_root}/platforms/si91x/core/chip/src/rsi_ps_ram_func.c",
@@ -288,11 +281,14 @@ template("efr32_sdk") {
       "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_time_period.c",
       "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_ulpss_clk.c",
       "${wisemcu_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_wwdt.c",
+      "${wisemcu_sdk_root}/platforms/si91x/hal/src/rsi_bootup_config.c",
+      "${wisemcu_sdk_root}/platforms/si91x/hal/src/rsi_hal_mcu_interrupt.c",
+      "${wisemcu_sdk_root}/platforms/si91x/hal/src/rsi_hal_mcu_m4_rom.c",
 
       # modified hal
-      "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_timer.c",
-      "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_platform_init.c",
       "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_m4.c",
+      "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_platform_init.c",
+      "${examples_plat_dir}/SiWx917/hal/rsi_hal_mcu_timer.c",
 
       # startup
       "${examples_plat_dir}/device/src/startup_RS1xxxx.c",

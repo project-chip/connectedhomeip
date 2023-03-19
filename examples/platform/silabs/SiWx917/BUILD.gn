@@ -17,8 +17,8 @@ import("//build_overrides/efr32_sdk.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
-import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
+import("${efr32_sdk_build_root}/SiWx917_sdk.gni")
 silabs_common_plat_dir = "${chip_root}/examples/platform/silabs"
 wifi_sdk_dir = "${chip_root}/src/platform/silabs/SiWx917/wifi"
 
@@ -229,15 +229,15 @@ source_set("siwx917-common") {
 
   sources = [
     "${silabs_common_plat_dir}/heap_4_silabs.c",
-    "${wifi_sdk_dir}/ethernetif.cpp",
     "${wifi_sdk_dir}/dhcp_client.cpp",
+    "${wifi_sdk_dir}/ethernetif.cpp",
     "${wifi_sdk_dir}/lwip_netif.cpp",
     "${wifi_sdk_dir}/wfx_notify.cpp",
-    "siwx917_utils.cpp",
-    "init_ccpPlatform.cpp",
-    "matter_config.cpp",
     "SiWx917/rsi_if.c",
     "SiWx917/wfx_rsi_host.c",
+    "init_ccpPlatform.cpp",
+    "matter_config.cpp",
+    "siwx917_utils.cpp",
   ]
 
   if (use_base_app) {
@@ -271,7 +271,6 @@ source_set("siwx917-common") {
   }
 
   if (chip_enable_wifi) {
-
     public_configs += [ ":silabs-wifi-config" ]
   }
 

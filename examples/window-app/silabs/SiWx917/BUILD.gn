@@ -47,9 +47,6 @@ efr32_sdk("sdk") {
     "${chip_root}/src/lib",
     "${examples_common_plat_dir}",
   ]
-
-
-
 }
 
 siwx917_executable("window_app") {
