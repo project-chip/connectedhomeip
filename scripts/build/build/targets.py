@@ -558,6 +558,7 @@ def BuildTelinkTarget():
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
+    target.AppendModifier('factory-data', enable_factory_data=True)
 
     return target
 

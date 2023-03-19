@@ -101,17 +101,18 @@ static void __AdapterStateChangedCb(int result, bt_adapter_state_e adapterState,
 
 void BLEManagerImpl::GattConnectionStateChangedCb(int result, bool connected, const char * remoteAddress, void * userData)
 {
-    ChipLogProgress(DeviceLayer, "Gatt Connection State Changed: %s result [%d]", connected ? "Connected" : "Disconnected", result);
-
-    if (result != BT_ERROR_NONE)
+    ChipLogProgress(DeviceLayer, "Gatt Connection State Changed [%u]: %s", result, connected ? "Connected" : "Disconnected");
+    switch (result)
     {
-        ChipLogError(DeviceLayer, "%s", connected ? "Connection req failed" : "Disconnection req failed");
+    case BT_ERROR_NONE:
+    case BT_ERROR_ALREADY_DONE:
+        sInstance.HandleConnectionEvent(connected, remoteAddress);
+        break;
+    default:
+        ChipLogError(DeviceLayer, "%s: %s", connected ? "Connection req failed" : "Disconnection req failed",
+                     get_error_message(result));
         if (connected)
             sInstance.NotifyHandleConnectFailed(CHIP_ERROR_INTERNAL);
-    }
-    else
-    {
-        sInstance.HandleConnectionEvent(connected, remoteAddress);
     }
 }
 

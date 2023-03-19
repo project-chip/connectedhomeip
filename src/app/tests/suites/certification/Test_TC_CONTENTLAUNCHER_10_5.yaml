@@ -30,20 +30,22 @@ tests:
       PICS: CONTENTLAUNCHER.S.C01.Rsp
       verification: |
           The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
-          ./chip-tool contentlauncher launch-url "exampleUrl"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
-          ./chip-tv-casting-app contentlauncher launch-url "exampleUrl"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
+          ./chip-tool contentlauncher launch-url "exampleUrl"   '{"providerName":  "exampleName", "background": { "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1
+          ./chip-tv-casting-app contentlauncher launch-url "exampleUrl"   '{"providerName":  "exampleName", "background": { "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1
 
           On TH  verify the success response (value 0) received  from DUT
 
-          [1651062947.426589][157354:157359] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
-          [1651062947.426633][157354:157359] CHIP:TOO:   LaunchResponse: {
-          [1651062947.426667][157354:157359] CHIP:TOO:     status: 0
-          [1651062947.426686][157354:157359] CHIP:TOO:     data: exampleData
-          [1651062947.426704][157354:157359] CHIP:TOO:    }
+          [1678789736.472050][327646:327648] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_050A Command=0x0000_0002
+          [1678789736.472076][327646:327648] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
+          [1678789736.472108][327646:327648] CHIP:TOO:   LauncherResponse: {
+          [1678789736.472137][327646:327648] CHIP:TOO:     status: 0
+          [1678789736.472147][327646:327648] CHIP:TOO:     data: exampleData
+          [1678789736.472156][327646:327648] CHIP:TOO:    }
+          [1678789736.472184][327646:327648] CHIP:DMG: ICR moving to [AwaitingDe]
 
 
           Example tv-app log file shows receipt of launchurl command:
-          [1653934858083] [86784:7552970] CHIP: [ZCL] ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=exampleUrl DisplayString= BrandingInformation.ProviderName=exampleName
+          [1678789736.471351][324821:324821] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=exampleUrl DisplayString= BrandingInformation.ProviderName=exampleName
       disabled: true
 
     - label:
@@ -52,19 +54,25 @@ tests:
       PICS: CONTENTLAUNCHER.S.C01.Rsp
       verification: |
           The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
-          ./chip-tool contentlauncher launch-url "https://csa-iot.org/"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1 --DisplayString "Custom Display String"
-          ./chip-tv-casting-app contentlauncher launch-url "https://csa-iot.org/"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1 --DisplayString "Custom Display String"
+          ./chip-tool contentlauncher launch-url "https://csa-iot.org/"   '{"providerName":  "exampleName", "background": {"color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1 --DisplayString "Custom Display String"
+          ./chip-tv-casting-app contentlauncher launch-url "https://csa-iot.org/"   '{"providerName":  "exampleName", "background": {"color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1 --DisplayString "Custom Display String"
 
           On TH  verify the success response (value 0) received  from DUT
-          [1651225659.477000][4263:4268] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
-          [1651225659.477112][4263:4268] CHIP:TOO:   LaunchResponse: {
-          [1651225659.477213][4263:4268] CHIP:TOO:     status: 0
-          [1651225659.477274][4263:4268] CHIP:TOO:     data: exampleData
-          [1651225659.477352][4263:4268] CHIP:TOO:    }
+          [1678789892.544748][327789:327791] CHIP:DMG: },
+          [1678789892.544778][327789:327791] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_050A Command=0x0000_0002
+          [1678789892.544785][327789:327791] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
+          [1678789892.544800][327789:327791] CHIP:TOO:   LauncherResponse: {
+          [1678789892.544806][327789:327791] CHIP:TOO:     status: 0
+          [1678789892.544809][327789:327791] CHIP:TOO:     data: exampleData
+          [1678789892.544811][327789:327791] CHIP:TOO:    }
+          [1678789892.544816][327789:327791] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1678789892.544827][327789:327791] CHIP:EM: <<< [E:5462i S:11532 M:235261867 (Ack:223833241)] (S) Msg TX to 1:0000000000000001 [67DC] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1678789892.544831][327789:327791] CHIP:IN: (S) Sending msg 235261867 on secure session with LSID: 11532
+
 
 
           Example tv-app log file shows receipt of launchurl command:
-          [1653935303371] [86784:7557521] CHIP: [ZCL] ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://csa-iot.org/ DisplayString=Custom Display String BrandingInformation.ProviderName=exampleName
+          [1678789892.544284][324821:324821] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://csa-iot.org/ DisplayString=Custom Display String BrandingInformation.ProviderName=exampleName
       disabled: true
 
     - label:
@@ -73,19 +81,22 @@ tests:
       PICS: CONTENTLAUNCHER.S.C01.Rsp
       verification: |
           The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
-          ./chip-tool contentlauncher launch-url "https://csa-iot.org/"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
-          ./chip-tv-casting-app contentlauncher launch-url "https://csa-iot.org/"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
+          ./chip-tool contentlauncher launch-url "https://csa-iot.org/"   '{"providerName":  "exampleName", "background": {"color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1
+          ./chip-tv-casting-app contentlauncher launch-url "https://csa-iot.org/"   '{"providerName":  "exampleName", "background": { "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1
 
           On TH  verify the success response (value 0) received  from DUT
-          [1651225659.477000][4263:4268] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
-          [1651225659.477112][4263:4268] CHIP:TOO:   LaunchResponse: {
-          [1651225659.477213][4263:4268] CHIP:TOO:     status: 0
-          [1651225659.477274][4263:4268] CHIP:TOO:     data: exampleData
-          [1651225659.477352][4263:4268] CHIP:TOO:    }
+          [1678789976.395074][327809:327811] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_050A Command=0x0000_0002
+          [1678789976.395083][327809:327811] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
+          [1678789976.395095][327809:327811] CHIP:TOO:   LauncherResponse: {
+          [1678789976.395106][327809:327811] CHIP:TOO:     status: 0
+          [1678789976.395109][327809:327811] CHIP:TOO:     data: exampleData
+          [1678789976.395112][327809:327811] CHIP:TOO:    }
+          [1678789976.395120][327809:327811] CHIP:DMG: ICR moving to [AwaitingDe]
+
 
 
           Example tv-app log file shows receipt of launchurl command:
-          [1653935043782] [86784:7554997] CHIP: [ZCL] ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://csa-iot.org/ DisplayString= BrandingInformation.ProviderName=exampleName
+          [1678789976.394509][324821:324821] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://csa-iot.org/ DisplayString= BrandingInformation.ProviderName=exampleName
       disabled: true
 
     - label:
@@ -94,22 +105,24 @@ tests:
       PICS: CONTENTLAUNCHER.S.C01.Rsp
       verification: |
           The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
-          ./chip-tool contentlauncher launch-url "https://badurl"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
-          ./chip-tv-casting-app contentlauncher launch-url "https://badurl"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
+          ./chip-tool contentlauncher launch-url "https://badurl"   '{"providerName":  "exampleName", "background": { "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1
+          ./chip-tv-casting-app contentlauncher launch-url "https://badurl"   '{"providerName":  "exampleName", "background": {"color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1
 
           On TH  verify the success response (value 0) received  from DUT
-          [1652429829.721244][29660:29665] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
-          [1652429829.721301][29660:29665] CHIP:TOO:   LaunchResponse: {
-          [1652429829.721341][29660:29665] CHIP:TOO:     status: 1
-          [1652429829.721368][29660:29665] CHIP:TOO:     data: exampleData
-          [1652429829.721395][29660:29665] CHIP:TOO:    }
+          [1678790057.261934][327869:327871] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_050A Command=0x0000_0002
+          [1678790057.261963][327869:327871] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
+          [1678790057.261997][327869:327871] CHIP:TOO:   LauncherResponse: {
+          [1678790057.262025][327869:327871] CHIP:TOO:     status: 1
+          [1678790057.262035][327869:327871] CHIP:TOO:     data: exampleData
+          [1678790057.262045][327869:327871] CHIP:TOO:    }
+          [1678790057.262072][327869:327871] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1678790057.262115][327869:327871] CHIP:EM: <<< [E:61104i S:23930 M:82030218 (Ack:133196816)] (S) Msg TX to 1:0000000000000001 [67DC] --- Type 0000:10 (SecureChannel:StandaloneAck)
 
-          [1654584050.322782][2478:2478] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_050A Command=0x0000_0001
-          [1654584050.322837][2478:2478] CHIP:DL: GetContentAppByEndpointId() - endpoint 1 not found
-          [1654584050.322860][2478:2478] CHIP:ZCL: Content Launcher NOT returning ContentApp delegate for endpoint:1
-          [1654584050.322891][2478:2478] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl
-          [1654584050.322915][2478:2478] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://badurl DisplayString= BrandingInformation.ProviderName=exampleName
-          [1654584050.322953][2478:2478] CHIP:DMG: ICR moving to [ Preparing]
+          Example tv-app log file shows receipt of launchurl command:
+          [1678790092.751184][324821:324821] CHIP:ZCL: Content Launcher NOT returning ContentApp delegate for endpoint:1
+          [1678790092.751199][324821:324821] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl
+          [1678790092.751206][324821:324821] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://badurl DisplayString= BrandingInformation.ProviderName=exampleName
+          [1678790092.751223][324821:324821] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true
 
     - label:
@@ -118,20 +131,26 @@ tests:
       PICS: CONTENTLAUNCHER.S.C01.Rsp
       verification: |
           The TH commands for this test step can be invoked using chip-tool (when DUT is a commissionee) or tv-casting-app (when DUT is a commissioner):
-          ./chip-tool contentlauncher launch-url "https://csa-iot.org/badauth"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
-          ./chip-tv-casting-app contentlauncher launch-url "https://csa-iot.org/badauth"   "{"providerName":  "exampleName", "background": { "imageUrl": "exampleUrl", "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}" 1 1
+          ./chip-tool contentlauncher launch-url "https://csa-iot.org/badauth"   '{"providerName":  "exampleName", "background": {"color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1
+          ./chip-tv-casting-app contentlauncher launch-url "https://csa-iot.org/badauth"   '{"providerName":  "exampleName", "background": { "color": "blue", "size" : {"width": 1.0, "height": 1.0,  "metric": 0} }}' 1 1
 
           On TH  verify the success response (value 0) received  from DUT
-          [1652429857.017897][29666:29671] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
-          [1652429857.017968][29666:29671] CHIP:TOO:   LaunchResponse: {
-          [1652429857.018031][29666:29671] CHIP:TOO:     status: 2
-          [1652429857.018068][29666:29671] CHIP:TOO:     data: exampleData
-          [1652429857.018103][29666:29671] CHIP:TOO:    }
+          [1678790163.014868][327910:327912] CHIP:DMG: },
+          [1678790163.014878][327910:327912] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_050A Command=0x0000_0002
+          [1678790163.014885][327910:327912] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_050A Command 0x0000_0002
+          [1678790163.014894][327910:327912] CHIP:TOO:   LauncherResponse: {
+          [1678790163.014903][327910:327912] CHIP:TOO:     status: 2
+          [1678790163.014905][327910:327912] CHIP:TOO:     data: exampleData
+          [1678790163.014908][327910:327912] CHIP:TOO:    }
+          [1678790163.014912][327910:327912] CHIP:DMG: ICR moving to [AwaitingDe]
+          [1678790163.014926][327910:327912] CHIP:EM: <<< [E:6864i S:36983 M:190033825 (Ack:105150405)] (S) Msg TX to 1:0000000000000001 [67DC] --- Type 0000:10 (SecureChannel:StandaloneAck)
+          [1678790163.014930][327910:327912] CHIP:IN: (S) Sending msg 190033825 on secure session with LSID: 36983
 
-          [1654584216.621632][2478:2478] CHIP:DMG: Received command for Endpoint=1 Cluster=0x0000_050A Command=0x0000_0001
-          [1654584216.621692][2478:2478] CHIP:DL: GetContentAppByEndpointId() - endpoint 1 not found
-          [1654584216.621718][2478:2478] CHIP:ZCL: Content Launcher NOT returning ContentApp delegate for endpoint:1
-          [1654584216.621752][2478:2478] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl
-          [1654584216.621804][2478:2478] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://csa-iot.org/badauth DisplayString= BrandingInformation.ProviderName=exampleName
-          [1654584216.621845][2478:2478] CHIP:DMG: ICR moving to [ Preparing]
+
+          Example tv-app log file shows receipt of launchurl command:
+          [1678790163.014705][324821:324821] CHIP:DL: GetContentAppByEndpointId() - endpoint 1 not found
+          [1678790163.014707][324821:324821] CHIP:ZCL: Content Launcher NOT returning ContentApp delegate for endpoint:1
+          [1678790163.014711][324821:324821] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl
+          [1678790163.014713][324821:324821] CHIP:ZCL: ContentLauncherManager::HandleLaunchUrl TEST CASE ContentURL=https://csa-iot.org/badauth DisplayString= BrandingInformation.ProviderName=exampleName
+          [1678790163.014719][324821:324821] CHIP:DMG: Command handler moving to [ Preparing]
       disabled: true

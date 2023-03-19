@@ -37,7 +37,7 @@ tests:
       disabled: true
 
     - label: "DUT reads the MaxNetworks attribute from the TH"
-      PICS: CNET.S.A0000
+      PICS: CNET.C.A0000
       verification: |
           ./chip-tool networkcommissioning read max-networks 54 0
 
@@ -58,7 +58,7 @@ tests:
       disabled: true
 
     - label: "DUT reads the Networks attribute from the TH"
-      PICS: CNET.S.A0001
+      PICS: CNET.C.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 54 0
 
@@ -78,7 +78,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ScanMaxTimeSeconds attribute from the TH"
-      PICS: CNET.S.A0002
+      PICS: CNET.C.A0002
       verification: |
           ./chip-tool networkcommissioning read scan-max-time-seconds 54 0
 
@@ -96,7 +96,7 @@ tests:
       disabled: true
 
     - label: "DUT reads ConnectMaxTimeSeconds attribute from the TH"
-      PICS: CNET.S.A0003
+      PICS: CNET.C.A0003
       verification: |
           ./chip-tool networkcommissioning read connect-max-time-seconds 54 0
 
@@ -114,7 +114,7 @@ tests:
       disabled: true
 
     - label: "DUT reads InterfaceEnabled attribute from the TH"
-      PICS: CNET.S.A0004
+      PICS: CNET.C.A0004
       verification: |
           ./chip-tool networkcommissioning read interface-enabled 54 0
 
@@ -132,7 +132,7 @@ tests:
       disabled: true
 
     - label: "DUT reads LastNetworkingStatus attribute from the TH"
-      PICS: CNET.S.A0005
+      PICS: CNET.C.A0005
       verification: |
           ./chip-tool networkcommissioning read last-networking-status 54 0
 
@@ -153,7 +153,7 @@ tests:
       disabled: true
 
     - label: "DUT reads LastNetworkID attribute from the TH"
-      PICS: CNET.S.A0006
+      PICS: CNET.C.A0006
       verification: |
           ./chip-tool networkcommissioning read last-network-id 54 0
 
@@ -174,7 +174,7 @@ tests:
       disabled: true
 
     - label: "DUT reads LastConnectErrorValue attribute from the TH"
-      PICS: CNET.S.A0007
+      PICS: CNET.C.A0007
       verification: |
           ./chip-tool networkcommissioning read last-connect-error-value 54 0
 

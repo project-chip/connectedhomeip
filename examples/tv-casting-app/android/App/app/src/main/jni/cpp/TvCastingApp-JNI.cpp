@@ -303,6 +303,20 @@ exit:
     return true;
 }
 
+JNI_METHOD(jboolean, purgeCache)(JNIEnv * env, jobject)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "JNI_METHOD purgeCache called");
+
+    CHIP_ERROR err = CastingServer::GetInstance()->PurgeCache();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "TVCastingApp-JNI::purgeCache failed: %" CHIP_ERROR_FORMAT, err.Format());
+        return false;
+    }
+    return true;
+}
+
 JNI_METHOD(jboolean, contentLauncherLaunchURL)
 (JNIEnv * env, jobject, jobject contentApp, jstring contentUrl, jstring contentDisplayStr, jobject jResponseHandler)
 {

@@ -565,6 +565,37 @@ NS_ASSUME_NONNULL_BEGIN
 @implementation MTRBasicClusterCapabilityMinimaStruct : MTRBasicInformationClusterCapabilityMinimaStruct
 @end
 
+@implementation MTRBasicInformationClusterProductAppearanceStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _finish = @(0);
+
+        _primaryColor = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRBasicInformationClusterProductAppearanceStruct alloc] init];
+
+    other.finish = self.finish;
+    other.primaryColor = self.primaryColor;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString =
+        [NSString stringWithFormat:@"<%@: finish:%@; primaryColor:%@; >", NSStringFromClass([self class]), _finish, _primaryColor];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRBasicInformationClusterStartUpEvent
 - (instancetype)init
 {

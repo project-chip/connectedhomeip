@@ -320,10 +320,18 @@ tests:
               - name: "UserIndex"
                 value: 1
 
-    - label: "Cleanup the created user"
+    - label: "Cleanup the created user with UserIndex 1"
       command: "ClearUser"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "UserIndex"
                 value: 1
+
+    - label: "Cleanup the created user with UserIndex 5"
+      command: "ClearUser"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "UserIndex"
+                value: 5

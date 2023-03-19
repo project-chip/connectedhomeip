@@ -6546,6 +6546,8 @@
       attributes:
           TimeSynchronization:
               - DSTOffset
+          BasicInformation:
+              - ProductAppearance
       command fields:
           DiagnosticLogs:
               RetrieveLogsRequest:
@@ -6555,6 +6557,8 @@
           TimeSynchronization:
               - DSTOffsetStruct
               - TimeZoneStruct
+          BasicInformation:
+              - ProductAppearanceStruct
       struct fields:
           TimeSynchronization:
               DSTOffsetStruct:
@@ -6565,6 +6569,10 @@
                   - offset
                   - validAt
                   - name
+          BasicInformation:
+              ProductAppearanceStruct:
+                  - finish
+                  - primaryColor
       enums:
           DiagnosticLogs:
               - IntentEnum
@@ -6581,6 +6589,9 @@
           PowerSource:
               - BatCommonDesignationEnum
               - BatApprovedChemistryEnum
+          BasicInformation:
+              - ColorEnum
+              - ProductFinishEnum
       enum values:
           DoorLock:
               LockDataTypeEnum:
@@ -6751,6 +6762,36 @@
                   - SodiumSulfur
                   - ZincBromide
                   - ZincCerium
+          BasicInformation:
+              ColorEnum:
+                  - Black
+                  - Navy
+                  - Green
+                  - Teal
+                  - Maroon
+                  - Purple
+                  - Olive
+                  - Gray
+                  - Blue
+                  - Lime
+                  - Aqua
+                  - Red
+                  - Fuchsia
+                  - Yellow
+                  - White
+                  - Nickel
+                  - Chrome
+                  - Brass
+                  - Copper
+                  - Silver
+                  - Gold
+              ProductFinishEnum:
+                  - Matte
+                  - Satin
+                  - Polished
+                  - Rugged
+                  - Fabric
+                  - Other
       bitmaps:
           OccupancySensing:
               - OccupancyBitmap
@@ -6815,6 +6856,9 @@
           # EventList is provisional for now.
           - EventList
       attributes:
+          # The ProductAppearance bits never happend for the old Basic cluster name.
+          Basic:
+              - ProductAppearance
           # EventList is provisional for now.
           Scenes:
               - EventList
@@ -6958,6 +7002,15 @@
               - EventList
           FaultInjection:
               - EventList
+      structs:
+          # The ProductAppearance bits never happend for the old Basic cluster name.
+          Basic:
+              - ProductAppearanceStruct
+      enums:
+          # The ProductAppearance bits never happend for the old Basic cluster name.
+          Basic:
+              - ProductFinishEnum
+              - ColorEnum
       enum values:
           DoorLock:
               DlLockDataType:
