@@ -64,7 +64,6 @@ efr32_sdk("sdk") {
   }
 }
 
-
 silabs_executable("lighting_app") {
   output_name = "chip-siwx917-lighting-example.out"
   include_dirs = [ "include" ]
