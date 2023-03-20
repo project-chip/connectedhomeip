@@ -33,9 +33,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "AppConfig.h"
 #include "FreeRTOS.h"
 #include "semphr.h"
-#include "AppConfig.h"
 
 #include "gpiointerrupt.h"
 
