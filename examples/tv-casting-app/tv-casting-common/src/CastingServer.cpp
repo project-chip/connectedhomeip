@@ -153,7 +153,8 @@ chip::Inet::IPAddress * CastingServer::getIpAddressForUDCRequest(chip::Inet::IPA
         if (ipAddresses[i].IsIPv4())
         {
             ipIndexToUse = i;
-            ChipLogProgress(AppServer, "Found IPv4 address at index: %lu - prioritizing use of IPv4", ipIndexToUse);
+            ChipLogProgress(AppServer, "Found IPv4 address at index: %lu - prioritizing use of IPv4",
+                            static_cast<long>(ipIndexToUse));
             break;
         }
 
