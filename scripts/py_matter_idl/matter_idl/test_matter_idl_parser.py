@@ -165,6 +165,33 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertEqual(actual, expected)
 
+    def test_timed_attributes(self):
+        actual = parseText("""
+            server cluster MyCluster = 1 {
+                attribute int32u attr1 = 1;
+                timedwrite attribute int32u attr2 = 2;
+                attribute int32u attr3 = 3;
+                timedwrite attribute octet_string<44> attr4[] = 4;
+            }
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.SERVER,
+                    name="MyCluster",
+                    code=1,
+                    attributes=[
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
+                            data_type=DataType(name="int32u"), code=1, name="attr1")),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE | AttributeQuality.TIMED_WRITE, definition=Field(
+                            data_type=DataType(name="int32u"), code=2, name="attr2")),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
+                            data_type=DataType(name="int32u"), code=3, name="attr3")),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE | AttributeQuality.TIMED_WRITE, definition=Field(
+                            data_type=DataType(name="octet_string", max_length=44), code=4, name="attr4", is_list=True)),
+                    ]
+                    )])
+        self.assertEqual(actual, expected)
+
     def test_attribute_access(self):
         actual = parseText("""
             server cluster MyCluster = 1 {
