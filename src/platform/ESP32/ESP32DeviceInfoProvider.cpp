@@ -241,7 +241,7 @@ ESP32DeviceInfoProvider::SupportedCalendarTypesIteratorImpl::SupportedCalendarTy
 size_t ESP32DeviceInfoProvider::SupportedCalendarTypesIteratorImpl::Count()
 {
     size_t count = 0;
-    for (uint8_t i = 0; i < to_underlying(CalendarTypeEnum::kUnknownEnumValue); i++)
+    for (uint8_t i = 0; i < to_underlying(app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kUnknownEnumValue); i++)
     {
         if (mSupportedCalendarTypes & (1 << i))
         {
@@ -254,7 +254,7 @@ size_t ESP32DeviceInfoProvider::SupportedCalendarTypesIteratorImpl::Count()
 
 bool ESP32DeviceInfoProvider::SupportedCalendarTypesIteratorImpl::Next(CalendarType & output)
 {
-    while (mIndex < to_underlying(CalendarTypeEnum::kUnknownEnumValue))
+    while (mIndex < to_underlying(app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kUnknownEnumValue))
     {
         if (mSupportedCalendarTypes & (1 << mIndex))
         {

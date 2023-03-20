@@ -345,7 +345,7 @@ tests:
               maxValue: 65535
 
     - label: "TH reads ChildRoleCount attribute value from DUT"
-      PICS: DGTHREAD.S.A001f
+      PICS: DGTHREAD.S.A000f
       command: "readAttribute"
       attribute: "ChildRoleCount"
       response:

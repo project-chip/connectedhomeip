@@ -118,6 +118,8 @@ tests:
       verification: |
           Into the shell, enter "cast cluster descriptor read  device-type-list 0 4" to read the device list of the descriptor cluster on endpoint 4
 
+          Descriptor cluster is supporting  endpoint 1 and 2 in RPI platform hence if TH  tried to read the device list of the descriptor cluster on endpoint 4  from the DUT, DUT should send the response as UNSUPPORTED_ENDPOINT,
+          It may vary based the DUT
           > cast cluster descriptor read  device-type-list 0 4
           ....
           [1653180214397] [48426:1919098] CHIP: [TOO] Endpoint: 6 Cluster: 0x0000_001D Attribute 0x0000_0000 DataVersion: 4094146641

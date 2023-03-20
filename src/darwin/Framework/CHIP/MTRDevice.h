@@ -74,7 +74,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  *
  * If events are always reported with calendar time, then this property will return nil.
  */
-@property (nonatomic, readonly, nullable) NSDate * estimatedStartTime MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly, nullable)
+    NSDate * estimatedStartTime API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 /**
  * Set the delegate to receive asynchronous callbacks about the device.
@@ -185,11 +186,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 
 @end
 
-extern NSString * const MTREventNumberKey MTR_NEWLY_AVAILABLE;
-extern NSString * const MTREventPriorityKey MTR_NEWLY_AVAILABLE;
-extern NSString * const MTREventTimeTypeKey MTR_NEWLY_AVAILABLE;
-extern NSString * const MTREventSystemUpTimeKey MTR_NEWLY_AVAILABLE;
-extern NSString * const MTREventTimestampDateKey MTR_NEWLY_AVAILABLE;
+extern NSString * const MTREventNumberKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventPriorityKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventTimeTypeKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventSystemUpTimeKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+extern NSString * const MTREventTimestampDateKey API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 @protocol MTRDeviceDelegate <NSObject>
 @required

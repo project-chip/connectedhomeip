@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 30.2.1. [TC-OCC-2.2] Attributes with server as DUT
+name: 28.2.2. [TC-OCC-2.2] Attributes with client as DUT
 
 PICS:
     - OCC.C

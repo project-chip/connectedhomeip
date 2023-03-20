@@ -181,6 +181,10 @@ public:
     // how long it will take to detect that our Sigma1 did not get through.
     static System::Clock::Timeout ComputeSigma1ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig);
 
+    // Compute our Sigma2 response timeout.  This can give consumers an idea of
+    // how long it will take to detect that our Sigma1 did not get through.
+    static System::Clock::Timeout ComputeSigma2ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig);
+
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.
      **/

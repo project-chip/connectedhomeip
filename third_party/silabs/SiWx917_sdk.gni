@@ -125,6 +125,7 @@ template("efr32_sdk") {
       "PLATFORM_HEADER=\"platform-header.h\"",
       "USE_NVM3=1",
       "RSI_ARM_CM4F",
+      "SIWX_917",
       "BRD4325A",
       "CHIP_9117",
       "RSI_BLE_ENABLE=1",
@@ -148,6 +149,9 @@ template("efr32_sdk") {
 
     if (chip_enable_wifi_ipv4) {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4=1" ]
+    }
+    if (invoker.enable_dic) {
+      _include_dirs += [ "${chip_root}/third_party/silabs/mqtt/stack" ]
     }
 
     # Enabling led interface
@@ -197,6 +201,9 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emdrv/uartdrv/config",
         "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
       ]
+      if (enable_dic) {
+        defines += [ "DIC_ENABLE=1" ]
+      }
     }
 
     libs += [ "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a" ]
@@ -339,6 +346,24 @@ template("efr32_sdk") {
 
     if (defined(invoker.sources)) {
       sources += invoker.sources
+    }
+    if (invoker.enable_dic) {
+      sources += [
+        "${chip_root}/third_party/mbedtls/repo/library/base64.c",
+        "${chip_root}/third_party/mbedtls/repo/library/debug.c",
+        "${chip_root}/third_party/mbedtls/repo/library/ecjpake.c",
+        "${chip_root}/third_party/mbedtls/repo/library/pem.c",
+        "${chip_root}/third_party/mbedtls/repo/library/rsa.c",
+        "${chip_root}/third_party/mbedtls/repo/library/rsa_internal.c",
+        "${chip_root}/third_party/mbedtls/repo/library/sha1.c",
+        "${chip_root}/third_party/mbedtls/repo/library/ssl_ciphersuites.c",
+        "${chip_root}/third_party/mbedtls/repo/library/ssl_cli.c",
+        "${chip_root}/third_party/mbedtls/repo/library/ssl_msg.c",
+        "${chip_root}/third_party/mbedtls/repo/library/ssl_srv.c",
+        "${chip_root}/third_party/mbedtls/repo/library/ssl_tls.c",
+        "${chip_root}/third_party/mbedtls/repo/library/x509.c",
+        "${chip_root}/third_party/silabs/mqtt/stack/mqtt.c",
+      ]
     }
 
     public_configs = [ ":${sdk_target_name}_config" ]

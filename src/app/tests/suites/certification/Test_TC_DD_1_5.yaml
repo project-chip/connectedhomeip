@@ -91,7 +91,7 @@ tests:
       disabled: true
 
     - label: "Power on DUT. Bring in NFC scanner close to NFC tag"
-      PICS: MCORE.DD.PHYSICAL_TAMPERING
+      PICS: "!MCORE.DD.PHYSICAL_TAMPERING"
       verification: |
           1. Power on the DUT.
           2. Using an NFC Scanner, physically bring the scanner close to the DUT.

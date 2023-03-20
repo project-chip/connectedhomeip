@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 3.2.3. [TC-DGGEN-2.3] Command received at server as DUT
+name: 3.2.3. [TC-DGGEN-2.3] Command Received [DUT Server]
 
 PICS:
     - DGGEN.S
@@ -26,7 +26,13 @@ config:
 tests:
     - label: "Commission DUT to TH"
       verification: |
+          execute the below mentioned command to put DUT into a commissionable state, Pls use equivalent command on the respective DUT
+           ./chip-all-clusters-app
 
+          Once DUT reach the  commissionable state pls send below mentioned command on TH. Pls use equivalent command on the respective DUT
+           ./chip-tool pairing onnetwork 1 20202021
+          Verify the commissioning completed with success on TH1(chip-tool) from DUT
+          [1650455358.501816][4366:4371] CHIP:TOO: Device commissioning completed with success
       disabled: true
 
     - label: "TH reads TestEventTriggersEnabled attribute value"
@@ -46,7 +52,7 @@ tests:
       verification: |
           Based on Spec, EnableKey value is to be provided by  manufacturer
           below mentioned the example command to verify
-           ./chip-tool generaldiagnostics  <EnableKey> test-event-trigger   0 1 0
+           ./chip-tool generaldiagnostics  test-event-trigger  <EnableKey>  0 1 0
       disabled: true
 
     - label:
