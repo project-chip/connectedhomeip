@@ -34,6 +34,9 @@
 #include "nvm3_default.h"
 #include "nvm3_hal_flash.h"
 #include <nvm3_lock.h>
+#ifdef BRD4325A
+#include "rsi_ccp_common.h"
+#endif
 
 // Substitute the GSDK weak nvm3_lockBegin and nvm3_lockEnd
 // for an application controlled re-entrance protection
@@ -43,6 +46,9 @@ static StaticSemaphore_t nvm3_SemStruct;
 void nvm3_lockBegin(void)
 {
     VerifyOrDie(nvm3_Sem != NULL);
+#ifdef BRD4325A
+    __disable_irq();
+#endif
     xSemaphoreTake(nvm3_Sem, portMAX_DELAY);
 }
 
@@ -50,6 +56,9 @@ void nvm3_lockEnd(void)
 {
     VerifyOrDie(nvm3_Sem != NULL);
     xSemaphoreGive(nvm3_Sem);
+#ifdef BRD4325A
+    __enable_irq();
+#endif
 }
 
 namespace chip {
