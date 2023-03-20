@@ -47,7 +47,10 @@
   {{/zcl_events}}
   {{#chip_server_cluster_attributes}}
   {{#unless isGlobalAttribute}}
-  {{! ensure indent }}{{#unless isWritableAttribute~}}
+  {{! ensure indent }}{{#if mustUseTimedWrite~}}
+    timedwrite {{!marker to place a space even with whitespace removal~}}
+  {{~/if~}}
+  {{~#unless isWritableAttribute~}}
     readonly {{!marker to place a space even with whitespace removal~}}
   {{~/unless~}}
   {{~!TODO: write only attributes should also be supported~}}
