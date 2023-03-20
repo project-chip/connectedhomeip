@@ -138,7 +138,7 @@ class Attribute:
 
     @property
     def requires_timed_write(self):
-        return not (AttributeQuality.TIMED_WRITE & self.qualities)
+        return AttributeQuality.TIMED_WRITE & self.qualities
 
 
 @dataclass
