@@ -57,23 +57,15 @@
 #ifdef RSI_M4_INTERFACE
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (EXT_FEAT_256K_MODE | EXT_FEAT_IEEE_80211W)
 #else
-#ifdef CHIP_9117
-#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (EXT_FEAT_448K_M4SS_256K | EXT_FEAT_IEEE_80211W)
-#else
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (EXT_FEAT_384K_MODE | EXT_FEAT_IEEE_80211W)
-#endif /* CHIP_9117 */
-#endif /* WIFI_ENABLE_SECURITY_WPA3 */
+#endif
 #else
 #ifdef RSI_M4_INTERFACE
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP EXT_FEAT_256K_MODE
 #else
-#ifdef CHIP_9117
-#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP EXT_FEAT_448K_M4SS_256K
-#else
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP EXT_FEAT_384K_MODE
-#endif /* CHIP_9117 */
-#endif /* RSI_M4_INTERFACE */
-#endif /* WIFI_ENABLE_SECURITY_WPA3 */
+#endif
+#endif
 
 //! To set Extended TCPIP feature select bit map
 #define RSI_EXT_TCPIP_FEATURE_BITMAP (/*EXT_FEAT_HTTP_OTAF_SUPPORT |*/ EXT_TCP_IP_SSL_16K_RECORD)
@@ -317,7 +309,7 @@
 //! Power save command parameters
 /*=======================================================================*/
 //! set handshake type of power mode
-#define RSI_HAND_SHAKE_TYPE GPIO_BASED
+#define RSI_HAND_SHAKE_TYPE MSG_BASED
 
 //! 0 - LP, 1- ULP mode with RAM retention and 2 - ULP with Non RAM retention
 #define RSI_SELECT_LP_OR_ULP_MODE RSI_ULP_WITH_RAM_RET

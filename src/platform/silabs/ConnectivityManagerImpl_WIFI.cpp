@@ -220,30 +220,6 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
     DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-CHIP_ERROR ConnectivityManagerImpl::_GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & SEDIntervalsConfig)
-{
-    // For now Wi-Fi uses DTIM power save mode
-    SEDIntervalsConfig.ActiveIntervalMS =
-        chip::System::Clock::Milliseconds32(50);
-    SEDIntervalsConfig.IdleIntervalMS =
-        chip::System::Clock::Milliseconds32(300);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
-{
-    // not required
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_RequestSEDActiveMode(bool onOff, bool delayIdle)
-{
-    // not required
-    return CHIP_NO_ERROR;
-}
-#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
-
 // == == == == == == == == == == ConnectivityManager Private Methods == == == == == == == == == ==
 
 void ConnectivityManagerImpl::DriveStationState()
