@@ -816,6 +816,42 @@ public class ClusterWriteMapping {
     writeAttributeMap.put(
         "pumpConfigurationAndControl", writePumpConfigurationAndControlInteractionInfo);
     Map<String, InteractionInfo> writeThermostatInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeThermostatHVACSystemTypeConfigurationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatHVACSystemTypeConfigurationCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeThermostatHVACSystemTypeConfigurationCommandParams.put(
+        "value", thermostatHVACSystemTypeConfigurationCommandParameterInfo);
+    InteractionInfo writeThermostatHVACSystemTypeConfigurationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeHVACSystemTypeConfigurationAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatHVACSystemTypeConfigurationCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeHVACSystemTypeConfigurationAttribute",
+        writeThermostatHVACSystemTypeConfigurationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeThermostatLocalTemperatureCalibrationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatlocalTemperatureCalibrationCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeThermostatLocalTemperatureCalibrationCommandParams.put(
+        "value", thermostatlocalTemperatureCalibrationCommandParameterInfo);
+    InteractionInfo writeThermostatLocalTemperatureCalibrationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeLocalTemperatureCalibrationAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatLocalTemperatureCalibrationCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeLocalTemperatureCalibrationAttribute",
+        writeThermostatLocalTemperatureCalibrationAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeThermostatOccupiedCoolingSetpointCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo thermostatoccupiedCoolingSetpointCommandParameterInfo =
@@ -852,6 +888,42 @@ public class ClusterWriteMapping {
     writeThermostatInteractionInfo.put(
         "writeOccupiedHeatingSetpointAttribute",
         writeThermostatOccupiedHeatingSetpointAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeThermostatUnoccupiedCoolingSetpointCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatunoccupiedCoolingSetpointCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeThermostatUnoccupiedCoolingSetpointCommandParams.put(
+        "value", thermostatunoccupiedCoolingSetpointCommandParameterInfo);
+    InteractionInfo writeThermostatUnoccupiedCoolingSetpointAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeUnoccupiedCoolingSetpointAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatUnoccupiedCoolingSetpointCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeUnoccupiedCoolingSetpointAttribute",
+        writeThermostatUnoccupiedCoolingSetpointAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeThermostatUnoccupiedHeatingSetpointCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatunoccupiedHeatingSetpointCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeThermostatUnoccupiedHeatingSetpointCommandParams.put(
+        "value", thermostatunoccupiedHeatingSetpointCommandParameterInfo);
+    InteractionInfo writeThermostatUnoccupiedHeatingSetpointAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeUnoccupiedHeatingSetpointAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatUnoccupiedHeatingSetpointCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeUnoccupiedHeatingSetpointAttribute",
+        writeThermostatUnoccupiedHeatingSetpointAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeThermostatMinHeatSetpointLimitCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo thermostatminHeatSetpointLimitCommandParameterInfo =
@@ -942,6 +1014,23 @@ public class ClusterWriteMapping {
     writeThermostatInteractionInfo.put(
         "writeMinSetpointDeadBandAttribute",
         writeThermostatMinSetpointDeadBandAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeThermostatRemoteSensingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatremoteSensingCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeThermostatRemoteSensingCommandParams.put(
+        "value", thermostatremoteSensingCommandParameterInfo);
+    InteractionInfo writeThermostatRemoteSensingAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeRemoteSensingAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatRemoteSensingCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeRemoteSensingAttribute", writeThermostatRemoteSensingAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeThermostatControlSequenceOfOperationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo thermostatcontrolSequenceOfOperationCommandParameterInfo =
@@ -976,6 +1065,231 @@ public class ClusterWriteMapping {
             writeThermostatSystemModeCommandParams);
     writeThermostatInteractionInfo.put(
         "writeSystemModeAttribute", writeThermostatSystemModeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeThermostatTemperatureSetpointHoldCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostattemperatureSetpointHoldCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeThermostatTemperatureSetpointHoldCommandParams.put(
+        "value", thermostattemperatureSetpointHoldCommandParameterInfo);
+    InteractionInfo writeThermostatTemperatureSetpointHoldAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeTemperatureSetpointHoldAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatTemperatureSetpointHoldCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeTemperatureSetpointHoldAttribute",
+        writeThermostatTemperatureSetpointHoldAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeThermostatTemperatureSetpointHoldDurationCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostattemperatureSetpointHoldDurationCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeThermostatTemperatureSetpointHoldDurationCommandParams.put(
+        "value", thermostattemperatureSetpointHoldDurationCommandParameterInfo);
+    InteractionInfo writeThermostatTemperatureSetpointHoldDurationAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeTemperatureSetpointHoldDurationAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatTemperatureSetpointHoldDurationCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeTemperatureSetpointHoldDurationAttribute",
+        writeThermostatTemperatureSetpointHoldDurationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        writeThermostatThermostatProgrammingOperationModeCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatthermostatProgrammingOperationModeCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeThermostatThermostatProgrammingOperationModeCommandParams.put(
+        "value", thermostatthermostatProgrammingOperationModeCommandParameterInfo);
+    InteractionInfo writeThermostatThermostatProgrammingOperationModeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeThermostatProgrammingOperationModeAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatThermostatProgrammingOperationModeCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeThermostatProgrammingOperationModeAttribute",
+        writeThermostatThermostatProgrammingOperationModeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeThermostatOccupiedSetbackCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatoccupiedSetbackCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeThermostatOccupiedSetbackCommandParams.put(
+        "value", thermostatoccupiedSetbackCommandParameterInfo);
+    InteractionInfo writeThermostatOccupiedSetbackAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeOccupiedSetbackAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatOccupiedSetbackCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeOccupiedSetbackAttribute", writeThermostatOccupiedSetbackAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeThermostatUnoccupiedSetbackCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatunoccupiedSetbackCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeThermostatUnoccupiedSetbackCommandParams.put(
+        "value", thermostatunoccupiedSetbackCommandParameterInfo);
+    InteractionInfo writeThermostatUnoccupiedSetbackAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeUnoccupiedSetbackAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatUnoccupiedSetbackCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeUnoccupiedSetbackAttribute",
+        writeThermostatUnoccupiedSetbackAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeThermostatEmergencyHeatDeltaCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatemergencyHeatDeltaCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeThermostatEmergencyHeatDeltaCommandParams.put(
+        "value", thermostatemergencyHeatDeltaCommandParameterInfo);
+    InteractionInfo writeThermostatEmergencyHeatDeltaAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeEmergencyHeatDeltaAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatEmergencyHeatDeltaCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeEmergencyHeatDeltaAttribute",
+        writeThermostatEmergencyHeatDeltaAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeThermostatACTypeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatACTypeCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeThermostatACTypeCommandParams.put("value", thermostatACTypeCommandParameterInfo);
+    InteractionInfo writeThermostatACTypeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeACTypeAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatACTypeCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeACTypeAttribute", writeThermostatACTypeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeThermostatACCapacityCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatACCapacityCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeThermostatACCapacityCommandParams.put("value", thermostatACCapacityCommandParameterInfo);
+    InteractionInfo writeThermostatACCapacityAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeACCapacityAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatACCapacityCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeACCapacityAttribute", writeThermostatACCapacityAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeThermostatACRefrigerantTypeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatACRefrigerantTypeCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeThermostatACRefrigerantTypeCommandParams.put(
+        "value", thermostatACRefrigerantTypeCommandParameterInfo);
+    InteractionInfo writeThermostatACRefrigerantTypeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeACRefrigerantTypeAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatACRefrigerantTypeCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeACRefrigerantTypeAttribute",
+        writeThermostatACRefrigerantTypeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeThermostatACCompressorTypeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatACCompressorTypeCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeThermostatACCompressorTypeCommandParams.put(
+        "value", thermostatACCompressorTypeCommandParameterInfo);
+    InteractionInfo writeThermostatACCompressorTypeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeACCompressorTypeAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatACCompressorTypeCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeACCompressorTypeAttribute", writeThermostatACCompressorTypeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeThermostatACErrorCodeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatACErrorCodeCommandParameterInfo =
+        new CommandParameterInfo("value", Long.class, Long.class);
+    writeThermostatACErrorCodeCommandParams.put("value", thermostatACErrorCodeCommandParameterInfo);
+    InteractionInfo writeThermostatACErrorCodeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeACErrorCodeAttribute(
+                      (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatACErrorCodeCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeACErrorCodeAttribute", writeThermostatACErrorCodeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeThermostatACLouverPositionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatACLouverPositionCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeThermostatACLouverPositionCommandParams.put(
+        "value", thermostatACLouverPositionCommandParameterInfo);
+    InteractionInfo writeThermostatACLouverPositionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeACLouverPositionAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatACLouverPositionCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeACLouverPositionAttribute", writeThermostatACLouverPositionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeThermostatACCapacityformatCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatACCapacityformatCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeThermostatACCapacityformatCommandParams.put(
+        "value", thermostatACCapacityformatCommandParameterInfo);
+    InteractionInfo writeThermostatACCapacityformatAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThermostatCluster) cluster)
+                  .writeACCapacityformatAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeThermostatACCapacityformatCommandParams);
+    writeThermostatInteractionInfo.put(
+        "writeACCapacityformatAttribute", writeThermostatACCapacityformatAttributeInteractionInfo);
     writeAttributeMap.put("thermostat", writeThermostatInteractionInfo);
     Map<String, InteractionInfo> writeFanControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeFanControlFanModeCommandParams =

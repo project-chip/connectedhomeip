@@ -1274,6 +1274,10 @@ typedef void (*CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType)(
 
 typedef void (*CHIPThermostatClusterLocalTemperatureAttributeCallbackType)(
     void *, chip::app::Clusters::Thermostat::Attributes::LocalTemperature::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterOutdoorTemperatureAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::OutdoorTemperature::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterOccupancyAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::Occupancy::TypeInfo::DecodableArgType);
 typedef void (*CHIPThermostatClusterAbsMinHeatSetpointLimitAttributeCallbackType)(
     void *, chip::app::Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo::DecodableArgType);
 typedef void (*CHIPThermostatClusterAbsMaxHeatSetpointLimitAttributeCallbackType)(
@@ -1282,10 +1286,22 @@ typedef void (*CHIPThermostatClusterAbsMinCoolSetpointLimitAttributeCallbackType
     void *, chip::app::Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo::DecodableArgType);
 typedef void (*CHIPThermostatClusterAbsMaxCoolSetpointLimitAttributeCallbackType)(
     void *, chip::app::Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterPICoolingDemandAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::PICoolingDemand::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterPIHeatingDemandAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::PIHeatingDemand::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterHVACSystemTypeConfigurationAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::HVACSystemTypeConfiguration::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterLocalTemperatureCalibrationAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::LocalTemperatureCalibration::TypeInfo::DecodableArgType);
 typedef void (*CHIPThermostatClusterOccupiedCoolingSetpointAttributeCallbackType)(
     void *, chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo::DecodableArgType);
 typedef void (*CHIPThermostatClusterOccupiedHeatingSetpointAttributeCallbackType)(
     void *, chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterUnoccupiedCoolingSetpointAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::UnoccupiedCoolingSetpoint::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterUnoccupiedHeatingSetpointAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::UnoccupiedHeatingSetpoint::TypeInfo::DecodableArgType);
 typedef void (*CHIPThermostatClusterMinHeatSetpointLimitAttributeCallbackType)(
     void *, chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo::DecodableArgType);
 typedef void (*CHIPThermostatClusterMaxHeatSetpointLimitAttributeCallbackType)(
@@ -1296,16 +1312,64 @@ typedef void (*CHIPThermostatClusterMaxCoolSetpointLimitAttributeCallbackType)(
     void *, chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo::DecodableArgType);
 typedef void (*CHIPThermostatClusterMinSetpointDeadBandAttributeCallbackType)(
     void *, chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterRemoteSensingAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::RemoteSensing::TypeInfo::DecodableArgType);
 typedef void (*CHIPThermostatClusterControlSequenceOfOperationAttributeCallbackType)(
     void *, chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo::DecodableArgType);
 typedef void (*CHIPThermostatClusterSystemModeAttributeCallbackType)(
     void *, chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterThermostatRunningModeAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::ThermostatRunningMode::TypeInfo::DecodableArgType);
 typedef void (*CHIPThermostatClusterStartOfWeekAttributeCallbackType)(
     void *, chip::app::Clusters::Thermostat::Attributes::StartOfWeek::TypeInfo::DecodableArgType);
 typedef void (*CHIPThermostatClusterNumberOfWeeklyTransitionsAttributeCallbackType)(
     void *, chip::app::Clusters::Thermostat::Attributes::NumberOfWeeklyTransitions::TypeInfo::DecodableArgType);
 typedef void (*CHIPThermostatClusterNumberOfDailyTransitionsAttributeCallbackType)(
     void *, chip::app::Clusters::Thermostat::Attributes::NumberOfDailyTransitions::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterTemperatureSetpointHoldAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::TemperatureSetpointHold::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterTemperatureSetpointHoldDurationAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::TemperatureSetpointHoldDuration::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterThermostatProgrammingOperationModeAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::ThermostatProgrammingOperationMode::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterThermostatRunningStateAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::ThermostatRunningState::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterSetpointChangeSourceAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::SetpointChangeSource::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterSetpointChangeAmountAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::SetpointChangeAmount::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterSetpointChangeSourceTimestampAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::SetpointChangeSourceTimestamp::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterOccupiedSetbackAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::OccupiedSetback::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterOccupiedSetbackMinAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::OccupiedSetbackMin::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterOccupiedSetbackMaxAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::OccupiedSetbackMax::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterUnoccupiedSetbackAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::UnoccupiedSetback::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterUnoccupiedSetbackMinAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::UnoccupiedSetbackMin::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterUnoccupiedSetbackMaxAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::UnoccupiedSetbackMax::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterEmergencyHeatDeltaAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::EmergencyHeatDelta::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterACTypeAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::ACType::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterACCapacityAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::ACCapacity::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterACRefrigerantTypeAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::ACRefrigerantType::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterACCompressorTypeAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::ACCompressorType::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterACErrorCodeAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::ACErrorCode::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterACLouverPositionAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::ACLouverPosition::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterACCoilTemperatureAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::ACCoilTemperature::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterACCapacityformatAttributeCallbackType)(
+    void *, chip::app::Clusters::Thermostat::Attributes::ACCapacityformat::TypeInfo::DecodableArgType);
 typedef void (*CHIPThermostatClusterGeneratedCommandListAttributeCallbackType)(
     void *, const chip::app::Clusters::Thermostat::Attributes::GeneratedCommandList::TypeInfo::DecodableType &);
 typedef void (*CHIPThermostatClusterAcceptedCommandListAttributeCallbackType)(
