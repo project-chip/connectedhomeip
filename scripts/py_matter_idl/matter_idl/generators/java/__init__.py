@@ -241,7 +241,8 @@ class EncodableValue:
             else:
                 raise Exception("Unknown fundamental type")
         elif type(t) == BasicInteger:
-            if t.byte_count >= 4:
+            # the >= 3 will include int24_t to be considered "long"
+            if t.byte_count >= 3:
                 return "Long"
             else:
                 return "Integer"
@@ -278,7 +279,7 @@ class EncodableValue:
             else:
                 raise Exception("Unknown fundamental type")
         elif type(t) == BasicInteger:
-            if t.byte_count >= 4:
+            if t.byte_count >= 3:
                 return "Ljava/lang/Long;"
             else:
                 return "Ljava/lang/Integer;"
