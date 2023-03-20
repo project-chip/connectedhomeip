@@ -99,7 +99,7 @@ CHIP_ERROR ExtensionFieldSetsImpl::InsertFieldSet(const ExtensionFieldSet & fiel
         }
     }
 
-    // if found, replace at found position, otherwise at insert first free position, otherwise return error
+    // if found, replace at found position, otherwise insert at first free position, otherwise return error
     if (firstEmptyPosition < kMaxClusterPerScenes)
     {
         mEFS[firstEmptyPosition] = fieldSet;

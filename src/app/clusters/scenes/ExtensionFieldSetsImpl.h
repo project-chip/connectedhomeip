@@ -81,7 +81,7 @@ struct ExtensionFieldSet
         ReturnErrorOnFailure(
             writer.StartContainer(TLV::ContextTag(TagEFS::kIndividualContainer), TLV::kTLVType_Structure, container));
 
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagEFS::kClusterID), static_cast<uint32_t>(mID)));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagEFS::kClusterID), mID));
         ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(TagEFS::kClusterFieldSetData), mBytesBuffer, mUsedBytes));
 
         return writer.EndContainer(container);
@@ -113,12 +113,12 @@ struct ExtensionFieldSet
         mUsedBytes = 0;
     }
 
-    bool IsEmpty() const { return (this->mUsedBytes == 0); }
+    bool IsEmpty() const { return (mUsedBytes == 0); }
 
     bool operator==(const ExtensionFieldSet & other) const
     {
-        return (this->mID == other.mID && this->mUsedBytes == other.mUsedBytes &&
-                !memcmp(this->mBytesBuffer, other.mBytesBuffer, this->mUsedBytes));
+        return (mID == other.mID && mUsedBytes == other.mUsedBytes &&
+                !memcmp(mBytesBuffer, other.mBytesBuffer, mUsedBytes));
     }
 };
 
@@ -164,7 +164,7 @@ public:
     }
 
 protected:
-    ExtensionFieldSet mEFS[kMaxClusterPerScenes];
+    ExtensionFieldSet mFieldSets[kMaxClusterPerScenes];
     uint8_t mFieldSetsCount = 0;
 };
 } // namespace scenes
