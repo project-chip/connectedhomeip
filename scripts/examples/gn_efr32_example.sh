@@ -33,6 +33,7 @@ source "$CHIP_ROOT/scripts/activate.sh"
 set -x
 env
 USE_WIFI=false
+USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
 
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
@@ -202,7 +203,8 @@ else
                 shift
                 ;;
             --docker)
-                optArgs+="efr32_sdk_root=\"$GSDK_ROOT\" openthread_root=\"$GSDK_ROOT/util/third_party/openthread\""
+                optArgs+="efr32_sdk_root=\"$GSDK_ROOT\" "
+                USE_DOCKER=true
                 shift
                 ;;
             *)
@@ -234,8 +236,11 @@ else
     if [ "$USE_WIFI" == true ]; then
         gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
     else
-        # thread build
-        #
+        # OpenThread build
+        if [ "$USE_DOCKER" == true ]; then
+            optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
+        fi
+
         if [ -z "$optArgs" ]; then
             gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\"" "$BUILD_DIR"
         else
