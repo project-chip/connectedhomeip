@@ -1,3 +1,9 @@
+package chip.devicecontroller;
+
+import chip.clusterinfo.CommandParameterInfo;
+import chip.clusterinfo.InteractionInfo;
+import chip.devicecontroller.ChipClusters.DefaultClusterCallback;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -6,40 +12,39 @@ public class ClusterWriteMapping {
     Map<String, Map<String, InteractionInfo>> writeAttributeMap = new HashMap<>();
 
     {%- for cluster in clientClusters | sort(attribute='code') %}
+      {%-  set typeLookup = idl | createLookupContext(cluster) %}
     Map<String, InteractionInfo> write{{cluster.name}}InteractionInfo = new LinkedHashMap<>();
-
       {%- for attribute in cluster.attributes | sort(attribute='name') %}
         {#- TODO: add support for struct-typed attributes -#}
         {% if not attribute.definition.is_list and attribute.is_writable %}
-    Map<String, CommandParameterInfo> write{{cluster.name}}{{attribute.definition.name}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo {{cluster.name | lowercamelcase}}{{attribute.definition.name | lowercamelcase}}CommandParameterInfo =
+    Map<String, CommandParameterInfo> write{{cluster.name}}{{attribute.definition.name | upfirst}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        {%-  set encodable = attribute.definition | asEncodable(typeLookup) %}
+    CommandParameterInfo {{cluster.name | lowfirst}}{{attribute.definition.name | lowfirst}}CommandParameterInfo =
         new CommandParameterInfo(
             "value", 
-            FIXME, {# {{asJavaType type null parent.parent.name removeGenericType=true}}.class, #}
-            FIXME {# {{asJavaType type null parent.parent.name underlyingType=true}}.class #}
+            {{ encodable.boxed_java_type }}.class, {# {{asJavaType type null parent.parent.name removeGenericType=true}}.class, #}
+            {{ encodable.boxed_java_type }}.class {# {{asJavaType type null parent.parent.name underlyingType=true}}.class #}
         );
-    write{{cluster.name}}{{attribute.definition.name}}CommandParams.put(
+    write{{cluster.name}}{{attribute.definition.name | upfirst}}CommandParams.put(
         "value",
-        {{cluster.name | lowercamelcase}}{{attribute.definition.name | lowercamelcase}}CommandParameterInfo
+        {{cluster.name | lowfirst}}{{attribute.definition.name | lowfirst}}CommandParameterInfo
     );
-    InteractionInfo write{{cluster.name}}{{attribute.definition.name}}AttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo write{{cluster.name}}{{attribute.definition.name | upfirst}}AttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.{{cluster.name}}Cluster) cluster).write{{cluster.name}}Attribute(
           (DefaultClusterCallback) callback,
-          FIXME, {# ({{asJavaBoxedType type chipType}}) #}
-          commandArguments.get("value")
+          ({{ encodable.boxed_java_type }}) commandArguments.get("value")
           {%- if attribute.requires_timed_write -%}, 1000 {% endif %}
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      write{{cluster.name}}{{attribute.definition.name}}CommandParams
+      write{{cluster.name}}{{attribute.definition.name | upfirst}}CommandParams
     );
-    write{{cluster.name}}InteractionInfo.put("write{{attribute.definition.name}}Attribute", write{{cluster.name}}{{attribute.definition.name}}AttributeInteractionInfo);
-        {% endif %}
-      {% endfor %}
-
-    writeAttributeMap.put("{{cluster.name | lowercamelcase}}", write{{cluster.name}}InteractionInfo);
-    {%  endfor %}
+    write{{cluster.name}}InteractionInfo.put("write{{attribute.definition.name | upfirst}}Attribute", write{{cluster.name}}{{attribute.definition.name | upfirst}}AttributeInteractionInfo);
+        {%- endif %}
+      {%- endfor %}
+    writeAttributeMap.put("{{cluster.name | lowfirst}}", write{{cluster.name}}InteractionInfo);
+    {%-  endfor %}
 
     return writeAttributeMap;
   }
