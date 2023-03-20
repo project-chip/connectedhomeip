@@ -34,7 +34,7 @@ public class ClusterWriteMapping {
         ((ChipClusters.{{cluster.name}}Cluster) cluster).write{{attribute.definition.name | upfirst}}Attribute(
           (DefaultClusterCallback) callback,
           ({{ encodable.boxed_java_type }}) commandArguments.get("value")
-          {%- if attribute.requires_timed_write -%}, 1000 {% endif %}
+          {%- if attribute.requires_timed_write -%}, 10000 {% endif %}
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
