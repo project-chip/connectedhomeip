@@ -254,7 +254,10 @@ class EncodableValue:
         elif type(t) == IdlEnumType:
             return "Integer"
         elif type(t) == IdlBitmapType:
-            return "Integer"
+            if t.base_type.byte_count >= 3:
+                return "Long"
+            else:
+                return "Integer"
         else:
             return "Object"
 
@@ -291,7 +294,10 @@ class EncodableValue:
         elif type(t) == IdlEnumType:
             return "Ljava/lang/Integer;"
         elif type(t) == IdlBitmapType:
-            return "Ljava/lang/Integer;"
+            if t.base_type.byte_count >= 3:
+                return "Ljava/lang/Long;"
+            else:
+                return "Ljava/lang/Integer;"
         else:
             return "Lchip/devicecontroller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
 
