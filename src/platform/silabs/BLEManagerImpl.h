@@ -26,8 +26,8 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #ifdef RSI_BLE_ENABLE
-#define MIN_CONNECTION_INT 45   // 45 msec
-#define MAX_CONNECTION_INT 45   // 45 msec
+#define MIN_CONNECTION_INT 45 // 45 msec
+#define MAX_CONNECTION_INT 45 // 45 msec
 #define SLAVE_LATENCY 0
 #define TIMEOUT 400
 #endif // RSI_BLE_ENABLE
