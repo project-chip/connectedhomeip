@@ -102,7 +102,6 @@ server cluster AccessControl = 31 {
   // attributes may be read-only as well
   readonly attribute int16u clusterRevision = 65533;
 
-
   // Commands have spec-defined numbers which are used for over-the-wire
   // invocation.
   //
