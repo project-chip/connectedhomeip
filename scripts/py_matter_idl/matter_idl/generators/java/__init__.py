@@ -252,7 +252,10 @@ class EncodableValue:
             else:
                 return "String"
         elif type(t) == IdlEnumType:
-            return "Integer"
+            if t.base_type.byte_count >= 3:
+                return "Long"
+            else:
+                return "Integer"
         elif type(t) == IdlBitmapType:
             if t.base_type.byte_count >= 3:
                 return "Long"
@@ -292,7 +295,10 @@ class EncodableValue:
             else:
                 return "Ljava/lang/String;"
         elif type(t) == IdlEnumType:
-            return "Ljava/lang/Integer;"
+            if t.base_type.byte_count >= 3:
+                return "Ljava/lang/Long;"
+            else:
+                return "Ljava/lang/Integer;"
         elif type(t) == IdlBitmapType:
             if t.base_type.byte_count >= 3:
                 return "Ljava/lang/Long;"
