@@ -52,9 +52,6 @@ declare_args() {
   sl_wfx_config_softap = false
   sl_wfx_config_scan = true
 
-  # Argument to Disable IPv4 for wifi(rs911)
-  chip_enable_wifi_ipv4 = false
-
   # Argument to force enable WPA3 security on rs91x
   rs91x_wpa3_only = false
 
@@ -264,10 +261,6 @@ efr32_executable("onoff_plug_app") {
     } else if (use_wf200) {
       sources += wf200_plat_src
       include_dirs += wf200_plat_incs
-    }
-
-    if (chip_enable_wifi_ipv4) {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_IPV4" ]
     }
 
     if (rs91x_wpa3_only) {
