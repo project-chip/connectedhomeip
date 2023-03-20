@@ -1870,37 +1870,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::MediaPlayback::Structs
     ComplexArgumentParser::Finalize(request.position);
 }
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::BasicInformation::Structs::ProductAppearanceStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(
-        ComplexArgumentParser::EnsureMemberExist("ProductAppearanceStruct.finish", "finish", value.isMember("finish")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ProductAppearanceStruct.primaryColor", "primaryColor",
-                                                                  value.isMember("primaryColor")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "finish");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.finish, value["finish"]));
-    valueCopy.removeMember("finish");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "primaryColor");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.primaryColor, value["primaryColor"]));
-    valueCopy.removeMember("primaryColor");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::BasicInformation::Structs::ProductAppearanceStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.finish);
-    ComplexArgumentParser::Finalize(request.primaryColor);
-}
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & request,
                                         Json::Value & value)
 {

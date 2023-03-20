@@ -1683,31 +1683,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 }
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::BasicInformation::Structs::ProductAppearanceStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("Finish", indent + 1, value.finish);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Finish'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("PrimaryColor", indent + 1, value.primaryColor);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PrimaryColor'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR
-DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -5041,11 +5016,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CapabilityMinima", 1, value);
-        }
-        case BasicInformation::Attributes::ProductAppearance::Id: {
-            chip::app::Clusters::BasicInformation::Structs::ProductAppearanceStruct::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ProductAppearance", 1, value);
         }
         case BasicInformation::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

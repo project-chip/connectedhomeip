@@ -350,31 +350,6 @@ public class ChipStructs {
     }
   }
 
-  public static class BasicInformationClusterProductAppearanceStruct {
-    public Integer finish;
-    public @Nullable Integer primaryColor;
-
-    public BasicInformationClusterProductAppearanceStruct(
-        Integer finish, @Nullable Integer primaryColor) {
-      this.finish = finish;
-      this.primaryColor = primaryColor;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder output = new StringBuilder();
-      output.append("BasicInformationClusterProductAppearanceStruct {\n");
-      output.append("\tfinish: ");
-      output.append(finish);
-      output.append("\n");
-      output.append("\tprimaryColor: ");
-      output.append(primaryColor);
-      output.append("\n");
-      output.append("}\n");
-      return output.toString();
-    }
-  }
-
   public static class OtaSoftwareUpdateRequestorClusterProviderLocation {
     public Long providerNodeID;
     public Integer endpoint;

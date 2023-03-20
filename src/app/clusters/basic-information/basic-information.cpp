@@ -58,7 +58,6 @@ private:
     CHIP_ERROR ReadDataModelRevision(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadLocation(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteLocation(AttributeValueDecoder & aDecoder);
-    CHIP_ERROR ReadProductAppearance(AttributeValueEncoder & aEncoder);
 };
 
 BasicAttrAccess gAttrAccess;
@@ -282,11 +281,6 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         break;
     }
 
-    case ProductAppearance::Id: {
-        status = ReadProductAppearance(aEncoder);
-        break;
-    }
-
     default:
         // We did not find a processing path, the caller will delegate elsewhere.
         break;
@@ -347,33 +341,6 @@ CHIP_ERROR BasicAttrAccess::WriteLocation(AttributeValueDecoder & aDecoder)
     VerifyOrReturnError(isValidLength, StatusIB(Protocols::InteractionModel::Status::InvalidValue).ToChipError());
 
     return DeviceLayer::ConfigurationMgr().StoreCountryCode(location.data(), location.size());
-}
-
-CHIP_ERROR BasicAttrAccess::ReadProductAppearance(AttributeValueEncoder & aEncoder)
-{
-    auto * provider = GetDeviceInstanceInfoProvider();
-    ProductFinishEnum finish;
-    ReturnErrorOnFailure(provider->GetProductFinish(&finish));
-
-    ColorEnum color;
-    CHIP_ERROR colorStatus = provider->GetProductPrimaryColor(&color);
-    if (colorStatus != CHIP_NO_ERROR && colorStatus != CHIP_ERROR_NOT_IMPLEMENTED)
-    {
-        return colorStatus;
-    }
-
-    Structs::ProductAppearanceStruct::Type productAppearance;
-    productAppearance.finish = finish;
-    if (colorStatus == CHIP_NO_ERROR)
-    {
-        productAppearance.primaryColor.SetNonNull(color);
-    }
-    else
-    {
-        productAppearance.primaryColor.SetNull();
-    }
-
-    return aEncoder.Encode(productAppearance);
 }
 
 class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate

@@ -17,7 +17,6 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
-#include <lib/core/ClusterEnums.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -170,30 +169,6 @@ public:
      *          if access fails.
      */
     virtual CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) = 0;
-
-    /**
-     * @brief Obtain the product's finish from the device's factory data.
-     *
-     * If the product finish is not available, this should return
-     * CHIP_ERROR_NOT_IMPLEMENTED, and the Basic Information ProductAppearance attribute should
-     * not be implemented for the device.
-     */
-    virtual CHIP_ERROR GetProductFinish(app::Clusters::BasicInformation::ProductFinishEnum * finish)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    /**
-     * @brief Obtain the product's primary color from the device's factory data.
-     *
-     * If the primary color finish is not available or does not exist (e.g. the
-     * device wants to return null for the color in the Basic Information
-     * ProductAppearance attribute), this should return CHIP_ERROR_NOT_IMPLEMENTED.
-     */
-    virtual CHIP_ERROR GetProductPrimaryColor(app::Clusters::BasicInformation::ColorEnum * primaryColor)
-    {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
 };
 
 /**
