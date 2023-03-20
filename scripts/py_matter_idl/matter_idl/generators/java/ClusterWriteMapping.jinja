@@ -14,7 +14,7 @@ public class ClusterWriteMapping {
     {%- for cluster in clientClusters | sort(attribute='code') %}
       {%-  set typeLookup = idl | createLookupContext(cluster) %}
     Map<String, InteractionInfo> write{{cluster.name}}InteractionInfo = new LinkedHashMap<>();
-      {%- for attribute in cluster.attributes | sort(attribute='name') %}
+      {%- for attribute in cluster.attributes | sort(attribute='name') | attributesWithCallback(typeLookup) %}
         {#- TODO: add support for struct-typed attributes -#}
         {% if not attribute.definition.is_list and attribute.is_writable %}
     Map<String, CommandParameterInfo> write{{cluster.name}}{{attribute.definition.name | upfirst}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
@@ -31,7 +31,7 @@ public class ClusterWriteMapping {
     );
     InteractionInfo write{{cluster.name}}{{attribute.definition.name | upfirst}}AttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.{{cluster.name}}Cluster) cluster).write{{cluster.name}}Attribute(
+        ((ChipClusters.{{cluster.name}}Cluster) cluster).write{{attribute.definition.name | upfirst}}Attribute(
           (DefaultClusterCallback) callback,
           ({{ encodable.boxed_java_type }}) commandArguments.get("value")
           {%- if attribute.requires_timed_write -%}, 1000 {% endif %}
@@ -44,7 +44,7 @@ public class ClusterWriteMapping {
         {%- endif %}
       {%- endfor %}
     writeAttributeMap.put("{{cluster.name | lowfirst}}", write{{cluster.name}}InteractionInfo);
-    {%-  endfor %}
+    {%-  endfor -%}
 
     return writeAttributeMap;
   }
