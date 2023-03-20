@@ -34,6 +34,7 @@ assert(current_os == "freertos")
 efr32_project_dir = "${chip_root}/examples/lock-app/silabs/SiWx917"
 examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
+import("${examples_plat_dir}/args.gni")
 
 declare_args() {
   # Dump memory usage at link time.
@@ -82,7 +83,7 @@ silabs_executable("lock_app") {
   deps = [
     ":sdk",
     "${examples_plat_dir}:siwx917-common",
-    "app_data_model",
+    app_data_model,
   ]
 
   if (chip_enable_pw_rpc) {

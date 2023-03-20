@@ -28,6 +28,7 @@ project_dir = "${chip_root}/examples/window-app"
 efr32_project_dir = "${project_dir}/silabs/SiWx917"
 examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
 examples_common_plat_dir = "${chip_root}/examples/platform/silabs"
+import("${examples_plat_dir}/args.gni")
 
 declare_args() {
   # Dump memory usage at link time.
