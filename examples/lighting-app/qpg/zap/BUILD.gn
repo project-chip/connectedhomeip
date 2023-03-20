@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,17 +13,13 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/app/chip_data_model.gni")
 
-import("${chip_root}/config/standalone/args.gni")
-import("${chip_root}/examples/platform/qpg/args.gni")
-qpg_sdk_target = get_label_info(":sdk", "label_no_toolchain")
-chip_enable_openthread = false
-chip_openthread_ftd = false
-chip_system_config_use_open_thread_inet_endpoints = true
-chip_with_lwip = false
+chip_data_model("zap") {
+  zap_file = "light.zap"
 
-lwip_debug = false
-
-# Disable lock tracking, since our FreeRTOS configuration does not set
-# INCLUDE_xSemaphoreGetMutexHolder
-chip_stack_lock_tracking = "none"
+  zap_pregenerated_dir =
+      "${chip_root}/zzz_generated/lighting-app/qpg/zap-generated"
+  is_server = true
+}

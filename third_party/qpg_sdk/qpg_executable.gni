@@ -22,8 +22,8 @@ import("qpg_sdk.gni")
 declare_args() {
   matter_device_vid = ""
   matter_device_pid = ""
-  matter_device_software_version_string = ""
   matter_device_software_version = ""
+  matter_device_software_version_string = ""
 }
 
 # Run the generator script that takes a .HEX file and adds the OTA header to it.

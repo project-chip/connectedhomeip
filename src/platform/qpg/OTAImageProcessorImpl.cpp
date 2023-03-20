@@ -42,14 +42,14 @@ CHIP_ERROR OTAImageProcessorImpl::ConfirmCurrentImage()
         return CHIP_ERROR_INTERNAL;
     }
 
-    uint32_t currentVersion;
+    uint32_t currentSwVersion;
     uint32_t targetVersion = requestor->GetTargetVersion();
-    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentVersion));
+    ReturnErrorOnFailure(DeviceLayer::ConfigurationMgr().GetSoftwareVersion(currentSwVersion));
 
-    if (currentVersion != targetVersion)
+    if (currentSwVersion != targetVersion)
     {
-        ChipLogError(SoftwareUpdate, "Current software version = %" PRIu32 ", expected software version = %" PRIu32, currentVersion,
-                     targetVersion);
+        ChipLogError(SoftwareUpdate, "Current software version = %" PRIu32 ", expected software version = %" PRIu32,
+                     currentSwVersion, targetVersion);
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -179,6 +179,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 {
+
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
@@ -187,8 +188,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
     ChipLogProgress(SoftwareUpdate, "Q: HandleFinalize");
 
-    qvCHIP_OtaSetPendingImage(imageProcessor->mSwVer /*swVer*/, CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION /*hwVer*/, 0,
-                              static_cast<std::uint32_t>(imageProcessor->mParams.downloadedBytes) /*imgSz*/);
+    qvCHIP_OtaSetPendingImage();
 
     imageProcessor->ReleaseBlock();
     // Start from scratch
