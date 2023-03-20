@@ -83,10 +83,6 @@ if [ "$#" == "0" ]; then
         enable_sleepy_device
             Enable Sleepy end device. (Default false)
             Must also set chip_openthread_ftd=false
-        sl_matter_version_str
-            Set a Matter sotfware version string for the Silabs examples
-            Used and formatted by default in this script.
-            To skip that formatting or use your own version string use --no-version
         use_rs9116
             Build wifi example with extension board rs9116. (Default false)
         use_SiWx917
@@ -100,11 +96,12 @@ if [ "$#" == "0" ]; then
         rs91x_wpa3_only
             Support for WPA3 only mode on RS91x
         sl_matter_version
-            Overwrite Matter software version
+            Use provided software version at build time
         sl_matter_version_str
-            Overwrite Matter software version string
+            Set a Matter sotfware version string for the Silabs examples
+            Used and formatted by default in this script.
         sl_hardware_version
-            Overwrite hardware version
+            Use provided hardware version at build time
         siwx917_commissionable_data
             Build with the commissionable data given in DeviceConfig.h (only for SiWx917)
         Presets
