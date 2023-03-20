@@ -22,43 +22,40 @@ namespace scenes {
 
 // ExtensionFieldSetsImpl::ExtensionFieldSetsImpl() : ExtensionFieldSets() {}
 
-CHIP_ERROR ExtensionFieldSetsImpl::Serialize(TLV::TLVWriter & writer) const
+CHIP_ERROR ExtensionFieldSetsImpl::Serialize(TLV::TLVWriter & writer, TLV::Tag structTag) const
 {
     TLV::TLVType container;
-    ReturnErrorOnFailure(
-        writer.StartContainer(TLV::ContextTag(TagEFS::kFieldSetArrayContainer), TLV::kTLVType_Structure, container));
-    ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagEFS::kFieldSetsCount), static_cast<uint8_t>(mFieldSetsCount)));
-    if (!IsEmpty())
+    ReturnErrorOnFailure(writer.StartContainer(structTag, TLV::kTLVType_Structure, container));
+    // ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagEFS::kFieldSetsCount), static_cast<uint8_t>(mFieldSetsCount)));
+    ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(TagEFS::kFieldSetArrayContainer), TLV::kTLVType_Array, container));
+    for (uint8_t i = 0; i < mFieldSetsCount; i++)
     {
-        for (uint8_t i = 0; i < mFieldSetsCount; i++)
-        {
-            if (!mFieldSets[i].IsEmpty())
-            {
-                ReturnErrorOnFailure(mFieldSets[i].Serialize(writer));
-            }
-        }
+        ReturnErrorOnFailure(mFieldSets[i].Serialize(writer));
     }
 
     return writer.EndContainer(container);
+    return writer.EndContainer(container);
 }
 
-CHIP_ERROR ExtensionFieldSetsImpl::Deserialize(TLV::TLVReader & reader)
+CHIP_ERROR ExtensionFieldSetsImpl::Deserialize(TLV::TLVReader & reader, TLV::Tag structTag)
 {
     TLV::TLVType container;
-    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(TagEFS::kFieldSetArrayContainer)));
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, structTag));
     ReturnErrorOnFailure(reader.EnterContainer(container));
 
-    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagEFS::kFieldSetsCount)));
-    ReturnErrorOnFailure(reader.Get(mFieldSetsCount));
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::ContextTag(TagEFS::kFieldSetArrayContainer)));
+    ReturnErrorOnFailure(reader.EnterContainer(container));
 
-    if (!this->IsEmpty())
+    uint8_t i = 0;
+    CHIP_ERROR err;
+    while ((err = reader.Next(TLV::AnonymousTag())) == CHIP_NO_ERROR && i < kMaxClustersPerScene)
     {
-        for (uint8_t i = 0; i < mFieldSetsCount; i++)
-        {
-            ReturnErrorOnFailure(mFieldSets[i].Deserialize(reader));
-        }
+        ReturnErrorOnFailure(mFieldSets[i].Deserialize(reader));
+        i++;
     }
+    mFieldSetsCount = i;
 
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     return reader.ExitContainer(container);
 }
 

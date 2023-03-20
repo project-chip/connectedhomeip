@@ -26,21 +26,6 @@
 namespace chip {
 namespace scenes {
 
-/// @brief Tags Used to serialize Scenes so they can be stored in flash memory.
-/// kEndpointID: Tag for the Endpoint ID to which this scene applies to
-/// kGroupID: Tag for GroupID if the Scene is a Group Scene
-/// kID: Tag for the scene ID together with the two previous tag, forms the SceneStorageID
-/// kName: Tag for the name of the scene
-/// kTransitionTime: Tag for the transition time of the scene in miliseconds
-enum class TagScene : uint8_t
-{
-    kEndpointID = 1,
-    kGroupID,
-    kID,
-    kName,
-    kTransitionTimeMs,
-};
-
 using clusterId = chip::ClusterId;
 
 /// @brief Default implementation of handler, handle EFS from add scene and view scene commands for any cluster
@@ -62,12 +47,11 @@ public:
     /// @param extensionFieldSet[in] ExtensionFieldSets provided by the AddScene Command, pre initialized
     /// @param cluster[out]  Cluster in the Extension field set, filled by the function
     /// @param serialisedBytes[out] Buffer to fill from the ExtensionFieldSet in command
-    /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
+    /// @return CHIP_NO_ERROR if successful, CHIP_ERROR_INVALID_ARGUMENT if the cluster is not supported, CHIP_ERROR value otherwise
     virtual CHIP_ERROR SerializeAdd(EndpointId endpoint,
                                     const app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
                                     ClusterId & cluster, MutableByteSpan & serialisedBytes) override
     {
-        app::DataModel::List<app::Clusters::Scenes::Structs::AttributeValuePair::Type> attributeValueList;
         app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType aVPair;
         TLV::TLVWriter writer;
         TLV::TLVType outer;
@@ -93,15 +77,16 @@ public:
                 valueBytes++;
             }
             // Check we could go through all bytes of the value
-            VerifyOrReturnError(value_iterator.Next() == false, CHIP_ERROR_BUFFER_TOO_SMALL);
+            ReturnErrorOnFailure(value_iterator.GetStatus());
+
             mAVPairs[pairCount].attributeValue = mValueBuffer[pairCount];
             mAVPairs[pairCount].attributeValue.reduce_size(valueBytes);
             pairCount++;
         }
-
         // Check we could go through all pairs in incomming command
-        VerifyOrReturnError(pair_iterator.Next() == false, CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorOnFailure(pair_iterator.GetStatus());
 
+        app::DataModel::List<app::Clusters::Scenes::Structs::AttributeValuePair::Type> attributeValueList;
         attributeValueList = mAVPairs;
         attributeValueList.reduce_size(pairCount);
 
@@ -119,7 +104,8 @@ public:
     /// @param endpoint target endpoint
     /// @param cluster  target cluster
     /// @param serialisedBytes data to deserialize into EFS
-    /// @return CHIP_NO_ERROR if Extension Field Set was successfully populated, specific CHIP_ERROR otherwise
+    /// @return CHIP_NO_ERROR if Extension Field Set was successfully populated, CHIP_ERROR_INVALID_ARGUMENT if the cluster is not
+    /// supported, specific CHIP_ERROR otherwise
     virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serialisedBytes,
                                    app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & extensionFieldSet) override
     {
@@ -135,9 +121,11 @@ public:
 
         extensionFieldSet.clusterID = cluster;
         reader.Init(serialisedBytes);
-        ReturnErrorOnFailure(reader.Next());
+        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
         ReturnErrorOnFailure(reader.EnterContainer(outer));
-        ReturnErrorOnFailure(reader.Next());
+        ReturnErrorOnFailure(reader.Next(
+            TLV::kTLVType_Array,
+            TLV::ContextTag(to_underlying(app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList))));
         attributeValueList.Decode(reader);
 
         auto pair_iterator = attributeValueList.begin();
@@ -154,16 +142,16 @@ public:
                 valueBytes++;
             }
             // Check we could go through all bytes of the value
-            VerifyOrReturnError(value_iterator.Next() == false, CHIP_ERROR_BUFFER_TOO_SMALL);
+            ReturnErrorOnFailure(value_iterator.GetStatus());
+
             mAVPairs[pairCount].attributeValue = mValueBuffer[pairCount];
             mAVPairs[pairCount].attributeValue.reduce_size(valueBytes);
             pairCount++;
         };
-
         // Check we could go through all pairs stored in memory
-        VerifyOrReturnError(pair_iterator.Next() == false, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorOnFailure(reader.ExitContainer(outer));
+        ReturnErrorOnFailure(pair_iterator.GetStatus());
 
+        ReturnErrorOnFailure(reader.ExitContainer(outer));
         extensionFieldSet.attributeValueList = mAVPairs;
         extensionFieldSet.attributeValueList.reduce_size(pairCount);
 

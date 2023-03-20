@@ -24,16 +24,12 @@ namespace chip {
 namespace scenes {
 
 /// @brief Tags Used to serialize Extension Field Sets struct as well as individual field sets.
-/// kArrayContainer: Tag for the container of the Struct with the EFS array
-/// kFieldSetsCount: Tag representing the number of individual field sets
-/// kIndividualContainer: Tag for the container of single EFS struct
+/// kFieldSetArrayContainer: Tag for the container of the EFS array
 /// kClusterID: Tag for the ClusterID of a field set
-/// kBufferBytes: Tag for the serialized field set data
+/// kClusterFieldSetData: Tag for the serialized field set data
 enum class TagEFS : uint8_t
 {
     kFieldSetArrayContainer = 1,
-    kFieldSetsCount,
-    kIndividualContainer,
     kClusterID,
     kClusterFieldSetData,
 };
@@ -78,8 +74,7 @@ struct ExtensionFieldSet
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const
     {
         TLV::TLVType container;
-        ReturnErrorOnFailure(
-            writer.StartContainer(TLV::ContextTag(TagEFS::kIndividualContainer), TLV::kTLVType_Structure, container));
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
 
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagEFS::kClusterID), mID));
         ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(TagEFS::kClusterFieldSetData), mBytesBuffer, mUsedBytes));
@@ -91,7 +86,6 @@ struct ExtensionFieldSet
     {
         ByteSpan buffer;
         TLV::TLVType container;
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(TagEFS::kIndividualContainer)));
         ReturnErrorOnFailure(reader.EnterContainer(container));
 
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagEFS::kClusterID)));
@@ -128,8 +122,8 @@ public:
     ~ExtensionFieldSetsImpl() override{};
 
     // overrides
-    CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override;
-    CHIP_ERROR Deserialize(TLV::TLVReader & reader) override;
+    CHIP_ERROR Serialize(TLV::TLVWriter & writer, TLV::Tag structTag) const override;
+    CHIP_ERROR Deserialize(TLV::TLVReader & reader, TLV::Tag structTag) override;
     void Clear() override;
     bool IsEmpty() const override { return (mFieldSetsCount == 0); }
     uint8_t GetFieldSetCount() const override { return mFieldSetsCount; };
@@ -141,6 +135,11 @@ public:
     // implementation
     bool operator==(const ExtensionFieldSetsImpl & other) const
     {
+        if (this->mFieldSetsCount != other.mFieldSetsCount)
+        {
+            return false;
+        }
+
         for (uint8_t i = 0; i < mFieldSetsCount; i++)
         {
             if (!(this->mFieldSets[i] == other.mFieldSets[i]))
@@ -158,6 +157,11 @@ public:
             this->mFieldSets[i] = other.mFieldSets[i];
         }
         mFieldSetsCount = other.mFieldSetsCount;
+
+        for (uint8_t i = mFieldSetsCount; i < kMaxClustersPerScene; i++)
+        {
+            this->mFieldSets[i].Clear();
+        }
 
         return *this;
     }

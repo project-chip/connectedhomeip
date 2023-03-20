@@ -26,6 +26,12 @@ using namespace chip;
 
 namespace {
 
+enum class TagTestEFS : uint8_t
+{
+    kEFS = 1,
+    kTestArray,
+};
+
 static constexpr size_t kPersistentSceneBufferMax = 256;
 
 // Test Cluster ID
@@ -50,6 +56,10 @@ static scenes::ExtensionFieldSetsImpl sEFSets;
 void TestInsertExtensionFieldSet(nlTestSuite * aSuite, void * aContext)
 {
     scenes::ExtensionFieldSetsImpl * EFS = &sEFSets;
+    scenes::ExtensionFieldSetsImpl testEFS1;
+    scenes::ExtensionFieldSetsImpl testEFS2;
+    scenes::ExtensionFieldSetsImpl testEFS3;
+    scenes::ExtensionFieldSetsImpl tempTestEFS;
     scenes::ExtensionFieldSet tempEFS;
 
     uint8_t empty_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
@@ -73,6 +83,21 @@ void TestInsertExtensionFieldSet(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, EFS3.mUsedBytes == kColorControlSize);
     NL_TEST_ASSERT(aSuite, !memcmp(colorControlBuffer, EFS3.mBytesBuffer, EFS3.mUsedBytes));
 
+    // operator tests single EFS
+    tempEFS = EFS1;
+    NL_TEST_ASSERT(aSuite, tempEFS == EFS1);
+    tempEFS = EFS2;
+    NL_TEST_ASSERT(aSuite, tempEFS == EFS2);
+    tempEFS = EFS3;
+    NL_TEST_ASSERT(aSuite, tempEFS == EFS3);
+
+    // Test clear EFS
+    tempEFS.Clear();
+    NL_TEST_ASSERT(aSuite, tempEFS.IsEmpty());
+    NL_TEST_ASSERT(aSuite, tempEFS.mID == kInvalidClusterId);
+    NL_TEST_ASSERT(aSuite, tempEFS.mUsedBytes == 0);
+    NL_TEST_ASSERT(aSuite, !memcmp(empty_buffer, tempEFS.mBytesBuffer, sizeof(tempEFS.mBytesBuffer)));
+
     // Test creation of EFS from Array and ByteSpan that are to big
     tempEFS = scenes::ExtensionFieldSet(kOnOffClusterId, double_size_buffer, sizeof(double_size_buffer));
     NL_TEST_ASSERT(aSuite, tempEFS.mID == kOnOffClusterId);
@@ -93,11 +118,8 @@ void TestInsertExtensionFieldSet(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, tempEFS.mUsedBytes == static_cast<uint8_t>(sizeof(tempEFS.mBytesBuffer)));
     NL_TEST_ASSERT(aSuite, !memcmp(double_size_buffer, tempEFS.mBytesBuffer, sizeof(tempEFS.mBytesBuffer)));
 
-    // Test clear EFS
     tempEFS.Clear();
-    NL_TEST_ASSERT(aSuite, tempEFS.mID == kInvalidClusterId);
-    NL_TEST_ASSERT(aSuite, tempEFS.mUsedBytes == 0);
-    NL_TEST_ASSERT(aSuite, !memcmp(empty_buffer, tempEFS.mBytesBuffer, sizeof(tempEFS.mBytesBuffer)));
+    NL_TEST_ASSERT(aSuite, tempEFS.IsEmpty());
 
     // Test insertion of uninitialized EFS
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == EFS->InsertFieldSet(tempEFS));
@@ -107,6 +129,34 @@ void TestInsertExtensionFieldSet(nlTestSuite * aSuite, void * aContext)
     tempEFS.mID = kOnOffClusterId;
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == EFS->InsertFieldSet(tempEFS));
     NL_TEST_ASSERT(aSuite, 0 == EFS->GetFieldSetCount());
+
+    // test operators on multiple EFS struct
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == testEFS1.InsertFieldSet(EFS1));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == testEFS1.InsertFieldSet(EFS2));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == testEFS1.InsertFieldSet(EFS3));
+
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == testEFS2.InsertFieldSet(EFS3));
+
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == testEFS3.InsertFieldSet(EFS1));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == testEFS3.InsertFieldSet(EFS2));
+
+    tempTestEFS = testEFS1;
+    NL_TEST_ASSERT(aSuite, tempTestEFS == testEFS1);
+    NL_TEST_ASSERT(aSuite, !(tempTestEFS == testEFS2));
+    NL_TEST_ASSERT(aSuite, !(tempTestEFS == testEFS3));
+    tempTestEFS = testEFS2;
+    NL_TEST_ASSERT(aSuite, tempTestEFS == testEFS2);
+    NL_TEST_ASSERT(aSuite, !(tempTestEFS == testEFS1));
+    NL_TEST_ASSERT(aSuite, !(tempTestEFS == testEFS3));
+    tempTestEFS = testEFS3;
+    NL_TEST_ASSERT(aSuite, tempTestEFS == testEFS3);
+    NL_TEST_ASSERT(aSuite, !(tempTestEFS == testEFS1));
+    NL_TEST_ASSERT(aSuite, !(tempTestEFS == testEFS2));
+
+    // test clear multipler efs struct
+    tempTestEFS.Clear();
+    NL_TEST_ASSERT(aSuite, tempTestEFS.IsEmpty());
+    NL_TEST_ASSERT(aSuite, 0 == tempTestEFS.GetFieldSetCount());
 
     // Test insert
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->InsertFieldSet(EFS1));
@@ -153,51 +203,39 @@ void TestSerializeDerializeExtensionFieldSet(nlTestSuite * aSuite, void * aConte
 
     // Individual Field Sets serialize / deserialize
     writer.Init(EFS1Buffer);
-    writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS1.Serialize(writer));
-    writer.EndContainer(outer);
     EFS1_serialized_length = writer.GetLengthWritten();
     NL_TEST_ASSERT(aSuite, EFS1_serialized_length <= scenes::kMaxFieldBytesPerCluster);
 
     writer.Init(EFS2Buffer);
-    writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS2.Serialize(writer));
-    writer.EndContainer(outer);
     EFS2_serialized_length = writer.GetLengthWritten();
     NL_TEST_ASSERT(aSuite, EFS2_serialized_length <= scenes::kMaxFieldBytesPerCluster);
 
     writer.Init(EFS3Buffer);
-    writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS3.Serialize(writer));
-    writer.EndContainer(outer);
     EFS3_serialized_length = writer.GetLengthWritten();
     NL_TEST_ASSERT(aSuite, EFS3_serialized_length <= scenes::kMaxFieldBytesPerCluster);
 
     reader.Init(EFS1Buffer);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.EnterContainer(outerRead));
+    reader.Next(TLV::AnonymousTag());
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == tempEFS.Deserialize(reader));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.ExitContainer(outerRead));
     NL_TEST_ASSERT(aSuite, EFS1 == tempEFS);
 
     reader.Init(EFS2Buffer);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.EnterContainer(outerRead));
+    reader.Next(TLV::AnonymousTag());
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == tempEFS.Deserialize(reader));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.ExitContainer(outerRead));
     NL_TEST_ASSERT(aSuite, EFS2 == tempEFS);
 
     reader.Init(EFS3Buffer);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.EnterContainer(outerRead));
+    reader.Next(TLV::AnonymousTag());
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == tempEFS.Deserialize(reader));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.ExitContainer(outerRead));
     NL_TEST_ASSERT(aSuite, EFS3 == tempEFS);
 
     // All ExtensionFieldSets serialize / deserialize
     writer.Init(sceneEFSBuffer);
     writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->Serialize(writer));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == EFS->Serialize(writer, TLV::ContextTag(TagTestEFS::kEFS)));
     writer.EndContainer(outer);
     sceneEFS_serialized_length = writer.GetLengthWritten();
     NL_TEST_ASSERT(aSuite, sceneEFS_serialized_length <= kPersistentSceneBufferMax);
@@ -205,7 +243,8 @@ void TestSerializeDerializeExtensionFieldSet(nlTestSuite * aSuite, void * aConte
     reader.Init(sceneEFSBuffer);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.Next());
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.EnterContainer(outerRead));
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == testSceneEFS.Deserialize(reader));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == testSceneEFS.Deserialize(reader, TLV::ContextTag(TagTestEFS::kEFS)));
+
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == reader.ExitContainer(outerRead));
     NL_TEST_ASSERT(aSuite, *EFS == testSceneEFS);
 }
