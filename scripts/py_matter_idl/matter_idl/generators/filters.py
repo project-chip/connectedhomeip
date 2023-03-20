@@ -24,6 +24,14 @@ def normalize_acronyms(s: str) -> str:
     return s.replace('WiFi', 'Wifi').replace('WI_FI', 'WIFI')
 
 
+def lower_camel_case(s: str) -> str:
+    """Like camelcase, except it ensures the first letter is actually
+       lower case.
+    """
+    s = stringcase.camelcase(s)
+    return s[0].lower() + s[1:]
+
+
 def RegisterCommonFilters(filtermap):
     """
     Register filters that are NOT considered platform-generator specific.
@@ -42,3 +50,4 @@ def RegisterCommonFilters(filtermap):
     filtermap['spinalcase'] = stringcase.spinalcase
 
     filtermap['normalize_acronyms'] = normalize_acronyms
+    filtermap['lowercamelcase'] = lower_camel_case

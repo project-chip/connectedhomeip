@@ -20,7 +20,7 @@ from typing import List, Set, Union
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.generators.types import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
                                          ParseDataType, TypeLookupContext)
-from matter_idl.matter_idl_types import Attribute, Cluster, ClusterSide, Command, DataType, Field, FieldQuality, Idl
+from matter_idl.matter_idl_types import Attribute, Cluster, ClusterSide, Command, DataType, Field, FieldQuality, Idl, ClusterSide
 from stringcase import capitalcase
 
 
@@ -369,6 +369,17 @@ class JavaGenerator(CodeGenerator):
         """
         Renders .CPP files required for JNI support.
         """
+
+        # Java generated code
+        self.internal_render_one_output(
+            template_path="java/ClusterWriteMapping.jinja",
+            output_file_name="java/chip/devicecontroller/ClusterWriteMapping.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT],
+            }
+        )
+
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:
