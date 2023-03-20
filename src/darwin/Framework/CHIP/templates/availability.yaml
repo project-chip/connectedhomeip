@@ -6541,7 +6541,11 @@
                   CoolSetpointPresent: CoolSetpointFieldPresent
 
 - release: "First after major API revamp"
-  versions: "future"
+  versions:
+      ios: "16.5"
+      macos: "13.4"
+      watchos: "9.5"
+      tvos: "16.5"
   introduced:
       attributes:
           TimeSynchronization:
@@ -6997,3 +7001,6 @@
           PumpConfigurationAndControl:
               PumpFeature:
                   LocalOperation: Local
+
+- release: "TBD"
+  versions: "future"
