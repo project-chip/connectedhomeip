@@ -47,8 +47,7 @@
   {{/zcl_events}}
   {{#chip_server_cluster_attributes}}
   {{#unless isGlobalAttribute}}
-  {{! ensure indent }}
-  {{~#if mustUseTimedWrite~}}
+  {{! ensure indent }}{{#if mustUseTimedWrite~}}
     timedwrite {{!marker to place a space even with whitespace removal~}}
   {{~/if~}}
   {{~#unless isWritableAttribute~}}
