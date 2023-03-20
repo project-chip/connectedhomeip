@@ -30,6 +30,7 @@ chip_enable_rotating_device_id = false
 cpp_standard = "c++17"
 enable_pic = false
 is_debug = true
+chip_config_network_layer_ble = false
 
 default_configs_exceptions =
     [ "//third_party/connectedhomeip/build/config/compiler:exceptions" ]
