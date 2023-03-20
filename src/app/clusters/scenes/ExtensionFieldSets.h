@@ -27,7 +27,7 @@ static constexpr uint8_t kInvalidPosition         = 0xff;
 static constexpr uint8_t kMaxClustersPerScene     = CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE;
 static constexpr uint8_t kMaxFieldBytesPerCluster = CHIP_CONFIG_SCENES_MAX_EXTENSION_FIELDSET_SIZE_PER_CLUSTER;
 
-/// @brief class meant serialize all extension ßfield sets of a scene so it can be stored and retrieved from flash memory.
+/// @brief A way to serialize and deserialize all cluster attribute data for a scene.
 class ExtensionFieldSets
 {
 public:

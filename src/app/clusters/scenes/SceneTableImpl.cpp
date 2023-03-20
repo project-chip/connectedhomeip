@@ -167,7 +167,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         TLV::TLVType container;
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
 
-        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagSceneImpl::kSceneCount), (scene_count)));
+        ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagSceneImpl::kSceneCount), scene_count));
         // Storing the scene map
         for (uint8_t i = 0; i < kMaxScenePerFabric; i++)
         {
@@ -387,7 +387,7 @@ void DefaultSceneTableImpl::RegisterHandler(SceneHandler * handler)
 void DefaultSceneTableImpl::UnregisterHandler(SceneHandler * handler)
 {
     // Verify list is populated and handler is not null
-    VerifyOrReturn(!this->HandlerListEmpty() && !(handler == nullptr));
+    VerifyOrReturn(!HandlerListEmpty() && !(handler == nullptr));
     mHandlerList.Remove(handler);
     mNumHandlers--;
 }
@@ -398,7 +398,7 @@ void DefaultSceneTableImpl::UnregisterAllHandlers()
     {
         IntrusiveList<SceneHandler>::Iterator foo = mHandlerList.begin();
         SceneHandler * handle                     = &(*foo);
-        mHandlerList.Remove((handle));
+        mHandlerList.Remove(handle);
         mNumHandlers--;
     }
 }
@@ -409,7 +409,7 @@ void DefaultSceneTableImpl::UnregisterAllHandlers()
 CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
 {
 
-    if (!this->HandlerListEmpty())
+    if (!HandlerListEmpty())
     {
         uint8_t clusterCount = 0;
         clusterId cArray[kMaxClusterPerScenes];
@@ -422,10 +422,9 @@ CHIP_ERROR DefaultSceneTableImpl::SceneSaveEFS(SceneTableEntry & scene)
             MutableByteSpan EFSSpan = MutableByteSpan(EFS.mBytesBuffer, kMaxFieldBytesPerCluster);
             EFS.mID                 = cluster;
 
-            IntrusiveList<SceneHandler>::Iterator iter = mHandlerList.begin();
-            while (iter != mHandlerList.end())
+            for (auto & handler : mHandlerList)
             {
-                if (iter->SupportsCluster(scene.mStorageId.mEndpointId, cluster))
+                if (handler.SupportsCluster(scene.mStorageId.mEndpointId, cluster))
                 {
                     ReturnErrorOnFailure(iter->SerializeSave(scene.mStorageId.mEndpointId, EFS.mID, EFSSpan));
                     EFS.mUsedBytes = static_cast<uint8_t>(EFSSpan.size());
@@ -495,7 +494,7 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
     return fabric.Delete(mStorage);
 }
 
-/// @brief wrapper function around emberAfGetClustersFromEndpoint to allow testing, shimed in test configuration because
+/// @brief wrapper function around emberAfGetClustersFromEndpoint to allow testing, shimmed in test configuration because
 /// emberAfGetClusterFromEndpoint relies on <app/util/attribute-storage.h>, which relies on zap generated files
 uint8_t DefaultSceneTableImpl::GetClustersFromEndpoint(EndpointId endpoint, ClusterId * clusterList, uint8_t listLen)
 {

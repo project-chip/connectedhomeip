@@ -188,7 +188,7 @@ chip::Optional<chip::ClusterId> emberAfGetNthClusterId(chip::EndpointId endpoint
 // for the given endpoint and client/server polarity
 uint8_t emberAfGetClustersFromEndpoint(EndpointId endpoint, ClusterId * clusterList, uint8_t listLen, bool server)
 {
-    uint8_t cluster_Count = emberAfClusterCount(endpoint, server);
+    uint8_t cluster_count = emberAfClusterCount(endpoint, server);
     uint8_t i;
 
     if (cluster_Count > listLen)
