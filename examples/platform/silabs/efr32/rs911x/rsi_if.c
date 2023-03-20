@@ -193,25 +193,6 @@ int32_t wfx_rsi_disconnect()
 }
 
 /******************************************************************
- * @fn   wfx_rsi_power_save()
- * @brief
- *       Setting the RS911x in DTIM sleep based mode
- *
- * @param[in] None
- * @return
- *        None
- *********************************************************************/
-void wfx_rsi_power_save()
-{
-    int32_t status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
-    if (status != RSI_SUCCESS)
-    {
-        WFX_RSI_LOG("Powersave Config Failed, Error Code : 0x%lX", status);
-        return;
-    }
-    WFX_RSI_LOG("Powersave Config Success");
-}
-/******************************************************************
  * @fn   wfx_rsi_join_cb(uint16_t status, const uint8_t *buf, const uint16_t len)
  * @brief
  *       called when driver join with cb
@@ -675,7 +656,13 @@ void wfx_rsi_task(void * arg)
                     hasNotifiedIPV4 = true;
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
                     // enabling the power save mode for RS9116 if sleepy device is enabled
-                    wfx_rsi_power_save();
+                    rsi_status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
+                    if (status != RSI_SUCCESS)
+                    {
+                        WFX_RSI_LOG("Powersave Config Failed, Error Code : 0x%lX", status);
+                        return status;
+                    }
+                    WFX_RSI_LOG("Powersave Config Success");
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
                     if (!hasNotifiedWifiConnectivity)
                     {
@@ -698,7 +685,12 @@ void wfx_rsi_task(void * arg)
                     hasNotifiedIPV6 = true;
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
                     // enabling the power save mode for RS9116 if sleepy device is enabled
-                    wfx_rsi_power_save();
+                    rsi_status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
+                    if (rsi_status != RSI_SUCCESS)
+                    {
+                        WFX_RSI_LOG("Powersave Config Failed, Error Code : 0x%lX", rsi_status);
+                    }
+                    WFX_RSI_LOG("Powersave Config Success");
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
                     if (!hasNotifiedWifiConnectivity)
                     {
