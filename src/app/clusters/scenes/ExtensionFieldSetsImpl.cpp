@@ -32,9 +32,9 @@ CHIP_ERROR ExtensionFieldSetsImpl::Serialize(TLV::TLVWriter & writer) const
     {
         for (uint8_t i = 0; i < mFieldSetsCount; i++)
         {
-            if (!mEFS[i].IsEmpty())
+            if (!mFieldSets[i].IsEmpty())
             {
-                ReturnErrorOnFailure(mEFS[i].Serialize(writer));
+                ReturnErrorOnFailure(mFieldSets[i].Serialize(writer));
             }
         }
     }
@@ -55,7 +55,7 @@ CHIP_ERROR ExtensionFieldSetsImpl::Deserialize(TLV::TLVReader & reader)
     {
         for (uint8_t i = 0; i < mFieldSetsCount; i++)
         {
-            ReturnErrorOnFailure(mEFS[i].Deserialize(reader));
+            ReturnErrorOnFailure(mFieldSets[i].Deserialize(reader));
         }
     }
 
@@ -68,7 +68,7 @@ void ExtensionFieldSetsImpl::Clear()
     {
         for (uint8_t i = 0; i < mFieldSetsCount; i++)
         {
-            mEFS[i].Clear();
+            mFieldSets[i].Clear();
         }
     }
     mFieldSetsCount = 0;
@@ -85,24 +85,24 @@ CHIP_ERROR ExtensionFieldSetsImpl::InsertFieldSet(const ExtensionFieldSet & fiel
     VerifyOrReturnError(fieldSet.mID != kInvalidClusterId, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!fieldSet.IsEmpty(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    for (uint8_t i = 0; i < kMaxClusterPerScenes; i++)
+    for (uint8_t i = 0; i < kMaxClustersPerScene; i++)
     {
-        if (mEFS[i].mID == fieldSet.mID)
+        if (mFieldSets[i].mID == fieldSet.mID)
         {
-            mEFS[i] = fieldSet;
+            mFieldSets[i] = fieldSet;
             return CHIP_NO_ERROR;
         }
 
-        if (mEFS[i].IsEmpty() && firstEmptyPosition == kInvalidPosition)
+        if (mFieldSets[i].IsEmpty() && firstEmptyPosition == kInvalidPosition)
         {
             firstEmptyPosition = i;
         }
     }
 
     // if found, replace at found position, otherwise insert at first free position, otherwise return error
-    if (firstEmptyPosition < kMaxClusterPerScenes)
+    if (firstEmptyPosition < kMaxClustersPerScene)
     {
-        mEFS[firstEmptyPosition] = fieldSet;
+        mFieldSets[firstEmptyPosition] = fieldSet;
         mFieldSetsCount++;
         return CHIP_NO_ERROR;
     }
@@ -114,7 +114,7 @@ CHIP_ERROR ExtensionFieldSetsImpl::GetFieldSetAtPosition(ExtensionFieldSet & fie
 {
     VerifyOrReturnError(position < mFieldSetsCount, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    fieldSet = mEFS[position];
+    fieldSet = mFieldSets[position];
 
     return CHIP_NO_ERROR;
 }
@@ -124,18 +124,18 @@ CHIP_ERROR ExtensionFieldSetsImpl::RemoveFieldAtPosition(uint8_t position)
     VerifyOrReturnValue(position < mFieldSetsCount, CHIP_NO_ERROR);
 
     uint8_t nextPos = static_cast<uint8_t>(position + 1);
-    uint8_t moveNum = static_cast<uint8_t>(kMaxClusterPerScenes - nextPos);
+    uint8_t moveNum = static_cast<uint8_t>(kMaxClustersPerScene - nextPos);
 
     // TODO: Implement general array management methods
     // Compress array after removal, if the removed position is not the last
     if (moveNum)
     {
-        memmove(&mEFS[position], &mEFS[nextPos], sizeof(ExtensionFieldSet) * moveNum);
+        memmove(&mFieldSets[position], &mFieldSets[nextPos], sizeof(ExtensionFieldSet) * moveNum);
     }
 
     mFieldSetsCount--;
     // Clear last occupied position
-    mEFS[mFieldSetsCount].Clear(); //
+    mFieldSets[mFieldSetsCount].Clear(); //
 
     return CHIP_NO_ERROR;
 }

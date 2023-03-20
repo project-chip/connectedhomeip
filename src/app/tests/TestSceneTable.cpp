@@ -399,41 +399,40 @@ void ResetSceneTable(SceneTable * sceneTable)
 void TestHandlerRegistration(nlTestSuite * aSuite, void * aContext)
 {
     SceneTable * sceneTable = &sSceneTable;
-    TestSceneHandler tmpHandler[scenes::kMaxClusterPerScenes];
+    TestSceneHandler tmpHandler[scenes::kMaxClustersPerScene];
 
-    for (uint8_t i = 0; i < scenes::kMaxClusterPerScenes; i++)
+    for (uint8_t i = 0; i < scenes::kMaxClustersPerScene; i++)
     {
-        NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == i);
         sceneTable->RegisterHandler(&tmpHandler[i]);
     }
     // Hanlder order in table : [H0, H1, H2]
 
-    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == scenes::kMaxClusterPerScenes);
+    NL_TEST_ASSERT(aSuite, !sceneTable->HandlerListEmpty());
     // Removal at beginning
     sceneTable->UnregisterHandler(&tmpHandler[0]);
-    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxClusterPerScenes - 1));
+    NL_TEST_ASSERT(aSuite, !sceneTable->HandlerListEmpty());
     // Re-insert
     sceneTable->RegisterHandler(&tmpHandler[0]);
-    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxClusterPerScenes));
+    NL_TEST_ASSERT(aSuite, !sceneTable->HandlerListEmpty());
     // Hanlder order in table : [H0, H1, H2]
 
     // Removal at the middle
     sceneTable->UnregisterHandler(&tmpHandler[2]);
-    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxClusterPerScenes - 1));
+    NL_TEST_ASSERT(aSuite, !sceneTable->HandlerListEmpty());
     // Re-insert
     sceneTable->RegisterHandler(&tmpHandler[2]);
-    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxClusterPerScenes));
+    NL_TEST_ASSERT(aSuite, !sceneTable->HandlerListEmpty());
     // Hanlder order in table : [H1, H0, H2]
 
     // Removal at the end
     sceneTable->UnregisterHandler(&tmpHandler[2]);
-    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == static_cast<uint8_t>(scenes::kMaxClusterPerScenes - 1));
+    NL_TEST_ASSERT(aSuite, !sceneTable->HandlerListEmpty());
 
     // Emptying Handler array
     sceneTable->UnregisterAllHandlers();
 
     // Verify the handler num has been updated properly
-    NL_TEST_ASSERT(aSuite, sceneTable->mNumHandlers == 0);
+    NL_TEST_ASSERT(aSuite, sceneTable->HandlerListEmpty());
 }
 
 void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
@@ -535,7 +534,7 @@ void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
 
     // Test Registering SceneHandler
     sceneTable->RegisterHandler(&sHandler);
-    NL_TEST_ASSERT(aSuite, sceneTable->GetHandlerNum() == 1);
+    NL_TEST_ASSERT(aSuite, !sceneTable->HandlerListEmpty());
 
     // Setup the On Off Extension field set in the expected state from a command
     reader.Init(OO_list);
@@ -853,7 +852,7 @@ void TestRemoveScenes(nlTestSuite * aSuite, void * aContext)
 
     // Remove at empty position, shouldn't trigger error
     NL_TEST_ASSERT(aSuite,
-                   CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntryAtPosition(kFabric1, chip::scenes::kMaxScenePerFabric - 1));
+                   CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntryAtPosition(kFabric1, chip::scenes::kMaxScenesPerFabric - 1));
 
     iterator = sceneTable->IterateSceneEntries(kFabric1);
     NL_TEST_ASSERT(aSuite, iterator->Count() == 0);

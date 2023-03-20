@@ -33,16 +33,15 @@ typedef uint8_t SceneIndex;
 typedef uint32_t TransitionTimeMs;
 typedef uint32_t SceneTransitionTime;
 
-constexpr GroupId kGlobalGroupSceneId       = 0x0000;
-constexpr SceneIndex kUndefinedSceneIndex   = 0xff;
-constexpr SceneId kUndefinedSceneId         = 0xff;
+constexpr GroupId kGlobalGroupSceneId        = 0x0000;
+constexpr SceneIndex kUndefinedSceneIndex    = 0xff;
+constexpr SceneId kUndefinedSceneId          = 0xff;
 static constexpr uint8_t kMaxScenesPerFabric = CHIP_CONFIG_SCENES_MAX_PER_FABRIC;
 
 static constexpr size_t kIteratorsMax       = CHIP_CONFIG_MAX_SCENES_CONCURRENT_ITERATORS;
 static constexpr size_t kSceneNameMaxLength = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH;
 
-
-/// @brief SceneHandlers are meant as interface between various clusters and the Scene table. 
+/// @brief SceneHandlers are meant as interface between various clusters and the Scene table.
 /// When a scene command involving extension field sets is received, the Scene Table will go through
 /// the list of handlers to either retrieve, populate or apply those extension field sets.
 ///
@@ -51,7 +50,7 @@ static constexpr size_t kSceneNameMaxLength = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM
 ///
 /// A SceneHandler can handle a single <endpoint, cluster> pair, or many such pairs.
 ///
-/// @note If more than one handler claims to handl a specific <endpoint, cluster> pair, only one of 
+/// @note If more than one handler claims to handl a specific <endpoint, cluster> pair, only one of
 /// those handlers will get called when executing actions related to extension field sets on the scene
 /// table.  It is not defined which handler will be selected.
 
@@ -66,20 +65,20 @@ public:
     /// @param endpoint target endpoint
     /// @param clusterBuffer Buffer to hold the supported cluster IDs, cannot hold more than
     /// CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE. The function shall use the reduce_size() method in the event it is supporting
-
     /// less than CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE clusters.
 
     virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) = 0;
 
     /// @brief Returns whether or not a cluster for scenes is supported on an endpoint
-
+    ///
     /// @param endpoint Target Endpoint ID
     /// @param cluster Target Cluster ID
     /// @return true if supported, false if not supported
     virtual bool SupportsCluster(EndpointId endpoint, ClusterId cluster) = 0;
 
-    /// @brief Called when handling AddScene.  Allows the handler to filter through the clusters in the command to serialize only the supported ones.
-
+    /// @brief Called when handling AddScene.  Allows the handler to filter through the clusters in the command to serialize only
+    /// the supported ones.
+    ///
     /// @param endpoint[in] Endpoint ID
     /// @param extensionFieldSet[in] ExtensionFieldSets provided by the AddScene Command, pre initialized
     /// @param cluster[out]  Cluster in the Extension field set, filled by the function
@@ -92,8 +91,7 @@ public:
     /// @brief Called when handling StoreScene, and only if the handler supports the given endpoint and cluster.
     ///
     /// The implementation must write the actual scene data to store to serializedBytes as described below.
-
-
+    ///
     /// @param endpoint[in] Target Endpoint
     /// @param cluster[in] Target Cluster
     /// @param serializedBytes[out] Output buffer, data needs to be writen in there and size adjusted to the size of the data
@@ -103,11 +101,11 @@ public:
     virtual CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) = 0;
 
     /// @brief Deserialize an ExtensionFieldSet into a cluster object (e.g. when handling ViewScene).
-
+    ///
     /// @param endpoint[in] Endpoint ID
     /// @param cluster[in] Cluster ID to save
     /// @param serializedBytes[in] ExtensionFieldSet stored in NVM
-
+    ///
     /// @param extensionFieldSet[out] ExtensionFieldSet in command format
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
     virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
@@ -115,11 +113,11 @@ public:
                                    app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & extensionFieldSet) = 0;
 
     /// @brief Restore a stored scene for the given cluster instance, over timeMs milliseconds (e.g. when handling RecallScene)
-
+    ///
     /// @param endpoint[in] Endpoint ID
     /// @param cluster[in] Cluster ID
     /// @param serializedBytes[in] ExtensionFieldSet stored in NVM
-
+    ///
     /// @param timeMs[in] Transition time in ms to apply the scene
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
     virtual CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
@@ -154,7 +152,6 @@ public:
         bool operator==(const SceneStorageId & other)
         {
             return (mEndpointId == other.mEndpointId && mGroupId == other.mGroupId && mSceneId == other.mSceneId);
-
         }
     };
 
@@ -168,7 +165,7 @@ public:
     /// mSceneTransitionTimeSeconds in enhanced scene commands
     struct SceneData
     {
-        char mName[kSceneNameMax]                  = { 0 };
+        char mName[kSceneNameMaxLength]            = { 0 };
         size_t mNameLength                         = 0;
         SceneTransitionTime mSceneTransitionTimeMs = 0;
         EFStype mExtensionFieldSets;
@@ -176,7 +173,6 @@ public:
         SceneData(const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0) : mSceneTransitionTimeMs(time)
         {
             SetName(sceneName);
-
         }
         SceneData(EFStype fields, const CharSpan & sceneName = CharSpan(), SceneTransitionTime time = 0) :
             mSceneTransitionTimeMs(time)
@@ -202,7 +198,7 @@ public:
             }
             else
             {
-                size_t maxChars = std::min(sceneName.size(), kSceneNameMax);
+                size_t maxChars = std::min(sceneName.size(), kSceneNameMaxLength);
                 memcpy(mName, sceneName.data(), maxChars);
                 mNameLength = maxChars;
             }
@@ -247,14 +243,12 @@ public:
         bool operator==(const SceneTableEntry & other)
         {
             return (mStorageId == other.mStorageId && mStorageData == other.mStorageData);
-
         }
 
         void operator=(const SceneTableEntry & other)
         {
             mStorageId   = other.mStorageId;
             mStorageData = other.mStorageData;
-
         }
     };
 
@@ -295,7 +289,6 @@ public:
 
     // Handlers
     virtual bool HandlerListEmpty() { return mHandlerList.Empty(); }
-
 
     // SceneHandler * mHandlers[kMaxSceneHandlers] = { nullptr };
     IntrusiveList<SceneHandler> mHandlerList;

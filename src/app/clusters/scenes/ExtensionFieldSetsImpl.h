@@ -117,8 +117,7 @@ struct ExtensionFieldSet
 
     bool operator==(const ExtensionFieldSet & other) const
     {
-        return (mID == other.mID && mUsedBytes == other.mUsedBytes &&
-                !memcmp(mBytesBuffer, other.mBytesBuffer, mUsedBytes));
+        return (mID == other.mID && mUsedBytes == other.mUsedBytes && !memcmp(mBytesBuffer, other.mBytesBuffer, mUsedBytes));
     }
 };
 
@@ -144,7 +143,7 @@ public:
     {
         for (uint8_t i = 0; i < mFieldSetsCount; i++)
         {
-            if (!(this->mEFS[i] == other.mEFS[i]))
+            if (!(this->mFieldSets[i] == other.mFieldSets[i]))
             {
                 return false;
             }
@@ -156,7 +155,7 @@ public:
     {
         for (uint8_t i = 0; i < other.mFieldSetsCount; i++)
         {
-            this->mEFS[i] = other.mEFS[i];
+            this->mFieldSets[i] = other.mFieldSets[i];
         }
         mFieldSetsCount = other.mFieldSetsCount;
 
@@ -164,7 +163,7 @@ public:
     }
 
 protected:
-    ExtensionFieldSet mFieldSets[kMaxClusterPerScenes];
+    ExtensionFieldSet mFieldSets[kMaxClustersPerScene];
     uint8_t mFieldSetsCount = 0;
 };
 } // namespace scenes
