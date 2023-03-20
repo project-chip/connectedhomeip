@@ -106,10 +106,6 @@ namespace {
 #define HOST_TASK_PRIORITY (4U)
 #define HOST_TASK_STACK_SIZE (gHost_TaskStackSize_c / sizeof(StackType_t))
 
-/* ble app task configuration */
-#define CHIP_DEVICE_CONFIG_BLE_APP_TASK_PRIORITY (HOST_TASK_PRIORITY - 1)
-#define CHIP_DEVICE_CONFIG_BLE_APP_TASK_STACK_SIZE (1024)
-
 /* advertising configuration */
 #define BLEKW_ADV_MAX_NO (2)
 #define BLEKW_SCAN_RSP_MAX_NO (2)
@@ -127,9 +123,6 @@ osaEventId_t event_msg;
 
 osaEventId_t mControllerTaskEvent;
 TimerHandle_t connectionTimeout;
-
-/* Used by BLE App Task to handle asynchronous GATT events */
-EventGroupHandle_t bleAppTaskLoopEvent;
 
 /* keep the device ID of the connected peer */
 uint8_t g_device_id;
@@ -183,14 +176,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     /* Create the connection timeout timer. */
     connectionTimeout =
         xTimerCreate("bleTimeoutTmr", pdMS_TO_TICKS(CHIP_BLE_KW_CONN_TIMEOUT), pdFALSE, (void *) 0, blekw_connection_timeout_cb);
-
-    /* Create BLE App Task */
-    bleAppTaskLoopEvent = xEventGroupCreate();
-    VerifyOrExit(bleAppTaskLoopEvent != NULL, err = CHIP_ERROR_INCORRECT_STATE);
-    bleAppCreated = xTaskCreate(bleAppTask, CHIP_DEVICE_CONFIG_BLE_APP_TASK_NAME,
-                                CHIP_DEVICE_CONFIG_BLE_APP_TASK_STACK_SIZE / sizeof(StackType_t), this,
-                                CHIP_DEVICE_CONFIG_BLE_APP_TASK_PRIORITY, NULL);
-    VerifyOrExit(bleAppCreated == pdPASS, err = CHIP_ERROR_INCORRECT_STATE);
 
     /* BLE Radio Init */
     VerifyOrExit(XCVR_Init(BLE_MODE, DR_2MBPS) == gXcvrSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
@@ -1022,77 +1007,74 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
     sInstance.DriveBLEState();
 }
 
-/*******************************************************************************
- * BLE App Task Processing
- *******************************************************************************/
-void BLEManagerImpl::bleAppTask(void * p_arg)
+void BLEManagerImpl::DoBleProcessing(void)
 {
-    while (true)
+    if (MSG_Pending(&blekw_msg_list))
     {
-        xEventGroupWaitBits(bleAppTaskLoopEvent, LOOP_EV_BLE, true, false, portMAX_DELAY);
+        /* There is message from the BLE tasks to solve */
+        blekw_msg_t * msg = (blekw_msg_t *) MSG_DeQueue(&blekw_msg_list);
 
-        if (MSG_Pending(&blekw_msg_list))
+        assert(msg != NULL);
+
+        if (msg->type == BLE_KW_MSG_ERROR)
         {
-            /* There is message from the BLE tasks to solve */
-            blekw_msg_t * msg = (blekw_msg_t *) MSG_DeQueue(&blekw_msg_list);
-
-            assert(msg != NULL);
-
-            if (msg->type == BLE_KW_MSG_ERROR)
+            if (msg->data.u8 == BLE_KW_MSG_2M_UPGRADE_ERROR)
             {
-                if (msg->data.u8 == BLE_KW_MSG_2M_UPGRADE_ERROR)
-                {
-                    ChipLogProgress(DeviceLayer,
-                                    "Warning. BLE is using 1Mbps. Couldn't upgrade to 2Mbps, "
-                                    "maybe the peer is missing 2Mbps support.");
-                }
-                else
-                {
-                    ChipLogProgress(DeviceLayer, "BLE Error: %d.\n", msg->data.u8);
-                }
+                ChipLogProgress(DeviceLayer,
+                                "Warning. BLE is using 1Mbps. Couldn't upgrade to 2Mbps, "
+                                "maybe the peer is missing 2Mbps support.");
             }
-            else if (msg->type == BLE_KW_MSG_CONNECTED)
+            else
             {
-                sInstance.HandleConnectEvent(msg);
+                ChipLogProgress(DeviceLayer, "BLE Error: %d.\n", msg->data.u8);
             }
-            else if (msg->type == BLE_KW_MSG_DISCONNECTED)
-            {
-                sInstance.HandleConnectionCloseEvent(msg);
-            }
-            else if (msg->type == BLE_KW_MSG_MTU_CHANGED)
-            {
-                blekw_start_connection_timeout();
-                ChipLogProgress(DeviceLayer, "BLE MTU size has been changed to %d.", msg->data.u16);
-            }
-            else if (msg->type == BLE_KW_MSG_ATT_WRITTEN || msg->type == BLE_KW_MSG_ATT_LONG_WRITTEN ||
-                     msg->type == BLE_KW_MSG_ATT_CCCD_WRITTEN)
-            {
-                sInstance.HandleWriteEvent(msg);
-            }
-            else if (msg->type == BLE_KW_MSG_ATT_READ)
-            {
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-                blekw_att_read_data_t * att_rd_data = (blekw_att_read_data_t *) msg->data.data;
-                if (value_chipoble_c3 == att_rd_data->handle)
-                    sInstance.HandleC3ReadRequest(msg);
-#endif
-            }
-            else if (msg->type == BLE_KW_MSG_FORCE_DISCONNECT)
-            {
-                ChipLogProgress(DeviceLayer, "BLE connection timeout: Forcing disconnection.");
-
-                /* Set the advertising parameters */
-                if (Gap_Disconnect(g_device_id) != gBleSuccess_c)
-                {
-                    ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
-                }
-                sInstance.RemoveConnection(g_device_id);
-            }
-
-            /* Freed the message from the queue */
-            MSG_Free(msg);
         }
+        else if (msg->type == BLE_KW_MSG_CONNECTED)
+        {
+            sInstance.HandleConnectEvent(msg);
+        }
+        else if (msg->type == BLE_KW_MSG_DISCONNECTED)
+        {
+            sInstance.HandleConnectionCloseEvent(msg);
+        }
+        else if (msg->type == BLE_KW_MSG_MTU_CHANGED)
+        {
+            blekw_start_connection_timeout();
+            ChipLogProgress(DeviceLayer, "BLE MTU size has been changed to %d.", msg->data.u16);
+        }
+        else if (msg->type == BLE_KW_MSG_ATT_WRITTEN || msg->type == BLE_KW_MSG_ATT_LONG_WRITTEN ||
+                 msg->type == BLE_KW_MSG_ATT_CCCD_WRITTEN)
+        {
+            sInstance.HandleWriteEvent(msg);
+        }
+        else if (msg->type == BLE_KW_MSG_ATT_READ)
+        {
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+            blekw_att_read_data_t * att_rd_data = (blekw_att_read_data_t *) msg->data.data;
+            if (value_chipoble_c3 == att_rd_data->handle)
+                sInstance.HandleC3ReadRequest(msg);
+#endif
+        }
+        else if (msg->type == BLE_KW_MSG_FORCE_DISCONNECT)
+        {
+            ChipLogProgress(DeviceLayer, "BLE connection timeout: Forcing disconnection.");
+
+            /* Set the advertising parameters */
+            if (Gap_Disconnect(g_device_id) != gBleSuccess_c)
+            {
+                ChipLogProgress(DeviceLayer, "Gap_Disconnect() failed.");
+            }
+            sInstance.RemoveConnection(g_device_id);
+        }
+
+        /* Free the message from the queue */
+        MSG_Free(msg);
     }
+}
+
+void BLEManagerImpl::DoBleProcessing(intptr_t arg)
+{
+    sInstance.DoBleProcessing();
 }
 
 void BLEManagerImpl::HandleConnectEvent(blekw_msg_t * msg)
@@ -1495,13 +1477,8 @@ CHIP_ERROR BLEManagerImpl::blekw_msg_add_att_written(blekw_msg_type_t type, uint
     FLib_MemCpy(att_wr_data->data, data, length);
 
     /* Put message in the queue */
-    if (gListOk_c != MSG_Queue(&blekw_msg_list, msg))
-    {
-        assert(0);
-    }
-
-    /* Notify BLE-APP Task to serve the BLE subsystem */
-    blekw_new_data_received_notification(LOOP_EV_BLE);
+    MSG_Queue(&blekw_msg_list, msg);
+    otTaskletsSignalPending(NULL);
 
     return CHIP_NO_ERROR;
 }
@@ -1527,13 +1504,8 @@ CHIP_ERROR BLEManagerImpl::blekw_msg_add_att_read(blekw_msg_type_t type, uint8_t
     att_rd_data->handle    = handle;
 
     /* Put message in the queue */
-    if (gListOk_c != MSG_Queue(&blekw_msg_list, msg))
-    {
-        assert(0);
-    }
-
-    /* Notify BLE-APP Task to serve the BLE subsystem */
-    blekw_new_data_received_notification(LOOP_EV_BLE);
+    MSG_Queue(&blekw_msg_list, msg);
+    otTaskletsSignalPending(NULL);
 
     return CHIP_NO_ERROR;
 }
@@ -1556,9 +1528,7 @@ CHIP_ERROR BLEManagerImpl::blekw_msg_add_u8(blekw_msg_type_t type, uint8_t data)
 
     /* Put message in the queue */
     MSG_Queue(&blekw_msg_list, msg);
-
-    /* Notify BLE-APP Task to serve the BLE subsystem */
-    blekw_new_data_received_notification(LOOP_EV_BLE);
+    otTaskletsSignalPending(NULL);
 
     return CHIP_NO_ERROR;
 }
@@ -1581,9 +1551,7 @@ CHIP_ERROR BLEManagerImpl::blekw_msg_add_u16(blekw_msg_type_t type, uint16_t dat
 
     /* Put message in the queue */
     MSG_Queue(&blekw_msg_list, msg);
-
-    /* Notify BLE-APP Task to serve the BLE subsystem */
-    blekw_new_data_received_notification(LOOP_EV_BLE);
+    otTaskletsSignalPending(NULL);
 
     return CHIP_NO_ERROR;
 }
@@ -1591,26 +1559,6 @@ CHIP_ERROR BLEManagerImpl::blekw_msg_add_u16(blekw_msg_type_t type, uint16_t dat
 /*******************************************************************************
  * FreeRTOS Task Management Functions
  *******************************************************************************/
-void BLEManagerImpl::blekw_new_data_received_notification(uint32_t mask)
-{
-    portBASE_TYPE taskToWake = pdFALSE;
-
-    if (__get_IPSR())
-    {
-        if (xEventGroupSetBitsFromISR(bleAppTaskLoopEvent, mask, &taskToWake) == pdPASS)
-        {
-            /* If xHigherPriorityTaskWoken is now set to pdTRUE then a context
-                   switch should be requested.  The macro used is port specific and will
-                   be either portYIELD_FROM_ISR() or portEND_SWITCHING_ISR() - refer to
-                   the documentation page for the port being used. */
-            portYIELD_FROM_ISR(taskToWake);
-        }
-    }
-    else
-    {
-        xEventGroupSetBits(bleAppTaskLoopEvent, mask);
-    }
-}
 
 void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
 {

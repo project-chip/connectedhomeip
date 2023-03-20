@@ -255,10 +255,11 @@ private:
     static void blekw_start_connection_timeout(void);
     static void blekw_stop_connection_timeout(void);
 
-    static void bleAppTask(void * p_arg);
+    static void DoBleProcessing(intptr_t arg);
 
 public:
     static bool blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conId);
+    void DoBleProcessing(void);
 };
 
 /**
