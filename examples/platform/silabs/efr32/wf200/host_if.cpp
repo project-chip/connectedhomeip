@@ -496,7 +496,7 @@ static void sl_wfx_ap_client_rejected_callback(uint32_t status, uint8_t * mac)
  * @param[in]  mac:
  *****************************************************************************/
 static void sl_wfx_ap_client_disconnected_callback(uint32_t status, uint8_t * mac)
-{-0opl1205.1300
+{
     // TODO
     SILABS_LOG("Client disconnected, reason: %d, MAC: %02X:%02X:%02X:%02X:%02X:%02X\r\n", (int) status, mac[0], mac[1], mac[2],
                mac[3], mac[4], mac[5]);
