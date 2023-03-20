@@ -249,7 +249,4 @@ void EFR32MatterConfig::InitWiFi(void)
 extern "C" void vApplicationIdleHook(void)
 {
     // FreeRTOS Idle callback
-
-    // Check CHIP Config nvm3 and repack flash if necessary.
-    Internal::SilabsConfig::RepackNvm3Flash();
 }

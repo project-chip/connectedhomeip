@@ -532,6 +532,18 @@ CHIP_ERROR OperationalSessionSetup::ScheduleSessionSetupReattempt(System::Clock:
     timerDelay = System::Clock::Seconds16(
         static_cast<uint16_t>(CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_INITIAL_DELAY_SECONDS
                               << min((mAttemptsDone - 1), CHIP_DEVICE_CONFIG_AUTOMATIC_CASE_RETRY_MAX_BACKOFF)));
+    if (mAttemptsDone % 2 == 0)
+    {
+        // It's possible that the other side received one of our Sigma1 messages
+        // and then failed to get its Sigma2 back to us.  If that's the case, it
+        // will be waiting for that Sigma2 to time out before it starts
+        // listening for Sigma1 messages again.
+        //
+        // To handle that, on every other retry, add the amount of time it would
+        // take the other side to time out.
+        auto additionalTimeout = CASESession::ComputeSigma2ResponseTimeout(GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()));
+        timerDelay += std::chrono::duration_cast<System::Clock::Seconds16>(additionalTimeout);
+    }
     CHIP_ERROR err = mInitParams.exchangeMgr->GetSessionManager()->SystemLayer()->StartTimer(timerDelay, TrySetupAgain, this);
     // The cast on count() is needed because the type count() returns might not
     // actually be uint16_t; on some platforms it's int.

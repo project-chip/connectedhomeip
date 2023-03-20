@@ -36,6 +36,9 @@ declare_args() {
   use_SiWx917 = false
   use_rs911x_sockets = false
   chip_enable_ble_rs911x = false
+
+  #Disable MQTT my default
+  enable_dic = false
 }
 
 declare_args() {

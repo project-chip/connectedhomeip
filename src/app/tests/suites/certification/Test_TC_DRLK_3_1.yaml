@@ -270,7 +270,7 @@ tests:
       disabled: true
 
     - label: "DUT reads DoorState from the TH."
-      PICS: DRLK.S.F05 && DRLK.C.A0003
+      PICS: DRLK.C.F05 && DRLK.C.A0003
       verification: |
           ./chip-tool doorlock read door-state 1 1
 
@@ -348,7 +348,7 @@ tests:
       disabled: true
 
     - label: "DUT reads DoorOpenEvents from the TH."
-      PICS: DRLK.S.F05 && DRLK.C.A0004
+      PICS: DRLK.C.F05 && DRLK.C.A0004
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
@@ -430,7 +430,7 @@ tests:
       disabled: true
 
     - label: "DUT reads DoorClosedEvents from the TH."
-      PICS: DRLK.S.F05 && DRLK.C.A0005
+      PICS: DRLK.C.F05 && DRLK.C.A0005
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
@@ -511,7 +511,7 @@ tests:
       disabled: true
 
     - label: "DUT reads OpenPeriod from the TH."
-      PICS: DRLK.S.F05 && DRLK.C.A0006
+      PICS: DRLK.C.F05 && DRLK.C.A0006
       verification: |
           This is an Optional attribute, so its not compulsory to get the expected outcome
 
@@ -591,7 +591,7 @@ tests:
       disabled: true
 
     - label: "DUT reads NumberOfTotalUsersSupportedfrom the TH."
-      PICS: DRLK.S.F05 && DRLK.C.A0011
+      PICS: DRLK.C.F05 && DRLK.C.A0011
       verification: |
           ./chip-tool doorlock read  number-of-total-users-supported 1 1
 
@@ -1365,7 +1365,7 @@ tests:
       disabled: true
 
     - label: "DUT reads CredentialRulesSupport from the TH."
-      PICS: DRLK.S.F08 && DRLK.C.A001b
+      PICS: DRLK.C.F08 && DRLK.C.A001b
       verification: |
           ./chip-tool doorlock read credential-rules-support 1 1
 

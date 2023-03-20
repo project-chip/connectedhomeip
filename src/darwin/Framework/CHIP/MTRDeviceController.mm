@@ -153,6 +153,14 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 // Clean up from a state where startup was called.
 - (void)cleanupAfterStartup
 {
+    // Invalidate our MTRDevice instances before we shut down our secure
+    // sessions and whatnot, so they don't start trying to resubscribe when we
+    // do the secure session shutdowns.
+    for (MTRDevice * device in [self.nodeIDToDeviceMap allValues]) {
+        [device invalidate];
+    }
+    [self.nodeIDToDeviceMap removeAllObjects];
+
     [_factory controllerShuttingDown:self];
 }
 
@@ -203,11 +211,6 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         delete _deviceControllerDelegateBridge;
         _deviceControllerDelegateBridge = nullptr;
     }
-
-    for (MTRDevice * device in [self.nodeIDToDeviceMap allValues]) {
-        [device invalidate];
-    }
-    [self.nodeIDToDeviceMap removeAllObjects];
 }
 
 - (BOOL)startup:(MTRDeviceControllerStartupParamsInternal *)startupParams
@@ -534,7 +537,13 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     MTRDevice * deviceToReturn = self.nodeIDToDeviceMap[nodeID];
     if (!deviceToReturn) {
         deviceToReturn = [[MTRDevice alloc] initWithNodeID:nodeID controller:self];
-        self.nodeIDToDeviceMap[nodeID] = deviceToReturn;
+        // If we're not running, don't add the device to our map.  That would
+        // create a cycle that nothing would break.  Just return the device,
+        // which will be in exactly the state it would be in if it were created
+        // while we were running and then we got shut down.
+        if ([self isRunning]) {
+            self.nodeIDToDeviceMap[nodeID] = deviceToReturn;
+        }
     }
     os_unfair_lock_unlock(&_deviceMapLock);
 

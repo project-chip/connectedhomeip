@@ -42,6 +42,7 @@ tests:
                 saveAs: commissionerNodeId
 
     - label: "TH adds ACL Operate privileges for Group 0x0103"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "Access Control"
       endpoint: 0
       command: "writeAttribute"
@@ -65,7 +66,82 @@ tests:
                   },
               ]
 
+    - label: "TH adds ACL Operate privileges for Group 0x0103"
+      verification: |
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": ["0x0103"], "targets": null }]' 1 0
+
+          Verify DUT sends SUCCESS(0x00) response on  TH(chip-tool)  Logs:
+
+          [1674197827.380263][1821:1823] CHIP:DMG: WriteResponseMessage =
+          [1674197827.380335][1821:1823] CHIP:DMG: {
+          [1674197827.380364][1821:1823] CHIP:DMG:         AttributeStatusIBs =
+          [1674197827.380405][1821:1823] CHIP:DMG:         [
+          [1674197827.380449][1821:1823] CHIP:DMG:                 AttributeStatusIB =
+          [1674197827.380486][1821:1823] CHIP:DMG:                 {
+          [1674197827.380541][1821:1823] CHIP:DMG:                         AttributePathIB =
+          [1674197827.380582][1821:1823] CHIP:DMG:                         {
+          [1674197827.380635][1821:1823] CHIP:DMG:                                 Endpoint = 0x0,
+          [1674197827.380677][1821:1823] CHIP:DMG:                                 Cluster = 0x1f,
+          [1674197827.380732][1821:1823] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1674197827.380784][1821:1823] CHIP:DMG:                         }
+          [1674197827.380829][1821:1823] CHIP:DMG:
+          [1674197827.380878][1821:1823] CHIP:DMG:                         StatusIB =
+          [1674197827.380918][1821:1823] CHIP:DMG:                         {
+          [1674197827.380968][1821:1823] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1674197827.381010][1821:1823] CHIP:DMG:                         },
+          [1674197827.381061][1821:1823] CHIP:DMG:
+          [1674197827.381094][1821:1823] CHIP:DMG:                 },
+          [1674197827.381152][1821:1823] CHIP:DMG:
+          [1674197827.381184][1821:1823] CHIP:DMG:                 AttributeStatusIB =
+          [1674197827.381230][1821:1823] CHIP:DMG:                 {
+          [1674197827.381263][1821:1823] CHIP:DMG:                         AttributePathIB =
+          [1674197827.381301][1821:1823] CHIP:DMG:                         {
+          [1674197827.381352][1821:1823] CHIP:DMG:                                 Endpoint = 0x0,
+          [1674197827.381406][1821:1823] CHIP:DMG:                                 Cluster = 0x1f,
+          [1674197827.381449][1821:1823] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1674197827.381502][1821:1823] CHIP:DMG:                                 ListIndex = Null,
+          [1674197827.381543][1821:1823] CHIP:DMG:                         }
+          [1674197827.381597][1821:1823] CHIP:DMG:
+          [1674197827.381635][1821:1823] CHIP:DMG:                         StatusIB =
+          [1674197827.381673][1821:1823] CHIP:DMG:                         {
+          [1674197827.381725][1821:1823] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1674197827.381763][1821:1823] CHIP:DMG:                         },
+          [1674197827.381814][1821:1823] CHIP:DMG:
+          [1674197827.381846][1821:1823] CHIP:DMG:                 },
+          [1674197827.381910][1821:1823] CHIP:DMG:
+          [1674197827.381942][1821:1823] CHIP:DMG:                 AttributeStatusIB =
+          [1674197827.381988][1821:1823] CHIP:DMG:                 {
+          [1674197827.382021][1821:1823] CHIP:DMG:                         AttributePathIB =
+          [1674197827.382070][1821:1823] CHIP:DMG:                         {
+          [1674197827.382109][1821:1823] CHIP:DMG:                                 Endpoint = 0x0,
+          [1674197827.382161][1821:1823] CHIP:DMG:                                 Cluster = 0x1f,
+          [1674197827.382204][1821:1823] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1674197827.382255][1821:1823] CHIP:DMG:                                 ListIndex = Null,
+          [1674197827.382295][1821:1823] CHIP:DMG:                         }
+          [1674197827.382349][1821:1823] CHIP:DMG:
+          [1674197827.382387][1821:1823] CHIP:DMG:                         StatusIB =
+          [1674197827.382436][1821:1823] CHIP:DMG:                         {
+          [1674197827.382476][1821:1823] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1674197827.382527][1821:1823] CHIP:DMG:                         },
+          [1674197827.382566][1821:1823] CHIP:DMG:
+          [1674197827.382599][1821:1823] CHIP:DMG:                 },
+          [1674197827.382650][1821:1823] CHIP:DMG:
+          [1674197827.382681][1821:1823] CHIP:DMG:         ],
+          [1674197827.382729][1821:1823] CHIP:DMG:
+          [1674197827.382759][1821:1823] CHIP:DMG:         InteractionModelRevision = 1
+          [1674197827.382789][1821:1823] CHIP:DMG: }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH sends KeySetWrite command with TH key"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "Group Key Management"
       endpoint: 0
       command: "KeySetWrite"
@@ -84,7 +160,53 @@ tests:
                         EpochStartTime2: 2220002,
                     }
 
+    - label: "TH sends KeySetWrite command with TH key"
+      verification: |
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": "0x01a3","groupKeySecurityPolicy": 0, "epochKey0":"d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":"d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":"d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
+
+          Verify DUT sends SUCCESS(0x00) response on  TH(chip-tool)  Logs:
+
+          [1674198053.466794][1826:1829] CHIP:DMG: InvokeResponseMessage =
+          [1674198053.466849][1826:1829] CHIP:DMG: {
+          [1674198053.466903][1826:1829] CHIP:DMG:         suppressResponse = false,
+          [1674198053.466962][1826:1829] CHIP:DMG:         InvokeResponseIBs =
+          [1674198053.467036][1826:1829] CHIP:DMG:         [
+          [1674198053.467093][1826:1829] CHIP:DMG:                 InvokeResponseIB =
+          [1674198053.467170][1826:1829] CHIP:DMG:                 {
+          [1674198053.467231][1826:1829] CHIP:DMG:                         CommandStatusIB =
+          [1674198053.467304][1826:1829] CHIP:DMG:                         {
+          [1674198053.467371][1826:1829] CHIP:DMG:                                 CommandPathIB =
+          [1674198053.467449][1826:1829] CHIP:DMG:                                 {
+          [1674198053.467525][1826:1829] CHIP:DMG:                                         EndpointId = 0x0,
+          [1674198053.467606][1826:1829] CHIP:DMG:                                         ClusterId = 0x3f,
+          [1674198053.467691][1826:1829] CHIP:DMG:                                         CommandId = 0x0,
+          [1674198053.467769][1826:1829] CHIP:DMG:                                 },
+          [1674198053.467854][1826:1829] CHIP:DMG:
+          [1674198053.467922][1826:1829] CHIP:DMG:                                 StatusIB =
+          [1674198053.467999][1826:1829] CHIP:DMG:                                 {
+          [1674198053.468076][1826:1829] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1674198053.468154][1826:1829] CHIP:DMG:                                 },
+          [1674198053.468231][1826:1829] CHIP:DMG:
+          [1674198053.468338][1826:1829] CHIP:DMG:                         },
+          [1674198053.468419][1826:1829] CHIP:DMG:
+          [1674198053.468479][1826:1829] CHIP:DMG:                 },
+          [1674198053.468550][1826:1829] CHIP:DMG:
+          [1674198053.468606][1826:1829] CHIP:DMG:         ],
+          [1674198053.468676][1826:1829] CHIP:DMG:
+          [1674198053.468731][1826:1829] CHIP:DMG:         InteractionModelRevision = 1
+          [1674198053.468788][1826:1829] CHIP:DMG: },
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH binds GroupId to GroupKeySet"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "Group Key Management"
       endpoint: 0
       command: "writeAttribute"
@@ -95,6 +217,63 @@ tests:
                   { FabricIndex: 1, GroupId: 0x0101, GroupKeySetID: 0x01a3 },
                   { FabricIndex: 1, GroupId: 0x0103, GroupKeySetID: 0x01a3 },
               ]
+
+    - label: "TH binds GroupId to GroupKeySet"
+      verification: |
+          ./chip-tool groupkeymanagement write group-key-map '[{"groupId": "0x0103", "groupKeySetID": "0x01a3", "fabricIndex": 1}]' 1 0
+
+          Verify DUT sends SUCCESS(0x00) response on  TH(chip-tool)  Logs:
+
+          [1674198154.629775][1837:1839] CHIP:DMG: WriteResponseMessage =
+          [1674198154.629832][1837:1839] CHIP:DMG: {
+          [1674198154.629908][1837:1839] CHIP:DMG:         AttributeStatusIBs =
+          [1674198154.629983][1837:1839] CHIP:DMG:         [
+          [1674198154.630064][1837:1839] CHIP:DMG:                 AttributeStatusIB =
+          [1674198154.630105][1837:1839] CHIP:DMG:                 {
+          [1674198154.630142][1837:1839] CHIP:DMG:                         AttributePathIB =
+          [1674198154.630178][1837:1839] CHIP:DMG:                         {
+          [1674198154.630290][1837:1839] CHIP:DMG:                                 Endpoint = 0x0,
+          [1674198154.630325][1837:1839] CHIP:DMG:                                 Cluster = 0x3f,
+          [1674198154.630358][1837:1839] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1674198154.630400][1837:1839] CHIP:DMG:                         }
+          [1674198154.630437][1837:1839] CHIP:DMG:
+          [1674198154.630476][1837:1839] CHIP:DMG:                         StatusIB =
+          [1674198154.630508][1837:1839] CHIP:DMG:                         {
+          [1674198154.630549][1837:1839] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1674198154.630581][1837:1839] CHIP:DMG:                         },
+          [1674198154.630621][1837:1839] CHIP:DMG:
+          [1674198154.630648][1837:1839] CHIP:DMG:                 },
+          [1674198154.630695][1837:1839] CHIP:DMG:
+          [1674198154.630721][1837:1839] CHIP:DMG:                 AttributeStatusIB =
+          [1674198154.630748][1837:1839] CHIP:DMG:                 {
+          [1674198154.630784][1837:1839] CHIP:DMG:                         AttributePathIB =
+          [1674198154.630814][1837:1839] CHIP:DMG:                         {
+          [1674198154.630854][1837:1839] CHIP:DMG:                                 Endpoint = 0x0,
+          [1674198154.630887][1837:1839] CHIP:DMG:                                 Cluster = 0x3f,
+          [1674198154.630929][1837:1839] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1674198154.630964][1837:1839] CHIP:DMG:                                 ListIndex = Null,
+          [1674198154.631004][1837:1839] CHIP:DMG:                         }
+          [1674198154.631039][1837:1839] CHIP:DMG:
+          [1674198154.631077][1837:1839] CHIP:DMG:                         StatusIB =
+          [1674198154.631108][1837:1839] CHIP:DMG:                         {
+          [1674198154.631148][1837:1839] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1674198154.631179][1837:1839] CHIP:DMG:                         },
+          [1674198154.631208][1837:1839] CHIP:DMG:
+          [1674198154.631244][1837:1839] CHIP:DMG:                 },
+          [1674198154.631275][1837:1839] CHIP:DMG:
+          [1674198154.631310][1837:1839] CHIP:DMG:         ],
+          [1674198154.631345][1837:1839] CHIP:DMG:
+          [1674198154.631378][1837:1839] CHIP:DMG:         InteractionModelRevision = 1
+          [1674198154.631403][1837:1839] CHIP:DMG: }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     - label: "TH sends RemoveAllGroups command"
       command: "RemoveAllGroups"
@@ -187,10 +366,56 @@ tests:
               - name: GroupKeySetID
                 value: 0x01a3
 
+    - label: "TH removes the GroupKeySet"
+      verification: |
+          ./chip-tool groupkeymanagement key-set-remove "0x01a3" 1 0
+
+          Verify DUT sends SUCCESS(0x00) response on TH(chip-tool)  Logs:
+
+          [1674199244.259870][1870:1872] CHIP:DMG: InvokeResponseMessage =
+          [1674199244.259895][1870:1872] CHIP:DMG: {
+          [1674199244.259918][1870:1872] CHIP:DMG:         suppressResponse = false,
+          [1674199244.259943][1870:1872] CHIP:DMG:         InvokeResponseIBs =
+          [1674199244.259975][1870:1872] CHIP:DMG:         [
+          [1674199244.259999][1870:1872] CHIP:DMG:                 InvokeResponseIB =
+          [1674199244.260035][1870:1872] CHIP:DMG:                 {
+          [1674199244.260061][1870:1872] CHIP:DMG:                         CommandStatusIB =
+          [1674199244.260093][1870:1872] CHIP:DMG:                         {
+          [1674199244.260120][1870:1872] CHIP:DMG:                                 CommandPathIB =
+          [1674199244.260154][1870:1872] CHIP:DMG:                                 {
+          [1674199244.260187][1870:1872] CHIP:DMG:                                         EndpointId = 0x0,
+          [1674199244.260222][1870:1872] CHIP:DMG:                                         ClusterId = 0x3f,
+          [1674199244.260257][1870:1872] CHIP:DMG:                                         CommandId = 0x3,
+          [1674199244.260305][1870:1872] CHIP:DMG:                                 },
+          [1674199244.260344][1870:1872] CHIP:DMG:
+          [1674199244.260373][1870:1872] CHIP:DMG:                                 StatusIB =
+          [1674199244.260406][1870:1872] CHIP:DMG:                                 {
+          [1674199244.260443][1870:1872] CHIP:DMG:                                         status = 0x00 (SUCCESS),
+          [1674199244.260476][1870:1872] CHIP:DMG:                                 },
+          [1674199244.260507][1870:1872] CHIP:DMG:
+          [1674199244.260536][1870:1872] CHIP:DMG:                         },
+          [1674199244.260569][1870:1872] CHIP:DMG:
+          [1674199244.260595][1870:1872] CHIP:DMG:                 },
+          [1674199244.260625][1870:1872] CHIP:DMG:
+          [1674199244.260650][1870:1872] CHIP:DMG:         ],
+          [1674199244.260680][1870:1872] CHIP:DMG:
+          [1674199244.260704][1870:1872] CHIP:DMG:         InteractionModelRevision = 1
+          [1674199244.260728][1870:1872] CHIP:DMG: },
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH cleans up groups using RemoveAllGroups command"
       command: "RemoveAllGroups"
 
     - label: "TH removes ACL Operate privileges for Group 0x0103"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "Access Control"
       endpoint: 0
       command: "writeAttribute"
@@ -206,3 +431,60 @@ tests:
                       Targets: null,
                   },
               ]
+
+    - label: "TH removes ACL Operate privileges for Group 0x0103"
+      verification: |
+          ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null }]' 1 0
+
+          Verify DUT sends SUCCESS(0x00) response on TH(chip-tool)  Logs:
+
+          [1674209548.549754][6888:6890] CHIP:DMG: WriteResponseMessage =
+          [1674209548.549758][6888:6890] CHIP:DMG: {
+          [1674209548.549760][6888:6890] CHIP:DMG:         AttributeStatusIBs =
+          [1674209548.549765][6888:6890] CHIP:DMG:         [
+          [1674209548.549768][6888:6890] CHIP:DMG:                 AttributeStatusIB =
+          [1674209548.549772][6888:6890] CHIP:DMG:                 {
+          [1674209548.549775][6888:6890] CHIP:DMG:                         AttributePathIB =
+          [1674209548.549779][6888:6890] CHIP:DMG:                         {
+          [1674209548.549782][6888:6890] CHIP:DMG:                                 Endpoint = 0x0,
+          [1674209548.549786][6888:6890] CHIP:DMG:                                 Cluster = 0x1f,
+          [1674209548.549789][6888:6890] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1674209548.549792][6888:6890] CHIP:DMG:                         }
+          [1674209548.549797][6888:6890] CHIP:DMG:
+          [1674209548.549800][6888:6890] CHIP:DMG:                         StatusIB =
+          [1674209548.549804][6888:6890] CHIP:DMG:                         {
+          [1674209548.549807][6888:6890] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1674209548.549810][6888:6890] CHIP:DMG:                         },
+          [1674209548.549813][6888:6890] CHIP:DMG:
+          [1674209548.549816][6888:6890] CHIP:DMG:                 },
+          [1674209548.549823][6888:6890] CHIP:DMG:
+          [1674209548.549825][6888:6890] CHIP:DMG:                 AttributeStatusIB =
+          [1674209548.549828][6888:6890] CHIP:DMG:                 {
+          [1674209548.549831][6888:6890] CHIP:DMG:                         AttributePathIB =
+          [1674209548.549836][6888:6890] CHIP:DMG:                         {
+          [1674209548.549839][6888:6890] CHIP:DMG:                                 Endpoint = 0x0,
+          [1674209548.549842][6888:6890] CHIP:DMG:                                 Cluster = 0x1f,
+          [1674209548.549845][6888:6890] CHIP:DMG:                                 Attribute = 0x0000_0000,
+          [1674209548.549849][6888:6890] CHIP:DMG:                                 ListIndex = Null,
+          [1674209548.549852][6888:6890] CHIP:DMG:                         }
+          [1674209548.549856][6888:6890] CHIP:DMG:
+          [1674209548.549859][6888:6890] CHIP:DMG:                         StatusIB =
+          [1674209548.549862][6888:6890] CHIP:DMG:                         {
+          [1674209548.549865][6888:6890] CHIP:DMG:                                 status = 0x00 (SUCCESS),
+          [1674209548.549868][6888:6890] CHIP:DMG:                         },
+          [1674209548.549871][6888:6890] CHIP:DMG:
+          [1674209548.549873][6888:6890] CHIP:DMG:                 },
+          [1674209548.549878][6888:6890] CHIP:DMG:
+          [1674209548.549881][6888:6890] CHIP:DMG:         ],
+          [1674209548.549887][6888:6890] CHIP:DMG:
+          [1674209548.549890][6888:6890] CHIP:DMG:         InteractionModelRevision = 1
+          [1674209548.549892][6888:6890] CHIP:DMG: }
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"

@@ -2400,6 +2400,19 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
                                                         NSError * _Nullable error))completion
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+- (void)readAttributeProductAppearanceWithCompletion:(void (^)(MTRBasicInformationClusterProductAppearanceStruct * _Nullable value,
+                                                         NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+- (void)subscribeAttributeProductAppearanceWithParams:(MTRSubscribeParams *)params
+                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                        reportHandler:(void (^)(MTRBasicInformationClusterProductAppearanceStruct * _Nullable value,
+                                                          NSError * _Nullable error))reportHandler MTR_NEWLY_AVAILABLE;
++ (void)readAttributeProductAppearanceWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer
+                                                   endpoint:(NSNumber *)endpoint
+                                                      queue:(dispatch_queue_t)queue
+                                                 completion:
+                                                     (void (^)(MTRBasicInformationClusterProductAppearanceStruct * _Nullable value,
+                                                         NSError * _Nullable error))completion MTR_NEWLY_AVAILABLE;
+
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
@@ -18974,6 +18987,39 @@ typedef NS_OPTIONS(uint16_t, MTRActionsCommandBits) {
     MTRActionsCommandBitsDisableAction API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x400,
     MTRActionsCommandBitsDisableActionWithDuration API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x800,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+typedef NS_ENUM(uint8_t, MTRBasicInformationColor) {
+    MTRBasicInformationColorBlack MTR_NEWLY_AVAILABLE = 0x00,
+    MTRBasicInformationColorNavy MTR_NEWLY_AVAILABLE = 0x01,
+    MTRBasicInformationColorGreen MTR_NEWLY_AVAILABLE = 0x02,
+    MTRBasicInformationColorTeal MTR_NEWLY_AVAILABLE = 0x03,
+    MTRBasicInformationColorMaroon MTR_NEWLY_AVAILABLE = 0x04,
+    MTRBasicInformationColorPurple MTR_NEWLY_AVAILABLE = 0x05,
+    MTRBasicInformationColorOlive MTR_NEWLY_AVAILABLE = 0x06,
+    MTRBasicInformationColorGray MTR_NEWLY_AVAILABLE = 0x07,
+    MTRBasicInformationColorBlue MTR_NEWLY_AVAILABLE = 0x08,
+    MTRBasicInformationColorLime MTR_NEWLY_AVAILABLE = 0x09,
+    MTRBasicInformationColorAqua MTR_NEWLY_AVAILABLE = 0x0A,
+    MTRBasicInformationColorRed MTR_NEWLY_AVAILABLE = 0x0B,
+    MTRBasicInformationColorFuchsia MTR_NEWLY_AVAILABLE = 0x0C,
+    MTRBasicInformationColorYellow MTR_NEWLY_AVAILABLE = 0x0D,
+    MTRBasicInformationColorWhite MTR_NEWLY_AVAILABLE = 0x0E,
+    MTRBasicInformationColorNickel MTR_NEWLY_AVAILABLE = 0x0F,
+    MTRBasicInformationColorChrome MTR_NEWLY_AVAILABLE = 0x10,
+    MTRBasicInformationColorBrass MTR_NEWLY_AVAILABLE = 0x11,
+    MTRBasicInformationColorCopper MTR_NEWLY_AVAILABLE = 0x12,
+    MTRBasicInformationColorSilver MTR_NEWLY_AVAILABLE = 0x13,
+    MTRBasicInformationColorGold MTR_NEWLY_AVAILABLE = 0x14,
+} MTR_NEWLY_AVAILABLE;
+
+typedef NS_ENUM(uint8_t, MTRBasicInformationProductFinish) {
+    MTRBasicInformationProductFinishMatte MTR_NEWLY_AVAILABLE = 0x00,
+    MTRBasicInformationProductFinishSatin MTR_NEWLY_AVAILABLE = 0x01,
+    MTRBasicInformationProductFinishPolished MTR_NEWLY_AVAILABLE = 0x02,
+    MTRBasicInformationProductFinishRugged MTR_NEWLY_AVAILABLE = 0x03,
+    MTRBasicInformationProductFinishFabric MTR_NEWLY_AVAILABLE = 0x04,
+    MTRBasicInformationProductFinishOther MTR_NEWLY_AVAILABLE = 0xFF,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateProviderOTAApplyUpdateAction) {
     MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,

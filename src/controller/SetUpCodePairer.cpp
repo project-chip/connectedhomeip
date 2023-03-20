@@ -585,10 +585,18 @@ SetUpCodePairerParameters::SetUpCodePairerParameters(const Dnssd::CommonResoluti
 }
 
 #if CONFIG_NETWORK_LAYER_BLE
-SetUpCodePairerParameters::SetUpCodePairerParameters(BLE_CONNECTION_OBJECT connObj)
+SetUpCodePairerParameters::SetUpCodePairerParameters(BLE_CONNECTION_OBJECT connObj, bool connected)
 {
     Transport::PeerAddress peerAddress = Transport::PeerAddress::BLE();
-    SetPeerAddress(peerAddress).SetConnectionObject(connObj);
+    SetPeerAddress(peerAddress);
+    if (connected)
+    {
+        SetConnectionObject(connObj);
+    }
+    else
+    {
+        SetDiscoveredObject(connObj);
+    }
 }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
