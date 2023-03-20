@@ -167,7 +167,7 @@ sl_status_t sl_wfx_host_spi_cs_deassert()
 }
 
 /****************************************************************************
- * @fn  static bool rx_dma_complete(unsigned int channel, unsigned int sequenceNo, void *userParam)
+ * @fn  static bool dma_complete(unsigned int channel, unsigned int sequenceNo, void *userParam)
  * @brief
  *     function called when the DMA complete
  * @param[in] channel:
@@ -176,7 +176,7 @@ sl_status_t sl_wfx_host_spi_cs_deassert()
  * @return returns true if suucessful,
  *          false otherwise
  *****************************************************************************/
-static bool rx_dma_complete(unsigned int channel, unsigned int sequenceNo, void * userParam)
+static bool dma_complete(unsigned int channel, unsigned int sequenceNo, void * userParam)
 {
     (void) channel;
     (void) sequenceNo;
@@ -209,7 +209,7 @@ void receiveDMA(uint8_t * buffer, uint16_t buffer_length)
 
     // Start receive DMA.
     DMADRV_PeripheralMemory(rx_dma_channel, MY_USART_RX_SIGNAL, (void *) buffer, (void *) &(MY_USART->RXDATA), true, buffer_length,
-                            dmadrvDataSize1, rx_dma_complete, NULL);
+                            dmadrvDataSize1, dma_complete, NULL);
 
     // Start transmit DMA.
     DMADRV_MemoryPeripheral(tx_dma_channel, MY_USART_TX_SIGNAL, (void *) &(MY_USART->TXDATA), (void *) &(dummy_tx_data), false,
@@ -233,7 +233,7 @@ void transmitDMA(uint8_t * buffer, uint16_t buffer_length)
     // Receive DMA runs only to initiate callback
     // Start receive DMA.
     DMADRV_PeripheralMemory(rx_dma_channel, MY_USART_RX_SIGNAL, &dummy_rx_data, (void *) &(MY_USART->RXDATA), false, buffer_length,
-                            dmadrvDataSize1, rx_dma_complete, NULL);
+                            dmadrvDataSize1, dma_complete, NULL);
     // Start transmit DMA.
     DMADRV_MemoryPeripheral(tx_dma_channel, MY_USART_TX_SIGNAL, (void *) &(MY_USART->TXDATA), (void *) buffer, true, buffer_length,
                             dmadrvDataSize1, NULL, NULL);
