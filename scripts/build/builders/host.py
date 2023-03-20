@@ -53,6 +53,8 @@ class HostApp(Enum):
     CERT_TOOL = auto()
     OTA_PROVIDER = auto()
     OTA_REQUESTOR = auto()
+    SIMULATED_APP1 = auto()
+    SIMULATED_APP2 = auto()
     PYTHON_BINDINGS = auto()
     EFR32_TEST_RUNNER = auto()
     TV_CASTING = auto()
@@ -88,6 +90,8 @@ class HostApp(Enum):
             return 'shell/standalone'
         elif self == HostApp.OTA_PROVIDER:
             return 'ota-provider-app/linux'
+        elif self in [HostApp.SIMULATED_APP1, HostApp.SIMULATED_APP2]:
+            return 'placeholder/linux/'
         elif self == HostApp.OTA_REQUESTOR:
             return 'ota-requestor-app/linux'
         elif self in [HostApp.ADDRESS_RESOLVE, HostApp.TESTS, HostApp.PYTHON_BINDINGS, HostApp.CERT_TOOL]:
@@ -155,6 +159,12 @@ class HostApp(Enum):
         elif self == HostApp.CERT_TOOL:
             yield 'chip-cert'
             yield 'chip-cert.map'
+        elif self == HostApp.SIMULATED_APP1:
+            yield 'chip-app1'
+            yield 'chip-app1.map'
+        elif self == HostApp.SIMULATED_APP2:
+            yield 'chip-app2'
+            yield 'chip-app2.map'
         elif self == HostApp.OTA_PROVIDER:
             yield 'chip-ota-provider-app'
             yield 'chip-ota-provider-app.map'
@@ -350,6 +360,12 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('enable_rtti=false')
             self.extra_gn_options.append('chip_project_config_include_dirs=["//config/python"]')
             self.build_command = 'chip-repl'
+
+        if self.app == HostApp.SIMULATED_APP1:
+            self.extra_gn_options.append('chip_tests_zap_config="app1"')
+
+        if self.app == HostApp.SIMULATED_APP2:
+            self.extra_gn_options.append('chip_tests_zap_config="app2"')
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
