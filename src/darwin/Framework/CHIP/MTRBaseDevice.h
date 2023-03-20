@@ -453,13 +453,13 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 typedef NS_ENUM(NSUInteger, MTREventTimeType) {
     MTREventTimeTypeSystemUpTime = 0,
     MTREventTimeTypeTimestampDate
-} MTR_NEWLY_AVAILABLE;
+} API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 typedef NS_ENUM(NSUInteger, MTREventPriority) {
     MTREventPriorityDebug = 0,
     MTREventPriorityInfo = 1,
     MTREventPriorityCritical = 2
-} MTR_NEWLY_AVAILABLE;
+} API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 @interface MTREventReport : NSObject
 @property (nonatomic, readonly, copy) MTREventPath * path;
@@ -467,9 +467,10 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
 @property (nonatomic, readonly, copy) NSNumber * priority; // PriorityLevel type (MTREventPriority)
 
 // Either systemUpTime or timestampDate will be valid depending on eventTimeType
-@property (nonatomic, readonly) MTREventTimeType eventTimeType MTR_NEWLY_AVAILABLE;
-@property (nonatomic, readonly) NSTimeInterval systemUpTime MTR_NEWLY_AVAILABLE;
-@property (nonatomic, readonly, copy, nullable) NSDate * timestampDate MTR_NEWLY_AVAILABLE;
+@property (nonatomic, readonly) MTREventTimeType eventTimeType API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+@property (nonatomic, readonly) NSTimeInterval systemUpTime API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+@property (nonatomic, readonly, copy, nullable)
+    NSDate * timestampDate API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 // An instance of one of the event payload interfaces.
 @property (nonatomic, readonly, copy) id value;
@@ -581,7 +582,8 @@ typedef NS_ENUM(NSUInteger, MTREventPriority) {
 @end
 
 @interface MTREventReport (Deprecated)
-@property (nonatomic, readonly, copy) NSNumber * timestamp MTR_NEWLY_DEPRECATED("Please use timestampDate and systemUpTime");
+@property (nonatomic, readonly, copy) NSNumber * timestamp MTR_DEPRECATED(
+    "Please use timestampDate and systemUpTime", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5));
 @end
 
 NS_ASSUME_NONNULL_END
