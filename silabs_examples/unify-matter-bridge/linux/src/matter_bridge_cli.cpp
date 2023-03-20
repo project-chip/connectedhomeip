@@ -20,6 +20,7 @@
 #include "group_command_translator.hpp"
 #include "matter_node_state_monitor.hpp"
 #include "matter_bridge_qrcode_publisher.hpp"
+#include <app/util/attribute-storage.h>
 #include <iostream>
 
 using namespace chip;
@@ -70,6 +71,28 @@ static sl_status_t epmap_cli_func(const handle_args_t & arg)
     }
     return SL_STATUS_OK;
 }
+static sl_status_t attribute_store_cli_func(const handle_args_t & arg)
+{
+    for (uint16_t ep = 0; ep < emberAfEndpointCount(); ep++) {
+            const EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
+            if (!endpointType) return SL_STATUS_OK;
+            sl_log_info(LOG_TAG, " ep: %d \n", ep);
+            for (uint8_t clusterIndex = 0; clusterIndex < endpointType->clusterCount; clusterIndex++) {
+                const EmberAfCluster * cluster = &(endpointType->cluster[clusterIndex]);
+                if (!cluster) return SL_STATUS_OK;
+                sl_log_info(LOG_TAG, "\tCluster: " ChipLogFormatMEI, ChipLogValueMEI(cluster->clusterId));
+
+                sl_log_info(LOG_TAG, "\t\tAttributeId: ");
+                std::string str;
+                for (uint16_t attrIndex = 0; attrIndex < cluster->attributeCount; attrIndex++) {
+                        const EmberAfAttributeMetadata * am = &(cluster->attributes[attrIndex]);
+                        if (!am) return SL_STATUS_OK;
+                        sl_log_info(LOG_TAG,  ChipLogFormatMEI ", ", ChipLogValueMEI(am->attributeId));
+                }
+            }
+    }
+    return SL_STATUS_OK;
+}
 
 static sl_status_t groups_map_cli_func(const handle_args_t & arg)
 {
@@ -87,6 +110,7 @@ command_map_t unify_cli_commands = {
     { "endpoint_map", { "Show Unify to Matter endpoint map", epmap_cli_func } },
     { "qr_code_publish", { "Publish Unify Matter Bridge QR code", qr_code_publish_cli_func} },
     { "groups_map", { "Show Matter vs Unify groups map", groups_map_cli_func } },
+    { "matter_attribute_store", { "Show all the matter endpoints, their supported clusters and attributes", attribute_store_cli_func} },
 };
 
 sl_status_t matter_bridge_cli_init()
