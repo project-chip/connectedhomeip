@@ -84,6 +84,8 @@ public:
     /// @param cluster[out]  Cluster in the Extension field set, filled by the function
     /// @param serialisedBytes[out] Buffer to fill from the ExtensionFieldSet in command
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
+    /// @note Only gets called after the scene-cluster has previously verified that the endpoint,cluster valuer pair is supported by
+    /// the handler. It is therefore the implementation's reponsibility to also implement the SupportsCluster method.
     virtual CHIP_ERROR SerializeAdd(EndpointId endpoint,
                                     const app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
                                     ClusterId & cluster, MutableByteSpan & serialisedBytes) = 0;
@@ -103,11 +105,13 @@ public:
     /// @brief Deserialize an ExtensionFieldSet into a cluster object (e.g. when handling ViewScene).
     ///
     /// @param endpoint[in] Endpoint ID
-    /// @param cluster[in] Cluster ID to save
+    /// @param cluster[in] Cluster ID
     /// @param serializedBytes[in] ExtensionFieldSet stored in NVM
     ///
     /// @param extensionFieldSet[out] ExtensionFieldSet in command format
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
+    /// @note Only gets called after the scene-cluster has previously verified that the endpoint,cluster valuer pair is supported by
+    /// the handler. It is therefore the implementation's reponsibility to also implement the SupportsCluster method.
     virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
 
                                    app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & extensionFieldSet) = 0;
@@ -148,6 +152,8 @@ public:
             mGroupId    = kGlobalGroupSceneId;
             mSceneId    = kUndefinedSceneId;
         }
+
+        bool IsValid() { return (mEndpointId != kInvalidEndpointId) && (mSceneId != kUndefinedSceneId); }
 
         bool operator==(const SceneStorageId & other)
         {
