@@ -69,7 +69,7 @@ public:
     // Iterators
     GroupInfoIterator * IterateGroupInfo(FabricIndex fabric_index) override;
     EndpointIterator * IterateEndpoints(FabricIndex fabric_index,
-                                        Optional<GroupId> group_id = Optional<GroupId>::Missing()) override;
+                                        Optional<GroupId> group_id = NullOptional) override;
 
     //
     // Group-Key map
