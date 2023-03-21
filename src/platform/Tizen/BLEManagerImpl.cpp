@@ -42,6 +42,8 @@
 #include <utility>
 
 #include <bluetooth.h>
+#include <bluetooth_internal.h>
+#include <bluetooth_type_internal.h>
 #include <glib.h>
 
 #include <ble/Ble.h>
