@@ -46,6 +46,7 @@ ALL_PLATFORMS = set([
     'mw320',
     'genio',
     'openiotsdk',
+    'silabs_docker',
 ])
 
 Module = namedtuple('Module', 'name path platforms')

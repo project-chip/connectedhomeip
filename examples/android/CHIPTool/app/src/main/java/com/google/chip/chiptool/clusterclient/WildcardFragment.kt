@@ -531,12 +531,12 @@ class WildcardFragment : Fragment() {
     private val TLV_MAP = mapOf(
             "UnsignedInt" to object:TlvWriterInterface {
               override fun generate(writer : TlvWriter, value: String, tag: chip.tlv.Tag) {
-                writer.put(tag, value.toUInt())
+                writer.put(tag, value.toULong())
               }
             },
             "Int" to object:TlvWriterInterface {
               override fun generate(writer : TlvWriter, value: String, tag: chip.tlv.Tag) {
-                writer.put(tag, value.toInt())
+                writer.put(tag, value.toLong())
               }
             },
             "Boolean" to object:TlvWriterInterface {

@@ -241,7 +241,8 @@ class EncodableValue:
             else:
                 raise Exception("Unknown fundamental type")
         elif type(t) == BasicInteger:
-            if t.byte_count >= 4:
+            # the >= 3 will include int24_t to be considered "long"
+            if t.byte_count >= 3:
                 return "Long"
             else:
                 return "Integer"
@@ -251,9 +252,15 @@ class EncodableValue:
             else:
                 return "String"
         elif type(t) == IdlEnumType:
-            return "Integer"
+            if t.base_type.byte_count >= 3:
+                return "Long"
+            else:
+                return "Integer"
         elif type(t) == IdlBitmapType:
-            return "Integer"
+            if t.base_type.byte_count >= 3:
+                return "Long"
+            else:
+                return "Integer"
         else:
             return "Object"
 
@@ -278,7 +285,7 @@ class EncodableValue:
             else:
                 raise Exception("Unknown fundamental type")
         elif type(t) == BasicInteger:
-            if t.byte_count >= 4:
+            if t.byte_count >= 3:
                 return "Ljava/lang/Long;"
             else:
                 return "Ljava/lang/Integer;"
@@ -288,9 +295,15 @@ class EncodableValue:
             else:
                 return "Ljava/lang/String;"
         elif type(t) == IdlEnumType:
-            return "Ljava/lang/Integer;"
+            if t.base_type.byte_count >= 3:
+                return "Ljava/lang/Long;"
+            else:
+                return "Ljava/lang/Integer;"
         elif type(t) == IdlBitmapType:
-            return "Ljava/lang/Integer;"
+            if t.base_type.byte_count >= 3:
+                return "Ljava/lang/Long;"
+            else:
+                return "Ljava/lang/Integer;"
         else:
             return "Lchip/devicecontroller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
 
@@ -369,6 +382,7 @@ class JavaGenerator(CodeGenerator):
         """
         Renders .CPP files required for JNI support.
         """
+
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:

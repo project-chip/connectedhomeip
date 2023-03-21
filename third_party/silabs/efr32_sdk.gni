@@ -53,6 +53,13 @@ declare_args() {
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
 
+declare_args() {
+  sl_ot_libs_path = "${efr32_sdk_root}/protocol/openthread"
+  sl_ot_efr32_root =
+      "${efr32_sdk_root}/protocol/openthread/platform-abstraction/efr32"
+  sl_openthread_root = "${efr32_sdk_root}/util/third_party/openthread"
+}
+
 # Defines an efr32 SDK build target.
 #
 # Parameters:
@@ -221,7 +228,11 @@ template("efr32_sdk") {
       if (use_SiWx917) {
         #Added this flag only for SiwX917 NCP board
         #TODO: Remove when rsi_wlan_ext_stats gets implemented using Wisemcu SDK
-        defines += [ "SiWx917_WIFI" ]
+        defines += [
+          "SiWx917_WIFI",
+          "EXP_BOARD=1",
+          "CHIP_9117=1",
+        ]
       } else if (use_wf200) {
         defines += [
           "SL_HEAP_SIZE=24576",
