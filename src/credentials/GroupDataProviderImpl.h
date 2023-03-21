@@ -68,8 +68,7 @@ public:
     CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, EndpointId endpoint_id) override;
     // Iterators
     GroupInfoIterator * IterateGroupInfo(FabricIndex fabric_index) override;
-    EndpointIterator * IterateEndpoints(FabricIndex fabric_index,
-                                        Optional<GroupId> group_id = NullOptional) override;
+    EndpointIterator * IterateEndpoints(FabricIndex fabric_index, Optional<GroupId> group_id = NullOptional) override;
 
     //
     // Group-Key map

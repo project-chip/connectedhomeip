@@ -253,8 +253,7 @@ public:
      *  @retval An instance of EndpointIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
-    virtual EndpointIterator * IterateEndpoints(FabricIndex fabric_index,
-                                                Optional<GroupId> group_id = NullOptional) = 0;
+    virtual EndpointIterator * IterateEndpoints(FabricIndex fabric_index, Optional<GroupId> group_id = NullOptional) = 0;
 
     //
     // Group-Key map
