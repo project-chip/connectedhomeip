@@ -234,24 +234,25 @@ def get_fixed_label_dict(fixed_labels):
 
 def get_supported_modes_dict(supported_modes):
     output_dict = {}
-    
+
     for mode_str in supported_modes:
         mode_label_strs = mode_str.split('/')
         mode = mode_label_strs[0]
         label = mode_label_strs[1]
         ep = mode_label_strs[2]
-        
+
         semantic_tag_strs = mode_label_strs[3].split(', ')
         semantic_tags = [{"value": int(v.split('\\')[0]), "mfgCode": int(v.split('\\')[1], 16)} for v in semantic_tag_strs]
-        
+
         mode_dict = {"Label": label, "Mode": int(mode), "Semantic_Tag": semantic_tags}
-        
+
         if ep in output_dict:
             output_dict[ep].append(mode_dict)
         else:
             output_dict[ep] = [mode_dict]
-    
+
     return output_dict
+
 
 def check_str_range(s, min_len, max_len, name):
     if s and ((len(s) < min_len) or (len(s) > max_len)):
@@ -437,7 +438,6 @@ def populate_factory_data(args, spake2p_params):
 
                     FACTORY_DATA.update({'st-v/{:x}/{:x}/{:x}'.format(int(ep), i, j): _value})
                     FACTORY_DATA.update({'st-mfg/{:x}/{:x}/{:x}'.format(int(ep), i, j): _mfg_code})
- 
 
 
 def gen_raw_ec_keypair_from_der(key_file, pubkey_raw_file, privkey_raw_file):
