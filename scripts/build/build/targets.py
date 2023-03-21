@@ -105,6 +105,8 @@ def BuildHostTarget():
         TargetPart('shell', app=HostApp.SHELL),
         TargetPart('ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False),
         TargetPart('ota-requestor', app=HostApp.OTA_REQUESTOR, enable_ble=False),
+        TargetPart('simulated-app1', app=HostApp.SIMULATED_APP1, enable_ble=False),
+        TargetPart('simulated-app2', app=HostApp.SIMULATED_APP2, enable_ble=False),
         TargetPart('python-bindings', app=HostApp.PYTHON_BINDINGS),
         TargetPart('tv-app', app=HostApp.TV_APP),
         TargetPart('tv-casting-app', app=HostApp.TV_CASTING),

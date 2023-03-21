@@ -231,6 +231,7 @@ RUN case ${TARGETPLATFORM} in \
             --target linux-x64-ota-provider-ipv6only \
             --target linux-x64-ota-requestor-ipv6only \
             --target linux-x64-lock-ipv6only \
+            --target linux-x64-simulated-app1-ipv6only \
             build \
             && mv out/linux-x64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
             && mv out/linux-x64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
@@ -242,6 +243,7 @@ RUN case ${TARGETPLATFORM} in \
             && mv out/linux-x64-ota-provider-ipv6only/chip-ota-provider-app out/chip-ota-provider-app \
             && mv out/linux-x64-ota-requestor-ipv6only/chip-ota-requestor-app out/chip-ota-requestor-app \
             && mv out/linux-x64-lock-ipv6only/chip-lock-app out/chip-lock-app \
+            && mv out/linux-x64-simulated-app1-ipv6only/chip-app1 out/chip-app1 \
                 ;; \
         "linux/arm64")\
             set -x \
@@ -257,6 +259,7 @@ RUN case ${TARGETPLATFORM} in \
             --target linux-arm64-ota-provider-ipv6only \
             --target linux-arm64-ota-requestor-ipv6only \
             --target linux-arm64-lock-ipv6only \
+            --target linux-arm64-simulated-app1-ipv6only \
             build \
             && mv out/linux-arm64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
             && mv out/linux-arm64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
@@ -268,11 +271,10 @@ RUN case ${TARGETPLATFORM} in \
             && mv out/linux-arm64-ota-provider-ipv6only/chip-ota-provider-app out/chip-ota-provider-app \
             && mv out/linux-arm64-ota-requestor-ipv6only/chip-ota-requestor-app out/chip-ota-requestor-app \
             && mv out/linux-arm64-lock-ipv6only/chip-lock-app out/chip-lock-app \
+            && mv out/linux-arm64-simulated-app1-ipv6only/chip-app1 out/chip-app1 \
             ;; \
         *) ;; \
     esac
-
-RUN scripts/examples/gn_build_test_example.sh app1
 
 RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i no
 
