@@ -17,6 +17,7 @@
 
 #include "ErrorUtils.h"
 
+#include <app_preference.h>
 #include <dns-sd.h>
 
 namespace chip {
@@ -27,14 +28,20 @@ CHIP_ERROR TizenToChipError(int tizenError)
 {
     switch (tizenError)
     {
-    case DNSSD_ERROR_NONE:
+    case TIZEN_ERROR_NONE:
         return CHIP_NO_ERROR;
-    case DNSSD_ERROR_NAME_CONFLICT:
-        return CHIP_ERROR_MDNS_COLLISION;
-    case DNSSD_ERROR_OUT_OF_MEMORY:
-        return CHIP_ERROR_NO_MEMORY;
+    case TIZEN_ERROR_OUT_OF_MEMORY:
+        return CHIP_NO_ERROR;
     default:
         return CHIP_ERROR_INTERNAL;
+
+    // Tizen DNSSD API errors
+    case DNSSD_ERROR_NAME_CONFLICT:
+        return CHIP_ERROR_MDNS_COLLISION;
+
+    // Tizen Preference API errors
+    case PREFERENCE_ERROR_NO_KEY:
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
     }
 }
 
