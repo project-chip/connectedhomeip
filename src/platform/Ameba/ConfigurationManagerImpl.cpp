@@ -31,6 +31,7 @@
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <wifi_conf.h>
+#include <sys_api.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -274,7 +275,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
-    // sys_reset();
+    sys_reset();
 }
 
 ConfigurationManager & ConfigurationMgrImpl()
