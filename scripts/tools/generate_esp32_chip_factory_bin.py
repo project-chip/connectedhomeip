@@ -21,8 +21,8 @@ import base64
 import enum
 import logging
 import os
-import sys
 import re
+import sys
 from types import SimpleNamespace
 
 import cryptography.x509
