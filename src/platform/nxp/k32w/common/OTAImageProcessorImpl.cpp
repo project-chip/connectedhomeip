@@ -105,6 +105,8 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         return;
     }
 
+    GetRequestorInstance()->GetProviderLocation(imageProcessor->mBackupProviderLocation);
+
     imageProcessor->mHeaderParser.Init();
     imageProcessor->mAccumulator.Init(sizeof(OTATlvHeader));
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
@@ -206,6 +208,8 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         }
     }
     imageProcessor->Clear();
+
+    OtaHookAbort();
 }
 
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)

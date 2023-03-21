@@ -19,6 +19,8 @@
 #include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 #include <src/include/platform/CHIPDeviceLayer.h>
 
+#include <src/app/clusters/ota-requestor/OTARequestorInterface.h>
+
 #include <platform/nxp/k32w/k32w0/CHIPDevicePlatformConfig.h>
 #include <platform/nxp/k32w/k32w0/OTAFirmwareProcessor.h>
 #if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
@@ -29,6 +31,10 @@
 
 #ifndef CONFIG_CHIP_K32W0_MAX_ENTRIES_TEST
 #define CONFIG_CHIP_K32W0_MAX_ENTRIES_TEST 0
+#endif
+
+#ifndef CONFIG_CHIP_K32W0_OTA_ABORT_HOOK
+#define CONFIG_CHIP_K32W0_OTA_ABORT_HOOK 0
 #endif
 
 extern "C" void ResetMCU(void);
@@ -76,4 +82,37 @@ extern "C" WEAK void OtaHookReset()
 {
     OTA_CommitCustomEntries();
     ResetMCU();
+}
+
+extern "C" WEAK void OtaHookAbort()
+{
+    /*
+     Disclaimer: This is not default behavior and it was not checked against
+     Matter specification compliance. You should use this at your own discretion.
+
+     Use CONFIG_CHIP_K32W0_OTA_ABORT_HOOK to enable/disable this feature (disabled by default).
+     This hook is called inside OTAImageProcessorImpl::HandleAbort to schedule a retry (when enabled).
+    */
+#if CONFIG_CHIP_K32W0_OTA_ABORT_HOOK
+    auto& imageProcessor = chip::OTAImageProcessorImpl::GetDefaultInstance();
+    auto& providerLocation = imageProcessor.GetBackupProvider();
+
+    if (providerLocation.HasValue())
+    {
+        auto* requestor = chip::GetRequestorInstance();
+        requestor->SetCurrentProviderLocation(providerLocation.Value());
+        if (requestor->GetCurrentUpdateState() == chip::OTARequestorInterface::OTAUpdateStateEnum::kIdle)
+        {
+            chip::DeviceLayer::SystemLayer().ScheduleLambda([requestor] { requestor->TriggerImmediateQueryInternal(); });
+        }
+        else
+        {
+            ChipLogError(SoftwareUpdate, "OTA requestor not in kIdle");
+        }
+    }
+    else
+    {
+        ChipLogError(SoftwareUpdate, "Backup provider info not available");
+    }
+#endif
 }
