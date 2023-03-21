@@ -381,7 +381,7 @@ class __JavaCodeGenerator(CodeGenerator):
         self.jinja_env.filters['canGenerateSubscribe'] = CanGenerateSubscribe
 
 
-class JavaJNIGenerator(__JavaCodeGenerator)
+class JavaJNIGenerator(__JavaCodeGenerator):
     """Generates JNI java files (i.e. C++ source/headers)."""
 
     def __init__(self, *args, **kargs):
@@ -417,7 +417,7 @@ class JavaJNIGenerator(__JavaCodeGenerator)
             )
 
 
-class JavaClassGenerator(__JavaCodeGenerator)
+class JavaClassGenerator(__JavaCodeGenerator):
     """Generates .java files """
 
     def __init__(self, *args, **kargs):
