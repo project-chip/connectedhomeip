@@ -182,7 +182,7 @@ void BLEManagerImpl::ReadValueRequestedCb(const char * remoteAddress, int reques
 
     VerifyOrReturn(__GetAttInfo(gattHandle, &uuid, &type) == BT_ERROR_NONE,
                    ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from GATT handle"));
-    ChipLogProgress(DeviceLayer, "Gatt read requested on %s: %s", __ConvertAttTypeToStr(type), StringOrNullMarker(uuid));
+    ChipLogProgress(DeviceLayer, "Gatt read requested on %s: uuid=%s", __ConvertAttTypeToStr(type), StringOrNullMarker(uuid));
     g_free(uuid);
 
     ret = bt_gatt_get_value(gattHandle, &value, &len);
@@ -208,8 +208,8 @@ void BLEManagerImpl::WriteValueRequestedCb(const char * remoteAddress, int reque
 
     VerifyOrReturn(__GetAttInfo(gattHandle, &uuid, &type) == BT_ERROR_NONE,
                    ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from GATT handle"));
-    ChipLogProgress(DeviceLayer, "Gatt write requested on %s [len=%d]: %s", __ConvertAttTypeToStr(type), len,
-                    StringOrNullMarker(uuid));
+    ChipLogProgress(DeviceLayer, "Gatt write requested on %s: uuid=%s len=%d", __ConvertAttTypeToStr(type),
+                    StringOrNullMarker(uuid), len);
     ChipLogByteSpan(DeviceLayer, ByteSpan(reinterpret_cast<const uint8_t *>(value), len));
     g_free(uuid);
 
