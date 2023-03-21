@@ -51,6 +51,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/SetupDiscriminator.h>
+#include <lib/support/Span.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
@@ -171,8 +172,8 @@ static constexpr const char * __ConvertAttTypeToStr(bt_gatt_type_e type)
     }
 }
 
-static void __ReadValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
-                                   int offset, void * userData)
+void BLEManagerImpl::ReadValueRequestedCb(const char * remoteAddress, int requestId, bt_gatt_server_h server, bt_gatt_h gattHandle,
+                                          int offset, void * userData)
 {
     int ret, len = 0;
     bt_gatt_type_e type;
@@ -181,13 +182,13 @@ static void __ReadValueRequestedCb(const char * remoteAddress, int requestId, bt
 
     VerifyOrReturn(__GetAttInfo(gattHandle, &uuid, &type) == BT_ERROR_NONE,
                    ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from GATT handle"));
-    ChipLogProgress(DeviceLayer, "Read Requested on %s: %s", __ConvertAttTypeToStr(type), StringOrNullMarker(uuid));
+    ChipLogProgress(DeviceLayer, "Gatt read requested on %s: %s", __ConvertAttTypeToStr(type), StringOrNullMarker(uuid));
     g_free(uuid);
 
     ret = bt_gatt_get_value(gattHandle, &value, &len);
     VerifyOrReturn(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_get_value() failed. ret: %d", ret));
 
-    ChipLogProgress(DeviceLayer, "Read Value (len: %d): %.*s", len, len, value);
+    ChipLogByteSpan(DeviceLayer, ByteSpan(reinterpret_cast<const uint8_t *>(value), len));
 
     ret = bt_gatt_server_send_response(requestId, BT_GATT_REQUEST_TYPE_READ, offset, 0x00, value, len);
     g_free(value);
@@ -207,9 +208,9 @@ void BLEManagerImpl::WriteValueRequestedCb(const char * remoteAddress, int reque
 
     VerifyOrReturn(__GetAttInfo(gattHandle, &uuid, &type) == BT_ERROR_NONE,
                    ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from GATT handle"));
-
-    ChipLogProgress(DeviceLayer, "Write Requested on %s: %s", __ConvertAttTypeToStr(type), StringOrNullMarker(uuid));
-    ChipLogProgress(DeviceLayer, "Write Value (len: %d): %.*s ", len, len, value);
+    ChipLogProgress(DeviceLayer, "Gatt write requested on %s [len=%d]: %s", __ConvertAttTypeToStr(type), len,
+                    StringOrNullMarker(uuid));
+    ChipLogByteSpan(DeviceLayer, ByteSpan(reinterpret_cast<const uint8_t *>(value), len));
     g_free(uuid);
 
     ret = bt_gatt_set_value(gattHandle, value, len);
@@ -579,7 +580,7 @@ int BLEManagerImpl::RegisterGATTServer()
                                         &char2);
 
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_characteristic_create() failed. ret: %d", ret));
-    ret = bt_gatt_server_set_read_value_requested_cb(char2, __ReadValueRequestedCb, nullptr);
+    ret = bt_gatt_server_set_read_value_requested_cb(char2, ReadValueRequestedCb, nullptr);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_gatt_server_set_read_value_requested_cb() failed. ret: %d", ret));
     ret = bt_gatt_server_set_characteristic_notification_state_change_cb(char2, NotificationStateChangedCb, nullptr);
