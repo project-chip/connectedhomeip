@@ -331,11 +331,6 @@ def getGlobalTemplatesTargets():
         template="src/app/zap-templates/app-templates.json",
         output_dir='zzz_generated/darwin/controller-clusters/zap-generated'))
 
-    targets.append(JinjaCodegenTarget(
-        generator="java-class",
-        idl_path="src/controller/data_model/controller-clusters.matter",
-        output_directory="src/controller/java/generated"))
-
     return targets
 
 
