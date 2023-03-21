@@ -27,25 +27,25 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
     VerifyOrReturnValue(ESP32Config::ReadConfigValue(countKey, supportedModeCount) == CHIP_NO_ERROR, ModeOptionsProvider(nullptr, nullptr));
 
 	ModeOptionStructType *modeOptionStruct = new ModeOptionStructType[supportedModeCount + 1];
-	
+
 	for (int index = 0; index < supportedModeCount; index++) {
 		Structs::ModeOptionStruct::Type option;
    	 	uint32_t supportedModeMode = 0;
     	uint32_t semanticTagCount = 0;
 		size_t outLen   = 0;
-		
+
 		memset(supportedModeLabel, 0, sizeof(supportedModeLabel));
 		memset(keyBuf, 0, sizeof(char)*ESP32Config::kMaxConfigKeyNameLength);
     	VerifyOrReturnValue(ESP32Config::KeyAllocator::SupportedModesLabel(keyBuf, sizeof(keyBuf), endpointId, index) == CHIP_NO_ERROR, ModeOptionsProvider(nullptr, nullptr));
     	ESP32Config::Key labelKey(ESP32Config::kConfigNamespace_ChipFactory, keyBuf);
     	VerifyOrReturnValue(ESP32Config::ReadConfigValueStr(labelKey, supportedModeLabel, sizeof(supportedModeLabel), outLen) == CHIP_NO_ERROR, ModeOptionsProvider(nullptr, nullptr));
 
-		
+
 		memset(keyBuf, 0, sizeof(char)*ESP32Config::kMaxConfigKeyNameLength);
     	VerifyOrReturnValue(ESP32Config::KeyAllocator::SupportedModesValue(keyBuf, sizeof(keyBuf), endpointId, index) == CHIP_NO_ERROR, ModeOptionsProvider(nullptr, nullptr));
     	ESP32Config::Key modeKey(ESP32Config::kConfigNamespace_ChipFactory, keyBuf);
     	VerifyOrReturnValue(ESP32Config::ReadConfigValue(labelKey, supportedModeMode) == CHIP_NO_ERROR, ModeOptionsProvider(nullptr, nullptr));
-		
+
 		memset(keyBuf, 0, sizeof(char)*ESP32Config::kMaxConfigKeyNameLength);
     	VerifyOrReturnValue(ESP32Config::KeyAllocator::SemanticTagsCount(keyBuf, sizeof(keyBuf), endpointId, index) == CHIP_NO_ERROR, ModeOptionsProvider(nullptr, nullptr));
     	ESP32Config::Key stCountKey(ESP32Config::kConfigNamespace_ChipFactory, keyBuf);
@@ -71,9 +71,9 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
 			tag.value = static_cast<uint16_t>(semanticTagValue);
 			tag.mfgCode = static_cast<chip::VendorId>(semanticTagMfgCode);
 			semanticTags[stIndex] = static_cast<const SemanticTag>(tag);
-			
+
 		}
-			
+
     	option.label =  chip::CharSpan::fromCharString(supportedModeLabel);
     	option.mode = static_cast<uint8_t>(supportedModeMode);
     	option.semanticTags = DataModel::List<const SemanticTag>(semanticTags, semanticTagCount);

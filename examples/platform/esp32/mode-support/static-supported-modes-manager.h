@@ -32,7 +32,7 @@ class StaticSupportedModesManager : public chip::app::Clusters::ModeSelect::Supp
 
 public:
     static const StaticSupportedModesManager instance;
-	
+
 	static char supportedModeLabel[64];
 
     SupportedModesManager::ModeOptionsProvider getModeOptionsProvider(EndpointId endpointId) const override;
