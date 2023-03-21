@@ -49,7 +49,7 @@ declare_args() {
 
   # Argument to enable IPv4 for wifi
   # aligning to match chip_inet_config_enable_ipv4 default configuration
-  chip_enable_wifi_ipv4 = true
+  chip_enable_wifi_ipv4 = false
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
