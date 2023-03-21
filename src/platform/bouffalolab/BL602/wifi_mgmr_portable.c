@@ -115,7 +115,7 @@ int wifi_mgmr_profile_ssid_get(uint8_t * ssid)
 
 uint32_t wifi_mgmr_get_security_type(void)
 {
-    /** return values defined from app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum */
+    /** return values defined from app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum */
     if (strlen(wifiMgmr.wifi_mgmr_stat_info.passphr))
     {
         if (gWpaSm.pmk_len)
