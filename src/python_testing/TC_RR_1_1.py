@@ -644,11 +644,17 @@ class TC_RR_1_1(MatterBaseTest):
 
             base_groups_per_endpoint: int = math.floor(groups_per_fabric / len(group_endpoints))
             groups_remainder: int = groups_per_fabric % len(group_endpoints)
-            fabric_group_index: int = 0
+
+            group_id_list = [group_id for group_id in (group_key_map[client_idx])]
+            # This is just a sanity check that the number of IDs provided matches how many group IDs we are told to
+            # write to each fabric.
+            asserts.assert_equal(len(group_id_list), groups_per_fabric)
 
             for endpoint_id in group_endpoints:
-                groups_to_add: int = base_groups_per_endpoint + groups_remainder
-                groups_remainder -= 1
+                groups_to_add: int = base_groups_per_endpoint
+                if groups_remainder:
+                    groups_to_add += 1
+                    groups_remainder -= 1
 
                 feature_map: int = await self.read_single_attribute(client,
                                                                     node_id=self.dut_node_id,
@@ -658,7 +664,8 @@ class TC_RR_1_1(MatterBaseTest):
                 name_supported: bool = (feature_map & (1 << name_featrure_bit)) != 0
 
                 # Write groups to cluster
-                for group_id in group_key_map[client_idx]:
+                for _ in range(groups_to_add):
+                    group_id = group_id_list.pop()
                     group_name: str = self.random_string(16) if name_supported else ""
                     command: Clusters.Groups.Commands.AddGroup = Clusters.Groups.Commands.AddGroup(
                         groupID=group_id, groupName=group_name)
@@ -671,9 +678,6 @@ class TC_RR_1_1(MatterBaseTest):
                         self.dut_node_id, endpoint_id, command, responseType=Clusters.Groups.Commands.AddGroupResponse)
                     asserts.assert_equal(StatusEnum.Success, add_response.status)
                     asserts.assert_equal(group_id, add_response.groupID)
-
-                # for endpoint_id in group_endpoints
-                fabric_group_index += groups_to_add
 
         return written_group_table_map
 
