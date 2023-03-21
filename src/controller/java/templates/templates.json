@@ -103,11 +103,6 @@
             "path": "ClusterInfo-read-interaction.zapt",
             "name": "Generate read interaction for cluster information map",
             "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterReadMapping.java"
-        },
-        {
-            "path": "ClusterInfo-write-interaction.zapt",
-            "name": "Generate write interaction for cluster information map",
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterWriteMapping.java"
         }
     ]
 }
