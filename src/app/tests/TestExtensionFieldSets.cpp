@@ -63,7 +63,7 @@ void TestInsertExtensionFieldSet(nlTestSuite * aSuite, void * aContext)
     scenes::ExtensionFieldSet tempEFS;
 
     uint8_t empty_buffer[scenes::kMaxFieldBytesPerCluster] = { 0 };
-    uint8_t double_size_buffer[scenes::kMaxFieldBytesPerCluster * 2];
+    uint8_t double_size_buffer[scenes::kMaxFieldBytesPerCluster + 1];
     ByteSpan bufferSpan(double_size_buffer);
 
     memset(double_size_buffer, static_cast<uint8_t>(1), sizeof(double_size_buffer));
