@@ -26,10 +26,10 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #ifdef RSI_BLE_ENABLE
-#define MIN_CONNECTION_INT 45 // 45 msec
-#define MAX_CONNECTION_INT 45 // 45 msec
-#define SLAVE_LATENCY 0
-#define TIMEOUT 400
+#define BLE_MIN_CONNECTION_INTERVAL_MS 45 // 45 msec
+#define BLE_MAX_CONNECTION_INTERVAL_MS 45 // 45 msec
+#define BLE_SLAVE_LATENCY_MS 0
+#define BLE_TIMEOUT_MS 400
 #endif // RSI_BLE_ENABLE
 #include "FreeRTOS.h"
 #include "timers.h"

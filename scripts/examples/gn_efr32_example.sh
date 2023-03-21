@@ -95,7 +95,7 @@ if [ "$#" == "0" ]; then
             Build wifi example with extension board wf200. (Default false)
         'import("//with_pw_rpc.gni")'
             Use to build the example with pigweed RPC
-        OTA_periodic_query_timeout
+        ota_periodic_query_timeout_sec
             Periodic query timeout variable for OTA in seconds
         rs91x_wpa3_only
             Support for WPA3 only mode on RS91x

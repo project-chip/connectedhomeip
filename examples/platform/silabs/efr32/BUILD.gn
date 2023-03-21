@@ -24,7 +24,7 @@ declare_args() {
   enable_heap_monitoring = false
 
   # OTA timeout in seconds
-  OTA_periodic_query_timeout = 86400
+  ota_periodic_query_timeout_sec = 86400
 
   # Wifi related stuff - they are overridden by gn -args="use_wf200=true"
   sl_wfx_config_softap = false
@@ -209,7 +209,7 @@ source_set("efr32-ICD-subscription-callback") {
 }
 
 config("efr32-common-config") {
-  defines = [ "OTA_PERIODIC_TIMEOUT=${OTA_periodic_query_timeout}" ]
+  defines = [ "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_sec}" ]
 
   if (!disable_lcd) {
     include_dirs = [ "display" ]
