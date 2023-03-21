@@ -33,6 +33,7 @@ source "$CHIP_ROOT/scripts/activate.sh"
 set -x
 env
 USE_WIFI=false
+USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
 
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
@@ -120,6 +121,8 @@ if [ "$#" == "0" ]; then
             Currently : v1.0-<branchName>-<ShortCommitSha>
         --release
             Remove all logs and debugs features (including the LCD). Yield the smallest image size possible
+        --docker
+            Change GSDK root for docker builds
 
     "
 elif [ "$#" -lt "2" ]; then
@@ -199,6 +202,11 @@ else
                 optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
                 shift
                 ;;
+            --docker)
+                optArgs+="efr32_sdk_root=\"$GSDK_ROOT\" "
+                USE_DOCKER=true
+                shift
+                ;;
             *)
                 if [ "$1" =~ *"use_rs9116=true"* ] || [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true
@@ -228,8 +236,11 @@ else
     if [ "$USE_WIFI" == true ]; then
         gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
     else
-        # thread build
-        #
+        # OpenThread build
+        if [ "$USE_DOCKER" == true ]; then
+            optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
+        fi
+
         if [ -z "$optArgs" ]; then
             gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\"" "$BUILD_DIR"
         else

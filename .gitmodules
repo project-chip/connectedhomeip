@@ -58,7 +58,7 @@
 	path = third_party/freertos/repo
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
 	branch  = V10.3.1-kernel-only
-	platforms = ameba,cc13x2_26x2,bouffalolab,efr32,esp32,k32w0,infineon,qpg,cc32xx
+	platforms = ameba,cc13x2_26x2,bouffalolab,efr32,esp32,k32w0,infineon,qpg,cc32xx,silabs_docker
 [submodule "simw-top-mini"]
 	path = third_party/simw-top-mini/repo
 	url = https://github.com/NXP/plug-and-trust.git
@@ -76,7 +76,7 @@
 	path = third_party/openthread/ot-efr32
 	url = https://github.com/SiliconLabs/ot-efr32.git
 	branch  = matter_sve
-	platforms = efr32
+	platforms = efr32,silabs_docker
 [submodule "third_party/openthread/ot-ifx"]
 	path = third_party/openthread/ot-ifx
 	url = https://github.com/Infineon/ot-ifx-release.git
@@ -238,7 +238,7 @@
 	path = third_party/silabs/matter_support
 	url = https://github.com/SiliconLabs/sdk_support.git
 	branch = main
-	platforms = efr32
+	platforms = efr32,silabs_docker
 [submodule "third_party/silabs/gecko_sdk"]
 	path = third_party/silabs/gecko_sdk
 	url = https://github.com/SiliconLabs/gecko_sdk.git
@@ -248,7 +248,7 @@
 	path = third_party/silabs/wiseconnect-wifi-bt-sdk
 	url = https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git
 	branch = master
-	platforms = efr32
+	platforms = efr32,silabs_docker
 [submodule "editline"]
 	path = third_party/editline/repo
 	url = https://github.com/troglobit/editline.git

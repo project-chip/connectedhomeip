@@ -53,6 +53,13 @@ declare_args() {
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
 
+declare_args() {
+  sl_ot_libs_path = "${efr32_sdk_root}/protocol/openthread"
+  sl_ot_efr32_root =
+      "${efr32_sdk_root}/protocol/openthread/platform-abstraction/efr32"
+  sl_openthread_root = "${efr32_sdk_root}/util/third_party/openthread"
+}
+
 # Defines an efr32 SDK build target.
 #
 # Parameters:
