@@ -30,8 +30,8 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <wifi_conf.h>
 #include <sys_api.h>
+#include <wifi_conf.h>
 
 namespace chip {
 namespace DeviceLayer {
