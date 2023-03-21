@@ -241,7 +241,7 @@
 //! Power save command parameters
 /*=======================================================================*/
 //! set handshake type of power mode
-//#define RSI_HAND_SHAKE_TYPE GPIO_BASED
+#define RSI_HAND_SHAKE_TYPE GPIO_BASED
 
 #define BLE_ATT_REC_SIZE 500
 #define NO_OF_VAL_ATT 5 //! Attribute value count

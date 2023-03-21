@@ -223,6 +223,7 @@ class Efr32Builder(GnBuilder):
             # case for pre-installed images), use it directly.
             sdk_path = shlex.quote(os.environ['GSDK_ROOT'])
             self.extra_gn_options.append(f"efr32_sdk_root=\"{sdk_path}\"")
+            self.extra_gn_options.append(f"openthread_root=\"{sdk_path}/util/third_party/openthread\"")
 
     def GnBuildArgs(self):
         return self.extra_gn_options

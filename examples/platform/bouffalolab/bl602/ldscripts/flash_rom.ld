@@ -18,10 +18,6 @@ MEMORY
 {
   rom       (rxai!w) : ORIGIN = 0x21015000, LENGTH = 44K
   flash     (rxai!w) : ORIGIN = 0x23000000, LENGTH = 4M
-  
-  /* ram_tcm   (wxa)    : ORIGIN = 0x4200C000, LENGTH = (16K + 16K + 48K + 64K + 64K + 8K - __EM_SIZE) put itcm with dtam and also OCRAM*/
-  /* ram_wifi  (wxa)    : ORIGIN = 0x42042000 - __EM_SIZE, LENGTH = (8K + 104K - 64K - 8K) leave 8K left for BLE*/
-  
   ram_tcm   (wxa)    : ORIGIN = __RAM_START, LENGTH = __RAM_TCM_LEN
   ram_wifi  (wxa)    : ORIGIN = __RAM_START + __RAM_TCM_LEN, LENGTH = __RAM_WIFI_LEN
 }

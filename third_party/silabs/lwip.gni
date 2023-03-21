@@ -13,13 +13,14 @@
 # limitations under the License.
 import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/lwip.gni")
+import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 # Defines a lwIP build target.
 #
 # lwIP depends on external header files to compile. This template defines
 # a combined build of the lwIP sources plus target configuration.
 template("lwip_target") {
-  _lwip_root = "${efr32_sdk_build_root}/gecko_sdk/util/third_party/lwip/lwip"
+  _lwip_root = "${efr32_sdk_root}/util/third_party/lwip/lwip"
 
   lwip_target_name = target_name
 
