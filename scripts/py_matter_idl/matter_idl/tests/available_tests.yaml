@@ -35,6 +35,10 @@ java-jni:
         jni/MyClusterClient-ReadImpl.cpp: outputs/optional_argument/jni/MyClusterClient-ReadImpl.cpp
         jni/MyClusterClient-InvokeSubscribeImpl.cpp: outputs/optional_argument/jni/MyClusterClient-InvokeSubscribeImpl.cpp
 
+java-class:
+    inputs/several_clusters.matter:
+        java/chip/devicecontroller/ClusterWriteMapping.java: outputs/several_clusters/java/ClusterWriteMapping.java
+
 bridge:
     inputs/simple_attribute.matter:
         bridge/BridgeClustersImpl.h: outputs/simple_attribute/bridge/BridgeClustersImpl.h
