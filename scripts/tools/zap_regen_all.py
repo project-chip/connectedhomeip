@@ -41,6 +41,10 @@ class TargetType(Flag):
     # Global templates: generally examples and chip controller
     GLOBAL = auto()
 
+    # codgen.py templates (generally java templates, which cannot be built
+    # at compile time currently)
+    IDL_CODEGEN = auto()
+
     # App-specific templates (see getSpecificTemplatesTargets)
     SPECIFIC = auto()
 
@@ -48,12 +52,13 @@ class TargetType(Flag):
     GOLDEN_TEST_IMAGES = auto()
 
     # All possible targets. Convenience constant
-    ALL = TESTS | GLOBAL | SPECIFIC | GOLDEN_TEST_IMAGES
+    ALL = TESTS | GLOBAL | IDL_CODEGEN | SPECIFIC | GOLDEN_TEST_IMAGES
 
 
 __TARGET_TYPES__ = {
     'tests': TargetType.TESTS,
     'global': TargetType.GLOBAL,
+    'idl_codegen': TargetType.IDL_CODEGEN,
     'specific': TargetType.SPECIFIC,
     'golden_test_images': TargetType.GOLDEN_TEST_IMAGES,
     'all': TargetType.ALL,
@@ -196,6 +201,36 @@ class GoldenTestImageTarget():
         logging.info("  %s" % " ".join(self.command))
 
 
+class JinjaCodegenTarget():
+    def __init__(self, generator: str, output_directory: str, idl_path: str):
+        # This runs a test, but the important bit is we pass `--regenerate`
+        # to it and this will cause it to OVERWRITE golden images.
+        self.idl_path = idl_path
+        self.generator = generator
+        self.output_directory = output_directory
+        self.command = ["./scripts/codegen.py", "--output-dir", output_directory,
+                        "--generator", generator, idl_path]
+
+    def generate(self) -> TargetRunStats:
+        generate_start = time.time()
+        subprocess.check_call(self.command)
+        generate_end = time.time()
+
+        return TargetRunStats(
+            generate_time=generate_end - generate_start,
+            config=f'codegen:{self.generator}',
+            template=self.idl_path,
+        )
+
+    def distinct_output(self):
+        # Fake output - this is a single target that generates golden images
+        return ZapDistinctOutput(input_template=f'{self.generator}{self.idl_path}', output_directory=self.output_directory)
+
+    def log_command(self):
+        logging.info("  %s" % " ".join(self.command))
+
+
+
 def checkPythonVersion():
     if sys.version_info[0] < 3:
         print('Must use Python 3. Current version is ' +
@@ -295,7 +330,23 @@ def getGlobalTemplatesTargets():
     targets.append(ZAPGenerateTarget(
         'src/controller/data_model/controller-clusters.zap',
         template="src/app/zap-templates/app-templates.json",
-        output_dir=os.path.join('zzz_generated/darwin/controller-clusters/zap-generated')))
+        output_dir='zzz_generated/darwin/controller-clusters/zap-generated'))
+
+    targets.append(JinjaCodegenTarget(
+        generator="java-class",
+        idl_path="src/controller/data_model/controller-clusters.matter",
+        output_directory="src/controller/java/generated"))
+
+    return targets
+
+
+def getCodegenTemplates():
+    targets = []
+
+    targets.append(JinjaCodegenTarget(
+        generator="java-class",
+        idl_path="src/controller/data_model/controller-clusters.matter",
+        output_directory="src/controller/java/generated"))
 
     return targets
 
@@ -363,6 +414,9 @@ def getTargets(type, test_target):
 
     if type & TargetType.SPECIFIC:
         targets.extend(getSpecificTemplatesTargets())
+
+    if type & TargetType.IDL_CODEGEN:
+        targets.extend(getCodegenTemplates())
 
     if type & TargetType.GOLDEN_TEST_IMAGES:
         targets.extend(getGoldenTestImageTargets())
