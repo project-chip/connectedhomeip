@@ -80,6 +80,7 @@ bool ESP32DeviceInfoProvider::FixedLabelIteratorImpl::Next(FixedLabelType & outp
 
     VerifyOrReturnValue(ESP32Config::KeyAllocator::FixedLabelValue(keyBuf, sizeof(keyBuf), mEndpoint,
                                                                    static_cast<uint16_t>(mIndex)) == CHIP_NO_ERROR,
+                        false);
     ESP32Config::Key valueKey(ESP32Config::kConfigNamespace_ChipFactory, keyBuf);
     VerifyOrReturnValue(ESP32Config::ReadConfigValueStr(valueKey, mFixedLabelValueBuf, sizeof(mFixedLabelValueBuf), valueOutLen) ==
                             CHIP_NO_ERROR,

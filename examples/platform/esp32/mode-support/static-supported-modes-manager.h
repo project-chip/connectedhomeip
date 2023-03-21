@@ -25,7 +25,6 @@ namespace app {
 namespace Clusters {
 namespace ModeSelect {
 
-
 class StaticSupportedModesManager : public chip::app::Clusters::ModeSelect::SupportedModesManager
 {
     using ModeOptionStructType = Structs::ModeOptionStruct::Type;
@@ -33,11 +32,12 @@ class StaticSupportedModesManager : public chip::app::Clusters::ModeSelect::Supp
 public:
     static const StaticSupportedModesManager instance;
 
-	static char supportedModeLabel[64];
+    static char supportedModeLabel[64];
 
     SupportedModesManager::ModeOptionsProvider getModeOptionsProvider(EndpointId endpointId) const override;
 
-    Protocols::InteractionModel::Status getModeOptionByMode(EndpointId endpointId, uint8_t mode, const ModeOptionStructType ** dataPtr) const override;
+    Protocols::InteractionModel::Status getModeOptionByMode(EndpointId endpointId, uint8_t mode,
+                                                            const ModeOptionStructType ** dataPtr) const override;
 
     ~StaticSupportedModesManager(){};
 

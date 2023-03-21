@@ -181,7 +181,6 @@ public:
         return snprintf(key, size, "fl-v/%x/%x", endpoint, index) > 0 ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
     }
 
-
     // Supported modes
 
     static CHIP_ERROR SupportedModesCount(char * key, size_t size, uint16_t endpoint)
@@ -214,7 +213,6 @@ public:
         VerifyOrReturnError(key, CHIP_ERROR_INVALID_ARGUMENT);
         return snprintf(key, size, "st-mfg/%x/%x/%x", endpoint, index, ind) > 0 ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
     }
-
 };
 
 } // namespace Internal
