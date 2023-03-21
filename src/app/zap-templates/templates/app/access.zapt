@@ -15,7 +15,7 @@
 // Parallel array data (*cluster*, attribute, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
     {{/first}}
-    {{#chip_server_cluster_attributes}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "read")}}
@@ -37,7 +37,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/chip_server_cluster_attributes}}
+    {{/enabled_attributes_for_cluster_and_side}}
     {{#last}}
 }
     {{/last}}
@@ -48,7 +48,7 @@
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
     {{/first}}
-    {{#chip_server_cluster_attributes}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "read")}}
@@ -70,7 +70,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/chip_server_cluster_attributes}}
+    {{/enabled_attributes_for_cluster_and_side}}
     {{#last}}
 }
     {{/last}}
@@ -81,7 +81,7 @@
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
     {{/first}}
-    {{#chip_server_cluster_attributes}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "read")}}
@@ -103,7 +103,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/chip_server_cluster_attributes}}
+    {{/enabled_attributes_for_cluster_and_side}}
     {{#last}}
 }
     {{/last}}
@@ -116,7 +116,7 @@
 // Parallel array data (*cluster*, attribute, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
     {{/first}}
-    {{#chip_server_cluster_attributes}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "write")}}
@@ -138,7 +138,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/chip_server_cluster_attributes}}
+    {{/enabled_attributes_for_cluster_and_side}}
     {{#last}}
 }
     {{/last}}
@@ -149,7 +149,7 @@
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
     {{/first}}
-    {{#chip_server_cluster_attributes}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "write")}}
@@ -171,7 +171,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/chip_server_cluster_attributes}}
+    {{/enabled_attributes_for_cluster_and_side}}
     {{#last}}
 }
     {{/last}}
@@ -182,7 +182,7 @@
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
     {{/first}}
-    {{#chip_server_cluster_attributes}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "write")}}
@@ -204,7 +204,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/chip_server_cluster_attributes}}
+    {{/enabled_attributes_for_cluster_and_side}}
     {{#last}}
 }
     {{/last}}
