@@ -36,7 +36,7 @@ CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
     {
         mProcessedLength += bytes;
         block = block.SubSpan(bytes);
-        if (mProcessedLength == mLength )
+        if (mProcessedLength == mLength)
         {
             status = ExitAction();
             if(!IsError(status) && (block.size() > 0))
@@ -50,6 +50,13 @@ CHIP_ERROR OTATlvProcessor::Process(ByteSpan & block)
     }
 
     return status;
+}
+
+void OTATlvProcessor::ClearInternal()
+{
+    mLength = 0;
+    mProcessedLength = 0;
+    mWasSelected = false;
 }
 
 bool OTATlvProcessor::IsError(CHIP_ERROR & status)

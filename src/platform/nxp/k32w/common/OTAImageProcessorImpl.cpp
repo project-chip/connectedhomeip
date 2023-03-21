@@ -198,14 +198,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor != nullptr)
     {
-        for (auto const & pair : imageProcessor->mProcessorMap)
-        {
-            if (pair.second->WasSelected())
-            {
-                pair.second->AbortAction();
-                pair.second->Clear();
-            }
-        }
+        imageProcessor->AbortAllProcessors();
     }
     imageProcessor->Clear();
 
@@ -258,6 +251,21 @@ void OTAImageProcessorImpl::HandleStatus(CHIP_ERROR status)
     {
         ChipLogError(SoftwareUpdate, "Image update canceled. Failed to process OTA block: %s", ErrorStr(status));
         GetRequestorInstance()->CancelImageUpdate();
+    }
+}
+
+void OTAImageProcessorImpl::AbortAllProcessors()
+{
+    ChipLogError(SoftwareUpdate, "All selected processors will call abort action");
+
+    for (auto const& pair : mProcessorMap)
+    {
+        if (pair.second->WasSelected())
+        {
+            pair.second->AbortAction();
+            pair.second->Clear();
+            pair.second->SetWasSelected(false);
+         }
     }
 }
 
@@ -350,13 +358,21 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
             if (error != CHIP_NO_ERROR)
             {
                 ChipLogError(SoftwareUpdate, "Apply action for tag %d processor failed.", (uint8_t) pair.first);
+                // Revert all previously applied actions if current apply action fails.
+                // Reset image processor and requestor states.
+                imageProcessor->AbortAllProcessors();
                 imageProcessor->Clear();
                 GetRequestorInstance()->Reset();
+
                 return;
             }
-            pair.second->Clear();
-            pair.second->SetWasSelected(false);
         }
+    }
+
+    for (auto const& pair : imageProcessor->mProcessorMap)
+    {
+        pair.second->Clear();
+        pair.second->SetWasSelected(false);
     }
 
     imageProcessor->mAccumulator.Clear();

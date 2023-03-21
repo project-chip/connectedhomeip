@@ -83,9 +83,9 @@ extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism()
         ReturnErrorCodeIf(PDM_E_STATUS_OK != status, CHIP_FACTORY_DATA_PDM_RESTORE);
 
         error = K32W0FactoryDataProvider::GetDefaultInstance().UpdateData(buffer.Get());
-        if (CHIP_NO_ERROR == error)
+        if (error == CHIP_NO_ERROR)
         {
-            PDM_vDeleteDataRecord(kNvmId_FactoryDataBackup);
+            ChipLogProgress(DeviceLayer, "Factory data was restored successfully");
         }
     }
 

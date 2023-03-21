@@ -45,10 +45,8 @@ CHIP_ERROR OTAFirmwareProcessor::Init()
 
 CHIP_ERROR OTAFirmwareProcessor::Clear()
 {
+    OTATlvProcessor::ClearInternal();
     mAccumulator.Clear();
-    mLength              = 0;
-    mProcessedLength     = 0;
-    mWasSelected         = false;
     mDescriptorProcessed = false;
 
     return CHIP_NO_ERROR;
@@ -99,6 +97,7 @@ CHIP_ERROR OTAFirmwareProcessor::AbortAction()
 {
     OTA_CancelImage();
     OTA_ResetCustomEntries();
+    OTA_ResetCurrentEepromAddress();
     OTA_SetStartEepromOffset(0);
     Clear();
 

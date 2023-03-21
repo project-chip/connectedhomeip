@@ -97,11 +97,16 @@ private:
      */
     CHIP_ERROR ReleaseBlock();
 
-    MutableByteSpan mBlock;
-    OTADownloader * mDownloader;
+    /**
+     * Call AbortAction for all processors that were used
+     */
+    void AbortAllProcessors();
+
+    MutableByteSpan      mBlock;
+    OTADownloader *      mDownloader;
     OTAImageHeaderParser mHeaderParser;
-    OTATlvProcessor * mCurrentProcessor = nullptr;
-    OTADataAccumulator mAccumulator;
+    OTATlvProcessor *    mCurrentProcessor = nullptr;
+    OTADataAccumulator   mAccumulator;
     std::map<uint32_t, OTATlvProcessor *> mProcessorMap;
     Optional<ProviderLocation> mBackupProviderLocation;
 };

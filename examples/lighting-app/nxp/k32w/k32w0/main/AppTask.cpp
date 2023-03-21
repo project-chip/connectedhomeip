@@ -134,6 +134,40 @@ CHIP_ERROR AppTask::StartAppTask()
     return err;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+static void CheckOtaEntry()
+{
+	K32W_LOG("Current OTA_ENTRY_TOP_ADDR: 0x%x", OTA_ENTRY_TOP_ADDR);
+
+	CustomOtaEntries_t ota_entries;
+	if(gOtaSuccess_c == OTA_GetCustomEntries(&ota_entries) && ota_entries.ota_state != otaNoImage)
+	{
+		if(ota_entries.ota_state == otaApplied)
+		{
+			K32W_LOG("OTA successfully applied");
+#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+            // If this point is reached, it means OTA_CommitCustomEntries was successfully called.
+            // Delete the factory data backup to stop doing a restore when the factory data provider
+            // is initialized. This ensures that both the factory data and app were updated, otherwise
+            // revert to the backed up factory data.
+			PDM_vDeleteDataRecord(kNvmId_FactoryDataBackup);
+#endif
+		}
+		else
+		{
+			K32W_LOG("OTA failed with status %d", ota_entries.ota_state);
+		}
+
+		// Clear the entry
+		OTA_ResetCustomEntries();
+	}
+	else
+	{
+		K32W_LOG("Unable to access OTA entries structure");
+	}
+}
+#endif
+
 CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -143,7 +177,9 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model and start server
     PlatformMgr().ScheduleWork(InitServer, 0);
 
-// Initialize device attestation config
+    CheckOtaEntry();
+
+    // Initialize device attestation config
 #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
     // Initialize factory data provider
     ReturnErrorOnFailure(AppTask::FactoryDataProvider::GetDefaultInstance().Init());
@@ -209,30 +245,6 @@ CHIP_ERROR AppTask::Init()
     err = ConfigurationMgr().GetSoftwareVersion(currentVersion);
 
     K32W_LOG("Current Software Version: %s, %" PRIu32, currentSoftwareVer, currentVersion);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    K32W_LOG("Current OTA_ENTRY_TOP_ADDR: 0x%x", OTA_ENTRY_TOP_ADDR);
-
-    CustomOtaEntries_t ota_entries;
-    if(gOtaSuccess_c == OTA_GetCustomEntries(&ota_entries) && ota_entries.ota_state != otaNoImage)
-    {
-        if(ota_entries.ota_state == otaApplied)
-        {
-            K32W_LOG("OTA successfully applied");
-        }
-        else
-        {
-            K32W_LOG("OTA failed with status %d", ota_entries.ota_state);
-        }
-        
-        // Clear the entry 
-        OTA_ResetCustomEntries();
-    }
-    else
-    {
-        K32W_LOG("Unable to access OTA entries structure");
-    }
-#endif
 
     return err;
 }
