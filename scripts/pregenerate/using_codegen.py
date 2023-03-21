@@ -87,6 +87,7 @@ class CodegenJavaJNIPregenerator:
     def CreateTarget(self, idl: InputIdlFile, runner):
         return CodegenTarget(sdk_root=self.sdk_root, idl=idl, generator="java-jni", runner=runner)
 
+
 class CodegenJavaClassPregenerator:
     """Pregeneration logic for "java" codegen.py outputs"""
 

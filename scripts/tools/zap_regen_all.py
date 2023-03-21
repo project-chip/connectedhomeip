@@ -230,7 +230,6 @@ class JinjaCodegenTarget():
         logging.info("  %s" % " ".join(self.command))
 
 
-
 def checkPythonVersion():
     if sys.version_info[0] < 3:
         print('Must use Python 3. Current version is ' +

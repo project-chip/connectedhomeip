@@ -33,7 +33,7 @@ except ImportError:
 from matter_idl.generators import GeneratorStorage
 from matter_idl.generators.bridge import BridgeGenerator
 from matter_idl.generators.cpp.application import CppApplicationGenerator
-from matter_idl.generators.java import JavaJNIGenerator, JavaClassGenerator
+from matter_idl.generators.java import JavaClassGenerator, JavaJNIGenerator
 from matter_idl.matter_idl_types import Idl
 
 TESTS_DIR = os.path.join(os.path.dirname(__file__), "tests")

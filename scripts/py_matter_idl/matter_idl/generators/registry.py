@@ -17,7 +17,7 @@ import importlib
 
 from matter_idl.generators.bridge import BridgeGenerator
 from matter_idl.generators.cpp.application import CppApplicationGenerator
-from matter_idl.generators.java import JavaJNIGenerator, JavaClassGenerator
+from matter_idl.generators.java import JavaClassGenerator, JavaJNIGenerator
 
 
 class CodeGenerator(enum.Enum):
