@@ -490,19 +490,24 @@ CHIP_ERROR K32W0FactoryDataProvider::GetHardwareVersionString(char * buf, size_t
 
 CHIP_ERROR K32W0FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
-    ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;
-#if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-    char uniqueId[ConfigurationManager::kMaxUniqueIDLength] = { 0 };
-    uint16_t uniqueIdLen                                    = 0;
-    ReturnErrorOnFailure(SearchForId(FactoryDataId::kUniqueId, (uint8_t *) (&uniqueId[0]), sizeof(uniqueId), uniqueIdLen));
+    CHIP_ERROR err = CHIP_ERROR_NOT_IMPLEMENTED;
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
     static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >= ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
                   "Length of unique ID for rotating device ID is smaller than minimum.");
+    uint16_t uniqueIdLen = 0;
+    err = SearchForId(FactoryDataId::kUniqueId, (uint8_t *) uniqueIdSpan.data(), uniqueIdSpan.size(), uniqueIdLen);
+#if defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
+    if (err == CHIP_ERROR_NOT_FOUND)
+    {
+        constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
 
-    ReturnErrorCodeIf(uniqueIdLen > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
-    ReturnErrorCodeIf(uniqueIdLen != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-    memcpy(uniqueIdSpan.data(), uniqueId, uniqueIdLen);
+        ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
+        uniqueIdLen = sizeof(uniqueId);
+    }
+#endif // CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
+    ReturnErrorOnFailure(err);
     uniqueIdSpan.reduce_size(uniqueIdLen);
-    return CHIP_NO_ERROR;
 #endif
 
     return err;
