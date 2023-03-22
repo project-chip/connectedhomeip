@@ -195,12 +195,13 @@ exit:
     return err;
 }
 
-/* Iterate through the key range to find a key that matches. */
 static uint8_t FindKVSSubID(const char * key, uint16_t & subID)
 {
     char key_scratch[PersistentStorageDelegate::kKeyLengthMax + 1];
     NVINTF_nvProxy_t nvProxy = { 0 };
     uint8_t status           = NVINTF_SUCCESS;
+    // Store first valid sub ID that has already been found in NV to prevent re-scanning the same page
+    uint16_t firstSubID = 0xffff;
 
     nvProxy.sysid  = CC13XX_26XXConfig::kConfigKey_KVS_key.nvID.systemID;
     nvProxy.itemid = CC13XX_26XXConfig::kConfigKey_KVS_key.nvID.itemID;
@@ -222,6 +223,17 @@ static uint8_t FindKVSSubID(const char * key, uint16_t & subID)
             subID = nvProxy.subid;
             break;
         }
+        if (firstSubID == 0xFFFF)
+        {
+            firstSubID = nvProxy.subid;
+        }
+        else if (firstSubID == nvProxy.subid)
+        {
+            // Scanned all of NV with no new subID found.
+            status = NVINTF_NOTFOUND;
+            break;
+        }
+
     } while (NVINTF_SUCCESS == status);
 
     sNvoctpFps.unlockNV(lock_key);
