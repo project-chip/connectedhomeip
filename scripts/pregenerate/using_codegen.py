@@ -80,8 +80,7 @@ class CodegenJavaJNIPregenerator:
         self.sdk_root = sdk_root
 
     def Accept(self, idl: InputIdlFile):
-        # Java is highly specific, a single path is acceptable for dynamic
-        # bridge codegen
+        # Java is highly specific, a single path is acceptable for codegen
         return idl.relative_path == "src/controller/data_model/controller-clusters.matter"
 
     def CreateTarget(self, idl: InputIdlFile, runner):
