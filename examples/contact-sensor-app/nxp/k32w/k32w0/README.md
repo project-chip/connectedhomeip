@@ -571,6 +571,11 @@ A user can select which default processors to enable:
 -    `chip_enable_ota_firmware_processor=1` to enable default firmware (app/SSBL) update processor (enabled by default).
 -    `chip_enable_ota_factory_data_processor=1` to enable default factory data update processor (disabled by default).
 
+The address for storing the custom OTA entry can also be specified:
+- `ota_custom_entry_address="0x000C1000"` is the default value, where `0x000C1000` is the end address of the PDM area.
+  PDM area ends at `0x00100000` (top of external flash) and has a size of `63 * 4096` bytes.
+  The user should be aware of the external flash configuration and use an address that does not overlap with anything else.
+
 Please see more in the [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
 
 Here is an example that generates an OTA image with application update TLV:

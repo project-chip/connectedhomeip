@@ -211,6 +211,8 @@ CHIP_ERROR AppTask::Init()
     K32W_LOG("Current Software Version: %s, %" PRIu32, currentSoftwareVer, currentVersion);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    K32W_LOG("Current OTA_ENTRY_TOP_ADDR: 0x%x", OTA_ENTRY_TOP_ADDR);
+
     CustomOtaEntries_t ota_entries;
     if(gOtaSuccess_c == OTA_GetCustomEntries(&ota_entries) && ota_entries.ota_state != otaNoImage)
     {

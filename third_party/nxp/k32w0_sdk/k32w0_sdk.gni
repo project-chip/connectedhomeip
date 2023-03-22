@@ -46,6 +46,7 @@ declare_args() {
   chip_enable_ota_firmware_processor = 1
   chip_enable_ota_factory_data_processor = 0
   chip_with_pdm_encryption=1
+  ota_custom_entry_address="0x000C1000"
 }
 
 assert(k32w0_sdk_root != "", "k32w0_sdk_root must be specified")
@@ -316,7 +317,8 @@ template("k32w0_sdk") {
       defines += [
         "gOTAAllowCustomStartAddress=1",
         "gOTAUseCustomOtaEntry=1",
-        "gOTACustomOtaEntryMemory=1"
+        "gOTACustomOtaEntryMemory=1",
+        "OTA_ENTRY_TOP_ADDR=${ota_custom_entry_address}"
       ]
 
       if (chip_enable_ota_factory_data_processor == 1) {

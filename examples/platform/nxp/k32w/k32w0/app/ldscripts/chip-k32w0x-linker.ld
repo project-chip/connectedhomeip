@@ -31,6 +31,61 @@
  *   GCC linker script for K32W061/K32W041.
  */
 
+/******************* Map of K32W0 internal flash ***********************************
+
+             0x000A_0000
+    - - - +---------------+ - - - - - - - -
+          |               |
+    8.5K  | Flash config  |
+          |   RESERVED    | 0x0009_DE00
+    - - - +---------------+ - - - - - - - -
+          |               |
+     2K   | Factory data  |
+          |               | 0x0009_D600
+    - - - +---------------+ - - - - - - - -
+          |               |
+     1K   | App metadata  |
+          |               | 0x0009_D200
+    - - - +---------------+ - - - - - - - -
+          |               |
+   612.5K |  Application  |
+          |               | 0x0000_4000
+    - - - +---------------+ - - - - - - - -
+          |               |
+     8K   |  SSBL update  |
+          |               | 0x0000_2000
+    - - - +---------------+ - - - - - - - -
+          |               |
+     8K   |     SSBL      |
+          |               | 0x0000_0000
+    - - - +---------------+ - - - - - - - -
+             0x0000_0000
+
+* - If OTA is disabled, SSBL and SSBL updated region are not present.
+  - The only address range that changes is the application, which will span from
+    0x0000_0000 to 0x0009_D200, having 628.5K max size.
+ *****************************************************************************/
+
+/******************* Map of DK6 external flash ***********************************
+
+             0x0010_0000
+    - - - +---------------+ - - - - - - - -
+          |               |
+    252K  |   PDM area    |
+          |               | 0x000C_1000
+    - - - +---------------+ - - - - - - - -
+          |               |
+     4K   |   OTA entry   |
+          |               | 0x000C_0000
+    - - - +---------------+ - - - - - - - -
+          |               |
+    768K  |   OTA area    |
+          |               |
+    - - - +---------------+ - - - - - - - -
+             0x0000_0000
+
+ *****************************************************************************/
+
 OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 
 /*
@@ -97,8 +152,7 @@ NVMSectorCountLink        = 63;
 NV_STORAGE_SIZE           = NVMSectorCountLink * m_ext_flash_sector_size;
 NV_STORAGE_MAX_SECTORS    = NVMSectorCountLink;
 NV_STORAGE_SECTOR_SIZE    = m_ext_flash_sector_size;
-/* Reserve one sector from top of external flash for custom OTA entry. */
-NV_STORAGE_START_ADDRESS  = m_ext_flash_size - m_ext_flash_sector_size - 1;
+NV_STORAGE_START_ADDRESS  = m_ext_flash_size - 1;
 NV_STORAGE_END_ADDRESS    = NV_STORAGE_START_ADDRESS - NV_STORAGE_SIZE + 1;
 
 INT_STORAGE_START         = m_int_flash_size - 1;
