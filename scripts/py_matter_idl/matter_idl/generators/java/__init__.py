@@ -356,9 +356,11 @@ def CanGenerateSubscribe(attr: Attribute, lookup: TypeLookupContext) -> bool:
     return not lookup.is_struct_type(attr.definition.data_type.name)
 
 
-class JavaGenerator(CodeGenerator):
+class __JavaCodeGenerator(CodeGenerator):
     """
-    Generation of java code for matter.
+    Code generation for java-specific files.
+
+    Registers filters used by all java generators.
     """
 
     def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
@@ -377,6 +379,13 @@ class JavaGenerator(CodeGenerator):
         self.jinja_env.filters['asEncodable'] = EncodableValueFrom
         self.jinja_env.filters['createLookupContext'] = CreateLookupContext
         self.jinja_env.filters['canGenerateSubscribe'] = CanGenerateSubscribe
+
+
+class JavaJNIGenerator(__JavaCodeGenerator):
+    """Generates JNI java files (i.e. C++ source/headers)."""
+
+    def __init__(self, *args, **kargs):
+        super().__init__(*args, **kargs)
 
     def internal_render_all(self):
         """
@@ -406,3 +415,24 @@ class JavaGenerator(CodeGenerator):
                     'typeLookup': TypeLookupContext(self.idl, cluster),
                 }
             )
+
+
+class JavaClassGenerator(__JavaCodeGenerator):
+    """Generates .java files """
+
+    def __init__(self, *args, **kargs):
+        super().__init__(*args, **kargs)
+
+    def internal_render_all(self):
+        """
+        Renders .java files required for java matter support
+        """
+
+        self.internal_render_one_output(
+            template_path="java/ClusterWriteMapping.jinja",
+            output_file_name="java/chip/devicecontroller/ClusterWriteMapping.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT],
+            }
+        )

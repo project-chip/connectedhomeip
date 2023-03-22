@@ -10,7 +10,7 @@
 #   - input_file is the input IDL
 #   - output_file/golden_path are the expected output file names
 #     and the expected content for those output files.
-java:
+java-jni:
     inputs/simple_attribute.matter:
         jni/MyClusterClient-ReadImpl.cpp: outputs/simple_attribute/jni/MyClusterClient-ReadImpl.cpp
         jni/MyClusterClient-InvokeSubscribeImpl.cpp: outputs/simple_attribute/jni/MyClusterClient-InvokeSubscribeImpl.cpp
@@ -34,6 +34,10 @@ java:
     inputs/optional_argument.matter:
         jni/MyClusterClient-ReadImpl.cpp: outputs/optional_argument/jni/MyClusterClient-ReadImpl.cpp
         jni/MyClusterClient-InvokeSubscribeImpl.cpp: outputs/optional_argument/jni/MyClusterClient-InvokeSubscribeImpl.cpp
+
+java-class:
+    inputs/several_clusters.matter:
+        java/chip/devicecontroller/ClusterWriteMapping.java: outputs/several_clusters/java/ClusterWriteMapping.java
 
 bridge:
     inputs/simple_attribute.matter:
