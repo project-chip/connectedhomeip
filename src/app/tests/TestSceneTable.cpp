@@ -34,11 +34,7 @@ using SceneData         = scenes::DefaultSceneTableImpl::SceneData;
 using ExtensionFieldSet = scenes::ExtensionFieldSet;
 using TransitionTimeMs  = scenes::TransitionTimeMs;
 
-namespace {
-
-// Group constants
-constexpr uint16_t kMaxGroupsPerFabric    = 5;
-constexpr uint16_t kMaxGroupKeysPerFabric = 4;
+namespace TestScenes {
 
 // Test Cluster ID
 constexpr chip::ClusterId kOnOffClusterId        = 0x0006;
@@ -918,7 +914,7 @@ void TestFabricScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric2, sceneId3, scene));
 }
 
-} // namespace
+} // namespace TestScenes
 
 /**
  *  Tear down the test suite.
@@ -928,7 +924,7 @@ int TestSetup(void * inContext)
     VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
 
     // Initialize Scene Table
-    VerifyOrReturnError(CHIP_NO_ERROR == sSceneTable.Init(&testStorage), FAILURE);
+    VerifyOrReturnError(CHIP_NO_ERROR == TestScenes::sSceneTable.Init(&TestScenes::testStorage), FAILURE);
 
     return SUCCESS;
 }
@@ -938,7 +934,7 @@ int TestSetup(void * inContext)
  */
 int TestTeardown(void * inContext)
 {
-    sSceneTable.Finish();
+    TestScenes::sSceneTable.Finish();
     chip::Platform::MemoryShutdown();
 
     return SUCCESS;
@@ -946,13 +942,13 @@ int TestTeardown(void * inContext)
 
 int TestSceneTable()
 {
-    static nlTest sTests[] = { NL_TEST_DEF("TestHandlerRegistration", TestHandlerRegistration),
-                               NL_TEST_DEF("TestHandlerFunctions", TestHandlerFunctions),
-                               NL_TEST_DEF("TestStoreScenes", TestStoreScenes),
-                               NL_TEST_DEF("TestOverwriteScenes", TestOverwriteScenes),
-                               NL_TEST_DEF("TestIterateScenes", TestIterateScenes),
-                               NL_TEST_DEF("TestRemoveScenes", TestRemoveScenes),
-                               NL_TEST_DEF("TestFabricScenes", TestFabricScenes),
+    static nlTest sTests[] = { NL_TEST_DEF("TestHandlerRegistration", TestScenes::TestHandlerRegistration),
+                               NL_TEST_DEF("TestHandlerFunctions", TestScenes::TestHandlerFunctions),
+                               NL_TEST_DEF("TestStoreScenes", TestScenes::TestStoreScenes),
+                               NL_TEST_DEF("TestOverwriteScenes", TestScenes::TestOverwriteScenes),
+                               NL_TEST_DEF("TestIterateScenes", TestScenes::TestIterateScenes),
+                               NL_TEST_DEF("TestRemoveScenes", TestScenes::TestRemoveScenes),
+                               NL_TEST_DEF("TestFabricScenes", TestScenes::TestFabricScenes),
 
                                NL_TEST_SENTINEL() };
 

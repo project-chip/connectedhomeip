@@ -24,7 +24,7 @@
 
 using namespace chip;
 
-namespace {
+namespace TestEFS {
 
 enum class TagTestEFS : uint8_t
 {
@@ -304,7 +304,7 @@ void TestRemoveExtensionFieldSet(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, true == EFS->IsEmpty());
 }
 
-} // namespace
+} // namespace TestEFS
 /**
  *  Tear down the test suite.
  */
@@ -327,9 +327,10 @@ int TestTeardown(void * inContext)
 
 int TestExtensionFieldSets()
 {
-    static nlTest sTests[] = { NL_TEST_DEF("TestInsertExtensionFieldSet", TestInsertExtensionFieldSet),
-                               NL_TEST_DEF("TestSerializeDerializeExtensionFieldSet", TestSerializeDerializeExtensionFieldSet),
-                               NL_TEST_DEF("TestRemoveExtensionFieldSet", TestRemoveExtensionFieldSet),
+    static nlTest sTests[] = { NL_TEST_DEF("TestInsertExtensionFieldSet", TestEFS::TestInsertExtensionFieldSet),
+                               NL_TEST_DEF("TestSerializeDerializeExtensionFieldSet",
+                                           TestEFS::TestSerializeDerializeExtensionFieldSet),
+                               NL_TEST_DEF("TestRemoveExtensionFieldSet", TestEFS::TestRemoveExtensionFieldSet),
 
                                NL_TEST_SENTINEL() };
 
