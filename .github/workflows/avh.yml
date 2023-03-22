@@ -15,6 +15,9 @@
 name: Arm Virtual Hardware
 
 on:
+    # All AVH devices in the same account share the same virtual BLE and
+    # (Wi-Fi) IP network, to workaround this in the short term run the action
+    # hourly instead of per push / pull request
     schedule:
         - cron: '0 * * * *'
     workflow_dispatch:
