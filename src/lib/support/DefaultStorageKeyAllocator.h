@@ -204,6 +204,12 @@ public:
     {
         return StorageKeyName::Formatted("f/%x/sc/%x", fabric, id);
     }
+
+    // Time synchronization cluster
+    static StorageKeyName TSTrustedTimeSource() { return StorageKeyName::FromConst("g/ts/tts"); }
+    static StorageKeyName TSDefaultNTP() { return StorageKeyName::FromConst("g/ts/dntp"); }
+    static StorageKeyName TSTimeZone() { return StorageKeyName::FromConst("g/ts/tz"); }
+    static StorageKeyName TSDSTOffset() { return StorageKeyName::FromConst("g/ts/dsto"); }
 };
 
 } // namespace chip

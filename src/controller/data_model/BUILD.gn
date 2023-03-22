@@ -179,6 +179,8 @@ if (current_os == "android" || build_java_matter_controller) {
       # https://github.com/project-chip/connectedhomeip/issues/24425
       #"jni/ClientMonitoringClient-ReadImpl.cpp",
       #"jni/ClientMonitoringClient-InvokeSubscribeImpl.cpp",
+      "jni/TimeSynchronizationClient-ReadImpl.cpp",
+      "jni/TimeSynchronizationClient-InvokeSubscribeImpl.cpp",
     ]
 
     deps = [

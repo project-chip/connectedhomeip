@@ -1029,6 +1029,121 @@ public class ChipStructs {
     }
   }
 
+  public static class TimeSynchronizationClusterDSTOffsetStruct {
+    public Long offset;
+    public Long validStarting;
+    public @Nullable Long validUntil;
+
+    public TimeSynchronizationClusterDSTOffsetStruct(
+        Long offset, Long validStarting, @Nullable Long validUntil) {
+      this.offset = offset;
+      this.validStarting = validStarting;
+      this.validUntil = validUntil;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TimeSynchronizationClusterDSTOffsetStruct {\n");
+      output.append("\toffset: ");
+      output.append(offset);
+      output.append("\n");
+      output.append("\tvalidStarting: ");
+      output.append(validStarting);
+      output.append("\n");
+      output.append("\tvalidUntil: ");
+      output.append(validUntil);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct {
+    public Long nodeID;
+    public Integer endpoint;
+
+    public TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct(
+        Long nodeID, Integer endpoint) {
+      this.nodeID = nodeID;
+      this.endpoint = endpoint;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct {\n");
+      output.append("\tnodeID: ");
+      output.append(nodeID);
+      output.append("\n");
+      output.append("\tendpoint: ");
+      output.append(endpoint);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class TimeSynchronizationClusterTimeZoneStruct {
+    public Long offset;
+    public Long validAt;
+    public Optional<String> name;
+
+    public TimeSynchronizationClusterTimeZoneStruct(
+        Long offset, Long validAt, Optional<String> name) {
+      this.offset = offset;
+      this.validAt = validAt;
+      this.name = name;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TimeSynchronizationClusterTimeZoneStruct {\n");
+      output.append("\toffset: ");
+      output.append(offset);
+      output.append("\n");
+      output.append("\tvalidAt: ");
+      output.append(validAt);
+      output.append("\n");
+      output.append("\tname: ");
+      output.append(name);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class TimeSynchronizationClusterTrustedTimeSourceStruct {
+    public Integer fabricIndex;
+    public Long nodeID;
+    public Integer endpoint;
+
+    public TimeSynchronizationClusterTrustedTimeSourceStruct(
+        Integer fabricIndex, Long nodeID, Integer endpoint) {
+      this.fabricIndex = fabricIndex;
+      this.nodeID = nodeID;
+      this.endpoint = endpoint;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("TimeSynchronizationClusterTrustedTimeSourceStruct {\n");
+      output.append("\tfabricIndex: ");
+      output.append(fabricIndex);
+      output.append("\n");
+      output.append("\tnodeID: ");
+      output.append(nodeID);
+      output.append("\n");
+      output.append("\tendpoint: ");
+      output.append(endpoint);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class BridgedDeviceBasicInformationClusterProductAppearanceStruct {
     public Integer finish;
     public @Nullable Integer primaryColor;

@@ -133,6 +133,7 @@ chip_test_suite("tests") {
     "TestStatusResponseMessage.cpp",
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
+    "TestTimeSyncDataProvider.cpp",
   ]
 
   if (!chip_fake_platform) {

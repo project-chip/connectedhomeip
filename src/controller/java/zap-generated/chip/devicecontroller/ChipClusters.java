@@ -10171,6 +10171,480 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
+  public static class TimeSynchronizationCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 56L;
+
+    public TimeSynchronizationCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void setUTCTime(
+        DefaultClusterCallback callback,
+        Long UTCTime,
+        Integer granularity,
+        Optional<Integer> timeSource) {
+      setUTCTime(chipClusterPtr, callback, UTCTime, granularity, timeSource, null);
+    }
+
+    public void setUTCTime(
+        DefaultClusterCallback callback,
+        Long UTCTime,
+        Integer granularity,
+        Optional<Integer> timeSource,
+        int timedInvokeTimeoutMs) {
+      setUTCTime(chipClusterPtr, callback, UTCTime, granularity, timeSource, timedInvokeTimeoutMs);
+    }
+
+    public void setTrustedTimeSource(
+        DefaultClusterCallback callback,
+        @Nullable
+            ChipStructs.TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct
+                trustedTimeSource) {
+      setTrustedTimeSource(chipClusterPtr, callback, trustedTimeSource, null);
+    }
+
+    public void setTrustedTimeSource(
+        DefaultClusterCallback callback,
+        @Nullable
+            ChipStructs.TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct
+                trustedTimeSource,
+        int timedInvokeTimeoutMs) {
+      setTrustedTimeSource(chipClusterPtr, callback, trustedTimeSource, timedInvokeTimeoutMs);
+    }
+
+    public void setTimeZone(
+        SetTimeZoneResponseCallback callback,
+        ArrayList<ChipStructs.TimeSynchronizationClusterTimeZoneStruct> timeZone) {
+      setTimeZone(chipClusterPtr, callback, timeZone, null);
+    }
+
+    public void setTimeZone(
+        SetTimeZoneResponseCallback callback,
+        ArrayList<ChipStructs.TimeSynchronizationClusterTimeZoneStruct> timeZone,
+        int timedInvokeTimeoutMs) {
+      setTimeZone(chipClusterPtr, callback, timeZone, timedInvokeTimeoutMs);
+    }
+
+    public void setDSTOffset(
+        DefaultClusterCallback callback,
+        ArrayList<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct> DSTOffset) {
+      setDSTOffset(chipClusterPtr, callback, DSTOffset, null);
+    }
+
+    public void setDSTOffset(
+        DefaultClusterCallback callback,
+        ArrayList<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct> DSTOffset,
+        int timedInvokeTimeoutMs) {
+      setDSTOffset(chipClusterPtr, callback, DSTOffset, timedInvokeTimeoutMs);
+    }
+
+    public void setDefaultNTP(DefaultClusterCallback callback, @Nullable String defaultNTP) {
+      setDefaultNTP(chipClusterPtr, callback, defaultNTP, null);
+    }
+
+    public void setDefaultNTP(
+        DefaultClusterCallback callback, @Nullable String defaultNTP, int timedInvokeTimeoutMs) {
+      setDefaultNTP(chipClusterPtr, callback, defaultNTP, timedInvokeTimeoutMs);
+    }
+
+    private native void setUTCTime(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        Long UTCTime,
+        Integer granularity,
+        Optional<Integer> timeSource,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void setTrustedTimeSource(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        @Nullable
+            ChipStructs.TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct
+                trustedTimeSource,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void setTimeZone(
+        long chipClusterPtr,
+        SetTimeZoneResponseCallback Callback,
+        ArrayList<ChipStructs.TimeSynchronizationClusterTimeZoneStruct> timeZone,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void setDSTOffset(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        ArrayList<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct> DSTOffset,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void setDefaultNTP(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        @Nullable String defaultNTP,
+        @Nullable Integer timedInvokeTimeoutMs);
+
+    public interface SetTimeZoneResponseCallback {
+      void onSuccess(Boolean DSTOffsetRequired);
+
+      void onError(Exception error);
+    }
+
+    public interface UTCTimeAttributeCallback {
+      void onSuccess(@Nullable Long value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface DefaultNTPAttributeCallback {
+      void onSuccess(@Nullable String value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface TimeZoneAttributeCallback {
+      void onSuccess(List<ChipStructs.TimeSynchronizationClusterTimeZoneStruct> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface DSTOffsetAttributeCallback {
+      void onSuccess(List<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface LocalTimeAttributeCallback {
+      void onSuccess(@Nullable Long value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface GeneratedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AcceptedCommandListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface EventListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Long> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public void readUTCTimeAttribute(UTCTimeAttributeCallback callback) {
+      readUTCTimeAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUTCTimeAttribute(
+        UTCTimeAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUTCTimeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGranularityAttribute(IntegerAttributeCallback callback) {
+      readGranularityAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGranularityAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGranularityAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readTimeSourceAttribute(IntegerAttributeCallback callback) {
+      readTimeSourceAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeTimeSourceAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeTimeSourceAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readDefaultNTPAttribute(DefaultNTPAttributeCallback callback) {
+      readDefaultNTPAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeDefaultNTPAttribute(
+        DefaultNTPAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeDefaultNTPAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readTimeZoneAttribute(TimeZoneAttributeCallback callback) {
+      readTimeZoneAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeTimeZoneAttribute(
+        TimeZoneAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeTimeZoneAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readDSTOffsetAttribute(DSTOffsetAttributeCallback callback) {
+      readDSTOffsetAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeDSTOffsetAttribute(
+        DSTOffsetAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeDSTOffsetAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readLocalTimeAttribute(LocalTimeAttributeCallback callback) {
+      readLocalTimeAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLocalTimeAttribute(
+        LocalTimeAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeLocalTimeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readTimeZoneDatabaseAttribute(IntegerAttributeCallback callback) {
+      readTimeZoneDatabaseAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeTimeZoneDatabaseAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeTimeZoneDatabaseAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readNTPServerAvailableAttribute(BooleanAttributeCallback callback) {
+      readNTPServerAvailableAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeNTPServerAvailableAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeNTPServerAvailableAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readTimeZoneListMaxSizeAttribute(IntegerAttributeCallback callback) {
+      readTimeZoneListMaxSizeAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeTimeZoneListMaxSizeAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeTimeZoneListMaxSizeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readDSTOffsetListMaxSizeAttribute(IntegerAttributeCallback callback) {
+      readDSTOffsetListMaxSizeAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeDSTOffsetListMaxSizeAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeDSTOffsetListMaxSizeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readSupportsDNSResolveAttribute(BooleanAttributeCallback callback) {
+      readSupportsDNSResolveAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeSupportsDNSResolveAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeSupportsDNSResolveAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readGeneratedCommandListAttribute(GeneratedCommandListAttributeCallback callback) {
+      readGeneratedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeGeneratedCommandListAttribute(
+        GeneratedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeGeneratedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAcceptedCommandListAttribute(AcceptedCommandListAttributeCallback callback) {
+      readAcceptedCommandListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAcceptedCommandListAttribute(
+        AcceptedCommandListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAcceptedCommandListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readEventListAttribute(EventListAttributeCallback callback) {
+      readEventListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeEventListAttribute(
+        EventListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeEventListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeAttributeListAttribute(
+        AttributeListAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeAttributeListAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeFeatureMapAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeFeatureMapAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readUTCTimeAttribute(
+        long chipClusterPtr, UTCTimeAttributeCallback callback);
+
+    private native void subscribeUTCTimeAttribute(
+        long chipClusterPtr, UTCTimeAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGranularityAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeGranularityAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readTimeSourceAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeTimeSourceAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readDefaultNTPAttribute(
+        long chipClusterPtr, DefaultNTPAttributeCallback callback);
+
+    private native void subscribeDefaultNTPAttribute(
+        long chipClusterPtr,
+        DefaultNTPAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readTimeZoneAttribute(
+        long chipClusterPtr, TimeZoneAttributeCallback callback);
+
+    private native void subscribeTimeZoneAttribute(
+        long chipClusterPtr, TimeZoneAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readDSTOffsetAttribute(
+        long chipClusterPtr, DSTOffsetAttributeCallback callback);
+
+    private native void subscribeDSTOffsetAttribute(
+        long chipClusterPtr, DSTOffsetAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readLocalTimeAttribute(
+        long chipClusterPtr, LocalTimeAttributeCallback callback);
+
+    private native void subscribeLocalTimeAttribute(
+        long chipClusterPtr, LocalTimeAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readTimeZoneDatabaseAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeTimeZoneDatabaseAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readNTPServerAvailableAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void subscribeNTPServerAvailableAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readTimeZoneListMaxSizeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeTimeZoneListMaxSizeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readDSTOffsetListMaxSizeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeDSTOffsetListMaxSizeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readSupportsDNSResolveAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void subscribeSupportsDNSResolveAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readGeneratedCommandListAttribute(
+        long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
+
+    private native void subscribeGeneratedCommandListAttribute(
+        long chipClusterPtr,
+        GeneratedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readAcceptedCommandListAttribute(
+        long chipClusterPtr, AcceptedCommandListAttributeCallback callback);
+
+    private native void subscribeAcceptedCommandListAttribute(
+        long chipClusterPtr,
+        AcceptedCommandListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback);
+
+    private native void subscribeEventListAttribute(
+        long chipClusterPtr, EventListAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void subscribeAttributeListAttribute(
+        long chipClusterPtr,
+        AttributeListAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
   public static class BridgedDeviceBasicInformationCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 57L;
 
