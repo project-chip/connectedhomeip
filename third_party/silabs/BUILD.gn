@@ -63,7 +63,8 @@ if (silabs_board != "BRD4325B") {  # CCP board
     }
 
     copy("copy_openthread_system") {
-      sources = [ "${sl_openthread_root}/examples/platforms/openthread-system.h" ]
+      sources =
+          [ "${sl_openthread_root}/examples/platforms/openthread-system.h" ]
 
       outputs =
           [ "${root_gen_dir}/include/openthread/platform/{{source_file_part}}" ]
@@ -76,7 +77,8 @@ if (silabs_board != "BRD4325B") {  # CCP board
     }
 
     source_set("libopenthread-platform") {
-      sources = [ "${sl_openthread_root}/examples/platforms/openthread-system.h" ]
+      sources =
+          [ "${sl_openthread_root}/examples/platforms/openthread-system.h" ]
 
       public_deps = [ ":openthread_system" ]
 
