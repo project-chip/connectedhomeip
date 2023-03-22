@@ -14,11 +14,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#pragma once
 
-// These are the bridged devices
 #include <app/util/attribute-storage.h>
+
 #include <functional>
 #include <stdbool.h>
+
 #include <stdint.h>
 
 class Device
@@ -39,6 +41,7 @@ public:
         kChanged_State     = 0x02,
         kChanged_Location  = 0x04,
         kChanged_Name      = 0x08,
+        kChanged_Last      = kChanged_Name,
     } Changed;
 
     Device(const char * szDeviceName, const char * szLocation);
@@ -63,5 +66,31 @@ private:
     char mName[kDeviceNameSize];
     char mLocation[kDeviceLocationSize];
     chip::EndpointId mEndpointId;
+    DeviceCallback_fn mChanged_CB;
+};
+class DeviceTempSensor : public Device
+{
+public:
+    enum Changed_t
+    {
+        kChanged_MeasurementValue = kChanged_Last << 1,
+    } Changed;
+
+    DeviceTempSensor(const char * szDeviceName, std::string szLocation, int16_t min, int16_t max, int16_t measuredValue);
+
+    inline int16_t GetMeasuredValue() { return mMeasurement; };
+    void SetMeasuredValue(int16_t measurement);
+
+    using DeviceCallback_fn = std::function<void(DeviceTempSensor *, DeviceTempSensor::Changed_t)>;
+    void SetChangeCallback(DeviceCallback_fn aChanged_CB);
+
+    const int16_t mMin;
+    const int16_t mMax;
+
+private:
+    void HandleDeviceChange(Device * device, Device::Changed_t changeMask);
+
+private:
+    int16_t mMeasurement;
     DeviceCallback_fn mChanged_CB;
 };

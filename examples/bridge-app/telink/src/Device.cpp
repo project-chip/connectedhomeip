@@ -119,3 +119,46 @@ void Device::SetChangeCallback(DeviceCallback_fn aChanged_CB)
 {
     mChanged_CB = aChanged_CB;
 }
+
+DeviceTempSensor::DeviceTempSensor(const char * szDeviceName, std::string szLocation, int16_t min, int16_t max,
+                                   int16_t measuredValue) :
+    Device(szDeviceName, szLocation.c_str()),
+    mMin(min), mMax(max), mMeasurement(measuredValue)
+{}
+
+void DeviceTempSensor::SetMeasuredValue(int16_t measurement)
+{
+    // Limit measurement based on the min and max.
+    if (measurement < mMin)
+    {
+        measurement = mMin;
+    }
+    else if (measurement > mMax)
+    {
+        measurement = mMax;
+    }
+
+    bool changed = mMeasurement != measurement;
+
+    ChipLogProgress(DeviceLayer, "TempSensorDevice new measurement=\"%d\"", measurement);
+
+    mMeasurement = measurement;
+
+    if (changed && mChanged_CB)
+    {
+        mChanged_CB(this, kChanged_MeasurementValue);
+    }
+}
+
+void DeviceTempSensor::SetChangeCallback(DeviceCallback_fn aChanged_CB)
+{
+    mChanged_CB = aChanged_CB;
+}
+
+void DeviceTempSensor::HandleDeviceChange(Device * device, Device::Changed_t changeMask)
+{
+    if (mChanged_CB)
+    {
+        mChanged_CB(this, (DeviceTempSensor::Changed_t) changeMask);
+    }
+}

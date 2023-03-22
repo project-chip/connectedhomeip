@@ -153,7 +153,9 @@ AppTask AppTask::sAppTask;
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
                       const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId);
 CHIP_ERROR RemoveDeviceEndpoint(Device * dev);
-// static void AppTask::InitServer(intptr_t context);
+void HandleDeviceTempSensorStatusChanged(DeviceTempSensor * dev, DeviceTempSensor::Changed_t itemChangedMask);
+EmberAfStatus HandleReadTempMeasurementAttribute(DeviceTempSensor * dev, chip::AttributeId attributeId, uint8_t * buffer,
+                                                 uint16_t maxReadLength);
 
 static const int kNodeLabelSize = 32;
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
@@ -164,24 +166,24 @@ static EndpointId gFirstDynamicEndpointId;
 
 static Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT]; // number of dynamic endpoints count
 
-// 4 Bridged devices
+const int16_t minMeasuredValue     = -27315;
+const int16_t maxMeasuredValue     = 32766;
+const int16_t initialMeasuredValue = 100;
+
+// 5 Bridged devices
 static Device gLight1("Light 1", "Office");
 static Device gLight2("Light 2", "Office");
 static Device gLight3("Light 3", "Kitchen");
-static Device gLight4("Light 4", "Den");
-static Device gThermostat("Thermo", "Office");
+static Device gLight4("Light 4", "Kitchen");
+static DeviceTempSensor TempSensor1("TempSensor 1", "Office", minMeasuredValue, maxMeasuredValue, initialMeasuredValue);
 
-// (taken from chip-devices.xml)
+// (taken from src/app/zap-templates/zcl/data-model/chip/matter-devices.xml)
 #define DEVICE_TYPE_BRIDGED_NODE 0x0013
 // (taken from lo-devices.xml)
 #define DEVICE_TYPE_LO_ON_OFF_LIGHT 0x0100
-
-// (taken from chip-devices.xml)
 #define DEVICE_TYPE_ROOT_NODE 0x0016
-// (taken from chip-devices.xml)
 #define DEVICE_TYPE_BRIDGE 0x000e
-// (taken from src/app/zap-templates/zcl/data-model/chip/thermostat-cluster.xml)
-#define DEVICE_TYPE_THERMOSTAT 0x0201
+#define DEVICE_TYPE_TEMP_SENSOR 0x0302
 // Device Version for dynamic endpoints:
 #define DEVICE_VERSION_DEFAULT 1
 
@@ -189,7 +191,6 @@ static Device gThermostat("Thermo", "Office");
    - On/Off
    - Descriptor
    - Bridged Device Basic Information
-   - Thermostat
 */
 
 // Declare On/Off cluster attributes
@@ -236,44 +237,30 @@ DECLARE_DYNAMIC_CLUSTER(Clusters::OnOff::Id, onOffAttrs, onOffIncomingCommands, 
     DECLARE_DYNAMIC_CLUSTER(chip::app::Clusters::BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, nullptr,
                             nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
-// Declare Thermostat
-const EmberAfDeviceType gBridgedThermostatDeviceTypes[] = { { DEVICE_TYPE_THERMOSTAT, DEVICE_VERSION_DEFAULT },
-                                                            { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
-// ---------------------------------------------------------------------------
-//
-// THERMOSTAT ENDPOINT: contains the following clusters:
-// - Thermostat
-// - Descriptor
-// - Bridged Device Basic
-
-DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(thermostatAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::LocalTemperature::Id, INT16S, 2, 0),
-    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::Id, INT16S, 2, 0),
-    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::Id, INT16S, 2, 0),
-    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::Id, INT16S, 2, 0),
-    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::Id, INT16S, 2, 0),
-    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Id, INT16S, 2, 0),
-    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Id, INT16S, 2, 0),
-    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::MinSetpointDeadBand::Id, INT8S, 1, 0),
-    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::ControlSequenceOfOperation::Id, INT8U, 1, 0),
-    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::SystemMode::Id, INT8U, 1, 0),
-    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Thermostat::Attributes::FeatureMap::Id, BITMAP32, 4, 0),
+// ----------------------------Temperature sensor-----------------------------------------------
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(tempSensorAttrs)
+DECLARE_DYNAMIC_ATTRIBUTE(Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Id, INT16S, 2, 0), /* Measured Value */
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::TemperatureMeasurement::Attributes::MinMeasuredValue::Id, INT16S, 2,
+                              0), /* Min Measured Value */
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::TemperatureMeasurement::Attributes::MaxMeasuredValue::Id, INT16S, 2,
+                              0), /* Max Measured Value */
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::TemperatureMeasurement::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* FeatureMap */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
-constexpr chip::CommandId ThermostatIncomingCommands[] = {
-    chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Id,
-    chip::kInvalidCommandId,
-};
-
-DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedThermostatClusters)
-DECLARE_DYNAMIC_CLUSTER(Clusters::Thermostat::Id, thermostatAttrs, ThermostatIncomingCommands, nullptr),
+//
+// TEMPERATURE SENSOR ENDPOINT: contains the following clusters:
+//   - Temperature measurement
+//   - Descriptor
+//   - Bridged Device Basic Information
+DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedTempSensorClusters)
+DECLARE_DYNAMIC_CLUSTER(Clusters::TemperatureMeasurement::Id, tempSensorAttrs, nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER(Clusters::Descriptor::Id, descriptorAttrs, nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER(Clusters::BridgedDeviceBasicInformation::Id, bridgedDeviceBasicAttrs, nullptr, nullptr),
     DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
-// Declare Bridged Thermostat endpoint
-DECLARE_DYNAMIC_ENDPOINT(bridgedThermostatEndpoint, bridgedThermostatClusters);
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Declare Bridged Light endpoint
+DECLARE_DYNAMIC_ENDPOINT(bridgedTempSensorEndpoint, bridgedTempSensorClusters);
+DataVersion gTempSensor1DataVersions[ArraySize(bridgedTempSensorClusters)];
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
@@ -282,7 +269,7 @@ DataVersion gLight1DataVersions[ArraySize(bridgedLightClusters)];
 DataVersion gLight2DataVersions[ArraySize(bridgedLightClusters)];
 DataVersion gLight3DataVersions[ArraySize(bridgedLightClusters)];
 DataVersion gLight4DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gThermostatDataVersions[ArraySize(thermostatAttrs)];
+// DataVersion gThermostatDataVersions[ArraySize(thermostatAttrs)];
 
 const EmberAfDeviceType gRootDeviceTypes[]          = { { DEVICE_TYPE_ROOT_NODE, DEVICE_VERSION_DEFAULT } };
 const EmberAfDeviceType gAggregateNodeDeviceTypes[] = { { DEVICE_TYPE_BRIDGE, DEVICE_VERSION_DEFAULT } };
@@ -290,6 +277,8 @@ const EmberAfDeviceType gAggregateNodeDeviceTypes[] = { { DEVICE_TYPE_BRIDGE, DE
 const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },
                                                        { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
 
+const EmberAfDeviceType gBridgedTempSensorDeviceTypes[] = { { DEVICE_TYPE_TEMP_SENSOR, DEVICE_VERSION_DEFAULT },
+                                                            { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
 /* REVISION definitions:
  */
 
@@ -297,7 +286,10 @@ const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_L
 #define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (1u)
 #define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
 #define ZCL_ON_OFF_CLUSTER_REVISION (4u)
+#define ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION (1u)
+#define ZCL_TEMPERATURE_SENSOR_FEATURE_MAP (0u)
 /////////// BRIDGE END ///////////
+
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
                       const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId)
 {
@@ -415,19 +407,26 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
                                                    uint16_t maxReadLength)
 {
+    using namespace Clusters;
+
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
     if ((endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT) && (gDevices[endpointIndex] != NULL))
     {
         Device * dev = gDevices[endpointIndex];
 
-        if (clusterId == Clusters::BridgedDeviceBasicInformation::Id)
+        if (clusterId == BridgedDeviceBasicInformation::Id)
         {
             return HandleReadBridgedDeviceBasicAttribute(dev, attributeMetadata->attributeId, buffer, maxReadLength);
         }
-        else if (clusterId == Clusters::OnOff::Id)
+        else if (clusterId == OnOff::Id)
         {
             return HandleReadOnOffAttribute(dev, attributeMetadata->attributeId, buffer, maxReadLength);
+        }
+        else if (clusterId == TemperatureMeasurement::Id)
+        {
+            return HandleReadTempMeasurementAttribute(static_cast<DeviceTempSensor *>(dev), attributeMetadata->attributeId, buffer,
+                                                      maxReadLength);
         }
     }
 
@@ -602,24 +601,21 @@ CHIP_ERROR AppTask::Init(void)
     }
     //////////// BRIDGE ////////////
 
-    // bridge will have own database named gDevices.
-    // Clear database
     memset(gDevices, 0, sizeof(gDevices));
 
     gLight1.SetReachable(true);
     gLight2.SetReachable(true);
     gLight3.SetReachable(true);
     gLight4.SetReachable(true);
-    gThermostat.SetReachable(true);
+    // gThermostat.SetReachable(true);
+    TempSensor1.SetReachable(true);
 
     // Whenever bridged device changes its state
     gLight1.SetChangeCallback(&HandleDeviceStatusChanged);
     gLight2.SetChangeCallback(&HandleDeviceStatusChanged);
     gLight3.SetChangeCallback(&HandleDeviceStatusChanged);
     gLight4.SetChangeCallback(&HandleDeviceStatusChanged);
-
-    // NOTE: HandleDeviceStatusChanged is unified callback only for OnOff, refactor is needed
-    // gThermostat.SetChangeCallback(&HandleDeviceStatusChanged);
+    TempSensor1.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
 
     PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
     ////////////////////////////////
@@ -647,7 +643,6 @@ CHIP_ERROR AppTask::StartApp(void)
 
 static void AppTask::InitServer(intptr_t context)
 {
-    // Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 
     // Set starting endpoint id where dynamic endpoints will be assigned, which
     // will be the next consecutive endpoint id after the last fixed endpoint.
@@ -656,7 +651,7 @@ static void AppTask::InitServer(intptr_t context)
     gCurrentEndpointId = gFirstDynamicEndpointId;
 
     // Disable last fixed endpoint, which is used as a placeholder for all of the
-    // supported clusters so that ZAP will generated the requisite code.
+    // supported clusters so that ZAP will generate the requisite code.
     emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 
     // A bridge has root node device type on EP0 and aggregate node device type (bridge) at EP1
@@ -682,9 +677,61 @@ static void AppTask::InitServer(intptr_t context)
     AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
                       Span<DataVersion>(gLight2DataVersions), 1);
 
-    // Add Thermostat -- > will be mapped to ZCL endpoint 8
-    AddDeviceEndpoint(&gThermostat, &bridgedThermostatEndpoint, Span<const EmberAfDeviceType>(gBridgedThermostatDeviceTypes),
-                      Span<DataVersion>(gThermostatDataVersions), 1);
+    // Add Temperature Sensor devices --> will be mapped to endpoint 8
+    AddDeviceEndpoint(&TempSensor1, &bridgedTempSensorEndpoint, Span<const EmberAfDeviceType>(gBridgedTempSensorDeviceTypes),
+                      Span<DataVersion>(gTempSensor1DataVersions), 1);
+}
+
+void HandleDeviceTempSensorStatusChanged(DeviceTempSensor * dev, DeviceTempSensor::Changed_t itemChangedMask)
+{
+    using namespace Clusters;
+    if (itemChangedMask &
+        (DeviceTempSensor::kChanged_Reachable | DeviceTempSensor::kChanged_Name | DeviceTempSensor::kChanged_Location))
+    {
+        HandleDeviceStatusChanged(static_cast<Device *>(dev), (Device::Changed_t) itemChangedMask);
+    }
+    if (itemChangedMask & DeviceTempSensor::kChanged_MeasurementValue)
+    {
+        ScheduleReportingCallback(dev, TemperatureMeasurement::Id, TemperatureMeasurement::Attributes::MeasuredValue::Id);
+    }
+}
+
+EmberAfStatus HandleReadTempMeasurementAttribute(DeviceTempSensor * dev, chip::AttributeId attributeId, uint8_t * buffer,
+                                                 uint16_t maxReadLength)
+{
+    using namespace Clusters::TemperatureMeasurement::Attributes;
+
+    if ((attributeId == MeasuredValue::Id) && (maxReadLength == 2))
+    {
+        int16_t measuredValue = dev->GetMeasuredValue();
+        memcpy(buffer, &measuredValue, sizeof(measuredValue));
+    }
+    else if ((attributeId == MinMeasuredValue::Id) && (maxReadLength == 2))
+    {
+        int16_t minValue = dev->mMin;
+        memcpy(buffer, &minValue, sizeof(minValue));
+    }
+    else if ((attributeId == MaxMeasuredValue::Id) && (maxReadLength == 2))
+    {
+        int16_t maxValue = dev->mMax;
+        memcpy(buffer, &maxValue, sizeof(maxValue));
+    }
+    else if ((attributeId == FeatureMap::Id) && (maxReadLength == 4))
+    {
+        uint32_t featureMap = ZCL_TEMPERATURE_SENSOR_FEATURE_MAP;
+        memcpy(buffer, &featureMap, sizeof(featureMap));
+    }
+    else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 2))
+    {
+        uint16_t clusterRevision = ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION;
+        memcpy(buffer, &clusterRevision, sizeof(clusterRevision));
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+
+    return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 void AppTask::LightingActionButtonEventHandler(void)
