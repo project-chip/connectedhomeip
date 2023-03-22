@@ -23,6 +23,4 @@ typedef void (*CHIPDefaultWriteSuccessCallbackType)(void *);
 typedef void (*CHIPDefaultFailureCallbackType)(void *, CHIP_ERROR);
 
 
-  
-
 

@@ -23,7 +23,5 @@ typedef void (*CHIPDefaultWriteSuccessCallbackType)(void *);
 typedef void (*CHIPDefaultFailureCallbackType)(void *, CHIP_ERROR);
 
 
-  
 typedef void (*CHIPMyClusterClusterClusterAttrAttributeCallbackType)(void *, chip::app::Clusters::MyCluster::Attributes::ClusterAttr::TypeInfo::DecodableArgType);
-
 
