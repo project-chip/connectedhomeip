@@ -296,7 +296,6 @@ public:
     // Handlers
     virtual bool HandlerListEmpty() { return mHandlerList.Empty(); }
 
-    // SceneHandler * mHandlers[kMaxSceneHandlers] = { nullptr };
     IntrusiveList<SceneHandler> mHandlerList;
 };
 

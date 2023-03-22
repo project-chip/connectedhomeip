@@ -80,7 +80,7 @@ struct SceneTableData : public SceneTableEntry, PersistentData<kPersistentSceneB
     {
         CharSpan nameSpan(mStorageData.mName, mStorageData.mNameLength);
         TLV::TLVType container;
-        LogErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
 
         // Scene ID
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kEndpointID), mStorageId.mEndpointId));
