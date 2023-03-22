@@ -63,8 +63,7 @@ if (silabs_board != "BRD4325B") {  # CCP board
     }
 
     copy("copy_openthread_system") {
-      sources =
-          [ "${sl_openthread_root}/examples/platforms/openthread-system.h" ]
+      sources = [ "${sl_openthread_root}/examples/platforms/openthread-system.h" ]
 
       outputs =
           [ "${root_gen_dir}/include/openthread/platform/{{source_file_part}}" ]
@@ -77,8 +76,7 @@ if (silabs_board != "BRD4325B") {  # CCP board
     }
 
     source_set("libopenthread-platform") {
-      sources =
-          [ "${sl_openthread_root}/examples/platforms/openthread-system.h" ]
+      sources = [ "${sl_openthread_root}/examples/platforms/openthread-system.h" ]
 
       public_deps = [ ":openthread_system" ]
 
@@ -122,87 +120,71 @@ if (silabs_board != "BRD4325B") {  # CCP board
     source_set("ot-efr32-cert") {
       if (enable_openthread_cli) {
         sources = [
-          "${sl_ot_efr32_root}/platform-abstraction/efr32/openthread-core-efr32-config-check.h",
-          "${sl_ot_efr32_root}/platform-abstraction/efr32/openthread-core-efr32-config.h",
-        ]
-
-        public_deps = [
-          ":libopenthread-platform",
-          "${efr32_sdk_build_root}:efr32_sdk",
-        ]
-
-        public_configs = [ ":openthread_efr32_config" ]
-      }
-
-      source_set("ot-efr32-cert") {
-        if (enable_openthread_cli) {
-          sources = [
-            "${sl_openthread_root}/examples/apps/cli/cli_uart.cpp",
-            "${sl_openthread_root}/src/cli/cli.cpp",
-            "${sl_openthread_root}/src/cli/cli.hpp",
-            "${sl_openthread_root}/src/cli/cli_coap.cpp",
-            "${sl_openthread_root}/src/cli/cli_coap.hpp",
-            "${sl_openthread_root}/src/cli/cli_coap_secure.cpp",
-            "${sl_openthread_root}/src/cli/cli_coap_secure.hpp",
-            "${sl_openthread_root}/src/cli/cli_commissioner.cpp",
-            "${sl_openthread_root}/src/cli/cli_commissioner.hpp",
-            "${sl_openthread_root}/src/cli/cli_config.h",
-            "${sl_openthread_root}/src/cli/cli_dataset.cpp",
-            "${sl_openthread_root}/src/cli/cli_dataset.hpp",
-            "${sl_openthread_root}/src/cli/cli_history.cpp",
-            "${sl_openthread_root}/src/cli/cli_history.hpp",
-            "${sl_openthread_root}/src/cli/cli_joiner.cpp",
-            "${sl_openthread_root}/src/cli/cli_joiner.hpp",
-            "${sl_openthread_root}/src/cli/cli_network_data.cpp",
-            "${sl_openthread_root}/src/cli/cli_network_data.hpp",
-            "${sl_openthread_root}/src/cli/cli_output.cpp",
-            "${sl_openthread_root}/src/cli/cli_output.hpp",
-            "${sl_openthread_root}/src/cli/cli_srp_client.cpp",
-            "${sl_openthread_root}/src/cli/cli_srp_client.hpp",
-            "${sl_openthread_root}/src/cli/cli_srp_server.cpp",
-            "${sl_openthread_root}/src/cli/cli_srp_server.hpp",
-            "${sl_openthread_root}/src/cli/cli_tcp.cpp",
-            "${sl_openthread_root}/src/cli/cli_tcp.hpp",
-            "${sl_openthread_root}/src/cli/cli_udp.cpp",
-            "${sl_openthread_root}/src/cli/cli_udp.hpp",
-            "${sl_openthread_root}/src/cli/x509_cert_key.hpp",
-          ]
-        }
-
-        public_configs = [
-          ":openthread_efr32_config",
-          ":libopenthread-platform_config",
-        ]
-
-        public_deps = [
-          ":libopenthread-platform",
-          ":openthread_core_config_efr32",
-          "${segger_rtt_root}:segger_rtt",
-          "${sl_openthread_root}/include/openthread:openthread",
-          "${sl_openthread_root}/src/core/:libopenthread_core_headers",
-        ]
-
-        deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
-
-        # selected thread device type FTD or MTD
-        XTD = "ftd"
-        if (!chip_openthread_ftd) {
-          XTD = "mtd"
-        }
-
-        # Use silabs openthread library stack with or without coap api enabled
-        COAP_API = ""
-        if (use_thread_coap_lib) {
-          COAP_API = "coap_"
-        }
-
-        public_configs += [ "${sl_openthread_root}:openthread_${XTD}_config" ]
-
-        libs = [
-          "${sl_ot_efr32_root}/libs/libsl_ot_stack_${XTD}_${COAP_API}${silabs_family}_gcc.a",
-          "${sl_ot_efr32_root}/libs/libsl_platform_${XTD}_dmp_${silabs_family}_gcc.a",
+          "${sl_openthread_root}/examples/apps/cli/cli_uart.cpp",
+          "${sl_openthread_root}/src/cli/cli.cpp",
+          "${sl_openthread_root}/src/cli/cli.hpp",
+          "${sl_openthread_root}/src/cli/cli_coap.cpp",
+          "${sl_openthread_root}/src/cli/cli_coap.hpp",
+          "${sl_openthread_root}/src/cli/cli_coap_secure.cpp",
+          "${sl_openthread_root}/src/cli/cli_coap_secure.hpp",
+          "${sl_openthread_root}/src/cli/cli_commissioner.cpp",
+          "${sl_openthread_root}/src/cli/cli_commissioner.hpp",
+          "${sl_openthread_root}/src/cli/cli_config.h",
+          "${sl_openthread_root}/src/cli/cli_dataset.cpp",
+          "${sl_openthread_root}/src/cli/cli_dataset.hpp",
+          "${sl_openthread_root}/src/cli/cli_history.cpp",
+          "${sl_openthread_root}/src/cli/cli_history.hpp",
+          "${sl_openthread_root}/src/cli/cli_joiner.cpp",
+          "${sl_openthread_root}/src/cli/cli_joiner.hpp",
+          "${sl_openthread_root}/src/cli/cli_network_data.cpp",
+          "${sl_openthread_root}/src/cli/cli_network_data.hpp",
+          "${sl_openthread_root}/src/cli/cli_output.cpp",
+          "${sl_openthread_root}/src/cli/cli_output.hpp",
+          "${sl_openthread_root}/src/cli/cli_srp_client.cpp",
+          "${sl_openthread_root}/src/cli/cli_srp_client.hpp",
+          "${sl_openthread_root}/src/cli/cli_srp_server.cpp",
+          "${sl_openthread_root}/src/cli/cli_srp_server.hpp",
+          "${sl_openthread_root}/src/cli/cli_tcp.cpp",
+          "${sl_openthread_root}/src/cli/cli_tcp.hpp",
+          "${sl_openthread_root}/src/cli/cli_udp.cpp",
+          "${sl_openthread_root}/src/cli/cli_udp.hpp",
+          "${sl_openthread_root}/src/cli/x509_cert_key.hpp",
         ]
       }
+
+      public_configs = [
+        ":openthread_efr32_config",
+        ":libopenthread-platform_config",
+      ]
+
+      public_deps = [
+        ":libopenthread-platform",
+        ":openthread_core_config_efr32",
+        "${segger_rtt_root}:segger_rtt",
+        "${sl_openthread_root}/include/openthread:openthread",
+        "${sl_openthread_root}/src/core/:libopenthread_core_headers",
+      ]
+
+      deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
+
+      # selected thread device type FTD or MTD
+      XTD = "ftd"
+      if (!chip_openthread_ftd) {
+        XTD = "mtd"
+      }
+
+      # Use silabs openthread library stack with or without coap api enabled
+      COAP_API = ""
+      if (use_thread_coap_lib) {
+        COAP_API = "coap_"
+      }
+
+      public_configs += [ "${sl_openthread_root}:openthread_${XTD}_config" ]
+
+      libs = [
+        "${sl_ot_libs_path}/libs/libsl_ot_stack_${XTD}_${COAP_API}${silabs_family}_gcc.a",
+        "${sl_ot_libs_path}/libs/libsl_platform_${XTD}_dmp_${silabs_family}_gcc.a",
+      ]
     }
   }
 }
