@@ -30,6 +30,8 @@
 // include the CHIPProjectConfig from config/standalone
 #include <CHIPProjectConfig.h>
 
+#define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 3
+
 // Allows app options (ports) to be configured on launch of app
 #define CHIP_DEVICE_ENABLE_PORT_PARAMS 1
 

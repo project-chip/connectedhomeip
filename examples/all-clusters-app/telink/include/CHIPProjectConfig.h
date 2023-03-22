@@ -37,3 +37,6 @@
  * Reduce packet buffer pool size to 8 (default 15) to reduce ram consumption
  */
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 8
+
+// All clusters app has 3 group endpoints.
+#define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 3

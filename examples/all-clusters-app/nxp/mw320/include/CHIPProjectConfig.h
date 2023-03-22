@@ -202,3 +202,6 @@
 #endif // BUILD_RELEASE
 
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 1
+
+// All clusters app has 3 group endpoints.
+#define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 3
