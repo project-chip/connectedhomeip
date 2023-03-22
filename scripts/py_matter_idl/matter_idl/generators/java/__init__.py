@@ -428,11 +428,22 @@ class JavaClassGenerator(__JavaCodeGenerator):
         Renders .java files required for java matter support
         """
 
+        clientClusters = [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT]
+
+        self.internal_render_one_output(
+            template_path="java/ClusterReadMapping.jinja",
+            output_file_name="java/chip/devicecontroller/ClusterReadMapping.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
         self.internal_render_one_output(
             template_path="java/ClusterWriteMapping.jinja",
             output_file_name="java/chip/devicecontroller/ClusterWriteMapping.java",
             vars={
                 'idl': self.idl,
-                'clientClusters': [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT],
+                'clientClusters': clientClusters,
             }
         )
