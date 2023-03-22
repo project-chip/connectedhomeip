@@ -43,7 +43,8 @@ declare_args() {
 
   silabs_log_enabled = true
 
-  # Argument to Disable IPv4 for wifi(rs911)
+  # Argument to enable IPv4 for wifi
+  # aligning to match chip_inet_config_enable_ipv4 default configuration
   chip_enable_wifi_ipv4 = false
 }
 

@@ -170,7 +170,7 @@ else
                 shift
                 ;;
             --chip_enable_wifi_ipv4)
-                optArgs+="chip_enable_wifi_ipv4=true "
+                ipArgs="chip_enable_wifi_ipv4=true chip_inet_config_enable_ipv4=true "
                 shift
                 ;;
             --additional_data_advertising)
@@ -234,6 +234,7 @@ else
     BUILD_DIR=$OUTDIR/$SILABS_BOARD
     echo BUILD_DIR="$BUILD_DIR"
     if [ "$USE_WIFI" == true ]; then
+        optArgs+="$ipArgs"
         gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
     else
         # OpenThread build
