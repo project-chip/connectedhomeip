@@ -70,12 +70,6 @@ public:
     using HueMoveMode  = chip::app::Clusters::ColorControl::HueMoveMode;
     using HueDirection = chip::app::Clusters::ColorControl::HueDirection;
 
-    enum ColorLoopDirection
-    {
-        DECREMENT_HUE = 0x00,
-        INCREMENT_HUE = 0x01,
-    };
-
     enum ColorMode
     {
         COLOR_MODE_HSV         = 0x00,
