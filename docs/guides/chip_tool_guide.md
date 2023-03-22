@@ -331,7 +331,8 @@ application implements the On/Off and Level Control clusters. This means that
 you can test it by toggling the bulb (using the `onoff` cluster commands) or by
 manipulating its brightness (using the `levelcontrol` cluster commands):
 
--   Use the following command pattern to toggle the OnOff attribute state (e.g. visualized by the LED state):
+-   Use the following command pattern to toggle the OnOff attribute state (e.g.
+    visualized by the LED state):
 
     ```
     $ ./chip-tool onoff toggle <node_id> <endpoint_id>
@@ -343,7 +344,8 @@ manipulating its brightness (using the `levelcontrol` cluster commands):
     -   _<endpoint_id\>_ is the ID of the endpoint with OnOff cluster
         implemented.
 
--   Use the following command pattern to change the value of the CurrentLevel attribute (e.g. visualized by the LED brightness):
+-   Use the following command pattern to change the value of the CurrentLevel
+    attribute (e.g. visualized by the LED brightness):
 
     ```
     $ ./chip-tool levelcontrol move-to-level <level> <transition_time> <option_mask> <option_override> <node_id> <endpoint_id>
