@@ -95,7 +95,7 @@ if [ "$#" == "0" ]; then
             Build wifi example with extension board wf200. (Default false)
         'import("//with_pw_rpc.gni")'
             Use to build the example with pigweed RPC
-        OTA_periodic_query_timeout
+        ota_periodic_query_timeout_sec
             Periodic query timeout variable for OTA in seconds
         rs91x_wpa3_only
             Support for WPA3 only mode on RS91x
@@ -234,10 +234,13 @@ else
     BUILD_DIR=$OUTDIR/$SILABS_BOARD
     echo BUILD_DIR="$BUILD_DIR"
     if [ "$USE_WIFI" == true ]; then
+        # wifi build
+        # NCP mode EFR32 + wifi module
         optArgs+="$ipArgs"
         gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
     else
-        # OpenThread build
+        # OpenThread/SoC build
+        #
         if [ "$USE_DOCKER" == true ]; then
             optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
         fi
