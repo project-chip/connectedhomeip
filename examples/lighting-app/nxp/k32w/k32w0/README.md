@@ -203,7 +203,6 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/nxp/k32w/k32w0
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ ninja -C out/debug
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ $NXP_K32W0_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
 
     -   with Secure element
@@ -231,8 +230,8 @@ running oscillator as a clock source. In this case one must set the use_fro_32k
 argument to 1.
 
 In case signing errors are encountered when running the "sign_images.sh" script
-install the recommanded packages (python version > 3, pip3, pycrypto,
-pycryptodome):
+(run automatically) install the recommanded packages
+(python version > 3, pip3, pycrypto, pycryptodome):
 
 ```
 user@ubuntu:~$ python3 --version
