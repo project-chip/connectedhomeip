@@ -33,6 +33,7 @@ def upfirst(s: str) -> str:
     """Make the first letter uppercase """
     return s[0].upper() + s[1:]
 
+
 def lowfirst_except_acronym(s: str) -> str:
     """Make the first letter lowercase assuming the string is already in
        CamelCase.
@@ -43,7 +44,7 @@ def lowfirst_except_acronym(s: str) -> str:
     """
     if len(s) >= 2:
         if s[1].isupper():
-           return s
+            return s
 
     return lowfirst(s)
 
