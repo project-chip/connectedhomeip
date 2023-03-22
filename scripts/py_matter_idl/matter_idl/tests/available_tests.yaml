@@ -14,14 +14,17 @@ java-jni:
     inputs/simple_attribute.matter:
         jni/MyClusterClient-ReadImpl.cpp: outputs/simple_attribute/jni/MyClusterClient-ReadImpl.cpp
         jni/MyClusterClient-InvokeSubscribeImpl.cpp: outputs/simple_attribute/jni/MyClusterClient-InvokeSubscribeImpl.cpp
+        jni/CHIPCallbackTypes.h: outputs/simple_attribute/jni/CHIPCallbackTypes.h
 
     inputs/global_struct_attribute.matter:
         jni/DemoClusterClient-ReadImpl.cpp: outputs/global_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp
         jni/DemoClusterClient-InvokeSubscribeImpl.cpp: outputs/global_struct_attribute/jni/DemoClusterClient-InvokeSubscribeImpl.cpp
+        jni/CHIPCallbackTypes.h: outputs/global_struct_attribute/jni/CHIPCallbackTypes.h
 
     inputs/cluster_struct_attribute.matter:
         jni/DemoClusterClient-ReadImpl.cpp: outputs/cluster_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp
         jni/DemoClusterClient-InvokeSubscribeImpl.cpp: outputs/cluster_struct_attribute/jni/DemoClusterClient-InvokeSubscribeImpl.cpp
+        jni/CHIPCallbackTypes.h: outputs/cluster_struct_attribute/jni/CHIPCallbackTypes.h
 
     inputs/several_clusters.matter:
         jni/FirstClient-ReadImpl.cpp: outputs/several_clusters/jni/FirstClient-ReadImpl.cpp
@@ -30,10 +33,12 @@ java-jni:
         jni/FirstClient-InvokeSubscribeImpl.cpp: outputs/several_clusters/jni/FirstClient-InvokeSubscribeImpl.cpp
         jni/SecondClient-InvokeSubscribeImpl.cpp: outputs/several_clusters/jni/SecondClient-InvokeSubscribeImpl.cpp
         jni/ThirdClient-InvokeSubscribeImpl.cpp: outputs/several_clusters/jni/ThirdClient-InvokeSubscribeImpl.cpp
+        jni/CHIPCallbackTypes.h: outputs/several_clusters/jni/CHIPCallbackTypes.h
 
     inputs/optional_argument.matter:
         jni/MyClusterClient-ReadImpl.cpp: outputs/optional_argument/jni/MyClusterClient-ReadImpl.cpp
         jni/MyClusterClient-InvokeSubscribeImpl.cpp: outputs/optional_argument/jni/MyClusterClient-InvokeSubscribeImpl.cpp
+        jni/CHIPCallbackTypes.h: outputs/optional_argument/jni/CHIPCallbackTypes.h
 
 java-class:
     inputs/several_clusters.matter:

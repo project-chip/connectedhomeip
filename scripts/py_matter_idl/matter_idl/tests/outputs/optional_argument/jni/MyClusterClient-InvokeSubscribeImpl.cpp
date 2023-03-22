@@ -1,4 +1,4 @@
-#include <controller/java/zap-generated/CHIPCallbackTypes.h>
+#include <jni/CHIPCallbackTypes.h>
 #include <controller/java/zap-generated/CHIPInvokeCallbacks.h>
 #include <controller/java/zap-generated/CHIPReadCallbacks.h>
 

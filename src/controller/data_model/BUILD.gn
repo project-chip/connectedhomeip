@@ -188,6 +188,7 @@ if (current_os == "android" || build_java_matter_controller) {
   source_set("java-jni-sources") {
     public_configs = [
       ":java-build-config",
+      ":java-jni-generate_config",
       "${chip_root}/src:includes",
     ]
 
