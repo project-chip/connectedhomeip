@@ -169,15 +169,6 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         status =
             GetDeviceInstanceInfoProvider()->GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
 
-        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
-        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            manufacturingYear       = 2020;
-            manufacturingMonth      = 1;
-            manufacturingDayOfMonth = 1;
-            status                  = CHIP_NO_ERROR;
-        }
-
         if (status == CHIP_NO_ERROR)
         {
             // Format is YYYYMMDD
@@ -193,13 +184,6 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         char partNumber[kMaxLen + 1] = { 0 };
         status                       = GetDeviceInstanceInfoProvider()->GetPartNumber(partNumber, sizeof(partNumber));
 
-        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
-        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            partNumber[0] = '\0';
-            status        = CHIP_NO_ERROR;
-        }
-
         status = EncodeStringOnSuccess(status, aEncoder, partNumber, kMaxLen);
         break;
     }
@@ -208,13 +192,6 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         constexpr size_t kMaxLen     = DeviceLayer::ConfigurationManager::kMaxProductURLLength;
         char productUrl[kMaxLen + 1] = { 0 };
         status                       = GetDeviceInstanceInfoProvider()->GetProductURL(productUrl, sizeof(productUrl));
-
-        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
-        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            productUrl[0] = '\0';
-            status        = CHIP_NO_ERROR;
-        }
 
         status = EncodeStringOnSuccess(status, aEncoder, productUrl, kMaxLen);
         break;
@@ -225,13 +202,6 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         char productLabel[kMaxLen + 1] = { 0 };
         status                         = GetDeviceInstanceInfoProvider()->GetProductLabel(productLabel, sizeof(productLabel));
 
-        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
-        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            productLabel[0] = '\0';
-            status          = CHIP_NO_ERROR;
-        }
-
         status = EncodeStringOnSuccess(status, aEncoder, productLabel, kMaxLen);
         break;
     }
@@ -241,13 +211,6 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         char serialNumberString[kMaxLen + 1] = { 0 };
         status = GetDeviceInstanceInfoProvider()->GetSerialNumber(serialNumberString, sizeof(serialNumberString));
 
-        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
-        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            serialNumberString[0] = '\0';
-            status                = CHIP_NO_ERROR;
-        }
-
         status = EncodeStringOnSuccess(status, aEncoder, serialNumberString, kMaxLen);
         break;
     }
@@ -256,13 +219,6 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         constexpr size_t kMaxLen   = DeviceLayer::ConfigurationManager::kMaxUniqueIDLength;
         char uniqueId[kMaxLen + 1] = { 0 };
         status                     = ConfigurationMgr().GetUniqueId(uniqueId, sizeof(uniqueId));
-
-        // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
-        if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            uniqueId[0] = '\0';
-            status      = CHIP_NO_ERROR;
-        }
 
         status = EncodeStringOnSuccess(status, aEncoder, uniqueId, kMaxLen);
         break;
