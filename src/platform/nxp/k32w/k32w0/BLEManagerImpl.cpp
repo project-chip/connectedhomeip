@@ -95,6 +95,8 @@ namespace {
 #define CHIP_BLE_KW_EVNT_INDICATION_FAILED 0x0100
 /** Maximal time of connection without activity */
 #define CHIP_BLE_KW_CONN_TIMEOUT 60000
+/** Maximum number of pending BLE events */
+#define CHIP_BLE_EVENT_QUEUE_MAX_ENTRIES  10
 
 #define LOOP_EV_BLE (0x08)
 
@@ -115,8 +117,8 @@ namespace {
 /* FreeRTOS sw timer */
 TimerHandle_t sbleAdvTimeoutTimer;
 
-/* Message list used to synchronize asynchronous messages from the KW BLE tasks */
-anchor_t blekw_msg_list;
+/* Queue used to synchronize asynchronous messages from the KW BLE tasks */
+QueueHandle_t sBleEventQueue;
 
 /* Used to manage asynchronous events from BLE Stack: e.g.: GAP setup finished */
 osaEventId_t event_msg;
@@ -171,7 +173,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrExit(Ble_ConfigureHostStackConfig() == TRUE, err = CHIP_ERROR_INCORRECT_STATE);
 
     /* Prepare callback input queue.*/
-    MSG_InitQueue(&blekw_msg_list);
+    sBleEventQueue = xQueueCreate(CHIP_BLE_EVENT_QUEUE_MAX_ENTRIES, sizeof(blekw_msg_t*));
+    VerifyOrExit(sBleEventQueue != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
     /* Create the connection timeout timer. */
     connectionTimeout =
@@ -1009,13 +1012,11 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
 
 void BLEManagerImpl::DoBleProcessing(void)
 {
-    if (MSG_Pending(&blekw_msg_list))
+    blekw_msg_t * msg = NULL;
+    BaseType_t eventReceived = xQueueReceive(sBleEventQueue, &msg, 0);
+
+    while ((eventReceived == pdTRUE) && msg)
     {
-        /* There is message from the BLE tasks to solve */
-        blekw_msg_t * msg = (blekw_msg_t *) MSG_DeQueue(&blekw_msg_list);
-
-        assert(msg != NULL);
-
         if (msg->type == BLE_KW_MSG_ERROR)
         {
             if (msg->data.u8 == BLE_KW_MSG_2M_UPGRADE_ERROR)
@@ -1068,7 +1069,8 @@ void BLEManagerImpl::DoBleProcessing(void)
         }
 
         /* Free the message from the queue */
-        MSG_Free(msg);
+       free(msg);
+       msg = NULL;
     }
 }
 
@@ -1460,12 +1462,11 @@ CHIP_ERROR BLEManagerImpl::blekw_msg_add_att_written(blekw_msg_type_t type, uint
     blekw_att_written_data_t * att_wr_data;
 
     /* Allocate a buffer with enough space to store the packet */
-    msg = (blekw_msg_t *) MSG_Alloc(sizeof(blekw_msg_t) + sizeof(blekw_att_written_data_t) + length);
+    msg = (blekw_msg_t *) malloc(sizeof(blekw_msg_t) + sizeof(blekw_att_written_data_t) + length);
 
     if (!msg)
     {
         return CHIP_ERROR_NO_MEMORY;
-        assert(0);
     }
 
     msg->type              = type;
@@ -1476,8 +1477,7 @@ CHIP_ERROR BLEManagerImpl::blekw_msg_add_att_written(blekw_msg_type_t type, uint
     att_wr_data->length    = length;
     FLib_MemCpy(att_wr_data->data, data, length);
 
-    /* Put message in the queue */
-    MSG_Queue(&blekw_msg_list, msg);
+    xQueueSend(sBleEventQueue, &msg, 0);
     otTaskletsSignalPending(NULL);
 
     return CHIP_NO_ERROR;
@@ -1489,12 +1489,11 @@ CHIP_ERROR BLEManagerImpl::blekw_msg_add_att_read(blekw_msg_type_t type, uint8_t
     blekw_att_read_data_t * att_rd_data;
 
     /* Allocate a buffer with enough space to store the packet */
-    msg = (blekw_msg_t *) MSG_Alloc(sizeof(blekw_msg_t) + sizeof(blekw_att_read_data_t));
+    msg = (blekw_msg_t *) malloc(sizeof(blekw_msg_t) + sizeof(blekw_att_read_data_t));
 
     if (!msg)
     {
         return CHIP_ERROR_NO_MEMORY;
-        assert(0);
     }
 
     msg->type              = type;
@@ -1503,8 +1502,7 @@ CHIP_ERROR BLEManagerImpl::blekw_msg_add_att_read(blekw_msg_type_t type, uint8_t
     att_rd_data->device_id = device_id;
     att_rd_data->handle    = handle;
 
-    /* Put message in the queue */
-    MSG_Queue(&blekw_msg_list, msg);
+    xQueueSend(sBleEventQueue, &msg, 0);
     otTaskletsSignalPending(NULL);
 
     return CHIP_NO_ERROR;
@@ -1515,7 +1513,7 @@ CHIP_ERROR BLEManagerImpl::blekw_msg_add_u8(blekw_msg_type_t type, uint8_t data)
     blekw_msg_t * msg = NULL;
 
     /* Allocate a buffer with enough space to store the packet */
-    msg = (blekw_msg_t *) MSG_Alloc(sizeof(blekw_msg_t));
+    msg = (blekw_msg_t *) malloc(sizeof(blekw_msg_t));
 
     if (!msg)
     {
@@ -1526,8 +1524,7 @@ CHIP_ERROR BLEManagerImpl::blekw_msg_add_u8(blekw_msg_type_t type, uint8_t data)
     msg->length  = 0;
     msg->data.u8 = data;
 
-    /* Put message in the queue */
-    MSG_Queue(&blekw_msg_list, msg);
+    xQueueSend(sBleEventQueue, &msg, 0);
     otTaskletsSignalPending(NULL);
 
     return CHIP_NO_ERROR;
@@ -1538,7 +1535,7 @@ CHIP_ERROR BLEManagerImpl::blekw_msg_add_u16(blekw_msg_type_t type, uint16_t dat
     blekw_msg_t * msg = NULL;
 
     /* Allocate a buffer with enough space to store the packet */
-    msg = (blekw_msg_t *) MSG_Alloc(sizeof(blekw_msg_t));
+    msg = (blekw_msg_t *) malloc(sizeof(blekw_msg_t));
 
     if (!msg)
     {
@@ -1549,8 +1546,7 @@ CHIP_ERROR BLEManagerImpl::blekw_msg_add_u16(blekw_msg_type_t type, uint16_t dat
     msg->length   = 0;
     msg->data.u16 = data;
 
-    /* Put message in the queue */
-    MSG_Queue(&blekw_msg_list, msg);
+    xQueueSend(sBleEventQueue, &msg, 0);
     otTaskletsSignalPending(NULL);
 
     return CHIP_NO_ERROR;
