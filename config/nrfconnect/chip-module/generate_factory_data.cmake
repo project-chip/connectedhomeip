@@ -88,12 +88,7 @@ string(APPEND script_args "--include_passcode\n")
 string(APPEND script_args "--overwrite\n")
 
 # check if spake2 verifier should be generated using script
-if(CONFIG_CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER)
-    # request script to generate a new spake2_verifier
-    # by adding an argument to script_args
-    find_program(spake_exe NAMES spake2p REQUIRED)
-    string(APPEND script_args "--spake2p_path ${spake_exe}\n")   
-else()
+if(NOT CONFIG_CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER)
     # Spake2 verifier should be provided using kConfig
     string(APPEND script_args "--spake2_verifier \"${CONFIG_CHIP_DEVICE_SPAKE2_TEST_VERIFIER}\"\n")
 endif()
