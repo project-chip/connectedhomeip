@@ -799,10 +799,10 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeThermostatInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeThermostatHVACSystemTypeConfigurationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo thermostathVACSystemTypeConfigurationCommandParameterInfo =
+    CommandParameterInfo thermostatHVACSystemTypeConfigurationCommandParameterInfo =
         new CommandParameterInfo("value", Integer.class, Integer.class);
     writeThermostatHVACSystemTypeConfigurationCommandParams.put(
-        "value", thermostathVACSystemTypeConfigurationCommandParameterInfo);
+        "value", thermostatHVACSystemTypeConfigurationCommandParameterInfo);
     InteractionInfo writeThermostatHVACSystemTypeConfigurationAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
@@ -1156,9 +1156,9 @@ public class ClusterWriteMapping {
         writeThermostatEmergencyHeatDeltaAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeThermostatACTypeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo thermostataCTypeCommandParameterInfo =
+    CommandParameterInfo thermostatACTypeCommandParameterInfo =
         new CommandParameterInfo("value", Integer.class, Integer.class);
-    writeThermostatACTypeCommandParams.put("value", thermostataCTypeCommandParameterInfo);
+    writeThermostatACTypeCommandParams.put("value", thermostatACTypeCommandParameterInfo);
     InteractionInfo writeThermostatACTypeAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
@@ -1172,9 +1172,9 @@ public class ClusterWriteMapping {
         "writeACTypeAttribute", writeThermostatACTypeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeThermostatACCapacityCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo thermostataCCapacityCommandParameterInfo =
+    CommandParameterInfo thermostatACCapacityCommandParameterInfo =
         new CommandParameterInfo("value", Integer.class, Integer.class);
-    writeThermostatACCapacityCommandParams.put("value", thermostataCCapacityCommandParameterInfo);
+    writeThermostatACCapacityCommandParams.put("value", thermostatACCapacityCommandParameterInfo);
     InteractionInfo writeThermostatACCapacityAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
@@ -1188,10 +1188,10 @@ public class ClusterWriteMapping {
         "writeACCapacityAttribute", writeThermostatACCapacityAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeThermostatACRefrigerantTypeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo thermostataCRefrigerantTypeCommandParameterInfo =
+    CommandParameterInfo thermostatACRefrigerantTypeCommandParameterInfo =
         new CommandParameterInfo("value", Integer.class, Integer.class);
     writeThermostatACRefrigerantTypeCommandParams.put(
-        "value", thermostataCRefrigerantTypeCommandParameterInfo);
+        "value", thermostatACRefrigerantTypeCommandParameterInfo);
     InteractionInfo writeThermostatACRefrigerantTypeAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
@@ -1206,10 +1206,10 @@ public class ClusterWriteMapping {
         writeThermostatACRefrigerantTypeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeThermostatACCompressorTypeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo thermostataCCompressorTypeCommandParameterInfo =
+    CommandParameterInfo thermostatACCompressorTypeCommandParameterInfo =
         new CommandParameterInfo("value", Integer.class, Integer.class);
     writeThermostatACCompressorTypeCommandParams.put(
-        "value", thermostataCCompressorTypeCommandParameterInfo);
+        "value", thermostatACCompressorTypeCommandParameterInfo);
     InteractionInfo writeThermostatACCompressorTypeAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
@@ -1223,9 +1223,9 @@ public class ClusterWriteMapping {
         "writeACCompressorTypeAttribute", writeThermostatACCompressorTypeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeThermostatACErrorCodeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo thermostataCErrorCodeCommandParameterInfo =
+    CommandParameterInfo thermostatACErrorCodeCommandParameterInfo =
         new CommandParameterInfo("value", Long.class, Long.class);
-    writeThermostatACErrorCodeCommandParams.put("value", thermostataCErrorCodeCommandParameterInfo);
+    writeThermostatACErrorCodeCommandParams.put("value", thermostatACErrorCodeCommandParameterInfo);
     InteractionInfo writeThermostatACErrorCodeAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
@@ -1239,10 +1239,10 @@ public class ClusterWriteMapping {
         "writeACErrorCodeAttribute", writeThermostatACErrorCodeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeThermostatACLouverPositionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo thermostataCLouverPositionCommandParameterInfo =
+    CommandParameterInfo thermostatACLouverPositionCommandParameterInfo =
         new CommandParameterInfo("value", Integer.class, Integer.class);
     writeThermostatACLouverPositionCommandParams.put(
-        "value", thermostataCLouverPositionCommandParameterInfo);
+        "value", thermostatACLouverPositionCommandParameterInfo);
     InteractionInfo writeThermostatACLouverPositionAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
@@ -1256,10 +1256,10 @@ public class ClusterWriteMapping {
         "writeACLouverPositionAttribute", writeThermostatACLouverPositionAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeThermostatACCapacityformatCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo thermostataCCapacityformatCommandParameterInfo =
+    CommandParameterInfo thermostatACCapacityformatCommandParameterInfo =
         new CommandParameterInfo("value", Integer.class, Integer.class);
     writeThermostatACCapacityformatCommandParams.put(
-        "value", thermostataCCapacityformatCommandParameterInfo);
+        "value", thermostatACCapacityformatCommandParameterInfo);
     InteractionInfo writeThermostatACCapacityformatAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {

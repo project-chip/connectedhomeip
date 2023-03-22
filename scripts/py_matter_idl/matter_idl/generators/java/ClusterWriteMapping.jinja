@@ -19,7 +19,7 @@ public class ClusterWriteMapping {
         {% if not attribute.definition.is_list and attribute.is_writable %}
     Map<String, CommandParameterInfo> write{{cluster.name}}{{attribute.definition.name | upfirst}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         {%-  set encodable = attribute.definition | asEncodable(typeLookup) %}
-    CommandParameterInfo {{cluster.name | lowfirst}}{{attribute.definition.name | lowfirst}}CommandParameterInfo =
+    CommandParameterInfo {{cluster.name | lowfirst_except_acronym}}{{attribute.definition.name | lowfirst_except_acronym}}CommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             {{ encodable.boxed_java_type }}.class, {# {{asJavaType type null parent.parent.name removeGenericType=true}}.class, #}
@@ -27,7 +27,7 @@ public class ClusterWriteMapping {
         );
     write{{cluster.name}}{{attribute.definition.name | upfirst}}CommandParams.put(
         "value",
-        {{cluster.name | lowfirst}}{{attribute.definition.name | lowfirst}}CommandParameterInfo
+        {{cluster.name | lowfirst_except_acronym}}{{attribute.definition.name | lowfirst_except_acronym}}CommandParameterInfo
     );
     InteractionInfo write{{cluster.name}}{{attribute.definition.name | upfirst}}AttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
@@ -43,7 +43,7 @@ public class ClusterWriteMapping {
     write{{cluster.name}}InteractionInfo.put("write{{attribute.definition.name | upfirst}}Attribute", write{{cluster.name}}{{attribute.definition.name | upfirst}}AttributeInteractionInfo);
         {%- endif %}
       {%- endfor %}
-    writeAttributeMap.put("{{cluster.name | lowfirst}}", write{{cluster.name}}InteractionInfo);
+    writeAttributeMap.put("{{cluster.name | lowfirst_except_acronym}}", write{{cluster.name}}InteractionInfo);
     {%-  endfor -%}
 
     return writeAttributeMap;

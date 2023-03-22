@@ -33,6 +33,20 @@ def upfirst(s: str) -> str:
     """Make the first letter uppercase """
     return s[0].upper() + s[1:]
 
+def lowfirst_except_acronym(s: str) -> str:
+    """Make the first letter lowercase assuming the string is already in
+       CamelCase.
+
+       Differs from lowfirst because it checks the string for starting with
+       several uppercase, which is the case for acronyms (HVAC, ACL, WIFI),
+       in which case it will NOT lowercase first
+    """
+    if len(s) >= 2:
+        if s[1].isupper():
+           return s
+
+    return lowfirst(s)
+
 
 def RegisterCommonFilters(filtermap):
     """
@@ -53,4 +67,5 @@ def RegisterCommonFilters(filtermap):
 
     filtermap['normalize_acronyms'] = normalize_acronyms
     filtermap['lowfirst'] = lowfirst
+    filtermap['lowfirst_except_acronym'] = lowfirst_except_acronym
     filtermap['upfirst'] = upfirst
