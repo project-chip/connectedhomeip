@@ -353,6 +353,7 @@ public:
                 {
                     err = CHIP_NO_ERROR;
                 }
+                break;
             case kColorControlClusterId:
                 if (!memcmp(serialisedBytes.data(), CC_buffer, serialisedBytes.size()))
                 {
@@ -661,7 +662,6 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
     SceneTableEntry scene;
     // Set test
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene1));
-    LogErrorOnFailure(sceneTable->SetSceneTableEntry(kFabric1, scene2));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene2));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene3));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene4));
