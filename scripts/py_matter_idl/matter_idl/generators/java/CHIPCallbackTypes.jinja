@@ -29,10 +29,11 @@ typedef void (*CHIP{{cluster.name}}Cluster{{response.name}}CallbackType)(void *,
 
   {#- TODO: global response types? -#}
   {%- for attribute in cluster.attributes | sort(attribute='name') %}
-    {%- if attribute.definition.is_list %}
-typedef void (*CHIP{{cluster.name}}Cluster{{attribute.definition.name | upfirst}}AttributeCallbackType)(void *, const chip::app::Clusters::{{cluster.name}}::Attributes::{{attribute.definition.name | upfirst}}::TypeInfo::DecodableType &);
-    {%- else %}
-typedef void (*CHIP{{cluster.name}}Cluster{{attribute.definition.name | upfirst}}AttributeCallbackType)(void *, chip::app::Clusters::{{cluster.name}}::Attributes::{{attribute.definition.name | upfirst}}::TypeInfo::DecodableArgType);
+typedef void (*CHIP{{cluster.name}}Cluster{{attribute.definition.name | upfirst}}AttributeCallbackType)(void *, {##}
+    {%- if attribute.definition.is_list -%}
+       const chip::app::Clusters::{{cluster.name}}::Attributes::{{attribute.definition.name | upfirst}}::TypeInfo::DecodableType &);
+    {%- else -%}
+       chip::app::Clusters::{{cluster.name}}::Attributes::{{attribute.definition.name | upfirst}}::TypeInfo::DecodableArgType);
     {%- endif -%}
   {%- endfor -%}
 {% endfor %}
