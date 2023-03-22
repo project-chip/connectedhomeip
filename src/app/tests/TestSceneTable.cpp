@@ -916,8 +916,9 @@ void TestFabricScenes(nlTestSuite * aSuite, void * aContext)
 
 } // namespace TestScenes
 
+namespace {
 /**
- *  Tear down the test suite.
+ *  Setup the test suite.
  */
 int TestSetup(void * inContext)
 {
@@ -939,6 +940,7 @@ int TestTeardown(void * inContext)
 
     return SUCCESS;
 }
+} // namespace
 
 int TestSceneTable()
 {

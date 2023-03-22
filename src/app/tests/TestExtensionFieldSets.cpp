@@ -315,8 +315,9 @@ int TestSetup(void * inContext)
     return SUCCESS;
 }
 
+namespace {
 /**
- *  Tear down the test suite.
+ *  Setup the test suite.
  */
 int TestTeardown(void * inContext)
 {
@@ -324,6 +325,7 @@ int TestTeardown(void * inContext)
 
     return SUCCESS;
 }
+} // namespace
 
 int TestExtensionFieldSets()
 {
