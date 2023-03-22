@@ -28,33 +28,21 @@ public class ClusterReadMapping {
 
     {%- for cluster in clientClusters | sort(attribute='code') %}
       {%-  set typeLookup = idl | createLookupContext(cluster) %}
-        Map<String, InteractionInfo> read{{cluster.name | lowfirst_except_acronym}}InteractionInfo = new LinkedHashMap<>();
-{#
-        {{#chip_server_cluster_attributes}}
-        {{! TODO: Add support for struct-typed attributes }}
-        {{#unless (isStrEqual chipCallback.name "Unsupported")}}
-        Map<String, CommandParameterInfo> read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo = new InteractionInfo(
+        Map<String, InteractionInfo> read{{cluster.name}}InteractionInfo = new LinkedHashMap<>();
+      {%- for attribute in cluster.attributes | sort(attribute='name') | attributesWithCallback(typeLookup) %}
+        {#- TODO: add support for struct-typed attributes -#}
+        Map<String, CommandParameterInfo> read{{cluster.name}}{{attribute.definition.name | upfirst}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo read{{cluster.name}}{{attribute.definition.name | upfirst}}AttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster).read{{asUpperCamelCase name}}Attribute(
-              ({{#if_basic_global_response}}
-                ChipClusters.{{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback
-              {{else}}
-                ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}AttributeCallback
-              {{/if_basic_global_response}}) callback
+            ((ChipClusters.{{cluster.name}}Cluster) cluster).read{{attribute.definition.name | upfirst}}Attribute(
+              ({{ attribute | chipClustersCallbackName(typeLookup) }}) callback
             );
           },
-          {{#if_basic_global_response}}
-            () -> new ClusterInfoMapping.Delegated{{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback(),
-          {{else}}
-            () -> new ClusterInfoMapping.Delegated{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback(),
-          {{/if_basic_global_response}}
-          read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams
+          () -> new ClusterInfoMapping.{{ attribute | delegatedCallbackName(typeLookup)}}(),
+          read{{cluster.name}}{{attribute.definition.name | upfirst}}CommandParams
         );
-        read{{asUpperCamelCase ../name}}InteractionInfo.put("read{{asUpperCamelCase name}}Attribute", read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo);
-        {{/unless}}
-        {{/chip_server_cluster_attributes}}
-#} 
+        read{{cluster.name}}InteractionInfo.put("read{{attribute.definition.name | upfirst}}Attribute", read{{cluster.name}}{{attribute.definition.name | upfirst}}AttributeInteractionInfo);
+      {%- endfor %}
         readAttributeMap.put("{{cluster.name | lowfirst_except_acronym}}", read{{cluster.name}}InteractionInfo);
     {%- endfor -%}
         return readAttributeMap;

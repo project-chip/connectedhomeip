@@ -50,7 +50,8 @@ def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, No
             return 'CharString'
     elif type(actual) == BasicInteger:
         # TODO: unclear why this, but tries to match zap:
-        if actual.idl_name.lower() in ['vendor_id', 'fabric_idx']:
+        #       once java fully moves to jinja, these can probably be removed
+        if actual.idl_name.lower() in {'vendor_id', 'fabric_idx', 'group_id'}:
             return None
 
         if actual.is_signed:
@@ -70,7 +71,54 @@ def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, No
     return None
 
 
-def CallbackName(attr: Attribute, cluster: Cluster, context: TypeLookupContext) -> str:
+def GlobalNameToJavaName(name: str) -> str:
+    if name in {'Int8u', 'Int8s', 'Int16u', 'Int16s'}:
+        return 'Integer'
+
+    if name.startswith('Int'):
+        return 'Long'
+
+    # Double/Float/Booleans/CharString/OctetString
+    return name
+
+
+def DelegatedCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
+    """
+    Figure out what callback name to use when a variable requires a read callback.
+
+    These are split into native types, like Boolean/Float/Double/CharString, where
+    one callback type can support anything.
+
+    For specific types (e.g. A struct) codegen will generate its own callback name
+    specific to that type.
+    """
+    global_name = FieldToGlobalName(attr.definition, context)
+
+    if global_name:
+        return 'Delegated{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
+
+    return 'Delegated{}Cluster{}AttributeCallback'.format(context.cluster.name, capitalcase(attr.definition.name))
+
+
+def ChipClustersCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
+    """
+    Figure out what callback name to use when a variable requires a read callback.
+
+    These are split into native types, like Boolean/Float/Double/CharString, where
+    one callback type can support anything.
+
+    For specific types (e.g. A struct) codegen will generate its own callback name
+    specific to that type.
+    """
+    global_name = FieldToGlobalName(attr.definition, context)
+
+    if global_name:
+        return 'ChipClusters.{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
+
+    return 'ChipClusters.{}Cluster.{}AttributeCallback'.format(context.cluster.name, capitalcase(attr.definition.name))
+
+
+def CallbackName(attr: Attribute, context: TypeLookupContext) -> str:
     """
     Figure out what callback name to use when a variable requires a read callback.
 
@@ -86,7 +134,7 @@ def CallbackName(attr: Attribute, cluster: Cluster, context: TypeLookupContext) 
         return 'CHIP{}AttributeCallback'.format(capitalcase(global_name))
 
     return 'CHIP{}{}AttributeCallback'.format(
-        capitalcase(cluster.name),
+        capitalcase(context.cluster.name),
         capitalcase(attr.definition.name)
     )
 
@@ -372,6 +420,8 @@ class __JavaCodeGenerator(CodeGenerator):
 
         self.jinja_env.filters['attributesWithCallback'] = attributesWithSupportedCallback
         self.jinja_env.filters['callbackName'] = CallbackName
+        self.jinja_env.filters['chipClustersCallbackName'] = ChipClustersCallbackName
+        self.jinja_env.filters['delegatedCallbackName'] = DelegatedCallbackName
         self.jinja_env.filters['commandCallbackName'] = CommandCallbackName
         self.jinja_env.filters['named'] = NamedFilter
         self.jinja_env.filters['toBoxedJavaType'] = ToBoxedJavaType

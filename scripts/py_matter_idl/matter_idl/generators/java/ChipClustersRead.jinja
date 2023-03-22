@@ -31,7 +31,7 @@ JNI_METHOD(void, {{cluster.name | capitalcase}}Cluster, read{{attr.definition.na
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::{{cluster.name | capitalcase}}::Attributes::{{attr.definition.name | capitalcase}}::TypeInfo;
-    {%- set callbackName = attr | callbackName(cluster, typeLookup) %}
+    {%- set callbackName = attr | callbackName(typeLookup) %}
     std::unique_ptr<{{callbackName}}, void (*)({{callbackName}} *)> onSuccess(chip::Platform::New<{{callbackName}}>(callback, false), chip::Platform::Delete<{{callbackName}}>);
     VerifyOrReturn(onSuccess.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
 
