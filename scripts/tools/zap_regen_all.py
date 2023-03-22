@@ -229,7 +229,6 @@ class JinjaCodegenTarget():
             JAR_NAME = f"google-java-format-{FORMAT_VERSION}-all-deps.jar"
             jar_url = f"{URL_PREFIX}-{FORMAT_VERSION}/{JAR_NAME}"
 
-            home = str(Path.home())
             path, http_message = urllib.request.urlretrieve(jar_url, Path.home().joinpath(JAR_NAME).as_posix())
 
             subprocess.check_call(['java', '-jar', path, '--replace'] + java_outputs)
