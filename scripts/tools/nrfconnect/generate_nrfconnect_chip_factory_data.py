@@ -171,7 +171,7 @@ def gen_test_certs(chip_cert_exe: str,
 
     # convert to .der files
     for cert_k, cert_v in new_certificates.items():
-        action_type = "convert-cert" if cert_k.find("CERT") is not -1 else "convert-key"
+        action_type = "convert-cert" if cert_k.find("CERT") != -1 else "convert-key"
         log.info(cert_v + ".der")
         cmd = [chip_cert_exe, action_type,
                cert_v + ".pem",
