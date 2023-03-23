@@ -54,7 +54,8 @@ Ninja to build the executable.
     $ cd ~/connectedhomeip/examples/shell/cc13x2x7_26x2x7
     OR
     $ cd ~/connectedhomeip/examples/shell/cc13x4_26x4
-    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15"
+
+    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15.0\""
     $ ninja -C out/debug
 
     ```

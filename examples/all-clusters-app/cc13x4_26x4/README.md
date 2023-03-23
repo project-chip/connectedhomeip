@@ -105,7 +105,7 @@ Ninja to build the executable.
     $ cd ~/connectedhomeip/examples/all-clusters-app/cc13x2x7_26x2x7
     OR
     $ cd ~/connectedhomeip/examples/all-clusters-minimal-app/cc13x4_26x4
-    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15"
+    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15.0\""
     $ ninja -C out/debug
 
     ```
@@ -171,6 +171,9 @@ the session.
 Select the ELF image to load on the device with the `Browse` button. This file
 is placed in the `out/debug` folder by this guide and ends with the `*.out` file
 extension.
+For OTA enabled applications, the standalone image will instead end with the
+`*-bim.hex` file extension. This this is a combined image with application and
+and BIM included.
 
 Finally click the `Load Image` button to load the executable image onto the
 device. You should be able to see the log output over the XDS110 User UART.
