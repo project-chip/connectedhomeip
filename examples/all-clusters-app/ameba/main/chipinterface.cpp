@@ -172,9 +172,7 @@ extern "C" void ChipTest(void)
 
     // Set DeviceInstanceInfoProvider after CHIPDeviceManager init
     // CHIPDeviceManager init will set GenericDeviceInsanceInfoProvider first
-#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
     SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
-#endif
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, 0);
 

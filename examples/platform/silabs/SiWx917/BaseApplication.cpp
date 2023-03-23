@@ -201,7 +201,8 @@ CHIP_ERROR BaseApplication::Init(Identify * identifyObj)
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
-    SILABS_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+    SILABS_LOG("Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+    SILABS_LOG("Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
 
 #ifdef ENABLE_WSTK_LEDS
     sStatusLED.Init(APP_STATE_LED);

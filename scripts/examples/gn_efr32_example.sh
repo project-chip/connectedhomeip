@@ -83,10 +83,6 @@ if [ "$#" == "0" ]; then
         enable_sleepy_device
             Enable Sleepy end device. (Default false)
             Must also set chip_openthread_ftd=false
-        sl_matter_version_str
-            Set a Matter sotfware version string for the Silabs examples
-            Used and formatted by default in this script.
-            To skip that formatting or use your own version string use --no-version
         use_rs9116
             Build wifi example with extension board rs9116. (Default false)
         use_SiWx917
@@ -99,6 +95,13 @@ if [ "$#" == "0" ]; then
             Periodic query timeout variable for OTA in seconds
         rs91x_wpa3_only
             Support for WPA3 only mode on RS91x
+        sl_matter_version
+            Use provided software version at build time
+        sl_matter_version_str
+            Set a Matter sotfware version string for the Silabs examples
+            Used and formatted by default in this script.
+        sl_hardware_version
+            Use provided hardware version at build time
         siwx917_commissionable_data
             Build with the commissionable data given in DeviceConfig.h (only for SiWx917)
         Presets
@@ -116,9 +119,6 @@ if [ "$#" == "0" ]; then
             use the silabs openthread library
         --use_chip_lwip_lib
             use the chip lwip library
-        --no-version
-            Skip the silabs formating for the Matter software version string
-            Currently : v1.0-<branchName>-<ShortCommitSha>
         --release
             Remove all logs and debugs features (including the LCD). Yield the smallest image size possible
         --docker
@@ -194,10 +194,6 @@ else
             #   optArgs+="openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/openthread\" openthread_efr32_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/src/src\""
             #    shift
             #    ;;
-            --no-version)
-                USE_GIT_SHA_FOR_VERSION=false
-                shift
-                ;;
             --release)
                 optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
                 shift
@@ -207,6 +203,13 @@ else
                 USE_DOCKER=true
                 shift
                 ;;
+
+            *"sl_matter_version_str="*)
+                optArgs+="$1 "
+                USE_GIT_SHA_FOR_VERSION=false
+                shift
+                ;;
+
             *)
                 if [ "$1" =~ *"use_rs9116=true"* ] || [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true
