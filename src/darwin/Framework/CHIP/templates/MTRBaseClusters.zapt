@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
                 command=(asUpperCamelCase name preserveAcronyms=true)}}
 {{/chip_cluster_commands}}
 
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server removeKeys='isOptional'}}
 {{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (void)read{{>attribute}}With
@@ -62,7 +62,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 + (void) read{{>attribute}}WithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completion {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
 {{/if}}
 {{/unless}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -203,7 +203,7 @@ typedef NS_OPTIONS({{asUnderlyingZclType name}}, {{objCEnumName clusterName bitm
                 command=(compatCommandNameRemapping parent.name name)}}
 {{/chip_cluster_commands}}
 
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server removeKeys='isOptional'}}
 {{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
            (not (wasRemoved (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))))}}
 {{#*inline "attribute"}}Attribute{{compatAttributeNameRemapping parent.name name}}{{/inline}}
@@ -225,7 +225,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 + (void) read{{>attribute}}WithAttributeCache:(MTRAttributeCacheContainer *)attributeCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completionHandler:(void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))completionHandler {{availability (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name) deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use readAttribute" (asUpperCamelCase name preserveAcronyms=true) "WithAttributeCache:endpoint:queue:completion:")}};
 {{/if}}
 {{/if}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 
 @end
 

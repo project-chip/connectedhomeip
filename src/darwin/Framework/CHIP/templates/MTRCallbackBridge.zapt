@@ -32,7 +32,7 @@ typedef void (*Nullable{{asUpperCamelCase parent.name preserveAcronyms=true}}Clu
 {{/zcl_clusters}}
 
 {{#chip_client_clusters includeAll=true}}
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server removeKeys='isOptional'}}
 {{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
 {{#if isArray}}
 typedef void (*{{asUpperCamelCase parent.name preserveAcronyms=true}}{{asUpperCamelCase name preserveAcronyms=true}}ListAttributeCallback)(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} data);
@@ -45,7 +45,7 @@ typedef void (*{{asUpperCamelCase parent.name preserveAcronyms=true}}{{asUpperCa
 {{/if_is_strongly_typed_bitmap}}
 {{/if}}
 {{/unless}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 {{/chip_client_clusters}}
 
 {{#>MTRCallbackBridge header="1" partial-type="Status"                         }}DefaultSuccessCallback{{/MTRCallbackBridge}}
@@ -80,7 +80,7 @@ typedef void (*{{asUpperCamelCase parent.name preserveAcronyms=true}}{{asUpperCa
 {{#>MTRCallbackBridge header="1" type="vendor_id"    isNullable=true  ns="chip"}}NullableVendorIdAttributeCallback{{/MTRCallbackBridge}}
 
 {{#chip_client_clusters includeAll=true}}
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server removeKeys='isOptional'}}
 {{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
 {{#if isArray}}
 {{#>MTRCallbackBridge header="1" ns=parent.name                                }}{{asUpperCamelCase ../../name preserveAcronyms=true}}{{asUpperCamelCase ../name preserveAcronyms=true}}ListAttributeCallback{{/MTRCallbackBridge}}
@@ -93,7 +93,7 @@ typedef void (*{{asUpperCamelCase parent.name preserveAcronyms=true}}{{asUpperCa
   {{/if_is_strongly_typed_bitmap}}
 {{/if}}
 {{/unless}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 {{/chip_client_clusters}}
 
 {{#chip_client_clusters includeAll=true}}

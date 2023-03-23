@@ -1186,14 +1186,14 @@ void DeviceCommissioner::ExtendArmFailSafeForDeviceAttestation(const Credentials
 
     mAttestationDeviceInfo = Platform::MakeUnique<Credentials::DeviceAttestationVerifier::AttestationDeviceInfo>(info);
 
-    auto expiryLengthSeconds = deviceAttestationDelegate->FailSafeExpiryTimeoutSecs();
-    bool failSafeSkipped     = expiryLengthSeconds.HasValue();
-    if (failSafeSkipped)
+    auto expiryLengthSeconds      = deviceAttestationDelegate->FailSafeExpiryTimeoutSecs();
+    bool waitForFailsafeExtension = expiryLengthSeconds.HasValue();
+    if (waitForFailsafeExtension)
     {
         ChipLogProgress(Controller, "Changing fail-safe timer to %u seconds to handle DA failure", expiryLengthSeconds.Value());
         // Per spec, anything we do with the fail-safe armed must not time out
         // in less than kMinimumCommissioningStepTimeout.
-        failSafeSkipped =
+        waitForFailsafeExtension =
             ExtendArmFailSafe(mDeviceBeingCommissioned, mCommissioningStage, expiryLengthSeconds.Value(),
                               MakeOptional(kMinimumCommissioningStepTimeout), OnArmFailSafeExtendedForDeviceAttestation,
                               OnFailedToExtendedArmFailSafeDeviceAttestation);
@@ -1203,7 +1203,7 @@ void DeviceCommissioner::ExtendArmFailSafeForDeviceAttestation(const Credentials
         ChipLogProgress(Controller, "Proceeding without changing fail-safe timer value as delegate has not set it");
     }
 
-    if (failSafeSkipped)
+    if (!waitForFailsafeExtension)
     {
         // Callee does not use data argument.
         const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType data;

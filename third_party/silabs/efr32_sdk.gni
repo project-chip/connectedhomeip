@@ -20,7 +20,11 @@ import("//build_overrides/mbedtls.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("silabs_board.gni")
 
-wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
+if (use_rs9116) {
+  wifi_sapi_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
+} else {
+  wifi_sapi_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
+}
 
 declare_args() {
   # Location of the efr32 SDK.
@@ -47,7 +51,8 @@ declare_args() {
   # Enable Sleepy end device
   enable_sleepy_device = false
 
-  # Argument to Disable IPv4 for wifi(rs911)
+  # Argument to enable IPv4 for wifi
+  # aligning to match chip_inet_config_enable_ipv4 default configuration
   chip_enable_wifi_ipv4 = false
 }
 
@@ -162,9 +167,7 @@ template("efr32_sdk") {
     }
 
     if (chip_enable_ble_rs911x) {
-      _include_dirs += [
-        "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk/sapi/include",
-      ]
+      _include_dirs += [ "${wifi_sapi_root}/sapi/include" ]
     }
 
     # Note that we're setting the mbedTLS and PSA configuration files through a
@@ -247,7 +250,7 @@ template("efr32_sdk") {
         import("${chip_root}/src/platform/silabs/efr32/wifi_args.gni")
 
         defines += [ "LWIP_NETIF_API=1" ]
-        if (lwip_ipv4) {
+        if (chip_enable_wifi_ipv4) {
           defines += [
             "LWIP_IPV4=1",
 
@@ -688,10 +691,10 @@ template("efr32_sdk") {
 
     if (chip_enable_ble_rs911x) {
       sources += [
-        "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
-        "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
-        "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
-        "${wiseconnect_sdk_root}/sapi/driver/rsi_bt_ble.c",
+        "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
+        "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
+        "${wifi_sapi_root}/sapi/bluetooth/rsi_bt_common_apis.c",
+        "${wifi_sapi_root}/sapi/driver/rsi_bt_ble.c",
       ]
     } else {
       sources += [

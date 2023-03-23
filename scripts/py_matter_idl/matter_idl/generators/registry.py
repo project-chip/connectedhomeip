@@ -17,7 +17,7 @@ import importlib
 
 from matter_idl.generators.bridge import BridgeGenerator
 from matter_idl.generators.cpp.application import CppApplicationGenerator
-from matter_idl.generators.java import JavaGenerator
+from matter_idl.generators.java import JavaClassGenerator, JavaJNIGenerator
 
 
 class CodeGenerator(enum.Enum):
@@ -26,14 +26,17 @@ class CodeGenerator(enum.Enum):
     the simple enum value (user friendly and can be a command line input)
     into underlying generators.
     """
-    JAVA = enum.auto()
+    JAVA_JNI = enum.auto()
+    JAVA_CLASS = enum.auto()
     BRIDGE = enum.auto()
     CPP_APPLICATION = enum.auto()
     CUSTOM = enum.auto()
 
     def Create(self, *args, **kargs):
-        if self == CodeGenerator.JAVA:
-            return JavaGenerator(*args, **kargs)
+        if self == CodeGenerator.JAVA_JNI:
+            return JavaJNIGenerator(*args, **kargs)
+        elif self == CodeGenerator.JAVA_CLASS:
+            return JavaClassGenerator(*args, **kargs)
         elif self == CodeGenerator.BRIDGE:
             return BridgeGenerator(*args, **kargs)
         elif self == CodeGenerator.CPP_APPLICATION:
@@ -63,7 +66,8 @@ class CodeGenerator(enum.Enum):
 # to uniquely identify them when running command line tools or
 # executing tests
 GENERATORS = {
-    'java': CodeGenerator.JAVA,
+    'java-jni': CodeGenerator.JAVA_JNI,
+    'java-class': CodeGenerator.JAVA_CLASS,
     'bridge': CodeGenerator.BRIDGE,
     'cpp-app': CodeGenerator.CPP_APPLICATION,
     'custom': CodeGenerator.CUSTOM,

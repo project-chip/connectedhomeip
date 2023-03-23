@@ -2071,6 +2071,12 @@ public final class ChipIdLookup {
       if (attributeId == 0L) {
         return "LocalTemperature";
       }
+      if (attributeId == 1L) {
+        return "OutdoorTemperature";
+      }
+      if (attributeId == 2L) {
+        return "Occupancy";
+      }
       if (attributeId == 3L) {
         return "AbsMinHeatSetpointLimit";
       }
@@ -2083,11 +2089,29 @@ public final class ChipIdLookup {
       if (attributeId == 6L) {
         return "AbsMaxCoolSetpointLimit";
       }
+      if (attributeId == 7L) {
+        return "PICoolingDemand";
+      }
+      if (attributeId == 8L) {
+        return "PIHeatingDemand";
+      }
+      if (attributeId == 9L) {
+        return "HVACSystemTypeConfiguration";
+      }
+      if (attributeId == 16L) {
+        return "LocalTemperatureCalibration";
+      }
       if (attributeId == 17L) {
         return "OccupiedCoolingSetpoint";
       }
       if (attributeId == 18L) {
         return "OccupiedHeatingSetpoint";
+      }
+      if (attributeId == 19L) {
+        return "UnoccupiedCoolingSetpoint";
+      }
+      if (attributeId == 20L) {
+        return "UnoccupiedHeatingSetpoint";
       }
       if (attributeId == 21L) {
         return "MinHeatSetpointLimit";
@@ -2104,11 +2128,17 @@ public final class ChipIdLookup {
       if (attributeId == 25L) {
         return "MinSetpointDeadBand";
       }
+      if (attributeId == 26L) {
+        return "RemoteSensing";
+      }
       if (attributeId == 27L) {
         return "ControlSequenceOfOperation";
       }
       if (attributeId == 28L) {
         return "SystemMode";
+      }
+      if (attributeId == 30L) {
+        return "ThermostatRunningMode";
       }
       if (attributeId == 32L) {
         return "StartOfWeek";
@@ -2118,6 +2148,72 @@ public final class ChipIdLookup {
       }
       if (attributeId == 34L) {
         return "NumberOfDailyTransitions";
+      }
+      if (attributeId == 35L) {
+        return "TemperatureSetpointHold";
+      }
+      if (attributeId == 36L) {
+        return "TemperatureSetpointHoldDuration";
+      }
+      if (attributeId == 37L) {
+        return "ThermostatProgrammingOperationMode";
+      }
+      if (attributeId == 41L) {
+        return "ThermostatRunningState";
+      }
+      if (attributeId == 48L) {
+        return "SetpointChangeSource";
+      }
+      if (attributeId == 49L) {
+        return "SetpointChangeAmount";
+      }
+      if (attributeId == 50L) {
+        return "SetpointChangeSourceTimestamp";
+      }
+      if (attributeId == 52L) {
+        return "OccupiedSetback";
+      }
+      if (attributeId == 53L) {
+        return "OccupiedSetbackMin";
+      }
+      if (attributeId == 54L) {
+        return "OccupiedSetbackMax";
+      }
+      if (attributeId == 55L) {
+        return "UnoccupiedSetback";
+      }
+      if (attributeId == 56L) {
+        return "UnoccupiedSetbackMin";
+      }
+      if (attributeId == 57L) {
+        return "UnoccupiedSetbackMax";
+      }
+      if (attributeId == 58L) {
+        return "EmergencyHeatDelta";
+      }
+      if (attributeId == 64L) {
+        return "ACType";
+      }
+      if (attributeId == 65L) {
+        return "ACCapacity";
+      }
+      if (attributeId == 66L) {
+        return "ACRefrigerantType";
+      }
+      if (attributeId == 67L) {
+        return "ACCompressorType";
+      }
+      if (attributeId == 68L) {
+        return "ACErrorCode";
+      }
+      if (attributeId == 69L) {
+        return "ACLouverPosition";
+      }
+      if (attributeId == 70L) {
+        return "ACCoilTemperature";
+      }
+      if (attributeId == 71L) {
+        return "ACCapacityformat";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";

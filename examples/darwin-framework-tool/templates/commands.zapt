@@ -92,7 +92,7 @@ private:
 {{/unless}}
 {{/chip_cluster_commands}}
 
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server removeKeys='isOptional'}}
 {{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
 {{#*inline "cluster"}}Cluster{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
@@ -201,7 +201,7 @@ private:
     {{else if (isCharString type)}}
     chip::ByteSpan mValue;
     {{else}}
-    {{chipType}} mValue;
+    {{as_underlying_zcl_type type}} mValue;
     {{/if_chip_complex}}
 };
 
@@ -246,7 +246,7 @@ public:
 
 {{/if}}
 {{/unless}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 {{/unless}}
 {{/chip_client_clusters}}
 
@@ -268,7 +268,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         make_unique<{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}>(), //
         {{/unless}}
         {{/chip_cluster_commands}}
-        {{#chip_server_cluster_attributes}}
+        {{#zcl_attributes_server removeKeys='isOptional'}}
         {{#first}}
          make_unique<ReadAttribute>(Id), //
         {{/first}}
@@ -291,7 +291,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         make_unique<SubscribeAttribute{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{/if}}
         {{/unless}}
-        {{/chip_server_cluster_attributes}}
+        {{/zcl_attributes_server}}
         {{#zcl_events}}
         {{#first}}
         make_unique<ReadEvent>(Id), //
