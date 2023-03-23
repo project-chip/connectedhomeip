@@ -20,7 +20,11 @@ import("//build_overrides/mbedtls.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("silabs_board.gni")
 
-wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
+if (use_rs9116) {
+  wifi_sapi_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
+} else {
+  wifi_sapi_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
+}
 
 declare_args() {
   # Location of the efr32 SDK.
@@ -163,9 +167,7 @@ template("efr32_sdk") {
     }
 
     if (chip_enable_ble_rs911x) {
-      _include_dirs += [
-        "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk/sapi/include",
-      ]
+      _include_dirs += [ "${wifi_sapi_root}/sapi/include" ]
     }
 
     # Note that we're setting the mbedTLS and PSA configuration files through a
@@ -689,10 +691,10 @@ template("efr32_sdk") {
 
     if (chip_enable_ble_rs911x) {
       sources += [
-        "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
-        "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
-        "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
-        "${wiseconnect_sdk_root}/sapi/driver/rsi_bt_ble.c",
+        "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
+        "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
+        "${wifi_sapi_root}/sapi/bluetooth/rsi_bt_common_apis.c",
+        "${wifi_sapi_root}/sapi/driver/rsi_bt_ble.c",
       ]
     } else {
       sources += [

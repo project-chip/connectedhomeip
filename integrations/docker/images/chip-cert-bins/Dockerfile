@@ -299,7 +299,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/thermostat-app thermo
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-provider-app chip-ota-provider-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-requestor-app chip-ota-requestor-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lock-app chip-lock-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/app1/chip-app1 chip-app1
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-app1 chip-app1
 
 # Stage 3.1 Setup the Matter Python environment
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_lib python_lib
