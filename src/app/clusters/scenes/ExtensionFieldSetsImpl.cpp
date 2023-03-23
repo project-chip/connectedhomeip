@@ -26,7 +26,6 @@ CHIP_ERROR ExtensionFieldSetsImpl::Serialize(TLV::TLVWriter & writer, TLV::Tag s
 {
     TLV::TLVType container;
     ReturnErrorOnFailure(writer.StartContainer(structTag, TLV::kTLVType_Structure, container));
-    // ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagEFS::kFieldSetsCount), static_cast<uint8_t>(mFieldSetsCount)));
     ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(TagEFS::kFieldSetArrayContainer), TLV::kTLVType_Array, container));
     for (uint8_t i = 0; i < mFieldSetsCount; i++)
     {
@@ -132,7 +131,7 @@ CHIP_ERROR ExtensionFieldSetsImpl::RemoveFieldAtPosition(uint8_t position)
 
     mFieldSetsCount--;
     // Clear last occupied position
-    mFieldSets[mFieldSetsCount].Clear(); //
+    mFieldSets[mFieldSetsCount].Clear();
 
     return CHIP_NO_ERROR;
 }
