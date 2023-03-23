@@ -1,6 +1,6 @@
-# Running the Matter Demo over Wi-fi
+# Running the Matter Demo over Wi-Fi on EFR32 device
 
-## Flashing images/binaries on MG12, MG24 platform using Ozone, Simplicity Studio or Simplicity Commander.
+## Flashing Images/Binaries on EFR32MG24 Platform using Ozone, Simplicity Studio, or Simplicity Commander
 
 > Note: If you are coming from Simplicity Studio, you may have already installed
 > the demo image in Simplicity Studio, in which case you can skip to the
@@ -19,7 +19,7 @@
 
     1. Click the three-dots on the 'Device' tab and select 'Manufacturer' as
        '`Silicon Labs`'
-    2. Select 'Device' as '`EFR32MG12PxxxF1024`' or `EFR32MG24Bxxx1536`
+    2. Select 'Device' as `EFR32MG24Bxxx1536`
        depending on the device you are using.
     3. Click 'OK'
     4. The 'Register set' tab will get filled automatically
@@ -41,8 +41,8 @@
     through 'Browse', select the file named `chip-efr32-lighting-example.out`
     and click 'Next'. This is the image built in previous step.
 
-    > Note that you may be using a different board like the BRD4163A, BRD4164A,
-    > BRD4186C, or BRD4187C in which case your image will be in a directory
+    > Note that you may be using a different board like the
+    > BRD4186C or BRD4187C, in which case your image will be in a directory
     > corresponding to that board identifier.
 
 8.  Make sure the next screen has 'Initial PC' selected as 'ELF Entry Point' -
@@ -53,7 +53,7 @@
 9.  Select 'Download and Reset Program' in the dropdown next to the Power button
     on the top left of the page
 
-    > The Silabs chip, EFR32MG12 or EFR32MG24 will be erased and programmed
+    > The Silabs chip, EFR32MG24, will be erased and programmed
 
 10.  Run the image by clicking the 'Play' button on the top left (or press the F5
     key)
@@ -68,7 +68,7 @@
     > following commands will provide you with a serial console of the EFR32
 
     ```shell
-    $ konsole -e JLinkExe -device EFR32MG12PXXXF1024 -if JTAG -speed 4000 -autoconnect 1 &
+    $ konsole -e JLinkExe -device EFR32MG24Bxxx1536 -if JTAG -speed 4000 -autoconnect 1 &
     ```
 
     > (Put it in the background)
@@ -106,12 +106,12 @@
     > '\$SSID' is a placeholder for your Wi-Fi SSID and '\$PSK' is a placeholder
     > for the password of your Wi-Fi network.
 
-3. To turn **on** the LED on the EFR32MG12 or EFR32MG24:
+3. To turn **on** the LED on the EFR32MG24:
 
     ```shell
     $ out/standalone/chip-tool onoff on 1122 1
     ```
-4. To turn **off** the LED on the EFR32MG12 or EFR32MG24:
+4. To turn **off** the LED on the EFR32MG24:
 
     ```shell
     $ out/standalone/chip-tool onoff off 1122 1
@@ -135,15 +135,14 @@ need to unplug the Ethernet connection and try running the chip-tool as in step
 
 As the device remembers the Access Point credentials given for commissioning, if
 you want to run the demo multiple times, do a factory reset by pressing the BTN0
-on EFR32MG12 or EFR32MG24 for about 6-7 seconds. The LED0 will flash 3 times and
-the QR code will appear again on the LCD screen. After a factory reset, BTN0 needs to be pressed again to view the QR Code.
+on EFR32MG24 for about 6-7 seconds. The LED0 will flash 3 times.
 
 The commissioning command mentioned above does the following:
 
 - chip-tool scans BLE and locates the Silicon Labs device that uses the
 specified discriminator
 - Sends the Wi-Fi SSID and Passkey
-- The Silicon Labs device will join the Wi-Fi network and get an IPv4 address.
+- The Silicon Labs device will join the Wi-Fi network and get an IP address.
 It then starts providing mDNS records on IPv4 and IPv6
 - chip-tool then locates the device over Wi-Fi and establishes operational
 certificates

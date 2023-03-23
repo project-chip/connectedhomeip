@@ -1,7 +1,7 @@
 # Matter over Wi-Fi Demo Overview
 
-This document walks through the steps to build the Matter application i.e lighting, thermostat, door-lock for<br>
-EFR32MG boards. A complete list of hardware supported for Wi-Fi is included on the [Hardware Requirements page](../general/HARDWARE_REQUIREMENTS.md).
+This document walks through the steps to build the Matter 1.1 applications, such as lighting, light Switch, window covering, thermostat, door lock and On/Off Plug for
+EFR32MG24 and SiWx917 SoC boards. A complete list of hardware supported for Wi-Fi is included on the [Hardware Requirements page](../general/HARDWARE_REQUIREMENTS.md).
 
 ## Step 1: Matter Wi-Fi Prerequisites
 
@@ -24,11 +24,15 @@ of two platforms, either Linux/Mac or Raspberry Pi.
 
 Follow the steps in [Software Setup](SW_SETUP.md)
 
-Build commands are provided for the RS911x, SiWx917 and WF200 adapters.
+Build commands are provided for the EFR32MG24 host processor, with the RS9116, SiWx917 and WF200 network co-processors.
+
+Build command is provided for the SiWx917 SoC processor.
 
 ## Step 4: Running the Demo
 
-[Running Matter Demo over Wi-Fi using Linux](RUN_DEMO.md)
+[Running the Matter Demo on EFR32 hosts](RUN_DEMO.md)
+
+[Running the Matter Demo on SiWx917 SoC](RUN_DEMO_SiWx917_SoC.md)
 
 This contains instructions to run the Matter Wi-Fi demo using chip-tool
 running on a Linux Machine (either Laptop or Raspberry Pi) - follow this

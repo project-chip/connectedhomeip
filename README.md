@@ -16,12 +16,15 @@ _To see release notes containing list of features and knowns issues go to
 [SiliconLabs/matter/releases](https://github.com/SiliconLabs/matter/releases)
 and find the corresponding notes for the release you are using._
 
+As seen below, Silicon Labs supports Matter on several different hardware platforms including the EFR32, RS9116, WF200 and the new SiWx917 which is a Wi-Fi System-on-Chip (SoC).
+
+Device: EFR32+RS9116
 ![Silicon Labs](./docs/silabs/images/silicon_labs_matter.png)
 
-This repo contains documentation, demos, examples and all the code needed for
-Matter Accessory Device development on both Thread and Wi-Fi. The Thread
-development use cases differs from Wi-Fi because the Thread protocol requires
-the use of an Open Thread Border Router (OTBR).
+Device: SiWx917 SoC
+![Silicon Labs - SiWx917 soc](./docs/silabs/images/silicon_labs_matter_SiWx917.png)
+
+This repo contains documentation, demos, examples and all the code needed for Matter Accessory Device development on both Thread and Wi-Fi. The Thread development use cases differs from Wi-Fi because the Thread protocol requires the use of an Open Thread Border Router (OTBR).  
 
 -   To get started with the Thread demo and development see
     [Matter Thread](./docs/silabs/thread/DEMO_OVERVIEW.md)
