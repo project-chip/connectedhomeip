@@ -6,7 +6,6 @@ WeakEnums:
     - ColorControlOptions
     - ColorMode
     - EnhancedColorMode
-    - HardwareFaultEnum
     - IdentifyEffectIdentifier
     - IdentifyEffectVariant
     - IdentifyIdentifyType
