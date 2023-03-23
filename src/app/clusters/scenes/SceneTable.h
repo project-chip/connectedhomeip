@@ -50,7 +50,7 @@ static constexpr size_t kSceneNameMaxLength = CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM
 ///
 /// A SceneHandler can handle a single <endpoint, cluster> pair, or many such pairs.
 ///
-/// @note If more than one handler claims to handl a specific <endpoint, cluster> pair, only one of
+/// @note If more than one handler claims to handle a specific <endpoint, cluster> pair, only one of
 /// those handlers will get called when executing actions related to extension field sets on the scene
 /// table.  It is not defined which handler will be selected.
 
@@ -110,8 +110,7 @@ public:
     ///
     /// @param extensionFieldSet[out] ExtensionFieldSet in command format
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
-    /// @note Only gets called after the scene-cluster has previously verified that the endpoint,cluster valuer pair is supported by
-    /// the handler. It is therefore the implementation's reponsibility to also implement the SupportsCluster method.
+    /// @note Only gets called for handlers for which SupportsCluster() is true for the given endpoint and cluster.
     virtual CHIP_ERROR Deserialize(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
 
                                    app::Clusters::Scenes::Structs::ExtensionFieldSet::Type & extensionFieldSet) = 0;
@@ -220,16 +219,16 @@ public:
 
         bool operator==(const SceneData & other)
         {
-            return (this->mNameLength == other.mNameLength && !memcmp(this->mName, other.mName, this->mNameLength) &&
-                    (this->mSceneTransitionTimeMs == other.mSceneTransitionTimeMs) &&
-                    (this->mExtensionFieldSets == other.mExtensionFieldSets));
+            return (mNameLength == other.mNameLength && !memcmp(mName, other.mName,mNameLength) &&
+                    (mSceneTransitionTimeMs == other.mSceneTransitionTimeMs) &&
+                    (mExtensionFieldSets == other.mExtensionFieldSets));
         }
 
         void operator=(const SceneData & other)
         {
-            this->SetName(CharSpan(other.mName, other.mNameLength));
-            this->mExtensionFieldSets    = other.mExtensionFieldSets;
-            this->mSceneTransitionTimeMs = other.mSceneTransitionTimeMs;
+            SetName(CharSpan(other.mName, other.mNameLength));
+            mExtensionFieldSets    = other.mExtensionFieldSets;
+            mSceneTransitionTimeMs = other.mSceneTransitionTimeMs;
         }
     };
 

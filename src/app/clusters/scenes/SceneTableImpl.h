@@ -50,7 +50,7 @@ public:
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR_INVALID_ARGUMENT if the cluster is not supported, CHIP_ERROR value otherwise
     virtual CHIP_ERROR SerializeAdd(EndpointId endpoint,
                                     const app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
-                                    ClusterId & cluster, MutableByteSpan & serialisedBytes) override
+                                    ClusterId & cluster, MutableByteSpan & serializedBytes) override
     {
         app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType aVPair;
         TLV::TLVWriter writer;
@@ -93,7 +93,7 @@ public:
         writer.Init(serialisedBytes);
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
         ReturnErrorOnFailure(app::DataModel::Encode(
-            writer, TLV::ContextTag(to_underlying(app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)),
+            writer, TLV::ContextTag(app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList),
             attributeValueList));
         ReturnErrorOnFailure(writer.EndContainer(outer));
 
@@ -125,7 +125,7 @@ public:
         ReturnErrorOnFailure(reader.EnterContainer(outer));
         ReturnErrorOnFailure(reader.Next(
             TLV::kTLVType_Array,
-            TLV::ContextTag(to_underlying(app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList))));
+            TLV::ContextTag(app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)));
         attributeValueList.Decode(reader);
 
         auto pair_iterator = attributeValueList.begin();

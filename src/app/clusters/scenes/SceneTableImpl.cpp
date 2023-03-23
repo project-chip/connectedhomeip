@@ -24,7 +24,7 @@ namespace chip {
 namespace scenes {
 
 /// @brief Tags Used to serialize Scenes so they can be stored in flash memory.
-/// kSceneCount: Number of scene in a Fabric
+/// kSceneCount: Number of scenes in a Fabric
 /// kStorageIDArray: Array of StorageID struct
 /// kEndpointID: Tag for the Endpoint ID to which this scene applies to
 /// kGroupID: Tag for GroupID if the Scene is a Group Scene
