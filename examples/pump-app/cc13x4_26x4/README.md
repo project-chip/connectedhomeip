@@ -38,20 +38,14 @@ Instruments devices.
 
 ## Device UI
 
-This example application has a simple User Interface to depict the state of the
-pump and to control the state. The user LEDs on the LaunchPad are set on when
-the pump is started, and are set off when stopped. The LEDs will flash when in
-the transition state between started and stopped.
-
-Short presses (less than 1000ms) of the right user button (`BTN-2`) are used for
-toggling the pump state.
-
-Short presses (less than 1000ms) of the left user button (`BTN-1`) are used for
-toggling Matter BLE advertisements.
-
-Long presses (greater than 5000ms) of the left user button (`BTN-1`) will
-initiate a factory reset of the device clearing all stored provisioning
-information to allow for a new network setup.
+| Action                                           | Functionality                          |
+| ------------------------------------------------ | -------------------------------------- |
+| Left Button (`BTN-1`) Press (less than 1000 ms)  | BLE Advertisement                      |
+| Left Button (`BTN-1`) Press (more than 5000 ms)  | Factory Reset                          |
+| Right Button (`BTN-2`) Press (less than 1000 ms) | Toggle pump state                      |
+| Red & Green LED Blinking State                   | Pump transition from either Start/Stop |
+| Red & LED On State                               | Pump is started                        |
+| Red & Green LED Off State                        | Pump stopped                           |
 
 ## Building
 

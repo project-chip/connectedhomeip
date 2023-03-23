@@ -38,19 +38,15 @@ Instruments devices.
 
 ## Device UI
 
-This example application has a simple User Interface to depict the state of the
-door lock and to control the state. The user LEDs on the LaunchPad are set on
-when the lock is locked, and are set off when unlocked. The LEDs will flash when
-in the transition state between locked and unlocked.
-
-Short presses (less than 1000ms) of the user buttons are used for requesting
-lock and unlock of the door lock. The left button (`BTN-1`) is used to request
-locking. The right button (`BTN-2`) is used to request unlocking.
-
-Long presses (greater than 1000ms) of the user buttons are used for controlling
-BLE advertisements and resets. The left button (`BTN-1`) is used to perform a
-factory reset of the device. The Right button (`BTN-2`) is used to disable BLE
-advertisements (if enabled) or enable advertisements (if disabled).
+| Action                                           | Functionality                           |
+| ------------------------------------------------ | --------------------------------------  |
+| Left Button (`BTN-1`) Press (less than 1000 ms)  | Change state to unlocked                |
+| Right Button (`BTN-2`) Press (less than 1000 ms) | Change state to locked                  |
+| Left Button (`BTN-1`) Press (more than 1000 ms)  | Factory Reset                           |
+| Right Button (`BTN-2`) Press (more than 1000 ms) | BLE Advertisement                       |
+| Red & Green LED Blinking State                   | Lock state transition to locked/unlocked|
+| Red LED On State                                 | Lock state locked                       |
+| Red & Green LED Off State                        | Lock state unlocked                     |
 
 ## Building
 

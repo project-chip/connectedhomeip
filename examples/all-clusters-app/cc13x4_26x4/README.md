@@ -38,21 +38,14 @@ workings of Matter, as well as a template for creating real products based on
 the Texas Instruments devices.
 
 ## Device UI
-
-This example application has a simple User Interface to depict the state of the
-various Matter clusters and the attribute changes associated with them. The user
-LEDs on the LaunchPad are used for the onoff, levelcontrol and identify clusters
-to provide a working demonstration of the cluster attribute changes. The Green
-LED is used to represent attribute changes to endpoint 1 while the Red LED is
-used to represent changes to endpoint 2.
-
-Short presses (less than 1000ms) of the user buttons are used currently unused
-in the all-clusters application, but stubs are provided.
-
-Long presses (greater than 1000ms) of the user buttons are used for controlling
-BLE advertisements and resets. The left button (`BTN-1`) is used to perform a
-factory reset of the device. The Right button (`BTN-2`) is used to disable BLE
-advertisements (if enabled) or enable advertisements (if disabled).
+| Action                                           | Functionality                              |
+| ------------------------------------------------ | --------------------------------------     |
+| Left Button (`BTN-1`) Press (more than 1000 ms)  | Factory Reset                              |
+| Right Button (`BTN-2`) Press (more than 1000 ms) | BLE Advertisement                          |
+| Red LED Solid Blinking State                     | Identify Trigger Effect in progress (EP0/1)|
+| Red LED Off State                                | No Identify Trigger Effect in progress     |
+| Green LED Blinking State                         | Identify Trigger Effect in progress (EP 2) |
+| Green LED Off State                              | No Identify Trigger Effect in progress     |
 
 ## Building
 
