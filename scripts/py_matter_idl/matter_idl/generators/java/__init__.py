@@ -84,13 +84,7 @@ def GlobalNameToJavaName(name: str) -> str:
 
 def DelegatedCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
     """
-    Figure out what callback name to use when a variable requires a read callback.
-
-    These are split into native types, like Boolean/Float/Double/CharString, where
-    one callback type can support anything.
-
-    For specific types (e.g. A struct) codegen will generate its own callback name
-    specific to that type.
+    Figure out what callback name to use for delegate callback construction.
     """
     global_name = FieldToGlobalName(attr.definition, context)
 
@@ -102,13 +96,8 @@ def DelegatedCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
 
 def ChipClustersCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
     """
-    Figure out what callback name to use when a variable requires a read callback.
-
-    These are split into native types, like Boolean/Float/Double/CharString, where
-    one callback type can support anything.
-
-    For specific types (e.g. A struct) codegen will generate its own callback name
-    specific to that type.
+    Figure out what callback name to use when building a ChipCluster.*AttributeCallback 
+    in java codegen.
     """
     global_name = FieldToGlobalName(attr.definition, context)
 
