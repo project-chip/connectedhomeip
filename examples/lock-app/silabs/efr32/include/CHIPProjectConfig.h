@@ -61,26 +61,6 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8006
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
- *
- * The hardware version number assigned to device or product by the device vendor.  This
- * number is scoped to the device product id, and typically corresponds to a revision of the
- * physical device, a change to its packaging, and/or a change to its marketing presentation.
- * This value is generally *not* incremented for device software versions.
- */
-#define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 1
-
-/**
- * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
- *
- * A uint32_t identifying the software version running on the device.
- */
-/* The SoftwareVersion attribute of the Basic cluster. */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x0001
-#endif
-
-/**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
  *
  * Enable support for Chip-over-BLE (CHIPoBLE).

@@ -1701,17 +1701,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorLoop
     using EnumType = ColorControl::ColorLoopAction;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kDeactivate:
     case EnumType::kActivateFromColorLoopStartEnhancedHue:
     case EnumType::kActivateFromEnhancedCurrentHue:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_COLOR_LOOP_ACTION_DEACTIVATE:
-    case EMBER_ZCL_COLOR_LOOP_ACTION_ACTIVATE_FROM_COLOR_LOOP_START_ENHANCED_HUE:
-    case EMBER_ZCL_COLOR_LOOP_ACTION_ACTIVATE_FROM_ENHANCED_CURRENT_HUE:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(3);
@@ -1722,15 +1714,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorLoop
     using EnumType = ColorControl::ColorLoopDirection;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kDecrementHue:
     case EnumType::kIncrementHue:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_COLOR_LOOP_DIRECTION_DECREMENT_HUE:
-    case EMBER_ZCL_COLOR_LOOP_DIRECTION_INCREMENT_HUE:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(2);

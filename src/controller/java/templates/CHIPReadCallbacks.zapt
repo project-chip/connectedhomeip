@@ -37,9 +37,10 @@ private:
 {{/chip_server_global_responses}}
 
 {{#chip_client_clusters}}
-{{#chip_server_cluster_attributes}}
-{{#unless (isStrEqual chipCallback.name "Unsupported")}}
-{{#if_basic_global_response}}
+{{#zcl_attributes_server removeKeys='isOptional'}}
+{{#if_unsupported_attribute_callback type isArray ../id}}
+{{else}}
+{{#if_basic_attribute type ../id}}
 {{else}}
 class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback : public chip::Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType>
 {
@@ -65,10 +66,10 @@ private:
     jobject javaCallbackRef;
     bool keepAlive;
 };
-{{/if_basic_global_response}}
+{{/if_basic_attribute}}
 
-{{/unless}}
-{{/chip_server_cluster_attributes}}
+{{/if_unsupported_attribute_callback}}
+{{/zcl_attributes_server}}
 {{/chip_client_clusters}}
 
 {{/if}}

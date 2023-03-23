@@ -121,6 +121,9 @@ void sl_ble_event_handling_task(void)
             rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
             chip::DeviceLayer::Internal::BLEMgrImpl().HandleConnectEvent();
             WFX_RSI_LOG("%s Module got connected", __func__);
+            // Requests the connection parameters change with the remote device
+            rsi_ble_conn_params_update(event_msg.resp_enh_conn.dev_addr, BLE_MIN_CONNECTION_INTERVAL_MS,
+                                       BLE_MAX_CONNECTION_INTERVAL_MS, BLE_SLAVE_LATENCY_MS, BLE_TIMEOUT_MS);
         }
         break;
         case RSI_BLE_DISCONN_EVENT: {

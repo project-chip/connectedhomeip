@@ -304,9 +304,9 @@ $ python scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py \
 --date "2022-02-02" \
 --hw_ver 1 \
 --hw_ver_str "prerelase" \
---dac_cert "credentials/development/attestation/Matter-Development-DAC-8006-Cert.der" \
---dac_key "credentials/development/attestation/Matter-Development-DAC-8006-Key.der" \
---pai_cert "credentials/development/attestation/Matter-Development-PAI-noPID-Cert.der" \
+--dac_cert "credentials/development/attestation/Matter-Development-DAC-FFF1-8006-Cert.der" \
+--dac_key "credentials/development/attestation/Matter-Development-DAC-FFF1-8006-Key.der" \
+--pai_cert "credentials/development/attestation/Matter-Development-PAI-FFF1-noPID-Cert.der" \
 --spake2_it 1000 \
 --spake2_salt "U1BBS0UyUCBLZXkgU2FsdA==" \
 --discriminator 0xF00 \

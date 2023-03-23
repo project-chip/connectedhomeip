@@ -608,7 +608,7 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
 
     colorHueTransitionState->initialEnhancedHue = startHue;
 
-    if (direction)
+    if (direction == to_underlying(ColorLoopDirection::kIncrementHue))
     {
         colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(startHue - 1);
     }
@@ -617,7 +617,7 @@ void ColorControlServer::startColorLoop(EndpointId endpoint, uint8_t startFromSt
         colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(startHue + 1);
     }
 
-    colorHueTransitionState->up     = direction;
+    colorHueTransitionState->up     = (direction == to_underlying(ColorLoopDirection::kIncrementHue));
     colorHueTransitionState->repeat = true;
 
     colorHueTransitionState->stepsRemaining = static_cast<uint16_t>(time * TRANSITION_TIME_1S);
@@ -1496,9 +1496,9 @@ exit:
 bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                           const Commands::ColorLoopSet::DecodableType & commandData)
 {
-    uint8_t updateFlags       = commandData.updateFlags.Raw();
-    uint8_t action            = commandData.action;
-    uint8_t direction         = commandData.direction;
+    auto updateFlags          = commandData.updateFlags;
+    auto action               = commandData.action;
+    auto direction            = commandData.direction;
     uint16_t time             = commandData.time;
     uint16_t startHue         = commandData.startHue;
     uint8_t optionsMask       = commandData.optionsMask;
@@ -1512,10 +1512,7 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
     VerifyOrExit(colorHueTransitionState != nullptr, status = Status::UnsupportedEndpoint);
 
     // Validate the action and direction parameters of the command
-    if ((action != EMBER_ZCL_COLOR_LOOP_ACTION_DEACTIVATE &&
-         action != EMBER_ZCL_COLOR_LOOP_ACTION_ACTIVATE_FROM_COLOR_LOOP_START_ENHANCED_HUE &&
-         action != EMBER_ZCL_COLOR_LOOP_ACTION_ACTIVATE_FROM_ENHANCED_CURRENT_HUE) ||
-        (direction != DECREMENT_HUE && direction != INCREMENT_HUE))
+    if (action == ColorLoopAction::kUnknownEnumValue || direction == ColorLoopDirection::kUnknownEnumValue)
     {
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
@@ -1529,20 +1526,19 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
 
     Attributes::ColorLoopActive::Get(endpoint, &isColorLoopActive);
 
-    deactiveColorLoop =
-        (updateFlags & EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_ACTION) && (action == EMBER_ZCL_COLOR_LOOP_ACTION_DEACTIVATE);
+    deactiveColorLoop = updateFlags.Has(ColorLoopUpdateFlags::kUpdateAction) && (action == ColorLoopAction::kDeactivate);
 
-    if (updateFlags & EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_DIRECTION)
+    if (updateFlags.Has(ColorLoopUpdateFlags::kUpdateAction))
     {
-        Attributes::ColorLoopDirection::Set(endpoint, direction);
+        Attributes::ColorLoopDirection::Set(endpoint, to_underlying(direction));
 
         // Checks if color loop is active and stays active
         if (isColorLoopActive && !deactiveColorLoop)
         {
-            colorHueTransitionState->up                 = direction;
+            colorHueTransitionState->up                 = (direction == ColorLoopDirection::kIncrementHue);
             colorHueTransitionState->initialEnhancedHue = colorHueTransitionState->currentEnhancedHue;
 
-            if (direction)
+            if (direction == ColorLoopDirection::kIncrementHue)
             {
                 colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(colorHueTransitionState->initialEnhancedHue - 1);
             }
@@ -1554,7 +1550,7 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
         }
     }
 
-    if (updateFlags & EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_TIME)
+    if (updateFlags.Has(ColorLoopUpdateFlags::kUpdateTime))
     {
         Attributes::ColorLoopTime::Set(endpoint, time);
 
@@ -1576,14 +1572,14 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
         }
     }
 
-    if (updateFlags & EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_START_HUE)
+    if (updateFlags.Has(ColorLoopUpdateFlags::kUpdateStartHue))
     {
         Attributes::ColorLoopStartEnhancedHue::Set(endpoint, startHue);
     }
 
-    if (updateFlags & EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_ACTION)
+    if (updateFlags.Has(ColorLoopUpdateFlags::kUpdateAction))
     {
-        if (action == EMBER_ZCL_COLOR_LOOP_ACTION_DEACTIVATE)
+        if (action == ColorLoopAction::kDeactivate)
         {
             if (isColorLoopActive)
             {
@@ -1600,11 +1596,11 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
                 // Do Nothing since it's not on
             }
         }
-        else if (action == EMBER_ZCL_COLOR_LOOP_ACTION_ACTIVATE_FROM_COLOR_LOOP_START_ENHANCED_HUE)
+        else if (action == ColorLoopAction::kActivateFromColorLoopStartEnhancedHue)
         {
             startColorLoop(endpoint, true);
         }
-        else if (action == EMBER_ZCL_COLOR_LOOP_ACTION_ACTIVATE_FROM_ENHANCED_CURRENT_HUE)
+        else if (action == ColorLoopAction::kActivateFromEnhancedCurrentHue)
         {
             startColorLoop(endpoint, false);
         }
