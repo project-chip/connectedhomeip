@@ -95,6 +95,25 @@ class TargetPart:
 
         return True
 
+    def ToDict(self):
+        """Converts a TargetPart into a dictionary
+        """
+
+        result: Dict[str, str] = {}
+        result['name'] = self.name
+        bld_args_keys = list(self.build_arguments.keys())
+        for key in bld_args_keys:
+            result[key] = str(self.build_arguments[key])
+
+        if self.only_if_re is not None:
+            result['only_if_re'] = str(self.only_if_re.pattern)
+
+        if self.except_if_re is not None:
+            result['except_if_re'] = str(self.except_if_re.pattern)
+
+        return result
+
+
 
 def _HasVariantPrefix(value: str, prefix: str):
     """Checks if the given value is <prefix> or starts with "<prefix>-".
@@ -176,7 +195,6 @@ def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: List[
 
     # Remaining input is not empty and we failed to match it
     return None
-
 
 class BuildTarget:
 
@@ -261,6 +279,50 @@ class BuildTarget:
 
         for modifier in self.modifiers:
             result += f"[-{modifier.name}]"
+
+        return result
+
+    def ToDict(self):
+        """Outputs a parseable description of the available variants
+        and modifiers:
+
+            like:
+
+            "foo": {
+                "builder": "<class 'builders.foo.FooBuilder'>",
+                "shorthand": "foo-bar-baz[-m1]
+                "fixed_targets": [
+                    {
+                        "name": "foo",
+                        "board": "bar"
+                    }
+                    {
+                        "name": "baz",
+                        "app": "foo.baz"
+                    }
+                ],
+                "modifiers": [
+                    {
+                        "name": "modifier1",
+                        "m1": "True"
+                    }
+                ]
+            },
+        """
+        result: Dict[str, Any] = {}
+
+        result['name'] = self.name
+        result['builder'] = str(self.builder_class)
+        result['shorthand'] = self.HumanString()
+        result['parts'] = []
+        result['modifiers'] = []
+
+        for target in self.fixed_targets:
+            for target_part in target:
+                result['parts'].append(target_part.ToDict())
+
+        for target_part in self.modifiers:
+            result['modifiers'].append(target_part.ToDict())
 
         return result
 
