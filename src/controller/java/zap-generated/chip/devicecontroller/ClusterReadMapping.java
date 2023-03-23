@@ -1671,11 +1671,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BasicInformationCluster) cluster)
-                  .readVendorIDAttribute(
-                      (ChipClusters.BasicInformationCluster.VendorIDAttributeCallback) callback);
+                  .readVendorIDAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedBasicInformationClusterVendorIDAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readBasicInformationVendorIDCommandParams);
     readBasicInformationInteractionInfo.put(
         "readVendorIDAttribute", readBasicInformationVendorIDAttributeInteractionInfo);
@@ -5636,13 +5634,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
-                  .readVendorIDAttribute(
-                      (ChipClusters.BridgedDeviceBasicInformationCluster.VendorIDAttributeCallback)
-                          callback);
+                  .readVendorIDAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicInformationClusterVendorIDAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readBridgedDeviceBasicInformationVendorIDCommandParams);
     readBridgedDeviceBasicInformationInteractionInfo.put(
         "readVendorIDAttribute", readBridgedDeviceBasicInformationVendorIDAttributeInteractionInfo);
@@ -13198,11 +13192,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ApplicationBasicCluster) cluster)
-                  .readVendorIDAttribute(
-                      (ChipClusters.ApplicationBasicCluster.VendorIDAttributeCallback) callback);
+                  .readVendorIDAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedApplicationBasicClusterVendorIDAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readApplicationBasicVendorIDCommandParams);
     readApplicationBasicInteractionInfo.put(
         "readVendorIDAttribute", readApplicationBasicVendorIDAttributeInteractionInfo);
@@ -15897,10 +15889,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.UnitTestingCluster) cluster)
-                  .readVendorIdAttribute(
-                      (ChipClusters.UnitTestingCluster.VendorIdAttributeCallback) callback);
+                  .readVendorIdAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedUnitTestingClusterVendorIdAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readUnitTestingVendorIdCommandParams);
     readUnitTestingInteractionInfo.put(
         "readVendorIdAttribute", readUnitTestingVendorIdAttributeInteractionInfo);

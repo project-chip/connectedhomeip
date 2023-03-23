@@ -3998,14 +3998,6 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public interface VendorIDAttributeCallback {
-      void onSuccess(Integer value);
-
-      void onError(Exception ex);
-
-      default void onSubscriptionEstablished(long subscriptionId) {}
-    }
-
     public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
@@ -4056,12 +4048,12 @@ public class ChipClusters {
       subscribeVendorNameAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readVendorIDAttribute(VendorIDAttributeCallback callback) {
+    public void readVendorIDAttribute(IntegerAttributeCallback callback) {
       readVendorIDAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeVendorIDAttribute(
-        VendorIDAttributeCallback callback, int minInterval, int maxInterval) {
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeVendorIDAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -4306,10 +4298,10 @@ public class ChipClusters {
         int maxInterval);
 
     private native void readVendorIDAttribute(
-        long chipClusterPtr, VendorIDAttributeCallback callback);
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void subscribeVendorIDAttribute(
-        long chipClusterPtr, VendorIDAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readProductNameAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);
@@ -10189,14 +10181,6 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public interface VendorIDAttributeCallback {
-      void onSuccess(Integer value);
-
-      void onError(Exception ex);
-
-      default void onSubscriptionEstablished(long subscriptionId) {}
-    }
-
     public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
@@ -10238,12 +10222,12 @@ public class ChipClusters {
       subscribeVendorNameAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readVendorIDAttribute(VendorIDAttributeCallback callback) {
+    public void readVendorIDAttribute(IntegerAttributeCallback callback) {
       readVendorIDAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeVendorIDAttribute(
-        VendorIDAttributeCallback callback, int minInterval, int maxInterval) {
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeVendorIDAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -10437,10 +10421,10 @@ public class ChipClusters {
         int maxInterval);
 
     private native void readVendorIDAttribute(
-        long chipClusterPtr, VendorIDAttributeCallback callback);
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void subscribeVendorIDAttribute(
-        long chipClusterPtr, VendorIDAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readProductNameAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);
@@ -24904,14 +24888,6 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public interface VendorIDAttributeCallback {
-      void onSuccess(Integer value);
-
-      void onError(Exception ex);
-
-      default void onSubscriptionEstablished(long subscriptionId) {}
-    }
-
     public interface AllowedVendorListAttributeCallback {
       void onSuccess(List<Integer> valueList);
 
@@ -24961,12 +24937,12 @@ public class ChipClusters {
       subscribeVendorNameAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readVendorIDAttribute(VendorIDAttributeCallback callback) {
+    public void readVendorIDAttribute(IntegerAttributeCallback callback) {
       readVendorIDAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeVendorIDAttribute(
-        VendorIDAttributeCallback callback, int minInterval, int maxInterval) {
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeVendorIDAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -25079,10 +25055,10 @@ public class ChipClusters {
         int maxInterval);
 
     private native void readVendorIDAttribute(
-        long chipClusterPtr, VendorIDAttributeCallback callback);
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void subscribeVendorIDAttribute(
-        long chipClusterPtr, VendorIDAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readApplicationNameAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);
@@ -28220,14 +28196,6 @@ public class ChipClusters {
       default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
-    public interface VendorIdAttributeCallback {
-      void onSuccess(Integer value);
-
-      void onError(Exception ex);
-
-      default void onSubscriptionEstablished(long subscriptionId) {}
-    }
-
     public interface ListNullablesAndOptionalsStructAttributeCallback {
       void onSuccess(List<ChipStructs.UnitTestingClusterNullablesAndOptionalsStruct> valueList);
 
@@ -29158,7 +29126,7 @@ public class ChipClusters {
       subscribeEpochSAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readVendorIdAttribute(VendorIdAttributeCallback callback) {
+    public void readVendorIdAttribute(IntegerAttributeCallback callback) {
       readVendorIdAttribute(chipClusterPtr, callback);
     }
 
@@ -29172,7 +29140,7 @@ public class ChipClusters {
     }
 
     public void subscribeVendorIdAttribute(
-        VendorIdAttributeCallback callback, int minInterval, int maxInterval) {
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeVendorIdAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -30473,7 +30441,7 @@ public class ChipClusters {
         long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readVendorIdAttribute(
-        long chipClusterPtr, VendorIdAttributeCallback callback);
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeVendorIdAttribute(
         long chipClusterPtr,
@@ -30482,7 +30450,7 @@ public class ChipClusters {
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeVendorIdAttribute(
-        long chipClusterPtr, VendorIdAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readListNullablesAndOptionalsStructAttribute(
         long chipClusterPtr, ListNullablesAndOptionalsStructAttributeCallback callback);
