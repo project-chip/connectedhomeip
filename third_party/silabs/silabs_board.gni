@@ -37,8 +37,11 @@ declare_args() {
   use_rs911x_sockets = false
   chip_enable_ble_rs911x = false
 
-  #Disable MQTT my default
+  #Disable MQTT by default
   enable_dic = false
+
+  # Disable UART log forwarding by default
+  sl_uart_log_output = false
 }
 
 declare_args() {
