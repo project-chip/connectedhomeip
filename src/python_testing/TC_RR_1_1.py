@@ -690,7 +690,7 @@ class TC_RR_1_1(MatterBaseTest):
 
     async def send_acl(self,
                        test_step: int,
-                       client_by_name,  # TODO type hint is ChipDeviceController, but not sure if we have help back on import for some reason
+                       client_by_name,
                        enable_access_to_group_cluster: bool,
                        fabric_table: List[
                            Clusters.OperationalCredentials.Structs.FabricDescriptorStruct]):
