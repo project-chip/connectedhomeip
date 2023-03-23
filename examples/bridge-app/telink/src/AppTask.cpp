@@ -82,15 +82,12 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 namespace {
-constexpr int kFactoryResetCalcTimeout = 3000;
-constexpr int kFactoryResetTriggerCntr = 3;
-constexpr int kAppEventQueueSize       = 10;
-constexpr uint8_t kButtonPushEvent     = 1;
-constexpr uint8_t kButtonReleaseEvent  = 0;
-constexpr EndpointId kLightEndpointId  = 1;
-// NOTE: consider moving these 2 here:
-// static EndpointId gCurrentEndpointId;
-// static EndpointId gFirstDynamicEndpointId;
+constexpr int kFactoryResetCalcTimeout          = 3000;
+constexpr int kFactoryResetTriggerCntr          = 3;
+constexpr int kAppEventQueueSize                = 10;
+constexpr uint8_t kButtonPushEvent              = 1;
+constexpr uint8_t kButtonReleaseEvent           = 0;
+constexpr EndpointId kLightEndpointId           = 1;
 constexpr uint8_t kDefaultMinLevel              = 0;
 constexpr uint8_t kDefaultMaxLevel              = 254;
 constexpr uint32_t kIdentifyBlinkRateMs         = 200;
@@ -149,7 +146,6 @@ Identify sIdentify = {
 AppTask AppTask::sAppTask;
 #include <app/InteractionModelEngine.h>
 
-/////////// BRIDGE ///////////
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
                       const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId);
 CHIP_ERROR RemoveDeviceEndpoint(Device * dev);
@@ -247,7 +243,6 @@ DECLARE_DYNAMIC_ATTRIBUTE(Clusters::TemperatureMeasurement::Attributes::Measured
     DECLARE_DYNAMIC_ATTRIBUTE(Clusters::TemperatureMeasurement::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* FeatureMap */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
-//
 // TEMPERATURE SENSOR ENDPOINT: contains the following clusters:
 //   - Temperature measurement
 //   - Descriptor
@@ -288,7 +283,6 @@ const EmberAfDeviceType gBridgedTempSensorDeviceTypes[] = { { DEVICE_TYPE_TEMP_S
 #define ZCL_ON_OFF_CLUSTER_REVISION (4u)
 #define ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION (1u)
 #define ZCL_TEMPERATURE_SENSOR_FEATURE_MAP (0u)
-/////////// BRIDGE END ///////////
 
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
                       const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId)
@@ -599,7 +593,6 @@ CHIP_ERROR AppTask::Init(void)
         LOG_ERR("AppFabricTableDelegate fail");
         return err;
     }
-    //////////// BRIDGE ////////////
 
     memset(gDevices, 0, sizeof(gDevices));
 
@@ -607,7 +600,6 @@ CHIP_ERROR AppTask::Init(void)
     gLight2.SetReachable(true);
     gLight3.SetReachable(true);
     gLight4.SetReachable(true);
-    // gThermostat.SetReachable(true);
     TempSensor1.SetReachable(true);
 
     // Whenever bridged device changes its state
@@ -618,7 +610,7 @@ CHIP_ERROR AppTask::Init(void)
     TempSensor1.SetChangeCallback(&HandleDeviceTempSensorStatusChanged);
 
     PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
-    ////////////////////////////////
+
     return CHIP_NO_ERROR;
 }
 

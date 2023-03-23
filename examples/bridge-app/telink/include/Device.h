@@ -68,6 +68,7 @@ private:
     chip::EndpointId mEndpointId;
     DeviceCallback_fn mChanged_CB;
 };
+
 class DeviceTempSensor : public Device
 {
 public:

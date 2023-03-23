@@ -35,7 +35,6 @@ struct AppEvent
         kEventType_IdentifyStart,
         kEventType_IdentifyStop,
         kEventType_Lighting,
-        kEventType_Install,
     };
 
     uint16_t Type;

@@ -24,21 +24,12 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include "DeviceCallbacks.h"
-
 using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::app::Clusters;
 using namespace ::chip::app::Clusters::Actions::Attributes;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
-
-// void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
-//                                                      uint8_t type, uint16_t size, uint8_t * value)
-// {
-//     LOG_DBG("PostAttributeChangeCallback - Cluster ID: '0x%" PRIx32 "', EndPoint ID: '0x%x', Attribute ID: '0x%" PRIx32 "'",
-//              clusterId, endpointId, attributeId);
-// }
 
 namespace {
 
