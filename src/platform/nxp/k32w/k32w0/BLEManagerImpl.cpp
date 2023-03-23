@@ -73,7 +73,7 @@ namespace {
  * Macros & Constants definitions
  *******************************************************************************/
 /* Timeout of BLE commands */
-#define CHIP_BLE_KW_EVNT_TIMEOUT 1000
+#define CHIP_BLE_KW_EVNT_TIMEOUT 1000/portTICK_PERIOD_MS
 
 /** BLE advertisement state changed */
 #define CHIP_BLE_KW_EVNT_ADV_CHANGED 0x0001
@@ -121,7 +121,7 @@ TimerHandle_t sbleAdvTimeoutTimer;
 QueueHandle_t sBleEventQueue;
 
 /* Used to manage asynchronous events from BLE Stack: e.g.: GAP setup finished */
-osaEventId_t event_msg;
+EventGroupHandle_t  sEventGroup;
 
 osaEventId_t mControllerTaskEvent;
 TimerHandle_t connectionTimeout;
@@ -145,7 +145,7 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    osaEventFlags_t flags;
+    EventBits_t eventBits;
     BaseType_t bleAppCreated    = errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY;
     uint16_t attChipRxHandle[1] = { (uint16_t) value_chipoble_rx };
 
@@ -164,8 +164,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     /* Initialization of message wait events -
      * used for receiving BLE Stack events */
-    event_msg = OSA_EventCreate(TRUE);
-    VerifyOrExit(event_msg != NULL, err = CHIP_ERROR_INCORRECT_STATE);
+    sEventGroup = xEventGroupCreate();
+    VerifyOrExit(sEventGroup != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
     pfBLE_SignalFromISR = BLE_SignalFromISRCallback;
 
@@ -196,9 +196,20 @@ CHIP_ERROR BLEManagerImpl::_Init()
     VerifyOrExit(GattServer_RegisterCallback(blekw_gatt_server_cb) == gBleSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
 
     /* Wait until BLE Stack is ready */
-    VerifyOrExit(OSA_EventWait(event_msg, CHIP_BLE_KW_EVNT_INIT_COMPLETE, TRUE, CHIP_BLE_KW_EVNT_TIMEOUT, &flags) ==
-                     osaStatus_Success,
-                 err = CHIP_ERROR_INCORRECT_STATE);
+    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_INIT_COMPLETE, pdTRUE, pdTRUE, CHIP_BLE_KW_EVNT_TIMEOUT);
+    VerifyOrExit(eventBits & CHIP_BLE_KW_EVNT_INIT_COMPLETE, CHIP_ERROR_INCORRECT_STATE);
+
+#if BLE_HIGH_TX_POWER
+    /* Set Adv Power */
+    Gap_SetTxPowerLevel(gAdvertisingPowerLeveldBm_c, gTxPowerAdvChannel_c);
+    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_POWER_LEVEL_SET, pdTRUE, pdTRUE, CHIP_BLE_KW_EVNT_TIMEOUT);
+    VerifyOrExit(eventBits & CHIP_BLE_KW_EVNT_POWER_LEVEL_SET, CHIP_ERROR_INCORRECT_STATE);
+
+    /* Set Connect Power */
+    Gap_SetTxPowerLevel(gConnectPowerLeveldBm_c, gTxPowerConnChannel_c);
+    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_POWER_LEVEL_SET, pdTRUE, pdTRUE, CHIP_BLE_KW_EVNT_TIMEOUT);
+    VerifyOrExit(eventBits & CHIP_BLE_KW_EVNT_POWER_LEVEL_SET, CHIP_ERROR_INCORRECT_STATE);
+#endif
 
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
     PWR_ChangeDeepSleepMode(cPWR_PowerDown_RamRet);
@@ -496,7 +507,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 
 BLEManagerImpl::ble_err_t BLEManagerImpl::blekw_send_event(int8_t connection_handle, uint16_t handle, uint8_t * data, uint32_t len)
 {
-    osaEventFlags_t event_mask;
+    EventBits_t eventBits;
 
 #if CHIP_DEVICE_CHIP0BLE_DEBUG
     ChipLogProgress(DeviceLayer, "Trying to send event.");
@@ -515,11 +526,7 @@ BLEManagerImpl::ble_err_t BLEManagerImpl::blekw_send_event(int8_t connection_han
     }
 
     /************* Send the indication *************/
-    if (OSA_EventClear(event_msg, CHIP_BLE_KW_EVNT_INDICATION_CONFIRMED | CHIP_BLE_KW_EVNT_INDICATION_FAILED) != osaStatus_Success)
-    {
-        ChipLogProgress(DeviceLayer, "BLE Event - Can't clear OSA Events");
-        return BLE_E_FAIL;
-    }
+    xEventGroupClearBits(sEventGroup, CHIP_BLE_KW_EVNT_INDICATION_CONFIRMED | CHIP_BLE_KW_EVNT_INDICATION_FAILED);
 
     if (GattServer_SendInstantValueIndication(connection_handle, handle, len, data) != gBleSuccess_c)
     {
@@ -527,14 +534,11 @@ BLEManagerImpl::ble_err_t BLEManagerImpl::blekw_send_event(int8_t connection_han
         return BLE_E_FAIL;
     }
 
-    if (OSA_EventWait(event_msg, CHIP_BLE_KW_EVNT_INDICATION_CONFIRMED | CHIP_BLE_KW_EVNT_INDICATION_FAILED, FALSE,
-                      CHIP_BLE_KW_EVNT_TIMEOUT, &event_mask) != osaStatus_Success)
-    {
-        ChipLogProgress(DeviceLayer, "BLE Event - OSA Event failed");
-        return BLE_E_FAIL;
-    }
+    /* Wait until BLE Stack is ready */
+    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_INDICATION_CONFIRMED | CHIP_BLE_KW_EVNT_INDICATION_FAILED,
+                                    pdTRUE, pdFALSE, CHIP_BLE_KW_EVNT_TIMEOUT);
 
-    if (event_mask & CHIP_BLE_KW_EVNT_INDICATION_FAILED)
+    if (eventBits & CHIP_BLE_KW_EVNT_INDICATION_FAILED)
     {
         ChipLogProgress(DeviceLayer, "BLE Event - Sent Failed");
         return BLE_E_FAIL;
@@ -627,10 +631,10 @@ CHIP_ERROR BLEManagerImpl::blekw_host_init(void)
 BLEManagerImpl::ble_err_t BLEManagerImpl::blekw_start_advertising(gapAdvertisingParameters_t * adv_params,
                                                                   gapAdvertisingData_t * adv, gapScanResponseData_t * scnrsp)
 {
-    osaEventFlags_t event_mask;
+	EventBits_t eventBits;
 
     /************* Set the advertising parameters *************/
-    OSA_EventClear(event_msg, (CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED | CHIP_BLE_KW_EVNT_ADV_PAR_SETUP_COMPLETE));
+    xEventGroupClearBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED | CHIP_BLE_KW_EVNT_ADV_PAR_SETUP_COMPLETE);
 
     /* Set the advertising parameters */
     if (Gap_SetAdvertisingParameters(adv_params) != gBleSuccess_c)
@@ -644,19 +648,16 @@ BLEManagerImpl::ble_err_t BLEManagerImpl::blekw_start_advertising(gapAdvertising
         }
     }
 
-    if (OSA_EventWait(event_msg, (CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED | CHIP_BLE_KW_EVNT_ADV_PAR_SETUP_COMPLETE), FALSE,
-                      CHIP_BLE_KW_EVNT_TIMEOUT, &event_mask) != osaStatus_Success)
-    {
-        return BLE_E_ADV_PARAMS_FAILED;
-    }
+    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED | CHIP_BLE_KW_EVNT_ADV_PAR_SETUP_COMPLETE,
+                                    pdTRUE, pdFALSE, CHIP_BLE_KW_EVNT_TIMEOUT);
 
-    if (event_mask & CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED)
+    if (!(eventBits & CHIP_BLE_KW_EVNT_ADV_PAR_SETUP_COMPLETE))
     {
         return BLE_E_ADV_PARAMS_FAILED;
     }
 
     /************* Set the advertising data *************/
-    OSA_EventClear(event_msg, (CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED | CHIP_BLE_KW_EVNT_ADV_DAT_SETUP_COMPLETE));
+    xEventGroupClearBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED | CHIP_BLE_KW_EVNT_ADV_DAT_SETUP_COMPLETE);
 
     /* Set the advertising data */
     if (Gap_SetAdvertisingData(adv, scnrsp) != gBleSuccess_c)
@@ -664,26 +665,25 @@ BLEManagerImpl::ble_err_t BLEManagerImpl::blekw_start_advertising(gapAdvertising
         return BLE_E_SET_ADV_DATA;
     }
 
-    if (OSA_EventWait(event_msg, (CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED | CHIP_BLE_KW_EVNT_ADV_DAT_SETUP_COMPLETE), FALSE,
-                      CHIP_BLE_KW_EVNT_TIMEOUT, &event_mask) != osaStatus_Success)
-    {
-        return BLE_E_ADV_SETUP_FAILED;
-    }
+    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED | CHIP_BLE_KW_EVNT_ADV_DAT_SETUP_COMPLETE,
+                                    pdTRUE, pdFALSE, CHIP_BLE_KW_EVNT_TIMEOUT);
 
-    if (event_mask & CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED)
+    if (!(eventBits & CHIP_BLE_KW_EVNT_ADV_DAT_SETUP_COMPLETE))
     {
         return BLE_E_ADV_SETUP_FAILED;
     }
 
     /************* Start the advertising *************/
-    OSA_EventClear(event_msg, (CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED));
+    xEventGroupClearBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED);
 
     if (gBleSuccess_c != Gap_CreateRandomDeviceAddress(NULL, NULL))
     {
         return BLE_E_SET_ADV_PARAMS;
     }
 
-    if (OSA_EventWait(event_msg, CHIP_BLE_KW_EVNT_RND_ADDR_SET, FALSE, CHIP_BLE_KW_EVNT_TIMEOUT, &event_mask) != osaStatus_Success)
+    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_RND_ADDR_SET, pdTRUE, pdTRUE, CHIP_BLE_KW_EVNT_TIMEOUT);
+
+    if (!(eventBits & CHIP_BLE_KW_EVNT_RND_ADDR_SET))
     {
         return BLE_E_ADV_PARAMS_FAILED;
     }
@@ -698,16 +698,9 @@ BLEManagerImpl::ble_err_t BLEManagerImpl::blekw_start_advertising(gapAdvertising
     PWR_DisallowDeviceToSleep();
 #endif
 
-    if (OSA_EventWait(event_msg, (CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED), FALSE, CHIP_BLE_KW_EVNT_TIMEOUT,
-                      &event_mask) != osaStatus_Success)
-    {
-#if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
-        PWR_AllowDeviceToSleep();
-#endif
-        return BLE_E_START_ADV_FAILED;
-    }
-
-    if (event_mask & CHIP_BLE_KW_EVNT_ADV_FAILED)
+    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED,
+                                    pdTRUE, pdFALSE, CHIP_BLE_KW_EVNT_TIMEOUT);
+    if (!(eventBits & CHIP_BLE_KW_EVNT_ADV_CHANGED))
     {
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
         PWR_AllowDeviceToSleep();
@@ -724,10 +717,10 @@ BLEManagerImpl::ble_err_t BLEManagerImpl::blekw_start_advertising(gapAdvertising
 
 BLEManagerImpl::ble_err_t BLEManagerImpl::blekw_stop_advertising(void)
 {
-    osaEventFlags_t event_mask;
+	EventBits_t eventBits;
     bleResult_t res;
 
-    OSA_EventClear(event_msg, (CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED));
+    xEventGroupClearBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED);
 
     /* Stop the advertising data */
     res = Gap_StopAdvertising();
@@ -737,17 +730,18 @@ BLEManagerImpl::ble_err_t BLEManagerImpl::blekw_stop_advertising(void)
         return BLE_E_STOP;
     }
 
-    if (OSA_EventWait(event_msg, (CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED), FALSE, CHIP_BLE_KW_EVNT_TIMEOUT,
-                      &event_mask) != osaStatus_Success)
-    {
-        ChipLogProgress(DeviceLayer, "Stop advertising event timeout.");
-        return BLE_E_ADV_CHANGED;
-    }
+    eventBits = xEventGroupWaitBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_CHANGED | CHIP_BLE_KW_EVNT_ADV_FAILED,
+                                      pdTRUE, pdFALSE, CHIP_BLE_KW_EVNT_TIMEOUT);
 
-    if (event_mask & CHIP_BLE_KW_EVNT_ADV_FAILED)
+    if (eventBits & CHIP_BLE_KW_EVNT_ADV_FAILED)
     {
         ChipLogProgress(DeviceLayer, "Stop advertising flat out failed.");
         return BLE_E_ADV_FAILED;
+    }
+    else if (!(eventBits & CHIP_BLE_KW_EVNT_ADV_CHANGED))
+    {
+        ChipLogProgress(DeviceLayer, "Stop advertising event timeout.");
+        return BLE_E_ADV_CHANGED;
     }
 
     return BLE_OK;
@@ -1271,15 +1265,15 @@ void BLEManagerImpl::blekw_generic_cb(gapGenericEvent_t * pGenericEvent)
         break;
 
     case gAdvertisingSetupFailed_c:
-        OSA_EventSet(event_msg, CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED);
+    	xEventGroupSetBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_SETUP_FAILED);
         break;
 
     case gAdvertisingParametersSetupComplete_c:
-        OSA_EventSet(event_msg, CHIP_BLE_KW_EVNT_ADV_PAR_SETUP_COMPLETE);
+    	xEventGroupSetBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_PAR_SETUP_COMPLETE);
         break;
 
     case gAdvertisingDataSetupComplete_c:
-        OSA_EventSet(event_msg, CHIP_BLE_KW_EVNT_ADV_DAT_SETUP_COMPLETE);
+        xEventGroupSetBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_DAT_SETUP_COMPLETE);
         break;
 
     case gRandomAddressReady_c:
@@ -1287,15 +1281,24 @@ void BLEManagerImpl::blekw_generic_cb(gapGenericEvent_t * pGenericEvent)
         break;
 
     case gRandomAddressSet_c:
-        OSA_EventSet(event_msg, CHIP_BLE_KW_EVNT_RND_ADDR_SET);
+        xEventGroupSetBits(sEventGroup, CHIP_BLE_KW_EVNT_RND_ADDR_SET);
         break;
+
+#if BLE_HIGH_TX_POWER
+    case gTxPowerLevelSetComplete_c:
+        if (gBleSuccess_c == pGenericEvent->eventData.txPowerLevelSetStatus)
+        {
+            xEventGroupSetBits(sEventGroup, CHIP_BLE_KW_EVNT_POWER_LEVEL_SET);
+        }
+        break;
+#endif
 
     case gInitializationComplete_c:
         /* Common GAP configuration */
         BleConnManager_GapCommonConfig();
 
         /* Set the local synchronization event */
-        OSA_EventSet(event_msg, CHIP_BLE_KW_EVNT_INIT_COMPLETE);
+        xEventGroupSetBits(sEventGroup, CHIP_BLE_KW_EVNT_INIT_COMPLETE);
         break;
     default:
         break;
@@ -1307,7 +1310,7 @@ void BLEManagerImpl::blekw_gap_advertising_cb(gapAdvertisingEvent_t * pAdvertisi
     if (pAdvertisingEvent->eventType == gAdvertisingStateChanged_c)
     {
         /* Set the local synchronization event */
-        OSA_EventSet(event_msg, CHIP_BLE_KW_EVNT_ADV_CHANGED);
+        xEventGroupSetBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_CHANGED);
     }
     else
     {
@@ -1316,7 +1319,7 @@ void BLEManagerImpl::blekw_gap_advertising_cb(gapAdvertisingEvent_t * pAdvertisi
                         pAdvertisingEvent->eventData.failReason);
 
         /* Set the local synchronization event */
-        OSA_EventSet(event_msg, CHIP_BLE_KW_EVNT_ADV_FAILED);
+        xEventGroupSetBits(sEventGroup, CHIP_BLE_KW_EVNT_ADV_FAILED);
     }
 }
 
@@ -1429,14 +1432,14 @@ void BLEManagerImpl::blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent_t
 
     case gEvtHandleValueConfirmation_c:
         /* Set the local synchronization event */
-        OSA_EventSet(event_msg, CHIP_BLE_KW_EVNT_INDICATION_CONFIRMED);
+        xEventGroupSetBits(sEventGroup, CHIP_BLE_KW_EVNT_INDICATION_CONFIRMED);
         break;
 
     case gEvtError_c:
         if (pServerEvent->eventData.procedureError.procedureType == gSendIndication_c)
         {
             /* Set the local synchronization event */
-            OSA_EventSet(event_msg, CHIP_BLE_KW_EVNT_INDICATION_FAILED);
+            xEventGroupSetBits(sEventGroup, CHIP_BLE_KW_EVNT_INDICATION_FAILED);
         }
         else
         {
