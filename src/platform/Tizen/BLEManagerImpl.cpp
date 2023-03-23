@@ -104,16 +104,15 @@ static void __AdapterStateChangedCb(int result, bt_adapter_state_e adapterState,
 
 void BLEManagerImpl::GattConnectionStateChangedCb(int result, bool connected, const char * remoteAddress, void * userData)
 {
-    ChipLogProgress(DeviceLayer, "Gatt Connection State Changed [%u]: %s", result, connected ? "Connected" : "Disconnected");
     switch (result)
     {
     case BT_ERROR_NONE:
     case BT_ERROR_ALREADY_DONE:
+        ChipLogProgress(DeviceLayer, "GATT %s", connected ? "connected" : "disconnected");
         sInstance.HandleConnectionEvent(connected, remoteAddress);
         break;
     default:
-        ChipLogError(DeviceLayer, "%s: %s", connected ? "Connection req failed" : "Disconnection req failed",
-                     get_error_message(result));
+        ChipLogError(DeviceLayer, "GATT %s failed: %s", connected ? "connection" : "disconnection", get_error_message(result));
         if (connected)
             sInstance.NotifyHandleConnectFailed(CHIP_ERROR_INTERNAL);
     }
@@ -405,9 +404,9 @@ void BLEManagerImpl::NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId, CHIP_ER
 
 void BLEManagerImpl::NotifyHandleConnectFailed(CHIP_ERROR error)
 {
+    ChipLogProgress(DeviceLayer, "Connection failed: %" CHIP_ERROR_FORMAT, error.Format());
     if (sInstance.mIsCentral)
     {
-        ChipLogProgress(DeviceLayer, "Connection Failed: Post Platform event");
         ChipDeviceEvent event;
         event.Type                                    = DeviceEventType::kPlatformTizenBLECentralConnectFailed;
         event.Platform.BLECentralConnectFailed.mError = error;
