@@ -789,39 +789,12 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrReturnError(mState == ClientState::SubscriptionActive, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(IsSubscriptionActive(), CHIP_ERROR_INCORRECT_STATE);
 
     CancelLivenessCheckTimer();
 
     System::Clock::Timeout timeout;
-
-    if (mLivenessTimeoutOverride != System::Clock::kZero)
-    {
-        timeout = mLivenessTimeoutOverride;
-    }
-    else
-    {
-        VerifyOrReturnError(mReadPrepareParams.mSessionHolder, CHIP_ERROR_INCORRECT_STATE);
-
-        //
-        // To calculate the duration we're willing to wait for a report to come to us, we take into account the maximum interval of
-        // the subscription AND the time it takes for the report to make it to us in the worst case. This latter bit involves
-        // computing the Ack timeout from the publisher for the ReportData message being sent to us using our IDLE interval as the
-        // basis for that computation.
-        //
-        // Make sure to use the retransmission computation that includes backoff.  For purposes of that computation, treat us as
-        // active now (since we are right now sending/receiving messages), and use the default "how long are we guaranteed to stay
-        // active" threshold for now.
-        //
-        // TODO: We need to find a good home for this logic that will correctly compute this based on transport. For now, this will
-        // suffice since we don't use TCP as a transport currently and subscriptions over BLE aren't really a thing.
-        //
-        const auto & ourMrpConfig = GetDefaultMRPConfig();
-        auto publisherTransmissionTimeout =
-            GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
-                                     System::SystemClock().GetMonotonicTimestamp(), Transport::kMinActiveTime);
-        timeout = System::Clock::Seconds16(mMaxInterval) + publisherTransmissionTimeout;
-    }
+    ReturnErrorOnFailure(ComputeLivenessCheckTimerTimeout(&timeout));
 
     // EFR32/MBED/INFINION/K32W's chrono count return long unsigned, but other platform returns unsigned
     ChipLogProgress(
@@ -832,6 +805,37 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
         timeout, OnLivenessTimeoutCallback, this);
 
     return err;
+}
+
+CHIP_ERROR ReadClient::ComputeLivenessCheckTimerTimeout(System::Clock::Timeout * aTimeout)
+{
+    if (mLivenessTimeoutOverride != System::Clock::kZero)
+    {
+        *aTimeout = mLivenessTimeoutOverride;
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(mReadPrepareParams.mSessionHolder, CHIP_ERROR_INCORRECT_STATE);
+
+    //
+    // To calculate the duration we're willing to wait for a report to come to us, we take into account the maximum interval of
+    // the subscription AND the time it takes for the report to make it to us in the worst case. This latter bit involves
+    // computing the Ack timeout from the publisher for the ReportData message being sent to us using our IDLE interval as the
+    // basis for that computation.
+    //
+    // Make sure to use the retransmission computation that includes backoff.  For purposes of that computation, treat us as
+    // active now (since we are right now sending/receiving messages), and use the default "how long are we guaranteed to stay
+    // active" threshold for now.
+    //
+    // TODO: We need to find a good home for this logic that will correctly compute this based on transport. For now, this will
+    // suffice since we don't use TCP as a transport currently and subscriptions over BLE aren't really a thing.
+    //
+    const auto & ourMrpConfig = GetDefaultMRPConfig();
+    auto publisherTransmissionTimeout =
+        GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
+                                 System::SystemClock().GetMonotonicTimestamp(), Transport::kMinActiveTime);
+    *aTimeout = System::Clock::Seconds16(mMaxInterval) + publisherTransmissionTimeout;
+    return CHIP_NO_ERROR;
 }
 
 void ReadClient::CancelLivenessCheckTimer()
@@ -1186,6 +1190,23 @@ void ReadClient::TriggerResubscribeIfScheduled(const char * reason)
     ChipLogDetail(DataManagement, "ReadClient[%p] triggering resubscribe, reason: %s", this, reason);
     CancelResubscribeTimer();
     OnResubscribeTimerCallback(nullptr, this);
+}
+
+Optional<System::Clock::Timeout> ReadClient::GetSubscriptionTimeout()
+{
+    if (!IsSubscriptionType() || !IsSubscriptionActive())
+    {
+        return NullOptional;
+    }
+
+    System::Clock::Timeout timeout;
+    CHIP_ERROR err = ComputeLivenessCheckTimerTimeout(&timeout);
+    if (err != CHIP_NO_ERROR)
+    {
+        return NullOptional;
+    }
+
+    return MakeOptional(timeout);
 }
 
 } // namespace app
