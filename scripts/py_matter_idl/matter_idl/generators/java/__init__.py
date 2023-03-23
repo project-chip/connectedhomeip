@@ -66,7 +66,43 @@ def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, No
     return None
 
 
-def CallbackName(attr: Attribute, cluster: Cluster, context: TypeLookupContext) -> str:
+def GlobalNameToJavaName(name: str) -> str:
+    if name in {'Int8u', 'Int8s', 'Int16u', 'Int16s'}:
+        return 'Integer'
+
+    if name.startswith('Int'):
+        return 'Long'
+
+    # Double/Float/Booleans/CharString/OctetString
+    return name
+
+
+def DelegatedCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
+    """
+    Figure out what callback name to use for delegate callback construction.
+    """
+    global_name = FieldToGlobalName(attr.definition, context)
+
+    if global_name:
+        return 'Delegated{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
+
+    return 'Delegated{}Cluster{}AttributeCallback'.format(context.cluster.name, capitalcase(attr.definition.name))
+
+
+def ChipClustersCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
+    """
+    Figure out what callback name to use when building a ChipCluster.*AttributeCallback
+    in java codegen.
+    """
+    global_name = FieldToGlobalName(attr.definition, context)
+
+    if global_name:
+        return 'ChipClusters.{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
+
+    return 'ChipClusters.{}Cluster.{}AttributeCallback'.format(context.cluster.name, capitalcase(attr.definition.name))
+
+
+def CallbackName(attr: Attribute, context: TypeLookupContext) -> str:
     """
     Figure out what callback name to use when a variable requires a read callback.
 
@@ -82,7 +118,7 @@ def CallbackName(attr: Attribute, cluster: Cluster, context: TypeLookupContext) 
         return 'CHIP{}AttributeCallback'.format(capitalcase(global_name))
 
     return 'CHIP{}{}AttributeCallback'.format(
-        capitalcase(cluster.name),
+        capitalcase(context.cluster.name),
         capitalcase(attr.definition.name)
     )
 
@@ -368,6 +404,8 @@ class __JavaCodeGenerator(CodeGenerator):
 
         self.jinja_env.filters['attributesWithCallback'] = attributesWithSupportedCallback
         self.jinja_env.filters['callbackName'] = CallbackName
+        self.jinja_env.filters['chipClustersCallbackName'] = ChipClustersCallbackName
+        self.jinja_env.filters['delegatedCallbackName'] = DelegatedCallbackName
         self.jinja_env.filters['commandCallbackName'] = CommandCallbackName
         self.jinja_env.filters['named'] = NamedFilter
         self.jinja_env.filters['toBoxedJavaType'] = ToBoxedJavaType
@@ -424,11 +462,22 @@ class JavaClassGenerator(__JavaCodeGenerator):
         Renders .java files required for java matter support
         """
 
+        clientClusters = [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT]
+
+        self.internal_render_one_output(
+            template_path="java/ClusterReadMapping.jinja",
+            output_file_name="java/chip/devicecontroller/ClusterReadMapping.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
         self.internal_render_one_output(
             template_path="java/ClusterWriteMapping.jinja",
             output_file_name="java/chip/devicecontroller/ClusterWriteMapping.java",
             vars={
                 'idl': self.idl,
-                'clientClusters': [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT],
+                'clientClusters': clientClusters,
             }
         )
