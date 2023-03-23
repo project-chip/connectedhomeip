@@ -678,6 +678,13 @@ menu "CHIP Device Layer"
             help
                 Enable ESP32 Device LocationCapability
 
+        config SEC_CERT_DAC_PROVIDER
+            bool "Use Secure Cert DAC Provider"
+            default n
+            help
+                Use ESP32 Secure Cert DAC Provider which is  ESP32 DeviceAttestationCredentialsProvider implementation which reads attestation
+                information from the esp_secure_cert partition
+
     endmenu
 
 
