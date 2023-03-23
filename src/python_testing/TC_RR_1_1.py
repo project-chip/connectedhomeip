@@ -694,9 +694,8 @@ class TC_RR_1_1(MatterBaseTest):
                        enable_access_to_group_cluster: bool,
                        fabric_table: List[
                            Clusters.OperationalCredentials.Structs.FabricDescriptorStruct]):
-        for table_idx in range(len(fabric_table)):
+        for table_idx, fabric in enumerate(fabric_table):
             # Client is client A for each fabric
-            fabric = fabric_table[table_idx]
             client_name = "RD%dA" % table_idx
             client = client_by_name[client_name]
 
