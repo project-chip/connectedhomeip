@@ -34,9 +34,6 @@
 #include "nvm3_default.h"
 #include "nvm3_hal_flash.h"
 #include <nvm3_lock.h>
-#ifdef BRD4325A
-#include "rsi_ccp_common.h"
-#endif
 
 #ifndef BRD4325A // TODO: fix semaphore usage in nvm3_lock for siwx917. use weak implementation for that board instead
 // Substitute the GSDK weak nvm3_lockBegin and nvm3_lockEnd
