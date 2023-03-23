@@ -39,7 +39,7 @@ if (current_os == "android" || build_java_matter_controller) {
 
   chip_codegen("java-jni-generate") {
     input = "controller-clusters.matter"
-    generator = "java"
+    generator = "java-jni"
 
     outputs = [
       "jni/IdentifyClient-ReadImpl.cpp",
