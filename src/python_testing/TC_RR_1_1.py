@@ -17,6 +17,7 @@
 
 import asyncio
 import logging
+import math
 import queue
 import random
 import time
@@ -612,37 +613,45 @@ class TC_RR_1_1(MatterBaseTest):
                              fabric_table: List[
                                  Clusters.OperationalCredentials.Structs.FabricDescriptorStruct]) -> List[
             Dict[int, Clusters.GroupKeyManagement.Structs.GroupInfoMapStruct]]:
-        # Step 15: Add indicated_max_groups_per_fabric to each fabric through the Groups clusters on supporting endpoints.
+        # Step 14: Add indicated_max_groups_per_fabric to each fabric through the Groups clusters on supporting endpoints.
         written_group_table_map: List[Dict[int, Clusters.GroupKeyManagement.Structs.GroupInfoMapStruct]] = [
             {} for _ in range(fabrics)]
         for client_idx in range(fabrics):
             client: Any = clients[client_idx]
             fabric_idx: int = fabric_table[client_idx].fabricIndex
 
+            base_groups_per_endpoint: int = math.floor(groups_per_fabric / len(group_endpoints))
+            groups_remainder: int = groups_per_fabric % len(group_endpoints)
+
+            group_id_list_copy = list(group_key_map[client_idx])
+            # This is just a sanity check that the number of IDs provided matches how many group IDs we are told to
+            # write to each fabric.
+            asserts.assert_equal(len(group_id_list_copy), groups_per_fabric)
+
             for endpoint_id in group_endpoints:
+                groups_to_add: int = base_groups_per_endpoint
+                if groups_remainder:
+                    groups_to_add += 1
+                    groups_remainder -= 1
+
                 feature_map: int = await self.read_single_attribute(client,
                                                                     node_id=self.dut_node_id,
                                                                     endpoint=endpoint_id,
                                                                     attribute=Clusters.Groups.Attributes.FeatureMap)
-                name_featrure_bit = Clusters.Groups.Bitmaps.GroupClusterFeature.kGroupNames
-                name_supported: bool = (feature_map & name_featrure_bit) != 0
+                name_featrure_bit: int = 0
+                name_supported: bool = (feature_map & (1 << name_featrure_bit)) != 0
 
                 # Write groups to cluster
-                for group_id in group_key_map[client_idx]:
-                    group_name: str = ""
-                    if group_id in written_group_table_map[client_idx]:
-                        group_name = written_group_table_map[client_idx][group_id].groupName
-                        written_group_table_map[client_idx][group_id].endpoints.append(endpoint_id)
-                    else:
-                        if name_supported:
-                            group_name = self.random_string(16)
-                        written_group_table_map[client_idx][group_id] = Clusters.GroupKeyManagement.Structs.GroupInfoMapStruct(
-                            groupId=group_id,
-                            groupName=group_name,
-                            fabricIndex=fabric_idx,
-                            endpoints=[endpoint_id])
+                for _ in range(groups_to_add):
+                    group_id = group_id_list_copy.pop()
+                    group_name: str = self.random_string(16) if name_supported else ""
                     command: Clusters.Groups.Commands.AddGroup = Clusters.Groups.Commands.AddGroup(
                         groupID=group_id, groupName=group_name)
+                    written_group_table_map[client_idx][group_id] = Clusters.GroupKeyManagement.Structs.GroupInfoMapStruct(
+                        groupId=group_id,
+                        groupName=group_name,
+                        fabricIndex=fabric_idx,
+                        endpoints=[endpoint_id])
                     add_response: Clusters.Groups.Commands.AddGroupResponse = await client.SendCommand(
                         self.dut_node_id, endpoint_id, command, responseType=Clusters.Groups.Commands.AddGroupResponse)
                     asserts.assert_equal(StatusEnum.Success, add_response.status)
