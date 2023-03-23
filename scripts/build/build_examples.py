@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 import os
 import sys
@@ -24,7 +25,6 @@ from builders.builder import BuilderOptions
 from runner import PrintOnlyRunner, ShellRunner
 
 import build
-import json
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
