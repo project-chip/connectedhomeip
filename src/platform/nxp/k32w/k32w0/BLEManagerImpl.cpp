@@ -1087,7 +1087,6 @@ void BLEManagerImpl::HandleConnectEvent(blekw_msg_t * msg)
     g_device_id = device_id_loc;
     blekw_start_connection_timeout();
     sInstance.AddConnection(device_id_loc);
-    mFlags.Set(Flags::kRestartAdvertising);
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
