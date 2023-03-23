@@ -409,6 +409,7 @@ To support multi-image OTA feature, the SSBL project must be compiled using the 
 - `PDM_EXT_FLASH=1` - support PDM in external flash.
 - `gOTAUseCustomOtaEntry=1` - support custom OTA entry for multi-image.
 - `gOTACustomOtaEntryMemory=OTACustomStorage_ExtFlash` - K32W0 uses `OTACustomStorage_ExtFlash` (1) by default.
+- `SPIFI_DUAL_MODE_SUPPORT=1` - only for configurations that use dual SPIFI flash (e.g. K32W041AM variant).
 
 Optionally, add the following defines:
 - `SPIFI_OPTIM_SIZE=1` - to optimize SSBL size.
