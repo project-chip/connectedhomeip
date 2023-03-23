@@ -114,7 +114,6 @@ class TargetPart:
         return result
 
 
-
 def _HasVariantPrefix(value: str, prefix: str):
     """Checks if the given value is <prefix> or starts with "<prefix>-".
 
@@ -195,6 +194,7 @@ def _StringIntoParts(full_input: str, remaining_input: str, fixed_targets: List[
 
     # Remaining input is not empty and we failed to match it
     return None
+
 
 class BuildTarget:
 
