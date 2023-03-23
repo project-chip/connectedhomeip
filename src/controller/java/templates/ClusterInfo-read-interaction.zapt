@@ -15,30 +15,31 @@ public class ClusterReadMapping {
     Map<String, Map<String, InteractionInfo>> readAttributeMap = new HashMap<>();
     {{#chip_client_clusters}}
        Map<String, InteractionInfo> read{{asUpperCamelCase name}}InteractionInfo = new LinkedHashMap<>();
-        {{#chip_server_cluster_attributes}}
+        {{#zcl_attributes_server removeKeys='isOptional'}}
         {{! TODO: Add support for struct-typed attributes }}
-        {{#unless (isStrEqual chipCallback.name "Unsupported")}}
+        {{#if_unsupported_attribute_callback type isArray ../id}}
+        {{else}}
         Map<String, CommandParameterInfo> read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster).read{{asUpperCamelCase name}}Attribute(
-              ({{#if_basic_global_response}}
-                ChipClusters.{{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback
+              ({{#if_basic_attribute type ../id}}
+                ChipClusters.{{as_underlying_java_zcl_type type ../id boolean="Boolean"}}AttributeCallback
               {{else}}
                 ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}AttributeCallback
-              {{/if_basic_global_response}}) callback
+              {{/if_basic_attribute}}) callback
             );
           },
-          {{#if_basic_global_response}}
-            () -> new ClusterInfoMapping.Delegated{{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback(),
+          {{#if_basic_attribute type ../id}}
+            () -> new ClusterInfoMapping.Delegated{{as_underlying_java_zcl_type type ../id boolean="Boolean"}}AttributeCallback(),
           {{else}}
             () -> new ClusterInfoMapping.Delegated{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback(),
-          {{/if_basic_global_response}}
+          {{/if_basic_attribute}}
           read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams
         );
         read{{asUpperCamelCase ../name}}InteractionInfo.put("read{{asUpperCamelCase name}}Attribute", read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo);
-        {{/unless}}
-        {{/chip_server_cluster_attributes}}
+        {{/if_unsupported_attribute_callback}}
+        {{/zcl_attributes_server}}
         readAttributeMap.put("{{asLowerCamelCase name}}", read{{asUpperCamelCase name}}InteractionInfo);
         {{/chip_client_clusters}}
         return readAttributeMap;

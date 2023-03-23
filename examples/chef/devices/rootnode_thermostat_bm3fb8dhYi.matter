@@ -1240,6 +1240,17 @@ client cluster FanControl = 514 {
     kNaturalWind = 0x2;
   }
 
+  attribute FanModeType fanMode = 0;
+  attribute FanModeSequenceType fanModeSequence = 1;
+  attribute nullable int8u percentSetting = 2;
+  readonly attribute int8u percentCurrent = 3;
+  readonly attribute int8u speedMax = 4;
+  attribute nullable int8u speedSetting = 5;
+  readonly attribute int8u speedCurrent = 6;
+  readonly attribute bitmap8 rockSupport = 7;
+  attribute bitmap8 rockSetting = 8;
+  readonly attribute bitmap8 windSupport = 9;
+  attribute bitmap8 windSetting = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1260,6 +1271,10 @@ server cluster ThermostatUserInterfaceConfiguration = 516 {
 }
 
 client cluster TemperatureMeasurement = 1026 {
+  readonly attribute nullable int16s measuredValue = 0;
+  readonly attribute nullable int16s minMeasuredValue = 1;
+  readonly attribute nullable int16s maxMeasuredValue = 2;
+  readonly attribute int16u tolerance = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1269,6 +1284,10 @@ client cluster TemperatureMeasurement = 1026 {
 }
 
 client cluster RelativeHumidityMeasurement = 1029 {
+  readonly attribute nullable int16u measuredValue = 0;
+  readonly attribute nullable int16u minMeasuredValue = 1;
+  readonly attribute nullable int16u maxMeasuredValue = 2;
+  readonly attribute int16u tolerance = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1295,6 +1314,18 @@ client cluster OccupancySensing = 1030 {
     kPhysicalContact = 0x4;
   }
 
+  readonly attribute OccupancyBitmap occupancy = 0;
+  readonly attribute OccupancySensorTypeEnum occupancySensorType = 1;
+  readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
+  attribute access(write: manage) int16u PIROccupiedToUnoccupiedDelay = 16;
+  attribute access(write: manage) int16u PIRUnoccupiedToOccupiedDelay = 17;
+  attribute access(write: manage) int8u PIRUnoccupiedToOccupiedThreshold = 18;
+  attribute access(write: manage) int16u ultrasonicOccupiedToUnoccupiedDelay = 32;
+  attribute access(write: manage) int16u ultrasonicUnoccupiedToOccupiedDelay = 33;
+  attribute access(write: manage) int8u ultrasonicUnoccupiedToOccupiedThreshold = 34;
+  attribute access(write: manage) int16u physicalContactOccupiedToUnoccupiedDelay = 48;
+  attribute access(write: manage) int16u physicalContactUnoccupiedToOccupiedDelay = 49;
+  attribute access(write: manage) int8u physicalContactUnoccupiedToOccupiedThreshold = 50;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

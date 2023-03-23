@@ -86,11 +86,12 @@ void CHIP{{chipCallback.name}}AttributeCallback::CallbackFn(void * context, {{ch
 {{/chip_server_global_responses}}
 
 {{#chip_client_clusters}}
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server removeKeys='isOptional'}}
 {{! TODO: Add support for struct-typed attributes }}
-{{#unless (isStrEqual chipCallback.name "Unsupported")}}
+{{#if_unsupported_attribute_callback type isArray ../id}}
+{{else}}
 
-{{#if_basic_global_response}}
+{{#if_basic_attribute type ../id}}
 {{else}}
 CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
@@ -116,7 +117,7 @@ CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::
     }
     env->DeleteGlobalRef(javaCallbackRef);
 }
-{{/if_basic_global_response}}
+{{/if_basic_attribute}}
 
 {{#if isArray}}
 void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list)
@@ -144,7 +145,7 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 {{else}}
-  {{#if_basic_global_response}}
+  {{#if_basic_attribute type ../id}}
   {{else}}
     void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} value)
     {
@@ -168,10 +169,10 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
     }
-  {{/if_basic_global_response}}
+  {{/if_basic_attribute}}
 {{/if}}
-{{/unless}}
-{{/chip_server_cluster_attributes}}
+{{/if_unsupported_attribute_callback}}
+{{/zcl_attributes_server}}
 {{/chip_client_clusters}}
 
 {{/if}}
