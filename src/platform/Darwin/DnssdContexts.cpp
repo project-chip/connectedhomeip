@@ -15,17 +15,25 @@
  *    limitations under the License.
  */
 #include "DnssdImpl.h"
+#include "DnssdType.h"
 #include "MdnsError.h"
 
 #include <lib/support/CHIPMemString.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip::Dnssd;
+using namespace chip::Dnssd::Internal;
 
 namespace {
 
 constexpr uint8_t kDnssdKeyMaxSize          = 32;
 constexpr uint8_t kDnssdTxtRecordMaxEntries = 20;
+constexpr const char * kLocalDot            = "local.";
+
+bool IsLocalDomain(const char * domain)
+{
+    return strcmp(kLocalDot, domain) == 0;
+}
 
 std::string GetHostNameWithoutDomain(const char * hostnameWithDomain)
 {
@@ -37,17 +45,6 @@ std::string GetHostNameWithoutDomain(const char * hostnameWithDomain)
     }
 
     return hostname;
-}
-
-std::string GetFullTypeWithoutSubTypes(std::string fullType)
-{
-    size_t position = fullType.find(",");
-    if (position != std::string::npos)
-    {
-        fullType.erase(position);
-    }
-
-    return fullType;
 }
 
 void GetTextEntries(DnssdService & service, const unsigned char * data, uint16_t len)
@@ -105,6 +102,19 @@ DNSServiceProtocol GetProtocol(const chip::Inet::IPAddressType & addressType)
     // without IPv4, IPv6 is the only option
     return kDNSServiceProtocol_IPv6;
 #endif
+}
+
+DnssdService GetService(const char * name, const char * type, DnssdServiceProtocol protocol, uint32_t interfaceId)
+{
+    DnssdService service = {};
+    service.mInterface   = chip::Inet::InterfaceId(interfaceId);
+    service.mProtocol    = protocol;
+
+    auto baseType = GetBaseType(type);
+    chip::Platform::CopyString(service.mType, baseType.c_str());
+    chip::Platform::CopyString(service.mName, name);
+
+    return service;
 }
 
 } // namespace
@@ -289,6 +299,19 @@ ResolveContext * MdnsContexts::GetExistingResolveForInstanceName(const char * in
     return nullptr;
 }
 
+BrowseWithDelegateContext * MdnsContexts::GetExistingBrowseForDelegate(DnssdBrowseDelegate * delegate)
+{
+    for (auto & ctx : mContexts)
+    {
+        if (ctx->type == ContextType::BrowseWithDelegate && (static_cast<BrowseWithDelegateContext *>(ctx))->Matches(delegate))
+        {
+            return static_cast<BrowseWithDelegateContext *>(ctx);
+        }
+    }
+
+    return nullptr;
+}
+
 RegisterContext::RegisterContext(const char * sType, const char * instanceName, DnssdPublishCallback cb, void * cbContext)
 {
     type     = ContextType::Register;
@@ -346,6 +369,96 @@ void BrowseContext::DispatchPartialSuccess()
     callback(context, services.data(), services.size(), false, CHIP_NO_ERROR);
     sContextDispatchingSuccess = nullptr;
     services.clear();
+}
+
+void BrowseContext::OnBrowse(DNSServiceFlags flags, const char * name, const char * type, const char * domain, uint32_t interfaceId)
+{
+    (flags & kDNSServiceFlagsAdd) ? OnBrowseAdd(name, type, domain, interfaceId) : OnBrowseRemove(name, type, domain, interfaceId);
+
+    if (!(flags & kDNSServiceFlagsMoreComing))
+    {
+        DispatchPartialSuccess();
+    }
+}
+
+void BrowseContext::OnBrowseAdd(const char * name, const char * type, const char * domain, uint32_t interfaceId)
+{
+    ChipLogProgress(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, StringOrNullMarker(name),
+                    StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
+
+    VerifyOrReturn(IsLocalDomain(domain));
+    auto service = GetService(name, type, protocol, interfaceId);
+    services.push_back(service);
+}
+
+void BrowseContext::OnBrowseRemove(const char * name, const char * type, const char * domain, uint32_t interfaceId)
+{
+    ChipLogProgress(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, StringOrNullMarker(name),
+                    StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
+
+    VerifyOrReturn(name != nullptr);
+    VerifyOrReturn(IsLocalDomain(domain));
+
+    services.erase(std::remove_if(services.begin(), services.end(),
+                                  [name, type, interfaceId](const DnssdService & service) {
+                                      return strcmp(name, service.mName) == 0 && type == GetFullType(&service) &&
+                                          service.mInterface == chip::Inet::InterfaceId(interfaceId);
+                                  }),
+                   services.end());
+}
+
+BrowseWithDelegateContext::BrowseWithDelegateContext(DnssdBrowseDelegate * delegate, DnssdServiceProtocol cbContextProtocol)
+{
+    type     = ContextType::BrowseWithDelegate;
+    context  = static_cast<void *>(delegate);
+    protocol = cbContextProtocol;
+}
+
+void BrowseWithDelegateContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
+{
+    ChipLogError(Discovery, "Mdns: Browse failure (%s)", errorStr);
+
+    auto delegate = static_cast<DnssdBrowseDelegate *>(context);
+    delegate->OnBrowseStop(err);
+    MdnsContexts::GetInstance().Remove(this);
+}
+
+void BrowseWithDelegateContext::DispatchSuccess()
+{
+    auto delegate = static_cast<DnssdBrowseDelegate *>(context);
+    delegate->OnBrowseStop(CHIP_NO_ERROR);
+    MdnsContexts::GetInstance().Remove(this);
+}
+
+void BrowseWithDelegateContext::OnBrowse(DNSServiceFlags flags, const char * name, const char * type, const char * domain,
+                                         uint32_t interfaceId)
+{
+    (flags & kDNSServiceFlagsAdd) ? OnBrowseAdd(name, type, domain, interfaceId) : OnBrowseRemove(name, type, domain, interfaceId);
+}
+
+void BrowseWithDelegateContext::OnBrowseAdd(const char * name, const char * type, const char * domain, uint32_t interfaceId)
+{
+    ChipLogProgress(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, StringOrNullMarker(name),
+                    StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
+
+    VerifyOrReturn(IsLocalDomain(domain));
+
+    auto delegate = static_cast<DnssdBrowseDelegate *>(context);
+    auto service  = GetService(name, type, protocol, interfaceId);
+    delegate->OnBrowseAdd(service);
+}
+
+void BrowseWithDelegateContext::OnBrowseRemove(const char * name, const char * type, const char * domain, uint32_t interfaceId)
+{
+    ChipLogProgress(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, StringOrNullMarker(name),
+                    StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
+
+    VerifyOrReturn(name != nullptr);
+    VerifyOrReturn(IsLocalDomain(domain));
+
+    auto delegate = static_cast<DnssdBrowseDelegate *>(context);
+    auto service  = GetService(name, type, protocol, interfaceId);
+    delegate->OnBrowseRemove(service);
 }
 
 ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,

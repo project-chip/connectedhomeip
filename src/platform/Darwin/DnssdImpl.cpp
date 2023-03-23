@@ -15,13 +15,11 @@
  *    limitations under the License.
  */
 #include "DnssdImpl.h"
+#include "DnssdType.h"
 #include "MdnsError.h"
 
 #include <cstdio>
-#include <sstream>
-#include <string.h>
 
-#include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -29,12 +27,11 @@
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip::Dnssd;
+using namespace chip::Dnssd::Internal;
 
 namespace {
 
-constexpr const char * kLocalDot    = "local.";
-constexpr const char * kProtocolTcp = "._tcp";
-constexpr const char * kProtocolUdp = "._udp";
+constexpr const char * kLocalDot = "local.";
 
 constexpr DNSServiceFlags kRegisterFlags        = kDNSServiceFlagsNoAutoRename;
 constexpr DNSServiceFlags kBrowseFlags          = 0;
@@ -50,51 +47,6 @@ bool IsSupportedProtocol(DnssdServiceProtocol protocol)
 uint32_t GetInterfaceId(chip::Inet::InterfaceId interfaceId)
 {
     return interfaceId.IsPresent() ? interfaceId.GetPlatformInterface() : kDNSServiceInterfaceIndexAny;
-}
-
-std::string GetFullType(const char * type, DnssdServiceProtocol protocol)
-{
-    std::ostringstream typeBuilder;
-    typeBuilder << type;
-    typeBuilder << (protocol == DnssdServiceProtocol::kDnssdProtocolUdp ? kProtocolUdp : kProtocolTcp);
-    return typeBuilder.str();
-}
-
-std::string GetFullType(const DnssdService * service)
-{
-    return GetFullType(service->mType, service->mProtocol);
-}
-
-std::string GetFullTypeWithSubTypes(const char * type, DnssdServiceProtocol protocol, const char * subTypes[], size_t subTypeSize)
-{
-    std::ostringstream typeBuilder;
-    typeBuilder << type;
-    typeBuilder << (protocol == DnssdServiceProtocol::kDnssdProtocolUdp ? kProtocolUdp : kProtocolTcp);
-    for (int i = 0; i < (int) subTypeSize; i++)
-    {
-        typeBuilder << ",";
-        typeBuilder << subTypes[i];
-    }
-    return typeBuilder.str();
-}
-
-std::string GetFullTypeWithSubTypes(const char * type, DnssdServiceProtocol protocol)
-{
-    auto fullType = GetFullType(type, protocol);
-
-    std::string subtypeDelimiter = "._sub.";
-    size_t position              = fullType.find(subtypeDelimiter);
-    if (position != std::string::npos)
-    {
-        fullType = fullType.substr(position + subtypeDelimiter.size()) + "," + fullType.substr(0, position);
-    }
-
-    return fullType;
-}
-
-std::string GetFullTypeWithSubTypes(const DnssdService * service)
-{
-    return GetFullTypeWithSubTypes(service->mType, service->mProtocol, service->mSubTypes, service->mSubTypeSize);
 }
 
 std::string GetHostNameWithDomain(const char * hostname)
@@ -206,62 +158,22 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
     return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
 }
 
-void OnBrowseAdd(BrowseContext * context, const char * name, const char * type, const char * domain, uint32_t interfaceId)
-{
-    ChipLogProgress(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, StringOrNullMarker(name),
-                    StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
-
-    VerifyOrReturn(strcmp(kLocalDot, domain) == 0);
-
-    DnssdService service = {};
-    service.mInterface   = Inet::InterfaceId(interfaceId);
-    service.mProtocol    = context->protocol;
-
-    Platform::CopyString(service.mName, name);
-    Platform::CopyString(service.mType, type);
-
-    // only the first token after '.' should be included in the type
-    for (char * p = service.mType; *p != '\0'; p++)
-    {
-        if (*p == '.')
-        {
-            *p = '\0';
-            break;
-        }
-    }
-
-    context->services.push_back(service);
-}
-
-void OnBrowseRemove(BrowseContext * context, const char * name, const char * type, const char * domain, uint32_t interfaceId)
-{
-    ChipLogProgress(Discovery, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %" PRIu32, __func__, StringOrNullMarker(name),
-                    StringOrNullMarker(type), StringOrNullMarker(domain), interfaceId);
-
-    VerifyOrReturn(name != nullptr);
-    VerifyOrReturn(strcmp(kLocalDot, domain) == 0);
-
-    context->services.erase(std::remove_if(context->services.begin(), context->services.end(),
-                                           [name, type, interfaceId](const DnssdService & service) {
-                                               return strcmp(name, service.mName) == 0 && type == GetFullType(&service) &&
-                                                   service.mInterface == Inet::InterfaceId(interfaceId);
-                                           }),
-                            context->services.end());
-}
-
 static void OnBrowse(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceId, DNSServiceErrorType err, const char * name,
                      const char * type, const char * domain, void * context)
 {
-    auto sdCtx = reinterpret_cast<BrowseContext *>(context);
+    auto sdCtx = reinterpret_cast<BrowseHandler *>(context);
     VerifyOrReturn(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
+    sdCtx->OnBrowse(flags, name, type, domain, interfaceId);
+}
 
-    (flags & kDNSServiceFlagsAdd) ? OnBrowseAdd(sdCtx, name, type, domain, interfaceId)
-                                  : OnBrowseRemove(sdCtx, name, type, domain, interfaceId);
+CHIP_ERROR Browse(BrowseHandler * sdCtx, uint32_t interfaceId, const char * type)
+{
+    ChipLogProgress(Discovery, "Browsing for: %s", StringOrNullMarker(type));
+    DNSServiceRef sdRef;
+    auto err = DNSServiceBrowse(&sdRef, kBrowseFlags, interfaceId, type, kLocalDot, OnBrowse, sdCtx);
+    VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
-    if (!(flags & kDNSServiceFlagsMoreComing))
-    {
-        sdCtx->DispatchPartialSuccess();
-    }
+    return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
 }
 
 CHIP_ERROR Browse(void * context, DnssdBrowseCallback callback, uint32_t interfaceId, const char * type,
@@ -270,14 +182,17 @@ CHIP_ERROR Browse(void * context, DnssdBrowseCallback callback, uint32_t interfa
     auto sdCtx = chip::Platform::New<BrowseContext>(context, callback, protocol);
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
 
-    ChipLogProgress(Discovery, "Browsing for: %s", StringOrNullMarker(type));
-    DNSServiceRef sdRef;
-    auto err = DNSServiceBrowse(&sdRef, kBrowseFlags, interfaceId, type, kLocalDot, OnBrowse, sdCtx);
-    VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
-
-    ReturnErrorOnFailure(MdnsContexts::GetInstance().Add(sdCtx, sdRef));
+    ReturnErrorOnFailure(Browse(sdCtx, interfaceId, type));
     *browseIdentifier = reinterpret_cast<intptr_t>(sdCtx);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Browse(DnssdBrowseDelegate * delegate, uint32_t interfaceId, const char * type, DnssdServiceProtocol protocol)
+{
+    auto sdCtx = chip::Platform::New<BrowseWithDelegateContext>(delegate, protocol);
+    VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
+
+    return Browse(sdCtx, interfaceId, type);
 }
 
 static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceId, DNSServiceErrorType err,
@@ -480,6 +395,29 @@ CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
 
     ctx->Finalize(CHIP_ERROR_CANCELLED);
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
+                           chip::Inet::InterfaceId interface, DnssdBrowseDelegate * delegate)
+{
+    VerifyOrReturnError(type != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsSupportedProtocol(protocol), CHIP_ERROR_INVALID_ARGUMENT);
+
+    auto regtype     = GetFullTypeWithSubTypes(type, protocol);
+    auto interfaceId = GetInterfaceId(interface);
+    return Browse(delegate, interfaceId, regtype.c_str(), protocol);
+}
+
+CHIP_ERROR ChipDnssdStopBrowse(DnssdBrowseDelegate * delegate)
+{
+    auto existingCtx = MdnsContexts::GetInstance().GetExistingBrowseForDelegate(delegate);
+    if (existingCtx == nullptr)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    return existingCtx->Finalize(kDNSServiceErr_NoError);
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
