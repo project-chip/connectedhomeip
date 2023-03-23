@@ -96,7 +96,7 @@ def DelegatedCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
 
 def ChipClustersCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
     """
-    Figure out what callback name to use when building a ChipCluster.*AttributeCallback 
+    Figure out what callback name to use when building a ChipCluster.*AttributeCallback
     in java codegen.
     """
     global_name = FieldToGlobalName(attr.definition, context)
