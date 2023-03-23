@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- * TODO:
- * - modify bridge functions to be class members
- * - fix the `prj.conf` App-ID: 32773 == 0x8005 (example lighting-app)
- * - README
- * - consider using CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT from bridge-common (as in linux example)
- * - add Temperature Sensor
- */
+
 #include "AppTask.h"
 
 #include "AppConfig.h"

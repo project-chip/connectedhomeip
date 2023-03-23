@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,6 @@
 #pragma once
 
 // ---- Bridge App Example Config ----
-#define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 16
 
 // Buttons config
 #define BUTTON_PORT DEVICE_DT_GET(DT_NODELABEL(gpioc))

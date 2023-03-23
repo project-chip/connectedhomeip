@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2023 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,10 +23,6 @@
 
 #include <zephyr/kernel.h>
 
-#ifdef CONFIG_CHIP_PW_RPC
-#include "Rpc.h"
-#endif
-
 LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
@@ -36,10 +32,6 @@ using namespace ::chip::DeviceLayer;
 int main(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-#ifdef CONFIG_CHIP_PW_RPC
-    rpc::Init();
-#endif
 
     err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)

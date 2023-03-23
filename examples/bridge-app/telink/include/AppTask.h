@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,10 +30,6 @@
 #include <platform/telink/FactoryDataProvider.h>
 #endif
 
-#ifdef CONFIG_CHIP_PW_RPC
-#include "Rpc.h"
-#endif
-
 #include <cstdint>
 
 struct k_timer;
@@ -51,9 +47,6 @@ public:
     static void IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect);
 
 private:
-#ifdef CONFIG_CHIP_PW_RPC
-    friend class chip::rpc::TelinkButton;
-#endif
     friend AppTask & GetAppTask(void);
     CHIP_ERROR Init(void);
 
