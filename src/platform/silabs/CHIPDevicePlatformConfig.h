@@ -61,6 +61,11 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_IPV4 0
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 
+#ifdef CHIP_DEVICE_CONFIG_ENABLE_SED
+#define CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL chip::System::Clock::Milliseconds32(300)
+#define CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL chip::System::Clock::Milliseconds32(10)
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
+
 #endif /* SL_WIFI */
 
 // ========== Platform-specific Configuration =========

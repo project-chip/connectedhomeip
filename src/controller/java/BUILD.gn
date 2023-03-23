@@ -158,6 +158,49 @@ kotlin_library("tlv") {
   kotlinc_flags = [ "-Xlint:deprecation" ]
 }
 
+kotlin_library("tlv_reader_test") {
+  output_name = "TlvReaderTest.jar"
+
+  deps = [
+    ":tlv",
+    "${chip_root}/third_party/java_deps:junit-4",
+    "${chip_root}/third_party/java_deps:truth",
+  ]
+
+  sources = [ "tests/chip/tlv/TlvReaderTest.kt" ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
+kotlin_library("tlv_writer_test") {
+  output_name = "TlvWriterTest.jar"
+
+  deps = [
+    ":tlv",
+    "${chip_root}/third_party/java_deps:junit-4",
+    "${chip_root}/third_party/java_deps:truth",
+  ]
+
+  sources = [ "tests/chip/tlv/TlvWriterTest.kt" ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
+kotlin_library("tlv_read_write_test") {
+  output_name = "TlvReadWriteTest.jar"
+
+  deps = [
+    ":tlv",
+    "${chip_root}/third_party/java_deps:junit-4",
+    "${chip_root}/third_party/java_deps:kotlin-test",
+    "${chip_root}/third_party/java_deps:truth",
+  ]
+
+  sources = [ "tests/chip/tlv/TlvReadWriteTest.kt" ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
 android_library("java") {
   output_name = "CHIPController.jar"
 
@@ -169,6 +212,7 @@ android_library("java") {
   data_deps = [ ":jni" ]
 
   sources = [
+    "generated/java/chip/devicecontroller/ClusterWriteMapping.java",
     "src/chip/clusterinfo/ClusterCommandCallback.java",
     "src/chip/clusterinfo/ClusterInfo.java",
     "src/chip/clusterinfo/CommandParameterInfo.java",
@@ -219,7 +263,6 @@ android_library("java") {
     "zap-generated/chip/devicecontroller/ChipStructs.java",
     "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
     "zap-generated/chip/devicecontroller/ClusterReadMapping.java",
-    "zap-generated/chip/devicecontroller/ClusterWriteMapping.java",
   ]
 
   if (build_java_matter_controller) {

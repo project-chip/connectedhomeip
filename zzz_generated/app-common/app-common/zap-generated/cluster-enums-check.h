@@ -1701,17 +1701,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorLoop
     using EnumType = ColorControl::ColorLoopAction;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kDeactivate:
     case EnumType::kActivateFromColorLoopStartEnhancedHue:
     case EnumType::kActivateFromEnhancedCurrentHue:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_COLOR_LOOP_ACTION_DEACTIVATE:
-    case EMBER_ZCL_COLOR_LOOP_ACTION_ACTIVATE_FROM_COLOR_LOOP_START_ENHANCED_HUE:
-    case EMBER_ZCL_COLOR_LOOP_ACTION_ACTIVATE_FROM_ENHANCED_CURRENT_HUE:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(3);
@@ -1722,15 +1714,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorLoop
     using EnumType = ColorControl::ColorLoopDirection;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kDecrementHue:
     case EnumType::kIncrementHue:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_COLOR_LOOP_DIRECTION_DECREMENT_HUE:
-    case EMBER_ZCL_COLOR_LOOP_DIRECTION_INCREMENT_HUE:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(2);
@@ -1762,19 +1747,10 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::HueDirect
     using EnumType = ColorControl::HueDirection;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kShortestDistance:
     case EnumType::kLongestDistance:
     case EnumType::kUp:
     case EnumType::kDown:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_HUE_DIRECTION_SHORTEST_DISTANCE:
-    case EMBER_ZCL_HUE_DIRECTION_LONGEST_DISTANCE:
-    case EMBER_ZCL_HUE_DIRECTION_UP:
-    case EMBER_ZCL_HUE_DIRECTION_DOWN:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(4);
@@ -1785,17 +1761,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::HueMoveMo
     using EnumType = ColorControl::HueMoveMode;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kStop:
     case EnumType::kUp:
     case EnumType::kDown:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_HUE_MOVE_MODE_STOP:
-    case EMBER_ZCL_HUE_MOVE_MODE_UP:
-    case EMBER_ZCL_HUE_MOVE_MODE_DOWN:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(2);
@@ -1806,15 +1774,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::HueStepMo
     using EnumType = ColorControl::HueStepMode;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kUp:
     case EnumType::kDown:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_HUE_STEP_MODE_UP:
-    case EMBER_ZCL_HUE_STEP_MODE_DOWN:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(0);
@@ -1825,17 +1786,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::Saturatio
     using EnumType = ColorControl::SaturationMoveMode;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kStop:
     case EnumType::kUp:
     case EnumType::kDown:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_SATURATION_MOVE_MODE_STOP:
-    case EMBER_ZCL_SATURATION_MOVE_MODE_UP:
-    case EMBER_ZCL_SATURATION_MOVE_MODE_DOWN:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(2);
@@ -1846,15 +1799,8 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::Saturatio
     using EnumType = ColorControl::SaturationStepMode;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kUp:
     case EnumType::kDown:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_SATURATION_STEP_MODE_UP:
-    case EMBER_ZCL_SATURATION_STEP_MODE_DOWN:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(0);

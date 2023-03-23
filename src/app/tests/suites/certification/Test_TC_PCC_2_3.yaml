@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 15.2.3. [TC-PCC-2.3] Primary functionality with server as DUT
+name: 16.2.3. [TC-PCC-2.3] Control Mode with Server as DUT
 
 PICS:
     - PCC.S

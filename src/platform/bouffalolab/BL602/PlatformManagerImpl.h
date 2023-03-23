@@ -70,7 +70,7 @@ private:
 
     using Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::PostEventFromISR;
 
-    void PlatformInit(void);
+    CHIP_ERROR PlatformInit(void);
 };
 
 /**

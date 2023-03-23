@@ -73,7 +73,7 @@ class CodegenBridgePregenerator:
         return CodegenTarget(sdk_root=self.sdk_root, idl=idl, generator="bridge", runner=runner)
 
 
-class CodegenJavaPregenerator:
+class CodegenJavaJNIPregenerator:
     """Pregeneration logic for "java" codegen.py outputs"""
 
     def __init__(self, sdk_root):
@@ -85,7 +85,22 @@ class CodegenJavaPregenerator:
         return idl.relative_path == "src/controller/data_model/controller-clusters.matter"
 
     def CreateTarget(self, idl: InputIdlFile, runner):
-        return CodegenTarget(sdk_root=self.sdk_root, idl=idl, generator="java", runner=runner)
+        return CodegenTarget(sdk_root=self.sdk_root, idl=idl, generator="java-jni", runner=runner)
+
+
+class CodegenJavaClassPregenerator:
+    """Pregeneration logic for "java" codegen.py outputs"""
+
+    def __init__(self, sdk_root):
+        self.sdk_root = sdk_root
+
+    def Accept(self, idl: InputIdlFile):
+        # Java is highly specific, a single path is acceptable for dynamic
+        # bridge codegen
+        return idl.relative_path == "src/controller/data_model/controller-clusters.matter"
+
+    def CreateTarget(self, idl: InputIdlFile, runner):
+        return CodegenTarget(sdk_root=self.sdk_root, idl=idl, generator="java-class", runner=runner)
 
 
 class CodegenCppAppPregenerator:

@@ -19204,40 +19204,41 @@ typedef NS_OPTIONS(uint32_t, MTRUnitLocalizationFeature) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint16_t, MTRPowerSourceBatApprovedChemistry) {
-    MTRPowerSourceBatApprovedChemistryUnspecified MTR_NEWLY_AVAILABLE = 0x00,
-    MTRPowerSourceBatApprovedChemistryAlkaline MTR_NEWLY_AVAILABLE = 0x01,
-    MTRPowerSourceBatApprovedChemistryLithiumCarbonFluoride MTR_NEWLY_AVAILABLE = 0x02,
-    MTRPowerSourceBatApprovedChemistryLithiumChromiumOxide MTR_NEWLY_AVAILABLE = 0x03,
-    MTRPowerSourceBatApprovedChemistryLithiumCopperOxide MTR_NEWLY_AVAILABLE = 0x04,
-    MTRPowerSourceBatApprovedChemistryLithiumIronDisulfide MTR_NEWLY_AVAILABLE = 0x05,
-    MTRPowerSourceBatApprovedChemistryLithiumManganeseDioxide MTR_NEWLY_AVAILABLE = 0x06,
-    MTRPowerSourceBatApprovedChemistryLithiumThionylChloride MTR_NEWLY_AVAILABLE = 0x07,
-    MTRPowerSourceBatApprovedChemistryMagnesium MTR_NEWLY_AVAILABLE = 0x08,
-    MTRPowerSourceBatApprovedChemistryMercuryOxide MTR_NEWLY_AVAILABLE = 0x09,
-    MTRPowerSourceBatApprovedChemistryNickelOxyhydride MTR_NEWLY_AVAILABLE = 0x0A,
-    MTRPowerSourceBatApprovedChemistrySilverOxide MTR_NEWLY_AVAILABLE = 0x0B,
-    MTRPowerSourceBatApprovedChemistryZincAir MTR_NEWLY_AVAILABLE = 0x0C,
-    MTRPowerSourceBatApprovedChemistryZincCarbon MTR_NEWLY_AVAILABLE = 0x0D,
-    MTRPowerSourceBatApprovedChemistryZincChloride MTR_NEWLY_AVAILABLE = 0x0E,
-    MTRPowerSourceBatApprovedChemistryZincManganeseDioxide MTR_NEWLY_AVAILABLE = 0x0F,
-    MTRPowerSourceBatApprovedChemistryLeadAcid MTR_NEWLY_AVAILABLE = 0x10,
-    MTRPowerSourceBatApprovedChemistryLithiumCobaltOxide MTR_NEWLY_AVAILABLE = 0x11,
-    MTRPowerSourceBatApprovedChemistryLithiumIon MTR_NEWLY_AVAILABLE = 0x12,
-    MTRPowerSourceBatApprovedChemistryLithiumIonPolymer MTR_NEWLY_AVAILABLE = 0x13,
-    MTRPowerSourceBatApprovedChemistryLithiumIronPhosphate MTR_NEWLY_AVAILABLE = 0x14,
-    MTRPowerSourceBatApprovedChemistryLithiumSulfur MTR_NEWLY_AVAILABLE = 0x15,
-    MTRPowerSourceBatApprovedChemistryLithiumTitanate MTR_NEWLY_AVAILABLE = 0x16,
-    MTRPowerSourceBatApprovedChemistryNickelCadmium MTR_NEWLY_AVAILABLE = 0x17,
-    MTRPowerSourceBatApprovedChemistryNickelHydrogen MTR_NEWLY_AVAILABLE = 0x18,
-    MTRPowerSourceBatApprovedChemistryNickelIron MTR_NEWLY_AVAILABLE = 0x19,
-    MTRPowerSourceBatApprovedChemistryNickelMetalHydride MTR_NEWLY_AVAILABLE = 0x1A,
-    MTRPowerSourceBatApprovedChemistryNickelZinc MTR_NEWLY_AVAILABLE = 0x1B,
-    MTRPowerSourceBatApprovedChemistrySilverZinc MTR_NEWLY_AVAILABLE = 0x1C,
-    MTRPowerSourceBatApprovedChemistrySodiumIon MTR_NEWLY_AVAILABLE = 0x1D,
-    MTRPowerSourceBatApprovedChemistrySodiumSulfur MTR_NEWLY_AVAILABLE = 0x1E,
-    MTRPowerSourceBatApprovedChemistryZincBromide MTR_NEWLY_AVAILABLE = 0x1F,
-    MTRPowerSourceBatApprovedChemistryZincCerium MTR_NEWLY_AVAILABLE = 0x20,
-} MTR_NEWLY_AVAILABLE;
+    MTRPowerSourceBatApprovedChemistryUnspecified API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x00,
+    MTRPowerSourceBatApprovedChemistryAlkaline API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x01,
+    MTRPowerSourceBatApprovedChemistryLithiumCarbonFluoride API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x02,
+    MTRPowerSourceBatApprovedChemistryLithiumChromiumOxide API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x03,
+    MTRPowerSourceBatApprovedChemistryLithiumCopperOxide API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x04,
+    MTRPowerSourceBatApprovedChemistryLithiumIronDisulfide API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x05,
+    MTRPowerSourceBatApprovedChemistryLithiumManganeseDioxide API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
+    = 0x06,
+    MTRPowerSourceBatApprovedChemistryLithiumThionylChloride API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x07,
+    MTRPowerSourceBatApprovedChemistryMagnesium API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x08,
+    MTRPowerSourceBatApprovedChemistryMercuryOxide API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x09,
+    MTRPowerSourceBatApprovedChemistryNickelOxyhydride API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x0A,
+    MTRPowerSourceBatApprovedChemistrySilverOxide API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x0B,
+    MTRPowerSourceBatApprovedChemistryZincAir API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x0C,
+    MTRPowerSourceBatApprovedChemistryZincCarbon API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x0D,
+    MTRPowerSourceBatApprovedChemistryZincChloride API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x0E,
+    MTRPowerSourceBatApprovedChemistryZincManganeseDioxide API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x0F,
+    MTRPowerSourceBatApprovedChemistryLeadAcid API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x10,
+    MTRPowerSourceBatApprovedChemistryLithiumCobaltOxide API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x11,
+    MTRPowerSourceBatApprovedChemistryLithiumIon API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x12,
+    MTRPowerSourceBatApprovedChemistryLithiumIonPolymer API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x13,
+    MTRPowerSourceBatApprovedChemistryLithiumIronPhosphate API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x14,
+    MTRPowerSourceBatApprovedChemistryLithiumSulfur API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x15,
+    MTRPowerSourceBatApprovedChemistryLithiumTitanate API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x16,
+    MTRPowerSourceBatApprovedChemistryNickelCadmium API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x17,
+    MTRPowerSourceBatApprovedChemistryNickelHydrogen API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x18,
+    MTRPowerSourceBatApprovedChemistryNickelIron API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x19,
+    MTRPowerSourceBatApprovedChemistryNickelMetalHydride API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1A,
+    MTRPowerSourceBatApprovedChemistryNickelZinc API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1B,
+    MTRPowerSourceBatApprovedChemistrySilverZinc API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1C,
+    MTRPowerSourceBatApprovedChemistrySodiumIon API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1D,
+    MTRPowerSourceBatApprovedChemistrySodiumSulfur API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1E,
+    MTRPowerSourceBatApprovedChemistryZincBromide API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1F,
+    MTRPowerSourceBatApprovedChemistryZincCerium API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x20,
+} API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 typedef NS_ENUM(uint8_t, MTRPowerSourceBatChargeFault) {
     MTRPowerSourceBatChargeFaultUnspecified API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,
@@ -19273,93 +19274,93 @@ typedef NS_ENUM(uint8_t, MTRPowerSourceBatChargeState) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint16_t, MTRPowerSourceBatCommonDesignation) {
-    MTRPowerSourceBatCommonDesignationUnspecified MTR_NEWLY_AVAILABLE = 0x00,
-    MTRPowerSourceBatCommonDesignationAAA MTR_NEWLY_AVAILABLE = 0x01,
-    MTRPowerSourceBatCommonDesignationAA MTR_NEWLY_AVAILABLE = 0x02,
-    MTRPowerSourceBatCommonDesignationC MTR_NEWLY_AVAILABLE = 0x03,
-    MTRPowerSourceBatCommonDesignationD MTR_NEWLY_AVAILABLE = 0x04,
-    MTRPowerSourceBatCommonDesignation4v5 MTR_NEWLY_AVAILABLE = 0x05,
-    MTRPowerSourceBatCommonDesignation6v0 MTR_NEWLY_AVAILABLE = 0x06,
-    MTRPowerSourceBatCommonDesignation9v0 MTR_NEWLY_AVAILABLE = 0x07,
-    MTRPowerSourceBatCommonDesignation12AA MTR_NEWLY_AVAILABLE = 0x08,
-    MTRPowerSourceBatCommonDesignationAAAA MTR_NEWLY_AVAILABLE = 0x09,
-    MTRPowerSourceBatCommonDesignationA MTR_NEWLY_AVAILABLE = 0x0A,
-    MTRPowerSourceBatCommonDesignationB MTR_NEWLY_AVAILABLE = 0x0B,
-    MTRPowerSourceBatCommonDesignationF MTR_NEWLY_AVAILABLE = 0x0C,
-    MTRPowerSourceBatCommonDesignationN MTR_NEWLY_AVAILABLE = 0x0D,
-    MTRPowerSourceBatCommonDesignationNo6 MTR_NEWLY_AVAILABLE = 0x0E,
-    MTRPowerSourceBatCommonDesignationSubC MTR_NEWLY_AVAILABLE = 0x0F,
-    MTRPowerSourceBatCommonDesignationA23 MTR_NEWLY_AVAILABLE = 0x10,
-    MTRPowerSourceBatCommonDesignationA27 MTR_NEWLY_AVAILABLE = 0x11,
-    MTRPowerSourceBatCommonDesignationBA5800 MTR_NEWLY_AVAILABLE = 0x12,
-    MTRPowerSourceBatCommonDesignationDuplex MTR_NEWLY_AVAILABLE = 0x13,
-    MTRPowerSourceBatCommonDesignation4SR44 MTR_NEWLY_AVAILABLE = 0x14,
-    MTRPowerSourceBatCommonDesignation523 MTR_NEWLY_AVAILABLE = 0x15,
-    MTRPowerSourceBatCommonDesignation531 MTR_NEWLY_AVAILABLE = 0x16,
-    MTRPowerSourceBatCommonDesignation15v0 MTR_NEWLY_AVAILABLE = 0x17,
-    MTRPowerSourceBatCommonDesignation22v5 MTR_NEWLY_AVAILABLE = 0x18,
-    MTRPowerSourceBatCommonDesignation30v0 MTR_NEWLY_AVAILABLE = 0x19,
-    MTRPowerSourceBatCommonDesignation45v0 MTR_NEWLY_AVAILABLE = 0x1A,
-    MTRPowerSourceBatCommonDesignation67v5 MTR_NEWLY_AVAILABLE = 0x1B,
-    MTRPowerSourceBatCommonDesignationJ MTR_NEWLY_AVAILABLE = 0x1C,
-    MTRPowerSourceBatCommonDesignationCR123A MTR_NEWLY_AVAILABLE = 0x1D,
-    MTRPowerSourceBatCommonDesignationCR2 MTR_NEWLY_AVAILABLE = 0x1E,
-    MTRPowerSourceBatCommonDesignation2CR5 MTR_NEWLY_AVAILABLE = 0x1F,
-    MTRPowerSourceBatCommonDesignationCRP2 MTR_NEWLY_AVAILABLE = 0x20,
-    MTRPowerSourceBatCommonDesignationCRV3 MTR_NEWLY_AVAILABLE = 0x21,
-    MTRPowerSourceBatCommonDesignationSR41 MTR_NEWLY_AVAILABLE = 0x22,
-    MTRPowerSourceBatCommonDesignationSR43 MTR_NEWLY_AVAILABLE = 0x23,
-    MTRPowerSourceBatCommonDesignationSR44 MTR_NEWLY_AVAILABLE = 0x24,
-    MTRPowerSourceBatCommonDesignationSR45 MTR_NEWLY_AVAILABLE = 0x25,
-    MTRPowerSourceBatCommonDesignationSR48 MTR_NEWLY_AVAILABLE = 0x26,
-    MTRPowerSourceBatCommonDesignationSR54 MTR_NEWLY_AVAILABLE = 0x27,
-    MTRPowerSourceBatCommonDesignationSR55 MTR_NEWLY_AVAILABLE = 0x28,
-    MTRPowerSourceBatCommonDesignationSR57 MTR_NEWLY_AVAILABLE = 0x29,
-    MTRPowerSourceBatCommonDesignationSR58 MTR_NEWLY_AVAILABLE = 0x2A,
-    MTRPowerSourceBatCommonDesignationSR59 MTR_NEWLY_AVAILABLE = 0x2B,
-    MTRPowerSourceBatCommonDesignationSR60 MTR_NEWLY_AVAILABLE = 0x2C,
-    MTRPowerSourceBatCommonDesignationSR63 MTR_NEWLY_AVAILABLE = 0x2D,
-    MTRPowerSourceBatCommonDesignationSR64 MTR_NEWLY_AVAILABLE = 0x2E,
-    MTRPowerSourceBatCommonDesignationSR65 MTR_NEWLY_AVAILABLE = 0x2F,
-    MTRPowerSourceBatCommonDesignationSR66 MTR_NEWLY_AVAILABLE = 0x30,
-    MTRPowerSourceBatCommonDesignationSR67 MTR_NEWLY_AVAILABLE = 0x31,
-    MTRPowerSourceBatCommonDesignationSR68 MTR_NEWLY_AVAILABLE = 0x32,
-    MTRPowerSourceBatCommonDesignationSR69 MTR_NEWLY_AVAILABLE = 0x33,
-    MTRPowerSourceBatCommonDesignationSR516 MTR_NEWLY_AVAILABLE = 0x34,
-    MTRPowerSourceBatCommonDesignationSR731 MTR_NEWLY_AVAILABLE = 0x35,
-    MTRPowerSourceBatCommonDesignationSR712 MTR_NEWLY_AVAILABLE = 0x36,
-    MTRPowerSourceBatCommonDesignationLR932 MTR_NEWLY_AVAILABLE = 0x37,
-    MTRPowerSourceBatCommonDesignationA5 MTR_NEWLY_AVAILABLE = 0x38,
-    MTRPowerSourceBatCommonDesignationA10 MTR_NEWLY_AVAILABLE = 0x39,
-    MTRPowerSourceBatCommonDesignationA13 MTR_NEWLY_AVAILABLE = 0x3A,
-    MTRPowerSourceBatCommonDesignationA312 MTR_NEWLY_AVAILABLE = 0x3B,
-    MTRPowerSourceBatCommonDesignationA675 MTR_NEWLY_AVAILABLE = 0x3C,
-    MTRPowerSourceBatCommonDesignationAC41E MTR_NEWLY_AVAILABLE = 0x3D,
-    MTRPowerSourceBatCommonDesignation10180 MTR_NEWLY_AVAILABLE = 0x3E,
-    MTRPowerSourceBatCommonDesignation10280 MTR_NEWLY_AVAILABLE = 0x3F,
-    MTRPowerSourceBatCommonDesignation10440 MTR_NEWLY_AVAILABLE = 0x40,
-    MTRPowerSourceBatCommonDesignation14250 MTR_NEWLY_AVAILABLE = 0x41,
-    MTRPowerSourceBatCommonDesignation14430 MTR_NEWLY_AVAILABLE = 0x42,
-    MTRPowerSourceBatCommonDesignation14500 MTR_NEWLY_AVAILABLE = 0x43,
-    MTRPowerSourceBatCommonDesignation14650 MTR_NEWLY_AVAILABLE = 0x44,
-    MTRPowerSourceBatCommonDesignation15270 MTR_NEWLY_AVAILABLE = 0x45,
-    MTRPowerSourceBatCommonDesignation16340 MTR_NEWLY_AVAILABLE = 0x46,
-    MTRPowerSourceBatCommonDesignationRCR123A MTR_NEWLY_AVAILABLE = 0x47,
-    MTRPowerSourceBatCommonDesignation17500 MTR_NEWLY_AVAILABLE = 0x48,
-    MTRPowerSourceBatCommonDesignation17670 MTR_NEWLY_AVAILABLE = 0x49,
-    MTRPowerSourceBatCommonDesignation18350 MTR_NEWLY_AVAILABLE = 0x4A,
-    MTRPowerSourceBatCommonDesignation18500 MTR_NEWLY_AVAILABLE = 0x4B,
-    MTRPowerSourceBatCommonDesignation18650 MTR_NEWLY_AVAILABLE = 0x4C,
-    MTRPowerSourceBatCommonDesignation19670 MTR_NEWLY_AVAILABLE = 0x4D,
-    MTRPowerSourceBatCommonDesignation25500 MTR_NEWLY_AVAILABLE = 0x4E,
-    MTRPowerSourceBatCommonDesignation26650 MTR_NEWLY_AVAILABLE = 0x4F,
-    MTRPowerSourceBatCommonDesignation32600 MTR_NEWLY_AVAILABLE = 0x50,
-} MTR_NEWLY_AVAILABLE;
+    MTRPowerSourceBatCommonDesignationUnspecified API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x00,
+    MTRPowerSourceBatCommonDesignationAAA API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x01,
+    MTRPowerSourceBatCommonDesignationAA API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x02,
+    MTRPowerSourceBatCommonDesignationC API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x03,
+    MTRPowerSourceBatCommonDesignationD API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x04,
+    MTRPowerSourceBatCommonDesignation4v5 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x05,
+    MTRPowerSourceBatCommonDesignation6v0 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x06,
+    MTRPowerSourceBatCommonDesignation9v0 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x07,
+    MTRPowerSourceBatCommonDesignation12AA API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x08,
+    MTRPowerSourceBatCommonDesignationAAAA API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x09,
+    MTRPowerSourceBatCommonDesignationA API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x0A,
+    MTRPowerSourceBatCommonDesignationB API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x0B,
+    MTRPowerSourceBatCommonDesignationF API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x0C,
+    MTRPowerSourceBatCommonDesignationN API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x0D,
+    MTRPowerSourceBatCommonDesignationNo6 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x0E,
+    MTRPowerSourceBatCommonDesignationSubC API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x0F,
+    MTRPowerSourceBatCommonDesignationA23 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x10,
+    MTRPowerSourceBatCommonDesignationA27 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x11,
+    MTRPowerSourceBatCommonDesignationBA5800 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x12,
+    MTRPowerSourceBatCommonDesignationDuplex API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x13,
+    MTRPowerSourceBatCommonDesignation4SR44 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x14,
+    MTRPowerSourceBatCommonDesignation523 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x15,
+    MTRPowerSourceBatCommonDesignation531 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x16,
+    MTRPowerSourceBatCommonDesignation15v0 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x17,
+    MTRPowerSourceBatCommonDesignation22v5 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x18,
+    MTRPowerSourceBatCommonDesignation30v0 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x19,
+    MTRPowerSourceBatCommonDesignation45v0 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1A,
+    MTRPowerSourceBatCommonDesignation67v5 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1B,
+    MTRPowerSourceBatCommonDesignationJ API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1C,
+    MTRPowerSourceBatCommonDesignationCR123A API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1D,
+    MTRPowerSourceBatCommonDesignationCR2 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1E,
+    MTRPowerSourceBatCommonDesignation2CR5 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1F,
+    MTRPowerSourceBatCommonDesignationCRP2 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x20,
+    MTRPowerSourceBatCommonDesignationCRV3 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x21,
+    MTRPowerSourceBatCommonDesignationSR41 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x22,
+    MTRPowerSourceBatCommonDesignationSR43 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x23,
+    MTRPowerSourceBatCommonDesignationSR44 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x24,
+    MTRPowerSourceBatCommonDesignationSR45 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x25,
+    MTRPowerSourceBatCommonDesignationSR48 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x26,
+    MTRPowerSourceBatCommonDesignationSR54 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x27,
+    MTRPowerSourceBatCommonDesignationSR55 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x28,
+    MTRPowerSourceBatCommonDesignationSR57 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x29,
+    MTRPowerSourceBatCommonDesignationSR58 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x2A,
+    MTRPowerSourceBatCommonDesignationSR59 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x2B,
+    MTRPowerSourceBatCommonDesignationSR60 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x2C,
+    MTRPowerSourceBatCommonDesignationSR63 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x2D,
+    MTRPowerSourceBatCommonDesignationSR64 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x2E,
+    MTRPowerSourceBatCommonDesignationSR65 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x2F,
+    MTRPowerSourceBatCommonDesignationSR66 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x30,
+    MTRPowerSourceBatCommonDesignationSR67 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x31,
+    MTRPowerSourceBatCommonDesignationSR68 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x32,
+    MTRPowerSourceBatCommonDesignationSR69 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x33,
+    MTRPowerSourceBatCommonDesignationSR516 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x34,
+    MTRPowerSourceBatCommonDesignationSR731 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x35,
+    MTRPowerSourceBatCommonDesignationSR712 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x36,
+    MTRPowerSourceBatCommonDesignationLR932 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x37,
+    MTRPowerSourceBatCommonDesignationA5 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x38,
+    MTRPowerSourceBatCommonDesignationA10 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x39,
+    MTRPowerSourceBatCommonDesignationA13 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x3A,
+    MTRPowerSourceBatCommonDesignationA312 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x3B,
+    MTRPowerSourceBatCommonDesignationA675 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x3C,
+    MTRPowerSourceBatCommonDesignationAC41E API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x3D,
+    MTRPowerSourceBatCommonDesignation10180 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x3E,
+    MTRPowerSourceBatCommonDesignation10280 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x3F,
+    MTRPowerSourceBatCommonDesignation10440 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x40,
+    MTRPowerSourceBatCommonDesignation14250 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x41,
+    MTRPowerSourceBatCommonDesignation14430 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x42,
+    MTRPowerSourceBatCommonDesignation14500 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x43,
+    MTRPowerSourceBatCommonDesignation14650 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x44,
+    MTRPowerSourceBatCommonDesignation15270 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x45,
+    MTRPowerSourceBatCommonDesignation16340 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x46,
+    MTRPowerSourceBatCommonDesignationRCR123A API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x47,
+    MTRPowerSourceBatCommonDesignation17500 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x48,
+    MTRPowerSourceBatCommonDesignation17670 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x49,
+    MTRPowerSourceBatCommonDesignation18350 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x4A,
+    MTRPowerSourceBatCommonDesignation18500 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x4B,
+    MTRPowerSourceBatCommonDesignation18650 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x4C,
+    MTRPowerSourceBatCommonDesignation19670 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x4D,
+    MTRPowerSourceBatCommonDesignation25500 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x4E,
+    MTRPowerSourceBatCommonDesignation26650 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x4F,
+    MTRPowerSourceBatCommonDesignation32600 API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x50,
+} API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 typedef NS_ENUM(uint8_t, MTRPowerSourceBatFault) {
-    MTRPowerSourceBatFaultUnspecified MTR_NEWLY_AVAILABLE = 0x00,
-    MTRPowerSourceBatFaultUnspecfied API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPowerSourceBatFaultUnspecified")
+    MTRPowerSourceBatFaultUnspecified API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x00,
+    MTRPowerSourceBatFaultUnspecfied MTR_DEPRECATED(
+        "Please use MTRPowerSourceBatFaultUnspecified", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x00,
     MTRPowerSourceBatFaultOverTemp API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
     MTRPowerSourceBatFaultUnderTemp API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
@@ -19388,9 +19389,9 @@ typedef NS_ENUM(uint8_t, MTRPowerSourceWiredCurrentType) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRPowerSourceWiredFault) {
-    MTRPowerSourceWiredFaultUnspecified MTR_NEWLY_AVAILABLE = 0x00,
-    MTRPowerSourceWiredFaultUnspecfied API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPowerSourceWiredFaultUnspecified")
+    MTRPowerSourceWiredFaultUnspecified API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x00,
+    MTRPowerSourceWiredFaultUnspecfied MTR_DEPRECATED(
+        "Please use MTRPowerSourceWiredFaultUnspecified", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x00,
     MTRPowerSourceWiredFaultOverVoltage API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
     MTRPowerSourceWiredFaultUnderVoltage API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
@@ -19475,63 +19476,64 @@ typedef NS_OPTIONS(uint8_t, MTRNetworkCommissioningWiFiSecurity) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRDiagnosticLogsIntent) {
-    MTRDiagnosticLogsIntentEndUserSupport MTR_NEWLY_AVAILABLE = 0x00,
-    MTRDiagnosticLogsIntentNetworkDiag MTR_NEWLY_AVAILABLE = 0x01,
-    MTRDiagnosticLogsIntentCrashLogs MTR_NEWLY_AVAILABLE = 0x02,
-} MTR_NEWLY_AVAILABLE;
+    MTRDiagnosticLogsIntentEndUserSupport API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x00,
+    MTRDiagnosticLogsIntentNetworkDiag API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x01,
+    MTRDiagnosticLogsIntentCrashLogs API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x02,
+} API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 typedef NS_ENUM(uint8_t, MTRDiagnosticLogsLogsIntent) {
-    MTRDiagnosticLogsLogsIntentEndUserSupport API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsIntentEndUserSupport")
+    MTRDiagnosticLogsLogsIntentEndUserSupport MTR_DEPRECATED(
+        "Please use MTRDiagnosticLogsIntentEndUserSupport", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x00,
-    MTRDiagnosticLogsLogsIntentNetworkDiag API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsIntentNetworkDiag")
+    MTRDiagnosticLogsLogsIntentNetworkDiag MTR_DEPRECATED(
+        "Please use MTRDiagnosticLogsIntentNetworkDiag", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x01,
-    MTRDiagnosticLogsLogsIntentCrashLogs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsIntentCrashLogs")
+    MTRDiagnosticLogsLogsIntentCrashLogs MTR_DEPRECATED(
+        "Please use MTRDiagnosticLogsIntentCrashLogs", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x02,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsIntent");
+} MTR_DEPRECATED("Please use MTRDiagnosticLogsIntent", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5));
 
 typedef NS_ENUM(uint8_t, MTRDiagnosticLogsStatus) {
-    MTRDiagnosticLogsStatusSuccess MTR_NEWLY_AVAILABLE = 0x00,
-    MTRDiagnosticLogsStatusExhausted MTR_NEWLY_AVAILABLE = 0x01,
-    MTRDiagnosticLogsStatusNoLogs MTR_NEWLY_AVAILABLE = 0x02,
-    MTRDiagnosticLogsStatusBusy MTR_NEWLY_AVAILABLE = 0x03,
-    MTRDiagnosticLogsStatusDenied MTR_NEWLY_AVAILABLE = 0x04,
-} MTR_NEWLY_AVAILABLE;
+    MTRDiagnosticLogsStatusSuccess API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x00,
+    MTRDiagnosticLogsStatusExhausted API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x01,
+    MTRDiagnosticLogsStatusNoLogs API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x02,
+    MTRDiagnosticLogsStatusBusy API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x03,
+    MTRDiagnosticLogsStatusDenied API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x04,
+} API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 typedef NS_ENUM(uint8_t, MTRDiagnosticLogsLogsStatus) {
-    MTRDiagnosticLogsLogsStatusSuccess API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatusSuccess")
+    MTRDiagnosticLogsLogsStatusSuccess MTR_DEPRECATED(
+        "Please use MTRDiagnosticLogsStatusSuccess", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x00,
-    MTRDiagnosticLogsLogsStatusExhausted API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatusExhausted")
+    MTRDiagnosticLogsLogsStatusExhausted MTR_DEPRECATED(
+        "Please use MTRDiagnosticLogsStatusExhausted", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x01,
-    MTRDiagnosticLogsLogsStatusNoLogs API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatusNoLogs")
+    MTRDiagnosticLogsLogsStatusNoLogs MTR_DEPRECATED(
+        "Please use MTRDiagnosticLogsStatusNoLogs", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x02,
-    MTRDiagnosticLogsLogsStatusBusy API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatusBusy")
+    MTRDiagnosticLogsLogsStatusBusy MTR_DEPRECATED(
+        "Please use MTRDiagnosticLogsStatusBusy", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x03,
-    MTRDiagnosticLogsLogsStatusDenied API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatusDenied")
+    MTRDiagnosticLogsLogsStatusDenied MTR_DEPRECATED(
+        "Please use MTRDiagnosticLogsStatusDenied", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x04,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsStatus");
+} MTR_DEPRECATED("Please use MTRDiagnosticLogsStatus", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5));
 
 typedef NS_ENUM(uint8_t, MTRDiagnosticLogsTransferProtocol) {
-    MTRDiagnosticLogsTransferProtocolResponsePayload MTR_NEWLY_AVAILABLE = 0x00,
-    MTRDiagnosticLogsTransferProtocolBDX MTR_NEWLY_AVAILABLE = 0x01,
-} MTR_NEWLY_AVAILABLE;
+    MTRDiagnosticLogsTransferProtocolResponsePayload API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x00,
+    MTRDiagnosticLogsTransferProtocolBDX API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x01,
+} API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 typedef NS_ENUM(uint8_t, MTRDiagnosticLogsLogsTransferProtocol) {
-    MTRDiagnosticLogsLogsTransferProtocolResponsePayload API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsTransferProtocolResponsePayload")
+    MTRDiagnosticLogsLogsTransferProtocolResponsePayload MTR_DEPRECATED(
+        "Please use MTRDiagnosticLogsTransferProtocolResponsePayload", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+        tvos(16.1, 16.5))
     = 0x00,
-    MTRDiagnosticLogsLogsTransferProtocolBDX API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsTransferProtocolBDX")
+    MTRDiagnosticLogsLogsTransferProtocolBDX MTR_DEPRECATED(
+        "Please use MTRDiagnosticLogsTransferProtocolBDX", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x01,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    MTR_NEWLY_DEPRECATED("Please use MTRDiagnosticLogsTransferProtocol");
+} MTR_DEPRECATED("Please use MTRDiagnosticLogsTransferProtocol", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+    tvos(16.1, 16.5));
 
 typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsBootReason) {
     MTRGeneralDiagnosticsBootReasonUnspecified API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,
@@ -19755,19 +19757,21 @@ typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsAssociationFailureCause) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsConnectionStatus) {
-    MTRWiFiNetworkDiagnosticsConnectionStatusConnected MTR_NEWLY_AVAILABLE = 0x00,
-    MTRWiFiNetworkDiagnosticsConnectionStatusNotConnected MTR_NEWLY_AVAILABLE = 0x01,
-} MTR_NEWLY_AVAILABLE;
+    MTRWiFiNetworkDiagnosticsConnectionStatusConnected API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x00,
+    MTRWiFiNetworkDiagnosticsConnectionStatusNotConnected API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x01,
+} API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsWiFiConnectionStatus) {
-    MTRWiFiNetworkDiagnosticsWiFiConnectionStatusConnected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsConnectionStatusConnected")
+    MTRWiFiNetworkDiagnosticsWiFiConnectionStatusConnected MTR_DEPRECATED(
+        "Please use MTRWiFiNetworkDiagnosticsConnectionStatusConnected", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+        tvos(16.1, 16.5))
     = 0x00,
-    MTRWiFiNetworkDiagnosticsWiFiConnectionStatusNotConnected API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsConnectionStatusNotConnected")
+    MTRWiFiNetworkDiagnosticsWiFiConnectionStatusNotConnected MTR_DEPRECATED(
+        "Please use MTRWiFiNetworkDiagnosticsConnectionStatusNotConnected", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+        tvos(16.1, 16.5))
     = 0x01,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsConnectionStatus");
+} MTR_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsConnectionStatus", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+    tvos(16.1, 16.5));
 
 typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsSecurityType) {
     MTRWiFiNetworkDiagnosticsSecurityTypeUnspecified API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
@@ -19779,53 +19783,53 @@ typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsSecurityType) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsWiFiVersion) {
-    MTRWiFiNetworkDiagnosticsWiFiVersionA MTR_NEWLY_AVAILABLE = 0x00,
-    MTRWiFiNetworkDiagnosticsWiFiVersionB MTR_NEWLY_AVAILABLE = 0x01,
-    MTRWiFiNetworkDiagnosticsWiFiVersionG MTR_NEWLY_AVAILABLE = 0x02,
-    MTRWiFiNetworkDiagnosticsWiFiVersionN MTR_NEWLY_AVAILABLE = 0x03,
-    MTRWiFiNetworkDiagnosticsWiFiVersionAc MTR_NEWLY_AVAILABLE = 0x04,
-    MTRWiFiNetworkDiagnosticsWiFiVersionAx MTR_NEWLY_AVAILABLE = 0x05,
-} MTR_NEWLY_AVAILABLE;
+    MTRWiFiNetworkDiagnosticsWiFiVersionA API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x00,
+    MTRWiFiNetworkDiagnosticsWiFiVersionB API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x01,
+    MTRWiFiNetworkDiagnosticsWiFiVersionG API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x02,
+    MTRWiFiNetworkDiagnosticsWiFiVersionN API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x03,
+    MTRWiFiNetworkDiagnosticsWiFiVersionAc API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x04,
+    MTRWiFiNetworkDiagnosticsWiFiVersionAx API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x05,
+} API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 typedef NS_ENUM(uint8_t, MTRWiFiNetworkDiagnosticsWiFiVersionType) {
-    MTRWiFiNetworkDiagnosticsWiFiVersionTypeA API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionA")
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeA MTR_DEPRECATED(
+        "Please use MTRWiFiNetworkDiagnosticsWiFiVersionA", ios(16.4, 16.5), macos(13.3, 13.4), watchos(9.4, 9.5), tvos(16.4, 16.5))
     = 0x00,
     MTRWiFiNetworkDiagnosticsWiFiVersionType80211a MTR_DEPRECATED(
         "Please use MTRWiFiNetworkDiagnosticsWiFiVersionA", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x00,
-    MTRWiFiNetworkDiagnosticsWiFiVersionTypeB API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionB")
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeB MTR_DEPRECATED(
+        "Please use MTRWiFiNetworkDiagnosticsWiFiVersionB", ios(16.4, 16.5), macos(13.3, 13.4), watchos(9.4, 9.5), tvos(16.4, 16.5))
     = 0x01,
     MTRWiFiNetworkDiagnosticsWiFiVersionType80211b MTR_DEPRECATED(
         "Please use MTRWiFiNetworkDiagnosticsWiFiVersionB", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x01,
-    MTRWiFiNetworkDiagnosticsWiFiVersionTypeG API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionG")
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeG MTR_DEPRECATED(
+        "Please use MTRWiFiNetworkDiagnosticsWiFiVersionG", ios(16.4, 16.5), macos(13.3, 13.4), watchos(9.4, 9.5), tvos(16.4, 16.5))
     = 0x02,
     MTRWiFiNetworkDiagnosticsWiFiVersionType80211g MTR_DEPRECATED(
         "Please use MTRWiFiNetworkDiagnosticsWiFiVersionG", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x02,
-    MTRWiFiNetworkDiagnosticsWiFiVersionTypeN API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionN")
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeN MTR_DEPRECATED(
+        "Please use MTRWiFiNetworkDiagnosticsWiFiVersionN", ios(16.4, 16.5), macos(13.3, 13.4), watchos(9.4, 9.5), tvos(16.4, 16.5))
     = 0x03,
     MTRWiFiNetworkDiagnosticsWiFiVersionType80211n MTR_DEPRECATED(
         "Please use MTRWiFiNetworkDiagnosticsWiFiVersionN", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x03,
-    MTRWiFiNetworkDiagnosticsWiFiVersionTypeAc API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionAc")
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeAc MTR_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionAc", ios(16.4, 16.5),
+        macos(13.3, 13.4), watchos(9.4, 9.5), tvos(16.4, 16.5))
     = 0x04,
     MTRWiFiNetworkDiagnosticsWiFiVersionType80211ac MTR_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionAc",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x04,
-    MTRWiFiNetworkDiagnosticsWiFiVersionTypeAx API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionAx")
+    MTRWiFiNetworkDiagnosticsWiFiVersionTypeAx MTR_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionAx", ios(16.4, 16.5),
+        macos(13.3, 13.4), watchos(9.4, 9.5), tvos(16.4, 16.5))
     = 0x05,
     MTRWiFiNetworkDiagnosticsWiFiVersionType80211ax MTR_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersionAx",
         ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
     = 0x05,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    MTR_NEWLY_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersion");
+} MTR_DEPRECATED("Please use MTRWiFiNetworkDiagnosticsWiFiVersion", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+    tvos(16.1, 16.5));
 
 typedef NS_OPTIONS(uint32_t, MTRWiFiNetworkDiagnosticsFeature) {
     MTRWiFiNetworkDiagnosticsFeaturePacketCounts API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x1,
@@ -20289,8 +20293,8 @@ typedef NS_ENUM(uint8_t, MTRDoorLockLockDataType) {
     MTRDoorLockLockDataTypePIN API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x06,
     MTRDoorLockLockDataTypeRFID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x07,
     MTRDoorLockLockDataTypeFingerprint API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x08,
-    MTRDoorLockLockDataTypeFingerVein MTR_NEWLY_AVAILABLE = 0x09,
-    MTRDoorLockLockDataTypeFace MTR_NEWLY_AVAILABLE = 0x0A,
+    MTRDoorLockLockDataTypeFingerVein API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x09,
+    MTRDoorLockLockDataTypeFace API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x0A,
 } API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 typedef NS_ENUM(uint8_t, MTRDoorLockDlLockDataType) {
@@ -20813,58 +20817,71 @@ typedef NS_OPTIONS(uint16_t, MTRWindowCoveringSafetyStatus) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRPumpConfigurationAndControlControlMode) {
-    MTRPumpConfigurationAndControlControlModeConstantSpeed MTR_NEWLY_AVAILABLE = 0x00,
-    MTRPumpConfigurationAndControlControlModeConstantPressure MTR_NEWLY_AVAILABLE = 0x01,
-    MTRPumpConfigurationAndControlControlModeProportionalPressure MTR_NEWLY_AVAILABLE = 0x02,
-    MTRPumpConfigurationAndControlControlModeConstantFlow MTR_NEWLY_AVAILABLE = 0x03,
-    MTRPumpConfigurationAndControlControlModeConstantTemperature MTR_NEWLY_AVAILABLE = 0x05,
-    MTRPumpConfigurationAndControlControlModeAutomatic MTR_NEWLY_AVAILABLE = 0x07,
-} MTR_NEWLY_AVAILABLE;
+    MTRPumpConfigurationAndControlControlModeConstantSpeed API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x00,
+    MTRPumpConfigurationAndControlControlModeConstantPressure API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
+    = 0x01,
+    MTRPumpConfigurationAndControlControlModeProportionalPressure API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
+    = 0x02,
+    MTRPumpConfigurationAndControlControlModeConstantFlow API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x03,
+    MTRPumpConfigurationAndControlControlModeConstantTemperature API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
+    = 0x05,
+    MTRPumpConfigurationAndControlControlModeAutomatic API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x07,
+} API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 typedef NS_ENUM(uint8_t, MTRPumpConfigurationAndControlPumpControlMode) {
-    MTRPumpConfigurationAndControlPumpControlModeConstantSpeed API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlControlModeConstantSpeed")
+    MTRPumpConfigurationAndControlPumpControlModeConstantSpeed MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlControlModeConstantSpeed", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+        tvos(16.1, 16.5))
     = 0x00,
-    MTRPumpConfigurationAndControlPumpControlModeConstantPressure API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlControlModeConstantPressure")
+    MTRPumpConfigurationAndControlPumpControlModeConstantPressure MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlControlModeConstantPressure", ios(16.1, 16.5), macos(13.0, 13.4),
+        watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x01,
-    MTRPumpConfigurationAndControlPumpControlModeProportionalPressure API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1),
-        tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlControlModeProportionalPressure")
+    MTRPumpConfigurationAndControlPumpControlModeProportionalPressure MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlControlModeProportionalPressure", ios(16.1, 16.5), macos(13.0, 13.4),
+        watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x02,
-    MTRPumpConfigurationAndControlPumpControlModeConstantFlow API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlControlModeConstantFlow")
+    MTRPumpConfigurationAndControlPumpControlModeConstantFlow MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlControlModeConstantFlow", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+        tvos(16.1, 16.5))
     = 0x03,
-    MTRPumpConfigurationAndControlPumpControlModeConstantTemperature API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlControlModeConstantTemperature")
+    MTRPumpConfigurationAndControlPumpControlModeConstantTemperature MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlControlModeConstantTemperature", ios(16.1, 16.5), macos(13.0, 13.4),
+        watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x05,
-    MTRPumpConfigurationAndControlPumpControlModeAutomatic API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlControlModeAutomatic")
+    MTRPumpConfigurationAndControlPumpControlModeAutomatic MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlControlModeAutomatic", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+        tvos(16.1, 16.5))
     = 0x07,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlControlMode");
+} MTR_DEPRECATED("Please use MTRPumpConfigurationAndControlControlMode", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+    tvos(16.1, 16.5));
 
 typedef NS_ENUM(uint8_t, MTRPumpConfigurationAndControlOperationMode) {
-    MTRPumpConfigurationAndControlOperationModeNormal MTR_NEWLY_AVAILABLE = 0x00,
-    MTRPumpConfigurationAndControlOperationModeMinimum MTR_NEWLY_AVAILABLE = 0x01,
-    MTRPumpConfigurationAndControlOperationModeMaximum MTR_NEWLY_AVAILABLE = 0x02,
-    MTRPumpConfigurationAndControlOperationModeLocal MTR_NEWLY_AVAILABLE = 0x03,
-} MTR_NEWLY_AVAILABLE;
+    MTRPumpConfigurationAndControlOperationModeNormal API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x00,
+    MTRPumpConfigurationAndControlOperationModeMinimum API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x01,
+    MTRPumpConfigurationAndControlOperationModeMaximum API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x02,
+    MTRPumpConfigurationAndControlOperationModeLocal API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x03,
+} API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 typedef NS_ENUM(uint8_t, MTRPumpConfigurationAndControlPumpOperationMode) {
-    MTRPumpConfigurationAndControlPumpOperationModeNormal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlOperationModeNormal")
+    MTRPumpConfigurationAndControlPumpOperationModeNormal MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlOperationModeNormal", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+        tvos(16.1, 16.5))
     = 0x00,
-    MTRPumpConfigurationAndControlPumpOperationModeMinimum API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlOperationModeMinimum")
+    MTRPumpConfigurationAndControlPumpOperationModeMinimum MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlOperationModeMinimum", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+        tvos(16.1, 16.5))
     = 0x01,
-    MTRPumpConfigurationAndControlPumpOperationModeMaximum API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlOperationModeMaximum")
+    MTRPumpConfigurationAndControlPumpOperationModeMaximum MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlOperationModeMaximum", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+        tvos(16.1, 16.5))
     = 0x02,
-    MTRPumpConfigurationAndControlPumpOperationModeLocal API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlOperationModeLocal")
+    MTRPumpConfigurationAndControlPumpOperationModeLocal MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlOperationModeLocal", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+        tvos(16.1, 16.5))
     = 0x03,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlOperationMode");
+} MTR_DEPRECATED("Please use MTRPumpConfigurationAndControlOperationMode", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+    tvos(16.1, 16.5));
 
 typedef NS_OPTIONS(uint32_t, MTRPumpConfigurationAndControlPumpFeature) {
     MTRPumpConfigurationAndControlPumpFeatureConstantPressure API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x1,
@@ -20875,54 +20892,67 @@ typedef NS_OPTIONS(uint32_t, MTRPumpConfigurationAndControlPumpFeature) {
     MTRPumpConfigurationAndControlPumpFeatureConstantTemperature API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x10,
     MTRPumpConfigurationAndControlPumpFeatureAutomatic API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x20,
-    MTRPumpConfigurationAndControlPumpFeatureLocalOperation MTR_NEWLY_AVAILABLE = 0x40,
-    MTRPumpConfigurationAndControlPumpFeatureLocal API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpFeatureLocalOperation")
+    MTRPumpConfigurationAndControlPumpFeatureLocalOperation API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x40,
+    MTRPumpConfigurationAndControlPumpFeatureLocal MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlPumpFeatureLocalOperation", ios(16.4, 16.5), macos(13.3, 13.4), watchos(9.4, 9.5),
+        tvos(16.4, 16.5))
     = 0x40,
 } API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 typedef NS_OPTIONS(uint16_t, MTRPumpConfigurationAndControlPumpStatusBitmap) {
-    MTRPumpConfigurationAndControlPumpStatusBitmapDeviceFault MTR_NEWLY_AVAILABLE = 0x1,
-    MTRPumpConfigurationAndControlPumpStatusBitmapSupplyfault MTR_NEWLY_AVAILABLE = 0x2,
-    MTRPumpConfigurationAndControlPumpStatusBitmapSpeedLow MTR_NEWLY_AVAILABLE = 0x4,
-    MTRPumpConfigurationAndControlPumpStatusBitmapSpeedHigh MTR_NEWLY_AVAILABLE = 0x8,
-    MTRPumpConfigurationAndControlPumpStatusBitmapLocalOverride MTR_NEWLY_AVAILABLE = 0x10,
-    MTRPumpConfigurationAndControlPumpStatusBitmapRunning MTR_NEWLY_AVAILABLE = 0x20,
-    MTRPumpConfigurationAndControlPumpStatusBitmapRemotePressure MTR_NEWLY_AVAILABLE = 0x40,
-    MTRPumpConfigurationAndControlPumpStatusBitmapRemoteFlow MTR_NEWLY_AVAILABLE = 0x80,
-    MTRPumpConfigurationAndControlPumpStatusBitmapRemoteTemperature MTR_NEWLY_AVAILABLE = 0x100,
-} MTR_NEWLY_AVAILABLE;
+    MTRPumpConfigurationAndControlPumpStatusBitmapDeviceFault API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1,
+    MTRPumpConfigurationAndControlPumpStatusBitmapSupplyfault API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x2,
+    MTRPumpConfigurationAndControlPumpStatusBitmapSpeedLow API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x4,
+    MTRPumpConfigurationAndControlPumpStatusBitmapSpeedHigh API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x8,
+    MTRPumpConfigurationAndControlPumpStatusBitmapLocalOverride API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
+    = 0x10,
+    MTRPumpConfigurationAndControlPumpStatusBitmapRunning API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x20,
+    MTRPumpConfigurationAndControlPumpStatusBitmapRemotePressure API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
+    = 0x40,
+    MTRPumpConfigurationAndControlPumpStatusBitmapRemoteFlow API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x80,
+    MTRPumpConfigurationAndControlPumpStatusBitmapRemoteTemperature API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
+    = 0x100,
+} API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 typedef NS_OPTIONS(uint16_t, MTRPumpConfigurationAndControlPumpStatus) {
-    MTRPumpConfigurationAndControlPumpStatusDeviceFault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapDeviceFault")
+    MTRPumpConfigurationAndControlPumpStatusDeviceFault MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlPumpStatusBitmapDeviceFault", ios(16.1, 16.5), macos(13.0, 13.4),
+        watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x1,
-    MTRPumpConfigurationAndControlPumpStatusSupplyfault API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapSupplyfault")
+    MTRPumpConfigurationAndControlPumpStatusSupplyfault MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlPumpStatusBitmapSupplyfault", ios(16.1, 16.5), macos(13.0, 13.4),
+        watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x2,
-    MTRPumpConfigurationAndControlPumpStatusSpeedLow API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapSpeedLow")
+    MTRPumpConfigurationAndControlPumpStatusSpeedLow MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlPumpStatusBitmapSpeedLow", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+        tvos(16.1, 16.5))
     = 0x4,
-    MTRPumpConfigurationAndControlPumpStatusSpeedHigh API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapSpeedHigh")
+    MTRPumpConfigurationAndControlPumpStatusSpeedHigh MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlPumpStatusBitmapSpeedHigh", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+        tvos(16.1, 16.5))
     = 0x8,
-    MTRPumpConfigurationAndControlPumpStatusLocalOverride API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapLocalOverride")
+    MTRPumpConfigurationAndControlPumpStatusLocalOverride MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlPumpStatusBitmapLocalOverride", ios(16.1, 16.5), macos(13.0, 13.4),
+        watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x10,
-    MTRPumpConfigurationAndControlPumpStatusRunning API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapRunning")
+    MTRPumpConfigurationAndControlPumpStatusRunning MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlPumpStatusBitmapRunning", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+        tvos(16.1, 16.5))
     = 0x20,
-    MTRPumpConfigurationAndControlPumpStatusRemotePressure API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapRemotePressure")
+    MTRPumpConfigurationAndControlPumpStatusRemotePressure MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlPumpStatusBitmapRemotePressure", ios(16.1, 16.5), macos(13.0, 13.4),
+        watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x40,
-    MTRPumpConfigurationAndControlPumpStatusRemoteFlow API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapRemoteFlow")
+    MTRPumpConfigurationAndControlPumpStatusRemoteFlow MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlPumpStatusBitmapRemoteFlow", ios(16.1, 16.5), macos(13.0, 13.4),
+        watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x80,
-    MTRPumpConfigurationAndControlPumpStatusRemoteTemperature API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapRemoteTemperature")
+    MTRPumpConfigurationAndControlPumpStatusRemoteTemperature MTR_DEPRECATED(
+        "Please use MTRPumpConfigurationAndControlPumpStatusBitmapRemoteTemperature", ios(16.1, 16.5), macos(13.0, 13.4),
+        watchos(9.1, 9.5), tvos(16.1, 16.5))
     = 0x100,
-} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmap");
+} MTR_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmap", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+    tvos(16.1, 16.5));
 
 typedef NS_ENUM(uint8_t, MTRThermostatSetpointAdjustMode) {
     MTRThermostatSetpointAdjustModeHeat API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,
@@ -21139,21 +21169,22 @@ typedef NS_OPTIONS(uint32_t, MTRPressureMeasurementPressureFeature) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTROccupancySensingOccupancySensorType) {
-    MTROccupancySensingOccupancySensorTypePIR MTR_NEWLY_AVAILABLE = 0x00,
-    MTROccupancySensingOccupancySensorTypeUltrasonic MTR_NEWLY_AVAILABLE = 0x01,
-    MTROccupancySensingOccupancySensorTypePIRAndUltrasonic MTR_NEWLY_AVAILABLE = 0x02,
-    MTROccupancySensingOccupancySensorTypePhysicalContact MTR_NEWLY_AVAILABLE = 0x03,
-} MTR_NEWLY_AVAILABLE;
+    MTROccupancySensingOccupancySensorTypePIR API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x00,
+    MTROccupancySensingOccupancySensorTypeUltrasonic API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x01,
+    MTROccupancySensingOccupancySensorTypePIRAndUltrasonic API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x02,
+    MTROccupancySensingOccupancySensorTypePhysicalContact API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x03,
+} API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 typedef NS_OPTIONS(uint8_t, MTROccupancySensingOccupancyBitmap) {
-    MTROccupancySensingOccupancyBitmapOccupied MTR_NEWLY_AVAILABLE = 0x1,
-} MTR_NEWLY_AVAILABLE;
+    MTROccupancySensingOccupancyBitmapOccupied API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1,
+} API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 typedef NS_OPTIONS(uint8_t, MTROccupancySensingOccupancySensorTypeBitmap) {
-    MTROccupancySensingOccupancySensorTypeBitmapPIR MTR_NEWLY_AVAILABLE = 0x1,
-    MTROccupancySensingOccupancySensorTypeBitmapUltrasonic MTR_NEWLY_AVAILABLE = 0x2,
-    MTROccupancySensingOccupancySensorTypeBitmapPhysicalContact MTR_NEWLY_AVAILABLE = 0x4,
-} MTR_NEWLY_AVAILABLE;
+    MTROccupancySensingOccupancySensorTypeBitmapPIR API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1,
+    MTROccupancySensingOccupancySensorTypeBitmapUltrasonic API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x2,
+    MTROccupancySensingOccupancySensorTypeBitmapPhysicalContact API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
+    = 0x4,
+} API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 typedef NS_ENUM(uint8_t, MTRChannelStatus) {
     MTRChannelStatusSuccess API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,

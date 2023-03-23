@@ -268,7 +268,7 @@ application of OTA image.
 The RPCs in `lighting-common/lighting_service/lighting_service.proto` can be
 used to control various functionalities of the lighting app from a USB-connected
 host computer. To build the example with the RPC server, run the following
-command with _build-target_ replaced with the build target name of the Nordic
+command with _build-target_ replaced with the build target name of the Telink
 Semiconductor's kit you own:
 
     ```

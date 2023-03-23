@@ -17,7 +17,9 @@
 
 #include "LEDWidget.h"
 #include "ColorFormat.h"
+#if CONFIG_HAVE_DISPLAY
 #include "ScreenManager.h"
+#endif
 #include "led_strip.h"
 
 static const char * TAG = "LEDWidget";

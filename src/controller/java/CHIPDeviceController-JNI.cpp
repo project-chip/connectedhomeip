@@ -958,19 +958,52 @@ JNI_METHOD(void, releaseOperationalDevicePointer)(JNIEnv * env, jobject self, jl
     }
 }
 
-JNI_METHOD(void, shutdownSubscriptions)(JNIEnv * env, jobject self, jlong handle, jlong devicePtr)
+JNI_METHOD(jint, getFabricIndex)(JNIEnv * env, jobject self, jlong handle)
 {
     chip::DeviceLayer::StackLock lock;
 
-    DeviceProxy * device = reinterpret_cast<DeviceProxy *>(devicePtr);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
-    //
-    // We should move away from this model of shutting down subscriptions in this manner and instead,
-    // have Java own the ReadClient objects directly and manage their lifetimes.
-    //
-    // #13163 tracks this issue.
-    //
-    device->ShutdownSubscriptions();
+    return wrapper->Controller()->GetFabricIndex();
+}
+
+JNI_METHOD(void, shutdownSubscriptions)
+(JNIEnv * env, jobject self, jobject handle, jobject fabricIndex, jobject peerNodeId, jobject subscriptionId)
+{
+    chip::DeviceLayer::StackLock lock;
+    if (fabricIndex == nullptr && peerNodeId == nullptr && subscriptionId == nullptr)
+    {
+        app::InteractionModelEngine::GetInstance()->ShutdownAllSubscriptions();
+        return;
+    }
+
+    if (fabricIndex != nullptr && peerNodeId != nullptr && subscriptionId == nullptr)
+    {
+        jint jFabricIndex = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
+        jlong jPeerNodeId = chip::JniReferences::GetInstance().LongToPrimitive(peerNodeId);
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(static_cast<chip::FabricIndex>(jFabricIndex),
+                                                                          static_cast<chip::NodeId>(jPeerNodeId));
+        return;
+    }
+
+    if (fabricIndex != nullptr && peerNodeId == nullptr && subscriptionId == nullptr)
+    {
+        jint jFabricIndex = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(static_cast<chip::FabricIndex>(jFabricIndex));
+        return;
+    }
+
+    if (fabricIndex != nullptr && peerNodeId != nullptr && subscriptionId != nullptr)
+    {
+        jint jFabricIndex     = chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex);
+        jlong jPeerNodeId     = chip::JniReferences::GetInstance().LongToPrimitive(peerNodeId);
+        jlong jSubscriptionId = chip::JniReferences::GetInstance().LongToPrimitive(subscriptionId);
+        app::InteractionModelEngine::GetInstance()->ShutdownSubscription(
+            chip::ScopedNodeId(static_cast<chip::NodeId>(jPeerNodeId), static_cast<chip::FabricIndex>(jFabricIndex)),
+            static_cast<chip::SubscriptionId>(jSubscriptionId));
+        return;
+    }
+    ChipLogError(Controller, "Failed to shutdown subscriptions with correct input paramemeter");
 }
 
 JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
@@ -1133,7 +1166,8 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
 }
 
 JNI_METHOD(jboolean, openPairingWindowWithPIN)
-(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator, jlong setupPinCode)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator,
+ jobject setupPinCode)
 {
     VerifyOrReturnValue(chip::CanCastTo<uint32_t>(iteration), false);
 
@@ -1149,10 +1183,17 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
+    Optional<uint32_t> pinCode = Optional<uint32_t>();
+    if (setupPinCode != nullptr)
+    {
+        jlong jsetupPinCode = chip::JniReferences::GetInstance().LongToPrimitive(setupPinCode);
+        pinCode             = MakeOptional(static_cast<uint32_t>(jsetupPinCode));
+    }
+
     chip::SetupPayload setupPayload;
     err = AutoCommissioningWindowOpener::OpenCommissioningWindow(
         wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), static_cast<uint32_t>(iteration),
-        discriminator, MakeOptional(static_cast<uint32_t>(setupPinCode)), NullOptional, setupPayload);
+        discriminator, pinCode, NullOptional, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1191,8 +1232,8 @@ JNI_METHOD(jboolean, openPairingWindowCallback)
 }
 
 JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
-(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator, jlong setupPinCode,
- jobject jcallback)
+(JNIEnv * env, jobject self, jlong handle, jlong devicePtr, jint duration, jlong iteration, jint discriminator,
+ jobject setupPinCode, jobject jcallback)
 {
     VerifyOrReturnValue(chip::CanCastTo<uint32_t>(iteration), false);
 
@@ -1208,10 +1249,17 @@ JNI_METHOD(jboolean, openPairingWindowWithPINCallback)
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
+    Optional<uint32_t> pinCode = Optional<uint32_t>();
+    if (setupPinCode != nullptr)
+    {
+        jlong jsetupPinCode = chip::JniReferences::GetInstance().LongToPrimitive(setupPinCode);
+        pinCode             = MakeOptional(static_cast<uint32_t>(jsetupPinCode));
+    }
+
     chip::SetupPayload setupPayload;
     err = AndroidCommissioningWindowOpener::OpenCommissioningWindow(
         wrapper->Controller(), chipDevice->GetDeviceId(), System::Clock::Seconds16(duration), static_cast<uint32_t>(iteration),
-        discriminator, MakeOptional(static_cast<uint32_t>(setupPinCode)), NullOptional, jcallback, setupPayload);
+        discriminator, pinCode, NullOptional, jcallback, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1322,104 +1370,164 @@ exit:
 
 JNI_METHOD(void, subscribe)
 (JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
- jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered)
+ jint minInterval, jint maxInterval, jboolean keepSubscriptions, jboolean isFabricFiltered, jint imTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    DeviceProxy * device = reinterpret_cast<DeviceProxy *>(devicePtr);
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    app::ReadClient * readClient = nullptr;
+    jint numAttributePaths       = 0;
+    jint numEventPaths           = 0;
+    auto callback                = reinterpret_cast<ReportCallback *>(callbackHandle);
+    DeviceProxy * device         = reinterpret_cast<DeviceProxy *>(devicePtr);
     if (device == nullptr)
     {
-        ChipLogError(Controller, "No device found");
+        ChipLogProgress(Controller, "Could not cast device pointer to Device object");
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INCORRECT_STATE);
         return;
     }
-
-    std::vector<app::AttributePathParams> attributePathParamsList;
-    err = ParseAttributePathList(attributePathList, attributePathParamsList);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error parsing Java attribute paths: %s", ErrorStr(err)));
-
-    std::vector<app::EventPathParams> eventPathParamsList;
-    err = ParseEventPathList(eventPathList, eventPathParamsList);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error parsing Java event paths: %s", ErrorStr(err)));
-
     app::ReadPrepareParams params(device->GetSecureSession().Value());
-    params.mMinIntervalFloorSeconds     = minInterval;
-    params.mMaxIntervalCeilingSeconds   = maxInterval;
-    params.mpAttributePathParamsList    = attributePathParamsList.data();
-    params.mAttributePathParamsListSize = attributePathParamsList.size();
-    params.mpEventPathParamsList        = eventPathParamsList.data();
-    params.mEventPathParamsListSize     = eventPathParamsList.size();
-    params.mKeepSubscriptions           = (keepSubscriptions != JNI_FALSE);
-    params.mIsFabricFiltered            = (isFabricFiltered != JNI_FALSE);
 
-    auto callback = reinterpret_cast<ReportCallback *>(callbackHandle);
+    params.mMinIntervalFloorSeconds   = minInterval;
+    params.mMaxIntervalCeilingSeconds = maxInterval;
+    params.mKeepSubscriptions         = (keepSubscriptions != JNI_FALSE);
+    params.mIsFabricFiltered          = (isFabricFiltered != JNI_FALSE);
+    params.mTimeout                   = imTimeoutMs != 0 ? System::Clock::Milliseconds32(imTimeoutMs) : System::Clock::kZero;
 
-    app::ReadClient * readClient = Platform::New<app::ReadClient>(
-        app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
-        callback->mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Subscribe);
-
-    err = readClient->SendRequest(params);
-    if (err != CHIP_NO_ERROR)
+    if (attributePathList != nullptr)
     {
-        callback->OnError(err);
-        delete readClient;
-        delete callback;
-        return;
+        SuccessOrExit(err = JniReferences::GetInstance().GetListSize(attributePathList, numAttributePaths));
     }
 
+    if (numAttributePaths > 0)
+    {
+        std::unique_ptr<chip::app::AttributePathParams[]> attributePaths(new chip::app::AttributePathParams[numAttributePaths]);
+        for (uint8_t i = 0; i < numAttributePaths; i++)
+        {
+            jobject attributePathItem = nullptr;
+            SuccessOrExit(err = JniReferences::GetInstance().GetListItem(attributePathList, i, attributePathItem));
+
+            EndpointId endpointId;
+            ClusterId clusterId;
+            AttributeId attributeId;
+            SuccessOrExit(err = ParseAttributePath(attributePathItem, endpointId, clusterId, attributeId));
+            attributePaths[i] = chip::app::AttributePathParams(endpointId, clusterId, attributeId);
+        }
+        params.mpAttributePathParamsList    = attributePaths.get();
+        params.mAttributePathParamsListSize = numAttributePaths;
+        attributePaths.release();
+    }
+
+    if (eventPathList != nullptr)
+    {
+        SuccessOrExit(err = JniReferences::GetInstance().GetListSize(eventPathList, numEventPaths));
+    }
+
+    if (numEventPaths > 0)
+    {
+        std::unique_ptr<chip::app::EventPathParams[]> eventPaths(new chip::app::EventPathParams[numEventPaths]);
+        for (uint8_t i = 0; i < numEventPaths; i++)
+        {
+            jobject eventPathItem = nullptr;
+            SuccessOrExit(err = JniReferences::GetInstance().GetListItem(eventPathList, i, eventPathItem));
+
+            EndpointId endpointId;
+            ClusterId clusterId;
+            EventId eventId;
+            bool isUrgent;
+            SuccessOrExit(err = ParseEventPath(eventPathItem, endpointId, clusterId, eventId, isUrgent));
+            eventPaths[i] = chip::app::EventPathParams(endpointId, clusterId, eventId, isUrgent);
+        }
+
+        params.mpEventPathParamsList    = eventPaths.get();
+        params.mEventPathParamsListSize = numEventPaths;
+        eventPaths.release();
+    }
+
+    readClient = Platform::New<app::ReadClient>(app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+                                                callback->mClusterCacheAdapter.GetBufferedCallback(),
+                                                app::ReadClient::InteractionType::Subscribe);
+
+    SuccessOrExit(err = readClient->SendAutoResubscribeRequest(std::move(params)));
     callback->mReadClient = readClient;
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "JNI IM Subscribe Error: %s", err.AsString());
+        if (err == CHIP_JNI_ERROR_EXCEPTION_THROWN)
+        {
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+        }
+        callback->OnError(err);
+        if (readClient != nullptr)
+        {
+            Platform::Delete(readClient);
+        }
+        if (callback != nullptr)
+        {
+            Platform::Delete(callback);
+        }
+    }
 }
 
 JNI_METHOD(void, read)
 (JNIEnv * env, jobject self, jlong handle, jlong callbackHandle, jlong devicePtr, jobject attributePathList, jobject eventPathList,
- jboolean isFabricFiltered)
+ jboolean isFabricFiltered, jint imTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    DeviceProxy * device = reinterpret_cast<DeviceProxy *>(devicePtr);
+    auto callback = reinterpret_cast<ReportCallback *>(callbackHandle);
+    std::vector<app::AttributePathParams> attributePathParamsList;
+    std::vector<app::EventPathParams> eventPathParamsList;
+    app::ReadClient * readClient = nullptr;
+    DeviceProxy * device         = reinterpret_cast<DeviceProxy *>(devicePtr);
     if (device == nullptr)
     {
-        ChipLogError(Controller, "No device found");
+        ChipLogProgress(Controller, "Could not cast device pointer to Device object");
         JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INCORRECT_STATE);
         return;
     }
-
-    std::vector<app::AttributePathParams> attributePathParamsList;
-    err = ParseAttributePathList(attributePathList, attributePathParamsList);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error parsing Java attribute paths: %s", ErrorStr(err)));
-
-    std::vector<app::EventPathParams> eventPathParamsList;
-    err = ParseEventPathList(eventPathList, eventPathParamsList);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error parsing Java event paths: %s", ErrorStr(err)));
-
-    VerifyOrReturn(attributePathParamsList.size() != 0 || eventPathParamsList.size() != 0,
-                   ChipLogError(Controller, "Error parsing Java both event paths and attribute paths"));
     app::ReadPrepareParams params(device->GetSecureSession().Value());
+
+    SuccessOrExit(err = ParseAttributePathList(attributePathList, attributePathParamsList));
+    SuccessOrExit(err = ParseEventPathList(eventPathList, eventPathParamsList));
+    VerifyOrExit(attributePathParamsList.size() != 0 || eventPathParamsList.size() != 0, err = CHIP_ERROR_INVALID_ARGUMENT);
     params.mpAttributePathParamsList    = attributePathParamsList.data();
     params.mAttributePathParamsListSize = attributePathParamsList.size();
     params.mpEventPathParamsList        = eventPathParamsList.data();
     params.mEventPathParamsListSize     = eventPathParamsList.size();
 
     params.mIsFabricFiltered = (isFabricFiltered != JNI_FALSE);
+    params.mTimeout          = imTimeoutMs != 0 ? System::Clock::Milliseconds32(imTimeoutMs) : System::Clock::kZero;
 
-    auto callback = reinterpret_cast<ReportCallback *>(callbackHandle);
+    readClient = Platform::New<app::ReadClient>(app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+                                                callback->mClusterCacheAdapter.GetBufferedCallback(),
+                                                app::ReadClient::InteractionType::Read);
 
-    app::ReadClient * readClient = Platform::New<app::ReadClient>(
-        app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
-        callback->mClusterCacheAdapter.GetBufferedCallback(), app::ReadClient::InteractionType::Read);
+    SuccessOrExit(err = readClient->SendRequest(params));
+    callback->mReadClient = readClient;
 
-    err = readClient->SendRequest(params);
+exit:
     if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(Controller, "JNI IM Read Error: %s", err.AsString());
+        if (err == CHIP_JNI_ERROR_EXCEPTION_THROWN)
+        {
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+        }
         callback->OnError(err);
-        delete readClient;
-        delete callback;
-        return;
+        if (readClient != nullptr)
+        {
+            Platform::Delete(readClient);
+        }
+        if (callback != nullptr)
+        {
+            Platform::Delete(callback);
+        }
     }
-
-    callback->mReadClient = readClient;
 }
 
 JNI_METHOD(void, write)
@@ -1543,11 +1651,11 @@ exit:
         callback->OnError(writeClient, err);
         if (writeClient != nullptr)
         {
-            delete writeClient;
+            Platform::Delete(writeClient);
         }
         if (callback != nullptr)
         {
-            delete callback;
+            Platform::Delete(callback);
         }
     }
 }
@@ -1651,11 +1759,11 @@ exit:
         callback->OnError(nullptr, err);
         if (commandSender != nullptr)
         {
-            delete commandSender;
+            Platform::Delete(commandSender);
         }
         if (callback != nullptr)
         {
-            delete callback;
+            Platform::Delete(callback);
         }
     }
 }

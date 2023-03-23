@@ -35,7 +35,7 @@ tests:
       disabled: true
 
     - label: "DUT sends ResetCounts command to TH"
-      PICS: DGWIFI.S.C00.Rsp
+      PICS: DGWIFI.C.C00.Tx
       verification: |
           ./chip-tool wifinetworkdiagnostics reset-counts 1 0
 

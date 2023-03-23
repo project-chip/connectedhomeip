@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 84.1.1. [TC-DESC-1.1] Descriptor Cluster Attributes with DUT as Server
+name: 84.1.1. [TC-DESC-1.1] Global Attributes [DUT-Server]
 
 PICS:
     - DESC.S

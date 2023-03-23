@@ -33,6 +33,7 @@ source "$CHIP_ROOT/scripts/activate.sh"
 set -x
 env
 USE_WIFI=false
+USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
 
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
@@ -94,7 +95,7 @@ if [ "$#" == "0" ]; then
             Build wifi example with extension board wf200. (Default false)
         'import("//with_pw_rpc.gni")'
             Use to build the example with pigweed RPC
-        OTA_periodic_query_timeout
+        ota_periodic_query_timeout_sec
             Periodic query timeout variable for OTA in seconds
         rs91x_wpa3_only
             Support for WPA3 only mode on RS91x
@@ -113,11 +114,15 @@ if [ "$#" == "0" ]; then
             enable Addition data advertissing and rotating device ID
         --use_ot_lib
             use the silabs openthread library
+        --use_chip_lwip_lib
+            use the chip lwip library
         --no-version
             Skip the silabs formating for the Matter software version string
             Currently : v1.0-<branchName>-<ShortCommitSha>
         --release
             Remove all logs and debugs features (including the LCD). Yield the smallest image size possible
+        --docker
+            Change GSDK root for docker builds
 
     "
 elif [ "$#" -lt "2" ]; then
@@ -165,7 +170,7 @@ else
                 shift
                 ;;
             --chip_enable_wifi_ipv4)
-                optArgs+="chip_enable_wifi_ipv4=true "
+                ipArgs="chip_enable_wifi_ipv4=true chip_inet_config_enable_ipv4=true "
                 shift
                 ;;
             --additional_data_advertising)
@@ -180,6 +185,10 @@ else
                 optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
                 shift
                 ;;
+            --use_chip_lwip_lib)
+                optArgs+="lwip_root=\""//third_party/connectedhomeip/third_party/lwip"\" "
+                shift
+                ;;
             # Option not to be used until ot-efr32 github is updated
             # --use_ot_github_sources)
             #   optArgs+="openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/openthread\" openthread_efr32_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/src/src\""
@@ -191,6 +200,11 @@ else
                 ;;
             --release)
                 optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
+                shift
+                ;;
+            --docker)
+                optArgs+="efr32_sdk_root=\"$GSDK_ROOT\" "
+                USE_DOCKER=true
                 shift
                 ;;
             *)
@@ -220,10 +234,17 @@ else
     BUILD_DIR=$OUTDIR/$SILABS_BOARD
     echo BUILD_DIR="$BUILD_DIR"
     if [ "$USE_WIFI" == true ]; then
+        # wifi build
+        # NCP mode EFR32 + wifi module
+        optArgs+="$ipArgs"
         gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
     else
-        # thread build
+        # OpenThread/SoC build
         #
+        if [ "$USE_DOCKER" == true ]; then
+            optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
+        fi
+
         if [ -z "$optArgs" ]; then
             gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\"" "$BUILD_DIR"
         else

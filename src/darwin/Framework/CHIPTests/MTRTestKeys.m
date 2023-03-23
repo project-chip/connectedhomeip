@@ -26,6 +26,11 @@
 
 @synthesize publicKey = _publicKey, privateKey = _privateKey, ipk = _ipk;
 
+- (NSData *)publicKeyData
+{
+    return (__bridge_transfer NSData *) SecKeyCopyExternalRepresentation([self publicKey], nil);
+}
+
 - (instancetype)init
 {
     if (!(self = [super init])) {

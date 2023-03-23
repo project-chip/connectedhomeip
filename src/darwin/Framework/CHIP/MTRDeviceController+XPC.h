@@ -79,12 +79,12 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
 /**
  * Returns an NSXPCInterface configured for MTRDeviceControllerServerProtocol.
  */
-+ (NSXPCInterface *)xpcInterfaceForServerProtocol MTR_NEWLY_AVAILABLE;
++ (NSXPCInterface *)xpcInterfaceForServerProtocol API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 /**
  * Returns an NSXPCInterface configured for MTRDeviceControllerClientProtocol.
  */
-+ (NSXPCInterface *)xpcInterfaceForClientProtocol MTR_NEWLY_AVAILABLE;
++ (NSXPCInterface *)xpcInterfaceForClientProtocol API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 @end
 
 /**

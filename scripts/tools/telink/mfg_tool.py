@@ -567,8 +567,6 @@ def get_and_validate_args():
 
     parser = argparse.ArgumentParser(description='Manufacuring partition generator tool',
                                      formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=50))
-    mandatory_args = parser.add_argument_group("Mandatory keys", "These arguments must be provided to generate JSON file")
-    optional_args = parser.add_argument_group("Optional keys", "These arguments are optional and they depend on the user-purpose")
 
     # General options
     general_args = parser.add_argument_group('General options')

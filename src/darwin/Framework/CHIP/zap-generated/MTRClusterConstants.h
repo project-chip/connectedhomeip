@@ -2914,9 +2914,11 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     = 0x00000004,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeTimeZoneID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000005,
-    MTRAttributeIDTypeClusterTimeSynchronizationAttributeDSTOffsetID MTR_NEWLY_AVAILABLE = 0x00000006,
-    MTRAttributeIDTypeClusterTimeSynchronizationAttributeDstOffsetID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-        MTR_NEWLY_DEPRECATED("Please use MTRAttributeIDTypeTimeSynchronizationAttributeDSTOffsetID")
+    MTRAttributeIDTypeClusterTimeSynchronizationAttributeDSTOffsetID API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
+    = 0x00000006,
+    MTRAttributeIDTypeClusterTimeSynchronizationAttributeDstOffsetID MTR_DEPRECATED(
+        "Please use MTRAttributeIDTypeTimeSynchronizationAttributeDSTOffsetID", ios(16.4, 16.5), macos(13.3, 13.4),
+        watchos(9.4, 9.5), tvos(16.4, 16.5))
     = MTRAttributeIDTypeClusterTimeSynchronizationAttributeDSTOffsetID,
     MTRAttributeIDTypeClusterTimeSynchronizationAttributeLocalTimeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     = 0x00000007,

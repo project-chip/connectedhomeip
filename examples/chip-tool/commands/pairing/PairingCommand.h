@@ -35,6 +35,7 @@ enum class PairingMode
     Ble,
     SoftAP,
     AlreadyDiscovered,
+    AlreadyDiscoveredByIndex,
     OnNetwork,
 };
 
@@ -114,6 +115,12 @@ public:
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
+        case PairingMode::AlreadyDiscoveredByIndex:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
+            AddArgument("index", 0, UINT16_MAX, &mIndex);
+            AddArgument("pase-only", 0, 1, &mPaseOnly);
+            break;
         }
 
         switch (filterType)
@@ -171,6 +178,7 @@ private:
     CHIP_ERROR PairWithMdns(NodeId remoteId);
     CHIP_ERROR PairWithCode(NodeId remoteId);
     CHIP_ERROR PaseWithCode(NodeId remoteId);
+    CHIP_ERROR PairWithMdnsOrBleByIndex(NodeId remoteId, uint16_t index);
     CHIP_ERROR Unpair(NodeId remoteId);
     chip::Controller::CommissioningParameters GetCommissioningParameters();
 
@@ -189,6 +197,7 @@ private:
     uint16_t mRemotePort;
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
+    uint16_t mIndex;
     chip::ByteSpan mOperationalDataset;
     chip::ByteSpan mSSID;
     chip::ByteSpan mPassword;

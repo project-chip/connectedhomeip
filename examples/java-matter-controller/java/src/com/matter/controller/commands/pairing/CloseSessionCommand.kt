@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 
 class CloseSessionCommand(controller: ChipDeviceController, credsIssuer: CredentialsIssuer?) :
-  MatterCommand(controller, "close-session", credsIssuer) {
+  MatterCommand(controller, credsIssuer, "close-session") {
   private val destinationId: AtomicLong = AtomicLong()
   private val timeoutSecs: AtomicInteger = AtomicInteger()
 

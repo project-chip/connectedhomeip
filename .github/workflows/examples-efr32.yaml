@@ -39,7 +39,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: connectedhomeip/chip-build-efr32:0.6.47
+      image: connectedhomeip/chip-build-efr32:0.6.50
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
@@ -52,7 +52,7 @@ jobs:
           attempt_limit: 3
           attempt_delay: 2000
       - name: Checkout submodules
-        run: scripts/checkout_submodules.py --shallow --platform efr32
+        run: scripts/checkout_submodules.py --shallow --platform silabs_docker
 
       # - name: Out of Tree verification
       #   run: third_party/silabs/out_of_tree_verification.sh
@@ -114,7 +114,7 @@ jobs:
       - name: Build example EFR32+WF200 WiFi Lock app for BRD4161A
         timeout-minutes: 15
         run: |
-          scripts/examples/gn_efr32_example.sh examples/lock-app/silabs/efr32/ out/lock_app_wifi_wf200 BRD4161A is_debug=false chip_logging=false --wifi wf200
+          scripts/examples/gn_efr32_example.sh examples/lock-app/silabs/efr32/ out/lock_app_wifi_wf200 BRD4161A is_debug=false chip_logging=false --wifi wf200 --docker
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+wf200 lock-app \
             out/lock_app_wifi_wf200/BRD4161A/chip-efr32-lock-example.out /tmp/bloat_reports/
       - name: Clean out build output
@@ -122,7 +122,7 @@ jobs:
       - name: Build example EFR32+RS9116 WiFi Lighting app for BRD4161A
         timeout-minutes: 15
         run: |
-          scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out/lighting_app_wifi_rs9116 BRD4161A --wifi rs9116
+          scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out/lighting_app_wifi_rs9116 BRD4161A --wifi rs9116 --docker
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+rs9116 lighting-app \
             out/lighting_app_wifi_rs9116/BRD4161A/chip-efr32-lighting-example.out /tmp/bloat_reports/
       - name: Clean out build output

@@ -886,6 +886,21 @@ menu "CHIP Device Layer"
             default 900 
             help
                 The amount of time (in seconds) after which the CHIP platform will close the Commissioning Window
+    endmenu
+
+    menu "Enable ESP32 as a BLE Commissioner"
+        config ENABLE_ESP32_BLE_CONTROLLER
+            bool "Enable ESP32 as a BLE Commissioner"
+            default n
+            help
+                Enable esp32 as a BLE Commissioner.
+
+        config ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+            bool "Enable Commissionee and Commissioner mode"
+            default n
+            depends on ENABLE_ESP32_BLE_Controller
+            help
+                Enable including commissioner code (CHIPDeviceController.cpp) in the commissionee (Server.cpp) code.
 
     endmenu
 

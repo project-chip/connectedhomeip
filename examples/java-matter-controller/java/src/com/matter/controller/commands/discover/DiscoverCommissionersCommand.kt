@@ -23,6 +23,6 @@ import com.matter.controller.commands.common.MatterCommand
 
 class DiscoverCommissionersCommand(
   controller: ChipDeviceController, credsIssuer: CredentialsIssuer?
-) : MatterCommand(controller, "commissioners", credsIssuer) {
+) : MatterCommand(controller, credsIssuer, "commissioners") {
   override fun runCommand() {}
 }

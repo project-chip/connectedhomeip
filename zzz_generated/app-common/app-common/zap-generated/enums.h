@@ -46,21 +46,6 @@ enum EmberAfColorControlOptions : uint8_t
     EMBER_ZCL_COLOR_CONTROL_OPTIONS_EXECUTE_IF_OFF = 1,
 };
 
-// Enum for ColorLoopAction
-enum EmberAfColorLoopAction : uint8_t
-{
-    EMBER_ZCL_COLOR_LOOP_ACTION_DEACTIVATE                                  = 0,
-    EMBER_ZCL_COLOR_LOOP_ACTION_ACTIVATE_FROM_COLOR_LOOP_START_ENHANCED_HUE = 1,
-    EMBER_ZCL_COLOR_LOOP_ACTION_ACTIVATE_FROM_ENHANCED_CURRENT_HUE          = 2,
-};
-
-// Enum for ColorLoopDirection
-enum EmberAfColorLoopDirection : uint8_t
-{
-    EMBER_ZCL_COLOR_LOOP_DIRECTION_DECREMENT_HUE = 0,
-    EMBER_ZCL_COLOR_LOOP_DIRECTION_INCREMENT_HUE = 1,
-};
-
 // Enum for ColorMode
 enum EmberAfColorMode : uint8_t
 {
@@ -92,30 +77,6 @@ enum EmberAfHardwareFaultEnum : uint8_t
     EMBER_ZCL_HARDWARE_FAULT_ENUM_USER_INTERFACE_FAULT      = 8,
     EMBER_ZCL_HARDWARE_FAULT_ENUM_NON_VOLATILE_MEMORY_ERROR = 9,
     EMBER_ZCL_HARDWARE_FAULT_ENUM_TAMPER_DETECTED           = 10,
-};
-
-// Enum for HueDirection
-enum EmberAfHueDirection : uint8_t
-{
-    EMBER_ZCL_HUE_DIRECTION_SHORTEST_DISTANCE = 0,
-    EMBER_ZCL_HUE_DIRECTION_LONGEST_DISTANCE  = 1,
-    EMBER_ZCL_HUE_DIRECTION_UP                = 2,
-    EMBER_ZCL_HUE_DIRECTION_DOWN              = 3,
-};
-
-// Enum for HueMoveMode
-enum EmberAfHueMoveMode : uint8_t
-{
-    EMBER_ZCL_HUE_MOVE_MODE_STOP = 0,
-    EMBER_ZCL_HUE_MOVE_MODE_UP   = 1,
-    EMBER_ZCL_HUE_MOVE_MODE_DOWN = 3,
-};
-
-// Enum for HueStepMode
-enum EmberAfHueStepMode : uint8_t
-{
-    EMBER_ZCL_HUE_STEP_MODE_UP   = 1,
-    EMBER_ZCL_HUE_STEP_MODE_DOWN = 3,
 };
 
 // Enum for IdentifyEffectIdentifier
@@ -211,21 +172,6 @@ enum EmberAfRoutingRole : uint8_t
     EMBER_ZCL_ROUTING_ROLE_LEADER            = 6,
 };
 
-// Enum for SaturationMoveMode
-enum EmberAfSaturationMoveMode : uint8_t
-{
-    EMBER_ZCL_SATURATION_MOVE_MODE_STOP = 0,
-    EMBER_ZCL_SATURATION_MOVE_MODE_UP   = 1,
-    EMBER_ZCL_SATURATION_MOVE_MODE_DOWN = 3,
-};
-
-// Enum for SaturationStepMode
-enum EmberAfSaturationStepMode : uint8_t
-{
-    EMBER_ZCL_SATURATION_STEP_MODE_UP   = 1,
-    EMBER_ZCL_SATURATION_STEP_MODE_DOWN = 3,
-};
-
 // Enum for StepMode
 enum EmberAfStepMode : uint8_t
 {
@@ -243,11 +189,3 @@ enum EmberAfStepMode : uint8_t
 #define EMBER_AF_BARRIER_CONTROL_SAFETY_STATUS_FAILED_COMMUNICATION_OFFSET (2)
 #define EMBER_AF_BARRIER_CONTROL_SAFETY_STATUS_POSITION_FAILURE (8)
 #define EMBER_AF_BARRIER_CONTROL_SAFETY_STATUS_POSITION_FAILURE_OFFSET (3)
-#define EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_ACTION (1)
-#define EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_ACTION_OFFSET (0)
-#define EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_DIRECTION (2)
-#define EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_DIRECTION_OFFSET (1)
-#define EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_TIME (4)
-#define EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_TIME_OFFSET (2)
-#define EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_START_HUE (8)
-#define EMBER_AF_COLOR_LOOP_UPDATE_FLAGS_UPDATE_START_HUE_OFFSET (3)

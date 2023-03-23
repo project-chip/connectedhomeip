@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 30.2.1. [TC-OCC-2.4] Attributes with server as DUT
+name:
+    28.3.2. [TC-OCC-2.4] OccupancySensorTypeBitmap and OccupancySensorType
+    interdependency with client as DUT
 
 PICS:
     - OCC.C
@@ -28,11 +30,11 @@ tests:
     #  command: "WaitForCommissioning"
 
     - label: "TH reads OccupancySensorType attribute from DUT"
-      PICS: OCC.S.A0001
+      PICS: OCC.C.A0001
       wait: "readAttribute"
       attribute: "OccupancySensorType"
 
     - label: "TH reads OccupancySensorTypeBitmap attribute from DUT"
-      PICS: OCC.S.A0002
+      PICS: OCC.C.A0002
       wait: "readAttribute"
       attribute: "OccupancySensorTypeBitmap"
