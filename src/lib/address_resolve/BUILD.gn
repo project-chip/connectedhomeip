@@ -15,16 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-declare_args() {
-  # Define as "default" to include the built in resolution strategy in
-  # CHIP (i.e. sources within this directory).
-  #
-  # Define as "custom" to only have relevant type definitions included
-  # in which case the application is expected to provide a
-  #    CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER
-  # include to use
-  chip_address_resolve_strategy = "default"
-}
+import("address_resolve.gni")
 
 config("default_address_resolve_config") {
   defines = [ "CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>" ]

@@ -192,8 +192,6 @@ CHIP_ERROR AccessControlAttribute::ReadAcl(AttributeValueEncoder & aEncoder)
 CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncoder)
 {
     auto & storage = Server::GetInstance().GetPersistentStorage();
-    DefaultStorageKeyAllocator key;
-
     auto & fabrics = Server::GetInstance().GetFabricTable();
 
     return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
@@ -201,7 +199,8 @@ CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncode
         {
             uint8_t buffer[kExtensionDataMaxLength] = { 0 };
             uint16_t size                           = static_cast<uint16_t>(sizeof(buffer));
-            CHIP_ERROR errStorage = storage.SyncGetKeyValue(key.AccessControlExtensionEntry(fabric.GetFabricIndex()), buffer, size);
+            CHIP_ERROR errStorage                   = storage.SyncGetKeyValue(
+                DefaultStorageKeyAllocator::AccessControlExtensionEntry(fabric.GetFabricIndex()).KeyName(), buffer, size);
             ReturnErrorCodeIf(errStorage == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_ERROR_INCORRECT_STATE);
             if (errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {
@@ -295,13 +294,13 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
 CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     auto & storage = Server::GetInstance().GetPersistentStorage();
-    DefaultStorageKeyAllocator key;
 
     FabricIndex accessingFabricIndex = aDecoder.AccessingFabricIndex();
 
     uint8_t buffer[kExtensionDataMaxLength] = { 0 };
     uint16_t size                           = static_cast<uint16_t>(sizeof(buffer));
-    CHIP_ERROR errStorage = storage.SyncGetKeyValue(key.AccessControlExtensionEntry(accessingFabricIndex), buffer, size);
+    CHIP_ERROR errStorage                   = storage.SyncGetKeyValue(
+        DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName(), buffer, size);
     ReturnErrorCodeIf(errStorage == CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorCodeIf(errStorage != CHIP_NO_ERROR && errStorage != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, errStorage);
 
@@ -316,7 +315,8 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
         if (count == 0)
         {
             ReturnErrorCodeIf(errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
-            ReturnErrorOnFailure(storage.SyncDeleteKeyValue(key.AccessControlExtensionEntry(accessingFabricIndex)));
+            ReturnErrorOnFailure(storage.SyncDeleteKeyValue(
+                DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName()));
             AccessControlCluster::Structs::ExtensionEntry::Type item = {
                 .data        = ByteSpan(buffer, size),
                 .fabricIndex = accessingFabricIndex,
@@ -339,8 +339,9 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
 
             ReturnErrorOnFailure(CheckExtensionEntryDataFormat(item.data));
 
-            ReturnErrorOnFailure(storage.SyncSetKeyValue(key.AccessControlExtensionEntry(accessingFabricIndex), item.data.data(),
-                                                         static_cast<uint16_t>(item.data.size())));
+            ReturnErrorOnFailure(
+                storage.SyncSetKeyValue(DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName(),
+                                        item.data.data(), static_cast<uint16_t>(item.data.size())));
             ReturnErrorOnFailure(LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(),
                                                           errStorage == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND
                                                               ? AccessControlCluster::ChangeTypeEnum::kAdded
@@ -361,8 +362,9 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
 
         ReturnErrorOnFailure(CheckExtensionEntryDataFormat(item.data));
 
-        ReturnErrorOnFailure(storage.SyncSetKeyValue(key.AccessControlExtensionEntry(accessingFabricIndex), item.data.data(),
-                                                     static_cast<uint16_t>(item.data.size())));
+        ReturnErrorOnFailure(
+            storage.SyncSetKeyValue(DefaultStorageKeyAllocator::AccessControlExtensionEntry(accessingFabricIndex).KeyName(),
+                                    item.data.data(), static_cast<uint16_t>(item.data.size())));
         ReturnErrorOnFailure(
             LogExtensionChangedEvent(item, aDecoder.GetSubjectDescriptor(), AccessControlCluster::ChangeTypeEnum::kAdded));
     }

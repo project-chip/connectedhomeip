@@ -10,7 +10,7 @@
             AdministratorCommissioning/60:
                 attributes:
                     FeatureMap/65532: '0'
-            Basic/40:
+            BasicInformation/40:
                 attributes:
                     FeatureMap/65532: '0'
             Descriptor/29:

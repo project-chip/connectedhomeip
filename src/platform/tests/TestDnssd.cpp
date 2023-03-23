@@ -96,8 +96,9 @@ static void InitCallback(void * context, CHIP_ERROR error)
     service.mSubTypeSize   = 0;
 
     NL_TEST_ASSERT(suite, ChipDnssdPublishService(&service, HandlePublish) == CHIP_NO_ERROR);
+    intptr_t browseIdentifier;
     ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny,
-                    chip::Inet::InterfaceId::Null(), HandleBrowse, suite);
+                    chip::Inet::InterfaceId::Null(), HandleBrowse, suite, &browseIdentifier);
 }
 
 static void ErrorCallback(void * context, CHIP_ERROR error)

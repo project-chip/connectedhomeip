@@ -46,11 +46,11 @@ DLL_EXPORT OID ParseObjectID(const uint8_t * encodedOID, uint16_t encodedOIDLen)
         return kOID_NotSpecified;
     }
 
-    for (uint32_t i = 0; i < sOIDTableSize; i++)
+    for (const auto & tableEntry : sOIDTable)
     {
-        if (encodedOIDLen == sOIDTable[i].EncodedOIDLen && memcmp(encodedOID, sOIDTable[i].EncodedOID, encodedOIDLen) == 0)
+        if (encodedOIDLen == tableEntry.EncodedOIDLen && memcmp(encodedOID, tableEntry.EncodedOID, encodedOIDLen) == 0)
         {
-            return sOIDTable[i].EnumVal;
+            return tableEntry.EnumVal;
         }
     }
 
@@ -59,12 +59,12 @@ DLL_EXPORT OID ParseObjectID(const uint8_t * encodedOID, uint16_t encodedOIDLen)
 
 bool GetEncodedObjectID(OID oid, const uint8_t *& encodedOID, uint16_t & encodedOIDLen)
 {
-    for (uint32_t i = 0; i < sOIDTableSize; i++)
+    for (const auto & tableEntry : sOIDTable)
     {
-        if (oid == sOIDTable[i].EnumVal)
+        if (oid == tableEntry.EnumVal)
         {
-            encodedOID    = sOIDTable[i].EncodedOID;
-            encodedOIDLen = sOIDTable[i].EncodedOIDLen;
+            encodedOID    = tableEntry.EncodedOID;
+            encodedOIDLen = tableEntry.EncodedOIDLen;
             return true;
         }
     }
@@ -95,11 +95,11 @@ const char * GetOIDName(OID oid)
     {
         return "NotSpecified";
     }
-    for (uint32_t i = 0; i < sOIDTableSize; i++)
+    for (const auto & tableEntry : sOIDNameTable)
     {
-        if (oid == sOIDNameTable[i].EnumVal)
+        if (oid == tableEntry.EnumVal)
         {
-            return sOIDNameTable[i].Name;
+            return tableEntry.Name;
         }
     }
     return "Unknown";

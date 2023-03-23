@@ -320,6 +320,11 @@ client cluster LevelControl = 8 {
     kFrequency = 0x4;
   }
 
+  bitmap LevelControlOptions : BITMAP8 {
+    kExecuteIfOff = 0x1;
+    kCoupleColorTempToLevel = 0x2;
+  }
+
   readonly attribute nullable int8u currentLevel = 0;
   readonly attribute int16u remainingTime = 1;
   readonly attribute int8u minLevel = 2;
@@ -327,7 +332,7 @@ client cluster LevelControl = 8 {
   readonly attribute int16u currentFrequency = 4;
   readonly attribute int16u minFrequency = 5;
   readonly attribute int16u maxFrequency = 6;
-  attribute bitmap8 options = 15;
+  attribute LevelControlOptions options = 15;
   attribute int16u onOffTransitionTime = 16;
   attribute nullable int8u onLevel = 17;
   attribute nullable int16u onTransitionTime = 18;
@@ -340,55 +345,55 @@ client cluster LevelControl = 8 {
   request struct MoveToLevelRequest {
     INT8U level = 0;
     nullable INT16U transitionTime = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
+    LevelControlOptions optionsMask = 2;
+    LevelControlOptions optionsOverride = 3;
   }
 
   request struct MoveRequest {
     MoveMode moveMode = 0;
     nullable INT8U rate = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
+    LevelControlOptions optionsMask = 2;
+    LevelControlOptions optionsOverride = 3;
   }
 
   request struct StepRequest {
     StepMode stepMode = 0;
     INT8U stepSize = 1;
     nullable INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
+    LevelControlOptions optionsMask = 3;
+    LevelControlOptions optionsOverride = 4;
   }
 
   request struct StopRequest {
-    BITMAP8 optionsMask = 0;
-    BITMAP8 optionsOverride = 1;
+    LevelControlOptions optionsMask = 0;
+    LevelControlOptions optionsOverride = 1;
   }
 
   request struct MoveToLevelWithOnOffRequest {
     INT8U level = 0;
     nullable INT16U transitionTime = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
+    LevelControlOptions optionsMask = 2;
+    LevelControlOptions optionsOverride = 3;
   }
 
   request struct MoveWithOnOffRequest {
     MoveMode moveMode = 0;
     nullable INT8U rate = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
+    LevelControlOptions optionsMask = 2;
+    LevelControlOptions optionsOverride = 3;
   }
 
   request struct StepWithOnOffRequest {
     StepMode stepMode = 0;
     INT8U stepSize = 1;
     nullable INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
+    LevelControlOptions optionsMask = 3;
+    LevelControlOptions optionsOverride = 4;
   }
 
   request struct StopWithOnOffRequest {
-    BITMAP8 optionsMask = 0;
-    BITMAP8 optionsOverride = 1;
+    LevelControlOptions optionsMask = 0;
+    LevelControlOptions optionsOverride = 1;
   }
 
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
@@ -418,6 +423,11 @@ server cluster LevelControl = 8 {
     kFrequency = 0x4;
   }
 
+  bitmap LevelControlOptions : BITMAP8 {
+    kExecuteIfOff = 0x1;
+    kCoupleColorTempToLevel = 0x2;
+  }
+
   readonly attribute nullable int8u currentLevel = 0;
   readonly attribute int16u remainingTime = 1;
   readonly attribute int8u minLevel = 2;
@@ -425,7 +435,7 @@ server cluster LevelControl = 8 {
   readonly attribute int16u currentFrequency = 4;
   readonly attribute int16u minFrequency = 5;
   readonly attribute int16u maxFrequency = 6;
-  attribute bitmap8 options = 15;
+  attribute LevelControlOptions options = 15;
   attribute int16u onOffTransitionTime = 16;
   attribute nullable int8u onLevel = 17;
   attribute nullable int16u onTransitionTime = 18;
@@ -438,55 +448,55 @@ server cluster LevelControl = 8 {
   request struct MoveToLevelRequest {
     INT8U level = 0;
     nullable INT16U transitionTime = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
+    LevelControlOptions optionsMask = 2;
+    LevelControlOptions optionsOverride = 3;
   }
 
   request struct MoveRequest {
     MoveMode moveMode = 0;
     nullable INT8U rate = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
+    LevelControlOptions optionsMask = 2;
+    LevelControlOptions optionsOverride = 3;
   }
 
   request struct StepRequest {
     StepMode stepMode = 0;
     INT8U stepSize = 1;
     nullable INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
+    LevelControlOptions optionsMask = 3;
+    LevelControlOptions optionsOverride = 4;
   }
 
   request struct StopRequest {
-    BITMAP8 optionsMask = 0;
-    BITMAP8 optionsOverride = 1;
+    LevelControlOptions optionsMask = 0;
+    LevelControlOptions optionsOverride = 1;
   }
 
   request struct MoveToLevelWithOnOffRequest {
     INT8U level = 0;
     nullable INT16U transitionTime = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
+    LevelControlOptions optionsMask = 2;
+    LevelControlOptions optionsOverride = 3;
   }
 
   request struct MoveWithOnOffRequest {
     MoveMode moveMode = 0;
     nullable INT8U rate = 1;
-    BITMAP8 optionsMask = 2;
-    BITMAP8 optionsOverride = 3;
+    LevelControlOptions optionsMask = 2;
+    LevelControlOptions optionsOverride = 3;
   }
 
   request struct StepWithOnOffRequest {
     StepMode stepMode = 0;
     INT8U stepSize = 1;
     nullable INT16U transitionTime = 2;
-    BITMAP8 optionsMask = 3;
-    BITMAP8 optionsOverride = 4;
+    LevelControlOptions optionsMask = 3;
+    LevelControlOptions optionsOverride = 4;
   }
 
   request struct StopWithOnOffRequest {
-    BITMAP8 optionsMask = 0;
-    BITMAP8 optionsOverride = 1;
+    LevelControlOptions optionsMask = 0;
+    LevelControlOptions optionsOverride = 1;
   }
 
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
@@ -536,7 +546,7 @@ server cluster Descriptor = 29 {
 }
 
 server cluster Binding = 30 {
-  struct TargetStruct {
+  fabric_scoped struct TargetStruct {
     optional node_id node = 1;
     optional group_id group = 2;
     optional endpoint_no endpoint = 3;
@@ -570,11 +580,11 @@ server cluster AccessControl = 31 {
     kAdminister = 5;
   }
 
-  struct AccessControlEntry {
-    Privilege privilege = 1;
-    AuthMode authMode = 2;
-    nullable int64u subjects[] = 3;
-    nullable Target targets[] = 4;
+  fabric_scoped struct AccessControlEntry {
+    fabric_sensitive Privilege privilege = 1;
+    fabric_sensitive AuthMode authMode = 2;
+    nullable fabric_sensitive int64u subjects[] = 3;
+    nullable fabric_sensitive Target targets[] = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -584,12 +594,12 @@ server cluster AccessControl = 31 {
     nullable devtype_id deviceType = 2;
   }
 
-  struct ExtensionEntry {
-    octet_string<128> data = 1;
+  fabric_scoped struct ExtensionEntry {
+    fabric_sensitive octet_string<128> data = 1;
     fabric_idx fabricIndex = 254;
   }
 
-  info event access(read: administer) AccessControlEntryChanged = 0 {
+  fabric_sensitive info event access(read: administer) AccessControlEntryChanged = 0 {
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
@@ -597,7 +607,7 @@ server cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  info event access(read: administer) AccessControlExtensionChanged = 1 {
+  fabric_sensitive info event access(read: administer) AccessControlExtensionChanged = 1 {
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
@@ -615,7 +625,7 @@ server cluster AccessControl = 31 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster Basic = 40 {
+server cluster BasicInformation = 40 {
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
     int16u subscriptionsPerFabric = 1;
@@ -1376,6 +1386,14 @@ server cluster EthernetNetworkDiagnostics = 55 {
 }
 
 server cluster Switch = 59 {
+  bitmap SwitchFeature : BITMAP32 {
+    kLatchingSwitch = 0x1;
+    kMomentarySwitch = 0x2;
+    kMomentarySwitchRelease = 0x4;
+    kMomentarySwitchLongPress = 0x8;
+    kMomentarySwitchMultiPress = 0x10;
+  }
+
   info event SwitchLatched = 0 {
     INT8U newPosition = 0;
   }
@@ -1402,7 +1420,7 @@ server cluster Switch = 59 {
   }
 
   info event MultiPressComplete = 6 {
-    INT8U newPosition = 0;
+    INT8U previousPosition = 0;
     INT8U totalNumberOfPressesCounted = 1;
   }
 
@@ -1462,13 +1480,13 @@ server cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
-  struct NOCStruct {
-    octet_string noc = 1;
-    nullable octet_string icac = 2;
+  fabric_scoped struct NOCStruct {
+    fabric_sensitive octet_string noc = 1;
+    nullable fabric_sensitive octet_string icac = 2;
     fabric_idx fabricIndex = 254;
   }
 
-  struct FabricDescriptor {
+  fabric_scoped struct FabricDescriptor {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorId = 2;
     fabric_id fabricId = 3;
@@ -1560,13 +1578,13 @@ server cluster GroupKeyManagement = 63 {
     kCacheAndSync = 1;
   }
 
-  struct GroupKeyMapStruct {
+  fabric_scoped struct GroupKeyMapStruct {
     group_id groupId = 1;
     int16u groupKeySetID = 2;
     fabric_idx fabricIndex = 254;
   }
 
-  struct GroupInfoMapStruct {
+  fabric_scoped struct GroupInfoMapStruct {
     group_id groupId = 1;
     endpoint_no endpoints[] = 2;
     optional char_string<16> groupName = 3;
@@ -1739,6 +1757,11 @@ client cluster MediaPlayback = 1286 {
     kPaused = 1;
     kNotPlaying = 2;
     kBuffering = 3;
+  }
+
+  bitmap MediaPlaybackFeature : BITMAP32 {
+    kAdvancedSeek = 0x1;
+    kVariableSpeed = 0x2;
   }
 
   readonly attribute int16u clusterRevision = 65533;
@@ -2126,7 +2149,7 @@ client cluster AccountLogin = 1294 {
 }
 
 endpoint 0 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
 
   server cluster Descriptor {
     callback attribute deviceTypeList;
@@ -2154,7 +2177,7 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster Basic {
+  server cluster BasicInformation {
     callback attribute dataModelRevision default = 10;
     callback attribute vendorName;
     callback attribute vendorID;
@@ -2397,7 +2420,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type videoplayer = 35;
+  device type videoplayer = 35, version 1;
   binding cluster OnOff;
   binding cluster LevelControl;
   binding cluster Descriptor;
@@ -2516,7 +2539,7 @@ endpoint 1 {
   }
 }
 endpoint 2 {
-  device type occupancysensor = 263;
+  device type occupancysensor = 263, version 1;
 
   server cluster OnOff {
     ram      attribute onOff;

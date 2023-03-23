@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <app/reporting/reporting.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -28,6 +29,9 @@ using namespace chip::app::Clusters;
 using namespace chip::System::Clock;
 
 using AdministratorCommissioning::CommissioningWindowStatus;
+using chip::app::DataModel::MakeNullable;
+using chip::app::DataModel::Nullable;
+using chip::app::DataModel::NullNullable;
 
 namespace {
 
@@ -93,10 +97,19 @@ void CommissioningWindowManager::ResetState()
     mECMDiscriminator = 0;
     mECMIterations    = 0;
     mECMSaltLength    = 0;
-    mWindowStatus     = CommissioningWindowStatus::kWindowNotOpen;
 
-    mOpenerFabricIndex.SetNull();
-    mOpenerVendorId.SetNull();
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    if (mSEDActiveModeEnabled)
+    {
+        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(false);
+        mSEDActiveModeEnabled = false;
+    }
+#endif
+
+    UpdateWindowStatus(CommissioningWindowStatus::kWindowNotOpen);
+
+    UpdateOpenerFabricIndex(NullNullable);
+    UpdateOpenerVendorId(NullNullable);
 
     memset(&mECMPASEVerifier, 0, sizeof(mECMPASEVerifier));
     memset(mECMSalt, 0, sizeof(mECMSalt));
@@ -175,7 +188,7 @@ void CommissioningWindowManager::OnSessionEstablished(const SessionHandle & sess
     }
     else
     {
-        err = failSafeContext.ArmFailSafe(kUndefinedFabricId, System::Clock::Seconds16(60));
+        err = failSafeContext.ArmFailSafe(kUndefinedFabricIndex, System::Clock::Seconds16(60));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Error arming failsafe on PASE session establishment completion");
@@ -216,6 +229,14 @@ CHIP_ERROR CommissioningWindowManager::AdvertiseAndListenForPASE()
     VerifyOrReturnError(mCommissioningTimeoutTimerArmed, CHIP_ERROR_INCORRECT_STATE);
 
     mPairingSession.Clear();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    if (!mSEDActiveModeEnabled)
+    {
+        mSEDActiveModeEnabled = true;
+        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(true);
+    }
+#endif
 
     ReturnErrorOnFailure(mServer->GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
         Protocols::SecureChannel::MsgType::PBKDFParamRequest, &mPairingSession));
@@ -287,8 +308,8 @@ CommissioningWindowManager::OpenBasicCommissioningWindowForAdministratorCommissi
 {
     ReturnErrorOnFailure(OpenBasicCommissioningWindow(commissioningTimeout, CommissioningWindowAdvertisement::kDnssdOnly));
 
-    mOpenerFabricIndex.SetNonNull(fabricIndex);
-    mOpenerVendorId.SetNonNull(vendorId);
+    UpdateOpenerFabricIndex(MakeNullable(fabricIndex));
+    UpdateOpenerVendorId(MakeNullable(vendorId));
 
     return CHIP_NO_ERROR;
 }
@@ -322,8 +343,8 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(Seconds16
     }
     else
     {
-        mOpenerFabricIndex.SetNonNull(fabricIndex);
-        mOpenerVendorId.SetNonNull(vendorId);
+        UpdateOpenerFabricIndex(MakeNullable(fabricIndex));
+        UpdateOpenerVendorId(MakeNullable(vendorId));
     }
 
     return err;
@@ -349,6 +370,10 @@ void CommissioningWindowManager::CloseCommissioningWindow()
 
 CommissioningWindowStatus CommissioningWindowManager::CommissioningWindowStatusForCluster() const
 {
+    // If the condition we use to determine whether we were opened via the
+    // cluster ever changes, make sure whatever code affects that condition
+    // marks calls MatterReportingAttributeChangeCallback for WindowStatus as
+    // needed.
     if (mOpenerVendorId.IsNull())
     {
         // Not opened via the cluster.
@@ -368,7 +393,7 @@ void CommissioningWindowManager::OnFabricRemoved(FabricIndex removedIndex)
     if (!mOpenerFabricIndex.IsNull() && mOpenerFabricIndex.Value() == removedIndex)
     {
         // Per spec, we should clear out the stale fabric index.
-        mOpenerFabricIndex.SetNull();
+        UpdateOpenerFabricIndex(NullNullable);
     }
 }
 
@@ -400,13 +425,6 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
     DeviceLayer::ConfigurationMgr().NotifyOfAdvertisementStart();
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    if (!mIsBLE && !IsCommissioningWindowOpen())
-    {
-        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(true);
-    }
-#endif
-
 #if CONFIG_NETWORK_LAYER_BLE
     if (mIsBLE)
     {
@@ -424,11 +442,11 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
 
     if (mUseECM)
     {
-        mWindowStatus = CommissioningWindowStatus::kEnhancedWindowOpen;
+        UpdateWindowStatus(CommissioningWindowStatus::kEnhancedWindowOpen);
     }
     else
     {
-        mWindowStatus = CommissioningWindowStatus::kBasicWindowOpen;
+        UpdateWindowStatus(CommissioningWindowStatus::kBasicWindowOpen);
     }
 
     if (mAppDelegate != nullptr)
@@ -449,13 +467,6 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
     mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
     mListeningForPASE = false;
     mPairingSession.Clear();
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    if (!mIsBLE && IsCommissioningWindowOpen())
-    {
-        DeviceLayer::ConnectivityMgr().RequestSEDActiveMode(false);
-    }
-#endif
 
     // If aShuttingDown, don't try to change our DNS-SD advertisements.
     if (!aShuttingDown)
@@ -524,6 +535,53 @@ void CommissioningWindowManager::ExpireFailSafeIfArmed()
     {
         failSafeContext.ForceFailSafeTimerExpiry();
     }
+}
+
+void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatus aNewStatus)
+{
+    CommissioningWindowStatus oldClusterStatus = CommissioningWindowStatusForCluster();
+    mWindowStatus                              = aNewStatus;
+    if (CommissioningWindowStatusForCluster() != oldClusterStatus)
+    {
+        // The Administrator Commissioning cluster is always on the root endpoint.
+        MatterReportingAttributeChangeCallback(kRootEndpointId, AdministratorCommissioning::Id,
+                                               AdministratorCommissioning::Attributes::WindowStatus::Id);
+    }
+}
+
+void CommissioningWindowManager::UpdateOpenerVendorId(Nullable<VendorId> aNewOpenerVendorId)
+{
+    // Changing the opener vendor id affects what
+    // CommissioningWindowStatusForCluster() returns.
+    CommissioningWindowStatus oldClusterStatus = CommissioningWindowStatusForCluster();
+
+    if (mOpenerVendorId != aNewOpenerVendorId)
+    {
+        // The Administrator Commissioning cluster is always on the root endpoint.
+        MatterReportingAttributeChangeCallback(kRootEndpointId, AdministratorCommissioning::Id,
+                                               AdministratorCommissioning::Attributes::AdminVendorId::Id);
+    }
+
+    mOpenerVendorId = aNewOpenerVendorId;
+
+    if (CommissioningWindowStatusForCluster() != oldClusterStatus)
+    {
+        // The Administrator Commissioning cluster is always on the root endpoint.
+        MatterReportingAttributeChangeCallback(kRootEndpointId, AdministratorCommissioning::Id,
+                                               AdministratorCommissioning::Attributes::WindowStatus::Id);
+    }
+}
+
+void CommissioningWindowManager::UpdateOpenerFabricIndex(Nullable<FabricIndex> aNewOpenerFabricIndex)
+{
+    if (mOpenerFabricIndex != aNewOpenerFabricIndex)
+    {
+        // The Administrator Commissioning cluster is always on the root endpoint.
+        MatterReportingAttributeChangeCallback(kRootEndpointId, AdministratorCommissioning::Id,
+                                               AdministratorCommissioning::Attributes::AdminFabricIndex::Id);
+    }
+
+    mOpenerFabricIndex = aNewOpenerFabricIndex;
 }
 
 } // namespace chip

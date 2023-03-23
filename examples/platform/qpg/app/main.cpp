@@ -97,10 +97,17 @@ void Application_Init(void)
     ChipLogProgress(NotSpecified, "Qorvo " APP_NAME " Launching");
     ChipLogProgress(NotSpecified, "============================");
 
-    CHIP_ERROR ret = GetAppTask().StartAppTask();
-    if (ret != CHIP_NO_ERROR)
+    error = GetAppTask().Init();
+    if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "GetAppTask().Init() failed");
+        return;
+    }
+
+    error = GetAppTask().StartAppTask();
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "GetAppTask().StartAppTask() failed");
         return;
     }
 }

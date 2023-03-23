@@ -125,6 +125,7 @@ CHIP_ERROR DiscoveryCommands::SetupDiscoveryCommands()
 
 CHIP_ERROR DiscoveryCommands::TearDownDiscoveryCommands()
 {
+    mDNSResolver.StopDiscovery();
     mDNSResolver.SetOperationalDelegate(nullptr);
     mDNSResolver.SetCommissioningDelegate(nullptr);
     return CHIP_NO_ERROR;

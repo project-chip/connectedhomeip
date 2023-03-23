@@ -175,3 +175,14 @@ tests:
           values:
               - name: "status"
                 value: 5
+
+    - label: "verify that the media has not moved."
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0B.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Please enter 'y' if media has not moved"
+              - name: "expectedValue"
+                value: "y"

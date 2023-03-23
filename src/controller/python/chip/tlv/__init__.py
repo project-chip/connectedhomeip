@@ -680,13 +680,11 @@ class TLVReader(object):
                 if "profileTag" in list(decoding.keys()):
                     out[decoding["profileTag"]] = decoding["value"]
                 elif "tag" in list(decoding.keys()):
-                    if decoding["tag"] is not None:
-                        out[decoding["tag"]] = decoding["value"]
+                    if isinstance(out, Mapping):
+                        tag = decoding["tag"] if decoding["tag"] is not None else "Any"
+                        out[tag] = decoding["value"]
                     else:
-                        if isinstance(out, Mapping):
-                            out["Any"] = decoding["value"]
-                        elif isinstance(out, Sequence):
-                            out.append(decoding["value"])
+                        out.append(decoding["value"])
                 else:
                     raise ValueError("Attempt to decode unsupported TLV tag")
 

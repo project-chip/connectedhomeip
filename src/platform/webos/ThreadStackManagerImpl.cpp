@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ void ThreadStackManagerImpl::OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorde
                 const gchar * value_str = g_variant_get_string(value, nullptr);
                 if (value_str == nullptr)
                     continue;
-                ChipLogProgress(DeviceLayer, "Thread role changed to: %s", value_str);
+                ChipLogProgress(DeviceLayer, "Thread role changed to: %s", StringOrNullMarker(value_str));
                 me->ThreadDevcieRoleChangedHandler(value_str);
             }
         }
@@ -632,7 +632,7 @@ void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
             ChipLogProgress(DeviceLayer,
                             "Thread Network: %s (%016" PRIx64 ") ExtPanId(%016" PRIx64 ") RSSI %u LQI %u"
                             " Version %u",
-                            network_name, ext_address, ext_panid, rssi, lqi, version);
+                            StringOrNullMarker(network_name), ext_address, ext_panid, rssi, lqi, version);
             NetworkCommissioning::ThreadScanResponse networkScanned;
             networkScanned.panId         = panid;
             networkScanned.extendedPanId = ext_panid;

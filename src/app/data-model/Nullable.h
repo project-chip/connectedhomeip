@@ -86,6 +86,18 @@ struct Nullable : protected Optional<T>
     bool operator!=(const Nullable & other) const { return !(*this == other); }
 };
 
+template <class T>
+constexpr Nullable<std::decay_t<T>> MakeNullable(T && value)
+{
+    return Nullable<std::decay_t<T>>(InPlace, std::forward<T>(value));
+}
+
+template <class T, class... Args>
+constexpr Nullable<T> MakeNullable(Args &&... args)
+{
+    return Nullable<T>(InPlace, std::forward<Args>(args)...);
+}
+
 } // namespace DataModel
 } // namespace app
 } // namespace chip

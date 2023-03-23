@@ -82,6 +82,7 @@ class TizenBuilder(GnBuilder):
                  enable_wifi: bool = True,
                  use_asan: bool = False,
                  use_tsan: bool = False,
+                 use_ubsan: bool = False,
                  ):
         super(TizenBuilder, self).__init__(
             root=os.path.join(root, app.value.source),
@@ -110,6 +111,8 @@ class TizenBuilder(GnBuilder):
             self.extra_gn_options.append('is_asan=true')
         if use_tsan:
             raise Exception("TSAN sanitizer not supported by Tizen toolchain")
+        if use_ubsan:
+            self.extra_gn_options.append('is_ubsan=true')
 
     def GnBuildArgs(self):
         # Make sure that required ENV variables are defined

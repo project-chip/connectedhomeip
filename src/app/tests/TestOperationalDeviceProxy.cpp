@@ -69,7 +69,7 @@ void TestOperationalDeviceProxy_EstablishSessionDirectly(nlTestSuite * inSuite, 
     VerifyOrDie(groupDataProvider.Init() == CHIP_NO_ERROR);
     // TODO: Set IPK in groupDataProvider
 
-    DeviceProxyInitParams params = {
+    CASEClientInitParams params = {
         .sessionManager           = &sessionManager,
         .sessionResumptionStorage = &sessionResumptionStorage,
         .exchangeMgr              = &exchangeMgr,

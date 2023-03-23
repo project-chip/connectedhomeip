@@ -105,6 +105,11 @@ typedef NS_ENUM(NSUInteger, MTROTAImageDigestType) {
  */
 @property (nonatomic, copy, nullable) NSNumber * maxApplicableVersion;
 
++ (nullable MTROTAHeader *)headerFromData:(NSData *)data error:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+@end
+
+MTR_NEWLY_DEPRECATED("Please use [MTROTAHeader headerFromData]")
+@interface MTROTAHeaderParser : NSObject
 + (nullable MTROTAHeader *)headerFromData:(NSData *)data error:(NSError * __autoreleasing *)error;
 @end
 

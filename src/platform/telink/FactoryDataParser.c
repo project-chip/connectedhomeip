@@ -149,6 +149,18 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
         {
             res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->product_name);
         }
+        else if (strncmp("part_number", (const char *) currentString.value, currentString.len) == 0)
+        {
+            res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->part_number);
+        }
+        else if (strncmp("product_url", (const char *) currentString.value, currentString.len) == 0)
+        {
+            res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->product_url);
+        }
+        else if (strncmp("product_label", (const char *) currentString.value, currentString.len) == 0)
+        {
+            res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->product_label);
+        }
         else if (strncmp("enable_key", (const char *) currentString.value, currentString.len) == 0)
         {
             res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->enable_key);

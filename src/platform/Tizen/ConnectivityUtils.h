@@ -17,8 +17,9 @@
 
 #pragma once
 
-#include <platform/DiagnosticDataProvider.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <app-common/zap-generated/cluster-enums.h>
+
+#include "platform/internal/CHIPDeviceLayerInternal.h"
 
 namespace chip {
 namespace DeviceLayer {

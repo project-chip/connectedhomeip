@@ -36,8 +36,6 @@ static_library("qpg") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "FactoryDataProvider.cpp",

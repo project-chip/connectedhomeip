@@ -255,7 +255,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestRecordData(void)
+int TestRecordData()
 {
     nlTestSuite theSuite = { "RecordData", sTests, nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

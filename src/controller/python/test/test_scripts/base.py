@@ -478,8 +478,8 @@ class BaseTestHelper:
         #
         # Read the Basic cluster from the 2nd controller. This is possible with just view privileges.
         #
-        res = await newControllers[1].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.Basic.Attributes.ClusterRevision)])
-        if (type(res[0][Clusters.Basic][Clusters.Basic.Attributes.ClusterRevision]) != Clusters.Basic.Attributes.ClusterRevision.attribute_type.Type):
+        res = await newControllers[1].ReadAttribute(nodeid=nodeid, attributes=[(0, Clusters.BasicInformation.Attributes.ClusterRevision)])
+        if (type(res[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.ClusterRevision]) != Clusters.BasicInformation.Attributes.ClusterRevision.attribute_type.Type):
             self.logger.error(f"7: Received something other than data:{res}")
             return False
 
@@ -556,7 +556,7 @@ class BaseTestHelper:
         #
         for x in range(minimumSupportedFabrics * minimumCASESessionsPerFabric * 2):
             self.devCtrl.CloseSession(nodeid)
-            await self.devCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)])
+            await self.devCtrl.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)])
 
         self.logger.info("Testing CASE defunct logic")
 
@@ -573,12 +573,12 @@ class BaseTestHelper:
         def OnValueChange(path: Attribute.TypedAttributePath, transaction: Attribute.SubscriptionTransaction) -> None:
             nonlocal sawValueChange
             self.logger.info("Saw value change!")
-            if (path.AttributeType == Clusters.TestCluster.Attributes.Int8u and path.Path.EndpointId == 1):
+            if (path.AttributeType == Clusters.UnitTesting.Attributes.Int8u and path.Path.EndpointId == 1):
                 sawValueChange = True
 
         self.logger.info("Testing CASE defunct logic")
 
-        sub = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.TestCluster.Attributes.Int8u)], reportInterval=(0, 1))
+        sub = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.UnitTesting.Attributes.Int8u)], reportInterval=(0, 1))
         sub.SetAttributeUpdateCallback(OnValueChange)
 
         #
@@ -590,7 +590,7 @@ class BaseTestHelper:
         # Now write the attribute from fabric2, give it some time before checking if the report
         # was received.
         #
-        await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.Int8u(4))])
+        await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(4))])
         time.sleep(2)
 
         sub.Shutdown()
@@ -610,18 +610,18 @@ class BaseTestHelper:
         self.logger.info("Testing fabric-isolated CASE eviction")
 
         sawValueChange = False
-        sub = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.TestCluster.Attributes.Int8u)], reportInterval=(0, 1))
+        sub = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.UnitTesting.Attributes.Int8u)], reportInterval=(0, 1))
         sub.SetAttributeUpdateCallback(OnValueChange)
 
         for x in range(minimumSupportedFabrics * minimumCASESessionsPerFabric * 2):
             self.devCtrl2.CloseSession(nodeid)
-            await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)])
+            await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)])
 
         #
         # Now write the attribute from fabric2, give it some time before checking if the report
         # was received.
         #
-        await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.Int8u(4))])
+        await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(4))])
         time.sleep(2)
 
         sub.Shutdown()
@@ -636,14 +636,14 @@ class BaseTestHelper:
         self.logger.info("Testing fabric-isolated CASE eviction (reverse)")
 
         sawValueChange = False
-        sub = await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.TestCluster.Attributes.Int8u)], reportInterval=(0, 1))
+        sub = await self.devCtrl2.ReadAttribute(nodeid, [(Clusters.UnitTesting.Attributes.Int8u)], reportInterval=(0, 1))
         sub.SetAttributeUpdateCallback(OnValueChange)
 
         for x in range(minimumSupportedFabrics * minimumCASESessionsPerFabric * 2):
             self.devCtrl.CloseSession(nodeid)
-            await self.devCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)])
+            await self.devCtrl.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)])
 
-        await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.Int8u(4))])
+        await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.Int8u(4))])
         time.sleep(2)
 
         sub.Shutdown()
@@ -723,8 +723,8 @@ class BaseTestHelper:
 
     async def TestFabricSensitive(self, nodeid: int):
         expectedDataFabric1 = [
-            Clusters.TestCluster.Structs.TestFabricScoped(),
-            Clusters.TestCluster.Structs.TestFabricScoped()
+            Clusters.UnitTesting.Structs.TestFabricScoped(),
+            Clusters.UnitTesting.Structs.TestFabricScoped()
         ]
 
         expectedDataFabric1[0].fabricIndex = 100
@@ -747,7 +747,7 @@ class BaseTestHelper:
 
         self.logger.info("Writing data from fabric1...")
 
-        await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped(expectedDataFabric1))])
+        await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped(expectedDataFabric1))])
 
         expectedDataFabric2 = copy.deepcopy(expectedDataFabric1)
 
@@ -768,15 +768,15 @@ class BaseTestHelper:
 
         self.logger.info("Writing data from fabric2...")
 
-        await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped(expectedDataFabric2))])
+        await self.devCtrl2.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped(expectedDataFabric2))])
 
         #
         # Now read the data back filtered from fabric1 and ensure it matches.
         #
         self.logger.info("Reading back data from fabric1...")
 
-        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
-        readListDataFabric1 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
+        readListDataFabric1 = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
 
         #
         # Update the expected data's fabric index to that we just read back
@@ -791,8 +791,8 @@ class BaseTestHelper:
 
         self.logger.info("Reading back data from fabric2...")
 
-        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
-        readListDataFabric2 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
+        readListDataFabric2 = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
 
         #
         # Update the expected data's fabric index to that we just read back
@@ -832,19 +832,19 @@ class BaseTestHelper:
                     # which should automatically be initialized with defaults and compare that
                     # against what we got back.
                     #
-                    expectedDefaultData = Clusters.TestCluster.Structs.TestFabricScoped()
+                    expectedDefaultData = Clusters.UnitTesting.Structs.TestFabricScoped()
                     expectedDefaultData.fabricIndex = otherFabric
 
                     if (item != expectedDefaultData):
                         raise AssertionError("Got back mismatched data")
 
-        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=False)
-        readListDataFabric = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)], fabricFiltered=False)
+        readListDataFabric = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
         CompareUnfilteredData(self.currentFabric1,
                               self.currentFabric2, expectedDataFabric1)
 
-        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)], fabricFiltered=False)
-        readListDataFabric = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)], fabricFiltered=False)
+        readListDataFabric = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
         CompareUnfilteredData(self.currentFabric2,
                               self.currentFabric1, expectedDataFabric2)
 
@@ -861,21 +861,21 @@ class BaseTestHelper:
 
         expectedDataFabric1.pop(1)
 
-        await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped(expectedDataFabric1))])
+        await self.devCtrl.WriteAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped(expectedDataFabric1))])
 
         self.logger.info(
             "Reading back data (again) from fabric2 to ensure it hasn't changed")
 
-        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
-        readListDataFabric2 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        data = await self.devCtrl2.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
+        readListDataFabric2 = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
         if (expectedDataFabric2 != readListDataFabric2):
             raise AssertionError("Got back mismatched data")
 
         self.logger.info(
             "Reading back data (again) from fabric1 to ensure it hasn't changed")
 
-        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.TestCluster.Attributes.ListFabricScoped)])
-        readListDataFabric1 = data[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListFabricScoped]
+        data = await self.devCtrl.ReadAttribute(nodeid, [(1, Clusters.UnitTesting.Attributes.ListFabricScoped)])
+        readListDataFabric1 = data[1][Clusters.UnitTesting][Clusters.UnitTesting.Attributes.ListFabricScoped]
 
         self.logger.info("Comparing data on fabric1...")
         expectedDataFabric1[0].fabricIndex = self.currentFabric1
@@ -903,7 +903,7 @@ class BaseTestHelper:
             async with cv:
                 cv.notify()
 
-        subscription = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.Basic.Attributes.ClusterRevision)], reportInterval=(0, 5))
+        subscription = await self.devCtrl.ReadAttribute(nodeid, [(Clusters.BasicInformation.Attributes.ClusterRevision)], reportInterval=(0, 5))
 
         #
         # Register async callbacks that will fire when a re-sub is attempted or succeeds.
@@ -931,11 +931,7 @@ class BaseTestHelper:
     def TestCloseSession(self, nodeid: int):
         self.logger.info(f"Closing sessions with device {nodeid}")
         try:
-            err = self.devCtrl.CloseSession(nodeid)
-            if err != 0:
-                self.logger.exception(
-                    f"Failed to close sessions with device {nodeid}: {err}")
-                return False
+            self.devCtrl.CloseSession(nodeid)
             return True
         except Exception as ex:
             self.logger.exception(
@@ -1039,7 +1035,7 @@ class BaseTestHelper:
         failed_zcl = {}
         for basic_attr, expected_value in basic_cluster_attrs.items():
             try:
-                res = self.devCtrl.ZCLReadAttribute(cluster="Basic",
+                res = self.devCtrl.ZCLReadAttribute(cluster="BasicInformation",
                                                     attribute=basic_attr,
                                                     nodeid=nodeid,
                                                     endpoint=endpoint,
@@ -1054,7 +1050,7 @@ class BaseTestHelper:
         return True
 
     def TestWriteBasicAttributes(self, nodeid: int, endpoint: int, group: int):
-        @dataclass
+        @ dataclass
         class AttributeWriteRequest:
             cluster: str
             attribute: str
@@ -1062,8 +1058,8 @@ class BaseTestHelper:
             expected_status: IM.Status = IM.Status.Success
 
         requests = [
-            AttributeWriteRequest("Basic", "NodeLabel", "Test"),
-            AttributeWriteRequest("Basic", "Location",
+            AttributeWriteRequest("BasicInformation", "NodeLabel", "Test"),
+            AttributeWriteRequest("BasicInformation", "Location",
                                   "a pretty loooooooooooooog string", IM.Status.ConstraintError),
         ]
         failed_zcl = []
@@ -1177,9 +1173,9 @@ class BaseTestHelper:
         try:
             cluster = self.devCtrl.GetClusterHandler()
             clusterInfo = cluster.GetClusterInfoById(0xFFF1FC05)  # TestCluster
-            if clusterInfo["clusterName"] != "TestCluster":
+            if clusterInfo["clusterName"] != "UnitTesting":
                 raise Exception(
-                    f"Wrong cluster info clusterName: {clusterInfo['clusterName']} expected TestCluster")
+                    f"Wrong cluster info clusterName: {clusterInfo['clusterName']} expected 'UnitTesting'")
         except Exception as ex:
             self.logger.exception(f"Failed to finish API test: {ex}")
             return False

@@ -265,6 +265,13 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
 
     err = InterfaceId::Null().GetLinkLocalAddr(&addr);
+
+    // We should skip the following checks if the interface does not have the Link local address
+    if (err == INET_ERROR_ADDRESS_NOT_FOUND)
+    {
+        return;
+    }
+
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     intId = InterfaceId::FromIPAddress(addr);
     NL_TEST_ASSERT(inSuite, intId.IsPresent());

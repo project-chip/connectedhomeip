@@ -171,29 +171,25 @@ def gen_test_certs(chip_cert_exe: str,
                              new_certificates["PAI_CERT"] + ".der")
 
 
-def gen_spake2p_params(spake2p_path: str, passcode: int, it: int, salt: bytes) -> dict:
-    """ Generate Spake2+ params using external spake2p tool
+def gen_spake2p_verifier(passcode: int, it: int, salt: bytes) -> str:
+    """ Generate Spake2+ verifier using SPAKE2+ Python Tool
 
     Args:
-        spake2p_path (str): path to spake2p executable
         passcode (int): Pairing passcode using in Spake2+
         it (int): Iteration counter for Spake2+ verifier generation
         salt (str): Salt used to generate Spake2+ verifier
 
     Returns:
-        dict: dictionary containing passcode, it, salt, and generated Verifier
+        verifier encoded in Base64
     """
 
     cmd = [
-        spake2p_path, 'gen-verifier',
+        os.path.join(MATTER_ROOT, 'scripts/tools/spake2p/spake2p.py'), 'gen-verifier',
+        '--passcode', str(passcode),
+        '--salt', base64.b64encode(salt).decode('ascii'),
         '--iteration-count', str(it),
-        '--salt', base64.b64encode(salt),
-        '--pin-code', str(passcode),
-        '--out', '-',
     ]
-    output = subprocess.check_output(cmd)
-    output = output.decode('utf-8').splitlines()
-    return dict(zip(output[0].split(','), output[1].split(',')))
+    return subprocess.check_output(cmd)
 
 
 class FactoryDataGenerator:
@@ -223,8 +219,8 @@ class FactoryDataGenerator:
                 self._user_data = json.loads(self._args.user)
             except json.decoder.JSONDecodeError as e:
                 raise AssertionError("Provided wrong user data, this is not a JSON format! {}".format(e))
-        assert (self._args.spake2_verifier or (self._args.passcode and self._args.spake2p_path)), \
-            "Cannot find Spake2+ verifier, to generate a new one please provide passcode (--passcode) and path to spake2p tool (--spake2p_path)"
+        assert self._args.spake2_verifier or self._args.passcode, \
+            "Cannot find Spake2+ verifier, to generate a new one please provide passcode (--passcode)"
         assert (self._args.chip_cert_path or (self._args.dac_cert and self._args.pai_cert and self._args.dac_key)), \
             "Cannot find paths to DAC or PAI certificates .der files. To generate a new ones please provide a path to chip-cert executable (--chip_cert_path)"
         assert self._args.output.endswith(".json"), \
@@ -301,6 +297,9 @@ class FactoryDataGenerator:
             self._add_entry("product_id", self._args.product_id)
             self._add_entry("vendor_name", self._args.vendor_name)
             self._add_entry("product_name", self._args.product_name)
+            self._add_entry("product_label", self._args.product_label)
+            self._add_entry("product_url", self._args.product_url)
+            self._add_entry("part_number", self._args.part_number)
             self._add_entry("date", self._args.date)
             self._add_entry("hw_ver", self._args.hw_ver)
             self._add_entry("hw_ver_str", self._args.hw_ver_str)
@@ -345,9 +344,7 @@ class FactoryDataGenerator:
 
     def _generate_spake2_verifier(self):
         """ If verifier has not been provided in arguments list it should be generated via external script """
-        spake2_params = gen_spake2p_params(self._args.spake2p_path, self._args.passcode,
-                                           self._args.spake2_it, self._args.spake2_salt)
-        return base64.b64decode(spake2_params["Verifier"])
+        return base64.b64decode(gen_spake2p_verifier(self._args.passcode, self._args.spake2_it, self._args.spake2_salt))
 
     def _generate_rotating_device_uid(self):
         """ If rotating device unique ID has not been provided it should be generated """
@@ -438,9 +435,15 @@ def main():
                                      the setup code. Discriminator is used during a discovery process.")
 
     # optional keys
+    optional_arguments.add_argument("--product_url", type=str,
+                                    help="[string] provide link to product-specific web page")
+    optional_arguments.add_argument("--product_label", type=str,
+                                    help="[string] provide human-readable product label")
+    optional_arguments.add_argument("--part_number", type=str,
+                                    help="[string] provide human-readable product number")
     optional_arguments.add_argument("--chip_cert_path", type=str,
                                     help="Generate DAC and PAI certificates instead giving a path to .der files. This option requires a path to chip-cert executable."
-                                    "By default You can find spake2p in connectedhomeip/src/tools/chip-cert directory and build it there.")
+                                    "By default you can find chip-cert in connectedhomeip/src/tools/chip-cert directory and build it there.")
     optional_arguments.add_argument("--dac_cert", type=str,
                                     help="[.der] Provide the path to .der file containing DAC certificate.")
     optional_arguments.add_argument("--dac_key", type=str,
@@ -455,8 +458,6 @@ def main():
                                     help="[hex string] [128-bit hex-encoded] Provide the rotating device unique ID. If this argument is not provided a new rotating device id unique id will be generated.")
     optional_arguments.add_argument("--passcode", type=allow_any_int,
                                     help="[int | hex] Default PASE session passcode. (This is mandatory to generate Spake2+ verifier).")
-    optional_arguments.add_argument("--spake2p_path", type=str,
-                                    help="[string] Provide a path to spake2p. By default You can find spake2p in connectedhomeip/src/tools/spake2p directory and build it there.")
     optional_arguments.add_argument("--spake2_verifier", type=base64_str,
                                     help="[base64 string] Provide Spake2+ verifier without generating it.")
     optional_arguments.add_argument("--enable_key", type=str,

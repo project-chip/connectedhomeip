@@ -52,7 +52,7 @@ public:
 
     void Push(const ChipDeviceEvent & event);
     bool Empty();
-    const ChipDeviceEvent PopFront();
+    ChipDeviceEvent PopFront();
 
 private:
     std::queue<ChipDeviceEvent> mEventQueue;

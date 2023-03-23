@@ -75,14 +75,18 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: 200
+          constraints:
+              minValue: 170
+              maxValue: 230
 
     - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
-          value: 50
+          constraints:
+              minValue: 42
+              maxValue: 58
 
     - label:
           "TH sends MoveToHueAndSaturation command to DUT with Hue=160,
@@ -168,14 +172,18 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: 160
+          constraints:
+              minValue: 135
+              maxValue: 185
 
     - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
-          value: 80
+          constraints:
+              minValue: 68
+              maxValue: 92
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0008

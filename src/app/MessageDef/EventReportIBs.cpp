@@ -32,8 +32,8 @@
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR EventReportIBs::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR EventReportIBs::Parser::PrettyPrint() const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
@@ -51,7 +51,7 @@ CHIP_ERROR EventReportIBs::Parser::CheckSchemaValidity() const
             EventReportIB::Parser eventReport;
             ReturnErrorOnFailure(eventReport.Init(reader));
             PRETTY_PRINT_INCDEPTH();
-            ReturnErrorOnFailure(eventReport.CheckSchemaValidity());
+            ReturnErrorOnFailure(eventReport.PrettyPrint());
             PRETTY_PRINT_DECDEPTH();
         }
     }
@@ -67,7 +67,7 @@ CHIP_ERROR EventReportIBs::Parser::CheckSchemaValidity() const
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 EventReportIB::Builder & EventReportIBs::Builder::CreateEventReport()
 {

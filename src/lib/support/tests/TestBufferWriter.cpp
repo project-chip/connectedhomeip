@@ -236,7 +236,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestBufferWriter(void)
+int TestBufferWriter()
 {
     nlTestSuite theSuite = { "BufferWriter", sTests, nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

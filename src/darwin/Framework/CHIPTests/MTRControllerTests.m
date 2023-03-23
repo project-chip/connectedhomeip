@@ -103,6 +103,52 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertFalse([factory isRunning]);
 }
 
+- (void)testDeprecatedControllerLifecycle
+{
+    __auto_type * factory = [MTRControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * storage = [[MTRTestStorage alloc] init];
+    __auto_type * factoryParams = [[MTRControllerFactoryParams alloc] initWithStorage:storage];
+    XCTAssertTrue([factory startup:factoryParams]);
+    XCTAssertTrue([factory isRunning]);
+
+    __auto_type * testKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(testKeys);
+
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@(1) nocSigner:testKeys];
+    XCTAssertNotNil(params);
+
+    params.vendorID = @(kTestVendorId);
+
+    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    // now try to restart the controller
+    controller = [factory startControllerOnExistingFabric:params];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    // now try to restart the controller without providing a vendor id.
+    params.vendorID = nil;
+    controller = [factory startControllerOnExistingFabric:params];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    [factory shutdown];
+    XCTAssertFalse([factory isRunning]);
+}
+
 - (void)testFactoryShutdownShutsDownController
 {
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];

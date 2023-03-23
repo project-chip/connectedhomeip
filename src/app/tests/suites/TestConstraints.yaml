@@ -16,7 +16,7 @@ name: Test Cluster Constraints Tests
 
 config:
     nodeId: 0x12344321
-    cluster: "Test Cluster"
+    cluster: "Unit Testing"
     endpoint: 1
 
 tests:
@@ -111,6 +111,12 @@ tests:
           value: 5 # MaskVal1 | MaskVal3
           constraints:
               hasMasksSet: [0x01, 0x04] # [MaskVal1, MaskVal3]
+
+    - label: "Write attribute BITMAP32 Back to Default Value"
+      command: "writeAttribute"
+      attribute: "bitmap32"
+      arguments:
+          value: 0
 
     # Tests for INT32U attribute
 

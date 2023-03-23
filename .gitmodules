@@ -52,12 +52,8 @@
 [submodule "qpg_sdk"]
 	path = third_party/qpg_sdk/repo
 	url = https://github.com/Qorvo/QMatter
-	branch  = v0.9.0.0-libs
+	branch  = vlatest-libs
 	platforms = qpg
-[submodule "zap"]
-	path = third_party/zap/repo
-	url = https://github.com/project-chip/zap.git
-	branch  = master
 [submodule "freertos"]
 	path = third_party/freertos/repo
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
@@ -224,10 +220,6 @@
 	path = third_party/infineon/psoc6/psoc6_sdk/libs/serial-flash
 	url = https://github.com/Infineon/serial-flash
 	platforms = infineon
-[submodule "third_party/telink_sdk/repo"]
-	path = third_party/telink_sdk/repo
-	url = https://github.com/telink-semi/telink_b91_ble_single_connection_sdk_matter
-	platforms = telink
 [submodule "ti_simplelink_sdk"]
 	path = third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx
 	url = https://github.com/TexasInstruments/cc13xx_cc26xx_sdk.git
@@ -288,9 +280,18 @@
 	url = https://github.com/matter-mtk/genio-matter-lwip.git
 	branch = main
 	platforms = genio
+[submodule "open-iot-sdk"]
+	path = third_party/open-iot-sdk/sdk
+	url = https://git.gitlab.arm.com/iot/open-iot-sdk/sdk.git
+	branch = main
+	platforms = openiotsdk
+[submodule "open-iot-sdk-storage"]
+	path = third_party/open-iot-sdk/storage
+	url = https://git.gitlab.arm.com/iot/open-iot-sdk/storage.git
+	branch = main
+	platforms = openiotsdk
 [submodule "bouffalolab_sdk"]
-        path = third_party/bouffalolab/repo
-        url = https://github.com/bouffalolab/bl_iot_sdk_tiny.git
-        branch = master
+	path = third_party/bouffalolab/repo
+	url = https://github.com/bouffalolab/bl_iot_sdk_tiny.git
+        branch = main
         platforms = bouffalolab
-

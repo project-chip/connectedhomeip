@@ -23,19 +23,29 @@
 
 #pragma once
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <cstddef>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <utility>
 
 #include <bluetooth.h>
 #include <glib.h>
-#include <sys/param.h>
+
+#include <ble/Ble.h>
+#include <ble/CHIPBleServiceData.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/SetupDiscriminator.h>
+#include <platform/CHIPDeviceEvent.h>
+#include <system/SystemLayer.h>
+#include <system/SystemPacketBuffer.h>
 
 #include "ChipDeviceScanner.h"
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-
-using namespace chip::Ble;
 
 /**
  * enum Class for BLE Scanning state. CHIP supports Scanning by Discriminator or Address
@@ -86,18 +96,19 @@ public:
 private:
     // ===== Members that implement the BLEManager internal interface.
 
-    CHIP_ERROR _Init(void);
-    void _Shutdown() {}
-    bool _IsAdvertisingEnabled(void);
+    CHIP_ERROR _Init();
+    void _Shutdown();
+    bool _IsAdvertisingEnabled();
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
-    bool _IsAdvertising(void);
+    bool _IsAdvertising();
     CHIP_ERROR _SetAdvertisingMode(BLEAdvertisingMode mode);
     CHIP_ERROR _GetDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR _SetDeviceName(const char * deviceName);
-    uint16_t _NumConnections(void);
+    uint16_t _NumConnections();
+
     void _OnPlatformEvent(const ChipDeviceEvent * event);
     void HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * event);
-    BleLayer * _GetBleLayer(void);
+    BleLayer * _GetBleLayer();
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
@@ -126,13 +137,13 @@ private:
     CHIP_ERROR CancelConnection() override;
 
     //  ===== Members that implement virtual methods on ChipDeviceScannerDelegate
-    void OnChipDeviceScanned(void * device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
+    void OnChipDeviceScanned(void * device, const Ble::ChipBLEDeviceIdentificationInfo & info) override;
     void OnChipScanComplete() override;
 
     // ===== Members for internal use by the following friends.
 
-    friend BLEManager & BLEMgr(void);
-    friend BLEManagerImpl & BLEMgrImpl(void);
+    friend BLEManager & BLEMgr();
+    friend BLEManagerImpl & BLEMgrImpl();
 
     static BLEManagerImpl sInstance;
 
@@ -172,14 +183,14 @@ private:
     static void CharacteristicNotificationCb(bt_gatt_h characteristic, char * value, int len, void * userData);
 
     // ==== Connection.
-    void InitConnectionData(void);
+    void InitConnectionData();
     void AddConnectionData(const char * remoteAddr);
     void RemoveConnectionData(const char * remoteAddr);
 
     void HandleC1CharWriteEvent(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     void HandleRXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     void HandleConnectionEvent(bool connected, const char * remoteAddress);
-    static void HandleConnectionTimeout(chip::System::Layer * layer, void * data);
+    static void HandleConnectionTimeout(System::Layer * layer, void * data);
     static bool IsDeviceChipPeripheral(BLE_CONNECTION_OBJECT conId);
 
     // ==== BLE Adv & GATT Server.
@@ -202,10 +213,10 @@ private:
     void NotifySubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool isSubscribed);
     void NotifyBLENotificationReceived(System::PacketBufferHandle & buf, BLE_CONNECTION_OBJECT conId);
 
-    int RegisterGATTServer(void);
-    int StartAdvertising(void);
-    int StopAdvertising(void);
-    void CleanScanConfig(void);
+    int RegisterGATTServer();
+    int StartBLEAdvertising();
+    int StopBLEAdvertising();
+    void CleanScanConfig();
 
     CHIPoBLEServiceMode mServiceMode;
     BitFlags<Flags> mFlags;
@@ -230,7 +241,7 @@ private:
  * Internal components should use this to access features of the BLEManager object
  * that are common to all platforms.
  */
-inline BLEManager & BLEMgr(void)
+inline BLEManager & BLEMgr()
 {
     return BLEManagerImpl::sInstance;
 }
@@ -241,7 +252,7 @@ inline BLEManager & BLEMgr(void)
  * Internal components can use this to gain access to features of the BLEManager
  * that are specific to the Tizen platforms.
  */
-inline BLEManagerImpl & BLEMgrImpl(void)
+inline BLEManagerImpl & BLEMgrImpl()
 {
     return BLEManagerImpl::sInstance;
 }
@@ -264,5 +275,3 @@ inline bool BLEManagerImpl::_IsAdvertising()
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

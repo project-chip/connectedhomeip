@@ -514,7 +514,7 @@ void TestBasicAddNocUpdateNocFlow(nlTestSuite * inSuite, void * inContext)
     constexpr uint16_t kVendorId = 0xFFF1u;
 
     chip::Crypto::P256Keypair fabric11Node55Keypair; // Fabric ID 11,
-    NL_TEST_ASSERT(inSuite, fabric11Node55Keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, fabric11Node55Keypair.Initialize(Crypto::ECPKeyTarget::ECDSA) == CHIP_NO_ERROR);
 
     // Initialize a fabric table.
     ScopedFabricTable fabricTableHolder;
@@ -2523,7 +2523,7 @@ void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
 
         Crypto::P256Keypair * ephemeralKeypair = fabricTable.AllocateEphemeralKeypairForCASE();
         NL_TEST_ASSERT(inSuite, ephemeralKeypair != nullptr);
-        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize());
+        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA));
 
         NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig));
         NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig));
@@ -2550,7 +2550,7 @@ void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
 
         Crypto::P256Keypair * ephemeralKeypair = fabricTable.AllocateEphemeralKeypairForCASE();
         NL_TEST_ASSERT(inSuite, ephemeralKeypair != nullptr);
-        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize());
+        NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA));
 
         NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig));
         NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig));

@@ -23,7 +23,6 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
 
 #define APP_TASK_NAME "APP"
 #define APP_EVENT_QUEUE_SIZE 10

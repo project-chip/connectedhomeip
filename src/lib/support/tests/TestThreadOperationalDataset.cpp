@@ -288,7 +288,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestThreadOperationalDatasetBuilder(void)
+int TestThreadOperationalDatasetBuilder()
 {
     nlTestSuite theSuite = { "ThreadOperationalDataset", sTests, nullptr, nullptr };
 

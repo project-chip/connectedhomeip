@@ -20,6 +20,12 @@
             android:layout_height="wrap_content"
             android:text="Skip to manual commissioning >>" />
 
+        <Button
+            android:id="@+id/discoverButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Discover>" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

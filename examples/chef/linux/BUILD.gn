@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
+import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/build/chip/tools.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 import("${chip_root}/src/app/common_flags.gni")
@@ -92,7 +94,10 @@ executable("${sample_name}") {
 
     deps += pw_build_LINK_DEPS
 
-    cflags = [ "-Wno-gnu-designator" ]
+    cflags = []
+    if (is_clang) {
+      cflags += [ "-Wno-gnu-designator" ]
+    }
 
     include_dirs += [ "${chip_root}/examples/common" ]
   } else {

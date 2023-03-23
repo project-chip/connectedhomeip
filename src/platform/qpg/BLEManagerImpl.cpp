@@ -201,8 +201,12 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     break;
 
     case DeviceEventType::kCHIPoBLEUnsubscribe: {
+        ChipDeviceEvent connClosedEvent;
+
         ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEUnsubscribe");
         HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
+        connClosedEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
+        PlatformMgr().PostEventOrDie(&connClosedEvent);
     }
     break;
 
@@ -288,17 +292,17 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     uint16_t dataLen = data->DataLength();
 
     VerifyOrExit(IsSubscribed(conId), err = CHIP_ERROR_INVALID_ARGUMENT);
-    ChipLogDetail(DeviceLayer, "Sending notification for CHIPoBLE Client TX (con %u, len %u)", conId, dataLen);
+    ChipLogDetail(DeviceLayer, "Sending indication for CHIPoBLE Client TX (con %u, len %u)", conId, dataLen);
 
     isRxHandle = UUIDsMatch(&chipUUID_CHIPoBLEChar_RX, charId);
     cId        = qvCHIP_BleGetHandle(isRxHandle);
 
-    qvCHIP_BleSendNotification(conId, cId, dataLen, data->Start());
+    qvCHIP_BleSendIndication(conId, cId, dataLen, data->Start());
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "BLEManagerImpl::SendNotification() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
         return false;
     }
     return true;

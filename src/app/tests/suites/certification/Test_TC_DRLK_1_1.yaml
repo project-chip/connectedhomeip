@@ -151,6 +151,16 @@ tests:
               contains: [0, 1, 2, 37, 38, 65528, 65529, 65531, 65532, 65533]
 
     - label:
+          "TH reads Feature dependent(DRLK.S.F05) attributes in AttributeList"
+      PICS: DRLK.S.F05
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [3]
+
+    - label:
           "TH reads Feature dependent(DRLK.S.F08) attributes in AttributeList"
       PICS: DRLK.S.F08
       command: "readAttribute"
@@ -430,7 +440,7 @@ tests:
       response:
           constraints:
               type: list
-              contains: [28, 35]
+              contains: [28, 35, 37]
     #Commenting out the step EventList attribute which is out of scope for matter V1.0
     #- label:
     #      "Read EventList attribute from the DUT and Verify that the DUT

@@ -23,21 +23,19 @@
  *          for Tizen platforms.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include "ConfigurationManagerImpl.h"
 
-#include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
-#include <platform/Tizen/PosixConfig.h>
-#include <platform/Tizen/WiFiManager.h>
-#include <platform/internal/GenericConfigurationManagerImpl.ipp>
+
+#include "PosixConfig.h"
+#include "WiFiManager.h"
+#include "platform/internal/GenericConfigurationManagerImpl.ipp"
 
 namespace chip {
 namespace DeviceLayer {
-
-using namespace ::chip::DeviceLayer::Internal;
 
 ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 {
@@ -45,20 +43,20 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
     return sInstance;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::Init(void)
+CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR error;
 
-    error = Internal::GenericConfigurationManagerImpl<PosixConfig>::Init();
+    error = Internal::GenericConfigurationManagerImpl<Internal::PosixConfig>::Init();
     SuccessOrExit(error);
 
-    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_VendorId))
+    if (!Internal::PosixConfig::ConfigValueExists(Internal::PosixConfig::kConfigKey_VendorId))
     {
         error = StoreVendorId(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
         SuccessOrExit(error);
     }
 
-    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ProductId))
+    if (!Internal::PosixConfig::ConfigValueExists(Internal::PosixConfig::kConfigKey_ProductId))
     {
         error = StoreProductId(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
         SuccessOrExit(error);
@@ -72,109 +70,109 @@ exit:
 
 CHIP_ERROR ConfigurationManagerImpl::StoreVendorId(uint16_t vendorId)
 {
-    return WriteConfigValue(PosixConfig::kConfigKey_VendorId, vendorId);
+    return WriteConfigValue(Internal::PosixConfig::kConfigKey_VendorId, vendorId);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::StoreProductId(uint16_t productId)
 {
-    return WriteConfigValue(PosixConfig::kConfigKey_ProductId, productId);
+    return WriteConfigValue(Internal::PosixConfig::kConfigKey_ProductId, productId);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     constexpr size_t kExpectedBufSize = ConfigurationManager::kPrimaryMACAddressLength;
-    return WiFiMgr().GetDeviceMACAddress(buf, kExpectedBufSize);
+    return Internal::WiFiMgr().GetDeviceMACAddress(buf, kExpectedBufSize);
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
 }
 
-bool ConfigurationManagerImpl::CanFactoryReset(void)
+bool ConfigurationManagerImpl::CanFactoryReset()
 {
     return true;
 }
 
-void ConfigurationManagerImpl::InitiateFactoryReset(void) {}
+void ConfigurationManagerImpl::InitiateFactoryReset() {}
 
-CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value)
+CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(Platform::PersistedStorage::Key key, uint32_t & value)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value)
+CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(Platform::PersistedStorage::Key key, uint32_t value)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, bool & val)
 {
-    return PosixConfig::ReadConfigValue(key, val);
+    return Internal::PosixConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint16_t & val)
 {
-    return PosixConfig::ReadConfigValue(key, val);
+    return Internal::PosixConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint32_t & val)
 {
-    return PosixConfig::ReadConfigValue(key, val);
+    return Internal::PosixConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValue(Key key, uint64_t & val)
 {
-    return PosixConfig::ReadConfigValue(key, val);
+    return Internal::PosixConfig::ReadConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    return PosixConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
+    return Internal::PosixConfig::ReadConfigValueStr(key, buf, bufSize, outLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    return PosixConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
+    return Internal::PosixConfig::ReadConfigValueBin(key, buf, bufSize, outLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, bool val)
 {
-    return PosixConfig::WriteConfigValue(key, val);
+    return Internal::PosixConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint16_t val)
 {
-    return PosixConfig::WriteConfigValue(key, val);
+    return Internal::PosixConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint32_t val)
 {
-    return PosixConfig::WriteConfigValue(key, val);
+    return Internal::PosixConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValue(Key key, uint64_t val)
 {
-    return PosixConfig::WriteConfigValue(key, val);
+    return Internal::PosixConfig::WriteConfigValue(key, val);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str)
 {
-    return PosixConfig::WriteConfigValueStr(key, str);
+    return Internal::PosixConfig::WriteConfigValueStr(key, str);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    return PosixConfig::WriteConfigValueStr(key, str, strLen);
+    return Internal::PosixConfig::WriteConfigValueStr(key, str, strLen);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    return PosixConfig::WriteConfigValueBin(key, data, dataLen);
+    return Internal::PosixConfig::WriteConfigValueBin(key, data, dataLen);
 }
 
-void ConfigurationManagerImpl::RunConfigUnitTest(void)
+void ConfigurationManagerImpl::RunConfigUnitTest()
 {
-    PosixConfig::RunConfigUnitTest();
+    Internal::PosixConfig::RunConfigUnitTest();
 }
 
 ConfigurationManager & ConfigurationMgrImpl()

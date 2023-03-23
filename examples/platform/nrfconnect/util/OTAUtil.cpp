@@ -15,15 +15,21 @@
  *    limitations under the License.
  */
 
+#include "OTAUtil.h"
+
+#if CONFIG_CHIP_OTA_REQUESTOR
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/server/Server.h>
 #include <platform/nrfconnect/OTAImageProcessorImpl.h>
+#endif
 
 using namespace chip;
 using namespace chip::DeviceLayer;
+
+#if CONFIG_CHIP_OTA_REQUESTOR
 
 namespace {
 
@@ -32,12 +38,6 @@ DefaultOTARequestorDriver sOTARequestorDriver;
 chip::BDXDownloader sBDXDownloader;
 chip::DefaultOTARequestor sOTARequestor;
 } // namespace
-
-FlashHandler & GetFlashHandler()
-{
-    static FlashHandler sFlashHandler;
-    return sFlashHandler;
-}
 
 // compile-time factory method
 OTAImageProcessorImpl & GetOTAImageProcessor()
@@ -61,5 +61,12 @@ void InitBasicOTARequestor()
     sOTARequestor.Init(Server::GetInstance(), sOTARequestorStorage, sOTARequestorDriver, sBDXDownloader);
     chip::SetRequestorInstance(&sOTARequestor);
     sOTARequestorDriver.Init(&sOTARequestor, &imageProcessor);
-    imageProcessor.TriggerFlashAction(FlashHandler::Action::SLEEP);
+    imageProcessor.TriggerFlashAction(ExternalFlashManager::Action::SLEEP);
+}
+#endif
+
+ExternalFlashManager & GetFlashHandler()
+{
+    static ExternalFlashManager sFlashHandler;
+    return sFlashHandler;
 }

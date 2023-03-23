@@ -23,5 +23,11 @@ check_system_includes = true
 default_args = {
   target_cpu = "arm"
   target_os = "freertos"
+
+  pw_build_PIP_CONSTRAINTS =
+      [ "//third_party/connectedhomeip/scripts/constraints.txt" ]
+  pw_build_PIP_REQUIREMENTS =
+      [ "//third_party/connectedhomeip/scripts/requirements.txt" ]
+
   import("//args.gni")
 }

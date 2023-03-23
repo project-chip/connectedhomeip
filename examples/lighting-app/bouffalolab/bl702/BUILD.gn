@@ -38,21 +38,20 @@ declare_args() {
   # Dump memory usage at link time.
   chip_print_memory_usage = true
 
-  config_cache_size = 8192
-
-  # Monitor & log memory usage at runtime.
-  enable_heap_monitoring = false
-
   # OTA periodic query timeout in seconds
   ota_periodic_query_timeout = 86400
+
+  config_cache_size = 8192
+
+  enable_heap_monitoring = false
+
+  setupPinCode = 20202021
+  setupDiscriminator = 3840
 
   board = "XT-ZB6-DevKit"
   module_type = "BL706C-22"
   enable_psram = true
   baudrate = 2000000
-
-  setupPinCode = 20202021
-  setupDiscriminator = 3840
 }
 
 bl702_sdk("sdk") {

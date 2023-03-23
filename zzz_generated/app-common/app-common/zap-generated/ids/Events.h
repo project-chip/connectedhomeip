@@ -53,7 +53,7 @@ static constexpr EventId Id = 0x00000001;
 } // namespace Events
 } // namespace Actions
 
-namespace Basic {
+namespace BasicInformation {
 namespace Events {
 
 namespace StartUp {
@@ -73,7 +73,7 @@ static constexpr EventId Id = 0x00000003;
 } // namespace ReachableChanged
 
 } // namespace Events
-} // namespace Basic
+} // namespace BasicInformation
 
 namespace OtaSoftwareUpdateRequestor {
 namespace Events {
@@ -323,7 +323,7 @@ static constexpr EventId Id = 0x00000010;
 } // namespace Events
 } // namespace PumpConfigurationAndControl
 
-namespace TestCluster {
+namespace UnitTesting {
 namespace Events {
 
 namespace TestEvent {
@@ -335,7 +335,7 @@ static constexpr EventId Id = 0x00000002;
 } // namespace TestFabricScopedEvent
 
 } // namespace Events
-} // namespace TestCluster
+} // namespace UnitTesting
 
 } // namespace Clusters
 } // namespace app

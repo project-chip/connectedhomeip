@@ -171,6 +171,14 @@ private:
      */
     void ExpireFailSafeIfArmed();
 
+    /**
+     * Helpers to ensure the right attribute reporting happens when our state is
+     * updated.
+     */
+    void UpdateWindowStatus(app::Clusters::AdministratorCommissioning::CommissioningWindowStatus aNewStatus);
+    void UpdateOpenerVendorId(app::DataModel::Nullable<VendorId> aNewOpenerVendorId);
+    void UpdateOpenerFabricIndex(app::DataModel::Nullable<FabricIndex> aNewOpenerFabricIndex);
+
     AppDelegate * mAppDelegate = nullptr;
     Server * mServer           = nullptr;
 
@@ -194,6 +202,10 @@ private:
     uint32_t mECMIterations              = 0;
     uint32_t mECMSaltLength              = 0;
     uint8_t mECMSalt[kSpake2p_Max_PBKDF_Salt_Length];
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    bool mSEDActiveModeEnabled = false;
+#endif
 
     // For tests only, so that we can test the commissioning window timeout
     // without having to wait 3 minutes.

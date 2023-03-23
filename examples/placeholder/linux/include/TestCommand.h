@@ -87,7 +87,21 @@ public:
     void Exit(std::string message, CHIP_ERROR err) override
     {
         LogEnd(message, err);
-        SetCommandExitStatus(err);
+
+        if (CHIP_NO_ERROR == err)
+        {
+            chip::DeviceLayer::PlatformMgr().ScheduleWork(AsyncExit, reinterpret_cast<intptr_t>(this));
+        }
+        else
+        {
+            SetCommandExitStatus(err);
+        }
+    }
+
+    static void AsyncExit(intptr_t context)
+    {
+        TestCommand * command = reinterpret_cast<TestCommand *>(context);
+        command->SetCommandExitStatus(CHIP_NO_ERROR);
     }
 
     static void ScheduleNextTest(intptr_t context)

@@ -15,18 +15,21 @@
  *    limitations under the License.
  */
 
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <platform/Tizen/NetworkCommissioningDriver.h>
-
+#include <cstdint>
+#include <cstring>
 #include <limits>
-#include <string>
-#include <vector>
 
-using namespace chip;
-using namespace chip::Thread;
-using namespace chip::DeviceLayer::Internal;
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceBuildConfig.h>
+#include <platform/KeyValueStoreManager.h>
+#include <platform/NetworkCommissioning.h>
+
+#include "NetworkCommissioningDriver.h"
+#include "WiFiManager.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -137,8 +140,8 @@ void TizenWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
     ChipLogProgress(NetworkProvisioning, "TizenNetworkCommissioningDelegate: SSID: %.*s",
                     static_cast<int>(sizeof(mStagingNetwork.ssid)), reinterpret_cast<char *>(mStagingNetwork.ssid));
 
-    err = WiFiMgr().Connect(reinterpret_cast<char *>(mStagingNetwork.ssid), reinterpret_cast<char *>(mStagingNetwork.credentials),
-                            callback);
+    err = DeviceLayer::Internal::WiFiMgr().Connect(reinterpret_cast<char *>(mStagingNetwork.ssid),
+                                                   reinterpret_cast<char *>(mStagingNetwork.credentials), callback);
 
 exit:
     if (err != CHIP_NO_ERROR)

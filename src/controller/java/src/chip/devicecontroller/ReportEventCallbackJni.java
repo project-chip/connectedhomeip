@@ -17,7 +17,7 @@
  */
 package chip.devicecontroller;
 
-import androidx.annotation.Nullable;
+import javax.annotation.Nullable;
 
 /** JNI wrapper callback class for {@link ReportCallback}. */
 public class ReportEventCallbackJni {

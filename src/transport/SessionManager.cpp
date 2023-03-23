@@ -509,7 +509,7 @@ CHIP_ERROR SessionManager::InjectPaseSessionWithTestKey(SessionHolder & sessionH
     SecureSession * secureSession = session.Value()->AsSecureSession();
     secureSession->SetPeerAddress(peerAddress);
 
-    size_t secretLen = strlen(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE);
+    size_t secretLen = CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH;
     ByteSpan secret(reinterpret_cast<const uint8_t *>(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE), secretLen);
     ReturnErrorOnFailure(secureSession->GetCryptoContext().InitFromSecret(
         secret, ByteSpan(nullptr, 0), CryptoContext::SessionInfoType::kSessionEstablishment, role));
@@ -530,7 +530,7 @@ CHIP_ERROR SessionManager::InjectCaseSessionWithTestKey(SessionHolder & sessionH
     SecureSession * secureSession = session.Value()->AsSecureSession();
     secureSession->SetPeerAddress(peerAddress);
 
-    size_t secretLen = strlen(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE);
+    size_t secretLen = CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH;
     ByteSpan secret(reinterpret_cast<const uint8_t *>(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE), secretLen);
     ReturnErrorOnFailure(secureSession->GetCryptoContext().InitFromSecret(
         secret, ByteSpan(nullptr, 0), CryptoContext::SessionInfoType::kSessionEstablishment, role));

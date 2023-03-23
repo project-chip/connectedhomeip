@@ -1069,8 +1069,8 @@ class ChipClusters:
                 },
             },
     }
-    _BASIC_CLUSTER_INFO = {
-            "clusterName": "Basic",
+    _BASIC_INFORMATION_CLUSTER_INFO = {
+            "clusterName": "BasicInformation",
             "clusterId": 0x00000028,
             "commands": {
             },
@@ -6737,8 +6737,8 @@ class ChipClusters:
                 },
             },
     }
-    _TEST_CLUSTER_CLUSTER_INFO = {
-            "clusterName": "TestCluster",
+    _UNIT_TESTING_CLUSTER_INFO = {
+            "clusterName": "UnitTesting",
             "clusterId": 0xFFF1FC05,
             "commands": {
             0x00000000: {
@@ -7515,7 +7515,7 @@ class ChipClusters:
     0x0000001E: _BINDING_CLUSTER_INFO,
     0x0000001F: _ACCESS_CONTROL_CLUSTER_INFO,
     0x00000025: _ACTIONS_CLUSTER_INFO,
-    0x00000028: _BASIC_CLUSTER_INFO,
+    0x00000028: _BASIC_INFORMATION_CLUSTER_INFO,
     0x00000029: _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
     0x0000002A: _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
     0x0000002B: _LOCALIZATION_CONFIGURATION_CLUSTER_INFO,
@@ -7568,7 +7568,7 @@ class ChipClusters:
     0x0000050D: _APPLICATION_BASIC_CLUSTER_INFO,
     0x0000050E: _ACCOUNT_LOGIN_CLUSTER_INFO,
     0x00000B04: _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
-    0xFFF1FC05: _TEST_CLUSTER_CLUSTER_INFO,
+    0xFFF1FC05: _UNIT_TESTING_CLUSTER_INFO,
     }
 
     _CLUSTER_NAME_DICT = {
@@ -7583,7 +7583,7 @@ class ChipClusters:
         "Binding": _BINDING_CLUSTER_INFO,
         "AccessControl": _ACCESS_CONTROL_CLUSTER_INFO,
         "Actions": _ACTIONS_CLUSTER_INFO,
-        "Basic": _BASIC_CLUSTER_INFO,
+        "BasicInformation": _BASIC_INFORMATION_CLUSTER_INFO,
         "OtaSoftwareUpdateProvider": _OTA_SOFTWARE_UPDATE_PROVIDER_CLUSTER_INFO,
         "OtaSoftwareUpdateRequestor": _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
         "LocalizationConfiguration": _LOCALIZATION_CONFIGURATION_CLUSTER_INFO,
@@ -7636,7 +7636,7 @@ class ChipClusters:
         "ApplicationBasic": _APPLICATION_BASIC_CLUSTER_INFO,
         "AccountLogin": _ACCOUNT_LOGIN_CLUSTER_INFO,
         "ElectricalMeasurement": _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
-        "TestCluster": _TEST_CLUSTER_CLUSTER_INFO,
+        "UnitTesting": _UNIT_TESTING_CLUSTER_INFO,
     }
 
     def __init__(self, chipstack):

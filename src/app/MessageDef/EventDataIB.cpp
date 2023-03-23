@@ -33,12 +33,10 @@
 
 namespace chip {
 namespace app {
-
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR EventDataIB::Parser::PrettyPrint() const
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    int tagPresenceMask = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
 
     PRETTY_PRINT("EventDataIB =");
@@ -56,23 +54,16 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
         uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
         switch (tagNum)
         {
-        case to_underlying(Tag::kPath):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kPath))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kPath));
-            {
-                EventPathIB::Parser path;
-                ReturnErrorOnFailure(path.Init(reader));
+        case to_underlying(Tag::kPath): {
+            EventPathIB::Parser path;
+            ReturnErrorOnFailure(path.Init(reader));
 
-                PRETTY_PRINT_INCDEPTH();
-                ReturnErrorOnFailure(path.CheckSchemaValidity());
-                PRETTY_PRINT_DECDEPTH();
-            }
-            break;
+            PRETTY_PRINT_INCDEPTH();
+            ReturnErrorOnFailure(path.PrettyPrint());
+            PRETTY_PRINT_DECDEPTH();
+        }
+        break;
         case to_underlying(Tag::kEventNumber):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEventNumber))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kEventNumber));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
@@ -84,9 +75,6 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
 #endif // CHIP_DETAIL_LOGGING
             break;
         case to_underlying(Tag::kPriority):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kPriority))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kPriority));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
@@ -98,10 +86,6 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
 #endif // CHIP_DETAIL_LOGGING
             break;
         case to_underlying(Tag::kEpochTimestamp):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEpochTimestamp))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kEpochTimestamp));
-
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
@@ -114,10 +98,6 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
             break;
 
         case to_underlying(Tag::kSystemTimestamp):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kSystemTimestamp))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kSystemTimestamp));
-
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
@@ -129,9 +109,6 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
 #endif // CHIP_DETAIL_LOGGING
             break;
         case to_underlying(Tag::kDeltaEpochTimestamp):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kDeltaEpochTimestamp))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kDeltaEpochTimestamp));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
@@ -143,10 +120,6 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
 #endif // CHIP_DETAIL_LOGGING
             break;
         case to_underlying(Tag::kDeltaSystemTimestamp):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kDeltaSystemTimestamp))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kDeltaSystemTimestamp));
-
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
@@ -158,10 +131,6 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
 #endif // CHIP_DETAIL_LOGGING
             break;
         case to_underlying(Tag::kData):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kData))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kData));
-
             PRETTY_PRINT_INCDEPTH();
             ReturnErrorOnFailure(CheckIMPayload(reader, 0, "EventData"));
             PRETTY_PRINT_DECDEPTH();
@@ -177,15 +146,12 @@ CHIP_ERROR EventDataIB::Parser::CheckSchemaValidity() const
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        // check for required fields:
-        const int requiredFields =
-            (1 << to_underlying(Tag::kPath)) | (1 << to_underlying(Tag::kPriority)) | (1 << to_underlying(Tag::kData));
-        err = (tagPresenceMask & requiredFields) == requiredFields ? CHIP_NO_ERROR : CHIP_ERROR_IM_MALFORMED_EVENT_DATA_IB;
+        err = CHIP_NO_ERROR;
     }
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 CHIP_ERROR EventDataIB::Parser::GetPath(EventPathIB::Parser * const apPath)
 {

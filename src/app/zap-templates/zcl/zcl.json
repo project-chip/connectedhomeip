@@ -20,6 +20,7 @@
         "chip-ota.xml",
         "chip-types.xml",
         "channel-cluster.xml",
+        "client-monitoring-cluster.xml",
         "clusters-extensions.xml",
         "content-launch-cluster.xml",
         "descriptor-cluster.xml",
@@ -77,7 +78,7 @@
         "zll-devices.xml",
         "zll.xml"
     ],
-    "manufacturersXml": "../../../../third_party/zap/repo/zcl-builtin/shared/manufacturers.xml",
+    "manufacturersXml": "../../../../src/app/zap-templates/zcl/data-model/manufacturers.xml",
     "options": {
         "text": {
             "defaultResponsePolicy": ["Always", "Conditional", "Never"]
@@ -106,7 +107,7 @@
             "AdminFabricIndex",
             "AdminVendorId"
         ],
-        "Basic": [
+        "Basic Information": [
             "DataModelRevision",
             "VendorName",
             "VendorID",
@@ -171,7 +172,7 @@
             "FeatureMap",
             "ThreadMetrics"
         ],
-        "Test Cluster": [
+        "Unit Testing": [
             "struct_attr",
             "nullable_struct",
             "general_error_boolean",

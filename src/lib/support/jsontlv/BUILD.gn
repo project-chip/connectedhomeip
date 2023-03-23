@@ -16,7 +16,6 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/jsoncpp.gni")
 
 config("jsontlv_config") {
-  cflags = [ "-Wno-implicit-fallthrough" ]
 }
 
 static_library("jsontlv") {

@@ -17,10 +17,12 @@
  */
 
 #include "MediaCommandBase.h"
+#include "MediaSubscriptionBase.h"
 
 #include <functional>
 #include <zap-generated/CHIPClusters.h>
 
+// COMMAND CLASSES
 class LaunchAppCommand
     : public MediaCommandBase<chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type,
                               chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType>
@@ -50,4 +52,12 @@ public:
 
     CHIP_ERROR Invoke(chip::app::Clusters::ApplicationLauncher::Structs::Application::Type application,
                       std::function<void(CHIP_ERROR)> responseCallback);
+};
+
+// SUBSCRIBER CLASSES
+class CurrentAppSubscriber
+    : public MediaSubscriptionBase<chip::app::Clusters::ApplicationLauncher::Attributes::CurrentApp::TypeInfo>
+{
+public:
+    CurrentAppSubscriber() : MediaSubscriptionBase(chip::app::Clusters::ApplicationLauncher::Id) {}
 };

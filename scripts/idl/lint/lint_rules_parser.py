@@ -306,4 +306,4 @@ if __name__ == '__main__':
         logging.info("Data:")
         logging.info("%r" % data)
 
-    main()
+    main(auto_envvar_prefix='CHIP')

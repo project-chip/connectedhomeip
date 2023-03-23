@@ -26,6 +26,7 @@ from construct.core import ValidationError
 from .ClusterObjects import ClusterCommand
 import chip.exceptions
 import chip.interaction_model
+from chip.native import PyChipError
 
 import inspect
 import sys
@@ -99,12 +100,11 @@ class AsyncCommandTransaction:
         self._event_loop.call_soon_threadsafe(
             self._handleResponse, path, status, response)
 
-    def _handleError(self, imError: Status, chipError: int, exception: Exception):
+    def _handleError(self, imError: Status, chipError: PyChipError, exception: Exception):
         if exception:
             self._future.set_exception(exception)
         elif chipError != 0:
-            self._future.set_exception(
-                chip.exceptions.ChipStackError(chipError))
+            self._future.set_exception(chipError.to_exception())
         else:
             try:
                 self._future.set_exception(
@@ -114,7 +114,7 @@ class AsyncCommandTransaction:
                 self._future.set_exception(chip.interaction_model.InteractionModelError(
                     chip.interaction_model.Status.Failure))
 
-    def handleError(self, status: Status, chipError: int):
+    def handleError(self, status: Status, chipError: PyChipError):
         self._event_loop.call_soon_threadsafe(
             self._handleError, status, chipError, None
         )
@@ -123,7 +123,7 @@ class AsyncCommandTransaction:
 _OnCommandSenderResponseCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint16, c_uint32, c_uint32, c_uint16, c_uint8, c_void_p, c_uint32)
 _OnCommandSenderErrorCallbackFunct = CFUNCTYPE(
-    None, py_object, c_uint16, c_uint8, c_uint32)
+    None, py_object, c_uint16, c_uint8, PyChipError)
 _OnCommandSenderDoneCallbackFunct = CFUNCTYPE(
     None, py_object)
 
@@ -136,7 +136,7 @@ def _OnCommandSenderResponseCallback(closure, endpoint: int, cluster: int, comma
 
 
 @_OnCommandSenderErrorCallbackFunct
-def _OnCommandSenderErrorCallback(closure, imStatus: int, clusterStatus: int, chiperror: int):
+def _OnCommandSenderErrorCallback(closure, imStatus: int, clusterStatus: int, chiperror: PyChipError):
     closure.handleError(Status(imStatus, clusterStatus), chiperror)
 
 
@@ -145,7 +145,7 @@ def _OnCommandSenderDoneCallback(closure):
     ctypes.pythonapi.Py_DecRef(ctypes.py_object(closure))
 
 
-def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand, timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None) -> int:
+def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand, timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None) -> PyChipError:
     ''' Send a cluster-object encapsulated command to a device and does the following:
             - On receipt of a successful data response, returns the cluster-object equivalent through the provided future.
             - None (on a successful response containing no data)
@@ -183,7 +183,7 @@ def Init():
         setter = chip.native.NativeLibraryHandleMethodArguments(handle)
 
         setter.Set('pychip_CommandSender_SendCommand',
-                   c_uint32, [py_object, c_void_p, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16])
+                   PyChipError, [py_object, c_void_p, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16])
         setter.Set('pychip_CommandSender_InitCallbacks', None, [
                    _OnCommandSenderResponseCallbackFunct, _OnCommandSenderErrorCallbackFunct, _OnCommandSenderDoneCallbackFunct])
 

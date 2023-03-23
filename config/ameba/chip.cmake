@@ -30,6 +30,7 @@ list(
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
     -D_POSIX_REALTIME_SIGNALS
+    -DCHIP_SHELL_MAX_TOKENS=11
 )
 
 list(

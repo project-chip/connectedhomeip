@@ -27,12 +27,6 @@ config:
     payload:
         type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00" # This value needs to be generated automatically
-    alphaIndex:
-        type: int8u
-        defaultValue: 1
-    betaIndex:
-        type: int8u
-        defaultValue: 2
 
 tests:
     - label: "Wait for the commissioned device to be retrieved for alpha"
@@ -48,10 +42,7 @@ tests:
       command: "readAttribute"
       attribute: "CurrentFabricIndex"
       response:
-          # We could saveAs here, but then when we try to compare to it later
-          # the nullable-vs-non-nullable compare fails to work right.  For now
-          # just use a config variable.
-          value: alphaIndex
+          saveAs: alphaIndex
 
     - label: "Check that commissioning window is not open"
       command: "readAttribute"
@@ -172,10 +163,7 @@ tests:
       command: "readAttribute"
       attribute: "CurrentFabricIndex"
       response:
-          # We could saveAs here, but then when we try to compare to it later
-          # the nullable-vs-non-nullable compare fails to work right.  For now
-          # just use a config variable.
-          value: betaIndex
+          saveAs: betaIndex
 
     - label: "Open Commissioning Window from beta"
       identity: "beta"

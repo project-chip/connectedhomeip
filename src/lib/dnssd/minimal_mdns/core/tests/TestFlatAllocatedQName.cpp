@@ -133,7 +133,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestFlatAllocatedQName(void)
+int TestFlatAllocatedQName()
 {
     nlTestSuite theSuite = { "FlatAllocatedQName", sTests, nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

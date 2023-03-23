@@ -21,7 +21,6 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/util/basic-types.h>

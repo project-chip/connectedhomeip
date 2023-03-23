@@ -2,6 +2,8 @@
 
 #import <Matter/Matter.h>
 
+#define LOG_DEBUG_PERSISTENT_STORAGE_DELEGATE 0
+
 NSString * const kCHIPToolDefaultsDomain = @"com.apple.chiptool";
 
 id MTRGetDomainValueForKey(NSString * domain, NSString * key)
@@ -39,9 +41,13 @@ BOOL CHIPClearAllDomain(NSString * domain)
 {
 
     NSArray * allKeys = CHIPGetDomainKeyList(domain);
+#if LOG_DEBUG_PERSISTENT_STORAGE_DELEGATE
     NSLog(@"Removing keys: %@ %@", allKeys, domain);
+#endif
     for (id key in allKeys) {
+#if LOG_DEBUG_PERSISTENT_STORAGE_DELEGATE
         NSLog(@"Removing key: %@", key);
+#endif
         if (!MTRRemoveDomainValueForKey(domain, (NSString *) key)) {
             return NO;
         }
@@ -61,7 +67,9 @@ BOOL CHIPClearAllDomain(NSString * domain)
 - (nullable NSData *)storageDataForKey:(NSString *)key
 {
     NSData * value = MTRGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
+#if LOG_DEBUG_PERSISTENT_STORAGE_DELEGATE
     NSLog(@"CHIPPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
+#endif
     return value;
 }
 

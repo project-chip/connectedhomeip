@@ -295,7 +295,7 @@ static constexpr CommandId Id = 0x0000000B;
 } // namespace Commands
 } // namespace Actions
 
-namespace Basic {
+namespace BasicInformation {
 namespace Commands {
 
 namespace MfgSpecificPing {
@@ -303,7 +303,7 @@ static constexpr CommandId Id = 0x10020000;
 } // namespace MfgSpecificPing
 
 } // namespace Commands
-} // namespace Basic
+} // namespace BasicInformation
 
 namespace OtaSoftwareUpdateProvider {
 namespace Commands {
@@ -1091,7 +1091,21 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace ElectricalMeasurement
 
-namespace TestCluster {
+namespace ClientMonitoring {
+namespace Commands {
+
+namespace RegisterClientMonitoring {
+static constexpr CommandId Id = 0x00000000;
+} // namespace RegisterClientMonitoring
+
+namespace StayAwakeRequest {
+static constexpr CommandId Id = 0x00000001;
+} // namespace StayAwakeRequest
+
+} // namespace Commands
+} // namespace ClientMonitoring
+
+namespace UnitTesting {
 namespace Commands {
 
 namespace Test {
@@ -1231,7 +1245,7 @@ static constexpr CommandId Id = 0x00000015;
 } // namespace TestEmitTestFabricScopedEventRequest
 
 } // namespace Commands
-} // namespace TestCluster
+} // namespace UnitTesting
 
 namespace FaultInjection {
 namespace Commands {

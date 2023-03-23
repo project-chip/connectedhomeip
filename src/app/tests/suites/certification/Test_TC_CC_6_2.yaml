@@ -312,7 +312,6 @@ tests:
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
       response:
-          saveAs: ColorTemperatureMiredsStep4c
           constraints:
               minValue: ColorTempPhysicalMinMiredsValue
               maxValue: ColorTempPhysicalMaxMiredsValue
@@ -330,7 +329,9 @@ tests:
       command: "readAttribute"
       attribute: "ColorTemperatureMireds"
       response:
-          value: ColorTemperatureMiredsStep4c
+          constraints:
+              minValue: ColorTempPhysicalMinMiredsValue
+              maxValue: ColorTempPhysicalMaxMiredsValue
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F04 && CC.S.A0008

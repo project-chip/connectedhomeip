@@ -58,7 +58,7 @@ public:
     virtual ~CircularEventReader() = default;
 };
 
-EventManagement & EventManagement::GetInstance(void)
+EventManagement & EventManagement::GetInstance()
 {
     return sInstance;
 }

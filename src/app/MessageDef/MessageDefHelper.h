@@ -38,7 +38,7 @@
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK && CHIP_DETAIL_LOGGING
+#if CHIP_CONFIG_IM_PRETTY_PRINT && CHIP_DETAIL_LOGGING
 /**
  * Start a new "blank" line.  This will actually print out whitespace to the
  * current indent level, which can be followed with PRETTY_PRINT_SAMELINE calls.
@@ -81,11 +81,11 @@ void DecreaseDepth();
 #define PRETTY_PRINT_DECDEPTH()
 #endif
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
 // Parse an IM payload (attribute value, command fields, event fields,
 // recursively parsing any complex types encountered.
 CHIP_ERROR CheckIMPayload(TLV::TLVReader & aReader, int aDepth, const char * aLabel);
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 }; // namespace app
 }; // namespace chip

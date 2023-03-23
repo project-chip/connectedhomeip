@@ -20,10 +20,11 @@ _bootstrap_root = "//third_party/connectedhomeip"
 import("${_bootstrap_root}/build_overrides/pigweed_environment.gni")
 
 # Rebase paths to our root.
-dir_cipd_arm = get_path_info("${_bootstrap_root}/${dir_cipd_arm}", "abspath")
-dir_cipd_pigweed =
-    get_path_info("${_bootstrap_root}/${dir_cipd_pigweed}", "abspath")
-dir_cipd_python =
-    get_path_info("${_bootstrap_root}/${dir_cipd_python}", "abspath")
-dir_virtual_env =
+pw_env_setup_CIPD_ARM =
+    get_path_info("${_bootstrap_root}/${pw_env_setup_CIPD_ARM}", "abspath")
+pw_env_setup_CIPD_PIGWEED =
+    get_path_info("${_bootstrap_root}/${pw_env_setup_CIPD_PIGWEED}", "abspath")
+pw_env_setup_CIPD_PYTHON =
+    get_path_info("${_bootstrap_root}/${pw_env_setup_CIPD_PYTHON}", "abspath")
+pw_env_setup_VIRTUAL_ENV =
     get_path_info("${_bootstrap_root}/${pw_env_setup_VIRTUAL_ENV}", "abspath")

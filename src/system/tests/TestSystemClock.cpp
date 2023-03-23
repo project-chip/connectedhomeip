@@ -115,7 +115,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestSystemClock(void)
+int TestSystemClock()
 {
     nlTestSuite theSuite = {
         "chip-systemclock", &sTests[0], nullptr /* setup */, nullptr /* teardown */

@@ -70,17 +70,23 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
 
 CommissioningParameters PairingCommand::GetCommissioningParameters()
 {
+    auto params = CommissioningParameters();
+    params.SetSkipCommissioningComplete(mSkipCommissioningComplete.ValueOr(false));
+
     switch (mNetworkType)
     {
     case PairingNetworkType::WiFi:
-        return CommissioningParameters().SetWiFiCredentials(Controller::WiFiCredentials(mSSID, mPassword));
+        params.SetWiFiCredentials(Controller::WiFiCredentials(mSSID, mPassword));
+        break;
     case PairingNetworkType::Thread:
-        return CommissioningParameters().SetThreadOperationalDataset(mOperationalDataset);
+        params.SetThreadOperationalDataset(mOperationalDataset);
+        break;
     case PairingNetworkType::Ethernet:
     case PairingNetworkType::None:
-        return CommissioningParameters();
+        break;
     }
-    return CommissioningParameters();
+
+    return params;
 }
 
 CHIP_ERROR PairingCommand::PaseWithCode(NodeId remoteId)
@@ -109,10 +115,19 @@ CHIP_ERROR PairingCommand::PairWithCode(NodeId remoteId)
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
 {
-    RendezvousParameters params =
-        RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
-    CommissioningParameters commissioningParams = GetCommissioningParameters();
-    return CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
+    auto params = RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (mPaseOnly.ValueOr(false))
+    {
+        err = CurrentCommissioner().EstablishPASEConnection(remoteId, params);
+    }
+    else
+    {
+        auto commissioningParams = GetCommissioningParameters();
+        err                      = CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
+    }
+    return err;
 }
 
 CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
@@ -183,7 +198,7 @@ void PairingCommand::OnPairingComplete(CHIP_ERROR err)
     {
         ChipLogProgress(chipTool, "Pairing Success");
         ChipLogProgress(chipTool, "PASE establishment successful");
-        if (mPairingMode == PairingMode::CodePaseOnly)
+        if (mPairingMode == PairingMode::CodePaseOnly || mPaseOnly.ValueOr(false))
         {
             SetCommandExitStatus(err);
         }
@@ -237,7 +252,8 @@ void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & 
     nodeData.resolutionData.ipAddress[0].ToString(buf);
     ChipLogProgress(chipTool, "Discovered Device: %s:%u", buf, port);
 
-    // Stop Mdns discovery. Is it the right method ?
+    // Stop Mdns discovery.
+    CurrentCommissioner().StopCommissionableDiscovery();
     CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
 
     Inet::InterfaceId interfaceId =

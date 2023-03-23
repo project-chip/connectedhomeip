@@ -36,7 +36,7 @@ chip::Messaging::ExchangeManager gExchangeManager;
 chip::secure_channel::MessageCounterManager gMessageCounterManager;
 chip::TestPersistentStorageDelegate gStorage;
 
-void InitializeChip(void)
+void InitializeChip()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -62,7 +62,7 @@ exit:
     }
 }
 
-void ShutdownChip(void)
+void ShutdownChip()
 {
     gMessageCounterManager.Shutdown();
     gExchangeManager.Shutdown();

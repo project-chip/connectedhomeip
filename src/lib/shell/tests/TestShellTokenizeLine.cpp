@@ -136,7 +136,7 @@ static const nlTest sTests[] = {
     NL_TEST_SENTINEL()
 };
 
-int TestShellTokenizeLine(void)
+int TestShellTokenizeLine()
 {
     nlTestSuite theSuite = { "Test Shell: MainLoop", &sTests[0], nullptr, nullptr };
 

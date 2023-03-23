@@ -74,6 +74,7 @@ chip_test_suite("tests") {
   ]
 
   test_sources = [
+    "TestBasicPacketFilters.cpp",
     "TestInetAddress.cpp",
     "TestInetErrorStr.cpp",
   ]

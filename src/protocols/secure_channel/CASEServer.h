@@ -69,7 +69,7 @@ public:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
     Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return GetSession().GetMessageDispatch(); }
 
-    virtual CASESession & GetSession() { return mPairingSession; }
+    CASESession & GetSession() { return mPairingSession; }
 
 private:
     Messaging::ExchangeManager * mExchangeManager                       = nullptr;

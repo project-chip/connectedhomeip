@@ -35,8 +35,8 @@
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
@@ -96,7 +96,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
 
-    if (clusterId == ZCL_ON_OFF_CLUSTER_ID)
+    if (clusterId == app::Clusters::OnOff::Id)
     {
         if (attributeId != ZCL_ON_OFF_ATTRIBUTE_ID)
         {
@@ -106,7 +106,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
         statusLED1.Set(*value);
     }
-    else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID)
+    else if (clusterId == app::Clusters::LevelControl::Id)
     {
         if (attributeId != ZCL_CURRENT_LEVEL_ATTRIBUTE_ID)
         {
@@ -122,7 +122,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
             ChipLogError(Zcl, "wrong length for level: %d\n", size);
         }
     }
-    else if (clusterId == ZCL_COLOR_CONTROL_CLUSTER_ID)
+    else if (clusterId == app::Clusters::ColorControl::Id)
     {
         uint8_t hue, saturation;
 
@@ -136,18 +136,18 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         if (attributeId == ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID)
         {
             hue = *value;
-            emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
-                                       &saturation, sizeof(uint8_t));
+            emberAfReadServerAttribute(endpointId, app::Clusters::ColorControl::Id,
+                                       ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID, &saturation, sizeof(uint8_t));
         }
         if (attributeId == ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID)
         {
             saturation = *value;
-            emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID, &hue,
-                                       sizeof(uint8_t));
+            emberAfReadServerAttribute(endpointId, app::Clusters::ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID,
+                                       &hue, sizeof(uint8_t));
         }
         ChipLogProgress(Zcl, "New hue: %d, New saturation: %d ", hue, saturation);
     }
-    else if (clusterId == ZCL_IDENTIFY_CLUSTER_ID)
+    else if (clusterId == app::Clusters::Identify::Id)
     {
         if (attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID)
         {

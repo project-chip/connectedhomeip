@@ -87,9 +87,11 @@ target_sources(app PRIVATE main/main.cpp
 target_link_libraries(app PUBLIC
   pw_checksum
   pw_hdlc
+  pw_hdlc.pw_rpc
   pw_log
   pw_rpc.nanopb.echo_service
   pw_rpc.server
+  pw_sys_io
 )
 
 # Workaround cyclic dependency between nrf_security libraries)

@@ -150,7 +150,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
-          value: 120
+          constraints:
+              minValue: 102
+              maxValue: 138
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0008

@@ -52,9 +52,10 @@ public:
     CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
     void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
 
-private:
+protected:
     DiagnosticDataProviderImpl();
 
+private:
     const BootReasonType mBootReason;
 };
 

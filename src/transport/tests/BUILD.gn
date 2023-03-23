@@ -39,6 +39,7 @@ chip_test_suite("tests") {
     "TestPeerMessageCounter.cpp",
     "TestSecureSession.cpp",
     "TestSessionManager.cpp",
+    "TestSessionManagerDispatch.cpp",
   ]
 
   if (chip_device_platform != "mbed" && chip_device_platform != "efr32" &&

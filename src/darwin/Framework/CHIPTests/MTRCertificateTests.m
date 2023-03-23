@@ -34,6 +34,15 @@
 
     __auto_type * rootCert = [MTRCertificates createRootCertificate:testKeys issuerID:nil fabricID:nil error:nil];
     XCTAssertNotNil(rootCert);
+
+    // Test round-trip through TLV format.
+    __auto_type * tlvCert = [MTRCertificates convertX509Certificate:rootCert];
+    XCTAssertNotNil(tlvCert);
+
+    __auto_type * derCert = [MTRCertificates convertMatterCertificate:tlvCert];
+    XCTAssertNotNil(derCert);
+
+    XCTAssertEqualObjects(rootCert, derCert);
 }
 
 - (void)testGenerateIntermediateCert
@@ -54,6 +63,15 @@
                                                                            fabricID:nil
                                                                               error:nil];
     XCTAssertNotNil(intermediateCert);
+
+    // Test round-trip through TLV format.
+    __auto_type * tlvCert = [MTRCertificates convertX509Certificate:intermediateCert];
+    XCTAssertNotNil(tlvCert);
+
+    __auto_type * derCert = [MTRCertificates convertMatterCertificate:tlvCert];
+    XCTAssertNotNil(derCert);
+
+    XCTAssertEqualObjects(intermediateCert, derCert);
 }
 
 - (void)testGenerateOperationalCertNoIntermediate
@@ -81,6 +99,15 @@
                                                             caseAuthenticatedTags:cats
                                                                             error:nil];
     XCTAssertNotNil(operationalCert);
+
+    // Test round-trip through TLV format.
+    __auto_type * tlvCert = [MTRCertificates convertX509Certificate:operationalCert];
+    XCTAssertNotNil(tlvCert);
+
+    __auto_type * derCert = [MTRCertificates convertMatterCertificate:tlvCert];
+    XCTAssertNotNil(derCert);
+
+    XCTAssertEqualObjects(operationalCert, derCert);
 }
 
 - (void)testGenerateOperationalCertWithIntermediate
@@ -113,6 +140,15 @@
                                                             caseAuthenticatedTags:nil
                                                                             error:nil];
     XCTAssertNotNil(operationalCert);
+
+    // Test round-trip through TLV format.
+    __auto_type * tlvCert = [MTRCertificates convertX509Certificate:operationalCert];
+    XCTAssertNotNil(tlvCert);
+
+    __auto_type * derCert = [MTRCertificates convertMatterCertificate:tlvCert];
+    XCTAssertNotNil(derCert);
+
+    XCTAssertEqualObjects(operationalCert, derCert);
 }
 
 - (void)testGenerateOperationalCertErrorCases

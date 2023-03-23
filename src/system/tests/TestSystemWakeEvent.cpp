@@ -182,7 +182,7 @@ static const nlTest sTests[] =
 
 static nlTestSuite kTheSuite = { "chip-system-wake-event", sTests };
 
-int TestSystemWakeEvent(void)
+int TestSystemWakeEvent()
 {
     return chip::ExecuteTestsWithContext<TestContext>(&kTheSuite);
 }

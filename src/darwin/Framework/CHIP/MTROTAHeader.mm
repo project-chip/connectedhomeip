@@ -25,7 +25,7 @@
 #include <lib/core/OTAImageHeader.h>
 
 @implementation MTROTAHeader
-+ (MTROTAHeader * _Nullable)headerFromData:(NSData *)data error:(NSError * __autoreleasing *)error
++ (nullable MTROTAHeader *)headerFromData:(NSData *)data error:(NSError * __autoreleasing *)error
 {
     chip::OTAImageHeaderParser parser;
 
@@ -70,4 +70,13 @@
     parser.Clear();
     return headerObj;
 }
+@end
+
+@implementation MTROTAHeaderParser
+
++ (nullable MTROTAHeader *)headerFromData:(NSData *)data error:(NSError * __autoreleasing *)error
+{
+    return [MTROTAHeader headerFromData:data error:error];
+}
+
 @end

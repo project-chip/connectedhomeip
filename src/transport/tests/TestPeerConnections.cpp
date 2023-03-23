@@ -162,7 +162,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestPeerConnectionsFn(void)
+int TestPeerConnectionsFn()
 {
     nlTestSuite theSuite = { "Transport-SecureSessionTable", &sTests[0], Initialize, Finalize };
     nlTestRunner(&theSuite, nullptr);

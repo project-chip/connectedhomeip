@@ -20,6 +20,7 @@
 #include "lib/support/CHIPJNIError.h"
 #include "lib/support/JniReferences.h"
 #include "lib/support/JniTypeWrappers.h"
+#include "lib/support/SafeInt.h"
 
 #include <array>
 #include <cstdint>
@@ -67,7 +68,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR CHIPP256KeypairBridge::Initialize()
+CHIP_ERROR CHIPP256KeypairBridge::Initialize(ECPKeyTarget key_target)
 {
     if (HasKeypair())
     {
@@ -115,12 +116,14 @@ CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    VerifyOrReturnError(CanCastTo<uint32_t>(msg_length), CHIP_ERROR_INVALID_ARGUMENT);
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     jbyteArray jniMsg;
     jobject signedResult = nullptr;
     JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturnError(env != nullptr, err = CHIP_JNI_ERROR_NO_ENV);
-    err = JniReferences::GetInstance().N2J_ByteArray(env, msg, msg_length, jniMsg);
+    err = JniReferences::GetInstance().N2J_ByteArray(env, msg, static_cast<uint32_t>(msg_length), jniMsg);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
     VerifyOrReturnError(jniMsg != nullptr, err);
 

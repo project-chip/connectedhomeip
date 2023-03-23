@@ -17,8 +17,8 @@
 
 #import "MTRQRCodeSetupPayloadParser.h"
 #import "MTRError_Internal.h"
-#import "MTRLogging.h"
-#import "MTRMemory.h"
+#import "MTRFramework.h"
+#import "MTRLogging_Internal.h"
 #import "MTRSetupPayload_Internal.h"
 
 #import <setup_payload/QRCodeSetupPayloadParser.h>
@@ -29,10 +29,14 @@
     chip::QRCodeSetupPayloadParser * _chipQRCodeSetupPayloadParser;
 }
 
++ (void)initialize
+{
+    MTRFrameworkInit();
+}
+
 - (id)initWithBase38Representation:(NSString *)base38Representation
 {
     if (self = [super init]) {
-        [MTRMemory ensureInit];
         _base38Representation = base38Representation;
         _chipQRCodeSetupPayloadParser = new chip::QRCodeSetupPayloadParser(std::string([base38Representation UTF8String]));
     }

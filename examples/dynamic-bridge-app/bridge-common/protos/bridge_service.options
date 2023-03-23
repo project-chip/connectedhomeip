@@ -1,0 +1,2 @@
+chip.rpc.bridge.AddDevice.device_types max_count:32
+chip.rpc.bridge.AddDevice.clusters max_count:64

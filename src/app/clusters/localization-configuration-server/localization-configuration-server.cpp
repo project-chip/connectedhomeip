@@ -215,7 +215,7 @@ void emberAfLocalizationConfigurationClusterServerInitCallback(EndpointId endpoi
     }
 }
 
-void MatterLocalizationConfigurationPluginServerInitCallback(void)
+void MatterLocalizationConfigurationPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

@@ -124,7 +124,7 @@ public:
 
     ~P256KeypairHSM();
 
-    virtual CHIP_ERROR Initialize() override;
+    virtual CHIP_ERROR Initialize(ECPKeyTarget key_target) override;
 
     virtual CHIP_ERROR Serialize(P256SerializedKeypair & output) const override;
 

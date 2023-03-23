@@ -23,7 +23,6 @@
 #include "pigweed/rpc_services/internal/StatusUtils.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <lib/core/CHIPTLV.h>

@@ -301,7 +301,7 @@ static const nlTest sTests[] = { NL_TEST_DEF_FN(TestByteSpan),       NL_TEST_DEF
                                  NL_TEST_DEF_FN(TestSubSpan),        NL_TEST_DEF_FN(TestFromZclString),
                                  NL_TEST_DEF_FN(TestFromCharString), NL_TEST_SENTINEL() };
 
-int TestSpan(void)
+int TestSpan()
 {
     nlTestSuite theSuite = { "CHIP Span tests", &sTests[0], nullptr, nullptr };
 

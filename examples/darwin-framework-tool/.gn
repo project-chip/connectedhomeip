@@ -22,6 +22,5 @@ check_system_includes = true
 
 default_args = {
   import("//args.gni")
-
   chip_disable_platform_kvs = true
 }

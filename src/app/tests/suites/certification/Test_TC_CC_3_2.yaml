@@ -148,7 +148,6 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          saveAs: CurrentHueValueStep2f
           constraints:
               minValue: 80
               maxValue: 110
@@ -166,7 +165,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: CurrentHueValueStep2f
+          constraints:
+              minValue: 80
+              maxValue: 110
 
     - label:
           "TH sends MoveToHue command to DUT with Hue=60, Direction=0x00
@@ -224,8 +225,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 0
-              maxValue: 20
+              minValue: 8
+              maxValue: 12
 
     - label: "Wait 10s"
       cluster: "DelayCommands"
@@ -273,7 +274,6 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          saveAs: CurrentHueValueStep3f
           constraints:
               minValue: 140
               maxValue: 190
@@ -291,7 +291,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: CurrentHueValueStep3f
+          constraints:
+              minValue: 140
+              maxValue: 190
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0008

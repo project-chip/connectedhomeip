@@ -344,6 +344,11 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    /**
+     * Is the next element of the stream NULL.
+     */
+    bool WillDecodeNull() const { return mReader.GetType() == TLV::kTLVType_Null; }
+
     bool TriedDecode() const { return mTriedDecode; }
 
     /**

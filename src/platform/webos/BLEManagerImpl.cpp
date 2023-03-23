@@ -72,7 +72,7 @@ void HandleIncomingBleConnection(BLEEndPoint * bleEP)
     ChipLogProgress(DeviceLayer, "con rcvd");
 }
 
-void BLEManagerImpl::InitConnectionData(void)
+void BLEManagerImpl::InitConnectionData()
 {
     /* Initialize Hashmap */
     if (!mConnectionMap)
@@ -917,7 +917,7 @@ void BLEManagerImpl::NotifyBLEPeripheralAdvStopComplete(bool aIsSuccess, void * 
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void BLEManagerImpl::OnChipScanComplete(void)
+void BLEManagerImpl::OnChipScanComplete()
 {
     if (mBLEScanConfig.mBleScanState != BleScanState::kScanForDiscriminator &&
         mBLEScanConfig.mBleScanState != BleScanState::kScanForAddress)

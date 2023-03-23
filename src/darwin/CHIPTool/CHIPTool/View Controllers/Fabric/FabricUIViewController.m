@@ -221,17 +221,19 @@
             if (chipDevice) {
                 MTRBaseClusterOperationalCredentials * cluster =
                     [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:chipDevice
-                                                                        endpoint:@(0)
+                                                                        endpoint:0
                                                                            queue:dispatch_get_main_queue()];
-                [cluster readAttributeCurrentFabricIndexWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
-                    if (!error) {
-                        self->_currentFabricIndex = value;
-                    }
-                }];
+                [cluster
+                    readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                        if (!error) {
+                            self->_currentFabricIndex = value;
+                        }
+                    }];
 
-                [self updateResult:[NSString stringWithFormat:@"readAttributeCommissionedFabricsWithCompletion command sent."]
-                           isError:NO];
-                [cluster readAttributeCommissionedFabricsWithCompletion:^(
+                [self
+                    updateResult:[NSString stringWithFormat:@"readAttributeCommissionedFabricsWithCompletionHandler command sent."]
+                         isError:NO];
+                [cluster readAttributeCommissionedFabricsWithCompletionHandler:^(
                     NSNumber * _Nullable commissionedFabrics, NSError * _Nullable error) {
                     if (error) {
                         dispatch_async(dispatch_get_main_queue(), ^{
@@ -268,32 +270,31 @@
             if (chipDevice) {
                 MTRBaseClusterOperationalCredentials * cluster =
                     [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:chipDevice
-                                                                        endpoint:@(0)
+                                                                        endpoint:0
                                                                            queue:dispatch_get_main_queue()];
                 [self updateResult:[NSString stringWithFormat:@"readAttributeFabrics command sent."] isError:NO];
                 MTRReadParams * params = [[MTRReadParams alloc] init];
-                params.fabricFiltered = NO;
+                params.fabricFiltered = @NO;
                 [cluster
                     readAttributeFabricsWithParams:params
-                                        completion:^(NSArray * _Nullable fabricsList, NSError * _Nullable error) {
-                                            if (error) {
-                                                dispatch_async(dispatch_get_main_queue(), ^{
-                                                    [self updateResult:[NSString
-                                                                           stringWithFormat:
-                                                                               @"readAttributeFabrics command failed: %@.", error]
-                                                               isError:YES];
-                                                });
-                                            } else {
-                                                dispatch_async(dispatch_get_main_queue(), ^{
-                                                    [self updateResult:[NSString
-                                                                           stringWithFormat:
-                                                                               @"Command readAttributeFabrics command succeeded."]
-                                                               isError:NO];
-                                                });
-                                            }
-                                            NSLog(@"Got back fabrics list: %@ error %@", fabricsList, error);
-                                            [self updateFabricsListUIWithFabrics:fabricsList error:error];
-                                        }];
+                                 completionHandler:^(NSArray * _Nullable fabricsList, NSError * _Nullable error) {
+                                     if (error) {
+                                         dispatch_async(dispatch_get_main_queue(), ^{
+                                             [self updateResult:[NSString
+                                                                    stringWithFormat:@"readAttributeFabrics command failed: %@.",
+                                                                    error]
+                                                        isError:YES];
+                                         });
+                                     } else {
+                                         dispatch_async(dispatch_get_main_queue(), ^{
+                                             [self updateResult:[NSString stringWithFormat:
+                                                                              @"Command readAttributeFabrics command succeeded."]
+                                                        isError:NO];
+                                         });
+                                     }
+                                     NSLog(@"Got back fabrics list: %@ error %@", fabricsList, error);
+                                     [self updateFabricsListUIWithFabrics:fabricsList error:error];
+                                 }];
             } else {
                 [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"] isError:YES];
             }
@@ -331,7 +332,7 @@
 
                             MTRBaseClusterOperationalCredentials * opCredsCluster =
                                 [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:chipDevice
-                                                                                    endpoint:@(0)
+                                                                                    endpoint:0
                                                                                        queue:dispatch_get_main_queue()];
 
                             dispatch_group_t removeGroup = dispatch_group_create();
@@ -348,15 +349,13 @@
                                 dispatch_group_enter(removeGroup);
                                 [opCredsCluster
                                     removeFabricWithParams:params
-                                                completion:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                                                    NSError * _Nullable error) {
-                                                    [self
-                                                        updateResult:[NSString
-                                                                         stringWithFormat:@"Removed Fabric Index %@ with Error %@",
-                                                                         params.fabricIndex, error]
-                                                             isError:error];
-                                                    dispatch_group_leave(removeGroup);
-                                                }];
+                                         completionHandler:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                             NSError * _Nullable error) {
+                                             [self updateResult:[NSString stringWithFormat:@"Removed Fabric Index %@ with Error %@",
+                                                                          params.fabricIndex, error]
+                                                        isError:error];
+                                             dispatch_group_leave(removeGroup);
+                                         }];
                             }
                             dispatch_group_notify(removeGroup, dispatch_get_main_queue(), ^{
                                 // now we can remove ourselves
@@ -365,16 +364,16 @@
                                 params.fabricIndex = self.currentFabricIndex;
                                 [opCredsCluster
                                     removeFabricWithParams:params
-                                                completion:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
-                                                    NSError * _Nullable error) {
-                                                    if (!error) {
-                                                        MTRSetDevicePaired(MTRGetLastPairedDeviceId(), NO);
-                                                    }
-                                                    [self updateResult:[NSString stringWithFormat:
-                                                                                     @"Removed own Fabric Index %@ with Error %@",
-                                                                                 params.fabricIndex, error]
-                                                               isError:error];
-                                                }];
+                                         completionHandler:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data,
+                                             NSError * _Nullable error) {
+                                             if (!error) {
+                                                 MTRSetDevicePaired(MTRGetLastPairedDeviceId(), NO);
+                                             }
+                                             [self updateResult:[NSString
+                                                                    stringWithFormat:@"Removed own Fabric Index %@ with Error %@",
+                                                                    params.fabricIndex, error]
+                                                        isError:error];
+                                         }];
                             });
                         })) {
                         [self updateResult:[NSString stringWithFormat:@"Waiting for connection with the device"] isError:NO];
@@ -405,7 +404,7 @@
             if (chipDevice) {
                 MTRBaseClusterOperationalCredentials * cluster =
                     [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:chipDevice
-                                                                        endpoint:@(0)
+                                                                        endpoint:0
                                                                            queue:dispatch_get_main_queue()];
                 [self updateResult:[NSString stringWithFormat:@"updateFabricLabel command sent."] isError:NO];
                 __auto_type * params = [[MTROperationalCredentialsClusterUpdateFabricLabelParams alloc] init];
@@ -413,33 +412,34 @@
 
                 [cluster
                     updateFabricLabelWithParams:params
-                                     completion:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable response,
-                                         NSError * _Nullable error) {
-                                         // TODO: UpdateFabricLabel can return errors
-                                         // via the NOCResponse response, but that
-                                         // seems like a spec bug that should be fixed
-                                         // in the spec.
-                                         if (error) {
-                                             NSLog(@"Error trying to updateFabricLabel %@", error);
-                                             dispatch_async(dispatch_get_main_queue(), ^{
-                                                 self->_updateFabricLabelTextField.text = @"";
-                                                 [self updateResult:[NSString stringWithFormat:
-                                                                                  @"Command updateFabricLabel failed with error %@",
-                                                                              error]
-                                                            isError:YES];
-                                             });
-                                         } else {
-                                             NSLog(@"Successfully updated the label: %@", response);
-                                             dispatch_async(dispatch_get_main_queue(), ^{
-                                                 self->_updateFabricLabelTextField.text = @"";
-                                                 [self updateResult:[NSString stringWithFormat:@"Command updateFabricLabel "
-                                                                                               @"succeeded to update label to %@",
-                                                                              label]
-                                                            isError:NO];
-                                                 [self fetchFabricsList];
-                                             });
-                                         }
-                                     }];
+                              completionHandler:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable response,
+                                  NSError * _Nullable error) {
+                                  // TODO: UpdateFabricLabel can return errors
+                                  // via the NOCResponse response, but that
+                                  // seems like a spec bug that should be fixed
+                                  // in the spec.
+                                  if (error) {
+                                      NSLog(@"Error trying to updateFabricLabel %@", error);
+                                      dispatch_async(dispatch_get_main_queue(), ^{
+                                          self->_updateFabricLabelTextField.text = @"";
+                                          [self updateResult:[NSString
+                                                                 stringWithFormat:@"Command updateFabricLabel failed with error %@",
+                                                                 error]
+                                                     isError:YES];
+                                      });
+                                  } else {
+                                      NSLog(@"Successfully updated the label: %@", response);
+                                      dispatch_async(dispatch_get_main_queue(), ^{
+                                          self->_updateFabricLabelTextField.text = @"";
+                                          [self updateResult:[NSString
+                                                                 stringWithFormat:
+                                                                     @"Command updateFabricLabel succeeded to update label to %@",
+                                                                 label]
+                                                     isError:NO];
+                                          [self fetchFabricsList];
+                                      });
+                                  }
+                              }];
             } else {
                 [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"] isError:YES];
             }
@@ -460,25 +460,24 @@
                            isError:NO];
                 MTRBaseClusterOperationalCredentials * opCredsCluster =
                     [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:chipDevice
-                                                                        endpoint:@(0)
+                                                                        endpoint:0
                                                                            queue:dispatch_get_main_queue()];
                 MTROperationalCredentialsClusterRemoveFabricParams * params =
                     [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];
                 params.fabricIndex = fabricIndex;
                 [opCredsCluster
                     removeFabricWithParams:params
-                                completion:^(
-                                    MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error) {
-                                    if (!error) {
-                                        if (fabricIndex == self.currentFabricIndex) {
-                                            MTRSetDevicePaired(MTRGetLastPairedDeviceId(), NO);
-                                        }
-                                    }
-                                    [self
-                                        updateResult:[NSString stringWithFormat:@"Finished removing fabric Index %@ with Error :%@",
-                                                               fabricIndex, error]
-                                             isError:error];
-                                }];
+                         completionHandler:^(
+                             MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error) {
+                             if (!error) {
+                                 if (fabricIndex == self.currentFabricIndex) {
+                                     MTRSetDevicePaired(MTRGetLastPairedDeviceId(), NO);
+                                 }
+                             }
+                             [self updateResult:[NSString stringWithFormat:@"Finished removing fabric Index %@ with Error :%@",
+                                                          fabricIndex, error]
+                                        isError:error];
+                         }];
             } else {
                 [self updateResult:[NSString stringWithFormat:@"Failed to establish a connection with the device"] isError:YES];
             }

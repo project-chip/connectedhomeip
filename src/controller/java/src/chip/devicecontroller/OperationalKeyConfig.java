@@ -1,6 +1,6 @@
 package chip.devicecontroller;
 
-import androidx.annotation.Nullable;
+import javax.annotation.Nullable;
 
 /** Represents a set of operating credentials for a ChipDeviceController. */
 public final class OperationalKeyConfig {

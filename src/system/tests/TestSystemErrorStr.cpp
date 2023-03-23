@@ -97,7 +97,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestSystemErrorStr(void)
+int TestSystemErrorStr()
 {
     // clang-format off
     nlTestSuite theSuite =

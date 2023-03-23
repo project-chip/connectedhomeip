@@ -35,7 +35,7 @@ int BoltLockManager::Init()
     if (NULL == mTimerHandle)
     {
         PLAT_LOG("failed to create bolt lock timer");
-        while (1)
+        while (true)
             ;
     }
 

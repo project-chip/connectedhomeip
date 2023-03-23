@@ -19,9 +19,6 @@ leak:drbg_bytes
 # TODO: OpenSSL ERR_get_state seems to leak.
 leak:ERR_get_state
 
-# TODO: https://github.com/project-chip/connectedhomeip/issues/22333
-leak:[MTRBaseCluster* subscribeAttribute*WithParams:subscriptionEstablished:reportHandler:]
-
 #TODO: Figure out why nw_path_monitor_create leaks. The leak can be reproduced using:
 # -- testFile.cpp
 #

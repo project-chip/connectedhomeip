@@ -745,97 +745,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
 } // namespace OperationalCredentials
 
-namespace Scenes {
-
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
-{
-    CHIP_ERROR TLVError = CHIP_NO_ERROR;
-    bool wasHandled     = false;
-    {
-        switch (aCommandPath.mCommandId)
-        {
-        case Commands::AddScene::Id: {
-            Commands::AddScene::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfScenesClusterAddSceneCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::ViewScene::Id: {
-            Commands::ViewScene::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfScenesClusterViewSceneCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::RemoveScene::Id: {
-            Commands::RemoveScene::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfScenesClusterRemoveSceneCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::RemoveAllScenes::Id: {
-            Commands::RemoveAllScenes::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfScenesClusterRemoveAllScenesCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::StoreScene::Id: {
-            Commands::StoreScene::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfScenesClusterStoreSceneCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::RecallScene::Id: {
-            Commands::RecallScene::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfScenesClusterRecallSceneCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::GetSceneMembership::Id: {
-            Commands::GetSceneMembership::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfScenesClusterGetSceneMembershipCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
-                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
-        }
-        }
-    }
-
-    if (CHIP_NO_ERROR != TLVError || !wasHandled)
-    {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
-        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
-    }
-}
-
-} // namespace Scenes
-
 namespace SoftwareDiagnostics {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
@@ -990,9 +899,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
         break;
     case Clusters::OperationalCredentials::Id:
         Clusters::OperationalCredentials::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
-        break;
-    case Clusters::Scenes::Id:
-        Clusters::Scenes::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::SoftwareDiagnostics::Id:
         Clusters::SoftwareDiagnostics::DispatchServerCommand(apCommandObj, aCommandPath, aReader);

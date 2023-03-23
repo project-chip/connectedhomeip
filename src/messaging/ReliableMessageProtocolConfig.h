@@ -39,7 +39,7 @@ namespace chip {
  *    subsequent failures in milliseconds.
  *
  *  This is the default value, that might be adjusted by end device depending on its
- *  needs (e.g. sleeping period) using Service Discovery TXT record CRA key.
+ *  needs (e.g. sleeping period) using Service Discovery TXT record SAI key.
  *
  */
 #ifndef CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
@@ -54,10 +54,10 @@ namespace chip {
  *    failure in milliseconds.
  *
  * This is the default value, that might be adjusted by end device depending on its
- * needs (e.g. sleeping period) using Service Discovery TXT record CRI key.
+ * needs (e.g. sleeping period) using Service Discovery TXT record SII key.
  */
 #ifndef CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-#define CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL (5000_ms32)
+#define CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL (300_ms32)
 #endif // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
 
 /**
@@ -155,6 +155,21 @@ ReliableMessageProtocolConfig GetDefaultMRPConfig();
  *          use it when communicating with us.
  */
 Optional<ReliableMessageProtocolConfig> GetLocalMRPConfig();
+
+/**
+ * @brief
+ * Returns the maximum transmission time depending on the last activity time.
+ *
+ * @param[in] activeInterval    The active interval to use for the backoff calculation.
+ * @param[in] idleInterval      The idle interval to use for the backoff calculation.
+ * @param[in] lastActivityTime  The last time some activity has been recorded.
+ * @param[in] activityThreshold The activity threshold for a node to be considered active.
+ *
+ * @return The maximum transmission time
+ */
+System::Clock::Timestamp GetRetransmissionTimeout(System::Clock::Timestamp activeInterval, System::Clock::Timestamp idleInterval,
+                                                  System::Clock::Timestamp lastActivityTime,
+                                                  System::Clock::Timestamp activityThreshold);
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
 

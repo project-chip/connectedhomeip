@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/third_party/simw-top-mini/simw_config.gni")
 
 config("se05x_config") {
@@ -26,12 +27,16 @@ config("se05x_config") {
 
   #defines += ["FLOW_VERBOSE"]
 
-  if (host == "host_k32w") {
+  if (chip_device_platform == "k32w0") {
     defines += [
       "AX_EMBEDDED",
       "LPC_K32W",
       "SDK_OS_FREE_RTOS=1",
     ]
+  }
+
+  if (chip_rpi_se05x_t4t_demo == 1) {
+    defines += [ "CHIP_RPI_SE05X_T4T_DEMO" ]
   }
 
   include_dirs = [
@@ -49,7 +54,7 @@ config("se05x_config") {
     "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/inc",
     "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/smCom",
   ]
-  if (host == "host_k32w") {
+  if (chip_device_platform == "k32w0") {
     include_dirs += [
       "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/boards/DK6/wireless_examples/chip",
       "${chip_root}/third_party/simw-top-mini/repo/demos/ksdk/common/freertos/boards/DK6",
@@ -66,6 +71,7 @@ source_set("se05x") {
     "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/infra/sm_printf.c",
     "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/log/nxLog.c",
     "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/smCom/smCom.c",
+    "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/generic/se05x_t4t_utils.cpp",
     "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/rsp/se05x_reset.c",
     "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/se05x/src/se05x_ECC_curves.c",
     "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/se05x/src/se05x_mw.c",
@@ -93,12 +99,12 @@ source_set("se05x") {
     "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/libCommon/smCom/smComT1oI2C.c",
   ]
 
-  if (host == "host_k32w") {
+  if (chip_device_platform == "k32w0") {
     sources += [
       "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/ksdk/i2c_dk6.c",
       "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/ksdk/timer_kinetis_freertos.c",
     ]
-  } else if (host == "host_linux") {
+  } else if (chip_device_platform == "linux") {
     sources += [
       "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/generic/sm_timer.c",
       "${chip_root}/third_party/simw-top-mini/repo/hostlib/hostLib/platform/linux/i2c_a7.c",

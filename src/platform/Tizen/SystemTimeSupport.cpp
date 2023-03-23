@@ -23,15 +23,19 @@
  *          time/clock functions that are suitable for use on the Tizen platform.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-
-#include <lib/support/TimeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
-
-#include <chrono>
-#include <errno.h>
-#include <inttypes.h>
 #include <sys/time.h>
+
+#include <cerrno>
+#include <chrono>
+#include <cstdint>
+#include <ctime>
+
+#include <core/CHIPBuildConfig.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemClock.h>
+#include <system/SystemConfig.h>
+#include <system/SystemError.h>
 
 namespace chip {
 namespace System {

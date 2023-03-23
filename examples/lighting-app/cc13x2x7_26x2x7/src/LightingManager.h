@@ -66,11 +66,20 @@ private:
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
 
+<<<<<<< HEAD:examples/lighting-app/cc13x2x7_26x2x7/src/LightingManager.h
+=======
+    bool mAutoTurnOff;
+    uint32_t mAutoTurnOffDuration;
+    bool mAutoTurnOffTimerArmed;
+    bool mOffEffectArmed;
+
+>>>>>>> refs/tags/v1.0.0.2:examples/lighting-app/silabs/efr32/include/LightingManager.h
     void CancelTimer(void);
     void StartTimer(uint32_t aTimeoutMs);
 
     static void TimerEventHandler(TimerHandle_t xTimer);
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
+    static void OffEffectTimerEventHandler(AppEvent * aEvent);
 
     static LightingManager sLight;
 };

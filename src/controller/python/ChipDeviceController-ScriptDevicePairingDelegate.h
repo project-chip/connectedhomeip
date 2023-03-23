@@ -26,13 +26,14 @@
 #pragma once
 
 #include <controller/CHIPDeviceController.h>
+#include <controller/python/chip/native/PyChipError.h>
 
 namespace chip {
 namespace Controller {
 
 extern "C" {
-typedef void (*DevicePairingDelegate_OnPairingCompleteFunct)(ChipError::StorageType err);
-typedef void (*DevicePairingDelegate_OnCommissioningCompleteFunct)(NodeId nodeId, ChipError::StorageType err);
+typedef void (*DevicePairingDelegate_OnPairingCompleteFunct)(PyChipError err);
+typedef void (*DevicePairingDelegate_OnCommissioningCompleteFunct)(NodeId nodeId, PyChipError err);
 
 // Used for testing by OpCredsBinding
 typedef void (*DevicePairingDelegate_OnCommissioningSuccessFunct)(PeerId peerId);

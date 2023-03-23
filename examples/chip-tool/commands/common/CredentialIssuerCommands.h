@@ -19,11 +19,17 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <vector>
+
+namespace chip {
+namespace Controller {
+struct SetupParams;
+class OperationalCredentialsDelegate;
+} // namespace Controller
+} // namespace chip
 
 class CredentialIssuerCommands
 {

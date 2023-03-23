@@ -27,9 +27,6 @@ clang-apply-replacements out/fixes.yaml
 
 """
 
-import build
-import click
-import coloredlogs
 import glob
 import json
 import logging
@@ -43,6 +40,9 @@ import sys
 import tempfile
 import threading
 import traceback
+
+import click
+import coloredlogs
 import yaml
 
 
@@ -483,4 +483,4 @@ def cmd_fix(context):
 
 
 if __name__ == "__main__":
-    main()
+    main(auto_envvar_prefix='CHIP')

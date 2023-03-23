@@ -48,6 +48,9 @@ typedef void (*OperationalCredentialsFabricsListAttributeCallback)(
         chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & data);
 typedef void (*OperationalCredentialsTrustedRootCertificatesListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
+typedef void (*FixedLabelLabelListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & data);
 typedef void (*ModeSelectSupportedModesListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & data);

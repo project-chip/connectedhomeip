@@ -94,8 +94,8 @@ struct ChipBLEDeviceIdentificationInfo
     void SetDeviceDiscriminator(uint16_t deviceDiscriminator)
     {
         // Discriminator is 12-bit long, so don't overwrite bits 12th through 15th
-        deviceDiscriminator &= kDiscriminatorMask;
-        deviceDiscriminator |= static_cast<uint16_t>(DeviceDiscriminatorAndAdvVersion[1] << 8u & ~kDiscriminatorMask);
+        auto advVersion     = static_cast<uint16_t>(DeviceDiscriminatorAndAdvVersion[1] << 8u & ~kDiscriminatorMask);
+        deviceDiscriminator = static_cast<uint16_t>(advVersion | (deviceDiscriminator & kDiscriminatorMask));
         chip::Encoding::LittleEndian::Put16(DeviceDiscriminatorAndAdvVersion, deviceDiscriminator);
     }
 

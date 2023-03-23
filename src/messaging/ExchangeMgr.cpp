@@ -358,7 +358,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     }
 
     SendStandaloneAckIfNeeded(packetHeader, payloadHeader, session, msgFlags, std::move(msgBuf));
-    return;
 }
 
 void ExchangeManager::SendStandaloneAckIfNeeded(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
@@ -394,7 +393,6 @@ void ExchangeManager::SendStandaloneAckIfNeeded(const PacketHeader & packetHeade
     }
 
     // The exchange should be closed inside HandleMessage function. So don't bother close it here.
-    return;
 }
 
 void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * delegate)

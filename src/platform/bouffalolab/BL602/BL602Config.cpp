@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2019 Nest Labs, Inc.
  *    All rights reserved.
@@ -149,7 +149,7 @@ CHIP_ERROR BL602Config::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
     SuccessOrExit(err);
 
     outLen = ret;
-    strncpy(buf, tmpVal, outLen);
+    Platform::CopyString(buf, outLen, tmpVal);
 
 exit:
     return err;
@@ -216,7 +216,7 @@ CHIP_ERROR BL602Config::WriteConfigValue(Key key, uint64_t val)
     EfErrCode ret = ef_set_env_blob(key.name, &val, sizeof(val));
     if (ret != EF_NO_ERR)
     {
-        log_error("WriteConfigValue() failed. key: %s, ret: %d\r\n", key.name, ret);
+        log_error("WriteConfigValue() failed. key: %s, ret: %d\r\n", StringOrNullMarker(key.name), ret);
         err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
     SuccessOrExit(err);
@@ -261,7 +261,7 @@ CHIP_ERROR BL602Config::WriteConfigValueStr(Key key, const char * str, size_t st
     {
         strCopy.Calloc(strLen + 1);
         VerifyOrExit(strCopy, err = CHIP_ERROR_NO_MEMORY);
-        strncpy(strCopy.Get(), str, strLen);
+        Platform::CopyString(strCopy.Get(), strLen + 1, str);
     }
     err = BL602Config::WriteConfigValueStr(key, strCopy.Get());
 
@@ -339,7 +339,7 @@ CHIP_ERROR BL602Config::ClearConfigValue(Key key)
 
     SuccessOrExit(err);
 
-    ChipLogProgress(DeviceLayer, "Easyflash erase: %s", key.name);
+    ChipLogProgress(DeviceLayer, "Easyflash erase: %s", StringOrNullMarker(key.name));
 
 exit:
     return err;

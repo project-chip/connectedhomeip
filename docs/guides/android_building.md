@@ -33,7 +33,7 @@ There are following Apps on Android
 
 ## Source files
 
-You can find source files of the Android applications in the `src/android/`
+You can find source files of the Android applications in the `examples/android/`
 directory.
 
 <hr>
@@ -169,7 +169,7 @@ which allows us to directly edit core Matter code in-IDE.
 2. Modify the `matterSdkSourceBuild` variable to true, `matterBuildSrcDir` point
    to the appropriate output directory (e.g. `../../../../out/android_arm64`),
    and `matterSourceBuildAbiFilters` to the desired ABIs in
-   [src/android/CHIPTool/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTool/gradle.properties)
+   [examples/android/CHIPTool/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/examples/android/CHIPTool/gradle.properties)
 
 3) Open the project in Android Studio and run **File -> Sync Project with Gradle
    Files**.
@@ -180,21 +180,22 @@ which allows us to directly edit core Matter code in-IDE.
     - Run the following command in the command line:
 
         ```shell
-        cd src/android/CHIPTool
+        cd examples/android/CHIPTool
         ./gradlew build
         ```
 
 The debug Android package `app-debug.apk` will be generated at
-`src/android/CHIPTool/app/build/outputs/apk/debug/`, and can be installed with
+`examples/android/CHIPTool/app/build/outputs/apk/debug/`, and can be installed
+with
 
 ```shell
-adb install src/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
+adb install examples/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
 ```
 
 or
 
 ```shell
-(cd src/android/CHIPTool && ./gradlew installDebug)
+(cd examples/android/CHIPTool && ./gradlew installDebug)
 ```
 
 <a name="building-chiptest-scripts"></a>
@@ -209,5 +210,5 @@ Currently, the CHIPTest can only be built from scripts. The steps are similar to
 ```
 
 You can modify the `matterUTestLib` variable to the test lib in
-[src/android/CHIPTest/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTest/gradle.properties)
+[examples/android/CHIPTest/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/examples/android/CHIPTest/gradle.properties)
 to change target to test.

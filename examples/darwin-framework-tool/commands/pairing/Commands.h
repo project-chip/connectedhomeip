@@ -22,6 +22,7 @@
 
 #include "OpenCommissioningWindowCommand.h"
 #include "PairingCommandBridge.h"
+#include "PrepareCommissioningCommand.h"
 
 class PairCode : public PairingCommandBridge
 {
@@ -71,6 +72,7 @@ void registerCommandsPairing(Commands & commands)
         make_unique<PairBleThread>(),
         make_unique<Unpair>(),
         make_unique<OpenCommissioningWindowCommand>(),
+        make_unique<PrepareCommissioningCommand>(),
     };
 
     commands.Register(clusterName, clusterCommands);

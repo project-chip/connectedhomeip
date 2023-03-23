@@ -115,7 +115,8 @@ static void _logSSLError()
         const char * err_str_reason  = ERR_reason_error_string(static_cast<libssl_err_type>(ssl_err_code));
         if (err_str_lib)
         {
-            ChipLogError(Crypto, " ssl err  %s %s %s\n", err_str_lib, err_str_routine, err_str_reason);
+            ChipLogError(Crypto, " ssl err  %s %s %s\n", StringOrNullMarker(err_str_lib), StringOrNullMarker(err_str_routine),
+                         StringOrNullMarker(err_str_reason));
         }
 #endif // CHIP_ERROR_LOGGING
         ssl_err_code = ERR_get_error();
@@ -1019,7 +1020,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR P256Keypair::Initialize()
+CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
 {
     ERR_clear_error();
 
@@ -1673,7 +1674,8 @@ CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, Attestation
                 {
                     bool keyCertSignFlag = keyUsage & X509v3_KU_KEY_CERT_SIGN;
                     bool crlSignFlag     = keyUsage & X509v3_KU_CRL_SIGN;
-                    bool otherFlags      = keyUsage & ~(X509v3_KU_CRL_SIGN | X509v3_KU_KEY_CERT_SIGN | X509v3_KU_DIGITAL_SIGNATURE);
+                    bool otherFlags      = keyUsage &
+                        ~static_cast<uint32_t>(X509v3_KU_CRL_SIGN | X509v3_KU_KEY_CERT_SIGN | X509v3_KU_DIGITAL_SIGNATURE);
                     VerifyOrExit(keyCertSignFlag && crlSignFlag && !otherFlags, err = CHIP_ERROR_INTERNAL);
                 }
             }

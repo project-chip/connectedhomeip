@@ -30,11 +30,11 @@ public:
     TestRunner(const char * name, uint16_t testCount) : mTestName(name), mTestCount(testCount), mTestIndex(0) {}
     virtual ~TestRunner(){};
 
-    void LogStart() { ChipLogProgress(chipTool, " ***** Test Start : %s\n", mTestName); }
+    void LogStart() { ChipLogProgress(chipTool, " ***** Test Start : %s\n", StringOrNullMarker(mTestName)); }
 
     void LogStep(uint32_t stepNumber, const char * stepName)
     {
-        ChipLogProgress(chipTool, " ***** Test Step %u : %s\n", stepNumber, stepName);
+        ChipLogProgress(chipTool, " ***** Test Step %u : %s\n", stepNumber, StringOrNullMarker(stepName));
     }
 
     void LogEnd(std::string message, CHIP_ERROR err)

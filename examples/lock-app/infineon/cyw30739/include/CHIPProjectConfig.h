@@ -34,13 +34,13 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME "Infineon"
 
 /* The VendorID attribute of the Basic cluster. */
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF1
+#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0xFFF2
 
 /* The ProductName attribute of the Basic cluster. */
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME "CYW30739 Lock App"
 
 /* The ProductID attribute of the Basic cluster. */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8006
+#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8002
 
 /* The HardwareVersionString attribute of the Basic cluster. */
 #define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING "30739"

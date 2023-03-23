@@ -112,7 +112,7 @@ int TestReferenceCounted_Teardown(void * inContext)
     return SUCCESS;
 }
 
-int TestReferenceCounted(void)
+int TestReferenceCounted()
 {
     // clang-format off
     nlTestSuite theSuite =

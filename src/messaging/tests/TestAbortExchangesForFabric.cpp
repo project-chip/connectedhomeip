@@ -55,10 +55,8 @@ public:
     bool mOnMessageReceivedCalled = false;
 };
 
-void CheckAbortAllButOneExchange(nlTestSuite * inSuite, void * inContext)
+void CommonCheckAbortAllButOneExchange(nlTestSuite * inSuite, TestContext & ctx, bool dropResponseMessages)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
     // We want to have two sessions using the same fabric id that we use for
     // creating our exchange contexts.  That lets us test exchanges on the same
     // session as the "special exchange" as well as on other sessions.
@@ -68,29 +66,32 @@ void CheckAbortAllButOneExchange(nlTestSuite * inSuite, void * inContext)
     // doing.
     // TODO: These should really be CASE sessions...
     SessionHolder session1;
-    CHIP_ERROR err =
-        sessionManager.InjectPaseSessionWithTestKey(session1, 100, ctx.GetBobFabric()->GetNodeId(), 101, ctx.GetAliceFabricIndex(),
-                                                    ctx.GetBobAddress(), CryptoContext::SessionRole::kInitiator);
+    CHIP_ERROR err = sessionManager.InjectCaseSessionWithTestKey(session1, 100, 101, ctx.GetAliceFabric()->GetNodeId(),
+                                                                 ctx.GetBobFabric()->GetNodeId(), ctx.GetAliceFabricIndex(),
+                                                                 ctx.GetBobAddress(), CryptoContext::SessionRole::kInitiator, {});
+
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SessionHolder session1Reply;
-    err = sessionManager.InjectPaseSessionWithTestKey(session1Reply, 101, ctx.GetAliceFabric()->GetNodeId(), 100,
-                                                      ctx.GetBobFabricIndex(), ctx.GetAliceAddress(),
-                                                      CryptoContext::SessionRole::kResponder);
+    err = sessionManager.InjectCaseSessionWithTestKey(session1Reply, 101, 100, ctx.GetBobFabric()->GetNodeId(),
+                                                      ctx.GetAliceFabric()->GetNodeId(), ctx.GetBobFabricIndex(),
+                                                      ctx.GetAliceAddress(), CryptoContext::SessionRole::kResponder, {});
+
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // TODO: Ideally this would go to a different peer, but we don't have that
     // set up right now: only Alice and Bob have useful node ids and whatnot.
     SessionHolder session2;
-    err =
-        sessionManager.InjectPaseSessionWithTestKey(session2, 200, ctx.GetBobFabric()->GetNodeId(), 201, ctx.GetAliceFabricIndex(),
-                                                    ctx.GetBobAddress(), CryptoContext::SessionRole::kInitiator);
+    err = sessionManager.InjectCaseSessionWithTestKey(session2, 200, 201, ctx.GetAliceFabric()->GetNodeId(),
+                                                      ctx.GetBobFabric()->GetNodeId(), ctx.GetAliceFabricIndex(),
+                                                      ctx.GetBobAddress(), CryptoContext::SessionRole::kInitiator, {});
+
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SessionHolder session2Reply;
-    err = sessionManager.InjectPaseSessionWithTestKey(session2Reply, 201, ctx.GetAliceFabric()->GetNodeId(), 200,
-                                                      ctx.GetBobFabricIndex(), ctx.GetAliceAddress(),
-                                                      CryptoContext::SessionRole::kResponder);
+    err = sessionManager.InjectCaseSessionWithTestKey(session2Reply, 101, 100, ctx.GetBobFabric()->GetNodeId(),
+                                                      ctx.GetAliceFabric()->GetNodeId(), ctx.GetBobFabricIndex(),
+                                                      ctx.GetAliceAddress(), CryptoContext::SessionRole::kResponder, {});
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     auto & exchangeMgr = ctx.GetExchangeManager();
@@ -160,6 +161,12 @@ void CheckAbortAllButOneExchange(nlTestSuite * inSuite, void * inContext)
     const auto & sessionHandle1 = session1.Get();
     const auto & sessionHandle2 = session2.Get();
 
+    session1->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+        Test::MessagingContext::kResponsiveIdleRetransTimeout, Test::MessagingContext::kResponsiveActiveRetransTimeout));
+
+    session1Reply->AsSecureSession()->SetRemoteMRPConfig(ReliableMessageProtocolConfig(
+        Test::MessagingContext::kResponsiveIdleRetransTimeout, Test::MessagingContext::kResponsiveActiveRetransTimeout));
+
     NL_TEST_ASSERT(inSuite, session1);
     NL_TEST_ASSERT(inSuite, session2);
     auto * specialExhange = exchangeMgr.NewContext(session1.Get().Value(), &delegate);
@@ -183,15 +190,49 @@ void CheckAbortAllButOneExchange(nlTestSuite * inSuite, void * inContext)
     // Should be waiting for an ack now.
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
-    ctx.DrainAndServiceIO();
+    if (dropResponseMessages)
+    {
+        //
+        // This version of the test allows us to validate logic that marks expired sessions as defunct
+        // on encountering an MRP failure.
+        //
+        loopback.mNumMessagesToDrop   = Test::LoopbackTransport::kUnlimitedMessageCount;
+        loopback.mDroppedMessageCount = 0;
+
+        //
+        // We've set the session into responsive mode by altering the MRP intervals, so we should be able to
+        // trigger a MRP failure due to timing out waiting for an ACK.
+        //
+        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1000), [&]() { return false; });
+    }
+    else
+    {
+        ctx.DrainAndServiceIO();
+    }
 
     // Should not get an app-level response, since we are not expecting one.
     NL_TEST_ASSERT(inSuite, !delegate.mOnMessageReceivedCalled);
+
     // We should have gotten our ack.
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 
     waitingForSend1->Close();
     waitingForSend2->Close();
+
+    loopback.mNumMessagesToDrop   = 0;
+    loopback.mDroppedMessageCount = 0;
+}
+
+void CheckAbortAllButOneExchange(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    CommonCheckAbortAllButOneExchange(inSuite, ctx, false);
+}
+
+void CheckAbortAllButOneExchangeResponseTimeout(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    CommonCheckAbortAllButOneExchange(inSuite, ctx, true);
 }
 
 // Test Suite
@@ -202,7 +243,8 @@ void CheckAbortAllButOneExchange(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 const nlTest sTests[] =
 {
-    NL_TEST_DEF("Test aborting all but one exchange",         CheckAbortAllButOneExchange),
+    NL_TEST_DEF("Test aborting all but one exchange",                       CheckAbortAllButOneExchange),
+    NL_TEST_DEF("Test aborting all but one exchange + response timeout",    CheckAbortAllButOneExchangeResponseTimeout),
 
     NL_TEST_SENTINEL()
 };

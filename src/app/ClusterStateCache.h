@@ -483,6 +483,12 @@ public:
         mEventStatusCache.clear();
     }
 
+    /*
+     *  Get the last concrete report data path, if path is not concrete cluster path, return CHIP_ERROR_NOT_FOUND
+     *
+     */
+    CHIP_ERROR GetLastReportDataPath(ConcreteClusterPath & aPath);
+
 private:
     using AttributeState = Variant<Platform::ScopedMemoryBufferWithSize<uint8_t>, StatusIB>;
     // mPendingDataVersion represents a tentative data version for a cluster that we have gotten some reports for.
@@ -589,6 +595,11 @@ private:
     virtual CHIP_ERROR OnUpdateDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                                      const Span<AttributePathParams> & aAttributePaths,
                                                      bool & aEncodedDataVersionList) override;
+
+    void OnUnsolicitedMessageFromPublisher(ReadClient * apReadClient) override
+    {
+        return mCallback.OnUnsolicitedMessageFromPublisher(apReadClient);
+    }
 
     // Commit the pending cluster data version, if there is one.
     void CommitPendingDataVersion();

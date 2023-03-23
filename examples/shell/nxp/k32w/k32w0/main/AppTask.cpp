@@ -32,7 +32,6 @@
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
 #include "Keyboard.h"

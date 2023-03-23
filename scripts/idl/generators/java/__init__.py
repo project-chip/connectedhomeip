@@ -14,7 +14,7 @@
 # limitations under the License.
 
 from idl.generators import CodeGenerator, GeneratorStorage
-from idl.matter_idl_types import Idl, ClusterSide, Field, Attribute, Cluster, FieldAttribute, Command, DataType
+from idl.matter_idl_types import Idl, ClusterSide, Field, Attribute, Cluster, FieldQuality, Command, DataType
 from idl import matter_idl_types
 from idl.generators.types import ParseDataType, BasicString, BasicInteger, FundamentalType, IdlType, IdlEnumType, IdlBitmapType, TypeLookupContext
 from typing import Union, List, Set
@@ -31,10 +31,10 @@ def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, No
     if field.is_list:
         return None  # lists are always specific per cluster
 
-    if FieldAttribute.NULLABLE in field.attributes:
+    if FieldQuality.NULLABLE & field.qualities:
         return None
 
-    if FieldAttribute.OPTIONAL in field.attributes:
+    if FieldQuality.OPTIONAL & field.qualities:
         return None
 
     actual = ParseDataType(field.data_type, context)

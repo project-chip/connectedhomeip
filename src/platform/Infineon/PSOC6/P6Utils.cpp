@@ -627,7 +627,7 @@ static void ping_socket()
     LWIP_ASSERT("setting receive timeout failed", ret == 0);
     LWIP_UNUSED_ARG(ret);
 
-    while (1)
+    while (true)
     {
         if (ping_send(s, ping_target) == ERR_OK)
         {

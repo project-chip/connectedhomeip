@@ -35,8 +35,8 @@
     /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
-    /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic, Attribute: Location, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     49, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -56,8 +56,8 @@
     /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
-    /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic, Attribute: Location, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     1, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -77,8 +77,8 @@
     /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
-    /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic, Attribute: Location, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -97,8 +97,8 @@
     6, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
     8, /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: manage */ \
     31, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    40, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
-    40, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
+    40, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
+    40, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     63, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
@@ -109,8 +109,8 @@
     16387, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
     16384, /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: manage */ \
     0, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    5, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
-    6, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
+    5, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
+    6, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
@@ -121,8 +121,8 @@
     kMatterAccessPrivilegeManage, /* Cluster: On/Off, Attribute: StartUpOnOff, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \

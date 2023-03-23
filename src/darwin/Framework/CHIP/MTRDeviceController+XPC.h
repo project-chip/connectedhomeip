@@ -41,7 +41,7 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  * way
  */
 + (MTRDeviceController *)sharedControllerWithID:(id<NSCopying> _Nullable)controllerID
-                                xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock;
+                                xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock MTR_NEWLY_AVAILABLE;
 
 /**
  * Returns an encoded values object to send over XPC for read, write and command interactions
@@ -68,24 +68,28 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
 /**
  * Returns a serialized subscribe parameter object to send over XPC
  */
-+ (NSDictionary<NSString *, id> *)encodeXPCSubscribeParams:(MTRSubscribeParams *)params;
++ (NSDictionary<NSString *, id> * _Nullable)encodeXPCSubscribeParams:(MTRSubscribeParams * _Nullable)params;
 
 /**
  * Returns a deserialized subscribe parameter object from an object received over XPC
  */
-+ (MTRSubscribeParams *)decodeXPCSubscribeParams:(NSDictionary<NSString *, id> *)params;
++ (MTRSubscribeParams * _Nullable)decodeXPCSubscribeParams:(NSDictionary<NSString *, id> * _Nullable)params;
 
 @end
+
 /**
  * Protocol that remote object must support over XPC
  */
 @protocol MTRDeviceControllerServerProtocol <NSObject>
 
+@optional
 /**
  * Gets device controller ID corresponding to a specific fabric ID
  */
-- (void)getDeviceControllerWithFabricID:(NSNumber *)fabricID completion:(MTRDeviceControllerGetterHandler)completion;
+- (void)getDeviceControllerWithFabricId:(uint64_t)fabricId
+                             completion:(MTRDeviceControllerGetterHandler)completion MTR_NEWLY_DEPRECATED("This never called.");
 
+@required
 /**
  * Gets any available device controller ID
  */
@@ -95,10 +99,10 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  * Requests reading attribute
  */
 - (void)readAttributeWithController:(id _Nullable)controller
-                             nodeID:(NSNumber *)nodeID
-                         endpointID:(NSNumber * _Nullable)endpointID
-                          clusterID:(NSNumber * _Nullable)clusterID
-                        attributeID:(NSNumber * _Nullable)attributeID
+                             nodeId:(uint64_t)nodeId
+                         endpointId:(NSNumber * _Nullable)endpointId
+                          clusterId:(NSNumber * _Nullable)clusterId
+                        attributeId:(NSNumber * _Nullable)attributeId
                              params:(NSDictionary<NSString *, id> * _Nullable)params
                          completion:(MTRValuesHandler)completion;
 
@@ -106,10 +110,10 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  * Requests writing attribute
  */
 - (void)writeAttributeWithController:(id _Nullable)controller
-                              nodeID:(NSNumber *)nodeID
-                          endpointID:(NSNumber *)endpointID
-                           clusterID:(NSNumber *)clusterID
-                         attributeID:(NSNumber *)attributeID
+                              nodeId:(uint64_t)nodeId
+                          endpointId:(NSNumber *)endpointId
+                           clusterId:(NSNumber *)clusterId
+                         attributeId:(NSNumber *)attributeId
                                value:(id)value
                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
                           completion:(MTRValuesHandler)completion;
@@ -118,48 +122,54 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  * Requests invoking command
  */
 - (void)invokeCommandWithController:(id _Nullable)controller
-                             nodeID:(NSNumber *)nodeID
-                         endpointID:(NSNumber *)endpointID
-                          clusterID:(NSNumber *)clusterID
-                          commandID:(NSNumber *)commandID
+                             nodeId:(uint64_t)nodeId
+                         endpointId:(NSNumber *)endpointId
+                          clusterId:(NSNumber *)clusterId
+                          commandId:(NSNumber *)commandId
                              fields:(id)fields
                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
                          completion:(MTRValuesHandler)completion;
 
 /**
- * Requests subscribing attribute
+ * Requests subscribing attribute.  The minInterval/maxInterval arguments
+ * override whatever intervals might be present in params.
  */
 - (void)subscribeAttributeWithController:(id _Nullable)controller
-                                  nodeID:(NSNumber *)nodeID
-                              endpointID:(NSNumber * _Nullable)endpointID
-                               clusterID:(NSNumber * _Nullable)clusterID
-                             attributeID:(NSNumber * _Nullable)attributeID
-                                  params:(NSDictionary<NSString *, id> *)params
+                                  nodeId:(uint64_t)nodeId
+                              endpointId:(NSNumber * _Nullable)endpointId
+                               clusterId:(NSNumber * _Nullable)clusterId
+                             attributeId:(NSNumber * _Nullable)attributeId
+                             minInterval:(NSNumber *)minInterval
+                             maxInterval:(NSNumber *)maxInterval
+                                  params:(NSDictionary<NSString *, id> * _Nullable)params
                       establishedHandler:(dispatch_block_t)establishedHandler;
 
 /**
  * Requests to stop reporting
  */
-- (void)stopReportsWithController:(id _Nullable)controller nodeID:(NSNumber *)nodeID completion:(dispatch_block_t)completion;
+- (void)stopReportsWithController:(id _Nullable)controller nodeId:(uint64_t)nodeId completion:(dispatch_block_t)completion;
 
 /**
- * Requests subscription of all attributes.
+ * Requests subscription of all attributes.  The minInterval/maxInterval
+ * arguments override whatever intervals might be present in params.
  */
 - (void)subscribeWithController:(id _Nullable)controller
-                         nodeID:(NSNumber *)nodeID
-                         params:(NSDictionary<NSString *, id> *)params
+                         nodeId:(uint64_t)nodeId
+                    minInterval:(NSNumber *)minInterval
+                    maxInterval:(NSNumber *)maxInterval
+                         params:(NSDictionary<NSString *, id> * _Nullable)params
                     shouldCache:(BOOL)shouldCache
                      completion:(MTRStatusCompletion)completion;
 
 /**
  * Requests reading attribute cache
  */
-- (void)readClusterStateCacheWithController:(id _Nullable)controller
-                                     nodeID:(NSNumber *)nodeID
-                                 endpointID:(NSNumber * _Nullable)endpointID
-                                  clusterID:(NSNumber * _Nullable)clusterID
-                                attributeID:(NSNumber * _Nullable)attributeID
-                                 completion:(MTRValuesHandler)completion;
+- (void)readAttributeCacheWithController:(id _Nullable)controller
+                                  nodeId:(uint64_t)nodeId
+                              endpointId:(NSNumber * _Nullable)endpointId
+                               clusterId:(NSNumber * _Nullable)clusterId
+                             attributeId:(NSNumber * _Nullable)attributeId
+                              completion:(MTRValuesHandler)completion;
 
 @end
 
@@ -172,9 +182,17 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  * Handles a report received by a device controller
  */
 - (void)handleReportWithController:(id _Nullable)controller
-                            nodeID:(NSNumber *)nodeID
+                            nodeId:(uint64_t)nodeId
                             values:(id _Nullable)values
                              error:(NSError * _Nullable)error;
+
+@end
+
+@interface MTRDeviceController (Deprecated_XPC)
+
++ (MTRDeviceController *)sharedControllerWithId:(id<NSCopying> _Nullable)controllerID
+                                xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock
+    MTR_NEWLY_DEPRECATED("Please use sharedControllerWithID:xpcConnectBlock:");
 
 @end
 

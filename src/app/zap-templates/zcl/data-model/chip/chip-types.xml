@@ -53,7 +53,6 @@ limitations under the License.
     <type id="0x44" description="Long Character String"    name="long_char_string"            composite="true"/>
     <type id="0xE0" description="Time of day"              name="tod"               size="4"  analog="true"   />
     <type id="0xE1" description="Date"                     name="date"              size="4"  analog="true"   />
-    <type id="0xE2" description="UTC Time"                 name="utc"               size="4"  analog="true"   />
     <type id="0xE3" description="Epoch Microseconds"       name="epoch_us"          size="8"  analog="true"   />
     <type id="0xE4" description="Epoch Seconds"            name="epoch_s"           size="4"  analog="true"   />
     <type id="0xE5" description="System Time Microseconds" name="systime_us"        size="8"  analog="true"   />

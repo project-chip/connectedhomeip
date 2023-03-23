@@ -330,6 +330,21 @@ CHIP_ERROR FactoryDataProvider::GetProductId(uint16_t & productId)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR FactoryDataProvider::GetProductURL(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
 CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 {
     ChipError err       = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;

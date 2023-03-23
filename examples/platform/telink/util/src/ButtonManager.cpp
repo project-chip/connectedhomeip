@@ -46,14 +46,14 @@ int Button::Init(void)
     ret = gpio_pin_configure(mPort, mOutPin, GPIO_OUTPUT_ACTIVE);
     if (ret < 0)
     {
-        LOG_ERR("Configure out pin - fail. Status %d", ret);
+        LOG_ERR("Config out pin err: %d", ret);
         return ret;
     }
 
     ret = gpio_pin_configure(mPort, mInPin, GPIO_INPUT | GPIO_PULL_DOWN);
     if (ret < 0)
     {
-        LOG_ERR("Configure in pin - fail. Status %d", ret);
+        LOG_ERR("Config in pin err: %d", ret);
         return ret;
     }
 
@@ -68,7 +68,7 @@ int Button::Deinit(void)
     ret = gpio_pin_configure(mPort, mOutPin, GPIO_INPUT | GPIO_PULL_DOWN);
     if (ret < 0)
     {
-        LOG_ERR("Reconfigure out pin - fail. Status %d", ret);
+        LOG_ERR("Reconfig out pin err: %d", ret);
         return ret;
     }
 

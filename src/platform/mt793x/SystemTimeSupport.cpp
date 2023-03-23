@@ -38,7 +38,7 @@ ClockImpl gClockImpl;
 
 Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
-    return static_cast<chip::System::Clock::Microseconds64>(0);
+    return (Clock::Microseconds64(xTaskGetTickCount()) * configTICK_RATE_HZ);
 }
 
 Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)

@@ -26,8 +26,6 @@ static_library("mbed") {
     "ConfigurationManagerImpl.cpp",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "KeyValueStoreManagerImpl.cpp",

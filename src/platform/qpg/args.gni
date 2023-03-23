@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 import("//build_overrides/qpg_sdk.gni")
 import("${qpg_sdk_build_root}/qpg_sdk.gni")
 
@@ -56,3 +57,8 @@ openthread_core_config_deps = [
 
 openthread_external_platform =
     "${chip_root}/third_party/openthread/platforms/qpg:libopenthread-qpg"
+
+pw_build_LINK_DEPS = [
+  "$dir_pw_assert:impl",
+  "$dir_pw_log:impl",
+]

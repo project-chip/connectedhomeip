@@ -181,6 +181,15 @@ bool LockManager::InitiateAction(int32_t aActor, Action_t aAction)
     bool action_initiated = false;
     State_t new_state;
 
+    if (aAction == LOCK_JAMMED)
+    {
+        ChipLogProgress(Zcl, "Sending a lock jammed event");
+
+        /* Generating Door Lock Jammed event */
+        DoorLockServer::Instance().SendLockAlarmEvent(1, DlAlarmCode::kLockJammed);
+        return true;
+    }
+
     // Initiate Lock/Unlock Action only when the previous one is complete.
     if (mState == kState_LockCompleted && aAction == UNLOCK_ACTION)
     {
@@ -197,7 +206,6 @@ bool LockManager::InitiateAction(int32_t aActor, Action_t aAction)
 
     if (action_initiated)
     {
-
         StartTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
 
         // Since the timer started successfully, update the state and trigger callback

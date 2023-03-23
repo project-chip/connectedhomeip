@@ -76,7 +76,7 @@ CHIP_ERROR SetupPayloadParseCommand::Print(MTRSetupPayload * payload)
     NSLog(@"Version:       %@", payload.version);
     NSLog(@"VendorID:      %@", payload.vendorID);
     NSLog(@"ProductID:     %@", payload.productID);
-    NSLog(@"Custom flow:   %lu    (%@)", payload.commissioningFlow, CustomFlowString(payload.commissioningFlow));
+    NSLog(@"Custom flow:   %tu    (%@)", payload.commissioningFlow, CustomFlowString(payload.commissioningFlow));
     {
         if (payload.discoveryCapabilities == MTRDiscoveryCapabilitiesUnknown) {
             NSLog(@"Capabilities:  UNKNOWN");
@@ -100,7 +100,7 @@ CHIP_ERROR SetupPayloadParseCommand::Print(MTRSetupPayload * payload)
                 [humanFlags appendString:@"ON NETWORK"];
             }
 
-            NSLog(@"Capabilities:  0x%02lX (%@)", value, humanFlags);
+            NSLog(@"Capabilities:  0x%02lX (%@)", static_cast<long>(value), humanFlags);
         }
     }
     NSLog(@"Discriminator: %@", payload.discriminator);
@@ -116,8 +116,8 @@ CHIP_ERROR SetupPayloadParseCommand::Print(MTRSetupPayload * payload)
         return CHIP_ERROR_INTERNAL;
     }
     for (const MTROptionalQRCodeInfo * info : optionalVendorData) {
-        bool isTypeString = (info.infoType == MTROptionalQRCodeInfoTypeString);
-        bool isTypeInt32 = (info.infoType == MTROptionalQRCodeInfoTypeInt32);
+        bool isTypeString = (info.type == MTROptionalQRCodeInfoTypeString);
+        bool isTypeInt32 = (info.type == MTROptionalQRCodeInfoTypeInt32);
         VerifyOrReturnError(isTypeString || isTypeInt32, CHIP_ERROR_INVALID_ARGUMENT);
 
         if (isTypeString) {

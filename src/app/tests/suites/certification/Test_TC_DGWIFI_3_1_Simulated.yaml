@@ -1,0 +1,94 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 53.3.1. [TC-DGWIFI-3.1] Attributes [DUT as Client]
+
+PICS:
+    - DGWIFI.C.A
+    - DGWIFI.C
+
+config:
+    nodeId: 0x12344321
+    cluster: "WiFi Network Diagnostics"
+    endpoint: 0
+
+tests:
+    - label: "Wait for the device to be commissioned"
+      cluster: "DelayCommands"
+      command: "WaitForCommissioning"
+
+    - label: "Read attribute: BSSID"
+      PICS: DGWIFI.C.A0000
+      wait: "readAttribute"
+      attribute: "BSSID"
+
+    - label: "Read attribute: SecurityType"
+      PICS: DGWIFI.C.A0001
+      wait: "readAttribute"
+      attribute: "SecurityType"
+
+    - label: "Read attribute: WiFiVersion"
+      PICS: DGWIFI.C.A0002
+      wait: "readAttribute"
+      attribute: "WiFiVersion"
+
+    - label: "Read attribute: ChannelNumber"
+      PICS: DGWIFI.C.A0003
+      wait: "readAttribute"
+      attribute: "ChannelNumber"
+
+    - label: "Read attribute: RSSI"
+      PICS: DGWIFI.C.A0004
+      wait: "readAttribute"
+      attribute: "RSSI"
+
+    - label: "Read attribute: BeaconLostCount"
+      PICS: DGWIFI.C.A0005
+      wait: "readAttribute"
+      attribute: "BeaconLostCount"
+
+    - label: "Read attribute: BeaconRxCount"
+      PICS: DGWIFI.C.A0006
+      wait: "readAttribute"
+      attribute: "BeaconRxCount"
+
+    - label: "Read attribute: PacketMulticastRxCount"
+      PICS: DGWIFI.C.A0007
+      wait: "readAttribute"
+      attribute: "PacketMulticastRxCount"
+
+    - label: "Read attribute: PacketMulticastTxCount"
+      PICS: DGWIFI.C.A0008
+      wait: "readAttribute"
+      attribute: "PacketMulticastTxCount"
+
+    - label: "Read attribute: PacketUnicastRxCount"
+      PICS: DGWIFI.C.A0009
+      wait: "readAttribute"
+      attribute: "PacketUnicastRxCount"
+
+    - label: "Read attribute: PacketUnicastTxCount"
+      PICS: DGWIFI.C.A000a
+      wait: "readAttribute"
+      attribute: "PacketUnicastTxCount"
+
+    - label: "Read attribute: CurrentMaxRate"
+      PICS: DGWIFI.C.A000b
+      wait: "readAttribute"
+      attribute: "CurrentMaxRate"
+
+    - label: "Read attribute: OverrunCount"
+      PICS: DGWIFI.C.A000c
+      wait: "readAttribute"
+      attribute: "OverrunCount"

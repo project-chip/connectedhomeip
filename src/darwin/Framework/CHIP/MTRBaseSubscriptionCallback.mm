@@ -16,6 +16,7 @@
 
 #import "MTRBaseSubscriptionCallback.h"
 #import "MTRError_Internal.h"
+#import "MTRLogging_Internal.h"
 
 #include <platform/PlatformManager.h>
 
@@ -33,21 +34,17 @@ void MTRBaseSubscriptionCallback::ReportData()
 {
     __block NSArray * attributeReports = mAttributeReports;
     mAttributeReports = nil;
-    __block auto attributeCallback = mAttributeReportCallback;
+    auto attributeCallback = mAttributeReportCallback;
 
     __block NSArray * eventReports = mEventReports;
     mEventReports = nil;
-    __block auto eventCallback = mEventReportCallback;
+    auto eventCallback = mEventReportCallback;
 
     if (attributeCallback != nil && attributeReports.count) {
-        dispatch_async(mQueue, ^{
-            attributeCallback(attributeReports);
-        });
+        attributeCallback(attributeReports);
     }
     if (eventCallback != nil && eventReports.count) {
-        dispatch_async(mQueue, ^{
-            eventCallback(eventReports);
-        });
+        eventCallback(eventReports);
     }
 }
 
@@ -96,7 +93,8 @@ void MTRBaseSubscriptionCallback::OnDeallocatePaths(ReadPrepareParams && aReadPr
 void MTRBaseSubscriptionCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
 {
     if (mSubscriptionEstablishedHandler) {
-        dispatch_async(mQueue, mSubscriptionEstablishedHandler);
+        auto subscriptionEstablishedHandler = mSubscriptionEstablishedHandler;
+        subscriptionEstablishedHandler();
     }
 }
 
@@ -109,11 +107,17 @@ CHIP_ERROR MTRBaseSubscriptionCallback::OnResubscriptionNeeded(ReadClient * apRe
         auto callback = mResubscriptionCallback;
         auto error = [MTRError errorForCHIPErrorCode:aTerminationCause];
         auto delayMs = @(apReadClient->ComputeTimeTillNextSubscription());
-        dispatch_async(mQueue, ^{
-            callback(error, delayMs);
-        });
+        callback(error, delayMs);
     }
     return CHIP_NO_ERROR;
+}
+
+void MTRBaseSubscriptionCallback::OnUnsolicitedMessageFromPublisher(ReadClient *)
+{
+    if (mUnsolicitedMessageFromPublisherHandler) {
+        auto unsolicitedMessageFromPublisherHandler = mUnsolicitedMessageFromPublisherHandler;
+        unsolicitedMessageFromPublisherHandler();
+    }
 }
 
 void MTRBaseSubscriptionCallback::ReportError(CHIP_ERROR aError, bool aCancelSubscription)
@@ -129,19 +133,19 @@ void MTRBaseSubscriptionCallback::ReportError(CHIP_ERROR aError, bool aCancelSub
         return;
     }
 
-    __block ErrorCallback callback = mErrorCallback;
     __block auto * myself = this;
+
+    auto errorCallback = mErrorCallback;
     mErrorCallback = nil;
     mAttributeReportCallback = nil;
     mEventReportCallback = nil;
-    __auto_type onDoneHandler = mOnDoneHandler;
+    auto onDoneHandler = mOnDoneHandler;
     mOnDoneHandler = nil;
-    dispatch_async(mQueue, ^{
-        callback(err);
-        if (onDoneHandler) {
-            onDoneHandler();
-        }
-    });
+
+    errorCallback(err);
+    if (onDoneHandler) {
+        onDoneHandler();
+    }
 
     if (aCancelSubscription) {
         // We can't synchronously delete ourselves, because we're inside one of

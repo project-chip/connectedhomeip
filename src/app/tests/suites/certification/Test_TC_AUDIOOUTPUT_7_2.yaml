@@ -21,6 +21,9 @@ config:
     nodeId: 0x12344321
     cluster: "Audio Output"
     endpoint: 1
+    Index:
+        type: int8u
+        defaultValue: 1
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -46,7 +49,7 @@ tests:
       arguments:
           values:
               - name: "Index"
-                value: 1
+                value: Index
               - name: "name"
                 value: "CertTest"
 

@@ -16,7 +16,7 @@
 #
 """OTA image generator
 
-This script generates OTA image file from the input hex file.
+This script generates OTA image file from the input hex files.
 
 The XS data would be compressed into OTA image with the given LZSS tool.
 
@@ -35,7 +35,8 @@ from struct import pack, pack_into
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--binary", required=True, type=pathlib.Path)
-    parser.add_argument("--hex", required=True, type=pathlib.Path)
+    parser.add_argument("--ds_hex", required=True, type=pathlib.Path)
+    parser.add_argument("--xs_hex", required=True, type=pathlib.Path)
     parser.add_argument("--lzss_tool", required=True, type=pathlib.Path)
     parser.add_argument("--active_xs_len", required=True,
                         type=lambda x: int(x, 0))
@@ -46,8 +47,9 @@ def main():
 
     option = parser.parse_args()
 
-    intel_hex = IntelHex(str(option.hex))
-    ds_segment, xs_segment = intel_hex.segments()[1:3]
+    intel_hex = IntelHex(str(option.ds_hex))
+    intel_hex.loadhex(str(option.xs_hex))
+    ds_segment, xs_segment = intel_hex.segments()[0:2]
 
     ds_header = intel_hex.tobinarray(
         start=ds_segment[0], end=ds_segment[0] + 0x10 - 1)

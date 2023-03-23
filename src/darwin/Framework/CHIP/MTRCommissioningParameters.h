@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * If not nil, must be 32 bytes of data.
  */
-@property (nonatomic, copy, nullable) NSData * csrNonce;
+@property (nonatomic, copy, nullable) NSData * csrNonce MTR_NEWLY_AVAILABLE;
 /**
  * The nonce to use when requesting attestation information from the device.
  *
@@ -60,6 +60,8 @@ NS_ASSUME_NONNULL_BEGIN
  * An optional delegate that can be notified upon completion of device
  * attestation.  See documentation for MTRDeviceAttestationDelegate for
  * details.
+ *
+ * The delegate methods will be invoked on an arbitrary thread.
  */
 @property (nonatomic, strong, nullable) id<MTRDeviceAttestationDelegate> deviceAttestationDelegate;
 /**
@@ -68,9 +70,15 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * If nil, the fail-safe will not be extended before calling into the
  * deviceAttestationDelegate.
-
  */
-@property (nonatomic, copy, nullable) NSNumber * failSafeExpiryTimeout;
+@property (nonatomic, copy, nullable) NSNumber * failSafeExpiryTimeout MTR_NEWLY_AVAILABLE;
+
+@end
+
+@interface MTRCommissioningParameters (Deprecated)
+
+@property (nonatomic, copy, nullable) NSData * CSRNonce MTR_NEWLY_DEPRECATED("Please use csrNonce");
+@property (nonatomic, copy, nullable) NSNumber * failSafeExpiryTimeoutSecs MTR_NEWLY_DEPRECATED("Plase use failSafeExpiryTimeout");
 
 @end
 

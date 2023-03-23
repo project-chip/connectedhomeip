@@ -54,7 +54,7 @@ static void TestTotalStringLength(nlTestSuite * inSuite, void * inContext)
  */
 static const nlTest sTests[] = { NL_TEST_DEF_FN(TestMaxStringLength), NL_TEST_DEF_FN(TestTotalStringLength), NL_TEST_SENTINEL() };
 
-int TestSafeString(void)
+int TestSafeString()
 {
     nlTestSuite theSuite = { "CHIP SafeString tests", &sTests[0], nullptr, nullptr };
 

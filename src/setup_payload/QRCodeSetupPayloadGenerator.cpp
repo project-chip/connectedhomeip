@@ -53,7 +53,8 @@ static CHIP_ERROR populateBits(uint8_t * bits, size_t & offset, uint64_t input, 
     {
         if (input & 1)
         {
-            bits[index / 8] |= static_cast<uint8_t>(1 << index % 8);
+            const uint8_t mask = static_cast<uint8_t>(1 << index % 8);
+            bits[index / 8]    = static_cast<uint8_t>(bits[index / 8] | mask);
         }
         index++;
         input >>= 1;

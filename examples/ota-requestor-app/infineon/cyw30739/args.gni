@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("${chip_root}/config/standalone/args.gni")
 import("${chip_root}/src/platform/Infineon/CYW30739/args.gni")
 
 cyw30739_sdk_target = get_label_info(":sdk", "label_no_toolchain")

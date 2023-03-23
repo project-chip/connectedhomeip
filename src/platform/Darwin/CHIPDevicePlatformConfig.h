@@ -34,8 +34,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 #endif
 
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
-
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to Darwin platforms.
@@ -74,9 +72,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_TELEMETRY 0
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY 0
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY_FULL 0
-
-// TODO: CHIP has redesigned the crypto interface, pending on the final version of CHIP HASH APIs
-#define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 0
 
 // Reserve a single dynamic endpoint that we can use to host things like OTA
 // Provider server.

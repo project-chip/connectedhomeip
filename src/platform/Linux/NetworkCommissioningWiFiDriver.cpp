@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -156,7 +156,8 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
 
-    ChipLogProgress(NetworkProvisioning, "LinuxNetworkCommissioningDelegate: SSID: %s", networkId.data());
+    ChipLogProgress(NetworkProvisioning, "LinuxNetworkCommissioningDelegate: SSID: %s",
+                    StringOrNullMarker((char *) networkId.data()));
 
     err = ConnectivityMgrImpl().ConnectWiFiNetworkAsync(ByteSpan(mStagingNetwork.ssid, mStagingNetwork.ssidLen),
                                                         ByteSpan(mStagingNetwork.credentials, mStagingNetwork.credentialsLen),

@@ -29,7 +29,7 @@ group("default") {
 # in:
 #   out/obj/chip_rpc_distribution/  <- source files here
 #   out/obj/chip_rpc_distribution._build_wheel/chip_rpc-0.0.1-py3-none-any.whl
-pw_create_python_source_tree("chip_rpc_distribution") {
+pw_python_distribution("chip_rpc_distribution") {
   packages = [ "py:chip_rpc" ]
   generate_setup_cfg = {
     common_config_file = "common_setup.cfg"

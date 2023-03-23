@@ -93,6 +93,14 @@ public:
     static const Key kConfigKey_GroupKeyBase;
     static const Key kConfigKey_GroupKeyMax;
 
+    static const Key kConfigKey_LockUser;
+    static const Key kConfigKey_Credential;
+    static const Key kConfigKey_LockUserName;
+    static const Key kConfigKey_CredentialData;
+    static const Key kConfigKey_UserCredentials;
+    static const Key kConfigKey_WeekDaySchedules;
+    static const Key kConfigKey_YearDaySchedules;
+    static const Key kConfigKey_HolidaySchedules;
     // CHIP Counter Keys
     static const Key kConfigKey_BootCount;
     static const Key kConfigKey_TotalOperationalHours;

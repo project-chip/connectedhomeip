@@ -301,6 +301,20 @@
 #endif // CHIP_CONFIG_TEST_SHARED_SECRET_VALUE
 
 /**
+ *  @def CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH
+ *
+ *  @brief
+ *    Length of the shared secret to use for unit tests or when CHIP_CONFIG_SECURITY_TEST_MODE is enabled.
+ *
+ *    Note that the default value of 32 includes the null terminator.
+ *    WARNING: `strlen(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE)` will result in different keys
+ *              than expected and give unexpected results for shared secrets that contain '\x00'.
+ */
+#ifndef CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH
+#define CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH 32
+#endif // CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH
+
+/**
  *  @def CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES
  *
  *  @brief
@@ -359,6 +373,16 @@
 #ifndef CHIP_AUTOMATION_LOGGING
 #define CHIP_AUTOMATION_LOGGING 1
 #endif // CHIP_AUTOMATION_LOGGING
+
+/**
+ *  @def CHIP_LOG_FILTERING
+ *
+ *  @brief
+ *    If asserted (1), enable runtime log level configuration.
+ */
+#ifndef CHIP_LOG_FILTERING
+#define CHIP_LOG_FILTERING 1
+#endif
 
 /**
  * CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE
@@ -896,7 +920,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief The maximum size of the lambda which can be post into system event queue.
  */
 #ifndef CHIP_CONFIG_LAMBDA_EVENT_SIZE
-#define CHIP_CONFIG_LAMBDA_EVENT_SIZE (16)
+#define CHIP_CONFIG_LAMBDA_EVENT_SIZE (24)
 #endif
 
 /**
@@ -1246,6 +1270,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES 2
 #endif // CHIP_CONFIG_MINMDNS_MAX_PARALLEL_RESOLVES
 
+/**
+ * def CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS
+ *
+ * @brief Determines the maximum number of node resolve results (PeerAddresses) to keep
+ *        for establishing an operational session.
+ *
+ */
+#ifndef CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS
+#define CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS 1
+#endif // CHIP_CONFIG_MDNS_RESOLVE_LOOKUP_RESULTS
+
 /*
  * @def CHIP_CONFIG_NETWORK_COMMISSIONING_DEBUG_TEXT_BUFFER_SIZE
  *
@@ -1291,6 +1326,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_NUM_CD_KEY_SLOTS
 #define CHIP_CONFIG_NUM_CD_KEY_SLOTS 5
 #endif // CHIP_CONFIG_NUM_CD_KEY_SLOTS
+
+/**
+ * @def CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC
+ *
+ * @brief Defines the number of clients that can register for monitoring with a server
+ * see ClientMonitoring cluster for specification
+ */
+#ifndef CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC
+#define CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC 1
+#endif // CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC
 /**
  * @}
  */

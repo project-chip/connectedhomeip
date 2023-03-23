@@ -250,4 +250,26 @@
 #ifndef INET_CONFIG_IP_MULTICAST_HOP_LIMIT
 #define INET_CONFIG_IP_MULTICAST_HOP_LIMIT                 (64)
 #endif // INET_CONFIG_IP_MULTICAST_HOP_LIMIT
+
+/**
+ *  @def INET_CONFIG_UDP_SOCKET_PKTINFO
+ *
+ *  @brief
+ *    Use IP_PKTINFO and IPV6_PKTINFO control messages to specify the network
+ *    interface and the source address of a sent UDP packet.
+ *
+ *  @details
+ *    When this flag is set, the socket-based implementation of UDP endpoints
+ *    requires that IP_PKTINFO and IPV6_PKTINFO be supported. Otherwise, it is
+ *    left to the operating system to select the network interface and the
+ *    source address.
+ */
+#ifndef INET_CONFIG_UDP_SOCKET_PKTINFO
+#ifndef __ZEPHYR__
+#define INET_CONFIG_UDP_SOCKET_PKTINFO 1
+#else
+#define INET_CONFIG_UDP_SOCKET_PKTINFO 0
+#endif
+#endif // INET_CONFIG_UDP_SOCKET_PKTINFO
+
 // clang-format on

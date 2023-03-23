@@ -21,21 +21,29 @@ class ParseMetaData:
             self.column = column
 
 
-class FieldAttribute(enum.Enum):
+class StructQuality(enum.Flag):
+    NONE = 0
+    FABRIC_SCOPED = enum.auto()
+
+
+class FieldQuality(enum.Flag):
+    NONE = 0
     OPTIONAL = enum.auto()
     NULLABLE = enum.auto()
+    FABRIC_SENSITIVE = enum.auto()
 
 
-class CommandAttribute(enum.Enum):
+class CommandQuality(enum.Flag):
+    NONE = 0
     TIMED_INVOKE = enum.auto()
     FABRIC_SCOPED = enum.auto()
 
 
-class AttributeTag(enum.Enum):
+class AttributeQuality(enum.Flag):
+    NONE = 0
     READABLE = enum.auto()
     WRITABLE = enum.auto()
     NOSUBSCRIBE = enum.auto()
-    FABRIC_SCOPED = enum.auto()
 
 
 class AttributeStorage(enum.Enum):
@@ -48,6 +56,11 @@ class EventPriority(enum.Enum):
     DEBUG = enum.auto()
     INFO = enum.auto()
     CRITICAL = enum.auto()
+
+
+class EventQuality(enum.Flag):
+    NONE = 0
+    FABRIC_SENSITIVE = enum.auto()
 
 
 class ClusterSide(enum.Enum):
@@ -91,36 +104,36 @@ class Field:
     code: int
     name: str
     is_list: bool = False
-    attributes: Set[FieldAttribute] = field(default_factory=set)
+    qualities: FieldQuality = FieldQuality.NONE
 
     @property
     def is_optional(self):
-        return FieldAttribute.OPTIONAL in self.attributes
+        return FieldQuality.OPTIONAL & self.qualities
 
     @property
     def is_nullable(self):
-        return FieldAttribute.NULLABLE in self.attributes
+        return FieldQuality.NULLABLE & self.qualities
 
 
 @dataclass
 class Attribute:
     definition: Field
-    tags: Set[AttributeTag] = field(default_factory=set)
+    qualities: AttributeQuality = AttributeQuality.NONE
     readacl: AccessPrivilege = AccessPrivilege.VIEW
     writeacl: AccessPrivilege = AccessPrivilege.OPERATE
     default: Optional[Union[str, int]] = None
 
     @property
     def is_readable(self):
-        return AttributeTag.READABLE in self.tags
+        return AttributeQuality.READABLE & self.qualities
 
     @property
     def is_writable(self):
-        return AttributeTag.WRITABLE in self.tags
+        return AttributeQuality.WRITABLE & self.qualities
 
     @property
     def is_subscribable(self):
-        return AttributeTag.NOSUBSCRIBE not in self.tags
+        return not (AttributeQuality.NOSUBSCRIBE & self.qualities)
 
 
 @dataclass
@@ -129,6 +142,7 @@ class Struct:
     fields: List[Field]
     tag: Optional[StructTag] = None
     code: Optional[int] = None  # for responses only
+    qualities: StructQuality = StructQuality.NONE
 
 
 @dataclass
@@ -138,6 +152,11 @@ class Event:
     code: int
     fields: List[Field]
     readacl: AccessPrivilege = AccessPrivilege.VIEW
+    qualities: EventQuality = EventQuality.NONE
+
+    @property
+    def is_fabric_sensitive(self):
+        return EventQuality.FABRIC_SENSITIVE & self.qualities
 
 
 @dataclass
@@ -166,12 +185,12 @@ class Command:
     code: int
     input_param: Optional[str]
     output_param: str
-    attributes: Set[CommandAttribute] = field(default_factory=set)
+    qualities: CommandQuality = CommandQuality.NONE
     invokeacl: AccessPrivilege = AccessPrivilege.OPERATE
 
     @property
     def is_timed_invoke(self):
-        return CommandAttribute.TIMED_INVOKE in self.attributes
+        return CommandQuality.TIMED_INVOKE & self.qualities
 
 
 @dataclass
@@ -213,6 +232,7 @@ class ServerClusterInstantiation:
 class DeviceType:
     name: str
     code: int
+    version: int
 
 
 @dataclass

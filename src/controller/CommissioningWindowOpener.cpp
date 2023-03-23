@@ -271,20 +271,18 @@ void CommissioningWindowOpener::OnDeviceConnectedCallback(void * context, Messag
     switch (self->mNextStep)
     {
     case Step::kReadVID: {
-        constexpr EndpointId kBasicClusterEndpoint = 0;
-        BasicCluster cluster(exchangeMgr, sessionHandle, kBasicClusterEndpoint);
-        err = cluster.ReadAttribute<app::Clusters::Basic::Attributes::VendorID::TypeInfo>(context, OnVIDReadResponse,
-                                                                                          OnVIDPIDReadFailureResponse);
+        BasicInformationCluster cluster(exchangeMgr, sessionHandle, kRootEndpointId);
+        err = cluster.ReadAttribute<app::Clusters::BasicInformation::Attributes::VendorID::TypeInfo>(context, OnVIDReadResponse,
+                                                                                                     OnVIDPIDReadFailureResponse);
 #if CHIP_ERROR_LOGGING
         messageIfError = "Could not read VID for opening commissioning window";
 #endif // CHIP_ERROR_LOGGING
         break;
     }
     case Step::kReadPID: {
-        constexpr EndpointId kBasicClusterEndpoint = 0;
-        BasicCluster cluster(exchangeMgr, sessionHandle, kBasicClusterEndpoint);
-        err = cluster.ReadAttribute<app::Clusters::Basic::Attributes::ProductID::TypeInfo>(context, OnPIDReadResponse,
-                                                                                           OnVIDPIDReadFailureResponse);
+        BasicInformationCluster cluster(exchangeMgr, sessionHandle, kRootEndpointId);
+        err = cluster.ReadAttribute<app::Clusters::BasicInformation::Attributes::ProductID::TypeInfo>(context, OnPIDReadResponse,
+                                                                                                      OnVIDPIDReadFailureResponse);
 #if CHIP_ERROR_LOGGING
         messageIfError = "Could not read PID for opening commissioning window";
 #endif // CHIP_ERROR_LOGGING

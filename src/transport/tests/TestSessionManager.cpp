@@ -816,17 +816,17 @@ void SessionAllocationTest(nlTestSuite * inSuite, void * inContext)
                 ScopedNodeId(NodeIdFromPAKEKeyId(kDefaultCommissioningPasscodeId), kUndefinedFabricIndex));
             NL_TEST_ASSERT(inSuite, handle.HasValue());
             auto potentialCollision = handle.Value()->AsSecureSession()->GetLocalSessionId();
-            for (size_t h = 0; h < numHandles; ++h)
+            for (uint16_t sessionId : sessionIds)
             {
-                NL_TEST_ASSERT(inSuite, potentialCollision != sessionIds[h]);
+                NL_TEST_ASSERT(inSuite, potentialCollision != sessionId);
             }
             handle.Value()->AsSecureSession()->MarkForEviction();
         }
 
         // Free our allocated sessions.
-        for (size_t h = 0; h < numHandles; ++h)
+        for (auto & handle : handles)
         {
-            handles[h].Value()->AsSecureSession()->MarkForEviction();
+            handle.Value()->AsSecureSession()->MarkForEviction();
         }
     }
 

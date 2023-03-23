@@ -18,9 +18,7 @@
 
 #include <memory>
 #include <thread>
-
-#include <lib/core/CHIPError.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <vector>
 
 #include <glib.h>
 

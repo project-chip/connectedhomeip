@@ -14,12 +14,12 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/pigweed.gni")
-
+import("${build_root}/chip/java/config.gni")
 import("${build_root}/config/compiler/compiler.gni")
 import("${build_root}/config/sysroot.gni")
 import("${build_root}/config/target.gni")
 
-if (current_os == "mac") {
+if (current_os == "mac" || current_os == "ios") {
   import("${build_root}/config/mac/mac_sdk.gni")
 }
 
@@ -49,13 +49,11 @@ config("debug_default") {
 
 config("abi_default") {
   cflags = []
-  if (current_os == "mac") {
+  if (current_os == "mac" || current_os == "ios") {
     cflags += [
       "-target",
       mac_target_triple,
     ]
-  } else if (current_os == "ios") {
-    # iOS ABI currently set by chip_xcode_build_connector.sh
   }
 
   if (current_os != "mac" && current_os != "ios") {
@@ -196,9 +194,8 @@ config("optimize_default") {
 config("disabled_warnings") {
   cflags = [
     "-Wno-deprecated-declarations",
-    "-Wno-unknown-warning-option",
-    "-Wno-maybe-uninitialized",
     "-Wno-missing-field-initializers",
+    "-Wno-unknown-warning-option",
     "-Wno-unused-parameter",
   ]
   if (!is_debug) {
@@ -207,8 +204,9 @@ config("disabled_warnings") {
   }
   if (!is_clang) {
     cflags += [
-      "-Wno-psabi",
       "-Wno-cast-function-type",
+      "-Wno-psabi",
+      "-Wno-maybe-uninitialized",
     ]
   }
 }
@@ -227,7 +225,8 @@ config("warnings_common") {
   }
 
   if (current_os != "mac" && current_os != "ios" && current_os != "linux" &&
-      current_os != "win" && current_os != "tizen" && current_os != "webos") {
+      current_os != "win" && current_os != "tizen" && current_os != "webos" &&
+      current_os != "cmsis-rtos") {
     cflags += [ "-Wstack-usage=8192" ]
   }
 }
@@ -250,6 +249,10 @@ config("strict_warnings") {
     ]
   }
 
+  if (build_java_matter_controller) {
+    cflags -= [ "-Wshadow" ]
+  }
+
   cflags_cc = [ "-Wnon-virtual-dtor" ]
 
   ldflags = []
@@ -258,8 +261,18 @@ config("strict_warnings") {
     cflags += [
       "-Wimplicit-fallthrough",
       "-Wheader-hygiene",
+      "-Wshorten-64-to-32",
       "-Wformat-type-confusion",
     ]
+
+    # TODO: can make this back fatal in once pigweed updates can be taken again.
+    #       See https://github.com/project-chip/connectedhomeip/pull/22079
+    #
+    # Currently `./scripts/build/build_examples.py --target linux-arm64-light-rpc-ipv6only-clang build`
+    # fails in third_party/pigweed/repo/pw_protobuf
+    if (current_cpu == "arm64" && current_os == "linux") {
+      cflags += [ "-Wno-error=shorten-64-to-32" ]
+    }
   }
 
   if (!is_asan && (current_os == "linux" || current_os == "android")) {
@@ -279,9 +292,12 @@ config("disabled_warnings_third_party") {
   cflags = [
     "-Wno-unused",
     "-Wno-format",
-    "-Wno-maybe-uninitialized",
     "-Wno-address",
   ]
+
+  if (!is_clang) {
+    cflags += [ "-Wno-maybe-uninitialized" ]
+  }
 }
 
 config("warnings_third_party") {
@@ -369,7 +385,6 @@ config("sanitize_address") {
 
 config("sanitize_thread") {
   cflags = [ "-fsanitize=thread" ]
-
   ldflags = cflags
 }
 
@@ -387,11 +402,16 @@ config("sanitize_undefined_behavior") {
     "-fvisibility=hidden",
     "-fsanitize=undefined",
     "-fsanitize=float-divide-by-zero",
-    "-fsanitize=unsigned-integer-overflow",
-    "-fsanitize=implicit-conversion",
-    "-fsanitize=nullability",
-    "-fno-sanitize=vptr,function",
   ]
+  if (is_clang) {
+    cflags += [
+      "-fsanitize=unsigned-integer-overflow",
+      "-fsanitize=implicit-conversion",
+      "-fsanitize=nullability",
+      "-fno-sanitize=vptr,function",
+    ]
+  }
+
   ldflags = cflags
 }
 

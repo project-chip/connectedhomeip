@@ -61,16 +61,16 @@ private:
     {
         KeyStorage(const char * key = nullptr);
 
-        constexpr size_t GetSize() const { return sizeof(mValueSize) + strnlen(mKey, sizeof(mKey)); }
+        constexpr size_t GetSize() const { return sizeof(mValueSize) + strlen(mKey); }
         bool IsMatchKey(const char * key) const;
 
         uint16_t mValueSize;
-        char mKey[PersistentStorageDelegate::kKeyLengthMax];
+        char mKey[PersistentStorageDelegate::kKeyLengthMax + 1];
     };
 
     struct KeyConfigIdEntry : public slist_node_t
     {
-        KeyConfigIdEntry(uint8_t configID, const KeyStorage & keyStorage) : mConfigID(configID), mStorage(keyStorage) {}
+        KeyConfigIdEntry(uint8_t configID, const KeyStorage & keyStorage) : mStorage(keyStorage), mConfigID(configID) {}
 
         constexpr Config::Key GetValueConfigKey() const
         {
@@ -85,8 +85,8 @@ private:
         constexpr uint16_t GetValueSize() const { return mStorage.mValueSize; }
         constexpr void SetValueSize(uint16_t valueSize) { mStorage.mValueSize = valueSize; }
 
-        uint8_t mConfigID;
         KeyStorage mStorage;
+        uint8_t mConfigID;
     };
 
     KeyConfigIdEntry * AllocateEntry(const char * key);

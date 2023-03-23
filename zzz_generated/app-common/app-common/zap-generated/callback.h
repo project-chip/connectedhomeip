@@ -32,17 +32,6 @@
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/Constants.h>
 
-/** @brief Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- */
-void emberAfClusterInitCallback(chip::EndpointId endpoint, chip::ClusterId clusterId);
-
 // Cluster Init Functions
 
 /** @brief Identify Cluster Init
@@ -141,13 +130,13 @@ void emberAfAccessControlClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfActionsClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Basic Cluster Init
+/** @brief Basic Information Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBasicClusterInitCallback(chip::EndpointId endpoint);
+void emberAfBasicInformationClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief OTA Software Update Provider Cluster Init
  *
@@ -597,13 +586,21 @@ void emberAfAccountLoginClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfElectricalMeasurementClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Test Cluster Cluster Init
+/** @brief Client Monitoring Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfTestClusterClusterInitCallback(chip::EndpointId endpoint);
+void emberAfClientMonitoringClusterInitCallback(chip::EndpointId endpoint);
+
+/** @brief Unit Testing Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfUnitTestingClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Fault Injection Cluster Init
  *
@@ -1772,34 +1769,34 @@ void emberAfActionsClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfActionsClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Basic Cluster
+// Basic Information Cluster
 //
 
-/** @brief Basic Cluster Server Init
+/** @brief Basic Information Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfBasicInformationClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief Basic Cluster Client Init
+/** @brief Basic Information Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfBasicClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfBasicInformationClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief Basic Cluster Server Attribute Changed
+/** @brief Basic Information Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterBasicClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterBasicInformationClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief Basic Cluster Server Message Sent
+/** @brief Basic Information Cluster Server Message Sent
  *
  * Server Message Sent
  *
@@ -1809,10 +1806,11 @@ void MatterBasicClusterServerAttributeChangedCallback(const chip::app::ConcreteA
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfBasicClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                  uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfBasicInformationClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                             EmberStatus status);
 
-/** @brief Basic Cluster Client Message Sent
+/** @brief Basic Information Cluster Client Message Sent
  *
  * Client Message Sent
  *
@@ -1822,10 +1820,11 @@ void emberAfBasicClusterServerMessageSentCallback(const chip::MessageSendDestina
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfBasicClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                  uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfBasicInformationClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                             EmberStatus status);
 
-/** @brief Basic Cluster Server Pre Attribute Changed
+/** @brief Basic Information Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -1835,10 +1834,10 @@ void emberAfBasicClusterClientMessageSentCallback(const chip::MessageSendDestina
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterBasicClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                    EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterBasicInformationClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Basic Cluster Client Pre Attribute Changed
+/** @brief Basic Information Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -1848,24 +1847,24 @@ MatterBasicClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAtt
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterBasicClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                    EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterBasicInformationClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Basic Cluster Server Tick
+/** @brief Basic Information Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfBasicClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfBasicInformationClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief Basic Cluster Client Tick
+/** @brief Basic Information Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfBasicClusterClientTickCallback(chip::EndpointId endpoint);
+void emberAfBasicInformationClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // OTA Software Update Provider Cluster
@@ -7267,34 +7266,34 @@ void emberAfElectricalMeasurementClusterServerTickCallback(chip::EndpointId endp
 void emberAfElectricalMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// Test Cluster Cluster
+// Client Monitoring Cluster
 //
 
-/** @brief Test Cluster Cluster Server Init
+/** @brief Client Monitoring Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfTestClusterClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfClientMonitoringClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief Test Cluster Cluster Client Init
+/** @brief Client Monitoring Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfTestClusterClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfClientMonitoringClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief Test Cluster Cluster Server Attribute Changed
+/** @brief Client Monitoring Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterTestClusterClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterClientMonitoringClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief Test Cluster Cluster Server Message Sent
+/** @brief Client Monitoring Cluster Server Message Sent
  *
  * Server Message Sent
  *
@@ -7304,10 +7303,11 @@ void MatterTestClusterClusterServerAttributeChangedCallback(const chip::app::Con
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfTestClusterClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                        uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfClientMonitoringClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                             EmberStatus status);
 
-/** @brief Test Cluster Cluster Client Message Sent
+/** @brief Client Monitoring Cluster Client Message Sent
  *
  * Client Message Sent
  *
@@ -7317,10 +7317,11 @@ void emberAfTestClusterClusterServerMessageSentCallback(const chip::MessageSendD
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfTestClusterClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                        uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfClientMonitoringClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                             EmberStatus status);
 
-/** @brief Test Cluster Cluster Server Pre Attribute Changed
+/** @brief Client Monitoring Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -7330,10 +7331,10 @@ void emberAfTestClusterClusterClientMessageSentCallback(const chip::MessageSendD
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterTestClusterClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterClientMonitoringClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Test Cluster Cluster Client Pre Attribute Changed
+/** @brief Client Monitoring Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -7343,24 +7344,120 @@ MatterTestClusterClusterServerPreAttributeChangedCallback(const chip::app::Concr
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterTestClusterClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterClientMonitoringClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                               EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief Test Cluster Cluster Server Tick
+/** @brief Client Monitoring Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfTestClusterClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfClientMonitoringClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief Test Cluster Cluster Client Tick
+/** @brief Client Monitoring Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfTestClusterClusterClientTickCallback(chip::EndpointId endpoint);
+void emberAfClientMonitoringClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Unit Testing Cluster
+//
+
+/** @brief Unit Testing Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfUnitTestingClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Unit Testing Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfUnitTestingClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Unit Testing Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterUnitTestingClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Unit Testing Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfUnitTestingClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                        uint16_t msgLen, uint8_t * message, EmberStatus status);
+
+/** @brief Unit Testing Cluster Client Message Sent
+ *
+ * Client Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfUnitTestingClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                        uint16_t msgLen, uint8_t * message, EmberStatus status);
+
+/** @brief Unit Testing Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterUnitTestingClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Unit Testing Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status
+MatterUnitTestingClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                          EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Unit Testing Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfUnitTestingClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Unit Testing Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfUnitTestingClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Fault Injection Cluster
@@ -7800,11 +7897,11 @@ bool emberAfActionsClusterDisableActionWithDurationCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Actions::Commands::DisableActionWithDuration::DecodableType & commandData);
 /**
- * @brief Basic Cluster MfgSpecificPing Command callback (from client)
+ * @brief Basic Information Cluster MfgSpecificPing Command callback (from client)
  */
-bool emberAfBasicClusterMfgSpecificPingCallback(
+bool emberAfBasicInformationClusterMfgSpecificPingCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::Basic::Commands::MfgSpecificPing::DecodableType & commandData);
+    const chip::app::Clusters::BasicInformation::Commands::MfgSpecificPing::DecodableType & commandData);
 /**
  * @brief OTA Software Update Provider Cluster QueryImage Command callback (from client)
  */
@@ -8707,212 +8804,224 @@ bool emberAfElectricalMeasurementClusterGetMeasurementProfileCommandCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileCommand::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster Test Command callback (from client)
+ * @brief Client Monitoring Cluster RegisterClientMonitoring Command callback (from client)
  */
-bool emberAfTestClusterClusterTestCallback(chip::app::CommandHandler * commandObj,
-                                           const chip::app::ConcreteCommandPath & commandPath,
-                                           const chip::app::Clusters::TestCluster::Commands::Test::DecodableType & commandData);
+bool emberAfClientMonitoringClusterRegisterClientMonitoringCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ClientMonitoring::Commands::RegisterClientMonitoring::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestSpecificResponse Command callback (from server)
+ * @brief Client Monitoring Cluster StayAwakeRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestSpecificResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+bool emberAfClientMonitoringClusterStayAwakeRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ClientMonitoring::Commands::StayAwakeRequest::DecodableType & commandData);
+/**
+ * @brief Unit Testing Cluster Test Command callback (from client)
+ */
+bool emberAfUnitTestingClusterTestCallback(chip::app::CommandHandler * commandObj,
+                                           const chip::app::ConcreteCommandPath & commandPath,
+                                           const chip::app::Clusters::UnitTesting::Commands::Test::DecodableType & commandData);
+/**
+ * @brief Unit Testing Cluster TestSpecificResponse Command callback (from server)
+ */
+bool emberAfUnitTestingClusterTestSpecificResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                            uint8_t returnValue);
 /**
- * @brief Test Cluster Cluster TestNotHandled Command callback (from client)
+ * @brief Unit Testing Cluster TestNotHandled Command callback (from client)
  */
-bool emberAfTestClusterClusterTestNotHandledCallback(
+bool emberAfUnitTestingClusterTestNotHandledCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestNotHandled::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestNotHandled::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestAddArgumentsResponse Command callback (from server)
+ * @brief Unit Testing Cluster TestAddArgumentsResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestAddArgumentsResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+bool emberAfUnitTestingClusterTestAddArgumentsResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                                uint8_t returnValue);
 /**
- * @brief Test Cluster Cluster TestSpecific Command callback (from client)
+ * @brief Unit Testing Cluster TestSpecific Command callback (from client)
  */
-bool emberAfTestClusterClusterTestSpecificCallback(
+bool emberAfUnitTestingClusterTestSpecificCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestSpecific::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestSpecific::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestSimpleArgumentResponse Command callback (from server)
+ * @brief Unit Testing Cluster TestSimpleArgumentResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestSimpleArgumentResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+bool emberAfUnitTestingClusterTestSimpleArgumentResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                                  bool returnValue);
 /**
- * @brief Test Cluster Cluster TestUnknownCommand Command callback (from client)
+ * @brief Unit Testing Cluster TestUnknownCommand Command callback (from client)
  */
-bool emberAfTestClusterClusterTestUnknownCommandCallback(
+bool emberAfUnitTestingClusterTestUnknownCommandCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestUnknownCommand::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestStructArrayArgumentResponse Command callback (from server)
+ * @brief Unit Testing Cluster TestStructArrayArgumentResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestStructArrayArgumentResponseCallback(
+bool emberAfUnitTestingClusterTestStructArrayArgumentResponseCallback(
     chip::EndpointId endpoint, chip::app::CommandSender * commandObj, /* TYPE WARNING: array array defaults to */ uint8_t * arg1,
     /* TYPE WARNING: array array defaults to */ uint8_t * arg2, /* TYPE WARNING: array array defaults to */ uint8_t * arg3,
     /* TYPE WARNING: array array defaults to */ uint8_t * arg4, uint8_t arg5, bool arg6);
 /**
- * @brief Test Cluster Cluster TestAddArguments Command callback (from client)
+ * @brief Unit Testing Cluster TestAddArguments Command callback (from client)
  */
-bool emberAfTestClusterClusterTestAddArgumentsCallback(
+bool emberAfUnitTestingClusterTestAddArgumentsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestAddArguments::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestAddArguments::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestListInt8UReverseResponse Command callback (from server)
+ * @brief Unit Testing Cluster TestListInt8UReverseResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestListInt8UReverseResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+bool emberAfUnitTestingClusterTestListInt8UReverseResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                                    /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
 /**
- * @brief Test Cluster Cluster TestSimpleArgumentRequest Command callback (from client)
+ * @brief Unit Testing Cluster TestSimpleArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestSimpleArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestSimpleArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestSimpleArgumentRequest::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestEnumsResponse Command callback (from server)
+ * @brief Unit Testing Cluster TestEnumsResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestEnumsResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+bool emberAfUnitTestingClusterTestEnumsResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                         chip::VendorId arg1, uint8_t arg2);
 /**
- * @brief Test Cluster Cluster TestStructArrayArgumentRequest Command callback (from client)
+ * @brief Unit Testing Cluster TestStructArrayArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestStructArrayArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestStructArrayArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestStructArrayArgumentRequest::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestNullableOptionalResponse Command callback (from server)
+ * @brief Unit Testing Cluster TestNullableOptionalResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestNullableOptionalResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+bool emberAfUnitTestingClusterTestNullableOptionalResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                                    bool wasPresent, bool wasNull, uint8_t value,
                                                                    uint8_t originalValue);
 /**
- * @brief Test Cluster Cluster TestStructArgumentRequest Command callback (from client)
+ * @brief Unit Testing Cluster TestStructArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestStructArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestStructArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestStructArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestComplexNullableOptionalResponse Command callback (from server)
+ * @brief Unit Testing Cluster TestComplexNullableOptionalResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestComplexNullableOptionalResponseCallback(
+bool emberAfUnitTestingClusterTestComplexNullableOptionalResponseCallback(
     chip::EndpointId endpoint, chip::app::CommandSender * commandObj, bool NullableIntWasNull, uint16_t NullableIntValue,
     bool OptionalIntWasPresent, uint16_t OptionalIntValue, bool NullableOptionalIntWasPresent, bool NullableOptionalIntWasNull,
     uint16_t NullableOptionalIntValue, bool NullableStringWasNull, chip::CharSpan NullableStringValue,
     bool OptionalStringWasPresent, chip::CharSpan OptionalStringValue, bool NullableOptionalStringWasPresent,
     bool NullableOptionalStringWasNull, chip::CharSpan NullableOptionalStringValue, bool NullableStructWasNull,
-    chip::Optional<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> NullableStructValue,
+    chip::Optional<chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType> NullableStructValue,
     bool OptionalStructWasPresent,
-    chip::Optional<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> OptionalStructValue,
+    chip::Optional<chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType> OptionalStructValue,
     bool NullableOptionalStructWasPresent, bool NullableOptionalStructWasNull,
-    chip::Optional<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> NullableOptionalStructValue,
+    chip::Optional<chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType> NullableOptionalStructValue,
     bool NullableListWasNull, /* TYPE WARNING: array array defaults to */ uint8_t * NullableListValue, bool OptionalListWasPresent,
     /* TYPE WARNING: array array defaults to */ uint8_t * OptionalListValue, bool NullableOptionalListWasPresent,
     bool NullableOptionalListWasNull, /* TYPE WARNING: array array defaults to */ uint8_t * NullableOptionalListValue);
 /**
- * @brief Test Cluster Cluster TestNestedStructArgumentRequest Command callback (from client)
+ * @brief Unit Testing Cluster TestNestedStructArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestNestedStructArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestNestedStructArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestNestedStructArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster BooleanResponse Command callback (from server)
+ * @brief Unit Testing Cluster BooleanResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterBooleanResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, bool value);
+bool emberAfUnitTestingClusterBooleanResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj, bool value);
 /**
- * @brief Test Cluster Cluster TestListStructArgumentRequest Command callback (from client)
+ * @brief Unit Testing Cluster TestListStructArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestListStructArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestListStructArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestListStructArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster SimpleStructResponse Command callback (from server)
+ * @brief Unit Testing Cluster SimpleStructResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterSimpleStructResponseCallback(
+bool emberAfUnitTestingClusterSimpleStructResponseCallback(
     chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-    chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType arg1);
+    chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType arg1);
 /**
- * @brief Test Cluster Cluster TestListInt8UArgumentRequest Command callback (from client)
+ * @brief Unit Testing Cluster TestListInt8UArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestListInt8UArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestListInt8UArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestListInt8UArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestEmitTestEventResponse Command callback (from server)
+ * @brief Unit Testing Cluster TestEmitTestEventResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestEmitTestEventResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+bool emberAfUnitTestingClusterTestEmitTestEventResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                                 uint64_t value);
 /**
- * @brief Test Cluster Cluster TestNestedStructListArgumentRequest Command callback (from client)
+ * @brief Unit Testing Cluster TestNestedStructListArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestNestedStructListArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestNestedStructListArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestNestedStructListArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestEmitTestFabricScopedEventResponse Command callback (from server)
+ * @brief Unit Testing Cluster TestEmitTestFabricScopedEventResponse Command callback (from server)
  */
-bool emberAfTestClusterClusterTestEmitTestFabricScopedEventResponseCallback(chip::EndpointId endpoint,
+bool emberAfUnitTestingClusterTestEmitTestFabricScopedEventResponseCallback(chip::EndpointId endpoint,
                                                                             chip::app::CommandSender * commandObj, uint64_t value);
 /**
- * @brief Test Cluster Cluster TestListNestedStructListArgumentRequest Command callback (from client)
+ * @brief Unit Testing Cluster TestListNestedStructListArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestListNestedStructListArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestListNestedStructListArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestListInt8UReverseRequest Command callback (from client)
+ * @brief Unit Testing Cluster TestListInt8UReverseRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
+bool emberAfUnitTestingClusterTestListInt8UReverseRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestEnumsRequest Command callback (from client)
+ * @brief Unit Testing Cluster TestEnumsRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestEnumsRequestCallback(
+bool emberAfUnitTestingClusterTestEnumsRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestEnumsRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestNullableOptionalRequest Command callback (from client)
+ * @brief Unit Testing Cluster TestNullableOptionalRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestNullableOptionalRequestCallback(
+bool emberAfUnitTestingClusterTestNullableOptionalRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestComplexNullableOptionalRequest Command callback (from client)
+ * @brief Unit Testing Cluster TestComplexNullableOptionalRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestComplexNullableOptionalRequestCallback(
+bool emberAfUnitTestingClusterTestComplexNullableOptionalRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestComplexNullableOptionalRequest::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster SimpleStructEchoRequest Command callback (from client)
+ * @brief Unit Testing Cluster SimpleStructEchoRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterSimpleStructEchoRequestCallback(
+bool emberAfUnitTestingClusterSimpleStructEchoRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::SimpleStructEchoRequest::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::SimpleStructEchoRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TimedInvokeRequest Command callback (from client)
+ * @brief Unit Testing Cluster TimedInvokeRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTimedInvokeRequestCallback(
+bool emberAfUnitTestingClusterTimedInvokeRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TimedInvokeRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestSimpleOptionalArgumentRequest Command callback (from client)
+ * @brief Unit Testing Cluster TestSimpleOptionalArgumentRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestSimpleOptionalArgumentRequestCallback(
+bool emberAfUnitTestingClusterTestSimpleOptionalArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestSimpleOptionalArgumentRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestEmitTestEventRequest Command callback (from client)
+ * @brief Unit Testing Cluster TestEmitTestEventRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
+bool emberAfUnitTestingClusterTestEmitTestEventRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventRequest::DecodableType & commandData);
 /**
- * @brief Test Cluster Cluster TestEmitTestFabricScopedEventRequest Command callback (from client)
+ * @brief Unit Testing Cluster TestEmitTestFabricScopedEventRequest Command callback (from client)
  */
-bool emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(
+bool emberAfUnitTestingClusterTestEmitTestFabricScopedEventRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestEmitTestFabricScopedEventRequest::DecodableType & commandData);
+    const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventRequest::DecodableType & commandData);
 /**
  * @brief Fault Injection Cluster FailAtFault Command callback (from client)
  */
@@ -8925,272 +9034,3 @@ bool emberAfFaultInjectionClusterFailAtFaultCallback(
 bool emberAfFaultInjectionClusterFailRandomlyAtFaultCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::FaultInjection::Commands::FailRandomlyAtFault::DecodableType & commandData);
-
-/** @brief Add To Current App Tasks
- *
- * This function is only useful to sleepy end devices.  This function will note
- * the passed item as part of a set of tasks the application has outstanding
- * (e.g. message sent requiring APS acknwoledgement).  This will affect how the
- * application behaves with regard to sleeping and polling.  Until the
- * outstanding task is completed, the device may poll more frequently and sleep
- * less often.
- */
-void emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks);
-
-/** @brief Remove From Current App Tasks
- *
- * This function is only useful to sleepy end devices.  This function will
- * remove the passed item from the set of tasks the application has outstanding
- * (e.g. message sent requiring APS acknwoledgement).  This will affect how the
- * application behaves with regard to sleeping and polling.  Removing the item
- * from the list of outstanding tasks may allow the device to sleep longer and
- * poll less frequently.  If there are other outstanding tasks the system may
- * still have to stay away and poll more often.
- */
-void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks);
-
-/** @brief Allow Network Write Attribute
- *
- * This function is called by the application framework before it writes an
- * attribute in response to a write attribute request from an external device.
- * The value passed into this callback is the value to which the attribute is to
- * be set by the framework.
-        Example:	In mirroring simple metering data
- * on an Energy Services Interface (ESI) (formerly called Energy Service Portal
- * (ESP) in SE 1.0).), a mirrored simple meter needs to write read-only
- * attributes on its mirror. The-meter-mirror sample application, located in
- * app/framework/sample-apps, uses this callback to allow the mirrored device to
- * write simple metering attributes on the mirror regardless of the fact that
- * most simple metering attributes are defined as read-only by the ZigBee
- * specification.
-        Note:	The ZCL specification does not (as of this
- * writing) specify any permission-level security for writing writeable
- * attributes. As far as the ZCL specification is concerned, if an attribute is
- * writeable, any device that has a link key for the device should be able to
- * write that attribute. Furthermore if an attribute is read only, it should not
- * be written over the air. Thus, if you implement permissions for writing
- * attributes as a feature, you MAY be operating outside the specification. This
- * is unlikely to be a problem for writing read-only attributes, but it may be a
- * problem for attributes that are writeable according to the specification but
- * restricted by the application implementing this callback.
- */
-EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                          chip::AttributeId attributeId, uint8_t * value,
-                                                                          uint8_t type);
-
-/** @brief Attribute Read Access
- *
- * This function is called whenever the Application Framework needs to check
- * access permission for an attribute read.
- */
-bool emberAfAttributeReadAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
-
-/** @brief Attribute Write Access
- *
- * This function is called whenever the Application Framework needs to check
- * access permission for an attribute write.
- */
-bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
-
-/** @brief Default Response
- *
- * This function is called by the application framework when a Default Response
- * command is received from an external device.  The application should return
- * true if the message was processed or false if it was not.
- *
- * @param clusterId The cluster identifier of this response.
- * @param commandId The command identifier to which this is a response.
- * @param status Specifies either SUCCESS or the nature of the error that was
- * detected in the received command.
- */
-bool emberAfDefaultResponseCallback(chip::ClusterId clusterId, chip::CommandId commandId, EmberAfStatus status);
-
-/** @brief Pre Message Send
- *
- * This function is called by the framework when it is about to pass a message
- * to the stack primitives for sending.   This message may or may not be ZCL,
- * ZDO, or some other protocol.  This is called prior to
-        any ZigBee
- * fragmentation that may be done.  If the function returns true it is assumed
- * the callback has consumed and processed the message.  The callback must also
- * set the EmberStatus status code to be passed back to the caller.  The
- * framework will do no further processing on the message.
-        If the
- * function returns false then it is assumed that the callback has not processed
- * the mesasge and the framework will continue to process accordingly.
- *
- * @param messageStruct The structure containing the parameters of the APS
- * message to be sent.
- * @param status A pointer to the status code value that will be returned to the
- * caller.
- */
-bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberStatus * status);
-
-/** @brief Message Sent
- *
- * This function is called by the application framework from the message sent
- * handler, when it is informed by the stack regarding the message sent status.
- * All of the values passed to the emberMessageSentHandler are passed on to this
- * callback. This provides an opportunity for the application to verify that its
- * message has been sent successfully and take the appropriate action. This
- * callback should return a bool value of true or false. A value of true
- * indicates that the message sent notification has been handled and should not
- * be handled by the application framework.
- */
-bool emberAfMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
-                                uint8_t * message, EmberStatus status);
-
-/** @brief External Attribute Read
- *
- * Like emberAfExternalAttributeWriteCallback above, this function is called
- * when the framework needs to read an attribute that is not stored within the
- * Application Framework's data structures.
-        All of the important
- * information about the attribute itself is passed as a pointer to an
- * EmberAfAttributeMetadata struct, which is stored within the application and
- * used to manage the attribute. A complete description of the
- * EmberAfAttributeMetadata struct is provided in
- * app/framework/include/af-types.h
-        This function assumes that the
- * application is able to read the attribute, write it into the passed buffer,
- * and return immediately. Any attributes that require a state machine for
- * reading and writing are not really candidates for externalization at the
- * present time. The Application Framework does not currently include a state
- * machine for reading or writing attributes that must take place across a
- * series of application ticks. Attributes that cannot be read in a timely
- * manner should be stored within the Application Framework and updated
- * occasionally by the application code from within the
- * emberAfMainTickCallback.
-        If the application was successfully able to
- * read the attribute and write it into the passed buffer, it should return a
- * value of EMBER_ZCL_STATUS_SUCCESS. Ensure that the size of the externally
- * managed attribute value is smaller than what the buffer can hold. In the case
- * of a buffer overflow throw an appropriate error such as
- * EMBER_ZCL_STATUS_INSUFFICIENT_SPACE. Any other return value indicates the
- * application was not able to read the attribute.
- */
-EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
-                                                   uint16_t maxReadLength);
-
-/** @brief External Attribute Write
- *
- * This function is called whenever the Application Framework needs to write an
- * attribute which is not stored within the data structures of the Application
- * Framework itself. One of the new features in Version 2 is the ability to
- * store attributes outside the Framework. This is particularly useful for
- * attributes that do not need to be stored because they can be read off the
- * hardware when they are needed, or are stored in some central location used by
- * many modules within the system. In this case, you can indicate that the
- * attribute is stored externally. When the framework needs to write an external
- * attribute, it makes a call to this callback.
-        This callback is very
- * useful for host micros which need to store attributes in persistent memory.
- * Because each host micro (used with an Ember NCP) has its own type of
- * persistent memory storage, the Application Framework does not include the
- * ability to mark attributes as stored in flash the way that it does for Ember
- * SoCs like the EM35x. On a host micro, any attributes that need to be stored
- * in persistent memory should be marked as external and accessed through the
- * external read and write callbacks. Any host code associated with the
- * persistent storage should be implemented within this callback.
-        All of
- * the important information about the attribute itself is passed as a pointer
- * to an EmberAfAttributeMetadata struct, which is stored within the application
- * and used to manage the attribute. A complete description of the
- * EmberAfAttributeMetadata struct is provided in
- * app/framework/include/af-types.h.
-        This function assumes that the
- * application is able to write the attribute and return immediately. Any
- * attributes that require a state machine for reading and writing are not
- * candidates for externalization at the present time. The Application Framework
- * does not currently include a state machine for reading or writing attributes
- * that must take place across a series of application ticks. Attributes that
- * cannot be written immediately should be stored within the Application
- * Framework and updated occasionally by the application code from within the
- * emberAfMainTickCallback.
-        If the application was successfully able to
- * write the attribute, it returns a value of EMBER_ZCL_STATUS_SUCCESS. Any
- * other return value indicates the application was not able to write the
- * attribute.
- */
-EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                    const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
-
-/** @brief Get Current Time
- *
- * This callback is called when device attempts to get current time from the
- * hardware. If this device has means to retrieve exact time, then this method
- * should implement it. If the callback can't provide the exact time it should
- * return 0 to indicate failure. Default action is to return 0, which indicates
- * that device does not have access to real time.
- *
- */
-uint32_t emberAfGetCurrentTimeCallback();
-
-/** @brief Get Endpoint Info
- *
- * This function is a callback to an application implemented endpoint that
- * operates outside the normal application framework.  When the framework wishes
- * to perform operations with that endpoint it uses this callback to retrieve
- * the endpoint's information.  If the endpoint exists and the application can
- * provide data then true shall be returned.  Otherwise the callback must return
- * false.
- *
- * @param endpoint The endpoint to retrieve data for.  Ver.: always
- * @param returnNetworkIndex The index corresponding to the ZigBee network the
- * endpoint belongs to.  If not using a multi-network device, 0 must be
- * returned.  Otherwise on a multi-network device the stack will switch to this
- * network before sending the message.  Ver.: always
- * @param returnEndpointInfo A pointer to a data struct that will be written
- * with information about the endpoint.  Ver.: always
- */
-bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnNetworkIndex,
-                                    EmberAfEndpointInfoStruct * returnEndpointInfo);
-
-/** @brief Registration Abort
- *
- * This callback is called when the device should abort the registration
- * process.
- *
- */
-void emberAfRegistrationAbortCallback();
-
-/** @brief Interpan Send Message
- *
- * This function will send a raw MAC message with interpan frame format using
- * the passed parameters.
- *
- * @param header Interpan header info  Ver.: always
- * @param messageLength The length of the message received or to send  Ver.:
- * always
- * @param message The message data received or to send.  Ver.: always
- */
-EmberStatus emberAfInterpanSendMessageCallback(EmberAfInterpanHeader * header, uint16_t messageLength, uint8_t * message);
-
-/** @brief Start Move
- *
- * This function is called to initiate the process for a device to move (rejoin)
- * to a new parent.
- *
- */
-bool emberAfStartMoveCallback();
-
-/** @brief Pre Attribute Change
- *
- * This function is called by the application framework before it changes an
- * attribute value.  The value passed into this callback is the value to which
- * the attribute is to be set by the framework.  The application should return
- * chip::Protocols::InteractionModel::Status::Success to permit the change or
- * any other code to reject it.
- */
-chip::Protocols::InteractionModel::Status MatterPreAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                                           uint8_t type, uint16_t size, uint8_t * value);
-
-/** @brief Post Attribute Change
- *
- * This function is called by the application framework after it changes an
- * attribute value. The value passed into this callback is the value to which
- * the attribute was set by the framework.
- */
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
-                                       uint8_t * value);

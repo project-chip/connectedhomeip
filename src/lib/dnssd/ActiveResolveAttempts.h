@@ -58,6 +58,7 @@ public:
         struct Resolve
         {
             chip::PeerId peerId;
+            uint32_t consumerCount = 0;
 
             Resolve(chip::PeerId id) : peerId(id) {}
         };
@@ -68,7 +69,12 @@ public:
             IpResolve(HeapQName && host) : hostName(std::move(host)) {}
         };
 
-        ScheduledAttempt() {}
+        ScheduledAttempt()
+        {
+            static_assert(sizeof(Resolve) <= sizeof(Browse) || sizeof(Resolve) <= sizeof(HeapQName),
+                          "Figure out where to put the Resolve counter so that Resolve is not making ScheduledAttempt bigger than "
+                          "it has to be anyway to handle the other attempt types.");
+        }
         ScheduledAttempt(const chip::PeerId & peer, bool first) :
             resolveData(chip::InPlaceTemplateType<Resolve>(), peer), firstSend(first)
         {}
@@ -181,6 +187,50 @@ public:
         bool IsIpResolve() const { return resolveData.Is<IpResolve>(); }
         void Clear() { resolveData = DataType(); }
 
+        // Called when this scheduled attempt will replace an existing scheduled
+        // attempt, because either they match or we have run out of attempt
+        // slots.  When this happens, we want to propagate the consumer count
+        // from the existing attempt to the new one, if they're matching resolve
+        // attempts.
+        void WillCoalesceWith(const ScheduledAttempt & existing)
+        {
+            if (!IsResolve())
+            {
+                // Consumer count is only tracked for resolve requests
+                return;
+            }
+
+            if (!existing.Matches(*this))
+            {
+                // Out of attempt slots, so just dropping the existing attempt.
+                return;
+            }
+
+            // Adding another consumer to the same query. Propagate along the
+            // consumer count to our new attempt, which will replace the
+            // existing one.
+            resolveData.Get<Resolve>().consumerCount = existing.resolveData.Get<Resolve>().consumerCount + 1;
+        }
+
+        void ConsumerRemoved()
+        {
+            if (!IsResolve())
+            {
+                return;
+            }
+
+            auto & count = resolveData.Get<Resolve>().consumerCount;
+            if (count > 0)
+            {
+                --count;
+            }
+
+            if (count == 0)
+            {
+                Clear();
+            }
+        }
+
         const Browse & BrowseData() const { return resolveData.Get<Browse>(); }
         const Resolve & ResolveData() const { return resolveData.Get<Resolve>(); }
         const IpResolve & IpResolveData() const { return resolveData.Get<IpResolve>(); }
@@ -203,6 +253,14 @@ public:
     void Complete(const chip::PeerId & peerId);
     void Complete(const chip::Dnssd::DiscoveredNodeData & data);
     void CompleteIpResolution(SerializedQNameIterator targetHostName);
+
+    /// Mark all browse-type scheduled attemptes as a success, removing them
+    /// from the internal list.
+    CHIP_ERROR CompleteAllBrowses();
+
+    /// Note that resolve attempts for the given peer id now have one fewer
+    /// consumer.
+    void NodeIdResolutionNoLongerNeeded(const chip::PeerId & peerId);
 
     /// Mark that a resolution is pending, adding it to the internal list
     ///

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@
 #include <app/util/basic-types.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/CommonIterator.h>
 
 namespace chip {
 namespace Credentials {
@@ -56,9 +58,7 @@ public:
             }
             else
             {
-                size_t size = strnlen(groupName, kGroupNameMax);
-                strncpy(name, groupName, size);
-                name[size] = 0;
+                Platform::CopyString(name, groupName);
             }
         }
         void SetName(const CharSpan & groupName)
@@ -69,9 +69,7 @@ public:
             }
             else
             {
-                size_t size = std::min(groupName.size(), kGroupNameMax);
-                strncpy(name, groupName.data(), size);
-                name[size] = 0;
+                Platform::CopyString(name, groupName);
             }
         }
         bool operator==(const GroupInfo & other)
@@ -189,39 +187,11 @@ public:
         virtual void OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group) = 0;
     };
 
-    /**
-     * Template used to iterate the stored group data
-     */
-    template <typename T>
-    class Iterator
-    {
-    public:
-        virtual ~Iterator() = default;
-        /**
-         *  @retval The number of entries in total that will be iterated.
-         */
-        virtual size_t Count() = 0;
-        /**
-         *   @param[out] item  Value associated with the next element in the iteration.
-         *  @retval true if the next entry is successfully retrieved.
-         *  @retval false if no more entries can be found.
-         */
-        virtual bool Next(T & item) = 0;
-        /**
-         * Release the memory allocated by this iterator.
-         * Must be called before the pointer goes out of scope.
-         */
-        virtual void Release() = 0;
-
-    protected:
-        Iterator() = default;
-    };
-
-    using GroupInfoIterator    = Iterator<GroupInfo>;
-    using GroupKeyIterator     = Iterator<GroupKey>;
-    using EndpointIterator     = Iterator<GroupEndpoint>;
-    using KeySetIterator       = Iterator<KeySet>;
-    using GroupSessionIterator = Iterator<GroupSession>;
+    using GroupInfoIterator    = CommonIterator<GroupInfo>;
+    using GroupKeyIterator     = CommonIterator<GroupKey>;
+    using EndpointIterator     = CommonIterator<GroupEndpoint>;
+    using KeySetIterator       = CommonIterator<KeySet>;
+    using GroupSessionIterator = CommonIterator<GroupSession>;
 
     GroupDataProvider(uint16_t maxGroupsPerFabric    = CHIP_CONFIG_MAX_GROUPS_PER_FABRIC,
                       uint16_t maxGroupKeysPerFabric = CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC) :

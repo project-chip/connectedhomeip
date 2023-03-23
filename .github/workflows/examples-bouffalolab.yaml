@@ -35,7 +35,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: connectedhomeip/chip-build-bouffalolab:0.6.17
+      image: connectedhomeip/chip-build-bouffalolab:0.6.18
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
@@ -73,7 +73,7 @@ jobs:
           ./scripts/run_in_build_env.sh \
             "./scripts/build/build_examples.py \
               --target bouffalolab-bl602-iot-matter-v1-light \
-              --target bouffalolab-bl602-iot-matter-v1-light-rpc \
+              --target bouffalolab-bl602-iot-matter-v1-light-115200-rpc \
               build \
               --copy-artifacts-to out/artifacts \
             "
@@ -85,7 +85,7 @@ jobs:
               /tmp/bloat_reports/
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
               bl602 bl602+rpc lighting-app \
-              out/artifacts/bouffalolab-bl602-iot-matter-v1-light-rpc/chip-bl602-lighting-example.out \
+              out/artifacts/bouffalolab-bl602-iot-matter-v1-light-115200-rpc/chip-bl602-lighting-example.out \
               /tmp/bloat_reports/
       - name: Clean out build output
         run: rm -rf ./out
@@ -96,7 +96,7 @@ jobs:
           ./scripts/run_in_build_env.sh \
             "./scripts/build/build_examples.py \
               --target bouffalolab-xt-zb6-devkit-light \
-              --target bouffalolab-xt-zb6-devkit-light-rpc \
+              --target bouffalolab-xt-zb6-devkit-light-115200-rpc \
               build \
               --copy-artifacts-to out/artifacts \
             "
@@ -108,7 +108,7 @@ jobs:
               /tmp/bloat_reports/
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
               bl702 bl702+rpc lighting-app \
-              out/artifacts/bouffalolab-xt-zb6-devkit-light-rpc/chip-bl702-lighting-example.out \
+              out/artifacts/bouffalolab-xt-zb6-devkit-light-115200-rpc/chip-bl702-lighting-example.out \
               /tmp/bloat_reports/
       - name: Clean out build output
         run: rm -rf ./out

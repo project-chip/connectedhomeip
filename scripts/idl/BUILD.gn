@@ -18,15 +18,14 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/python.gni")
 
+import("${chip_root}/scripts/idl/files.gni")
+
 pw_python_package("idl") {
   setup = [ "setup.py" ]
-  inputs = [
+  inputs = matter_idl_generator_templates
+  inputs += [
     # Dependency grammar
     "matter_grammar.lark",
-
-    # Templates used for generation
-    "generators/java/ChipClustersCpp.jinja",
-    "generators/java/ChipClustersRead.jinja",
 
     # Unit test data
     "tests/available_tests.yaml",
@@ -35,34 +34,46 @@ pw_python_package("idl") {
     "tests/inputs/optional_argument.matter",
     "tests/inputs/several_clusters.matter",
     "tests/inputs/simple_attribute.matter",
+    "tests/outputs/cluster_struct_attribute/bridge/BridgeClustersImpl.h",
+    "tests/outputs/cluster_struct_attribute/bridge/BridgeGlobalStructs.h",
+    "tests/outputs/cluster_struct_attribute/bridge/DemoClusterServer.h",
     "tests/outputs/cluster_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp",
     "tests/outputs/cluster_struct_attribute/jni/DemoClusterClient-InvokeSubscribeImpl.cpp",
+    "tests/outputs/global_struct_attribute/bridge/BridgeClustersImpl.h",
+    "tests/outputs/global_struct_attribute/bridge/BridgeGlobalStructs.h",
+    "tests/outputs/global_struct_attribute/bridge/DemoClusterServer.h",
     "tests/outputs/global_struct_attribute/jni/DemoClusterClient-ReadImpl.cpp",
     "tests/outputs/global_struct_attribute/jni/DemoClusterClient-InvokeSubscribeImpl.cpp",
     "tests/outputs/optional_argument/jni/MyClusterClient-ReadImpl.cpp",
     "tests/outputs/optional_argument/jni/MyClusterClient-InvokeSubscribeImpl.cpp",
+    "tests/outputs/several_clusters/bridge/BridgeClustersImpl.h",
+    "tests/outputs/several_clusters/bridge/BridgeGlobalStructs.h",
+    "tests/outputs/several_clusters/bridge/FirstServer.h",
+    "tests/outputs/several_clusters/bridge/SecondServer.h",
+    "tests/outputs/several_clusters/bridge/Third.h",
+    "tests/outputs/several_clusters/bridge/ThirdServer.h",
     "tests/outputs/several_clusters/jni/FirstClient-ReadImpl.cpp",
     "tests/outputs/several_clusters/jni/SecondClient-ReadImpl.cpp",
     "tests/outputs/several_clusters/jni/ThirdClient-ReadImpl.cpp",
     "tests/outputs/several_clusters/jni/FirstClient-InvokeSubscribeImpl.cpp",
     "tests/outputs/several_clusters/jni/SecondClient-InvokeSubscribeImpl.cpp",
     "tests/outputs/several_clusters/jni/ThirdClient-InvokeSubscribeImpl.cpp",
+    "tests/outputs/simple_attribute/bridge/BridgeClustersImpl.h",
+    "tests/outputs/simple_attribute/bridge/BridgeGlobalStructs.h",
+    "tests/outputs/simple_attribute/bridge/MyClusterServer.h",
     "tests/outputs/simple_attribute/jni/MyClusterClient-ReadImpl.cpp",
     "tests/outputs/simple_attribute/jni/MyClusterClient-InvokeSubscribeImpl.cpp",
   ]
 
-  sources = [
-    "__init__.py",
-    "generators/__init__.py",
-    "generators/filters.py",
-    "generators/java/__init__.py",
-    "generators/types.py",
-    "matter_idl_parser.py",
-    "matter_idl_types.py",
-  ]
+  sources = matter_idl_generator_sources
 
   tests = [
     "test_matter_idl_parser.py",
     "test_generators.py",
+    "test_xml_parser.py",
   ]
+
+  # TODO: at a future time consider enabling all (* or missing) here to get
+  #       pylint checking these files
+  static_analysis = []
 }

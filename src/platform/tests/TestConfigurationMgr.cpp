@@ -289,7 +289,7 @@ static void TestConfigurationMgr_FirmwareBuildTime(nlTestSuite * inSuite, void *
         // Verify match.
         NL_TEST_ASSERT(inSuite, strcmp(date, parsedDate) == 0);
         NL_TEST_ASSERT(inSuite, strcmp(timeOfDay, parsedTimeOfDay) == 0);
-    } while (0);
+    } while (false);
 
     // Generate random chip epoch times and verify that our BuildTime.h parser
     // macros also work for these.

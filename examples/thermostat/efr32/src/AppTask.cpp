@@ -24,10 +24,14 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+
+#ifdef ENABLE_WSTK_LEDS
 #include "LEDWidget.h"
 #include "sl_simple_led_instances.h"
+#endif // ENABLE_WSTK_LEDS
 
 #ifdef DISPLAY_ENABLED
+#include "ThermostatUI.h"
 #include "lcd.h"
 #ifdef QR_CODE_ENABLED
 #include "qrcodegen.h"
@@ -36,14 +40,18 @@
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <assert.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/EFR32/freertos_bluetooth.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -54,7 +62,10 @@
 #define APP_FUNCTION_BUTTON &sl_button_btn0
 #define APP_THERMOSTAT &sl_button_btn1
 
+#define MODE_TIMER 1000 // 1s timer period
+
 using namespace chip;
+using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
 
 /**********************************************************
@@ -127,9 +138,6 @@ Identify gIdentify = {
 
 } // namespace
 
-using namespace chip::TLV;
-using namespace ::chip::DeviceLayer;
-
 /**********************************************************
  * AppTask Definitions
  *********************************************************/
@@ -142,12 +150,25 @@ CHIP_ERROR AppTask::Init()
 
 #ifdef DISPLAY_ENABLED
     GetLCD().Init((uint8_t *) "Thermostat-App");
+    GetLCD().SetCustomUI(ThermostatUI::DrawUI);
 #endif
 
     err = BaseApplication::Init(&gIdentify);
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("BaseApplication::Init() failed");
+        SILABS_LOG("BaseApplication::Init() failed");
+        appError(err);
+    }
+    err = SensorMgr().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        SILABS_LOG("SensorMgr::Init() failed");
+        appError(err);
+    }
+    err = TempMgr().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        SILABS_LOG("TempMgr::Init() failed");
         appError(err);
     }
 
@@ -167,7 +188,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        EFR32_LOG("AppTask.Init() failed");
+        SILABS_LOG("AppTask.Init() failed");
         appError(err);
     }
 
@@ -175,7 +196,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     sAppTask.StartStatusLEDTimer();
 #endif
 
-    EFR32_LOG("App Task started");
+    SILABS_LOG("App Task started");
     while (true)
     {
         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
@@ -205,34 +226,42 @@ void AppTask::OnIdentifyStop(Identify * identify)
 #endif
 }
 
-void AppTask::ThermostatActionEventHandler(AppEvent * aEvent)
+void AppTask::UpdateThermoStatUI()
 {
-    if (aEvent->Type == AppEvent::kEventType_Button)
+#ifdef DISPLAY_ENABLED
+    ThermostatUI::SetMode(TempMgr().GetMode());
+    ThermostatUI::SetHeatingSetPoint(TempMgr().GetHeatingSetPoint());
+    ThermostatUI::SetCoolingSetPoint(TempMgr().GetCoolingSetPoint());
+    ThermostatUI::SetCurrentTemp(TempMgr().GetCurrentTemp());
+
+#ifdef SL_WIFI
+    if (ConnectivityMgr().IsWiFiStationProvisioned())
+#else
+    if (ConnectivityMgr().IsThreadProvisioned())
+#endif /* !SL_WIFI */
     {
-        EFR32_LOG("App Button was pressed!");
-        // TODO: Implement button functionnality
+        AppTask::GetAppTask().GetLCD().WriteDemoUI(false); // State doesn't Matter
     }
+#else
+    SILABS_LOG("Thermostat Status - M:%d T:%d'C H:%d'C C:%d'C", TempMgr().GetMode(), TempMgr().GetCurrentTemp(),
+               TempMgr().GetHeatingSetPoint(), TempMgr().GetCoolingSetPoint());
+#endif // DISPLAY_ENABLED
 }
 
 void AppTask::ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction)
 {
-    if (buttonHandle == NULL)
+    if (buttonHandle == nullptr)
     {
         return;
     }
 
-    AppEvent button_event           = {};
-    button_event.Type               = AppEvent::kEventType_Button;
-    button_event.ButtonEvent.Action = btnAction;
+    AppEvent aEvent           = {};
+    aEvent.Type               = AppEvent::kEventType_Button;
+    aEvent.ButtonEvent.Action = btnAction;
 
-    if (buttonHandle == APP_THERMOSTAT && btnAction == SL_SIMPLE_BUTTON_PRESSED)
+    if (buttonHandle == APP_FUNCTION_BUTTON)
     {
-        button_event.Handler = ThermostatActionEventHandler;
-        sAppTask.PostEvent(&button_event);
-    }
-    else if (buttonHandle == APP_FUNCTION_BUTTON)
-    {
-        button_event.Handler = BaseApplication::ButtonHandler;
-        sAppTask.PostEvent(&button_event);
+        aEvent.Handler = BaseApplication::ButtonHandler;
+        sAppTask.PostEvent(&aEvent);
     }
 }

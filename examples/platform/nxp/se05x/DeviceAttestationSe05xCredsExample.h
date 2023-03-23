@@ -30,6 +30,7 @@ namespace Examples {
  *          storage abstractions.
  */
 DeviceAttestationCredentialsProvider * GetExampleSe05xDACProvider();
+DeviceAttestationCredentialsProvider * GetExampleSe05xDACProviderv2();
 
 } // namespace Examples
 } // namespace Credentials

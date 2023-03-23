@@ -18,7 +18,9 @@ public class ResourceUtils {
   private static final String KEY_CLUSTERS = "clusters";
   private static final String KEY_CLUSTER_ID = "identifier";
   private static final String KEY_FEATURES = "features";
+  private static final String KEY_FEATURE_FLAGS = "featureFlags";
   private static final String KEY_OPTIONAL_COMMANDS = "optionalCommands";
+  private static final String KEY_OPTIONAL_ATTRIBUTES = "optionalAttributes";
 
   private ResourceUtils() {}
 
@@ -58,14 +60,8 @@ public class ResourceUtils {
             String name = reader.nextName();
             if (name.equals(KEY_CLUSTER_ID)) {
               cluster.clusterIdentifier = reader.nextInt();
-            } else if (name.equals(KEY_FEATURES)) {
-              List<String> features = new ArrayList<>();
-              reader.beginArray();
-              while (reader.hasNext()) {
-                features.add(reader.nextString());
-              }
-              reader.endArray();
-              cluster.features = features.toArray(new String[features.size()]);
+            } else if (name.equals(KEY_FEATURE_FLAGS)) {
+              cluster.features = reader.nextInt();
             } else if (name.equals(KEY_OPTIONAL_COMMANDS)) {
               List<Integer> commands = new ArrayList<>();
               reader.beginArray();
@@ -79,6 +75,19 @@ public class ResourceUtils {
                 commandIds[i++] = command;
               }
               cluster.optionalCommandIdentifiers = commandIds;
+            } else if (name.equals(KEY_OPTIONAL_ATTRIBUTES)) {
+              List<Integer> attributes = new ArrayList<>();
+              reader.beginArray();
+              while (reader.hasNext()) {
+                attributes.add(reader.nextInt());
+              }
+              reader.endArray();
+              int[] attributeIds = new int[attributes.size()];
+              int i = 0;
+              for (Integer command : attributes) {
+                attributeIds[i++] = command;
+              }
+              cluster.optionalAttributesIdentifiers = attributeIds;
             } else {
               reader.skipValue();
             }

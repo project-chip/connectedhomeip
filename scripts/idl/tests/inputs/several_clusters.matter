@@ -12,5 +12,31 @@ client cluster Third = 3 {
       kKnown = 100;
     }
 
+    bitmap LevelControlOptions : BITMAP8 {
+      kExecuteIfOff = 0x1;
+      kCoupleColorTempToLevel = 0x2;
+    }
+
     attribute MyEnum someEnum = 10;
+    attribute LevelControlOptions options = 20;
+}
+
+server cluster Third = 3 {
+    enum MyEnum : enum8 {
+      kUnknown = 0;
+      kKnown = 100;
+    }
+
+    attribute MyEnum someEnum = 10;
+    readonly attribute int16u clusterRevision = 65533;
+}
+
+endpoint 0 {
+  device type rootdevice = 22, version 1;
+  binding cluster Second;
+
+  server cluster Third {
+    ram attribute someEnum;
+    ram attribute clusterRevision default = 2;
+  }
 }

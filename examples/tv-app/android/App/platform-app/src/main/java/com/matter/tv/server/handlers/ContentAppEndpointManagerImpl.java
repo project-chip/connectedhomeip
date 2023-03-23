@@ -6,6 +6,8 @@ import com.matter.tv.server.model.ContentApp;
 import com.matter.tv.server.receivers.ContentAppDiscoveryService;
 import com.matter.tv.server.service.ContentAppAgentService;
 import com.matter.tv.server.tvapp.ContentAppEndpointManager;
+import com.matter.tv.server.utils.EndpointsDataStore;
+import java.util.Collection;
 
 public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager {
 
@@ -18,15 +20,37 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
 
   public String sendCommand(int endpointId, int clusterId, int commandId, String commandPayload) {
     Log.d(TAG, "Received a command for endpointId " + endpointId + ". Message " + commandPayload);
-    for (ContentApp app :
-        ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps().values()) {
-      if (app.getEndpointId() == endpointId) {
-        Log.d(
-            TAG, "Sending a command for endpointId " + endpointId + ". Message " + commandPayload);
-        return ContentAppAgentService.sendCommand(
-            context, app.getAppName(), clusterId, commandId, commandPayload);
-      }
+
+    ContentApp discoveredApp =
+        getContentApp(
+            ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps().values(),
+            endpointId);
+    if (discoveredApp != null) {
+      Log.d(TAG, "Sending a command for endpointId " + endpointId + ". Message " + commandPayload);
+      return ContentAppAgentService.sendCommand(
+          context, discoveredApp.getAppName(), clusterId, commandId, commandPayload);
     }
+
+    // check to see if this was a previously discovered but now removed app
+    ContentApp persistedApp =
+        getContentApp(
+            EndpointsDataStore.getInstance(context).getAllPersistedContentApps().values(),
+            endpointId);
+    if (persistedApp != null) {
+      Log.d(
+          TAG,
+          "Message received for a previously discovered app that is no longer "
+              + "available. App Name "
+              + persistedApp.getAppName());
+      return "{\""
+          + ContentAppAgentService.FAILURE_KEY
+          + "\":{\""
+          + ContentAppAgentService.FAILURE_STATUS_KEY
+          + "\":"
+          + ContentAppAgentService.FAILED_UNSUPPORTED_ENDPOINT
+          + "}}";
+    }
+    // For test cases to pass.
     return "Success";
   }
 
@@ -39,14 +63,44 @@ public class ContentAppEndpointManagerImpl implements ContentAppEndpointManager 
             + clusterId
             + " attributeId "
             + attributeId);
-    for (ContentApp app :
-        ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps().values()) {
+    ContentApp discoveredApp =
+        getContentApp(
+            ContentAppDiscoveryService.getReceiverInstance().getDiscoveredContentApps().values(),
+            endpointId);
+    if (discoveredApp != null) {
+      Log.d(TAG, "Sending attribute read request for endpointId " + endpointId);
+      return ContentAppAgentService.sendAttributeReadRequest(
+          context, discoveredApp.getAppName(), clusterId, attributeId);
+    }
+    // check to see if this was a previously discovered but now removed app
+    ContentApp persistedApp =
+        getContentApp(
+            EndpointsDataStore.getInstance(context).getAllPersistedContentApps().values(),
+            endpointId);
+    if (persistedApp != null) {
+      Log.d(
+          TAG,
+          "Message received for a previously discovered app that is no longer "
+              + "available. App Name "
+              + persistedApp.getAppName());
+      return "{\""
+          + ContentAppAgentService.FAILURE_KEY
+          + "\":{\""
+          + ContentAppAgentService.FAILURE_STATUS_KEY
+          + "\":"
+          + ContentAppAgentService.FAILED_UNSUPPORTED_ENDPOINT
+          + "}}";
+    }
+    // For test cases to pass.
+    return "";
+  }
+
+  ContentApp getContentApp(Collection<ContentApp> apps, int endpointId) {
+    for (ContentApp app : apps) {
       if (app.getEndpointId() == endpointId) {
-        Log.d(TAG, "Sending attribute read request for endpointId " + endpointId);
-        return ContentAppAgentService.sendAttributeReadRequest(
-            context, app.getAppName(), clusterId, attributeId);
+        return app;
       }
     }
-    return "";
+    return null;
   }
 }

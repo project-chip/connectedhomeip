@@ -49,7 +49,7 @@ limitations under the License.
       user’s preferred format.</description>
     <!-- Base data types -->
     <attribute side="server" code="0x00" define="HOUR_FORMAT" type="HourFormat" min="0x00" max="0x01" writable="true" optional="false">HourFormat</attribute>
-    <attribute side="server" code="0x01" define="CALENDAR_TYPE" type="CalendarType" writable="true" optional="true">ActiveCalendarType</attribute>
+    <attribute side="server" code="0x01" define="ACTIVE_CALENDAR_TYPE" type="CalendarType" writable="true" optional="true">ActiveCalendarType</attribute>
     <attribute side="server" code="0x02" define="SUPPORTED_CALENDAR_TYPES" type="ARRAY" entryType="CalendarType" writable="false" optional="true">SupportedCalendarTypes</attribute>  
   </cluster>
 </configurator>

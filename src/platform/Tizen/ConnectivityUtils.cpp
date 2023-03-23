@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#include <platform/Tizen/ConnectivityUtils.h>
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include "ConnectivityUtils.h"
 
 // XXX: This is a workaround for a bug in the Tizen SDK header files. It is not
 //      possible to include both <net/if.h> and <linux/if.h> at the same time.
@@ -29,21 +28,26 @@
 #include <linux/ethtool.h>
 #include <linux/sockios.h>
 #include <linux/wireless.h>
-#include <string.h>
+#include <net/if.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
-#include <sys/types.h>
+#include <unistd.h>
 
-using namespace ::chip::app::Clusters::GeneralDiagnostics;
+#include <cstring>
+
+#include <app-common/zap-generated/cluster-enums.h>
+#include <lib/support/CHIPMemString.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-InterfaceType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
+app::Clusters::GeneralDiagnostics::InterfaceType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
 {
-    InterfaceType ret = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
-    int sock          = -1;
+    app::Clusters::GeneralDiagnostics::InterfaceType ret =
+        app::Clusters::GeneralDiagnostics::InterfaceType::EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
+    int sock = -1;
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
@@ -53,11 +57,11 @@ InterfaceType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
 
     // Test wireless extensions for CONNECTION_WIFI
     struct iwreq pwrq = {};
-    strncpy(pwrq.ifr_name, ifname, IFNAMSIZ - 1);
+    Platform::CopyString(pwrq.ifr_name, ifname);
 
     if (ioctl(sock, SIOCGIWNAME, &pwrq) != -1)
     {
-        ret = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+        ret = app::Clusters::GeneralDiagnostics::InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI;
     }
     else if ((strncmp(ifname, "en", 2) == 0) || (strncmp(ifname, "eth", 3) == 0))
     {
@@ -65,10 +69,10 @@ InterfaceType ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
         ecmd.cmd                = ETHTOOL_GSET;
         struct ifreq ifr        = {};
         ifr.ifr_data            = reinterpret_cast<char *>(&ecmd);
-        strncpy(ifr.ifr_name, ifname, IFNAMSIZ - 1);
+        Platform::CopyString(ifr.ifr_name, ifname);
 
         if (ioctl(sock, SIOCETHTOOL, &ifr) != -1)
-            ret = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
+            ret = app::Clusters::GeneralDiagnostics::InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
     }
 
     close(sock);

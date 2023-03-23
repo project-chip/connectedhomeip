@@ -21,8 +21,17 @@
  *          Platform-specific key value storage implementation for Tizen.
  */
 
-#include "AppPreference.h"
+/**
+ * Note: Use public include for KeyValueStoreManager which includes our local
+ *       platform/<PLATFORM>/KeyValueStoreManagerImpl.h after defining interface
+ *       class. */
 #include <platform/KeyValueStoreManager.h>
+
+#include <cstddef>
+
+#include <lib/core/CHIPError.h>
+
+#include "AppPreference.h"
 
 namespace chip {
 namespace DeviceLayer {

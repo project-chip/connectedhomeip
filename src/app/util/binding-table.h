@@ -117,7 +117,6 @@ private:
     uint8_t mSize = 0;
 
     PersistentStorageDelegate * mStorage;
-    DefaultStorageKeyAllocator mKeyAllocator;
 };
 
 } // namespace chip

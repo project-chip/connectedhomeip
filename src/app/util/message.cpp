@@ -15,30 +15,6 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2020 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-/***************************************************************************/
-/**
- * @file
- * @brief Code for manipulating the incoming and
- *outgoing messages in a flat memory buffer.
- *******************************************************************************
- ******************************************************************************/
-
 #include <app/util/af.h>
 #include <app/util/config.h>
 #include <app/util/util.h>
@@ -68,7 +44,7 @@ static uint8_t * zeroLenBytePtr = (uint8_t *) &zeroLenByte;
 // Utilities for adding bytes to the response buffer: appResponseData. These
 // functions take care of incrementing appResponseLength.
 
-void emberAfClearResponseData(void)
+void emberAfClearResponseData()
 {
     emberAfResponseType = ZCL_UTIL_RESP_NORMAL;
     // To prevent accidentally sending to someone else,
@@ -276,19 +252,4 @@ uint16_t emberAfLongStringLength(const uint8_t * buffer)
     // 0xFFFF means the string is invalid and there is no character data.
     uint16_t length = emberAfGetInt16u(buffer, 0, 2);
     return (length == 0xFFFF ? 0 : length);
-}
-
-uint8_t emberAfGetDate(uint8_t * message, uint16_t currentIndex, uint16_t msgLen, EmberAfDate * destination)
-{
-    if ((currentIndex + 4) > msgLen)
-    {
-        emberAfDebugPrintln("GetDate, %x bytes short", 4);
-        emberAfDebugFlush();
-        return 0;
-    }
-    destination->year       = message[(currentIndex + 0)];
-    destination->month      = message[(currentIndex + 1)];
-    destination->dayOfMonth = message[(currentIndex + 2)];
-    destination->dayOfWeek  = message[(currentIndex + 3)];
-    return 4;
 }

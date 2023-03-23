@@ -83,7 +83,7 @@ def load_config() -> None:
         config["silabs-thread"]["GECKO_SDK"] = f"{_REPO_BASE_PATH}third_party/efr32_sdk/repo"
         config["silabs-thread"]["TTY"] = None
         config["silabs-thread"]["CU"] = None
-        config["silabs-thread"]["EFR32_BOARD"] = None
+        config["silabs-thread"]["SILABS_BOARD"] = None
         config["ameba"]["AMEBA_SDK"] = None
         config["ameba"]["MATTER_SDK"] = None
         config["ameba"]["MODEL"] = 'D'
@@ -299,8 +299,6 @@ def main() -> int:
                       action="store_true", dest="do_interact")
     parser.add_option("-m", "--menuconfig", help="runs menuconfig on platforms that support it",
                       action="store_true", dest="do_menuconfig")
-    parser.add_option("", "--bootstrap_zap", help="installs zap dependencies",
-                      action="store_true", dest="do_bootstrap_zap")
     parser.add_option("-z", "--zap", help="runs zap to generate data model & interaction model artifacts",
                       action="store_true", dest="do_run_zap")
     parser.add_option("-g", "--zapgui", help="runs zap GUI display to allow editing of data model",
@@ -353,29 +351,6 @@ def main() -> int:
     options, _ = parser.parse_args(sys.argv[1:])
 
     splash()
-
-    #
-    # ZAP bootstrapping
-    #
-
-    if options.do_bootstrap_zap:
-        if sys.platform == "linux" or sys.platform == "linux2":
-            flush_print("Installing ZAP OS package dependencies")
-            install_deps_cmd = """\
-            sudo apt-get install nodejs node-yargs npm
-            libpixman-1-dev libcairo2-dev libpango1.0-dev node-pre-gyp
-            libjpeg9-dev libgif-dev node-typescript"""
-            shell.run_cmd(unwrap_cmd(install_deps_cmd))
-        if sys.platform == "darwin":
-            flush_print(
-                "Installation of ZAP OS packages not supported on MacOS")
-        if sys.platform == "win32":
-            flush_print(
-                "Installation of ZAP OS packages not supported on Windows")
-
-        flush_print("Running NPM to install ZAP Node.JS dependencies")
-        shell.run_cmd(
-            f"cd {_REPO_BASE_PATH}/third_party/zap/repo/ && npm install")
 
     #
     # CI
@@ -493,11 +468,11 @@ def main() -> int:
         pass
     elif options.build_target == "silabs-thread":
         flush_print('Path to gecko sdk is configured within Matter.')
-        if 'EFR32_BOARD' not in config['silabs-thread'] or config['silabs-thread']['EFR32_BOARD'] is None:
+        if 'SILABS_BOARD' not in config['silabs-thread'] or config['silabs-thread']['SILABS_BOARD'] is None:
             flush_print(
-                'EFR32_BOARD was not configured. Make sure silabs-thread.EFR32_BOARD is set on your config.yaml file')
+                'SILABS_BOARD was not configured. Make sure silabs-thread.SILABS_BOARD is set on your config.yaml file')
             exit(1)
-        efr32_board = config['silabs-thread']['EFR32_BOARD']
+        silabs_board = config['silabs-thread']['SILABS_BOARD']
     elif options.build_target == "ameba":
         if config['ameba']['AMEBA_SDK'] is None:
             flush_print(
@@ -688,7 +663,7 @@ def main() -> int:
                 f'{_REPO_BASE_PATH}/scripts/examples/gn_efr32_example.sh')
             efr32_cmd_args.append('./')
             efr32_cmd_args.append(f'out/{options.sample_device_type_name}')
-            efr32_cmd_args.append(f'{efr32_board}')
+            efr32_cmd_args.append(f'{silabs_board}')
             efr32_cmd_args.append(
                 f'\'sample_name=\"{options.sample_device_type_name}\"\'')
             if sw_ver_string:
@@ -715,6 +690,7 @@ def main() -> int:
             elif config['ameba']['MODEL'] == 'Z2':
                 shell.run_cmd(
                     f"cd {config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE")
+                shell.run_cmd("rm -f project_include.mk")
                 with open(f"{config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE/project_include.mk", "w") as f:
                     f.write(textwrap.dedent(f"""\
                         SAMPLE_NAME = {options.sample_device_type_name}
@@ -829,7 +805,7 @@ def main() -> int:
         elif (options.build_target == "silabs-thread") or (options.build_target == "silabs-wifi"):
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/efr32")
             shell.run_cmd(
-                f"python3 out/{options.sample_device_type_name}/{efr32_board}/chip-efr32-chef-example.flash.py")
+                f"python3 out/{options.sample_device_type_name}/{silabs_board}/chip-efr32-chef-example.flash.py")
 
             shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}")
         elif (options.build_target == "ameba"):
@@ -840,8 +816,11 @@ def main() -> int:
                 shell.run_cmd(
                     f"{config['ameba']['AMEBA_SDK']}/tools/AmebaD/Image_Tool_Linux/flash.sh {config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}/project/realtek_amebaD_va0_example/GCC-RELEASE/out", raise_on_returncode=False)
             else:
-                flush_print(
-                    "Ameba Z2 currently does not support flashing image through script, stil WIP")
+                shell.run_cmd(f"cd {_CHEF_SCRIPT_PATH}/ameba")
+                shell.run_cmd(
+                    f"cd {config['ameba']['AMEBA_SDK']}/tools/AmebaZ2/Image_Tool_Linux")
+                shell.run_cmd(
+                    f"{config['ameba']['AMEBA_SDK']}/tools/AmebaZ2/Image_Tool_Linux/flash.sh {config['ameba']['TTY']} {config['ameba']['AMEBA_SDK']}/project/realtek_amebaz2_v0_example/GCC-RELEASE/application_is/Debug/bin", raise_on_returncode=False)
 
     #
     # Terminal interaction

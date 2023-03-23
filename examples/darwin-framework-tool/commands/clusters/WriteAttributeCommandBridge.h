@@ -107,7 +107,8 @@ protected:
     void AddArguments()
     {
         AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs,
-            "If provided, do a timed write with the given timed interaction timeout.");
+            "If provided, do a timed write with the given timed interaction timeout. See \"7.6.10. Timed Interaction\" in the "
+            "Matter specification.");
         ModelCommand::AddArguments();
     }
 

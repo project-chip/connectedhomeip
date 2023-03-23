@@ -2,8 +2,8 @@
 
 #include <commands/clusters/ComplexArgument.h>
 
-{{#structs_with_cluster_name}}
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label, {{zapTypeToEncodableClusterObjectType name ns=clusterName}} & request, Json::Value & value)
+{{#structs_with_clusters groupByStructName=1}}
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::{{#unless (is_number_greater_than structClusterCount 1)}}{{as_camel_cased clusterName false}}{{else}}detail{{/unless}}::Structs::{{name}}::Type & request, Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -38,11 +38,11 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label, {{zapTypeToEncodable
     return CHIP_NO_ERROR;
 }
 
-void ComplexArgumentParser::Finalize({{zapTypeToEncodableClusterObjectType name ns=clusterName}} & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::{{#unless (is_number_greater_than structClusterCount 1)}}{{as_camel_cased clusterName false}}{{else}}detail{{/unless}}::Structs::{{name}}::Type & request)
 {
     {{#zcl_struct_items}}
     ComplexArgumentParser::Finalize(request.{{asLowerCamelCase label}});
     {{/zcl_struct_items}}
 }
-{{/structs_with_cluster_name}}
+{{/structs_with_clusters}}
 

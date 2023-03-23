@@ -1407,202 +1407,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
 } // namespace TargetNavigator
 
-namespace TestCluster {
-
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
-{
-    CHIP_ERROR TLVError = CHIP_NO_ERROR;
-    bool wasHandled     = false;
-    {
-        switch (aCommandPath.mCommandId)
-        {
-        case Commands::Test::Id: {
-            Commands::Test::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfTestClusterClusterTestCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::TestNotHandled::Id: {
-            Commands::TestNotHandled::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfTestClusterClusterTestNotHandledCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::TestSpecific::Id: {
-            Commands::TestSpecific::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfTestClusterClusterTestSpecificCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::TestAddArguments::Id: {
-            Commands::TestAddArguments::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfTestClusterClusterTestAddArgumentsCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::TestStructArgumentRequest::Id: {
-            Commands::TestStructArgumentRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfTestClusterClusterTestStructArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::TestNestedStructArgumentRequest::Id: {
-            Commands::TestNestedStructArgumentRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled =
-                    emberAfTestClusterClusterTestNestedStructArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::TestListStructArgumentRequest::Id: {
-            Commands::TestListStructArgumentRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled =
-                    emberAfTestClusterClusterTestListStructArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::TestListInt8UArgumentRequest::Id: {
-            Commands::TestListInt8UArgumentRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfTestClusterClusterTestListInt8UArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::TestNestedStructListArgumentRequest::Id: {
-            Commands::TestNestedStructListArgumentRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled =
-                    emberAfTestClusterClusterTestNestedStructListArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::TestListNestedStructListArgumentRequest::Id: {
-            Commands::TestListNestedStructListArgumentRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfTestClusterClusterTestListNestedStructListArgumentRequestCallback(apCommandObj, aCommandPath,
-                                                                                                      commandData);
-            }
-            break;
-        }
-        case Commands::TestListInt8UReverseRequest::Id: {
-            Commands::TestListInt8UReverseRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfTestClusterClusterTestListInt8UReverseRequestCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::TestEnumsRequest::Id: {
-            Commands::TestEnumsRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfTestClusterClusterTestEnumsRequestCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::TestNullableOptionalRequest::Id: {
-            Commands::TestNullableOptionalRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfTestClusterClusterTestNullableOptionalRequestCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::SimpleStructEchoRequest::Id: {
-            Commands::SimpleStructEchoRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfTestClusterClusterSimpleStructEchoRequestCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::TimedInvokeRequest::Id: {
-            Commands::TimedInvokeRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfTestClusterClusterTimedInvokeRequestCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::TestSimpleOptionalArgumentRequest::Id: {
-            Commands::TestSimpleOptionalArgumentRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled =
-                    emberAfTestClusterClusterTestSimpleOptionalArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::TestEmitTestEventRequest::Id: {
-            Commands::TestEmitTestEventRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfTestClusterClusterTestEmitTestEventRequestCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::TestEmitTestFabricScopedEventRequest::Id: {
-            Commands::TestEmitTestFabricScopedEventRequest::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled =
-                    emberAfTestClusterClusterTestEmitTestFabricScopedEventRequestCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
-                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
-        }
-        }
-    }
-
-    if (CHIP_NO_ERROR != TLVError || !wasHandled)
-    {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
-        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
-    }
-}
-
-} // namespace TestCluster
-
 namespace Thermostat {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
@@ -1639,6 +1443,202 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 }
 
 } // namespace Thermostat
+
+namespace UnitTesting {
+
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+{
+    CHIP_ERROR TLVError = CHIP_NO_ERROR;
+    bool wasHandled     = false;
+    {
+        switch (aCommandPath.mCommandId)
+        {
+        case Commands::Test::Id: {
+            Commands::Test::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfUnitTestingClusterTestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::TestNotHandled::Id: {
+            Commands::TestNotHandled::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfUnitTestingClusterTestNotHandledCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::TestSpecific::Id: {
+            Commands::TestSpecific::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfUnitTestingClusterTestSpecificCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::TestAddArguments::Id: {
+            Commands::TestAddArguments::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfUnitTestingClusterTestAddArgumentsCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::TestStructArgumentRequest::Id: {
+            Commands::TestStructArgumentRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfUnitTestingClusterTestStructArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::TestNestedStructArgumentRequest::Id: {
+            Commands::TestNestedStructArgumentRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled =
+                    emberAfUnitTestingClusterTestNestedStructArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::TestListStructArgumentRequest::Id: {
+            Commands::TestListStructArgumentRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled =
+                    emberAfUnitTestingClusterTestListStructArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::TestListInt8UArgumentRequest::Id: {
+            Commands::TestListInt8UArgumentRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfUnitTestingClusterTestListInt8UArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::TestNestedStructListArgumentRequest::Id: {
+            Commands::TestNestedStructListArgumentRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled =
+                    emberAfUnitTestingClusterTestNestedStructListArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::TestListNestedStructListArgumentRequest::Id: {
+            Commands::TestListNestedStructListArgumentRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfUnitTestingClusterTestListNestedStructListArgumentRequestCallback(apCommandObj, aCommandPath,
+                                                                                                      commandData);
+            }
+            break;
+        }
+        case Commands::TestListInt8UReverseRequest::Id: {
+            Commands::TestListInt8UReverseRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfUnitTestingClusterTestListInt8UReverseRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::TestEnumsRequest::Id: {
+            Commands::TestEnumsRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfUnitTestingClusterTestEnumsRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::TestNullableOptionalRequest::Id: {
+            Commands::TestNullableOptionalRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfUnitTestingClusterTestNullableOptionalRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::SimpleStructEchoRequest::Id: {
+            Commands::SimpleStructEchoRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfUnitTestingClusterSimpleStructEchoRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::TimedInvokeRequest::Id: {
+            Commands::TimedInvokeRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfUnitTestingClusterTimedInvokeRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::TestSimpleOptionalArgumentRequest::Id: {
+            Commands::TestSimpleOptionalArgumentRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled =
+                    emberAfUnitTestingClusterTestSimpleOptionalArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::TestEmitTestEventRequest::Id: {
+            Commands::TestEmitTestEventRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfUnitTestingClusterTestEmitTestEventRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::TestEmitTestFabricScopedEventRequest::Id: {
+            Commands::TestEmitTestFabricScopedEventRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled =
+                    emberAfUnitTestingClusterTestEmitTestFabricScopedEventRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
+            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
+                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
+            return;
+        }
+        }
+    }
+
+    if (CHIP_NO_ERROR != TLVError || !wasHandled)
+    {
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+    }
+}
+
+} // namespace UnitTesting
 
 namespace WindowCovering {
 
@@ -1778,11 +1778,11 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
     case Clusters::TargetNavigator::Id:
         Clusters::TargetNavigator::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
-    case Clusters::TestCluster::Id:
-        Clusters::TestCluster::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
-        break;
     case Clusters::Thermostat::Id:
         Clusters::Thermostat::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        break;
+    case Clusters::UnitTesting::Id:
+        Clusters::UnitTesting::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::WindowCovering::Id:
         Clusters::WindowCovering::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
