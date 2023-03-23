@@ -66,7 +66,6 @@ public:
     /// @param clusterBuffer Buffer to hold the supported cluster IDs, cannot hold more than
     /// CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE. The function shall use the reduce_size() method in the event it is supporting
     /// less than CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE clusters.
-
     virtual void GetSupportedClusters(EndpointId endpoint, Span<ClusterId> & clusterBuffer) = 0;
 
     /// @brief Returns whether or not a cluster for scenes is supported on an endpoint
@@ -81,14 +80,13 @@ public:
     ///
     /// @param endpoint[in] Endpoint ID
     /// @param extensionFieldSet[in] ExtensionFieldSets provided by the AddScene Command, pre initialized
-    /// @param cluster[out]  Cluster in the Extension field set, filled by the function
     /// @param serialisedBytes[out] Buffer to fill from the ExtensionFieldSet in command
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
     /// @note Only gets called after the scene-cluster has previously verified that the endpoint,cluster valuer pair is supported by
     /// the handler. It is therefore the implementation's reponsibility to also implement the SupportsCluster method.
     virtual CHIP_ERROR SerializeAdd(EndpointId endpoint,
                                     const app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
-                                    ClusterId & cluster, MutableByteSpan & serialisedBytes) = 0;
+                                    MutableByteSpan & serialisedBytes) = 0;
 
     /// @brief Called when handling StoreScene, and only if the handler supports the given endpoint and cluster.
     ///
@@ -98,7 +96,7 @@ public:
     /// @param cluster[in] Target Cluster
     /// @param serializedBytes[out] Output buffer, data needs to be writen in there and size adjusted to the size of the data
     /// written.
-
+    ///
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
     virtual CHIP_ERROR SerializeSave(EndpointId endpoint, ClusterId cluster, MutableByteSpan & serializedBytes) = 0;
 
@@ -123,6 +121,7 @@ public:
     ///
     /// @param timeMs[in] Transition time in ms to apply the scene
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
+    /// @note Only gets called for handlers for which SupportsCluster() is true for the given endpoint and cluster.
     virtual CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
                                   TransitionTimeMs timeMs) = 0;
 };
@@ -219,9 +218,8 @@ public:
 
         bool operator==(const SceneData & other)
         {
-            return (mNameLength == other.mNameLength && !memcmp(mName, other.mName,mNameLength) &&
-                    (mSceneTransitionTimeMs == other.mSceneTransitionTimeMs) &&
-                    (mExtensionFieldSets == other.mExtensionFieldSets));
+            return (mNameLength == other.mNameLength && !memcmp(mName, other.mName, mNameLength) &&
+                    (mSceneTransitionTimeMs == other.mSceneTransitionTimeMs) && (mExtensionFieldSets == other.mExtensionFieldSets));
         }
 
         void operator=(const SceneData & other)

@@ -176,55 +176,60 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
-        TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
+        TLV::TLVType fabricSceneContainer;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, fabricSceneContainer));
         ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kSceneCount), scene_count));
-        ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(TagScene::kStorageIDArray), TLV::kTLVType_Array, container));
+        TLV::TLVType sceneMapContainer;
+        ReturnErrorOnFailure(
+            writer.StartContainer(TLV::ContextTag(TagScene::kStorageIDArray), TLV::kTLVType_Array, sceneMapContainer));
 
         // Storing the scene map
         for (uint8_t i = 0; i < kMaxScenesPerFabric; i++)
         {
-            ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
+            TLV::TLVType sceneIdContainer;
+            ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, sceneIdContainer));
             ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kEndpointID), (scene_map[i].mEndpointId)));
             ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kGroupID), (scene_map[i].mGroupId)));
             ReturnErrorOnFailure(writer.Put(TLV::ContextTag(TagScene::kSceneID), (scene_map[i].mSceneId)));
-            ReturnErrorOnFailure(writer.EndContainer(container));
+            ReturnErrorOnFailure(writer.EndContainer(sceneIdContainer));
         }
-        ReturnErrorOnFailure(writer.EndContainer(container));
-        return writer.EndContainer(container);
+        ReturnErrorOnFailure(writer.EndContainer(sceneMapContainer));
+        return writer.EndContainer(fabricSceneContainer);
     }
 
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
     {
         ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
 
-        TLV::TLVType container;
-        ReturnErrorOnFailure(reader.EnterContainer(container));
+        TLV::TLVType fabricSceneContainer;
+        ReturnErrorOnFailure(reader.EnterContainer(fabricSceneContainer));
 
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kSceneCount)));
         ReturnErrorOnFailure(reader.Get(scene_count));
         ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::ContextTag(TagScene::kStorageIDArray)));
-        ReturnErrorOnFailure(reader.EnterContainer(container));
+        TLV::TLVType sceneMapContainer;
+        ReturnErrorOnFailure(reader.EnterContainer(sceneMapContainer));
 
         uint8_t i = 0;
         CHIP_ERROR err;
         while ((err = reader.Next(TLV::AnonymousTag())) == CHIP_NO_ERROR && i < kMaxScenesPerFabric)
         {
-            ReturnErrorOnFailure(reader.EnterContainer(container));
+            TLV::TLVType sceneIdContainer;
+            ReturnErrorOnFailure(reader.EnterContainer(sceneIdContainer));
             ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kEndpointID)));
             ReturnErrorOnFailure(reader.Get(scene_map[i].mEndpointId));
             ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kGroupID)));
             ReturnErrorOnFailure(reader.Get(scene_map[i].mGroupId));
             ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kSceneID)));
             ReturnErrorOnFailure(reader.Get(scene_map[i].mSceneId));
-            ReturnErrorOnFailure(reader.ExitContainer(container));
+            ReturnErrorOnFailure(reader.ExitContainer(sceneIdContainer));
 
             i++;
         }
-        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+        VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, err);
 
-        ReturnErrorOnFailure(reader.ExitContainer(container));
-        return reader.ExitContainer(container);
+        ReturnErrorOnFailure(reader.ExitContainer(sceneMapContainer));
+        return reader.ExitContainer(fabricSceneContainer);
     }
 
     /// @brief Finds the index where to insert current scene by going through the whole table and looking if the scene is already in
