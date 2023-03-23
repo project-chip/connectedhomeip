@@ -60,15 +60,19 @@ endif()
 
 # for development purpose user can use default certs instead of generating or providing them
 if(CONFIG_CHIP_FACTORY_DATA_USE_DEFAULT_CERTS)
+    # convert decimal VID to its hexadecimal representation to find out certification files in repository
+    math(EXPR LOCAL_VID "${CONFIG_CHIP_DEVICE_VENDOR_ID}" OUTPUT_FORMAT HEXADECIMAL)
+    string(SUBSTRING ${LOCAL_VID} 2 -1 raw_vid)
+    string(TOUPPER ${raw_vid} raw_vid_upper)
     # convert decimal PID to its hexadecimal representation to find out certification files in repository
     math(EXPR LOCAL_PID "${CONFIG_CHIP_DEVICE_PRODUCT_ID}" OUTPUT_FORMAT HEXADECIMAL)
     string(SUBSTRING ${LOCAL_PID} 2 -1 raw_pid)
     string(TOUPPER ${raw_pid} raw_pid_upper)
     # all certs are located in ${CHIP_ROOT}/credentials/development/attestation
     # it can be used during development without need to generate new certifications
-    string(APPEND script_args "--dac_cert \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-DAC-${raw_pid_upper}-Cert.der\"\n")
-    string(APPEND script_args "--dac_key \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-DAC-${raw_pid_upper}-Key.der\"\n")
-    string(APPEND script_args "--pai_cert \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-PAI-noPID-Cert.der\"\n")
+    string(APPEND script_args "--dac_cert \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-DAC-${raw_vid_upper}-${raw_pid_upper}-Cert.der\"\n")
+    string(APPEND script_args "--dac_key \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-DAC-${raw_vid_upper}-${raw_pid_upper}-Key.der\"\n")
+    string(APPEND script_args "--pai_cert \"${CHIP_ROOT}/credentials/development/attestation/Matter-Development-PAI-${raw_vid_upper}-noPID-Cert.der\"\n")
 elseif(CONFIG_CHIP_FACTORY_DATA_CERT_SOURCE_USER)
     string(APPEND script_args "--dac_cert \"${CONFIG_CHIP_FACTORY_DATA_USER_CERTS_DAC_CERT}\"\n")
     string(APPEND script_args "--dac_key \"${CONFIG_CHIP_FACTORY_DATA_USER_CERTS_DAC_KEY}\"\n")
@@ -88,12 +92,7 @@ string(APPEND script_args "--include_passcode\n")
 string(APPEND script_args "--overwrite\n")
 
 # check if spake2 verifier should be generated using script
-if(CONFIG_CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER)
-    # request script to generate a new spake2_verifier
-    # by adding an argument to script_args
-    find_program(spake_exe NAMES spake2p REQUIRED)
-    string(APPEND script_args "--spake2p_path ${spake_exe}\n")   
-else()
+if(NOT CONFIG_CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER)
     # Spake2 verifier should be provided using kConfig
     string(APPEND script_args "--spake2_verifier \"${CONFIG_CHIP_DEVICE_SPAKE2_TEST_VERIFIER}\"\n")
 endif()

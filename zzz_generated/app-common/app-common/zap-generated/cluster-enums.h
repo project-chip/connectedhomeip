@@ -2219,9 +2219,6 @@ namespace ThermostatUserInterfaceConfiguration {} // namespace ThermostatUserInt
 
 namespace ColorControl {
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ColorLoopAction
 enum class ColorLoopAction : uint8_t
 {
@@ -2234,14 +2231,7 @@ enum class ColorLoopAction : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 3,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ColorLoopAction                                                                      = EmberAfColorLoopAction;
-static ColorLoopAction __attribute__((unused)) kColorLoopActionkUnknownEnumValue           = static_cast<ColorLoopAction>(3);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ColorLoopDirection
 enum class ColorLoopDirection : uint8_t
 {
@@ -2253,10 +2243,6 @@ enum class ColorLoopDirection : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 2,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ColorLoopDirection                                                                   = EmberAfColorLoopDirection;
-static ColorLoopDirection __attribute__((unused)) kColorLoopDirectionkUnknownEnumValue     = static_cast<ColorLoopDirection>(2);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.

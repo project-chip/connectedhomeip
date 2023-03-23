@@ -42,7 +42,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             using namespace app::Clusters::{{asUpperCamelCase name}};
             switch (aPath.mAttributeId)
             {
-                {{#chip_server_cluster_attributes}}
+                {{#zcl_attributes_server removeKeys='isOptional'}}
                 case Attributes::{{asUpperCamelCase name}}::Id: {
                     using TypeInfo = Attributes::{{asUpperCamelCase name}}::TypeInfo;
                     TypeInfo::DecodableType cppValue;
@@ -54,7 +54,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     {{>decode_value target="value" source="cppValue" cluster=(asUpperCamelCase parent.name) depth=0 earlyReturn="nullptr"}}
                     return value;
                 }
-                {{/chip_server_cluster_attributes}}
+                {{/zcl_attributes_server}}
                 default:
                     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
                     break;

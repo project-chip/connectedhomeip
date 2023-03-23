@@ -49,11 +49,6 @@ def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, No
         else:
             return 'CharString'
     elif type(actual) == BasicInteger:
-        # TODO: unclear why this, but tries to match zap:
-        #       once java fully moves to jinja, these can probably be removed
-        if actual.idl_name.lower() in {'vendor_id', 'fabric_idx', 'group_id'}:
-            return None
-
         if actual.is_signed:
             return "Int{}s".format(actual.power_of_two_bits)
         else:

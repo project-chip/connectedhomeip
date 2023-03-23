@@ -431,7 +431,6 @@ extern "C" __attribute__((naked)) void HardFault_Handler(void)
                    "bx r1                                         \n"
                    "debugHardfault_address: .word debugHardfault  \n");
 }
-
 #endif // HARD_FAULT_LOG_ENABLE && SILABS_LOG_ENABLED
 
 #if HARD_FAULT_LOG_ENABLE

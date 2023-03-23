@@ -7,7 +7,7 @@ ARG COMMITHASH=7b99e6399c6069037c613782d78132c69b9dcabb
 # ZAP Development install, so that it runs on both x64 and arm64
 # Generally this should match with the ZAP version that is used for codegen within the
 # specified SHA
-ARG ZAP_VERSION=v2023.03.17-nightly
+ARG ZAP_VERSION=v2023.03.23-nightly
 
 # Ensure TARGETPLATFORM is set
 RUN case ${TARGETPLATFORM} in \
@@ -299,7 +299,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/thermostat-app thermo
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-provider-app chip-ota-provider-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-requestor-app chip-ota-requestor-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lock-app chip-lock-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/app1/chip-app1 chip-app1
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-app1 chip-app1
 
 # Stage 3.1 Setup the Matter Python environment
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_lib python_lib

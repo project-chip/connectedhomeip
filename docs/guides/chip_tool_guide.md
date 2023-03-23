@@ -3,6 +3,7 @@
 The CHIP Tool (`chip-tool`) is a Matter controller implementation that allows to
 commission a Matter device into the network and to communicate with it using
 Matter messages, which may encode Data Model actions, such as cluster commands.
+
 The tool also provides other utilities specific to Matter, such as parsing of
 the setup payload or performing discovery actions.
 
@@ -65,11 +66,10 @@ cases are described in the
 
 ## Using CHIP Tool for Matter device testing
 
-This section describes how to use CHIP Tool to test the Matter device. The
-following steps depend on the application clusters that you implemented on the
-device.
+The following steps depend on the application clusters that you implemented on
+the device.
 
-This tutorial is using the
+The steps are using the
 [Matter Lighting Application Example](https://github.com/project-chip/connectedhomeip/tree/master/examples/lighting-app)
 with the Bluetooth LE commissioning method support. You can use other Matter
 examples and still follow this procedure. If you use a different example, the
@@ -86,10 +86,10 @@ documentation.
 
 Some examples are configured to advertise automatically on boot. Other examples
 require physical trigger, for example pushing a button. Follow the documentation
-of the Matter device example to learn how Bluetooth LE advertising is enabled
-for the given example.
+of the Matter device example for the chosen platform to learn how Bluetooth LE
+advertising is enabled for the given example.
 
-### Step 3: Make sure the IP network is set up
+### Step 3: Set up the IP network
 
 To follow the next steps, the IP network must be up and running. For instance,
 the Thread network can be established using
@@ -147,10 +147,14 @@ administrator.
 
 ### Step 5: Determine Matter device's discriminator and setup PIN code
 
-Matter uses a 12-bit value called _discriminator_ to discern between multiple
-commissionable device advertisements and a 27-bit _setup PIN code_ to
-authenticate the device. You can find these values in the logging terminal of
-the device (for instance, UART) when the device boots up. For example:
+Matter uses the following values:
+
+-   Discriminator - A 12-bit value used to discern between multiple
+    commissionable device advertisements.
+-   Setup PIN code - A 27-bit value used to authenticate the device.
+
+You can find these values in the logging terminal of the device (for instance
+UART) when the device boots up. For example:
 
 ```
 I: 254 [DL]Device Configuration:
@@ -164,24 +168,28 @@ I: 278 [DL] Manufacturing Date: (not set)
 I: 281 [DL] Device Type: 65535 (0xFFFF)
 ```
 
-In this printout, the _discriminator_ is `3840 (0xF00)` and the _setup PIN code_
-is equal to `20202021`.
+In this printout, the discriminator is `3840 (0xF00)` and the setup PIN code is
+`20202021`.
 
 ### Step 6: Commission Matter device into an existing IP network
 
 Before communicating with the Matter device, first it must join an existing IP
 network.
 
-Matter devices may use different commissioning channel. Typically, devices which
-are not yet connected to the target IP network use Bluetooth LE as the
-commissioning channel. However, if the device has already joined an IP network,
-the only thing needed is to commission it to the Matter network over the IP
-protocol.
+Matter devices can use different commissioning channels:
+
+-   Devices that are not yet connected to the target IP network use Bluetooth LE
+    as the commissioning channel.
+-   Devices that have already joined an IP network only need to use the IP
+    protocol for commissioning to the Matter network.
 
 #### Commissioning over Bluetooth LE
 
-This section describes how your device can join the existing IP network over
-Bluetooth LE and then be commissioned into a Matter network.
+In this case, your device can join the existing IP network over Bluetooth LE and
+then be commissioned into a Matter network.
+
+Different scenarios are available for Thread and Wi-Fi networks, as described in
+the following subsections.
 
 After connecting the device over Bluetooth LE, the controller prints the
 following log:
@@ -243,13 +251,14 @@ This option is available when the Matter device is already present in an IP
 network, but it has not been commissioned to a Matter network yet.
 
 To commission the device, you can use either the setup PIN code or the setup PIN
-code and the discriminator, both of which you obtained in the step 5.
+code and the discriminator, both of which you obtained in the
+[step 5](#step-5-determine-matter-devices-discriminator-and-setup-pin-code).
 Alternatively, you can also use a QR code payload.
 
 ##### Commissioning with setup PIN code
 
-Use the following command pattern to discover devices and try to pair with the
-first discovered one using the provided setup code:
+To discover devices and try to pair with the first discovered device using the
+provided setup code, use the following command pattern:
 
 ```
 $ ./chip-tool pairing onnetwork <node_id> <pin_code>
@@ -264,8 +273,8 @@ In this command:
 
 ##### Commissioning with long discriminator
 
-Use the following command pattern to discover devices with a long discriminator
-and try to pair with the first discovered one using the provided setup code.
+To discover devices with a long discriminator and try to pair with the first
+discovered one using the provided setup code, use the following command pattern:
 
 ```
 $ ./chip-tool pairing onnetwork-long <node_id> <pin_code> <discriminator>
@@ -282,8 +291,9 @@ In this command:
 
 Matter devices log the QR code payload and manual pairing code when they boot.
 
-Use the following command pattern to discover devices based on the given QR code
-payload or manual pairing code and try to pair with the first discovered one:
+To discover devices based on the given QR code payload or manual pairing code
+and try to pair with the first discovered one, use the following command
+pattern:
 
 ```
 $ ./chip-tool pairing code <node_id> <qrcode_payload-or-manual_code>
@@ -298,8 +308,8 @@ In this command:
 
 #### Forgetting the already-commissioned device
 
-The following command removes the device with the given node ID from the list of
-commissioned Matter devices:
+In case commissioning needs to be retested, the following command removes the
+device with the given node ID from the list of commissioned Matter devices:
 
 ```
 $ ./chip-tool pairing unpair <node_id>
@@ -314,39 +324,43 @@ Having completed all previous steps, you have the Matter device successfully
 commissioned to the network. You can now test the device by interacting with
 Data Model clusters.
 
-For instance, in case of the lighting application, the application has the
-On/Off and Level Control clusters implemented. This means that you can test it
-by toggling the bulb (using the `onoff` cluster commands) or manipulating its
-brightness (using the `levelcontrol` cluster commands).
+#### Example: Matter Lighting Application Example
 
-Use the following command pattern to toggle the LED state:
+In case of the Matter Lighting Application Example we referenced in step 1, the
+application implements the On/Off and Level Control clusters. This means that
+you can test it by toggling the bulb (using the `onoff` cluster commands) or by
+manipulating its brightness (using the `levelcontrol` cluster commands):
 
-```
-$ ./chip-tool onoff toggle <node_id> <endpoint_id>
-```
+-   Use the following command pattern to toggle the OnOff attribute state (e.g.
+    visualized by the LED state):
 
-In this command:
+    ```
+    $ ./chip-tool onoff toggle <node_id> <endpoint_id>
+    ```
 
--   _<node_id\>_ is the user-defined ID of the commissioned node.
--   _<endpoint_id\>_ is the ID of the endpoint with OnOff cluster implemented.
+    In this command:
 
-Alternatively, use the following command pattern to change the brightness of the
-LED:
+    -   _<node_id\>_ is the user-defined ID of the commissioned node.
+    -   _<endpoint_id\>_ is the ID of the endpoint with OnOff cluster
+        implemented.
 
-```
-$ ./chip-tool levelcontrol move-to-level <level> <transition_time> <option_mask> <option_override> <node_id> <endpoint_id>
-```
+-   Use the following command pattern to change the value of the CurrentLevel
+    attribute (e.g. visualized by the LED brightness):
 
-In this command:
+    ```
+    $ ./chip-tool levelcontrol move-to-level <level> <transition_time> <option_mask> <option_override> <node_id> <endpoint_id>
+    ```
 
--   _<level\>_ is the brightness level encoded between `0` and `254`, unless a
-    custom range is configured in the cluster.
--   _<transition_time\>_ is the transition time.
--   _<option_mask\>_ is the option mask.
--   _<option_override\>_ is the option override.
--   _<node_id\>_ is the user-defined ID of the commissioned node.
--   _<endpoint_id\>_ is the ID of the endpoint with LevelControl cluster
-    implemented.
+    In this command:
+
+    -   _<level\>_ is the brightness level encoded between `0` and `254`, unless
+        a custom range is configured in the cluster.
+    -   _<transition_time\>_ is the transition time.
+    -   _<option_mask\>_ is the option mask.
+    -   _<option_override\>_ is the option override.
+    -   _<node_id\>_ is the user-defined ID of the commissioned node.
+    -   _<endpoint_id\>_ is the ID of the endpoint with LevelControl cluster
+        implemented.
 
 ### Step 8: Read basic information from the Matter device
 
@@ -382,34 +396,44 @@ $ ./chip-tool basic
 This section contains a general list of various CHIP Tool commands and options,
 not limited to commissioning procedure and cluster interaction.
 
-### Interactive mode versus single command mode
+### Interactive mode versus single-command mode
 
-By default, chip-tool runs in single command mode where if any single command
-does not complete within a certain timeout period, chip-tool will exit with a
-timeout error.
+The CHIP Tool can run in one of the following modes:
 
-Example of error:
+-   Single-command mode (default) - In this mode, the CHIP Tool will exit with a
+    timeout error if any single command does not complete within a certain
+    timeout period.
 
-```
-[1650992689511] [32397:1415601] CHIP: [TOO] Run command failure: ../../../examples/chip-tool/commands/common/CHIPCommand.cpp:392: CHIP Error 0x00000032: Timeout
-```
+    The timeout error will look similar to the following one:
+
+    ```
+    [1650992689511] [32397:1415601] CHIP: [TOO] Run command failure: ../../../examples/chip-tool/commands/common/CHIPCommand.cpp:392: CHIP Error 0x00000032: Timeout
+    ```
+
+-   Interactive mode - In this mode, a command will terminate with an error if
+    it does not complete within the timeout period. However, the CHIP Tool will
+    not be terminated and it will not terminate processes that previous commands
+    have started.
+
+#### Modifying timeout duration in single-command mode
 
 This timeout can be modified for any command execution by supplying the optional
 `--timeout` parameter, which takes a value in seconds, with the maximum being
 65535 seconds.
 
-Example of command:
+**Example of command:**
 
 ```
 $ ./chip-tool otasoftwareupdaterequestor subscribe-event state-transition 5 10 0x1234567890 0 --timeout 65535
 ```
 
-For commands such as event subscriptions that need to run for an extended period
-of time, chip-tool can be started in interactive mode first before running the
-command. In interactive mode, there will be no timeout and multiple commands can
-be issued.
+#### Starting the interactive mode
 
-Example of command:
+For commands such as event subscriptions that need to run for an extended period
+of time, the CHIP Tool can be started in interactive mode first before running
+the command.
+
+**Example of command:**
 
 ```
 $ ./chip-tool interactive start
@@ -599,10 +623,11 @@ $ ./chip-tool pairing ble-thread 1 hex:0e080000000000010000000300001335060004001
 
 ##### Using message tracing
 
-Message tracing allows to capture CHIP Tool secure messages that can be used for
-test automation.
+Message tracing allows capturing CHIP Tool secure messages that can be used for
+test automation. The tracing uses several types of flags that control where the
+traces should go.
 
-The following flags that control where the traces should go are available:
+The following flags are available:
 
 -   Trace file flag:
 
@@ -631,43 +656,25 @@ The following flags that control where the traces should go are available:
 The CHIP Tool allows to run a set of tests, already compiled in the tool,
 against a paired Matter device.
 
-To get the list of available tests, run the following command:
+-   To get the list of available tests, run the following command:
 
-```
-$ ./chip-tool tests
-```
+    ```
+    $ ./chip-tool tests
+    ```
 
-To execute a particular test against the paired device, use the following
-command pattern:
+-   To execute a particular test against the paired device, use the following
+    command pattern:
 
-```
-$ ./chip-tool tests <test_name>
-```
+    ```
+    $ ./chip-tool tests <test_name>
+    ```
 
-In this command:
+    In this command:
 
--   _<test_name\>_ is the name of the particular test.
+    -   _<test_name\>_ is the name of the particular test.
 
-#### Example: running `TestClusters` test
-
-As an example of running one test suite test:
-
-```
-# Clean initialization of state.
-rm -fr /tmp/chip_*
-
-# In a shell window, start the DUT device.
-./out/debug/standalone/chip-all-clusters-app
-
-# In a second shell window, pair the DUT with chip-tool.
-./out/debug/standalone/chip-tool pairing onnetwork 333221 20202021
-
-# Now run the test
-./out/debug/standalone/chip-tool tests TestCluster --nodeId 333221
-```
-
-Developer details on how the test suite is structured can be found
-[here](../../src/app/tests/suites/README.md).
+See the [Examples](#running-testclusters-test) section for an example of how to
+run a test from the test suite.
 
 ### Parsing the setup payload
 
@@ -861,19 +868,50 @@ In this command:
 -   _<endpoint_id\>_ is the ID of the endpoint on which the `binding` cluster is
     implemented.
 
+##### Running `TestClusters` test
+
+Complete the following steps to
+[run one test from the test suite](#running-a-test-suite-against-a-paired-peer-device):
+
+1. Clean the initialization of state using the following command:
+    ```
+    rm -fr /tmp/chip_*
+    ```
+1. In a shell window, start the DUT device:
+    ```
+    ./out/debug/standalone/chip-all-clusters-app
+    ```
+1. In a second shell window, pair the DUT with the CHIP Tool:
+    ```
+    ./out/debug/standalone/chip-tool pairing onnetwork 333221 20202021
+    ```
+1. Run the test with the following command:
+    ```
+    ./out/debug/standalone/chip-tool tests TestCluster --nodeId 333221
+    ```
+
+Read the [CHIP Test Suits](../../src/app/tests/suites/README.md) page for more
+information about how the test suite is structured.
+
 ### Multi-admin scenario
 
 Multi-admin feature allows you to join Matter device to several Matter fabrics
-and administer it by several different Matter administrators. First you need to
-commission the Matter device to first fabric following the
+and have several different Matter administrators administer it.
+
+Complete the steps mentioned in the following sections.
+
+#### Step 1: Commission to fabric
+
+Commission the Matter device to first fabric following the
 [Using CHIP Tool for Matter device testing](#using-chip-tool-for-matter-device-testing)
 section.
 
-Before it is possible to commission a Matter device to a new fabric, the
-administrator from first fabric must open the commissioning window for a new
-administrator from another fabric.
+#### Step 2: Open the commissioning window
 
-To open the commissioning window on the paired Matter device, use the following
+Make sure the administrator from the first fabric opens the commissioning window
+for a new administrator from another fabric.
+
+Open the commissioning window on the paired Matter device by using the following
 command pattern:
 
 ```
@@ -882,15 +920,15 @@ $ ./chip-tool pairing open-commissioning-window <node_id> <option> <window_timeo
 
 In this command:
 
--   _<node_id\>_ is the ID of the node that should open commissioning window
+-   _<node_id\>_ is the ID of the node that should open commissioning window.
 -   _<option\>_ is equal to 1 for Enhanced Commissioning Method and 0 for Basic
-    Commissioning Method
+    Commissioning Method.
 -   _<window_timeout\>_ is time in seconds, before the commissioning window
-    closes
+    closes.
 -   _<iteration\>_ is number of PBKDF iterations to use to derive the PAKE
-    verifier
+    verifier.
 -   _<discriminator\>_ is device specific discriminator determined during
-    commissioning
+    commissioning.
 
 > **Note:** The _<iteration\>_ and _<discriminator\>_ values are ignored if the
 > _<option\>_ is set to 0.
@@ -901,8 +939,11 @@ In this command:
 $ ./chip-tool pairing open-commissioning-window 1 1 300 1000 2365
 ```
 
-Note manual pairing code or QR code payload printed in the command output, as it
-will be required by the second Matter admin to join Matter device to its fabric.
+#### Step 3: Save the pairing code
+
+Write down the manual pairing code or the QR code payload printed in the command
+output, as it will be required by the second Matter admin to join Matter device
+to its fabric.
 
 **Example of output:**
 
@@ -913,28 +954,35 @@ will be required by the second Matter admin to join Matter device to its fabric.
 [1663675289.149445][56387:56392] CHIP:CTL: SetupQRCode: [MT:4CT91AFN00YHEE7E300]
 ```
 
-To commission the Matter device to a new fabric, you need to run another
-instance of CHIP Tool, using the following command pattern:
+#### Step 4: Commission the Matter device to a new fabric
 
-```
-$ ./chip-tool pairing code <payload> <node_id> --commissioner-name <commissioner_name>
-```
+Complete the following steps:
 
-In this command:
+1. Open another instance of the CHIP Tool.
+1. In the new instance of the CHIP Tool, commission the Matter device to a new
+   fabric by using the following command pattern:
 
--   _<payload\>_ is the the QR code payload or a manual pairing code generated
-    by the first commissioner instance when opened commissioning window
--   _<node_id\>_ is the user-defined ID of the node being commissioned. It
-    doesn't need to be the same ID, as for the first fabric.
--   _<commissioner_name\>_ is the name of the second fabric. Valid values are
-    "alpha", "beta", "gamma", and integers greater than or equal to 4. The
-    default if not specified is "alpha".
+    ```
+    $ ./chip-tool pairing code <payload> <node_id> --commissioner-name <commissioner_name>
+    ```
 
-**Example of command:**
+    In this command:
 
-```
-$ ./chip-tool pairing code 36281602573 1 --commissioner-name beta
-```
+    - _<payload\>_ is the the QR code payload or a manual pairing code generated
+      by the first commissioner instance when opened commissioning window
+    - _<node_id\>_ is the user-defined ID of the node being commissioned. It
+      doesn't need to be the same ID, as for the first fabric.
+    - _<commissioner_name\>_ is the name of the second fabric. Valid values are
+      "alpha", "beta", "gamma", and integers greater than or equal to 4. The
+      default if not specified is "alpha".
+
+    **Example of command:**
+
+    ```
+    $ ./chip-tool pairing code 36281602573 1 --commissioner-name beta
+    ```
+
+#### Step 5: Test reception of commands
 
 After completing the above steps, the Matter device should be able to receive
 and answer Matter commands sent in the second fabric. For example, you can use
