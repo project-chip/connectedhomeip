@@ -24,26 +24,29 @@ namespace scenes {
 
 CHIP_ERROR ExtensionFieldSetsImpl::Serialize(TLV::TLVWriter & writer, TLV::Tag structTag) const
 {
-    TLV::TLVType container;
-    ReturnErrorOnFailure(writer.StartContainer(structTag, TLV::kTLVType_Structure, container));
-    ReturnErrorOnFailure(writer.StartContainer(TLV::ContextTag(TagEFS::kFieldSetArrayContainer), TLV::kTLVType_Array, container));
+    TLV::TLVType structureContainer;
+    ReturnErrorOnFailure(writer.StartContainer(structTag, TLV::kTLVType_Structure, structureContainer));
+    TLV::TLVType arrayContainer;
+    ReturnErrorOnFailure(
+        writer.StartContainer(TLV::ContextTag(TagEFS::kFieldSetArrayContainer), TLV::kTLVType_Array, arrayContainer));
     for (uint8_t i = 0; i < mFieldSetsCount; i++)
     {
         ReturnErrorOnFailure(mFieldSets[i].Serialize(writer));
     }
 
-    return writer.EndContainer(container);
-    return writer.EndContainer(container);
+    ReturnErrorOnFailure(writer.EndContainer(arrayContainer));
+    return writer.EndContainer(structureContainer);
 }
 
 CHIP_ERROR ExtensionFieldSetsImpl::Deserialize(TLV::TLVReader & reader, TLV::Tag structTag)
 {
-    TLV::TLVType container;
+    TLV::TLVType structureContainer;
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, structTag));
-    ReturnErrorOnFailure(reader.EnterContainer(container));
+    ReturnErrorOnFailure(reader.EnterContainer(structureContainer));
 
+    TLV::TLVType arrayContainer;
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::ContextTag(TagEFS::kFieldSetArrayContainer)));
-    ReturnErrorOnFailure(reader.EnterContainer(container));
+    ReturnErrorOnFailure(reader.EnterContainer(arrayContainer));
 
     uint8_t i = 0;
     CHIP_ERROR err;
@@ -54,19 +57,26 @@ CHIP_ERROR ExtensionFieldSetsImpl::Deserialize(TLV::TLVReader & reader, TLV::Tag
     }
     mFieldSetsCount = i;
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    return reader.ExitContainer(container);
+    if (err != CHIP_END_OF_TLV)
+    {
+        if (err == CHIP_NO_ERROR)
+            return CHIP_ERROR_BUFFER_TOO_SMALL;
+
+        return err;
+    }
+
+    ReturnErrorOnFailure(reader.ExitContainer(arrayContainer));
+    return reader.ExitContainer(structureContainer);
 }
 
 void ExtensionFieldSetsImpl::Clear()
 {
-    if (!this->IsEmpty())
+
+    for (uint8_t i = 0; i < mFieldSetsCount; i++)
     {
-        for (uint8_t i = 0; i < mFieldSetsCount; i++)
-        {
-            mFieldSets[i].Clear();
-        }
+        mFieldSets[i].Clear();
     }
+
     mFieldSetsCount = 0;
 }
 

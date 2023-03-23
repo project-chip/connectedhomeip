@@ -45,42 +45,44 @@ public:
     /// @brief From command AddScene, allows handler to filter through clusters in command to serialize only the supported ones.
     /// @param endpoint[in] Endpoint ID
     /// @param extensionFieldSet[in] ExtensionFieldSets provided by the AddScene Command, pre initialized
-    /// @param cluster[out]  Cluster in the Extension field set, filled by the function
     /// @param serialisedBytes[out] Buffer to fill from the ExtensionFieldSet in command
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR_INVALID_ARGUMENT if the cluster is not supported, CHIP_ERROR value otherwise
     virtual CHIP_ERROR SerializeAdd(EndpointId endpoint,
                                     const app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
-                                    ClusterId & cluster, MutableByteSpan & serializedBytes) override
+                                    MutableByteSpan & serializedBytes) override
     {
         app::Clusters::Scenes::Structs::AttributeValuePair::DecodableType aVPair;
         TLV::TLVWriter writer;
         TLV::TLVType outer;
+        size_t pairTotal  = 0;
+        uint8_t pairCount = 0;
 
-        uint8_t pairCount  = 0;
-        uint8_t valueBytes = 0;
-
-        VerifyOrReturnError(SupportsCluster(endpoint, extensionFieldSet.clusterID), CHIP_ERROR_INVALID_ARGUMENT);
-
-        cluster = extensionFieldSet.clusterID;
+        // Verify size of list
+        extensionFieldSet.attributeValueList.ComputeSize(&pairTotal);
+        VerifyOrReturnError(pairTotal <= kMaxAvPair, CHIP_ERROR_BUFFER_TOO_SMALL);
 
         auto pair_iterator = extensionFieldSet.attributeValueList.begin();
         while (pair_iterator.Next() && pairCount < kMaxAvPair)
         {
             aVPair                          = pair_iterator.GetValue();
             mAVPairs[pairCount].attributeID = aVPair.attributeID;
-            auto value_iterator             = aVPair.attributeValue.begin();
+            size_t valueBytesTotal          = 0;
+            uint8_t valueBytesCount         = 0;
 
-            valueBytes = 0;
-            while (value_iterator.Next() && valueBytes < kMaxValueSize)
+            aVPair.attributeValue.ComputeSize(&valueBytesTotal);
+            VerifyOrReturnError(valueBytesTotal <= kMaxValueSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+            auto value_iterator = aVPair.attributeValue.begin();
+            while (value_iterator.Next())
             {
-                mValueBuffer[pairCount][valueBytes] = value_iterator.GetValue();
-                valueBytes++;
+                mValueBuffer[pairCount][valueBytesCount] = value_iterator.GetValue();
+                valueBytesCount++;
             }
             // Check we could go through all bytes of the value
             ReturnErrorOnFailure(value_iterator.GetStatus());
 
             mAVPairs[pairCount].attributeValue = mValueBuffer[pairCount];
-            mAVPairs[pairCount].attributeValue.reduce_size(valueBytes);
+            mAVPairs[pairCount].attributeValue.reduce_size(valueBytesCount);
             pairCount++;
         }
         // Check we could go through all pairs in incomming command
@@ -90,7 +92,7 @@ public:
         attributeValueList = mAVPairs;
         attributeValueList.reduce_size(pairCount);
 
-        writer.Init(serialisedBytes);
+        writer.Init(serializedBytes);
         ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
         ReturnErrorOnFailure(app::DataModel::Encode(
             writer, TLV::ContextTag(app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList),
@@ -114,38 +116,44 @@ public:
 
         TLV::TLVReader reader;
         TLV::TLVType outer;
-        uint8_t pairCount  = 0;
-        uint8_t valueBytes = 0;
-
-        VerifyOrReturnError(SupportsCluster(endpoint, cluster), CHIP_ERROR_INVALID_ARGUMENT);
+        size_t pairTotal  = 0;
+        uint8_t pairCount = 0;
 
         extensionFieldSet.clusterID = cluster;
         reader.Init(serialisedBytes);
         ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
         ReturnErrorOnFailure(reader.EnterContainer(outer));
         ReturnErrorOnFailure(reader.Next(
-            TLV::kTLVType_Array,
-            TLV::ContextTag(app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)));
+            TLV::kTLVType_Array, TLV::ContextTag(app::Clusters::Scenes::Structs::ExtensionFieldSet::Fields::kAttributeValueList)));
         attributeValueList.Decode(reader);
 
+        // Verify size of list
+        attributeValueList.ComputeSize(&pairTotal);
+        VerifyOrReturnError(pairTotal <= kMaxAvPair, CHIP_ERROR_BUFFER_TOO_SMALL);
+
         auto pair_iterator = attributeValueList.begin();
-        while (pair_iterator.Next() && pairCount < kMaxAvPair)
+        while (pair_iterator.Next())
         {
             decodePair                      = pair_iterator.GetValue();
             mAVPairs[pairCount].attributeID = decodePair.attributeID;
-            auto value_iterator             = decodePair.attributeValue.begin();
-            valueBytes                      = 0;
+            size_t valueBytesTotal          = 0;
+            uint8_t valueBytesCount         = 0;
 
-            while (value_iterator.Next() && valueBytes < kMaxValueSize)
+            // Verify size of attribute value
+            decodePair.attributeValue.ComputeSize(&valueBytesTotal);
+            VerifyOrReturnError(valueBytesTotal <= kMaxValueSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+            auto value_iterator = decodePair.attributeValue.begin();
+            while (value_iterator.Next() && valueBytesCount < kMaxValueSize)
             {
-                mValueBuffer[pairCount][valueBytes] = value_iterator.GetValue();
-                valueBytes++;
+                mValueBuffer[pairCount][valueBytesCount] = value_iterator.GetValue();
+                valueBytesCount++;
             }
             // Check we could go through all bytes of the value
             ReturnErrorOnFailure(value_iterator.GetStatus());
 
             mAVPairs[pairCount].attributeValue = mValueBuffer[pairCount];
-            mAVPairs[pairCount].attributeValue.reduce_size(valueBytes);
+            mAVPairs[pairCount].attributeValue.reduce_size(valueBytesCount);
             pairCount++;
         };
         // Check we could go through all pairs stored in memory
