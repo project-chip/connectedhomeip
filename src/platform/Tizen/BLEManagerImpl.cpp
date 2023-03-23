@@ -93,10 +93,9 @@ const char * desc_uuid_short = "2902";
 const char * chip_ble_service_uuid_short = "FFF6";
 
 /* Tizen Default Scan Timeout */
-static constexpr unsigned kNewConnectionScanTimeoutMs = 10000;
-
+static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(10);
 /* Tizen Default Connect Timeout */
-constexpr System::Clock::Timeout kConnectTimeoutMs = System::Clock::Seconds16(10);
+static constexpr System::Clock::Timeout kConnectTimeout = System::Clock::Seconds16(10);
 
 static void __AdapterStateChangedCb(int result, bt_adapter_state_e adapterState, void * userData)
 {
@@ -513,7 +512,7 @@ void BLEManagerImpl::OnChipDeviceScanned(void * device, const Ble::ChipBLEDevice
 
     /* Set CHIP Connecting state */
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
-    DeviceLayer::SystemLayer().StartTimer(kConnectTimeoutMs, HandleConnectionTimeout, nullptr);
+    DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectionTimeout, nullptr);
     mDeviceScanner->StopChipScan();
 
     /* Initiate Connect */
@@ -1405,20 +1404,15 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     }
 
     /* Send StartChipScan Request to Scanner Class */
-    err = mDeviceScanner->StartChipScan(kNewConnectionScanTimeoutMs, ScanFilterType::kServiceData, data);
+    err = mDeviceScanner->StartChipScan(kNewConnectionScanTimeout, ScanFilterType::kServiceData, data);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start a BLE scan"));
 
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to start a BLE Scan: %s", ErrorStr(err));
-        goto exit;
-    }
-
-    ChipLogError(DeviceLayer, "BLE Scan Initiation Successful");
+    ChipLogProgress(DeviceLayer, "BLE scan initiation successful");
     mBLEScanConfig.mBleScanState = scanType;
     return;
 
 exit:
-    ChipLogError(DeviceLayer, "Scan Initiation Failed!");
+    ChipLogError(DeviceLayer, "BLE scan initiation failed: %" CHIP_ERROR_FORMAT, err.Format());
     mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
     BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
 }

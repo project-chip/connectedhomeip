@@ -43,9 +43,6 @@ namespace Internal {
 const char * chip_service_uuid       = "0000FFF6-0000-1000-8000-00805F9B34FB";
 const char * chip_service_uuid_short = "FFF6";
 
-// Default CHIP Scan Timeout in Millisecond
-static unsigned int kScanTimeout = 10000;
-
 ChipDeviceScanner::ChipDeviceScanner(ChipDeviceScannerDelegate * delegate) : mDelegate(delegate) {}
 
 ChipDeviceScanner::~ChipDeviceScanner()
@@ -160,7 +157,7 @@ gboolean ChipDeviceScanner::TriggerScan(GMainLoop * mainLoop, gpointer userData)
     ChipLogProgress(DeviceLayer, "Scan started");
 
     // Start Timer
-    idleSource = g_timeout_source_new(kScanTimeout);
+    idleSource = g_timeout_source_new(self->mScanTimeoutMs);
     g_source_set_callback(idleSource, TimerExpiredCb, userData, nullptr);
     g_source_set_priority(idleSource, G_PRIORITY_HIGH_IDLE);
     g_source_attach(idleSource, g_main_loop_get_context(self->mAsyncLoop));
@@ -196,7 +193,7 @@ exit:
     UnRegisterScanFilter();
 }
 
-CHIP_ERROR ChipDeviceScanner::StartChipScan(unsigned timeoutMs, ScanFilterType filterType, ScanFilterData & filterData)
+CHIP_ERROR ChipDeviceScanner::StartChipScan(System::Clock::Timeout timeout, ScanFilterType filterType, ScanFilterData & filterData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReturnErrorCodeIf(mIsScanning, CHIP_ERROR_INCORRECT_STATE);
@@ -204,10 +201,10 @@ CHIP_ERROR ChipDeviceScanner::StartChipScan(unsigned timeoutMs, ScanFilterType f
     // Scan Filter Setup if supported: silently bypass error & do filterless scan in case of error
     CheckScanFilter(filterType, filterData);
 
-    kScanTimeout = timeoutMs;
+    mScanTimeoutMs = System::Clock::Milliseconds32(timeout).count();
 
     // All set to trigger LE Scan
-    ChipLogProgress(DeviceLayer, "Start CHIP Scan...");
+    ChipLogProgress(DeviceLayer, "Start CHIP BLE scan: timeout=%ums", mScanTimeoutMs);
     if (MainLoop::Instance().AsyncRequest(TriggerScan, this) == false)
     {
         ChipLogError(DeviceLayer, "Failed to trigger Scan...");
