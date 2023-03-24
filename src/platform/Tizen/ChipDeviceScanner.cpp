@@ -28,6 +28,7 @@
 #include <utility>
 
 #include <bluetooth.h>
+#include <bluetooth_internal.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
@@ -170,9 +171,11 @@ exit:
 
 static bool __IsScanFilterSupported()
 {
-    // Tizen API: bt_adapter_le_is_scan_filter_supported() is currently internal
-    // Defaulting to true
-    return true;
+    bool is_supported;
+    int ret = bt_adapter_le_is_scan_filter_supported(&is_supported);
+    VerifyOrReturnValue(ret == BT_ERROR_NONE, false,
+                        ChipLogError(DeviceLayer, "bt_adapter_le_is_scan_filter_supported() failed: %s", get_error_message(ret)));
+    return is_supported;
 }
 
 void ChipDeviceScanner::CheckScanFilter(ScanFilterType filterType, ScanFilterData & filterData)
