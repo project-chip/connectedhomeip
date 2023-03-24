@@ -80,6 +80,8 @@ struct DnssdService
     Optional<chip::Inet::IPAddress> mAddress;
     // Time to live in seconds. Per rfc6762 section 10, because we have a hostname, our default TTL is 120 seconds
     uint32_t mTtlSeconds = 120;
+
+    void ToDiscoveredNodeData(const Span<Inet::IPAddress> & addresses, DiscoveredNodeData & nodeData);
 };
 
 /**
@@ -272,6 +274,23 @@ CHIP_ERROR ChipDnssdStopBrowse(DnssdBrowseDelegate * delegate);
  */
 CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
                             void * context);
+
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+/**
+ * This function resolves the services published by mDNS
+ *
+ * @param[in] browseResult  The service entry returned by @ref ChipDnssdBrowse
+ * @param[in] interface     The interface to send queries.
+ * @param[in] delegate      The delegate to notify when a service is resolved.
+ *
+ * @retval CHIP_NO_ERROR                The resolve succeeds.
+ * @retval CHIP_ERROR_INVALID_ARGUMENT  The name, type or delegate is nullptr.
+ * @retval Error code                   The resolve fails.
+ *
+ */
+CHIP_ERROR ChipDnssdResolve(DnssdService * browseResult, chip::Inet::InterfaceId interface,
+                            CommissioningResolveDelegate * delegate);
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
 
 /**
  * This function notifies the implementation that a resolve result is no longer
