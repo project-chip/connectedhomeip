@@ -212,6 +212,7 @@ android_library("java") {
   data_deps = [ ":jni" ]
 
   sources = [
+    "generated/java/chip/devicecontroller/ClusterReadMapping.java",
     "generated/java/chip/devicecontroller/ClusterWriteMapping.java",
     "src/chip/clusterinfo/ClusterCommandCallback.java",
     "src/chip/clusterinfo/ClusterInfo.java",
@@ -262,7 +263,6 @@ android_library("java") {
     "zap-generated/chip/devicecontroller/ChipIdLookup.java",
     "zap-generated/chip/devicecontroller/ChipStructs.java",
     "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
-    "zap-generated/chip/devicecontroller/ClusterReadMapping.java",
   ]
 
   if (build_java_matter_controller) {

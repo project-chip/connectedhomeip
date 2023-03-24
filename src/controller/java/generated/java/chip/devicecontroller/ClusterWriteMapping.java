@@ -242,6 +242,57 @@ public class ClusterWriteMapping {
         writeLevelControlStartUpCurrentLevelAttributeInteractionInfo);
     writeAttributeMap.put("levelControl", writeLevelControlInteractionInfo);
     Map<String, InteractionInfo> writeBinaryInputBasicInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeBinaryInputBasicActiveTextCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo binaryInputBasicactiveTextCommandParameterInfo =
+        new CommandParameterInfo("value", String.class, String.class);
+    writeBinaryInputBasicActiveTextCommandParams.put(
+        "value", binaryInputBasicactiveTextCommandParameterInfo);
+    InteractionInfo writeBinaryInputBasicActiveTextAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BinaryInputBasicCluster) cluster)
+                  .writeActiveTextAttribute(
+                      (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeBinaryInputBasicActiveTextCommandParams);
+    writeBinaryInputBasicInteractionInfo.put(
+        "writeActiveTextAttribute", writeBinaryInputBasicActiveTextAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeBinaryInputBasicDescriptionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo binaryInputBasicdescriptionCommandParameterInfo =
+        new CommandParameterInfo("value", String.class, String.class);
+    writeBinaryInputBasicDescriptionCommandParams.put(
+        "value", binaryInputBasicdescriptionCommandParameterInfo);
+    InteractionInfo writeBinaryInputBasicDescriptionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BinaryInputBasicCluster) cluster)
+                  .writeDescriptionAttribute(
+                      (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeBinaryInputBasicDescriptionCommandParams);
+    writeBinaryInputBasicInteractionInfo.put(
+        "writeDescriptionAttribute", writeBinaryInputBasicDescriptionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeBinaryInputBasicInactiveTextCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo binaryInputBasicinactiveTextCommandParameterInfo =
+        new CommandParameterInfo("value", String.class, String.class);
+    writeBinaryInputBasicInactiveTextCommandParams.put(
+        "value", binaryInputBasicinactiveTextCommandParameterInfo);
+    InteractionInfo writeBinaryInputBasicInactiveTextAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BinaryInputBasicCluster) cluster)
+                  .writeInactiveTextAttribute(
+                      (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeBinaryInputBasicInactiveTextCommandParams);
+    writeBinaryInputBasicInteractionInfo.put(
+        "writeInactiveTextAttribute", writeBinaryInputBasicInactiveTextAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeBinaryInputBasicOutOfServiceCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo binaryInputBasicoutOfServiceCommandParameterInfo =
@@ -276,6 +327,23 @@ public class ClusterWriteMapping {
             writeBinaryInputBasicPresentValueCommandParams);
     writeBinaryInputBasicInteractionInfo.put(
         "writePresentValueAttribute", writeBinaryInputBasicPresentValueAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeBinaryInputBasicReliabilityCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo binaryInputBasicreliabilityCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeBinaryInputBasicReliabilityCommandParams.put(
+        "value", binaryInputBasicreliabilityCommandParameterInfo);
+    InteractionInfo writeBinaryInputBasicReliabilityAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BinaryInputBasicCluster) cluster)
+                  .writeReliabilityAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeBinaryInputBasicReliabilityCommandParams);
+    writeBinaryInputBasicInteractionInfo.put(
+        "writeReliabilityAttribute", writeBinaryInputBasicReliabilityAttributeInteractionInfo);
     writeAttributeMap.put("binaryInputBasic", writeBinaryInputBasicInteractionInfo);
     Map<String, InteractionInfo> writeDescriptorInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("descriptor", writeDescriptorInteractionInfo);
@@ -558,6 +626,56 @@ public class ClusterWriteMapping {
         "writeOnModeAttribute", writeModeSelectOnModeAttributeInteractionInfo);
     writeAttributeMap.put("modeSelect", writeModeSelectInteractionInfo);
     Map<String, InteractionInfo> writeDoorLockInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeDoorLockDoorOpenEventsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockdoorOpenEventsCommandParameterInfo =
+        new CommandParameterInfo("value", Long.class, Long.class);
+    writeDoorLockDoorOpenEventsCommandParams.put(
+        "value", doorLockdoorOpenEventsCommandParameterInfo);
+    InteractionInfo writeDoorLockDoorOpenEventsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeDoorOpenEventsAttribute(
+                      (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockDoorOpenEventsCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeDoorOpenEventsAttribute", writeDoorLockDoorOpenEventsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDoorLockDoorClosedEventsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockdoorClosedEventsCommandParameterInfo =
+        new CommandParameterInfo("value", Long.class, Long.class);
+    writeDoorLockDoorClosedEventsCommandParams.put(
+        "value", doorLockdoorClosedEventsCommandParameterInfo);
+    InteractionInfo writeDoorLockDoorClosedEventsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeDoorClosedEventsAttribute(
+                      (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockDoorClosedEventsCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeDoorClosedEventsAttribute", writeDoorLockDoorClosedEventsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDoorLockOpenPeriodCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockopenPeriodCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeDoorLockOpenPeriodCommandParams.put("value", doorLockopenPeriodCommandParameterInfo);
+    InteractionInfo writeDoorLockOpenPeriodAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeOpenPeriodAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockOpenPeriodCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeOpenPeriodAttribute", writeDoorLockOpenPeriodAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeDoorLockLanguageCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLocklanguageCommandParameterInfo =
@@ -574,6 +692,22 @@ public class ClusterWriteMapping {
             writeDoorLockLanguageCommandParams);
     writeDoorLockInteractionInfo.put(
         "writeLanguageAttribute", writeDoorLockLanguageAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDoorLockLEDSettingsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockLEDSettingsCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeDoorLockLEDSettingsCommandParams.put("value", doorLockLEDSettingsCommandParameterInfo);
+    InteractionInfo writeDoorLockLEDSettingsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeLEDSettingsAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockLEDSettingsCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeLEDSettingsAttribute", writeDoorLockLEDSettingsAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeDoorLockAutoRelockTimeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockautoRelockTimeCommandParameterInfo =
@@ -623,6 +757,24 @@ public class ClusterWriteMapping {
             writeDoorLockOperatingModeCommandParams);
     writeDoorLockInteractionInfo.put(
         "writeOperatingModeAttribute", writeDoorLockOperatingModeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDoorLockEnableLocalProgrammingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockenableLocalProgrammingCommandParameterInfo =
+        new CommandParameterInfo("value", Boolean.class, Boolean.class);
+    writeDoorLockEnableLocalProgrammingCommandParams.put(
+        "value", doorLockenableLocalProgrammingCommandParameterInfo);
+    InteractionInfo writeDoorLockEnableLocalProgrammingAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeEnableLocalProgrammingAttribute(
+                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockEnableLocalProgrammingCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeEnableLocalProgrammingAttribute",
+        writeDoorLockEnableLocalProgrammingAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeDoorLockEnableOneTouchLockingCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockenableOneTouchLockingCommandParameterInfo =
@@ -641,6 +793,24 @@ public class ClusterWriteMapping {
     writeDoorLockInteractionInfo.put(
         "writeEnableOneTouchLockingAttribute",
         writeDoorLockEnableOneTouchLockingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDoorLockEnableInsideStatusLEDCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockenableInsideStatusLEDCommandParameterInfo =
+        new CommandParameterInfo("value", Boolean.class, Boolean.class);
+    writeDoorLockEnableInsideStatusLEDCommandParams.put(
+        "value", doorLockenableInsideStatusLEDCommandParameterInfo);
+    InteractionInfo writeDoorLockEnableInsideStatusLEDAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeEnableInsideStatusLEDAttribute(
+                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockEnableInsideStatusLEDCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeEnableInsideStatusLEDAttribute",
+        writeDoorLockEnableInsideStatusLEDAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeDoorLockEnablePrivacyModeButtonCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockenablePrivacyModeButtonCommandParameterInfo =
@@ -659,6 +829,24 @@ public class ClusterWriteMapping {
     writeDoorLockInteractionInfo.put(
         "writeEnablePrivacyModeButtonAttribute",
         writeDoorLockEnablePrivacyModeButtonAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDoorLockLocalProgrammingFeaturesCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLocklocalProgrammingFeaturesCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeDoorLockLocalProgrammingFeaturesCommandParams.put(
+        "value", doorLocklocalProgrammingFeaturesCommandParameterInfo);
+    InteractionInfo writeDoorLockLocalProgrammingFeaturesAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeLocalProgrammingFeaturesAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockLocalProgrammingFeaturesCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeLocalProgrammingFeaturesAttribute",
+        writeDoorLockLocalProgrammingFeaturesAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeDoorLockWrongCodeEntryLimitCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockwrongCodeEntryLimitCommandParameterInfo =
@@ -695,6 +883,23 @@ public class ClusterWriteMapping {
     writeDoorLockInteractionInfo.put(
         "writeUserCodeTemporaryDisableTimeAttribute",
         writeDoorLockUserCodeTemporaryDisableTimeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDoorLockSendPINOverTheAirCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLocksendPINOverTheAirCommandParameterInfo =
+        new CommandParameterInfo("value", Boolean.class, Boolean.class);
+    writeDoorLockSendPINOverTheAirCommandParams.put(
+        "value", doorLocksendPINOverTheAirCommandParameterInfo);
+    InteractionInfo writeDoorLockSendPINOverTheAirAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeSendPINOverTheAirAttribute(
+                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockSendPINOverTheAirCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeSendPINOverTheAirAttribute", writeDoorLockSendPINOverTheAirAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeDoorLockRequirePINforRemoteOperationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockrequirePINforRemoteOperationCommandParameterInfo =
@@ -713,6 +918,24 @@ public class ClusterWriteMapping {
     writeDoorLockInteractionInfo.put(
         "writeRequirePINforRemoteOperationAttribute",
         writeDoorLockRequirePINforRemoteOperationAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDoorLockExpiringUserTimeoutCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockexpiringUserTimeoutCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeDoorLockExpiringUserTimeoutCommandParams.put(
+        "value", doorLockexpiringUserTimeoutCommandParameterInfo);
+    InteractionInfo writeDoorLockExpiringUserTimeoutAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeExpiringUserTimeoutAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockExpiringUserTimeoutCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeExpiringUserTimeoutAttribute",
+        writeDoorLockExpiringUserTimeoutAttributeInteractionInfo);
     writeAttributeMap.put("doorLock", writeDoorLockInteractionInfo);
     Map<String, InteractionInfo> writeWindowCoveringInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeWindowCoveringModeCommandParams =
@@ -733,6 +956,114 @@ public class ClusterWriteMapping {
         "writeModeAttribute", writeWindowCoveringModeAttributeInteractionInfo);
     writeAttributeMap.put("windowCovering", writeWindowCoveringInteractionInfo);
     Map<String, InteractionInfo> writeBarrierControlInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeBarrierControlBarrierOpenEventsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo barrierControlbarrierOpenEventsCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeBarrierControlBarrierOpenEventsCommandParams.put(
+        "value", barrierControlbarrierOpenEventsCommandParameterInfo);
+    InteractionInfo writeBarrierControlBarrierOpenEventsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BarrierControlCluster) cluster)
+                  .writeBarrierOpenEventsAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeBarrierControlBarrierOpenEventsCommandParams);
+    writeBarrierControlInteractionInfo.put(
+        "writeBarrierOpenEventsAttribute",
+        writeBarrierControlBarrierOpenEventsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeBarrierControlBarrierCloseEventsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo barrierControlbarrierCloseEventsCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeBarrierControlBarrierCloseEventsCommandParams.put(
+        "value", barrierControlbarrierCloseEventsCommandParameterInfo);
+    InteractionInfo writeBarrierControlBarrierCloseEventsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BarrierControlCluster) cluster)
+                  .writeBarrierCloseEventsAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeBarrierControlBarrierCloseEventsCommandParams);
+    writeBarrierControlInteractionInfo.put(
+        "writeBarrierCloseEventsAttribute",
+        writeBarrierControlBarrierCloseEventsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeBarrierControlBarrierCommandOpenEventsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo barrierControlbarrierCommandOpenEventsCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeBarrierControlBarrierCommandOpenEventsCommandParams.put(
+        "value", barrierControlbarrierCommandOpenEventsCommandParameterInfo);
+    InteractionInfo writeBarrierControlBarrierCommandOpenEventsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BarrierControlCluster) cluster)
+                  .writeBarrierCommandOpenEventsAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeBarrierControlBarrierCommandOpenEventsCommandParams);
+    writeBarrierControlInteractionInfo.put(
+        "writeBarrierCommandOpenEventsAttribute",
+        writeBarrierControlBarrierCommandOpenEventsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeBarrierControlBarrierCommandCloseEventsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo barrierControlbarrierCommandCloseEventsCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeBarrierControlBarrierCommandCloseEventsCommandParams.put(
+        "value", barrierControlbarrierCommandCloseEventsCommandParameterInfo);
+    InteractionInfo writeBarrierControlBarrierCommandCloseEventsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BarrierControlCluster) cluster)
+                  .writeBarrierCommandCloseEventsAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeBarrierControlBarrierCommandCloseEventsCommandParams);
+    writeBarrierControlInteractionInfo.put(
+        "writeBarrierCommandCloseEventsAttribute",
+        writeBarrierControlBarrierCommandCloseEventsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeBarrierControlBarrierOpenPeriodCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo barrierControlbarrierOpenPeriodCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeBarrierControlBarrierOpenPeriodCommandParams.put(
+        "value", barrierControlbarrierOpenPeriodCommandParameterInfo);
+    InteractionInfo writeBarrierControlBarrierOpenPeriodAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BarrierControlCluster) cluster)
+                  .writeBarrierOpenPeriodAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeBarrierControlBarrierOpenPeriodCommandParams);
+    writeBarrierControlInteractionInfo.put(
+        "writeBarrierOpenPeriodAttribute",
+        writeBarrierControlBarrierOpenPeriodAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeBarrierControlBarrierClosePeriodCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo barrierControlbarrierClosePeriodCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeBarrierControlBarrierClosePeriodCommandParams.put(
+        "value", barrierControlbarrierClosePeriodCommandParameterInfo);
+    InteractionInfo writeBarrierControlBarrierClosePeriodAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BarrierControlCluster) cluster)
+                  .writeBarrierClosePeriodAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeBarrierControlBarrierClosePeriodCommandParams);
+    writeBarrierControlInteractionInfo.put(
+        "writeBarrierClosePeriodAttribute",
+        writeBarrierControlBarrierClosePeriodAttributeInteractionInfo);
     writeAttributeMap.put("barrierControl", writeBarrierControlInteractionInfo);
     Map<String, InteractionInfo> writePumpConfigurationAndControlInteractionInfo =
         new LinkedHashMap<>();
@@ -1877,6 +2208,193 @@ public class ClusterWriteMapping {
     writeAttributeMap.put(
         "relativeHumidityMeasurement", writeRelativeHumidityMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeOccupancySensingInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo>
+        writeOccupancySensingPIROccupiedToUnoccupiedDelayCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo occupancySensingPIROccupiedToUnoccupiedDelayCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeOccupancySensingPIROccupiedToUnoccupiedDelayCommandParams.put(
+        "value", occupancySensingPIROccupiedToUnoccupiedDelayCommandParameterInfo);
+    InteractionInfo writeOccupancySensingPIROccupiedToUnoccupiedDelayAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OccupancySensingCluster) cluster)
+                  .writePIROccupiedToUnoccupiedDelayAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeOccupancySensingPIROccupiedToUnoccupiedDelayCommandParams);
+    writeOccupancySensingInteractionInfo.put(
+        "writePIROccupiedToUnoccupiedDelayAttribute",
+        writeOccupancySensingPIROccupiedToUnoccupiedDelayAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        writeOccupancySensingPIRUnoccupiedToOccupiedDelayCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo occupancySensingPIRUnoccupiedToOccupiedDelayCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeOccupancySensingPIRUnoccupiedToOccupiedDelayCommandParams.put(
+        "value", occupancySensingPIRUnoccupiedToOccupiedDelayCommandParameterInfo);
+    InteractionInfo writeOccupancySensingPIRUnoccupiedToOccupiedDelayAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OccupancySensingCluster) cluster)
+                  .writePIRUnoccupiedToOccupiedDelayAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeOccupancySensingPIRUnoccupiedToOccupiedDelayCommandParams);
+    writeOccupancySensingInteractionInfo.put(
+        "writePIRUnoccupiedToOccupiedDelayAttribute",
+        writeOccupancySensingPIRUnoccupiedToOccupiedDelayAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        writeOccupancySensingPIRUnoccupiedToOccupiedThresholdCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo occupancySensingPIRUnoccupiedToOccupiedThresholdCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeOccupancySensingPIRUnoccupiedToOccupiedThresholdCommandParams.put(
+        "value", occupancySensingPIRUnoccupiedToOccupiedThresholdCommandParameterInfo);
+    InteractionInfo writeOccupancySensingPIRUnoccupiedToOccupiedThresholdAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OccupancySensingCluster) cluster)
+                  .writePIRUnoccupiedToOccupiedThresholdAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeOccupancySensingPIRUnoccupiedToOccupiedThresholdCommandParams);
+    writeOccupancySensingInteractionInfo.put(
+        "writePIRUnoccupiedToOccupiedThresholdAttribute",
+        writeOccupancySensingPIRUnoccupiedToOccupiedThresholdAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        writeOccupancySensingUltrasonicOccupiedToUnoccupiedDelayCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo occupancySensingultrasonicOccupiedToUnoccupiedDelayCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeOccupancySensingUltrasonicOccupiedToUnoccupiedDelayCommandParams.put(
+        "value", occupancySensingultrasonicOccupiedToUnoccupiedDelayCommandParameterInfo);
+    InteractionInfo
+        writeOccupancySensingUltrasonicOccupiedToUnoccupiedDelayAttributeInteractionInfo =
+            new InteractionInfo(
+                (cluster, callback, commandArguments) -> {
+                  ((ChipClusters.OccupancySensingCluster) cluster)
+                      .writeUltrasonicOccupiedToUnoccupiedDelayAttribute(
+                          (DefaultClusterCallback) callback,
+                          (Integer) commandArguments.get("value"));
+                },
+                () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+                writeOccupancySensingUltrasonicOccupiedToUnoccupiedDelayCommandParams);
+    writeOccupancySensingInteractionInfo.put(
+        "writeUltrasonicOccupiedToUnoccupiedDelayAttribute",
+        writeOccupancySensingUltrasonicOccupiedToUnoccupiedDelayAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        writeOccupancySensingUltrasonicUnoccupiedToOccupiedDelayCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo occupancySensingultrasonicUnoccupiedToOccupiedDelayCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeOccupancySensingUltrasonicUnoccupiedToOccupiedDelayCommandParams.put(
+        "value", occupancySensingultrasonicUnoccupiedToOccupiedDelayCommandParameterInfo);
+    InteractionInfo
+        writeOccupancySensingUltrasonicUnoccupiedToOccupiedDelayAttributeInteractionInfo =
+            new InteractionInfo(
+                (cluster, callback, commandArguments) -> {
+                  ((ChipClusters.OccupancySensingCluster) cluster)
+                      .writeUltrasonicUnoccupiedToOccupiedDelayAttribute(
+                          (DefaultClusterCallback) callback,
+                          (Integer) commandArguments.get("value"));
+                },
+                () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+                writeOccupancySensingUltrasonicUnoccupiedToOccupiedDelayCommandParams);
+    writeOccupancySensingInteractionInfo.put(
+        "writeUltrasonicUnoccupiedToOccupiedDelayAttribute",
+        writeOccupancySensingUltrasonicUnoccupiedToOccupiedDelayAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        writeOccupancySensingUltrasonicUnoccupiedToOccupiedThresholdCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo
+        occupancySensingultrasonicUnoccupiedToOccupiedThresholdCommandParameterInfo =
+            new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeOccupancySensingUltrasonicUnoccupiedToOccupiedThresholdCommandParams.put(
+        "value", occupancySensingultrasonicUnoccupiedToOccupiedThresholdCommandParameterInfo);
+    InteractionInfo
+        writeOccupancySensingUltrasonicUnoccupiedToOccupiedThresholdAttributeInteractionInfo =
+            new InteractionInfo(
+                (cluster, callback, commandArguments) -> {
+                  ((ChipClusters.OccupancySensingCluster) cluster)
+                      .writeUltrasonicUnoccupiedToOccupiedThresholdAttribute(
+                          (DefaultClusterCallback) callback,
+                          (Integer) commandArguments.get("value"));
+                },
+                () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+                writeOccupancySensingUltrasonicUnoccupiedToOccupiedThresholdCommandParams);
+    writeOccupancySensingInteractionInfo.put(
+        "writeUltrasonicUnoccupiedToOccupiedThresholdAttribute",
+        writeOccupancySensingUltrasonicUnoccupiedToOccupiedThresholdAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        writeOccupancySensingPhysicalContactOccupiedToUnoccupiedDelayCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo
+        occupancySensingphysicalContactOccupiedToUnoccupiedDelayCommandParameterInfo =
+            new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeOccupancySensingPhysicalContactOccupiedToUnoccupiedDelayCommandParams.put(
+        "value", occupancySensingphysicalContactOccupiedToUnoccupiedDelayCommandParameterInfo);
+    InteractionInfo
+        writeOccupancySensingPhysicalContactOccupiedToUnoccupiedDelayAttributeInteractionInfo =
+            new InteractionInfo(
+                (cluster, callback, commandArguments) -> {
+                  ((ChipClusters.OccupancySensingCluster) cluster)
+                      .writePhysicalContactOccupiedToUnoccupiedDelayAttribute(
+                          (DefaultClusterCallback) callback,
+                          (Integer) commandArguments.get("value"));
+                },
+                () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+                writeOccupancySensingPhysicalContactOccupiedToUnoccupiedDelayCommandParams);
+    writeOccupancySensingInteractionInfo.put(
+        "writePhysicalContactOccupiedToUnoccupiedDelayAttribute",
+        writeOccupancySensingPhysicalContactOccupiedToUnoccupiedDelayAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        writeOccupancySensingPhysicalContactUnoccupiedToOccupiedDelayCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo
+        occupancySensingphysicalContactUnoccupiedToOccupiedDelayCommandParameterInfo =
+            new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeOccupancySensingPhysicalContactUnoccupiedToOccupiedDelayCommandParams.put(
+        "value", occupancySensingphysicalContactUnoccupiedToOccupiedDelayCommandParameterInfo);
+    InteractionInfo
+        writeOccupancySensingPhysicalContactUnoccupiedToOccupiedDelayAttributeInteractionInfo =
+            new InteractionInfo(
+                (cluster, callback, commandArguments) -> {
+                  ((ChipClusters.OccupancySensingCluster) cluster)
+                      .writePhysicalContactUnoccupiedToOccupiedDelayAttribute(
+                          (DefaultClusterCallback) callback,
+                          (Integer) commandArguments.get("value"));
+                },
+                () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+                writeOccupancySensingPhysicalContactUnoccupiedToOccupiedDelayCommandParams);
+    writeOccupancySensingInteractionInfo.put(
+        "writePhysicalContactUnoccupiedToOccupiedDelayAttribute",
+        writeOccupancySensingPhysicalContactUnoccupiedToOccupiedDelayAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        writeOccupancySensingPhysicalContactUnoccupiedToOccupiedThresholdCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo
+        occupancySensingphysicalContactUnoccupiedToOccupiedThresholdCommandParameterInfo =
+            new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeOccupancySensingPhysicalContactUnoccupiedToOccupiedThresholdCommandParams.put(
+        "value", occupancySensingphysicalContactUnoccupiedToOccupiedThresholdCommandParameterInfo);
+    InteractionInfo
+        writeOccupancySensingPhysicalContactUnoccupiedToOccupiedThresholdAttributeInteractionInfo =
+            new InteractionInfo(
+                (cluster, callback, commandArguments) -> {
+                  ((ChipClusters.OccupancySensingCluster) cluster)
+                      .writePhysicalContactUnoccupiedToOccupiedThresholdAttribute(
+                          (DefaultClusterCallback) callback,
+                          (Integer) commandArguments.get("value"));
+                },
+                () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+                writeOccupancySensingPhysicalContactUnoccupiedToOccupiedThresholdCommandParams);
+    writeOccupancySensingInteractionInfo.put(
+        "writePhysicalContactUnoccupiedToOccupiedThresholdAttribute",
+        writeOccupancySensingPhysicalContactUnoccupiedToOccupiedThresholdAttributeInteractionInfo);
     writeAttributeMap.put("occupancySensing", writeOccupancySensingInteractionInfo);
     Map<String, InteractionInfo> writeWakeOnLanInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("wakeOnLan", writeWakeOnLanInteractionInfo);
@@ -1921,6 +2439,159 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeAccountLoginInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("accountLogin", writeAccountLoginInteractionInfo);
     Map<String, InteractionInfo> writeElectricalMeasurementInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo>
+        writeElectricalMeasurementAverageRmsVoltageMeasurementPeriodCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo
+        electricalMeasurementaverageRmsVoltageMeasurementPeriodCommandParameterInfo =
+            new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeElectricalMeasurementAverageRmsVoltageMeasurementPeriodCommandParams.put(
+        "value", electricalMeasurementaverageRmsVoltageMeasurementPeriodCommandParameterInfo);
+    InteractionInfo
+        writeElectricalMeasurementAverageRmsVoltageMeasurementPeriodAttributeInteractionInfo =
+            new InteractionInfo(
+                (cluster, callback, commandArguments) -> {
+                  ((ChipClusters.ElectricalMeasurementCluster) cluster)
+                      .writeAverageRmsVoltageMeasurementPeriodAttribute(
+                          (DefaultClusterCallback) callback,
+                          (Integer) commandArguments.get("value"));
+                },
+                () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+                writeElectricalMeasurementAverageRmsVoltageMeasurementPeriodCommandParams);
+    writeElectricalMeasurementInteractionInfo.put(
+        "writeAverageRmsVoltageMeasurementPeriodAttribute",
+        writeElectricalMeasurementAverageRmsVoltageMeasurementPeriodAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        writeElectricalMeasurementAverageRmsUnderVoltageCounterCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo electricalMeasurementaverageRmsUnderVoltageCounterCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeElectricalMeasurementAverageRmsUnderVoltageCounterCommandParams.put(
+        "value", electricalMeasurementaverageRmsUnderVoltageCounterCommandParameterInfo);
+    InteractionInfo
+        writeElectricalMeasurementAverageRmsUnderVoltageCounterAttributeInteractionInfo =
+            new InteractionInfo(
+                (cluster, callback, commandArguments) -> {
+                  ((ChipClusters.ElectricalMeasurementCluster) cluster)
+                      .writeAverageRmsUnderVoltageCounterAttribute(
+                          (DefaultClusterCallback) callback,
+                          (Integer) commandArguments.get("value"));
+                },
+                () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+                writeElectricalMeasurementAverageRmsUnderVoltageCounterCommandParams);
+    writeElectricalMeasurementInteractionInfo.put(
+        "writeAverageRmsUnderVoltageCounterAttribute",
+        writeElectricalMeasurementAverageRmsUnderVoltageCounterAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        writeElectricalMeasurementRmsExtremeOverVoltagePeriodCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo electricalMeasurementrmsExtremeOverVoltagePeriodCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeElectricalMeasurementRmsExtremeOverVoltagePeriodCommandParams.put(
+        "value", electricalMeasurementrmsExtremeOverVoltagePeriodCommandParameterInfo);
+    InteractionInfo writeElectricalMeasurementRmsExtremeOverVoltagePeriodAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectricalMeasurementCluster) cluster)
+                  .writeRmsExtremeOverVoltagePeriodAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeElectricalMeasurementRmsExtremeOverVoltagePeriodCommandParams);
+    writeElectricalMeasurementInteractionInfo.put(
+        "writeRmsExtremeOverVoltagePeriodAttribute",
+        writeElectricalMeasurementRmsExtremeOverVoltagePeriodAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        writeElectricalMeasurementRmsExtremeUnderVoltagePeriodCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo electricalMeasurementrmsExtremeUnderVoltagePeriodCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeElectricalMeasurementRmsExtremeUnderVoltagePeriodCommandParams.put(
+        "value", electricalMeasurementrmsExtremeUnderVoltagePeriodCommandParameterInfo);
+    InteractionInfo writeElectricalMeasurementRmsExtremeUnderVoltagePeriodAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectricalMeasurementCluster) cluster)
+                  .writeRmsExtremeUnderVoltagePeriodAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeElectricalMeasurementRmsExtremeUnderVoltagePeriodCommandParams);
+    writeElectricalMeasurementInteractionInfo.put(
+        "writeRmsExtremeUnderVoltagePeriodAttribute",
+        writeElectricalMeasurementRmsExtremeUnderVoltagePeriodAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeElectricalMeasurementRmsVoltageSagPeriodCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo electricalMeasurementrmsVoltageSagPeriodCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeElectricalMeasurementRmsVoltageSagPeriodCommandParams.put(
+        "value", electricalMeasurementrmsVoltageSagPeriodCommandParameterInfo);
+    InteractionInfo writeElectricalMeasurementRmsVoltageSagPeriodAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectricalMeasurementCluster) cluster)
+                  .writeRmsVoltageSagPeriodAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeElectricalMeasurementRmsVoltageSagPeriodCommandParams);
+    writeElectricalMeasurementInteractionInfo.put(
+        "writeRmsVoltageSagPeriodAttribute",
+        writeElectricalMeasurementRmsVoltageSagPeriodAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeElectricalMeasurementRmsVoltageSwellPeriodCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo electricalMeasurementrmsVoltageSwellPeriodCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeElectricalMeasurementRmsVoltageSwellPeriodCommandParams.put(
+        "value", electricalMeasurementrmsVoltageSwellPeriodCommandParameterInfo);
+    InteractionInfo writeElectricalMeasurementRmsVoltageSwellPeriodAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectricalMeasurementCluster) cluster)
+                  .writeRmsVoltageSwellPeriodAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeElectricalMeasurementRmsVoltageSwellPeriodCommandParams);
+    writeElectricalMeasurementInteractionInfo.put(
+        "writeRmsVoltageSwellPeriodAttribute",
+        writeElectricalMeasurementRmsVoltageSwellPeriodAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeElectricalMeasurementOverloadAlarmsMaskCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo electricalMeasurementoverloadAlarmsMaskCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeElectricalMeasurementOverloadAlarmsMaskCommandParams.put(
+        "value", electricalMeasurementoverloadAlarmsMaskCommandParameterInfo);
+    InteractionInfo writeElectricalMeasurementOverloadAlarmsMaskAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectricalMeasurementCluster) cluster)
+                  .writeOverloadAlarmsMaskAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeElectricalMeasurementOverloadAlarmsMaskCommandParams);
+    writeElectricalMeasurementInteractionInfo.put(
+        "writeOverloadAlarmsMaskAttribute",
+        writeElectricalMeasurementOverloadAlarmsMaskAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeElectricalMeasurementAcOverloadAlarmsMaskCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo electricalMeasurementacOverloadAlarmsMaskCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeElectricalMeasurementAcOverloadAlarmsMaskCommandParams.put(
+        "value", electricalMeasurementacOverloadAlarmsMaskCommandParameterInfo);
+    InteractionInfo writeElectricalMeasurementAcOverloadAlarmsMaskAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectricalMeasurementCluster) cluster)
+                  .writeAcOverloadAlarmsMaskAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeElectricalMeasurementAcOverloadAlarmsMaskCommandParams);
+    writeElectricalMeasurementInteractionInfo.put(
+        "writeAcOverloadAlarmsMaskAttribute",
+        writeElectricalMeasurementAcOverloadAlarmsMaskAttributeInteractionInfo);
     writeAttributeMap.put("electricalMeasurement", writeElectricalMeasurementInteractionInfo);
     Map<String, InteractionInfo> writeClientMonitoringInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("clientMonitoring", writeClientMonitoringInteractionInfo);
@@ -3155,6 +3826,23 @@ public class ClusterWriteMapping {
     writeUnitTestingInteractionInfo.put(
         "writeNullableRangeRestrictedInt16sAttribute",
         writeUnitTestingNullableRangeRestrictedInt16sAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeUnitTestingWriteOnlyInt8uCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo unitTestingwriteOnlyInt8uCommandParameterInfo =
+        new CommandParameterInfo("value", Integer.class, Integer.class);
+    writeUnitTestingWriteOnlyInt8uCommandParams.put(
+        "value", unitTestingwriteOnlyInt8uCommandParameterInfo);
+    InteractionInfo writeUnitTestingWriteOnlyInt8uAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UnitTestingCluster) cluster)
+                  .writeWriteOnlyInt8uAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeUnitTestingWriteOnlyInt8uCommandParams);
+    writeUnitTestingInteractionInfo.put(
+        "writeWriteOnlyInt8uAttribute", writeUnitTestingWriteOnlyInt8uAttributeInteractionInfo);
     writeAttributeMap.put("unitTesting", writeUnitTestingInteractionInfo);
     return writeAttributeMap;
   }
