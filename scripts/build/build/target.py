@@ -319,7 +319,7 @@ class BuildTarget:
         return {
             'name': self.name,
             'shorthand': self.HumanString(),
-            'parts': [part.ToDict() for target in self.fixed_targets for part in target],
+            'parts': [[part.ToDict() for part in target] for target in self.fixed_targets],
             'modifiers': [part.ToDict() for part in self.modifiers]
         }
 
