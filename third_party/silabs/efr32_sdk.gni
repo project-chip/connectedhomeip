@@ -310,6 +310,7 @@ template("efr32_sdk") {
         "SL_CATALOG_POWER_MANAGER_PRESENT",
         "SL_CATALOG_SLEEPTIMER_PRESENT",
         "SL_SLEEP_TIME_MS=${sleep_time_ms}",
+
         # Used for wifi devices to get packet details
         "WIFI_DEBUG_ENABLED=1",
       ]
