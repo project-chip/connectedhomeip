@@ -39,20 +39,14 @@ the Texas Instruments devices.
 
 ## Device UI
 
-This example application has a simple User Interface to depict the state of the
-various Matter clusters and the attribute changes associated with them. The user
-LEDs on the LaunchPad are used for the onoff, levelcontrol and identify clusters
-to provide a working demonstration of the cluster attribute changes. The Green
-LED is used to represent attribute changes to endpoint 1 while the Red LED is
-used to represent changes to endpoint 2.
-
-Short presses (less than 1000ms) of the user buttons are used currently unused
-in the all-clusters application, but stubs are provided.
-
-Long presses (greater than 1000ms) of the user buttons are used for controlling
-BLE advertisements and resets. The left button (`BTN-1`) is used to perform a
-factory reset of the device. The Right button (`BTN-2`) is used to disable BLE
-advertisements (if enabled) or enable advertisements (if disabled).
+| Action                                           | Functionality                              |
+| ------------------------------------------------ | --------------------------------------     |
+| Left Button (`BTN-1`) Press (more than 1000 ms)  | Factory Reset                              |
+| Right Button (`BTN-2`) Press (more than 1000 ms) | BLE Advertisement (Enable/Disable)         |
+| Red LED Solid Blinking State                     | Identify Trigger Effect in progress (EP0/1)|
+| Red LED Off State                                | No Identify Trigger Effect in progress     |
+| Green LED Blinking State                         | Identify Trigger Effect in progress (EP 2) |
+| Green LED Off State                              | No Identify Trigger Effect in progress     |
 
 ## Building
 
@@ -105,7 +99,7 @@ Ninja to build the executable.
     $ cd ~/connectedhomeip/examples/all-clusters-minimal-app/cc13x2x7_26x2x7
     OR
     $ cd ~/connectedhomeip/examples/all-clusters-minimal-app/cc13x4_26x4
-    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15"
+    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15.0\""
     $ ninja -C out/debug
 
     ```
@@ -171,6 +165,11 @@ the session.
 Select the ELF image to load on the device with the `Browse` button. This file
 is placed in the `out/debug` folder by this guide and ends with the `*.out` file
 extension.
+For OTA enabled applications, the standalone image will instead end with the
+`*-bim.hex` file extension. This this is a combined image with application and
+and BIM included.
+The flag to enable or disable the OTA feature is determined by
+"chip_enable_ota_requestor" in the application's args.gni file.
 
 Finally click the `Load Image` button to load the executable image onto the
 device. You should be able to see the log output over the XDS110 User UART.
@@ -287,7 +286,7 @@ commands.
 For technical support, please consider creating a post on TI's [E2E forum][e2e].
 Additionally, we welcome any feedback.
 
-[matter]: https://github.com/project-chip/connectedhomeip
+[matter]: https://csa-iot.org/all-solutions/matter/
 [ccs]: https://www.ti.com/tool/CCSTUDIO
 [ccs_after_launch]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#after-launch

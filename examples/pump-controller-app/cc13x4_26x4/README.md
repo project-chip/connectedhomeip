@@ -39,20 +39,14 @@ Instruments devices.
 
 ## Device UI
 
-This example application has a simple User Interface to depict the state of the
-pump and to control the state. The user LEDs on the LaunchPad are set on when
-the pump is started, and are set off when stopped. The LEDs will flash when in
-the transition state between started and stopped.
-
-Short presses (less than 1000ms) of the right user button (`BTN-2`) are used for
-toggling the pump state.
-
-Short presses (less than 1000ms) of the left user button (`BTN-1`) are used for
-toggling Matter BLE advertisements.
-
-Long presses (greater than 5000ms) of the left user button (`BTN-1`) will
-initiate a factory reset of the device clearing all stored provisioning
-information to allow for a new network setup.
+| Action                                           | Functionality                          |
+| ------------------------------------------------ | -------------------------------------- |
+| Left Button (`BTN-1`) Press (less than 1000 ms)  | BLE Advertisement (Enable/Disable)     |
+| Left Button (`BTN-1`) Press (more than 5000 ms)  | Factory Reset                          |
+| Right Button (`BTN-2`) Press (less than 1000 ms) | Toggle pump state                      |
+| Red & Green LED Blinking State                   | Pump transition from either Start/Stop |
+| Red & LED On State                               | Pump is started                        |
+| Red & Green LED Off State                        | Pump stopped                           |
 
 ## Building
 
@@ -105,7 +99,7 @@ Ninja to build the executable.
     $ cd ~/connectedhomeip/examples/pump-controller-app/cc13x2x7_26x2x7
     OR
     $ cd ~/connectedhomeip/examples/pump-controller-app/cc13x4_26x4
-    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15"
+    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15.0\""
     $ ninja -C out/debug
 
     ```
@@ -170,6 +164,11 @@ the session.
 Select the ELF image to load on the device with the `Browse` button. This file
 is placed in the `out/debug` folder by this guide and ends with the `*.out` file
 extension.
+For OTA enabled applications, the standalone image will instead end with the
+`*-bim.hex` file extension. This this is a combined image with application and
+and BIM included.
+The flag to enable or disable the OTA feature is determined by
+"chip_enable_ota_requestor" in the application's args.gni file.
 
 Finally click the `Load Image` button to load the executable image onto the
 device. You should be able to see the log output over the XDS110 User UART.
@@ -280,7 +279,7 @@ commands.
 For technical support, please consider creating a post on TI's [E2E forum][e2e].
 Additionally, we welcome any feedback.
 
-[matter]: https://github.com/project-chip/connectedhomeip
+[matter]: https://csa-iot.org/all-solutions/matter/
 [ccs]: https://www.ti.com/tool/CCSTUDIO
 [ccs_after_launch]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#after-launch

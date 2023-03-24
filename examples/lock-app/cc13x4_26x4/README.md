@@ -38,19 +38,15 @@ Instruments devices.
 
 ## Device UI
 
-This example application has a simple User Interface to depict the state of the
-door lock and to control the state. The user LEDs on the LaunchPad are set on
-when the lock is locked, and are set off when unlocked. The LEDs will flash when
-in the transition state between locked and unlocked.
-
-Short presses (less than 1000ms) of the user buttons are used for requesting
-lock and unlock of the door lock. The left button (`BTN-1`) is used to request
-locking. The right button (`BTN-2`) is used to request unlocking.
-
-Long presses (greater than 1000ms) of the user buttons are used for controlling
-BLE advertisements and resets. The left button (`BTN-1`) is used to perform a
-factory reset of the device. The Right button (`BTN-2`) is used to disable BLE
-advertisements (if enabled) or enable advertisements (if disabled).
+| Action                                           | Functionality                           |
+| ------------------------------------------------ | --------------------------------------  |
+| Left Button (`BTN-1`) Press (less than 1000 ms)  | Change state to unlocked                |
+| Right Button (`BTN-2`) Press (less than 1000 ms) | Change state to locked                  |
+| Left Button (`BTN-1`) Press (more than 1000 ms)  | Factory Reset                           |
+| Right Button (`BTN-2`) Press (more than 1000 ms) | BLE Advertisement (Enable/Disable)      |
+| Red & Green LED Blinking State                   | Lock state transition to locked/unlocked|
+| Red LED On State                                 | Lock state locked                       |
+| Red & Green LED Off State                        | Lock state unlocked                     |
 
 ## Building
 
@@ -103,7 +99,7 @@ Ninja to build the executable.
     $ cd ~/connectedhomeip/examples/lock-app/cc13x2x7_26x2x7
     OR
     $ cd ~/connectedhomeip/examples/lock-app/cc13x4_26x4
-    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15"
+    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15.0\""
     $ ninja -C out/debug
 
     ```
@@ -172,6 +168,11 @@ the session.
 Select the ELF image to load on the device with the `Browse` button. This file
 is placed in the `out/debug` folder by this guide and ends with the `*.out` file
 extension.
+For OTA enabled applications, the standalone image will instead end with the
+`*-bim.hex` file extension. This this is a combined image with application and
+and BIM included.
+The flag to enable or disable the OTA feature is determined by
+"chip_enable_ota_requestor" in the application's args.gni file.
 
 Finally click the `Load Image` button to load the executable image onto the
 device. You should be able to see the log output over the XDS110 User UART.
@@ -306,7 +307,7 @@ commands.
 For technical support, please consider creating a post on TI's [E2E forum][e2e].
 Additionally, we welcome any feedback.
 
-[matter]: https://github.com/project-chip/connectedhomeip
+[matter]: https://csa-iot.org/all-solutions/matter/
 [ccs]: https://www.ti.com/tool/CCSTUDIO
 [ccs_after_launch]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#after-launch

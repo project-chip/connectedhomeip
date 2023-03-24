@@ -54,7 +54,8 @@ Ninja to build the executable.
     $ cd ~/connectedhomeip/examples/shell/cc13x2x7_26x2x7
     OR
     $ cd ~/connectedhomeip/examples/shell/cc13x4_26x4
-    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15"
+
+    $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15.0\""
     $ ninja -C out/debug
 
     ```
@@ -159,7 +160,7 @@ For help with the shell itself, refer to the
 For technical support, please consider creating a post on TI's [E2E forum][e2e].
 Additionally, we welcome any feedback.
 
-[matter]: https://github.com/project-chip/connectedhomeip
+[matter]: https://csa-iot.org/all-solutions/matter/
 [ccs]: https://www.ti.com/tool/CCSTUDIO
 [ccs_after_launch]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#after-launch
