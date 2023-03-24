@@ -37,6 +37,8 @@ namespace {
 
 class DeviceAttestationCredsSilabs : public DeviceAttestationCredentialsProvider
 {
+    // Miss-aligned certificates is a common error, and printing the first few bytes is
+    // useful to verify proper alignment. Eight bytes is enough for this purpose.
     static constexpr size_t kDebugLength = 8;
 
 public:
@@ -55,7 +57,7 @@ public:
         uint8_t * address = _credentials_address + offset;
         ByteSpan cd_span(address, size);
         ChipLogProgress(DeviceLayer, "GetCertificationDeclaration, addr:%p, size:%lu", address, size);
-        ChipLogByteSpan(Zcl, ByteSpan(cd_span.data(), kDebugLength));
+        ChipLogByteSpan(DeviceLayer, ByteSpan(cd_span.data(), kDebugLength > cd_span.size() ? cd_span.size() : kDebugLength));
         return CopySpanToMutableSpan(cd_span, out_span);
     }
 
@@ -81,7 +83,7 @@ public:
         uint8_t * address = _credentials_address + offset;
         ByteSpan cert_span(address, size);
         ChipLogProgress(DeviceLayer, "GetDeviceAttestationCert, addr:%p, size:%lu", address, size);
-        ChipLogByteSpan(Zcl, ByteSpan(cert_span.data(), kDebugLength));
+        ChipLogByteSpan(DeviceLayer, ByteSpan(cert_span.data(), kDebugLength > cert_span.size() ? cert_span.size() : kDebugLength));
         return CopySpanToMutableSpan(cert_span, out_span);
     }
 
@@ -100,7 +102,7 @@ public:
         uint8_t * address = _credentials_address + offset;
         ByteSpan cert_span(address, size);
         ChipLogProgress(DeviceLayer, "GetProductAttestationIntermediateCert, addr:%p, size:%lu", address, size);
-        ChipLogByteSpan(Zcl, ByteSpan(cert_span.data(), kDebugLength));
+        ChipLogByteSpan(DeviceLayer, ByteSpan(cert_span.data(), kDebugLength > cert_span.size() ? cert_span.size() : kDebugLength));
         return CopySpanToMutableSpan(cert_span, out_span);
     }
 
