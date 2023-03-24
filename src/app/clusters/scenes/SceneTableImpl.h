@@ -78,14 +78,12 @@ public:
                 mValueBuffer[pairCount][valueBytesCount] = value_iterator.GetValue();
                 valueBytesCount++;
             }
-            // Check we could go through all bytes of the value
             ReturnErrorOnFailure(value_iterator.GetStatus());
 
             mAVPairs[pairCount].attributeValue = mValueBuffer[pairCount];
             mAVPairs[pairCount].attributeValue.reduce_size(valueBytesCount);
             pairCount++;
         }
-        // Check we could go through all pairs in incomming command
         ReturnErrorOnFailure(pair_iterator.GetStatus());
 
         app::DataModel::List<app::Clusters::Scenes::Structs::AttributeValuePair::Type> attributeValueList;
@@ -149,14 +147,12 @@ public:
                 mValueBuffer[pairCount][valueBytesCount] = value_iterator.GetValue();
                 valueBytesCount++;
             }
-            // Check we could go through all bytes of the value
             ReturnErrorOnFailure(value_iterator.GetStatus());
 
             mAVPairs[pairCount].attributeValue = mValueBuffer[pairCount];
             mAVPairs[pairCount].attributeValue.reduce_size(valueBytesCount);
             pairCount++;
         };
-        // Check we could go through all pairs stored in memory
         ReturnErrorOnFailure(pair_iterator.GetStatus());
 
         ReturnErrorOnFailure(reader.ExitContainer(outer));

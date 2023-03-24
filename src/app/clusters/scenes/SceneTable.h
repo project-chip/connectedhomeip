@@ -82,7 +82,8 @@ public:
     /// @param extensionFieldSet[in] ExtensionFieldSets provided by the AddScene Command, pre initialized
     /// @param serialisedBytes[out] Buffer to fill from the ExtensionFieldSet in command
     /// @return CHIP_NO_ERROR if successful, CHIP_ERROR value otherwise
-    /// @note Only gets called after the scene-cluster has previously verified that the endpoint,cluster valuer pair is supported by
+    /// @note Only gets called after the scene-cluster has previously verified that the endpoint,cluster pair is supported by
+
     /// the handler. It is therefore the implementation's reponsibility to also implement the SupportsCluster method.
     virtual CHIP_ERROR SerializeAdd(EndpointId endpoint,
                                     const app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType & extensionFieldSet,
