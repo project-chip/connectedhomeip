@@ -109,7 +109,12 @@ static uint16_t lastCount; // Nb of bytes already processed from the active dmaB
 #define UART_TASK_SIZE 256
 #define UART_TASK_NAME "UART"
 #define UART_TX_COMPLETE_BIT (1 << 0)
+
+#ifdef CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE
 #define UART_TX_MAX_BUF_LEN (CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE + 2) // \r\n
+#else
+#define UART_TX_MAX_BUF_LEN (258)
+#endif
 
 TaskHandle_t sUartTaskHandle;
 StackType_t uartStack[UART_TASK_SIZE * sizeof(StackType_t)];
@@ -280,6 +285,10 @@ void uartConsoleInit(void)
 
     // Start App task.
     sUartTaskHandle = xTaskCreateStatic(uartMainLoop, UART_TASK_NAME, UART_TASK_SIZE, nullptr, 30, uartStack, &uartTaskStruct);
+
+    assert(sUartTaskHandle);
+    assert(sUartEventGroup);
+    assert(sUartTxQueue);
 }
 
 void USART_IRQHandler(void)
@@ -310,7 +319,7 @@ void UART_tx_callback(struct UARTDRV_HandleData * handle, Ecode_t transferStatus
 {
     BaseType_t xHigherPriorityTaskWoken;
     /* Was the message posted successfully? */
-    if (xEventGroupSetBitsFromISR(sUartEventGroup, UART_TX_COMPLETE_BIT, &xHigherPriorityTaskWoken) != pdFAIL)
+    if (xEventGroupSetBitsFromISR(sUartEventGroup, UART_TX_COMPLETE_BIT, &xHigherPriorityTaskWoken) == pdPASS)
     {
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
     }

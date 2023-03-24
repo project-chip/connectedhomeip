@@ -67,6 +67,11 @@
 #include "uart.h"
 #endif
 
+// Enable RTT by default
+#ifndef SILABS_LOG_OUT_RTT
+#define SILABS_LOG_OUT_RTT 1
+#endif
+
 // SEGGER_RTT includes
 #if SILABS_LOG_OUT_RTT
 #include "SEGGER_RTT.h"
@@ -137,25 +142,23 @@ static void PrintLog(const char * msg)
     {
         size_t sz;
         sz = strlen(msg);
+
 #if SILABS_LOG_OUT_UART
         uartLogWrite(msg, sz);
-#endif
-#if SILABS_LOG_OUT_RTT
+#elif PW_RPC_ENABLED
+        PigweedLogger::putString(msg, sz);
+#else
         SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, msg, sz);
 #endif
 
-#ifdef PW_RPC_ENABLED
-        PigweedLogger::putString(msg, sz);
-#endif
-
-#if SILABS_LOG_OUT_RTT
+#if SILABS_LOG_OUT_RTT || PW_RPC_ENABLED
         const char * newline = "\r\n";
         sz                   = strlen(newline);
-        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, sz);
-#endif
-
-#ifdef PW_RPC_ENABLED
+#if PW_RPC_ENABLED
         PigweedLogger::putString(newline, sz);
+#else
+        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, sz);
+#endif // PW_RPC_ENABLED
 #endif
     }
 }

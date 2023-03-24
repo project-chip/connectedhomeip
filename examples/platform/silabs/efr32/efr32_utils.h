@@ -37,9 +37,6 @@ void appError(int err);
 #ifndef SILABS_LOG_OUT_UART
 #define SILABS_LOG_OUT_UART 0
 #endif
-#ifndef SILABS_LOG_OUT_RTT
-#define SILABS_LOG_OUT_RTT 1
-#endif
 
 #include <lib/core/CHIPError.h>
 void appError(CHIP_ERROR error);
