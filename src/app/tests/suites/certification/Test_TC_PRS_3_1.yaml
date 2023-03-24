@@ -1,0 +1,312 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
+
+name: 34.3.1. [TC-PRS-3.1] Attributes with client as DUT
+
+PICS:
+    - PRS.C
+    - PRS.C.AM-READ
+    - PRS.C.AO-READ
+    - PRS.C.AM-WRITE
+    - PRS.C.AO-WRITE
+
+config:
+    nodeId: 0x12344321
+    cluster: "Basic Information"
+    endpoint: 0
+
+tests:
+    - label: "Note"
+      verification: |
+          For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
+      disabled: true
+
+    - label:
+          "DUT reads all supported mandatory attributes from TH one at a time in
+          a manufacturer specific order."
+      PICS: PRS.C.AM-READ
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+
+          ./chip-tool pressuremeasurement read measured-value 1 1
+
+          verify the " measured-value response" on the TH (all-cluster-app) log:
+
+          [1653992317.047323][2347:2347] CHIP:IM: Received Read request
+          [1653992317.047382][2347:2347] CHIP:DMG: ReadRequestMessage =
+          [1653992317.047457][2347:2347] CHIP:DMG: {
+          [1653992317.047480][2347:2347] CHIP:DMG:         AttributePathIBs =
+          [1653992317.047507][2347:2347] CHIP:DMG:         [
+          [1653992317.047531][2347:2347] CHIP:DMG:                 AttributePathIB =
+          [1653992317.047563][2347:2347] CHIP:DMG:                 {
+          [1653992317.047592][2347:2347] CHIP:DMG:                         Endpoint = 0x1,
+          [1653992317.047657][2347:2347] CHIP:DMG:                         Cluster = 0x403,
+          [1653992317.047695][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1653992317.047725][2347:2347] CHIP:DMG:                 }
+          [1653992317.047774][2347:2347] CHIP:DMG:
+          [1653992317.047803][2347:2347] CHIP:DMG:         ],
+          [1653992317.047831][2347:2347] CHIP:DMG:
+          [1653992317.047859][2347:2347] CHIP:DMG:         isFabricFiltered = true,
+          [1653992317.047884][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
+          [1653992317.047908][2347:2347] CHIP:DMG: },
+          [1653992317.047995][2347:2347] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+          ./chip-tool pressuremeasurement read  min-measured-value 1 1
+
+          verify the " min-measured-value response" on the TH (all-cluster-app) log:
+
+          [1653992385.759474][2347:2347] CHIP:IM: Received Read request
+          [1653992385.759533][2347:2347] CHIP:DMG: ReadRequestMessage =
+          [1653992385.759561][2347:2347] CHIP:DMG: {
+          [1653992385.759584][2347:2347] CHIP:DMG:         AttributePathIBs =
+          [1653992385.759618][2347:2347] CHIP:DMG:         [
+          [1653992385.759647][2347:2347] CHIP:DMG:                 AttributePathIB =
+          [1653992385.759678][2347:2347] CHIP:DMG:                 {
+          [1653992385.759745][2347:2347] CHIP:DMG:                         Endpoint = 0x1,
+          [1653992385.759781][2347:2347] CHIP:DMG:                         Cluster = 0x403,
+          [1653992385.759859][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1653992385.759918][2347:2347] CHIP:DMG:                 }
+          [1653992385.759971][2347:2347] CHIP:DMG:
+          [1653992385.760000][2347:2347] CHIP:DMG:         ],
+          [1653992385.760049][2347:2347] CHIP:DMG:
+          [1653992385.760100][2347:2347] CHIP:DMG:         isFabricFiltered = true,
+          [1653992385.760125][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
+          [1653992385.760168][2347:2347] CHIP:DMG: }
+
+
+          ./chip-tool pressuremeasurement read  max-measured-value 1 1
+
+          verify the " max-measured-value response" on the TH (all-cluster-app) log:
+
+          [1653992415.580348][2347:2347] CHIP:IM: Received Read request
+          [1653992415.580414][2347:2347] CHIP:DMG: ReadRequestMessage =
+          [1653992415.580442][2347:2347] CHIP:DMG: {
+          [1653992415.580473][2347:2347] CHIP:DMG:         AttributePathIBs =
+          [1653992415.580501][2347:2347] CHIP:DMG:         [
+          [1653992415.580534][2347:2347] CHIP:DMG:                 AttributePathIB =
+          [1653992415.580563][2347:2347] CHIP:DMG:                 {
+          [1653992415.580602][2347:2347] CHIP:DMG:                         Endpoint = 0x1,
+          [1653992415.580674][2347:2347] CHIP:DMG:                         Cluster = 0x403,
+          [1653992415.580713][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1653992415.580746][2347:2347] CHIP:DMG:                 }
+          [1653992415.580786][2347:2347] CHIP:DMG:
+          [1653992415.580812][2347:2347] CHIP:DMG:         ],
+          [1653992415.580852][2347:2347] CHIP:DMG:
+          [1653992415.580879][2347:2347] CHIP:DMG:         isFabricFiltered = true,
+          [1653992415.580913][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
+          [1653992415.580936][2347:2347] CHIP:DMG: }
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific order."
+      PICS: PRS.C.AO-READ
+      verification: |
+          OPTIONAL ATTRIBUTES ARE NOT IMPLEMENTED IN SDK, If Implemented we will get the expected outcome that is value of below attributes as per Spec
+
+
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+          TH receives the read command and knows this attribute for this cluster and provides a plausable value, DUT processes the values and operates normally
+
+          ./chip-tool pressuremeasurement read  tolerance 1 1
+          ./chip-tool pressuremeasurement read scaled-value 1 1
+          ./chip-tool pressuremeasurement read  min-scaled-value  1 1
+          ./chip-tool pressuremeasurement read  max-scaled-value  1 1
+          ./chip-tool pressuremeasurement read scaled-tolerance 1 1
+          ./chip-tool pressuremeasurement read scale 1 1
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported mandatory attributes on
+          the TH one at a time in a manufacturer specific order."
+      PICS: PRS.C.AM-WRITE
+      verification: |
+          This cluster doesn"t have any writable attributes
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific order."
+      PICS: PRS.C.AO-WRITE
+      verification: |
+          This cluster doesn"t have any writable attributes
+      disabled: true
+
+    - label:
+          "Configure TH such that it implements mandatory and none of the
+          optional attributes of the server-side of the cluster, and that it
+          also reflects this in global attributes such as FeatureMap and
+          AttributeList. Commission DUT to TH again."
+      PICS: ""
+      verification: |
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+
+          TH receives the read command and knows this attribute for this cluster and provides a plausable value, DUT processes the values and operates normally
+
+
+          ./chip-tool pressuremeasurement read feature-map 1 1
+          verify the "  feature-map  response" on the TH (all-cluster-minimal-app) log:
+
+          [1678873303.474810][348369:348369] CHIP:EM: Handling via exchange: 59017r, Delegate: 0x55713c07aca8
+          [1678873303.474829][348369:348369] CHIP:IM: Received Read request
+          [1678873303.474872][348369:348369] CHIP:DMG: ReadRequestMessage =
+          [1678873303.474880][348369:348369] CHIP:DMG: {
+          [1678873303.474885][348369:348369] CHIP:DMG:         AttributePathIBs =
+          [1678873303.474894][348369:348369] CHIP:DMG:         [
+          [1678873303.474900][348369:348369] CHIP:DMG:                 AttributePathIB =
+          [1678873303.474908][348369:348369] CHIP:DMG:                 {
+          [1678873303.474915][348369:348369] CHIP:DMG:                         Endpoint = 0x1,
+          [1678873303.474922][348369:348369] CHIP:DMG:                         Cluster = 0x403,
+          [1678873303.474930][348369:348369] CHIP:DMG:                         Attribute = 0x0000_FFFC,
+          [1678873303.474936][348369:348369] CHIP:DMG:                 }
+          [1678873303.474944][348369:348369] CHIP:DMG:
+          [1678873303.474950][348369:348369] CHIP:DMG:         ],
+          [1678873303.474959][348369:348369] CHIP:DMG:
+          [1678873303.474966][348369:348369] CHIP:DMG:         isFabricFiltered = true,
+          [1678873303.474972][348369:348369] CHIP:DMG:         InteractionModelRevision = 1
+          [1678873303.474978][348369:348369] CHIP:DMG: },
+          [1678873303.475012][348369:348369] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1678873303.475045][348369:348369] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1678873303.475054][348369:348369] CHIP:DMG: <RE:Run> Cluster 403, Attribute fffc is dirty
+
+           ./chip-tool pressuremeasurement read attribute-list  1 1
+          verify the " attribute-list response" on the TH (all-cluster-minimal-app) log:
+
+          [1659606175.282588][7312:7312] CHIP:EM: Handling via exchange: 12368r, Delegate: 0xaaaaad2c4f68
+          [1659606175.282635][7312:7312] CHIP:IM: Received Read request
+          [1659606175.282718][7312:7312] CHIP:DMG: ReadRequestMessage =
+          [1659606175.282746][7312:7312] CHIP:DMG: {
+          [1659606175.282768][7312:7312] CHIP:DMG:         AttributePathIBs =
+          [1659606175.282794][7312:7312] CHIP:DMG:         [
+          [1659606175.282818][7312:7312] CHIP:DMG:                 AttributePathIB =
+          [1659606175.282846][7312:7312] CHIP:DMG:                 {
+          [1659606175.282874][7312:7312] CHIP:DMG:                         Endpoint = 0x1,
+          [1659606175.282910][7312:7312] CHIP:DMG:                         Cluster = 0x403,
+          [1659606175.282946][7312:7312] CHIP:DMG:                         Attribute = 0x0000_FFFB,
+          [1659606175.282975][7312:7312] CHIP:DMG:                 }
+          [1659606175.283004][7312:7312] CHIP:DMG:
+          [1659606175.283029][7312:7312] CHIP:DMG:         ],
+          [1659606175.283056][7312:7312] CHIP:DMG:
+          [1659606175.283083][7312:7312] CHIP:DMG:         isFabricFiltered = true,
+          [1659606175.283108][7312:7312] CHIP:DMG:         InteractionModelRevision = 1
+          [1659606175.283132][7312:7312] CHIP:DMG: },
+          [1659606175.283211][7312:7312] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1659606175.283312][7312:7312] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1659606175.283343][7312:7312] CHIP:DMG: <RE:Run> Cluster 403, Attribute fffb is dirty
+          [1659606175.283364][7312:7312] CHIP:DMG: Reading attribute: Cluster=0x0000_0403 Endpoint=1 AttributeId=0x0000_FFFB (expanded=0)
+
+
+
+
+           ./chip-tool pressuremeasurement read measured-value 1 1
+
+          verify the " measured-value response" on the TH (all-cluster-minimal-app) log:
+
+          [1653992317.047323][2347:2347] CHIP:IM: Received Read request
+          [1653992317.047382][2347:2347] CHIP:DMG: ReadRequestMessage =
+          [1653992317.047457][2347:2347] CHIP:DMG: {
+          [1653992317.047480][2347:2347] CHIP:DMG:         AttributePathIBs =
+          [1653992317.047507][2347:2347] CHIP:DMG:         [
+          [1653992317.047531][2347:2347] CHIP:DMG:                 AttributePathIB =
+          [1653992317.047563][2347:2347] CHIP:DMG:                 {
+          [1653992317.047592][2347:2347] CHIP:DMG:                         Endpoint = 0x1,
+          [1653992317.047657][2347:2347] CHIP:DMG:                         Cluster = 0x403,
+          [1653992317.047695][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0000,
+          [1653992317.047725][2347:2347] CHIP:DMG:                 }
+          [1653992317.047774][2347:2347] CHIP:DMG:
+          [1653992317.047803][2347:2347] CHIP:DMG:         ],
+          [1653992317.047831][2347:2347] CHIP:DMG:
+          [1653992317.047859][2347:2347] CHIP:DMG:         isFabricFiltered = true,
+          [1653992317.047884][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
+          [1653992317.047908][2347:2347] CHIP:DMG: },
+          [1653992317.047995][2347:2347] CHIP:DMG: IM RH moving to [GeneratingReports]
+
+          ./chip-tool pressuremeasurement read  min-measured-value 1 1
+
+          verify the " min-measured-value response" on the TH (all-cluster-minimal-app) log:
+
+          [1653992385.759474][2347:2347] CHIP:IM: Received Read request
+          [1653992385.759533][2347:2347] CHIP:DMG: ReadRequestMessage =
+          [1653992385.759561][2347:2347] CHIP:DMG: {
+          [1653992385.759584][2347:2347] CHIP:DMG:         AttributePathIBs =
+          [1653992385.759618][2347:2347] CHIP:DMG:         [
+          [1653992385.759647][2347:2347] CHIP:DMG:                 AttributePathIB =
+          [1653992385.759678][2347:2347] CHIP:DMG:                 {
+          [1653992385.759745][2347:2347] CHIP:DMG:                         Endpoint = 0x1,
+          [1653992385.759781][2347:2347] CHIP:DMG:                         Cluster = 0x403,
+          [1653992385.759859][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0001,
+          [1653992385.759918][2347:2347] CHIP:DMG:                 }
+          [1653992385.759971][2347:2347] CHIP:DMG:
+          [1653992385.760000][2347:2347] CHIP:DMG:         ],
+          [1653992385.760049][2347:2347] CHIP:DMG:
+          [1653992385.760100][2347:2347] CHIP:DMG:         isFabricFiltered = true,
+          [1653992385.760125][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
+          [1653992385.760168][2347:2347] CHIP:DMG: },
+
+
+          ./chip-tool pressuremeasurement read  max-measured-value 1 1
+
+          verify the " max-measured-value response" on the TH (all-cluster-minimal-app) log:
+
+          [1653992415.580348][2347:2347] CHIP:IM: Received Read request
+          [1653992415.580414][2347:2347] CHIP:DMG: ReadRequestMessage =
+          [1653992415.580442][2347:2347] CHIP:DMG: {
+          [1653992415.580473][2347:2347] CHIP:DMG:         AttributePathIBs =
+          [1653992415.580501][2347:2347] CHIP:DMG:         [
+          [1653992415.580534][2347:2347] CHIP:DMG:                 AttributePathIB =
+          [1653992415.580563][2347:2347] CHIP:DMG:                 {
+          [1653992415.580602][2347:2347] CHIP:DMG:                         Endpoint = 0x1,
+          [1653992415.580674][2347:2347] CHIP:DMG:                         Cluster = 0x403,
+          [1653992415.580713][2347:2347] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1653992415.580746][2347:2347] CHIP:DMG:                 }
+          [1653992415.580786][2347:2347] CHIP:DMG:
+          [1653992415.580812][2347:2347] CHIP:DMG:         ],
+          [1653992415.580852][2347:2347] CHIP:DMG:
+          [1653992415.580879][2347:2347] CHIP:DMG:         isFabricFiltered = true,
+          [1653992415.580913][2347:2347] CHIP:DMG:         InteractionModelRevision = 1
+          [1653992415.580936][2347:2347] CHIP:DMG: },"
+      disabled: true
+
+    - label:
+          "DUT reads all supported optional attributes from TH one at a time in
+          a manufacturer specific order."
+      PICS: PRS.C.AO-READ
+      verification: |
+          TH all-clusters-minimal-app does not support optional attributes, if implemted we will get "General error: 0x86 (UNSUPPORTED_ATTRIBUTE)" as output when we read following attributes.
+
+
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
+
+          TH receives the read command and knows this attribute for this cluster and provides a plausable value, DUT processes the values and operates normally
+
+          ./chip-tool pressuremeasurement read  tolerance 1 1
+          ./chip-tool pressuremeasurement read scaled-value 1 1
+          ./chip-tool pressuremeasurement read  min-scaled-value  1 1
+          ./chip-tool pressuremeasurement read  max-scaled-value  1 1
+          ./chip-tool pressuremeasurement read scaled-tolerance 1 1
+          ./chip-tool pressuremeasurement read scale 1 1
+      disabled: true
+
+    - label:
+          "DUT writes a suitable value to all supported optional attributes on
+          the TH one at a time in a manufacturer specific order."
+      PICS: PRS.C.AO-WRITE
+      verification: |
+          This cluster doesn"t have any writable attributes
+      disabled: true

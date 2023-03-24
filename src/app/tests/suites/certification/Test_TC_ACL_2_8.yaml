@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 133.2.3. [TC-ACL-2.8] Extension attribute
+name: 133.2.3. [TC-ACL-2.8] ACL multi-fabric
 
 PICS:
     - ACL.S
@@ -63,6 +63,7 @@ tests:
           saveAs: TH1FabricIndex
 
     - label: "TH1 puts DUT into commissioning mode"
+      PICS: CADMIN.S.C00.Rsp && PICS_SDK_CI_ONLY
       cluster: "Administrator Commissioning"
       command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
@@ -80,6 +81,7 @@ tests:
                 value: "SPAKE2P Key Salt"
 
     - label: "Waiting after opening commissioning window"
+      PICS: CADMIN.S.C00.Rsp && PICS_SDK_CI_ONLY
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -87,7 +89,38 @@ tests:
               - name: "ms"
                 value: waitAfterCommissioning
 
+    - label:
+          "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin
+          node ID N2"
+      verification: |
+          Open a commissioning window On TH1(Chiptool)using below command
+
+          ./chip-tool  pairing open-commissioning-window 1 1 400 2000 3841
+
+          [1657186324.710951][10820:10825] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
+          [1657186324.710980][10820:10825] CHIP:CTL: Successfully opened pairing window On TH(Chiptool)e device
+          [1657186324.711048][10820:10825] CHIP:CTL: Manual pairing code: [36253605617]
+          [1657186324.711108][10820:10825] CHIP:CTL: SetupQRCode: [MT:-24J0IRV01A7TB7E700]
+
+
+          Commission TH2(Chiptool) to DUT using manualcode generated in TH1 using open commission window
+
+          ./chip-tool pairing code 2 36253605617 --commissioner-name beta --commissioner-nodeid 223344
+
+          [1657186359.584672][3509:3514] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1657186359.584743][3509:3514] CHIP:TOO: Device commissioning completed with success
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
     - label: "TH2 starts a commissioning process with DUT"
+      PICS: PICS_SDK_CI_ONLY
       identity: "beta"
       cluster: "CommissionerCommands"
       command: "PairWithCode"
@@ -99,6 +132,7 @@ tests:
                 value: payload
 
     - label: "DUT is commissioned by TH2 on Fabric ID2 "
+      PICS: PICS_SDK_CI_ONLY
       identity: "beta"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
@@ -303,3 +337,18 @@ tests:
                               },
                           FabricIndex: TH2FabricIndex,
                       }
+
+    - label: "TH1 writes ACL attribute value is an empty list"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: []
+
+    - label: "TH2 writes ACL attribute value is an empty list"
+      identity: "beta"
+      PICS: ACL.S.A0000
+      command: "writeAttribute"
+      attribute: "ACL"
+      arguments:
+          value: []

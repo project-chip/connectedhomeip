@@ -18,30 +18,6 @@ into an existing Matter network and can be controlled by this network.
 
 <hr>
 
--   [Overview](#overview)
-    -   [Bluetooth LE advertising](#bluetooth-le-advertising)
-    -   [Bluetooth LE rendezvous](#bluetooth-le-rendezvous)
-    -   [Device Firmware Upgrade](#device-firmware-upgrade)
--   [Requirements](#requirements)
-    -   [Supported devices](#supported-devices)
--   [Device UI](#device-ui)
--   [Setting up the environment](#setting-up-the-environment)
-    -   [Using Docker container for setup](#using-docker-container-for-setup)
-    -   [Using native shell for setup](#using-native-shell-for-setup)
--   [Building](#building)
-    -   [Removing build artifacts](#removing-build-artifacts)
-    -   [Building with release configuration](#building-with-release-configuration)
-    -   [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
--   [Configuring the example](#configuring-the-example)
-    -   [Example build types](#example-build-types)
--   [Flashing and debugging](#flashing-and-debugging)
--   [Testing the example](#testing-the-example)
-    -   [Testing using Linux CHIPTool](#testing-using-linux-chiptool)
-    -   [Testing using Android CHIPTool](#testing-using-android-chiptool)
-    -   [Testing Device Firmware Upgrade](#testing-device-firmware-upgrade)
-
-<hr>
-
 ## Overview
 
 This example is running on the nRF Connect platform, which is based on Nordic

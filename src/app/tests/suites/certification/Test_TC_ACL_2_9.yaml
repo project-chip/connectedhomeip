@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 133.2.3. [TC-ACL-2.9] Extension attribute
+name: 133.2.3. [TC-ACL-2.9] Cluster Access
 
 PICS:
     - ACL.S
@@ -165,3 +165,21 @@ tests:
       event: "AccessControlExtensionChanged"
       response:
           error: UNSUPPORTED_ACCESS
+
+    - label: "Test cleanup: Reset Devices to factory defaults"
+      PICS: PICS_SDK_CI_ONLY
+      cluster: "SystemCommands"
+      command: "FactoryReset"
+
+    - label: "Test cleanup: Reset Devices to factory defaults"
+      verification: |
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"

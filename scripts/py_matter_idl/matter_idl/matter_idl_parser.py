@@ -175,6 +175,9 @@ class MatterIdlTransformer(Transformer):
     def attr_nosubscribe(self, _):
         return AttributeQuality.NOSUBSCRIBE
 
+    def attr_timed(self, _):
+        return AttributeQuality.TIMED_WRITE
+
     def attribute_qualities(self, qualities):
         return UnionOfAllFlags(qualities) or AttributeQuality.NONE
 

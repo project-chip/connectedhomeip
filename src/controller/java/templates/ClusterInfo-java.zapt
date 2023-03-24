@@ -235,9 +235,10 @@ public class ClusterInfoMapping {
       }
 
   {{/chip_cluster_responses}}
-      {{#chip_server_cluster_attributes}}
-      {{#unless (isStrEqual chipCallback.name "Unsupported")}}
-      {{#if_basic_global_response}}
+      {{#zcl_attributes_server removeKeys='isOptional'}}
+      {{#if_unsupported_attribute_callback type isArray ../id}}
+      {{else}}
+      {{#if_basic_attribute type ../id}}
       {{else}}
       public static class Delegated{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}AttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
@@ -270,9 +271,9 @@ public class ClusterInfoMapping {
           callback.onFailure(ex);
         }
       }
-      {{/if_basic_global_response}}
-      {{/unless}}
-      {{/chip_server_cluster_attributes}}
+      {{/if_basic_attribute}}
+      {{/if_unsupported_attribute_callback}}
+      {{/zcl_attributes_server}}
 
   {{/chip_client_clusters}}
 
