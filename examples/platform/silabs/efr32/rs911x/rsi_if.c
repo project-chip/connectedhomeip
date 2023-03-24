@@ -116,10 +116,6 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
  *********************************************************************/
 int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
 {
-#ifdef SiWx917_WIFI
-    // TODO: for wisemcu
-    return 0;
-#else
     int32_t status;
     uint8_t buff[RSI_RESPONSE_MAX_SIZE] = { 0 };
     status                              = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
@@ -139,7 +135,6 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
         extra_info->overrun_count     = test->overrun_count - temp_reset->overrun_count;
     }
     return status;
-#endif
 }
 
 /******************************************************************
@@ -152,10 +147,6 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
  *********************************************************************/
 int32_t wfx_rsi_reset_count()
 {
-#ifdef SiWx917_WIFI
-    // TODO: for wisemcu
-    return 0;
-#else
     int32_t status;
     uint8_t buff[RSI_RESPONSE_MAX_SIZE] = { 0 };
     status                              = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
@@ -175,7 +166,6 @@ int32_t wfx_rsi_reset_count()
         temp_reset->overrun_count     = test->overrun_count;
     }
     return status;
-#endif
 }
 
 /******************************************************************
