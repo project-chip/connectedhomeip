@@ -1,3 +1,0 @@
-&cpu0 {
-	clock-frequency = <32000000>;
-};

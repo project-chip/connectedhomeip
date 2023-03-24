@@ -91,6 +91,15 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
         return (err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
+    if (checkExist(key, key))
+    {
+        ret = deleteKey(key, key);
+        if (TRUE != ret)
+        {
+            ChipLogError(DeviceLayer, "Warning, KVS leakage, failed to remove old kvs value");
+        }
+    }
+
     ret = setPref_new(key, key, (uint8_t *) value, value_size);
 
     if (TRUE == ret)

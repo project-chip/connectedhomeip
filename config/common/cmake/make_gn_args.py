@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-#    Copyright (c) 2022 Project CHIP Authors
+#    Copyright (c) 2023 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,10 +18,9 @@
 #
 
 import argparse
-import re
 import sys
 
-GN_SPECIAL_CHARACTERS = r'(["$\\])'
+GN_SPECIAL_SEPARATOR = "+|+"
 GN_CFLAG_EXCLUDES = [
     '-fno-asynchronous-unwind-tables',
     '-fno-common',
@@ -35,10 +34,6 @@ GN_CFLAG_EXCLUDES = [
 ]
 
 
-def escape_strings(gn_args):
-    return [[key, re.sub(GN_SPECIAL_CHARACTERS, r'\\\1', value)] for key, value in gn_args]
-
-
 def write_gn_args(args):
     if args.module:
         sys.stdout.write('import("{}")\n'.format(args.module))
@@ -47,20 +42,31 @@ def write_gn_args(args):
         sys.stdout.write('{} = {}\n'.format(key, value))
 
     for key, value in args.arg_string:
-        sys.stdout.write('{} = "{}"\n'.format(key, value))
-
-    for key, value in args.arg_cflags:
-        # Remove empty include paths - fix generator expressions issue
-        filtered_value = [x for x in value.split(",") if x != '"-isystem"']
-        sys.stdout.write('{} = [{}]\n'.format(
-            key, ",".join(filtered_value)))
+        # Escaped quote and dollar sign characters
+        filtered_value = value.replace('"', '\\"')
+        filtered_value = filtered_value.replace('$', '\\$')
+        sys.stdout.write('{} = "{}"\n'.format(key, filtered_value))
 
     cflag_excludes = ', '.join(['"{}"'.format(exclude)
                                for exclude in GN_CFLAG_EXCLUDES])
 
-    for key, value in args.arg_cflags_lang:
-        sys.stdout.write('{} = filter_exclude(string_split("{}"), [{}])\n'.format(
-            key, value, cflag_excludes))
+    for key, value in args.arg_cflags:
+        filtered_value = value.split(" -")
+        # Remove empty include paths and defines caused by Cmake generator expressions
+        filtered_value = filter(lambda v: v != "D", filtered_value)
+        filtered_value = filter(lambda v: v != "isystem", filtered_value)
+        # Escaped quote and dollar sign characters
+        filtered_value = map(lambda v: v.replace('"', '\\"'), filtered_value)
+        filtered_value = map(lambda v: v.replace('$', '\\$'), filtered_value)
+        # Remove white spaces around the argument and remove internal whitespace
+        # for correct splitting in string_split() function
+        filtered_value = map(lambda v: v.strip(), filtered_value)
+        filtered_value = map(lambda v: v.replace(' ', ''), filtered_value)
+        #  Remove duplicates
+        filtered_value = list(dict.fromkeys(filtered_value))
+
+        sys.stdout.write('{} = filter_exclude(string_split("{}", "{}"), [{}])\n'.format(
+            key, "{}-".format(GN_SPECIAL_SEPARATOR).join(filtered_value), GN_SPECIAL_SEPARATOR, cflag_excludes))
 
 
 def main():
@@ -69,7 +75,6 @@ def main():
     parser.add_argument('--arg', action='append', nargs=2, default=[])
     parser.add_argument('--arg-string', action='append', nargs=2, default=[])
     parser.add_argument('--arg-cflags', action='append', nargs=2, default=[])
-    parser.add_argument('--arg-cflags-lang', action='append', nargs=2, default=[])
     args = parser.parse_args()
     write_gn_args(args)
 
