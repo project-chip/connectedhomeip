@@ -384,35 +384,22 @@ def BuildK32WTarget():
     return target
 
 def TITargets():
-    target = Target('ti', TIBuilder)
+    target = BuildTarget('ti', TIBuilder)
 
-    LP_CC2652R7 = target.Extend('LP_CC2652R7', board=TIBoard.LP_CC2652R7)
-    LP_EM_CC1354P10_6 = target.Extend('LP_EM_CC1354P10_6', board=TIBoard.LP_EM_CC1354P10_6)
-
-    #yield LP_CC2652R7.Extend('all-clusters-minimal', app=TIApp.ALL_CLUSTERS_MINIMAL)
-    yield LP_CC2652R7.Extend('lock-mtd', app=TIApp.LOCK, openthread_ftd=False)
-    yield LP_CC2652R7.Extend('pump', app=TIApp.PUMP)
-    yield LP_CC2652R7.Extend('pump-controller', app=TIApp.PUMP_CONTROLLER)
-
-    #yield LP_EM_CC1354P10_6.Extend('all-clusters-app', app=TIApp.ALL_CLUSTERS)
-    yield LP_EM_CC1354P10_6.Extend('all-clusters-minimal', app=TIApp.ALL_CLUSTERS_MINIMAL)
-    yield LP_EM_CC1354P10_6.Extend('lock-ftd', app=TIApp.LOCK, openthread_ftd=True)
-    yield LP_EM_CC1354P10_6.Extend('lock-mtd', app=TIApp.LOCK, openthread_ftd=False)
-    yield LP_EM_CC1354P10_6.Extend('pump', app=TIApp.PUMP)
-    yield LP_EM_CC1354P10_6.Extend('pump-controller', app=TIApp.PUMP_CONTROLLER)
-
-    # apps
+    # board
     target.AppendFixedTargets([
-        TargetPart('all-clusters', app=cc13x2x7_26x2x7App.ALL_CLUSTERS),
-        TargetPart('all-clusters-minimal', app=cc13x2x7_26x2x7App.ALL_CLUSTERS_MINIMAL),
-        TargetPart('lock', app=cc13x2x7_26x2x7App.LOCK),
-        TargetPart('pump', app=cc13x2x7_26x2x7App.PUMP),
-        TargetPart('pump-controller', app=cc13x2x7_26x2x7App.PUMP_CONTROLLER),
-        TargetPart('shell', app=cc13x2x7_26x2x7App.SHELL),
+        TargetPart('cc13x2x7_26x2x7', board=TIBoard.LP_CC2652R7),
+        TargetPart('cc13x4_26x4', board=TIBoard.LP_EM_CC1354P10_6)
     ])
 
-    target.AppendModifier(name="ftd", openthread_ftd=True).ExceptIfRe("-mtd")
-    target.AppendModifier(name="mtd", openthread_ftd=False).ExceptIfRe("-ftd")
+    target.AppendFixedTargets([
+        TargetPart('all-clusters-app', app=TIApp.ALL_CLUSTERS).OnlyIfRe("-(c13x4_26x4)-"),
+        TargetPart('all-clusters-minimal', app=TIApp.ALL_CLUSTERS_MINIMAL).OnlyIfRe("-(c13x4_26x4)-"),
+        TargetPart('lock-ftd', app=TIApp.LOCK, openthread_ftd=True),
+        TargetPart('lock-mtd', app=TIApp.LOCK, openthread_ftd=False),
+        TargetPart('pump', app=TIApp.PUMP),
+        TargetPart('pump-controller', app=TIApp.PUMP_CONTROLLER)
+    ])
 
     return target
 
@@ -565,7 +552,7 @@ BUILD_TARGETS = [
     BuildAmebaTarget(),
     BuildAndroidTarget(),
     BuildBouffalolabTarget(),
-    Buildcc13x2x7_26x2x7Target(),
+    TITargets(),
     BuildCyw30739Target(),
     BuildEfr32Target(),
     BuildEsp32Target(),

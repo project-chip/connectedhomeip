@@ -57,31 +57,14 @@ CHIP_ERROR LightingManager::Init()
 
     if (sLightTimer == NULL)
     {
-<<<<<<< HEAD:examples/lighting-app/cc13x2x7_26x2x7/src/LightingManager.cpp
         PLAT_LOG("sLightTimer timer create failed");
-=======
-        SILABS_LOG("sLightTimer timer create failed");
-        return APP_ERROR_CREATE_TIMER_FAILED;
->>>>>>> refs/tags/v1.0.0.2:examples/lighting-app/silabs/efr32/src/LightingManager.cpp
     }
 
     bool currentLedState;
     // read current on/off value on endpoint one.
-<<<<<<< HEAD:examples/lighting-app/cc13x2x7_26x2x7/src/LightingManager.cpp
     OnOffServer::Instance().getOnOffValue(1, &currentLedState);
 
     mState = currentLedState ? kState_OnCompleted : kState_OffCompleted;
-=======
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    OnOffServer::Instance().getOnOffValue(1, &currentLedState);
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-    mState                 = currentLedState ? kState_OnCompleted : kState_OffCompleted;
-    mAutoTurnOffTimerArmed = false;
-    mAutoTurnOff           = false;
-    mAutoTurnOffDuration   = 0;
-    mOffEffectArmed        = false;
->>>>>>> refs/tags/v1.0.0.2:examples/lighting-app/silabs/efr32/src/LightingManager.cpp
 
     return CHIP_NO_ERROR;
 }
@@ -123,26 +106,7 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
 
     if (action_initiated)
     {
-<<<<<<< HEAD:examples/lighting-app/cc13x2x7_26x2x7/src/LightingManager.cpp
         StartTimer(ACTUATOR_MOVEMENT_PERIOD_MS);
-=======
-        if (mAutoTurnOffTimerArmed && new_state == kState_OffInitiated)
-        {
-            // If auto turn off timer has been armed and someone initiates turning off,
-            // cancel the timer and continue as normal.
-            mAutoTurnOffTimerArmed = false;
-
-            CancelTimer();
-        }
-
-        if (mOffEffectArmed && new_state == kState_OnInitiated)
-        {
-            CancelTimer();
-            mOffEffectArmed = false;
-        }
-
-        StartTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
->>>>>>> refs/tags/v1.0.0.2:examples/lighting-app/silabs/efr32/src/LightingManager.cpp
 
         // Since the timer started successfully, update the state and trigger callback
         mState = new_state;
@@ -160,11 +124,7 @@ void LightingManager::StartTimer(uint32_t aTimeoutMs)
 {
     if (xTimerIsTimerActive(sLightTimer))
     {
-<<<<<<< HEAD:examples/lighting-app/cc13x2x7_26x2x7/src/LightingManager.cpp
         PLAT_LOG("app timer already started!");
-=======
-        SILABS_LOG("app timer already started!");
->>>>>>> refs/tags/v1.0.0.2:examples/lighting-app/silabs/efr32/src/LightingManager.cpp
         CancelTimer();
     }
 
@@ -173,12 +133,7 @@ void LightingManager::StartTimer(uint32_t aTimeoutMs)
     // cannot immediately be sent to the timer command queue.
     if (xTimerChangePeriod(sLightTimer, pdMS_TO_TICKS(aTimeoutMs), 100) != pdPASS)
     {
-<<<<<<< HEAD:examples/lighting-app/cc13x2x7_26x2x7/src/LightingManager.cpp
         PLAT_LOG("sLightTimer timer start() failed");
-=======
-        SILABS_LOG("sLightTimer timer start() failed");
-        appError(APP_ERROR_START_TIMER_FAILED);
->>>>>>> refs/tags/v1.0.0.2:examples/lighting-app/silabs/efr32/src/LightingManager.cpp
     }
 }
 
@@ -186,12 +141,7 @@ void LightingManager::CancelTimer(void)
 {
     if (xTimerStop(sLightTimer, 0) == pdFAIL)
     {
-<<<<<<< HEAD:examples/lighting-app/cc13x2x7_26x2x7/src/LightingManager.cpp
         PLAT_LOG("sLightTimer stop() failed");
-=======
-        SILABS_LOG("sLightTimer stop() failed");
-        appError(APP_ERROR_STOP_TIMER_FAILED);
->>>>>>> refs/tags/v1.0.0.2:examples/lighting-app/silabs/efr32/src/LightingManager.cpp
     }
 }
 
@@ -204,62 +154,10 @@ void LightingManager::TimerEventHandler(TimerHandle_t xTimer)
     // once sLightTimer expires. Post an event to apptask queue with the actual handler
     // so that the event can be handled in the context of the apptask.
     AppEvent event;
-<<<<<<< HEAD:examples/lighting-app/cc13x2x7_26x2x7/src/LightingManager.cpp
     event.Type               = AppEvent::kEventType_AppEvent;
     event.LightEvent.Context = light;
 
     event.Handler = ActuatorMovementTimerEventHandler;
-=======
-    event.Type               = AppEvent::kEventType_Timer;
-    event.TimerEvent.Context = light;
-    if (light->mAutoTurnOffTimerArmed)
-    {
-        event.Handler = AutoTurnOffTimerEventHandler;
-    }
-    else if (light->mOffEffectArmed)
-    {
-        event.Handler = OffEffectTimerEventHandler;
-    }
-    else
-    {
-        event.Handler = ActuatorMovementTimerEventHandler;
-    }
-    AppTask::GetAppTask().PostEvent(&event);
-}
-
-void LightingManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)
-{
-    LightingManager * light = static_cast<LightingManager *>(aEvent->TimerEvent.Context);
-    int32_t actor           = AppEvent::kEventType_Timer;
-
-    // Make sure auto turn off timer is still armed.
-    if (!light->mAutoTurnOffTimerArmed)
-    {
-        return;
-    }
-
-    light->mAutoTurnOffTimerArmed = false;
-
-    SILABS_LOG("Auto Turn Off has been triggered!");
-
-    light->InitiateAction(actor, OFF_ACTION);
-}
-
-void LightingManager::OffEffectTimerEventHandler(AppEvent * aEvent)
-{
-    LightingManager * light = static_cast<LightingManager *>(aEvent->TimerEvent.Context);
-    int32_t actor           = AppEvent::kEventType_Timer;
-
-    // Make sure auto turn off timer is still armed.
-    if (!light->mOffEffectArmed)
-    {
-        return;
-    }
-
-    light->mOffEffectArmed = false;
-
-    SILABS_LOG("OffEffect completed");
->>>>>>> refs/tags/v1.0.0.2:examples/lighting-app/silabs/efr32/src/LightingManager.cpp
 
     AppTask::GetAppTask().PostEvent(&event);
 }
@@ -289,19 +187,6 @@ void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
         {
             light->mActionCompleted_CB(actionCompleted);
         }
-<<<<<<< HEAD:examples/lighting-app/cc13x2x7_26x2x7/src/LightingManager.cpp
-=======
-
-        if (light->mAutoTurnOff && actionCompleted == ON_ACTION)
-        {
-            // Start the timer for auto turn off
-            light->StartTimer(light->mAutoTurnOffDuration * 1000);
-
-            light->mAutoTurnOffTimerArmed = true;
-
-            SILABS_LOG("Auto Turn off enabled. Will be triggered in %u seconds", light->mAutoTurnOffDuration);
-        }
->>>>>>> refs/tags/v1.0.0.2:examples/lighting-app/silabs/efr32/src/LightingManager.cpp
     }
 }
 
