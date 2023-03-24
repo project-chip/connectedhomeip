@@ -58,19 +58,20 @@ public:
         uint8_t pairCount = 0;
 
         // Verify size of list
-        extensionFieldSet.attributeValueList.ComputeSize(&pairTotal);
-        VerifyOrReturnError(pairTotal <= kMaxAvPair, CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorOnFailure(extensionFieldSet.attributeValueList.ComputeSize(&pairTotal));
+        VerifyOrReturnError(pairTotal <= Span<app::Clusters::Scenes::Structs::AttributeValuePair::Type>(mAVPairs).size(),
+                            CHIP_ERROR_BUFFER_TOO_SMALL);
 
         auto pair_iterator = extensionFieldSet.attributeValueList.begin();
-        while (pair_iterator.Next() && pairCount < kMaxAvPair)
+        while (pair_iterator.Next())
         {
             aVPair                          = pair_iterator.GetValue();
             mAVPairs[pairCount].attributeID = aVPair.attributeID;
             size_t valueBytesTotal          = 0;
             uint8_t valueBytesCount         = 0;
 
-            aVPair.attributeValue.ComputeSize(&valueBytesTotal);
-            VerifyOrReturnError(valueBytesTotal <= kMaxValueSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+            ReturnErrorOnFailure(aVPair.attributeValue.ComputeSize(&valueBytesTotal));
+            VerifyOrReturnError(valueBytesTotal <= Span<uint8_t>(mValueBuffer[0]).size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
             auto value_iterator = aVPair.attributeValue.begin();
             while (value_iterator.Next())
@@ -126,8 +127,9 @@ public:
         attributeValueList.Decode(reader);
 
         // Verify size of list
-        attributeValueList.ComputeSize(&pairTotal);
-        VerifyOrReturnError(pairTotal <= kMaxAvPair, CHIP_ERROR_BUFFER_TOO_SMALL);
+        ReturnErrorOnFailure(attributeValueList.ComputeSize(&pairTotal));
+        VerifyOrReturnError(pairTotal <= Span<app::Clusters::Scenes::Structs::AttributeValuePair::Type>(mAVPairs).size(),
+                            CHIP_ERROR_BUFFER_TOO_SMALL);
 
         auto pair_iterator = attributeValueList.begin();
         while (pair_iterator.Next())
@@ -138,11 +140,11 @@ public:
             uint8_t valueBytesCount         = 0;
 
             // Verify size of attribute value
-            decodePair.attributeValue.ComputeSize(&valueBytesTotal);
-            VerifyOrReturnError(valueBytesTotal <= kMaxValueSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+            ReturnErrorOnFailure(decodePair.attributeValue.ComputeSize(&valueBytesTotal));
+            VerifyOrReturnError(valueBytesTotal <= Span<uint8_t>(mValueBuffer[0]).size(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
             auto value_iterator = decodePair.attributeValue.begin();
-            while (value_iterator.Next() && valueBytesCount < kMaxValueSize)
+            while (value_iterator.Next())
             {
                 mValueBuffer[pairCount][valueBytesCount] = value_iterator.GetValue();
                 valueBytesCount++;
