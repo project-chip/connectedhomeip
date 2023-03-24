@@ -293,7 +293,7 @@ class BuildTarget:
 
             {
                 "name": "foo"
-                "shorthand": "foo-bar-baz[-m1]
+                "shorthand": "foo-bar-baz[-m1]"
                 "parts": [
                     {
                         "name": "foo",
@@ -316,18 +316,12 @@ class BuildTarget:
                 ]
             }
         """
-        result: Dict[str, Any] = {}
-
-        result['name'] = self.name
-        result['shorthand'] = self.HumanString()
-
-        result['parts']: List[str] = []
-        for target in self.fixed_targets:
-            result['parts'] = [part.ToDict() for part in target]
-
-        result['modifiers']: List[str] = [part.ToDict() for part in self.modifiers]
-
-        return result
+        return {
+            'name': self.name,
+            'shorthand': self.HumanString(),
+            'parts': [part.ToDict() for target in self.fixed_targets for part in target],
+            'modifiers': [part.ToDict() for part in self.modifiers]
+        }
 
     def AllVariants(self) -> Iterable[str]:
         """Returns all possible accepted variants by this target.
