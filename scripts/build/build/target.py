@@ -101,9 +101,12 @@ class TargetPart:
 
         result: Dict[str, str] = {}
         result['name'] = self.name
-        bld_args_keys = list(self.build_arguments.keys())
-        for key in bld_args_keys:
-            result[key] = str(self.build_arguments[key])
+
+        build_arguments: Dict[str, str] = {}
+        for key, value in self.build_arguments.items():
+            build_arguments[key] = str(value)
+
+        result['build_arguments'] = build_arguments
 
         if self.only_if_re is not None:
             result['only_if_re'] = str(self.only_if_re.pattern)
@@ -288,17 +291,21 @@ class BuildTarget:
 
             like:
 
-            "foo": {
-                "builder": "<class 'builders.foo.FooBuilder'>",
+            {
+                "name": "foo"
                 "shorthand": "foo-bar-baz[-m1]
-                "fixed_targets": [
+                "parts": [
                     {
                         "name": "foo",
-                        "board": "bar"
+                        "build_arguments": {
+                            "board": "bar"
+                        }
                     }
                     {
                         "name": "baz",
-                        "app": "foo.baz"
+                        "build_arguments": {
+                            "app": "foo.baz"
+                        }
                     }
                 ],
                 "modifiers": [
@@ -307,22 +314,18 @@ class BuildTarget:
                         "m1": "True"
                     }
                 ]
-            },
+            }
         """
         result: Dict[str, Any] = {}
 
         result['name'] = self.name
-        result['builder'] = str(self.builder_class)
         result['shorthand'] = self.HumanString()
-        result['parts'] = []
-        result['modifiers'] = []
 
+        result['parts']: List[str] = []
         for target in self.fixed_targets:
-            for target_part in target:
-                result['parts'].append(target_part.ToDict())
+            result['parts'] = [part.ToDict() for part in target]
 
-        for target_part in self.modifiers:
-            result['modifiers'].append(target_part.ToDict())
+        result['modifiers']: List[str] = [part.ToDict() for part in self.modifiers]
 
         return result
 

@@ -198,12 +198,7 @@ def cmd_targets(context, format):
             for s in target.AllVariants():
                 print(s)
     elif format == 'json':
-        targets = []
-
-        for target in build.targets.BUILD_TARGETS:
-            targets.append(target.ToDict())
-
-        print(json.dumps(targets, indent=4))
+        print(json.dumps([target.ToDict() for target in build.targets.BUILD_TARGETS], indent=4))
     else:
         for target in build.targets.BUILD_TARGETS:
             print(target.HumanString())
