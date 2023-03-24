@@ -71,13 +71,15 @@ bool ESP32DeviceInfoProvider::FixedLabelIteratorImpl::Next(FixedLabelType & outp
     memset(mFixedLabelNameBuf, 0, sizeof(mFixedLabelNameBuf));
     memset(mFixedLabelValueBuf, 0, sizeof(mFixedLabelValueBuf));
 
-    VerifyOrReturnValue(ESP32Config::KeyAllocator::FixedLabelKey(keyBuf, sizeof(keyBuf), mEndpoint, mIndex) == CHIP_NO_ERROR,
-                        false);
+    VerifyOrReturnValue(
+        ESP32Config::KeyAllocator::FixedLabelKey(keyBuf, sizeof(keyBuf), mEndpoint, static_cast<uint16_t>(mIndex)) == CHIP_NO_ERROR,
+        false);
     ESP32Config::Key keyKey(ESP32Config::kConfigNamespace_ChipFactory, keyBuf);
     VerifyOrReturnValue(
         ESP32Config::ReadConfigValueStr(keyKey, mFixedLabelNameBuf, sizeof(mFixedLabelNameBuf), keyOutLen) == CHIP_NO_ERROR, false);
 
-    VerifyOrReturnValue(ESP32Config::KeyAllocator::FixedLabelValue(keyBuf, sizeof(keyBuf), mEndpoint, mIndex) == CHIP_NO_ERROR,
+    VerifyOrReturnValue(ESP32Config::KeyAllocator::FixedLabelValue(keyBuf, sizeof(keyBuf), mEndpoint,
+                                                                   static_cast<uint16_t>(mIndex)) == CHIP_NO_ERROR,
                         false);
     ESP32Config::Key valueKey(ESP32Config::kConfigNamespace_ChipFactory, keyBuf);
     VerifyOrReturnValue(ESP32Config::ReadConfigValueStr(valueKey, mFixedLabelValueBuf, sizeof(mFixedLabelValueBuf), valueOutLen) ==
@@ -210,7 +212,8 @@ bool ESP32DeviceInfoProvider::SupportedLocalesIteratorImpl::Next(CharSpan & outp
     size_t keyOutLen = 0;
     memset(mLocaleBuf, 0, sizeof(mLocaleBuf));
 
-    VerifyOrReturnValue(ESP32Config::KeyAllocator::Locale(keyBuf, sizeof(keyBuf), mIndex) == CHIP_NO_ERROR, false);
+    VerifyOrReturnValue(ESP32Config::KeyAllocator::Locale(keyBuf, sizeof(keyBuf), static_cast<uint16_t>(mIndex)) == CHIP_NO_ERROR,
+                        false);
     ESP32Config::Key keyKey(ESP32Config::kConfigNamespace_ChipFactory, keyBuf);
     VerifyOrReturnValue(ESP32Config::ReadConfigValueStr(keyKey, mLocaleBuf, sizeof(mLocaleBuf), keyOutLen) == CHIP_NO_ERROR, false);
 
