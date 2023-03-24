@@ -57,6 +57,10 @@ CHIP_ERROR ExtensionFieldSetsImpl::Deserialize(TLV::TLVReader & reader, TLV::Tag
     }
     mFieldSetsCount = i;
 
+    // In the event of an OTA where the maximum number of cluster per scene has been reduced, the extension field set will be
+    // considered "corrupted" if we don't manage to load it all (if err == CHIP_NO_ERROR after the loop). We therefore return an
+    // error and this scene will have to be deleted. This is done because truncating an EFS doesn't garrantee the order of the
+    // clusters loaded, which might allow to load clusters that are no longer supported and loosing supported ones.
     if (err != CHIP_END_OF_TLV)
     {
         if (err == CHIP_NO_ERROR)

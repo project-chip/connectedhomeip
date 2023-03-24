@@ -435,7 +435,6 @@ void TestHandlerRegistration(nlTestSuite * aSuite, void * aContext)
 void TestHandlerFunctions(nlTestSuite * aSuite, void * aContext)
 {
     SceneTable * sceneTable = &sSceneTable;
-    ClusterId tempCluster   = 0;
 
     app::Clusters::Scenes::Structs::ExtensionFieldSet::Type extensionFieldSetOut;
     app::Clusters::Scenes::Structs::ExtensionFieldSet::DecodableType extensionFieldSetIn;

@@ -226,6 +226,9 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
 
             i++;
         }
+        // In the event of an OTA, is kMaxScenesPerFabric was reduced, err will be equal to CHIP_NO_ERROR. We close the TLV with
+        // only the acceptable number of scenes and the next save will take care of reducing the memory usage of the map. This
+        // allows the user to preserve their scenes in between OTA updates.
         VerifyOrReturnError(err == CHIP_END_OF_TLV || err == CHIP_NO_ERROR, err);
 
         ReturnErrorOnFailure(reader.ExitContainer(sceneMapContainer));
