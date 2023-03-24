@@ -393,9 +393,10 @@ def TITargets():
     ])
 
     target.AppendFixedTargets([
-        TargetPart('all-clusters-app', app=TIApp.ALL_CLUSTERS).OnlyIfRe("-(c13x4_26x4)-"),
-        TargetPart('all-clusters-minimal', app=TIApp.ALL_CLUSTERS_MINIMAL).OnlyIfRe("-(c13x4_26x4)-"),
-        TargetPart('lock-ftd', app=TIApp.LOCK, openthread_ftd=True),
+        TargetPart('all-clusters', app=TIApp.ALL_CLUSTERS).OnlyIfRe("-(cc13x4_26x4)-"),
+        TargetPart('all-clusters-minimal', app=TIApp.ALL_CLUSTERS_MINIMAL).OnlyIfRe("-(cc13x4_26x4)-"),
+        TargetPart('lighting', app=TIApp.LIGHTING).OnlyIfRe("-(cc13x2x7_26x2x7)-"),
+        TargetPart('lock-ftd', app=TIApp.LOCK, openthread_ftd=True).OnlyIfRe("-(cc13x4_26x4)-"),
         TargetPart('lock-mtd', app=TIApp.LOCK, openthread_ftd=False),
         TargetPart('pump', app=TIApp.PUMP),
         TargetPart('pump-controller', app=TIApp.PUMP_CONTROLLER)
