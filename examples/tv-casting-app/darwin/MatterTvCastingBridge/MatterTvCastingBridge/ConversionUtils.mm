@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -54,16 +54,22 @@
     outDiscoveredNodeData.commissionData.longDiscriminator = objCDiscoveredNodeData.longDiscriminator;
     outDiscoveredNodeData.commissionData.commissioningMode = objCDiscoveredNodeData.commissioningMode;
     outDiscoveredNodeData.commissionData.pairingHint = objCDiscoveredNodeData.pairingHint;
-    chip::Platform::CopyString(outDiscoveredNodeData.commissionData.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
-        [objCDiscoveredNodeData.deviceName UTF8String]);
+    memset(outDiscoveredNodeData.commissionData.deviceName, '\0', sizeof(outDiscoveredNodeData.commissionData.deviceName));
+    if (objCDiscoveredNodeData.deviceName != nullptr) {
+        chip::Platform::CopyString(outDiscoveredNodeData.commissionData.deviceName, chip::Dnssd::kMaxDeviceNameLen + 1,
+            [objCDiscoveredNodeData.deviceName UTF8String]);
+    }
     outDiscoveredNodeData.commissionData.rotatingIdLen = objCDiscoveredNodeData.rotatingIdLen;
     memcpy(
         outDiscoveredNodeData.commissionData.rotatingId, objCDiscoveredNodeData.rotatingId, objCDiscoveredNodeData.rotatingIdLen);
 
     // setting CommonResolutionData
     outDiscoveredNodeData.resolutionData.port = objCDiscoveredNodeData.port;
-    chip::Platform::CopyString(outDiscoveredNodeData.resolutionData.hostName, chip::Dnssd::kHostNameMaxLength + 1,
-        [objCDiscoveredNodeData.hostName UTF8String]);
+    memset(outDiscoveredNodeData.resolutionData.hostName, '\0', sizeof(outDiscoveredNodeData.resolutionData.hostName));
+    if (objCDiscoveredNodeData.hostName != nullptr) {
+        chip::Platform::CopyString(outDiscoveredNodeData.resolutionData.hostName, chip::Dnssd::kHostNameMaxLength + 1,
+            [objCDiscoveredNodeData.hostName UTF8String]);
+    }
     outDiscoveredNodeData.resolutionData.interfaceId = chip::Inet::InterfaceId(objCDiscoveredNodeData.platformInterface);
     outDiscoveredNodeData.resolutionData.numIPs = objCDiscoveredNodeData.numIPs;
     for (size_t i = 0; i < objCDiscoveredNodeData.numIPs; i++) {
@@ -114,16 +120,16 @@
     objCDiscoveredNodeData.commissioningMode = cppDiscoveredNodedata->commissionData.commissioningMode;
     objCDiscoveredNodeData.pairingHint = cppDiscoveredNodedata->commissionData.pairingHint;
     objCDiscoveredNodeData.deviceName = [NSString stringWithCString:cppDiscoveredNodedata->commissionData.deviceName
-                                                           encoding:NSASCIIStringEncoding];
+                                                           encoding:NSUTF8StringEncoding];
     objCDiscoveredNodeData.rotatingIdLen = cppDiscoveredNodedata->commissionData.rotatingIdLen;
     objCDiscoveredNodeData.rotatingId = cppDiscoveredNodedata->commissionData.rotatingId;
     objCDiscoveredNodeData.instanceName = [NSString stringWithCString:cppDiscoveredNodedata->commissionData.instanceName
-                                                             encoding:NSASCIIStringEncoding];
+                                                             encoding:NSUTF8StringEncoding];
 
     // from CommonResolutionData
     objCDiscoveredNodeData.port = cppDiscoveredNodedata->resolutionData.port;
     objCDiscoveredNodeData.hostName = [NSString stringWithCString:cppDiscoveredNodedata->resolutionData.hostName
-                                                         encoding:NSASCIIStringEncoding];
+                                                         encoding:NSUTF8StringEncoding];
     objCDiscoveredNodeData.platformInterface = cppDiscoveredNodedata->resolutionData.interfaceId.GetPlatformInterface();
     objCDiscoveredNodeData.numIPs = cppDiscoveredNodedata->resolutionData.numIPs;
     if (cppDiscoveredNodedata->resolutionData.numIPs > 0) {
@@ -148,7 +154,7 @@
         objCVideoPlayer.deviceType = cppTargetVideoPlayerInfo->GetDeviceType();
         objCVideoPlayer.isConnected = (cppTargetVideoPlayerInfo->GetOperationalDeviceProxy() != nil);
         objCVideoPlayer.deviceName = [NSString stringWithCString:cppTargetVideoPlayerInfo->GetDeviceName()
-                                                        encoding:NSASCIIStringEncoding];
+                                                        encoding:NSUTF8StringEncoding];
         objCVideoPlayer.contentApps = [NSMutableArray new];
         TargetEndpointInfo * cppTargetEndpointInfos = cppTargetVideoPlayerInfo->GetEndpoints();
         for (size_t i = 0; i < kMaxNumberOfEndpoints && cppTargetEndpointInfos[i].IsInitialized(); i++) {

@@ -19,15 +19,15 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <logging/log.h>
-#include <settings/settings.h>
+#include <zephyr/logging/log.h>
+#include <zephyr/settings/settings.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
 LOG_MODULE_REGISTER(runner, CONFIG_MATTER_LOG_LEVEL);
 
-void main(void)
+extern "C" void main(void)
 {
     VerifyOrDie(settings_subsys_init() == 0);
 

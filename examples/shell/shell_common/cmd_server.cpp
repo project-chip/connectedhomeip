@@ -170,7 +170,7 @@ static CHIP_ERROR CmdAppServerClusters(int argc, char ** argv)
 {
     bool server = true;
 
-    for (int i = 0; i < emberAfEndpointCount(); i++)
+    for (uint16_t i = 0; i < emberAfEndpointCount(); i++)
     {
         EndpointId endpoint = emberAfEndpointFromIndex(i);
 
@@ -190,7 +190,7 @@ static CHIP_ERROR CmdAppServerClusters(int argc, char ** argv)
 
 static CHIP_ERROR CmdAppServerEndpoints(int argc, char ** argv)
 {
-    for (int i = 0; i < emberAfEndpointCount(); i++)
+    for (uint16_t i = 0; i < emberAfEndpointCount(); i++)
     {
         EndpointId endpoint = emberAfEndpointFromIndex(i);
 

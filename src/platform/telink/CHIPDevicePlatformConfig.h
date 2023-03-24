@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -122,6 +122,12 @@
 #endif // !defined(CONFIG_CHIP_MALLOC_SYS_HEAP) && defined(CONFIG_NEWLIB_LIBC)
 #endif // CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
 
+#ifndef CHIP_DEVICE_BLE_ADVERTISING_PRIORITY
+/// Priority of the Matter BLE advertising when there are multiple application
+/// components that compete for the BLE advertising.
+#define CHIP_DEVICE_BLE_ADVERTISING_PRIORITY 0
+#endif // CHIP_DEVICE_BLE_ADVERTISING_PRIORITY
+
 #ifndef CHIP_DEVICE_CONFIG_CERTIFICATION_DECLARATION
 //-> format_version = 1
 //-> vendor_id = 0xFFF1
@@ -215,3 +221,20 @@
 #ifdef CONFIG_CHIP_EXTENDED_DISCOVERY
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
 #endif // CONFIG_CHIP_EXTENDED_DISCOVERY
+
+#ifdef CONFIG_CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
+#define CHIP_DEVICE_CONFIG_ENABLE_SED 1
+#define CHIP_DEVICE_CONFIG_THREAD_SSED CONFIG_CHIP_THREAD_SSED
+#endif // CONFIG_CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
+
+#ifndef CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL
+#ifdef CONFIG_CHIP_SED_IDLE_INTERVAL
+#define CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL chip::System::Clock::Milliseconds32(CONFIG_CHIP_SED_IDLE_INTERVAL)
+#endif // CONFIG_CHIP_SED_IDLE_INTERVAL
+#endif // CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL
+
+#ifndef CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL
+#ifdef CONFIG_CHIP_SED_ACTIVE_INTERVAL
+#define CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL chip::System::Clock::Milliseconds32(CONFIG_CHIP_SED_ACTIVE_INTERVAL)
+#endif // CONFIG_CHIP_SED_ACTIVE_INTERVAL
+#endif // CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL

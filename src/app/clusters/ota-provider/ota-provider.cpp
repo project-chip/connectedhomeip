@@ -21,6 +21,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/config.h>
 #include <app/util/error-mapping.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/Constants.h>
@@ -148,8 +149,8 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
                                                                const app::ConcreteCommandPath & commandPath,
                                                                const Commands::QueryImage::DecodableType & commandData)
 {
-    auto & vendorId            = commandData.vendorId;
-    auto & productId           = commandData.productId;
+    auto & vendorId            = commandData.vendorID;
+    auto & productId           = commandData.productID;
     auto & hardwareVersion     = commandData.hardwareVersion;
     auto & softwareVersion     = commandData.softwareVersion;
     auto & protocolsSupported  = commandData.protocolsSupported;

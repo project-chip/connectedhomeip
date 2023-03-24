@@ -157,6 +157,9 @@ public class AndroidBleManager implements BleManager {
             if (desc.getValue() == BluetoothGattDescriptor.ENABLE_INDICATION_VALUE) {
               mPlatform.handleSubscribeComplete(
                   connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
+            } else if (desc.getValue() == BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) {
+              mPlatform.handleSubscribeComplete(
+                  connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
             } else if (desc.getValue() == BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE) {
               mPlatform.handleUnsubscribeComplete(
                   connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
@@ -283,10 +286,18 @@ public class AndroidBleManager implements BleManager {
 
     BluetoothGattDescriptor descriptor =
         subscribeChar.getDescriptor(UUID.fromString(CLIENT_CHARACTERISTIC_CONFIG));
-    descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
-    if (!bluetoothGatt.writeDescriptor(descriptor)) {
-      Log.e(TAG, "writeDescriptor failed");
-      return false;
+    if ((subscribeChar.getProperties() & BluetoothGattCharacteristic.PROPERTY_INDICATE) != 0) {
+      descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
+      if (!bluetoothGatt.writeDescriptor(descriptor)) {
+        Log.e(TAG, "writeDescriptor failed");
+        return false;
+      }
+    } else if ((subscribeChar.getProperties() & BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0) {
+      descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+      if (!bluetoothGatt.writeDescriptor(descriptor)) {
+        Log.e(TAG, "writeDescriptor failed");
+        return false;
+      }
     }
     return true;
   }

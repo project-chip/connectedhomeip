@@ -33,8 +33,11 @@ tests:
 
     - label: "TH receives Onboarding Payload from the DUT"
       verification: |
-          1. Parse the DUT commissionee QR Code using the TH commissioner: chip-tool
-          $ ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
+          1. Run DUT. Example for DUT=all-clusters app
+          ./chip-all-clusters-app --version 0 --vendor-id 0xFFF1 --product-id 0x8001 --custom-flow 2 --capabilities 4 --discriminator 3840 --passcode 20202021
+
+          2. Parse the DUT commissionee QR Code using the TH commissioner: chip-tool
+           ./chip-tool payload parse-setup-payload MT:-24J029Q00KA0648G00
           [1657230447725] [31078:16782733] CHIP: [SPL] Parsing base38Representation: MT:-24J029Q00KA0648G00
           [1657230447725] [31078:16782733] CHIP: [SPL] Version:       0
           [1657230447725] [31078:16782733] CHIP: [SPL] VendorID:      65521
@@ -44,7 +47,7 @@ tests:
           [1657230447725] [31078:16782733] CHIP: [SPL] Discriminator: 3840
           [1657230447725] [31078:16782733] CHIP: [SPL] Passcode:      20202021
 
-          2. Verify that the CommissioningFlow is set to 2 (Custom Flow)
+          3. Verify that the CommissioningFlow is set to 2 (Custom Flow)
       disabled: true
 
     - label:
@@ -57,8 +60,8 @@ tests:
           2. Verify DUT is advertising in commissioning mode. On DUT,
 
           For devices already on the network:
-          $  ./chip-tool discover commissionables
-          Verify in TH as commissioner side:
+            ./chip-tool discover commissionables
+          Verify in TH (CHIP-TOOL)
 
           [1651192893436] [15304:442604] CHIP: [DL] Mdns: OnNewAddress interface: 24 ip:fe80::dea6:32ff:fe8d:6e32
           [1651192893436] [15304:442604] CHIP: [DIS]         Vendor ID: 65521
@@ -87,7 +90,9 @@ tests:
           1. Pair the DUT commissionee using the TH=chip-tool commissioner on the applicable Discovery technology (IP, BLE, etc.)
           2. Verify that the DUT is commissioned to the TH commissioner successfully
 
-          Verify on the TH as commissioner side:
+           ./chip-tool pairing code 1 MT:-24J029Q00KA0648G00
+
+          Verify on the TH (CHIP-TOOL):
           CHIP:CTL: Received CommissioningComplete response
           CHIP:CTL: Rendezvous cleanup
           CHIP:TOO: Device commissioning completed with success

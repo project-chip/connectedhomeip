@@ -32,26 +32,28 @@ class DeviceCommissioner;
 enum CommissioningStage : uint8_t
 {
     kError,
-    kSecurePairing,             ///< Establish a PASE session with the device
-    kReadCommissioningInfo,     ///< Query General Commissioning Attributes and Network Features
-    kArmFailsafe,               ///< Send ArmFailSafe (0x30:0) command to the device
-    kConfigRegulatory,          ///< Send SetRegulatoryConfig (0x30:2) command to the device
-    kSendPAICertificateRequest, ///< Send PAI CertificateChainRequest (0x3E:2) command to the device
-    kSendDACCertificateRequest, ///< Send DAC CertificateChainRequest (0x3E:2) command to the device
-    kSendAttestationRequest,    ///< Send AttestationRequest (0x3E:0) command to the device
-    kAttestationVerification,   ///< Verify AttestationResponse (0x3E:1) validity
-    kSendOpCertSigningRequest,  ///< Send CSRRequest (0x3E:4) command to the device
-    kValidateCSR,               ///< Verify CSRResponse (0x3E:5) validity
-    kGenerateNOCChain,          ///< TLV encode Node Operational Credentials (NOC) chain certs
-    kSendTrustedRootCert,       ///< Send AddTrustedRootCertificate (0x3E:11) command to the device
-    kSendNOC,                   ///< Send AddNOC (0x3E:6) command to the device
-    kWiFiNetworkSetup,          ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
-    kThreadNetworkSetup,        ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
-    kWiFiNetworkEnable,         ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
-    kThreadNetworkEnable,       ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
-    kFindOperational,           ///< Perform operational discovery and establish a CASE session with the device
-    kSendComplete,              ///< Send CommissioningComplete (0x30:4) command to the device
-    kCleanup,                   ///< Call delegates with status, free memory, clear timers and state
+    kSecurePairing,              ///< Establish a PASE session with the device
+    kReadCommissioningInfo,      ///< Query General Commissioning Attributes and Network Features
+    kArmFailsafe,                ///< Send ArmFailSafe (0x30:0) command to the device
+    kConfigRegulatory,           ///< Send SetRegulatoryConfig (0x30:2) command to the device
+    kSendPAICertificateRequest,  ///< Send PAI CertificateChainRequest (0x3E:2) command to the device
+    kSendDACCertificateRequest,  ///< Send DAC CertificateChainRequest (0x3E:2) command to the device
+    kSendAttestationRequest,     ///< Send AttestationRequest (0x3E:0) command to the device
+    kAttestationVerification,    ///< Verify AttestationResponse (0x3E:1) validity
+    kSendOpCertSigningRequest,   ///< Send CSRRequest (0x3E:4) command to the device
+    kValidateCSR,                ///< Verify CSRResponse (0x3E:5) validity
+    kGenerateNOCChain,           ///< TLV encode Node Operational Credentials (NOC) chain certs
+    kSendTrustedRootCert,        ///< Send AddTrustedRootCertificate (0x3E:11) command to the device
+    kSendNOC,                    ///< Send AddNOC (0x3E:6) command to the device
+    kWiFiNetworkSetup,           ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
+    kThreadNetworkSetup,         ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
+    kFailsafeBeforeWiFiEnable,   ///< Extend the fail-safe before doing kWiFiNetworkEnable
+    kFailsafeBeforeThreadEnable, ///< Extend the fail-safe before doing kThreadNetworkEnable
+    kWiFiNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
+    kThreadNetworkEnable,        ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
+    kFindOperational,            ///< Perform operational discovery and establish a CASE session with the device
+    kSendComplete,               ///< Send CommissioningComplete (0x30:4) command to the device
+    kCleanup,                    ///< Call delegates with status, free memory, clear timers and state
     /// Send ScanNetworks (0x31:0) command to the device.
     /// ScanNetworks can happen anytime after kArmFailsafe.
     /// However, the cirque tests fail if it is earlier in the list
@@ -177,9 +179,9 @@ public:
     // Epoch key for the identity protection key for the node being commissioned. In the AutoCommissioner, this is set by by the
     // kGenerateNOCChain stage through the OperationalCredentialsDelegate.
     // This value must be set before calling PerformCommissioningStep for the kSendNOC step.
-    const Optional<AesCcm128KeySpan> GetIpk() const
+    const Optional<IdentityProtectionKeySpan> GetIpk() const
     {
-        return mIpk.HasValue() ? Optional<AesCcm128KeySpan>(mIpk.Value().Span()) : Optional<AesCcm128KeySpan>();
+        return mIpk.HasValue() ? Optional<IdentityProtectionKeySpan>(mIpk.Value().Span()) : Optional<IdentityProtectionKeySpan>();
     }
 
     // Admin subject id used for the case access control entry created if the AddNOC command succeeds. In the AutoCommissioner, this
@@ -321,9 +323,9 @@ public:
         mIcac.SetValue(icac);
         return *this;
     }
-    CommissioningParameters & SetIpk(const AesCcm128KeySpan ipk)
+    CommissioningParameters & SetIpk(const IdentityProtectionKeySpan ipk)
     {
-        mIpk.SetValue(AesCcm128Key(ipk));
+        mIpk.SetValue(IdentityProtectionKey(ipk));
         return *this;
     }
     CommissioningParameters & SetAdminSubject(const NodeId adminSubject)
@@ -425,6 +427,26 @@ public:
         return *this;
     }
 
+    // Clear all members that depend on some sort of external buffer.  Can be
+    // used to make sure that we are not holding any dangling pointers.
+    void ClearExternalBufferDependentValues()
+    {
+        mCSRNonce.ClearValue();
+        mAttestationNonce.ClearValue();
+        mWiFiCreds.ClearValue();
+        mCountryCode.ClearValue();
+        mThreadOperationalDataset.ClearValue();
+        mNOCChainGenerationParameters.ClearValue();
+        mRootCert.ClearValue();
+        mNoc.ClearValue();
+        mIcac.ClearValue();
+        mIpk.ClearValue();
+        mAttestationElements.ClearValue();
+        mAttestationSignature.ClearValue();
+        mPAI.ClearValue();
+        mDAC.ClearValue();
+    }
+
 private:
     // Items that can be set by the commissioner
     Optional<uint16_t> mFailsafeTimerSeconds;
@@ -439,7 +461,7 @@ private:
     Optional<ByteSpan> mRootCert;
     Optional<ByteSpan> mNoc;
     Optional<ByteSpan> mIcac;
-    Optional<AesCcm128Key> mIpk;
+    Optional<IdentityProtectionKey> mIpk;
     Optional<NodeId> mAdminSubject;
     // Items that come from the device in commissioning steps
     Optional<ByteSpan> mAttestationElements;
@@ -484,13 +506,13 @@ struct CSRResponse
 
 struct NocChain
 {
-    NocChain(ByteSpan newNoc, ByteSpan newIcac, ByteSpan newRcac, AesCcm128KeySpan newIpk, NodeId newAdminSubject) :
+    NocChain(ByteSpan newNoc, ByteSpan newIcac, ByteSpan newRcac, IdentityProtectionKeySpan newIpk, NodeId newAdminSubject) :
         noc(newNoc), icac(newIcac), rcac(newRcac), ipk(newIpk), adminSubject(newAdminSubject)
     {}
     ByteSpan noc;
     ByteSpan icac;
     ByteSpan rcac;
-    AesCcm128KeySpan ipk;
+    IdentityProtectionKeySpan ipk;
     NodeId adminSubject;
 };
 

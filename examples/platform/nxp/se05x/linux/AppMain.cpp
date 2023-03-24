@@ -23,6 +23,7 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -292,13 +293,14 @@ exit:
 
 struct CommonCaseDeviceServerInitParams_Se05x : public CommonCaseDeviceServerInitParams
 {
-    CHIP_ERROR InitializeStaticResourcesBeforeServerInit() override
+    CHIP_ERROR InitializeStaticResourcesBeforeServerInit()
     {
         static chip::KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
         static chip::PersistentStorageOperationalKeystoreHSM sPersistentStorageOperationalKeystore;
         static chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
         static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
         static IgnoreCertificateValidityPolicy sDefaultCertValidityPolicy;
+        static chip::Crypto::DefaultSessionKeystore sSessionKeystore;
 
 #if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
         static chip::SimpleSessionResumptionStorage sSessionResumptionStorage;
@@ -333,8 +335,12 @@ struct CommonCaseDeviceServerInitParams_Se05x : public CommonCaseDeviceServerIni
             this->opCertStore = &sPersistentStorageOpCertStore;
         }
 
+        // Session Keystore injection
+        this->sessionKeystore = &sSessionKeystore;
+
         // Group Data provider injection
         sGroupDataProvider.SetStorageDelegate(this->persistentStorageDelegate);
+        sGroupDataProvider.SetSessionKeystore(this->sessionKeystore);
         ReturnErrorOnFailure(sGroupDataProvider.Init());
         this->groupDataProvider = &sGroupDataProvider;
 
@@ -361,7 +367,7 @@ struct CommonCaseDeviceServerInitParams_Se05x : public CommonCaseDeviceServerIni
 
 #endif
 
-void ChipLinuxAppMainLoop()
+void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 {
 #ifdef ENABLE_HSM_EC_KEY
     static CommonCaseDeviceServerInitParams_Se05x initParams;
@@ -425,7 +431,7 @@ void ChipLinuxAppMainLoop()
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ChipLogProgress(AppServer, "Starting commissioner");
-    VerifyOrReturn(InitCommissioner(LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10,
+    VerifyOrReturn(InitCommissioner(LinuxDeviceOptions::GetInstance().securedCommissionerPort,
                                     LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort) == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Started commissioner");
 #if defined(ENABLE_CHIP_SHELL)
@@ -435,7 +441,14 @@ void ChipLinuxAppMainLoop()
 
     ApplicationInit();
 
-    DeviceLayer::PlatformMgr().RunEventLoop();
+    if (impl != nullptr)
+    {
+        impl->RunMainLoop();
+    }
+    else
+    {
+        DeviceLayer::PlatformMgr().RunEventLoop();
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     ShutdownCommissioner();

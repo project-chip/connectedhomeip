@@ -189,7 +189,11 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configSUPPORT_DYNAMIC_ALLOCATION (1)
 
 #ifndef configTOTAL_HEAP_SIZE
+#ifdef DIC_ENABLE
+#define configTOTAL_HEAP_SIZE ((size_t)(44 * 1024))
+#else
 #define configTOTAL_HEAP_SIZE ((size_t)(34 * 1024))
+#endif // DIC_ENABLE
 #endif // configTOTAL_HEAP_SIZE
 
 /* Optional functions - most linkers will remove unused functions anyway. */

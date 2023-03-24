@@ -13,20 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
+import logging
 from time import sleep
 
-from chip import ChipDeviceCtrl
-
-from common.utils import *
-
-from common.pigweed_client import PigweedClient
-from device_service import device_service_pb2
+import pytest
 from button_service import button_service_pb2
+from chip import ChipDeviceCtrl
+from common.pigweed_client import PigweedClient
+from common.utils import *
+from device_service import device_service_pb2
 from locking_service import locking_service_pb2
 from pw_status import Status
 
-import logging
 log = logging.getLogger(__name__)
 
 BLE_DEVICE_NAME = "MBED-lock"

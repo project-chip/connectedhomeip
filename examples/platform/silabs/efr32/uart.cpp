@@ -26,9 +26,13 @@ extern "C" {
 #include "em_usart.h"
 #include "sl_board_control.h"
 #include "sl_uartdrv_instances.h"
-#if (defined(EFR32MG24) || defined(MGM24))
+#ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
 #include "sl_uartdrv_eusart_vcom_config.h"
-#else
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+#include "spi_multiplex.h"
+#endif /* EFR32MG24 && WF200_WIFI */
+#endif
+#ifdef SL_CATALOG_UARTDRV_USART_PRESENT
 #include "sl_uartdrv_usart_vcom_config.h"
 #endif // EFR32MG24
 #include "uart.h"
@@ -44,7 +48,7 @@ extern "C" {
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #endif
 
-#if (defined(EFR32MG24) || defined(MGM24))
+#ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
 #define HELPER1(x) EUSART##x##_RX_IRQn
 #else
 #define HELPER1(x) USART##x##_RX_IRQn
@@ -52,7 +56,7 @@ extern "C" {
 
 #define HELPER2(x) HELPER1(x)
 
-#if (defined(EFR32MG24) || defined(MGM24))
+#ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
 #define HELPER3(x) EUSART##x##_RX_IRQHandler
 #else
 #define HELPER3(x) USART##x##_RX_IRQHandler
@@ -61,7 +65,7 @@ extern "C" {
 #define HELPER4(x) HELPER3(x)
 
 // On MG24 boards VCOM runs on the EUSART device, MG12 uses the UART device
-#if (defined(EFR32MG24) || defined(MGM24))
+#ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
 #define USART_IRQ HELPER2(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)
 #define USART_IRQHandler HELPER4(SL_UARTDRV_EUSART_VCOM_PERIPHERAL_NO)
 #define vcom_handle sl_uartdrv_eusart_vcom_handle
@@ -221,7 +225,7 @@ void uartConsoleInit(void)
     NVIC_ClearPendingIRQ(USART_IRQ);
     NVIC_EnableIRQ(USART_IRQ);
 
-#if (defined(EFR32MG24) || defined(MGM24))
+#ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
     // Clear previous RX interrupts
     EUSART_IntClear(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
 
@@ -246,7 +250,7 @@ void USART_IRQHandler(void)
     otSysEventSignalPending();
 #endif
 
-#if (defined(EFR32MG24) || defined(MGM24))
+#ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
     EUSART_IntClear(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
 #endif
 }
@@ -293,20 +297,26 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
     sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
 #endif
 
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    pre_uart_transfer();
+#endif /* EFR32MG24 && WF200_WIFI */
+
     // Use of ForceTransmit here. Transmit with DMA was causing errors with PW_RPC
-    // TODO Use DMA and find/fix what causes the issue with PW
-    if (UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) Buf, BufLength) == ECODE_EMDRV_UARTDRV_OK)
-    {
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
-        sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
-#endif
-        return BufLength;
-    }
+    // TODO: Use DMA and find/fix what causes the issue with PW
+    Ecode_t ecode_status = UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) Buf, BufLength);
+
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    post_uart_transfer();
+#endif /* EFR32MG24 && WF200_WIFI */
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
 #endif
 
+    if (ECODE_EMDRV_UARTDRV_OK == ecode_status)
+    {
+        return BufLength;
+    }
     return UART_CONSOLE_ERR;
 }
 

@@ -181,7 +181,6 @@ public:
         VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
 
         SetIdentity(identity);
-
         [controller setDeviceControllerDelegate:mDeviceControllerDelegate queue:mCallbackQueue];
         [mDeviceControllerDelegate setDeviceId:value.nodeId];
         [mDeviceControllerDelegate setActive:YES];
@@ -202,6 +201,26 @@ public:
         return MTRErrorToCHIPErrorCode(err);
     }
 
+    CHIP_ERROR GetCommissionerNodeId(const char * _Nullable identity,
+        const chip::app::Clusters::CommissionerCommands::Commands::GetCommissionerNodeId::Type & value,
+        void (^_Nonnull OnResponse)(const chip::GetCommissionerNodeIdResponse &))
+    {
+        auto * controller = GetCommissioner(identity);
+        VerifyOrReturnError(controller != nil, CHIP_ERROR_INCORRECT_STATE);
+
+        auto id = [controller.controllerNodeId unsignedLongLongValue];
+        ChipLogProgress(chipTool, "Commissioner Node Id: %llu", id);
+
+        chip::GetCommissionerNodeIdResponse outValue;
+        outValue.nodeId = id;
+
+        dispatch_async(mCallbackQueue, ^{
+            OnResponse(outValue);
+        });
+
+        return CHIP_NO_ERROR;
+    }
+
     /////////// SystemCommands Interface /////////
     CHIP_ERROR ContinueOnChipMainThread(CHIP_ERROR err) override
     {
@@ -215,7 +234,13 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    MTRBaseDevice * _Nullable GetDevice(const char * _Nullable identity) { return mConnectedDevices[identity]; }
+    MTRBaseDevice * _Nullable GetDevice(const char * _Nullable identity)
+    {
+        MTRDeviceController * controller = GetCommissioner(identity);
+
+        SetIdentity(identity);
+        return mConnectedDevices[identity];
+    }
 
     // PairingDeleted and PairingComplete need to be public so our pairing
     // delegate can call them.
@@ -573,19 +598,19 @@ NS_ASSUME_NONNULL_BEGIN
     using namespace chip::app::Clusters::OperationalCredentials;
 
     if (CHIP_ERROR_INVALID_PUBLIC_KEY == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidPublicKey));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidPublicKey));
     }
     if (CHIP_ERROR_WRONG_NODE_ID == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNodeOpId));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidNodeOpId));
     }
     if (CHIP_ERROR_UNSUPPORTED_CERT_FORMAT == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidNOC));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidNOC));
     }
     if (CHIP_ERROR_FABRIC_EXISTS == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kFabricConflict));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kFabricConflict));
     }
     if (CHIP_ERROR_INVALID_FABRIC_INDEX == err) {
-        return StatusIB(Status::Failure, to_underlying(OperationalCertStatus::kInvalidFabricIndex));
+        return StatusIB(Status::Failure, to_underlying(NodeOperationalCertStatusEnum::kInvalidFabricIndex));
     }
 
     return StatusIB(err);

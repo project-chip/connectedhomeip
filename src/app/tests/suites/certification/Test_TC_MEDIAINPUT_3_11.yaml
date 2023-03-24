@@ -48,7 +48,7 @@ tests:
       command: "SelectInput"
       arguments:
           values:
-              - name: "index"
+              - name: "Index"
                 value: 1
 
     - label: "Read current input list"

@@ -16,9 +16,8 @@
 #
 
 import logging
-import threading
-import os
 import subprocess
+import threading
 from time import sleep
 
 from .device import Device
@@ -45,7 +44,7 @@ class FvpDevice(Device):
             '-C', 'mps3_board.telnetterminal0.start_port={}'.format(self.connection_channel.get_port())
         ]
 
-        if network_interface != None:
+        if network_interface is not None:
             self.fvp_cmd.extend(['-C', 'mps3_board.hostbridge.interfaceName={}'.format(network_interface), ])
         else:
             self.fvp_cmd.extend(['-C', 'mps3_board.hostbridge.userNetworking=1'])

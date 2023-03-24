@@ -51,7 +51,7 @@ tests:
              port = [5650]
              txt = ["T=1" "SAI=300" "SII=5000" "DN=Test TV" "DT=35" "VP=65521+32769"]
 
-          to look for subtypes, on the raspi run $ a  avahi-browse -p _services._dns-sd._udp | grep _matterd
+          to look for subtypes, on the raspi run $   avahi-browse -p _services._dns-sd._udp | grep _matterd
 
           +;wlan0;IPv6;_T35;_sub._matterd._udp;local
           +;wlan0;IPv6;_V65521;_sub._matterd._udp;local
@@ -71,11 +71,14 @@ tests:
 
           [1659544548029] [13752:9267297] CHIP: [DL] _OnPlatformEvent
           [1659544548030] [13752:9267297] CHIP: [DIS] Browsing for: _matterc._udp
-          [1659544548031] [13752:9267297] CHIP: [DIS] Mdns: OnBrowseAdd  name: DD200C20D25AE5F7, type: _matterc._udp., domain: local., interface: 8        [1659544548031] [13752:9267297] CHIP: [DIS] Resolve type=_matterc._udp name=DD200C20D25AE5F7 interface=8
-          [1659544548032] [13752:9267297] CHIP: [DIS] Mdns : OnNewInterface hostname:ubuntuserverAccessory1.local. fullname:DD200C20D25AE5F7._matterc._udp.local. interface: 8 port: 26411 TXT:D=840CM=2INVALID_TEST=40        [1659544548033] [13752:9267297] CHIP: [DIS] Mdns: OnNewAddress interface: 8 ip:fd5d:9cc0:fc52:0:dea6:32ff:fe8d:7072
+          [1659544548031] [13752:9267297] CHIP: [DIS] Mdns: OnBrowseAdd  name: DD200C20D25AE5F7, type: _matterc._udp., domain: local., interface: 8
+          [1659544548031] [13752:9267297] CHIP: [DIS] Resolve type=_matterc._udp name=DD200C20D25AE5F7 interface=8
+          [1659544548032] [13752:9267297] CHIP: [DIS] Mdns : OnNewInterface hostname:ubuntuserverAccessory1.local. fullname:DD200C20D25AE5F7._matterc._udp.local. interface: 8 port: 26411 TXT:"D=840CM=2INVALID_TEST=40"
+          [1659544548033] [13752:9267297] CHIP: [DIS] Mdns: OnNewAddress interface: 8 ip:fd5d:9cc0:fc52:0:dea6:32ff:fe8d:7072
           [1659544548033] [13752:9267297] CHIP: [DIS] Mdns: Resolve success on interface 8
           [1660288371.031350][3364:3369] CHIP:DIS: Discovered node:
-          [1660288371.031374][3364:3369] CHIP:DIS:         Hostname: E45F0149AE290000        [1660288371.031402][3364:3369] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe49:ae29
+          [1660288371.031374][3364:3369] CHIP:DIS:         Hostname: E45F0149AE290000
+          [1660288371.031402][3364:3369] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe49:ae29
           [1660288371.031427][3364:3369] CHIP:DIS:         Port: 5640
           [1660288371.031450][3364:3369] CHIP:DIS:         Mrp Interval idle: 5000 ms
           [1660288371.031473][3364:3369] CHIP:DIS:         Mrp Interval active: 300 ms
@@ -90,7 +93,8 @@ tests:
           [1660288371.031669][3364:3369] CHIP:DIS:         Instance Name: 35025D5C5DA30C17
           [1660288371.031694][3364:3369] CHIP:DIS:         Commissioning Mode: 0
           [1660288371.031722][3364:3369] CHIP:DIS: Discovered node:
-          [1660288371.031743][3364:3369] CHIP:DIS:         Hostname: E45F0149AE290000        [1660288371.031768][3364:3369] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe49:ae29
+          [1660288371.031743][3364:3369] CHIP:DIS:         Hostname: E45F0149AE290000
+          [1660288371.031768][3364:3369] CHIP:DIS:         IP Address #1: fe80::e65f:1ff:fe49:ae29
           [1660288371.031791][3364:3369] CHIP:DIS:         Port: 5640
           [1660288371.031814][3364:3369] CHIP:DIS:         Mrp Interval idle: 5000 ms
           [1660288371.031836][3364:3369] CHIP:DIS:         Mrp Interval active: 300 ms

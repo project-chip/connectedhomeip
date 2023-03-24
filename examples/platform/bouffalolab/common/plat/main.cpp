@@ -25,14 +25,15 @@
 
 #include <FreeRTOS.h>
 
-#include "AppConfig.h"
 #include <AppTask.h>
 #include <easyflash.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
+#include <plat.h>
+
+extern "C" {
 
 #include <blog.h>
-extern "C" {
 
 #ifdef BL702_ENABLE
 #include <bl702_glb.h>
@@ -153,7 +154,7 @@ extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBu
     function then they must be declared static - otherwise they will be allocated on
     the stack and so not exists after this function exits. */
     static StaticTask_t xTimerTaskTCB;
-    static StackType_t uxTimerTaskStack[configMINIMAL_STACK_SIZE * 3 / 2];
+    static StackType_t uxTimerTaskStack[configTIMER_TASK_STACK_DEPTH];
 
     /* Pass out a pointer to the StaticTask_t structure in which the Timer
     task's state will be stored. */
@@ -165,17 +166,23 @@ extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBu
     /* Pass out the size of the array pointed to by *ppxTimerTaskStackBuffer.
     Note that, as the array is necessarily of type StackType_t,
     configTIMER_TASK_STACK_DEPTH is specified in words, not bytes. */
-    *pulTimerTaskStackSize = configMINIMAL_STACK_SIZE * 3 / 2;
+    *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
 }
 
 #if (configUSE_TICK_HOOK != 0)
-extern "C" void vApplicationTickHook(void) {}
+extern "C" void vApplicationTickHook(void)
+{
+#if defined(CFG_USB_CDC_ENABLE)
+    extern void usb_cdc_monitor(void);
+    usb_cdc_monitor();
+#endif
+}
 #endif
 
-extern "C" void vApplicationSleep(TickType_t xExpectedIdleTime) {}
+void vApplicationSleep(TickType_t xExpectedIdleTime) {}
 
 extern "C" void user_vAssertCalled(void) __attribute__((weak, alias("vAssertCalled")));
-extern "C" void vAssertCalled(void)
+void vAssertCalled(void)
 {
     void * ra = (void *) __builtin_return_address(0);
 
@@ -328,6 +335,7 @@ extern "C" void START_ENTRY(void)
     app_init();
 
     easyflash_init();
+    ef_load_env_cache();
 
     ChipLogProgress(NotSpecified, "Init CHIP Memory");
     chip::Platform::MemoryInit(NULL, 0);
@@ -335,6 +343,11 @@ extern "C" void START_ENTRY(void)
 #ifdef SYS_AOS_LOOP_ENABLE
     ChipLogProgress(NotSpecified, "Starting AOS loop Task");
     aos_loop_start();
+#else
+#if defined(CFG_USB_CDC_ENABLE)
+    extern void usb_cdc_start(int fd_console);
+    usb_cdc_start(-1);
+#endif
 #endif
 
     ChipLogProgress(NotSpecified, "Starting App Task");

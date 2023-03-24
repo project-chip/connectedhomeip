@@ -60,6 +60,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -84,6 +85,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -101,6 +103,7 @@ tests:
               maxValue: 230
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -118,6 +121,7 @@ tests:
               maxValue: 254
 
     - label: "Wait 5s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -151,6 +155,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -175,6 +180,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -192,6 +198,7 @@ tests:
               maxValue: 81
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -199,16 +206,19 @@ tests:
               - name: "ms"
                 value: 10000
 
+    #Tolerance to be computed from the range
+    #Start value 120, expected value 20, 120 - 20 = 100, 100 % 15 = 15 , So 20+/-15
     - label: "TH reads CurrentSaturation attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0001
       command: "readAttribute"
       attribute: "CurrentSaturation"
       response:
           constraints:
-              minValue: 17
-              maxValue: 23
+              minValue: 5
+              maxValue: 35
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -242,6 +252,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -266,6 +277,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -308,6 +320,7 @@ tests:
               maxValue: 230
 
     - label: "Wait 2s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -347,7 +360,7 @@ tests:
     - label: "Turn off light that we turned on"
       PICS: OO.S.C00.Rsp
       cluster: "On/Off"
-      command: "off"
+      command: "Off"
 
     - label: "Check on/off attribute value is false after off command"
       cluster: "On/Off"

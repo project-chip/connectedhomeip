@@ -35,8 +35,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
 
-void * __dso_handle = 0;
-
 using chip::ByteSpan;
 using chip::EndpointId;
 using chip::FabricIndex;
@@ -97,9 +95,7 @@ extern "C" void ChipTest(void)
 
     initPref();
 
-    // Initialize device attestation, commissionable data and device instance info
-    // TODO: Use our own DeviceInstanceInfoProvider
-    // SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    mFactoryDataProvider.Init();
     SetCommissionableDataProvider(&mFactoryDataProvider);
     SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
 
@@ -113,6 +109,10 @@ extern "C" void ChipTest(void)
     {
         ChipLogProgress(DeviceLayer, "DeviceManagerInit() - OK\r\n");
     }
+
+    // Set DeviceInstanceInfoProvider after CHIPDeviceManager init
+    // CHIPDeviceManager init will set GenericDeviceInsanceInfoProvider first
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, 0);
 }

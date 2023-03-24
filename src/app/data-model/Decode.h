@@ -23,8 +23,8 @@
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPSafeCasts.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
+#include <lib/core/TLV.h>
 #include <protocols/interaction_model/Constants.h>
 
 namespace chip {

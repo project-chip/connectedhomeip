@@ -13,15 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import re
-import sys
 import os
 import pathlib
-import firmware_utils
+import re
+import sys
 
 import bflb_iot_tool
 import bflb_iot_tool.__main__
-
+import firmware_utils
 
 # Additional options that can be use to configure an `Flasher`
 # object (as dictionary keys) and/or passed as command line options.

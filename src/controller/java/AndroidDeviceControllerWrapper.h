@@ -28,6 +28,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
+#include <crypto/RawKeySessionKeystore.h>
 #include <lib/support/TimeUtils.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
@@ -35,10 +36,13 @@
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <controller/ExamplePersistentStorage.h>
 #else
-#include "AndroidOperationalCredentialsIssuer.h"
 #include <platform/android/AndroidChipPlatform-JNI.h>
 #include <platform/android/CHIPP256KeypairBridge.h>
 #endif // JAVA_MATTER_CONTROLLER_TEST
+
+#include "AndroidOperationalCredentialsIssuer.h"
+#include "AttestationTrustStoreBridge.h"
+#include "DeviceAttestationDelegateBridge.h"
 
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
@@ -178,6 +182,13 @@ public:
         return mOpCredsIssuer.get();
     }
 
+    DeviceAttestationDelegateBridge * GetDeviceAttestationDelegateBridge() { return mDeviceAttestationDelegateBridge; }
+
+    CHIP_ERROR UpdateDeviceAttestationDelegateBridge(jobject deviceAttestationDelegate, chip::Optional<uint16_t> expiryTimeoutSecs,
+                                                     bool shouldWaitAfterDeviceAttestation);
+
+    CHIP_ERROR UpdateAttestationTrustStoreBridge(jobject attestationTrustStoreDelegate);
+
 private:
     using ChipDeviceControllerPtr = std::unique_ptr<chip::Controller::DeviceCommissioner>;
 
@@ -187,6 +198,8 @@ private:
     chip::Credentials::GroupDataProviderImpl mGroupDataProvider;
     // TODO: This may need to be injected as an OperationalCertificateStore *
     chip::Credentials::PersistentStorageOpCertStore mOpCertStore;
+    // TODO: This may need to be injected as a SessionKeystore*
+    chip::Crypto::RawKeySessionKeystore mSessionKeystore;
 
     JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;
@@ -213,6 +226,10 @@ private:
     chip::Controller::AutoCommissioner mAutoCommissioner;
 
     chip::Credentials::PartialDACVerifier mPartialDACVerifier;
+
+    DeviceAttestationDelegateBridge * mDeviceAttestationDelegateBridge        = nullptr;
+    AttestationTrustStoreBridge * mAttestationTrustStoreBridge                = nullptr;
+    chip::Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller,
 #ifdef JAVA_MATTER_CONTROLLER_TEST

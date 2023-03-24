@@ -30,11 +30,11 @@
 #include <lwip/tcpip.h>
 
 extern "C" {
-#include <bl602_hal/bl_sys.h>
 #include <bl60x_fw_api.h>
+#include <bl60x_wifi_driver/bl_main.h>
+#include <bl60x_wifi_driver/wifi_mgmr.h>
 #include <bl_efuse.h>
-#include <bl_main.h>
-#include <wifi_mgmr.h>
+#include <bl_sys.h>
 #include <wifi_mgmr_ext.h>
 }
 
@@ -194,7 +194,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         Platform::CopyString(ifp->Name, netif->name);
         ifp->name          = CharSpan::fromCharString(ifp->Name);
         ifp->isOperational = true;
-        ifp->type          = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+        ifp->type          = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
         ifp->offPremiseServicesReachableIPv4.SetNull();
         ifp->offPremiseServicesReachableIPv6.SetNull();
         bl_efuse_read_mac(ifp->MacAddress);
@@ -246,18 +246,22 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityType)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
-    int authmode;
+    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
+    securityType = SecurityTypeEnum::kUnspecified;
+    // int authmode;
 
     // authmode     = mgmr_get_security_type();
     // securityType = MapAuthModeToSecurityType(authmode);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wifiVersion)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion)
 {
-    wifiVersion = 0;
+    // TODO: Keeping existing behavior, but this looks broken.
+    // https://github.com/project-chip/connectedhomeip/issues/25546
+    wifiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kA;
     return CHIP_NO_ERROR;
 }
 

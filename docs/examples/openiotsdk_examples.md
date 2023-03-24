@@ -18,8 +18,8 @@ $ git submodule update --init
 
 The VSCode devcontainer has all dependencies pre-installed. Using the VSCode
 devcontainer is the recommended way to interact with Open IoT SDK port of the
-Matter Project. Please read this
-[README.md](../../..//docs/VSCODE_DEVELOPMENT.md) for more information.
+Matter Project. Please read this [README.md](../VSCODE_DEVELOPMENT.md) for more
+information.
 
 ### Networking setup
 
@@ -140,6 +140,51 @@ Then add the GDB plugin to your development environment:
     arguments with `docker run` command. Remember add GDB plugin path to
     environment variable as FAST_MODEL_PLUGINS_PATH inside container.
 
+## Configuration
+
+### Trusted Firmware-M
+
+To add [TF-M](https://tf-m-user-guide.trustedfirmware.org) support to Matter
+example you need to set `TFM_SUPPORT` variable inside main application
+`CMakeLists.txt` file.
+
+```
+set(TFM_SUPPORT YES)
+```
+
+This causes the Matter example to be built as non-secure application in
+Non-secure Processing Environment (`NSPE`). The bootloader and the secure part
+are also built from `TF-M` sources. All components are merged into a single
+executable file at the end of the building process.
+
+You can also provide the own version of Matter example by setting
+`TFM_NS_APP_VERSION` variable.
+
+```
+set(TFM_NS_APP_VERSION "0.0.1")
+```
+
+### Trusted Firmware-M Protected Storage
+
+There is an option to add
+[TF-M Protected Storage Service](https://tf-m-user-guide.trustedfirmware.org/integration_guide/services/tfm_ps_integration_guide.html)
+support for `key-value` storage component in Matter examples. You need to set
+`CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS` variable inside main application
+`CMakeLists.txt` fi
+
+```
+set(CONFIG_CHIP_OPEN_IOT_SDK_USE_PSA_PS YES)
+```
+
+This option causes `key-value` objects will be stored in a secure part of flash
+memory and the Protected Storage Service takes care of their encryption and
+authentication.
+
+**NOTE**
+
+The `TF-M Protected Storage` option requires enabling
+[TF-M](#trusted-firmware-m) support.
+
 ## Building
 
 You build using a vscode task or call the script directly from the command line.
@@ -196,7 +241,7 @@ ${MATTER_ROOT}/scripts/run_in_ns.sh ARMns ${MATTER_ROOT}/scripts/examples/openio
 ### Commissioning
 
 Once booted the application can be commissioned, please refer to
-[docs/guides/openiotsdk_commissioning.md](/../guides/openiotsdk_commissioning.md)
+[docs/guides/openiotsdk_commissioning.md](../guides/openiotsdk_commissioning.md)
 for further instructions.
 
 ## Testing

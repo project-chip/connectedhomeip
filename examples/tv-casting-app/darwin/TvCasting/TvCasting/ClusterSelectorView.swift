@@ -41,6 +41,17 @@ struct ClusterSelectorView: View {
             ).background(Color.blue)
                 .foregroundColor(Color.white)
                 .padding()
+
+            NavigationLink(
+                destination: CertTestView(),
+                label: {
+                    Text("Certification Tests")
+                        .frame(width: 300, height: 30, alignment: .center)
+                        .border(Color.black, width: 1)
+                }
+            ).background(Color.blue)
+                .foregroundColor(Color.white)
+                .padding()
         }
         .navigationTitle("Cluster selection")
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)

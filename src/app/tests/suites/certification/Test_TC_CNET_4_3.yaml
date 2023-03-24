@@ -42,7 +42,7 @@ tests:
       verification: |
           ./chip-tool descriptor read server-list 1 0
 
-          Verify "server list" on the TH(Chip-tool) Log:
+          Verify "server list has value 49" on the TH(Chip-tool) Log:
 
           [1646226258.250313][2446:2451] CHIP:DMG:        SuppressResponse = true,
           [1646226258.250337][2446:2451] CHIP:DMG:        InteractionModelRevision = 1

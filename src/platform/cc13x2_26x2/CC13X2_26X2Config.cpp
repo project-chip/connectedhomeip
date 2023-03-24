@@ -44,61 +44,89 @@ namespace Internal {
 /* itemID and subID are limited to 10 bits, even though their types are uint16_t */
 
 // Keys stored in the Chip-factory namespace
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_SerialNum             = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                           .itemID   = 0x0001 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDeviceId           = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                             .itemID   = 0x0002 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDeviceCert         = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                               .itemID   = 0x0003 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDeviceICACerts     = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                                   .itemID   = 0x0004 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDevicePrivateKey   = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                                     .itemID   = 0x0005 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_HardwareVersion       = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                                 .itemID   = 0x0006 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_ManufacturingDate     = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                                   .itemID   = 0x0007 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_SetupPinCode          = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                              .itemID   = 0x0008 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_SetupDiscriminator    = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                                    .itemID   = 0x0009 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Spake2pIterationCount = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                                       .itemID   = 0x000a } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Spake2pSalt           = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                             .itemID   = 0x000b } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Spake2pVerifier       = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                                 .itemID   = 0x000c } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_BootCount             = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                           .itemID   = 0x000d } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_TotalOperationalHours = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                                       .itemID   = 0x000f } };
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_SerialNum = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipFactory, .subID = 0x0001 }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDeviceId = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipFactory, .subID = 0x0002 }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDeviceCert = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipFactory, .subID = 0x0003 }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDeviceICACerts = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipFactory, .subID = 0x0004 }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_MfrDevicePrivateKey = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipFactory, .subID = 0x0005 }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_HardwareVersion = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipFactory, .subID = 0x0006 }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_ManufacturingDate = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipFactory, .subID = 0x0007 }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_SetupPinCode = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipFactory, .subID = 0x0008 }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_SetupDiscriminator = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipFactory, .subID = 0x0009 }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Spake2pIterationCount = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipFactory, .subID = 0x000a }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Spake2pSalt = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipFactory, .subID = 0x000b }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Spake2pVerifier = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipFactory, .subID = 0x000c }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_LifeTimeCounter = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipFactory, .subID = 0x0010 }
+};
+
+// Keys stored in the Chip-counters namespace
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_BootCount = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipCounters, .subID = 0x000d }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_TotalOperationalHours = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipCounters, .subID = 0x000f }
+};
 
 // Keys stored in the Chip-config namespace
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_ServiceConfig      = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
-                                                                               .itemID   = 0x0012 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_PairedAccountId    = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
-                                                                                 .itemID   = 0x0013 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_ServiceId          = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
-                                                                           .itemID   = 0x0014 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_LastUsedEpochKeyId = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
-                                                                                    .itemID   = 0x0017 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_FailSafeArmed      = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
-                                                                               .itemID   = 0x0018 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_WiFiStationSecType = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
-                                                                                    .itemID   = 0x0019 } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_RegulatoryLocation = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
-                                                                                    .itemID   = 0x001a } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_CountryCode        = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
-                                                                             .itemID   = 0x001b } };
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_ServiceConfig = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipConfig, .subID = 0x0012 }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_PairedAccountId = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipConfig, .subID = 0x0013 }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_ServiceId = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipConfig, .subID = 0x0014 }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_LastUsedEpochKeyId = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipConfig, .subID = 0x00017 }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_FailSafeArmed = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipConfig, .subID = 0x00018 }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_WiFiStationSecType = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipConfig, .subID = 0x00019 }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_RegulatoryLocation = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipConfig, .subID = 0x0001a }
+};
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_CountryCode = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipConfig, .subID = 0x0001b }
+};
 // itemID 0x001c is unused (used to be breadcrumb).
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_UniqueId = { { .systemID = kCC13X2_26X2ChipConfig_Sysid,
-                                                                          .itemID   = 0x001d } };
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_UniqueId = {
+    { .systemID = kCC13X2_26X2Matter_SysID, .itemID = kCC13X2_26X2Matter_ItemID_ChipConfig, .subID = 0x0001d }
+};
 
 /* Internal for the KVS interface. */
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_KVS_key   = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                         .itemID   = 0x001d } };
-const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_KVS_value = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                           .itemID   = 0x001e } };
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_KVS_key   = { { .systemID = kCC13X2_26X2Matter_SysID,
+                                                                         .itemID   = kCC13X2_26X2Matter_ItemID_ChipKVS_key } };
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_KVS_value = { { .systemID = kCC13X2_26X2Matter_SysID,
+                                                                           .itemID   = kCC13X2_26X2Matter_ItemID_ChipKVS_value } };
 
 /* Static local variables */
 static NVINTF_nvFuncts_t sNvoctpFps = { 0 };
@@ -389,43 +417,62 @@ CHIP_ERROR CC13X2_26X2Config::FactoryResetConfig(void)
     NVINTF_nvProxy_t nvProxy = { 0 };
     uint8_t status           = NVINTF_SUCCESS;
 
+    // Delete items with the config, counter, kvs_key and kvs_value itemIDs. Items with the factory
+    // itemIDs are not deleted.
+
     intptr_t key = sNvoctpFps.lockNV();
 
     /* Setup doNext call */
-    nvProxy.sysid = kCC13X2_26X2ChipConfig_Sysid;
-    nvProxy.flag  = NVINTF_DOSTART | NVINTF_DOSYSID | NVINTF_DODELETE;
+    nvProxy.sysid  = kCC13X2_26X2Matter_SysID;
+    nvProxy.itemid = kCC13X2_26X2Matter_ItemID_ChipConfig;
+    nvProxy.flag   = NVINTF_DOSTART | NVINTF_DOITMID | NVINTF_DODELETE;
 
-    /* Lock and wipe all items with sysid TIOP */
+    /* Lock and wipe all items with config itemid */
     do
     {
         status = sNvoctpFps.doNext(&nvProxy);
     } while (NVINTF_SUCCESS == status);
     /* check we ran out of elements */
-    VerifyOrExit(status != NVINTF_NOTFOUND, err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    VerifyOrExit(status == NVINTF_NOTFOUND, err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
-    /* Setup doNext call. Sysid is the same here, but it doesn't necessarily have to be. Matching POSIX impl */
-    nvProxy.sysid = kCC13X2_26X2ChipFactory_Sysid;
-    nvProxy.flag  = NVINTF_DOSTART | NVINTF_DOSYSID | NVINTF_DODELETE;
+    /* Setup doNext call */
+    nvProxy.sysid  = kCC13X2_26X2Matter_SysID;
+    nvProxy.itemid = kCC13X2_26X2Matter_ItemID_ChipCounters;
+    nvProxy.flag   = NVINTF_DOSTART | NVINTF_DOITMID | NVINTF_DODELETE;
 
-    /* Lock and wipe all items with sysid TIOP */
+    /* Lock and wipe all items with counters itemid */
     do
     {
         status = sNvoctpFps.doNext(&nvProxy);
     } while (NVINTF_SUCCESS == status);
     /* check we ran out of elements */
-    VerifyOrExit(status != NVINTF_NOTFOUND, err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    VerifyOrExit(status == NVINTF_NOTFOUND, err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
-    /* Setup doNext call. Sysid is the same here, but it doesn't necessarily have to be. Matching POSIX impl */
-    nvProxy.sysid = kCC13X2_26X2ChipCounters_Sysid;
-    nvProxy.flag  = NVINTF_DOSTART | NVINTF_DOSYSID | NVINTF_DODELETE;
+    /* Setup doNext call */
+    nvProxy.sysid  = kCC13X2_26X2Matter_SysID;
+    nvProxy.itemid = kCC13X2_26X2Matter_ItemID_ChipKVS_key;
+    nvProxy.flag   = NVINTF_DOSTART | NVINTF_DOITMID | NVINTF_DODELETE;
 
-    /* Lock and wipe all items with sysid TIOP */
+    /* Lock and wipe all items with kvs_key itemid */
     do
     {
         status = sNvoctpFps.doNext(&nvProxy);
     } while (NVINTF_SUCCESS == status);
     /* check we ran out of elements */
-    VerifyOrExit(status != NVINTF_NOTFOUND, err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    VerifyOrExit(status == NVINTF_NOTFOUND, err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+
+    /* Setup doNext call */
+    nvProxy.sysid  = kCC13X2_26X2Matter_SysID;
+    nvProxy.itemid = kCC13X2_26X2Matter_ItemID_ChipKVS_value;
+    nvProxy.flag   = NVINTF_DOSTART | NVINTF_DOITMID | NVINTF_DODELETE;
+
+    /* Lock and wipe all items with key_value itemid */
+    do
+    {
+        status = sNvoctpFps.doNext(&nvProxy);
+    } while (NVINTF_SUCCESS == status);
+    /* check we ran out of elements */
+    VerifyOrExit(status == NVINTF_NOTFOUND, err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 
 exit:
     sNvoctpFps.unlockNV(key);

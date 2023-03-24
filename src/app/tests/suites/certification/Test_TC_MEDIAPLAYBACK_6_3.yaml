@@ -41,26 +41,26 @@ tests:
       PICS: MEDIAPLAYBACK.S.C01.Rsp
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Sends a Seek command"
-      PICS: MEDIAPLAYBACK.S.C0B.Rsp
+      PICS: MEDIAPLAYBACK.S.C0b.Rsp
       command: "Seek"
       arguments:
           values:
-              - name: "Position"
+              - name: "position"
                 value: 10000
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label:
           "Verify that the media has moved to 10 seconds from the starting point"
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0B.Rsp
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0b.Rsp
       arguments:
           values:
               - name: "message"
@@ -71,11 +71,11 @@ tests:
                 value: "y"
 
     - label: "Reads the SampledPosition attribute"
-      PICS: MEDIAPLAYBACK.S.A0003 && MEDIAPLAYBACK.S.C0B.Rsp
+      PICS: MEDIAPLAYBACK.S.A0003 && MEDIAPLAYBACK.S.C0b.Rsp
       command: "readAttribute"
       attribute: "SampledPosition"
       response:
-          value: 10000
+          value: { "Position": 10000 }
 
     #Issue 10988
     - label: "TH reads the StartTime attribute from the DUT"
@@ -165,7 +165,7 @@ tests:
     - label:
           "Sends a Seek command Position value beyond the furthest valid
           position"
-      PICS: MEDIAPLAYBACK.S.C0B.Rsp
+      PICS: MEDIAPLAYBACK.S.C0b.Rsp
       command: "Seek"
       arguments:
           values:
@@ -173,13 +173,13 @@ tests:
                 value: SeekPosition
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 5
 
     - label: "verify that the media has not moved."
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0B.Rsp
+      PICS: PICS_USER_PROMPT && MEDIAPLAYBACK.S.C0b.Rsp
       arguments:
           values:
               - name: "message"

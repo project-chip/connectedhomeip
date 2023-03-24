@@ -41,7 +41,7 @@
 #include <app/EventManagement.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
-#include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/TLVDebug.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -278,7 +278,7 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
     bool dataExists =
         (emberAfGetServerAttributeIndexByAttributeId(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId) != UINT16_MAX);
 
-    ChipLogDetail(DataManagement, "Reading Mock Endpoint %" PRIx32 "Mock Cluster %" PRIx32 ", Field %" PRIx32 " is dirty",
+    ChipLogDetail(DataManagement, "Reading Mock Endpoint %x Mock Cluster %" PRIx32 ", Field %" PRIx32 " is dirty",
                   aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 
     if (!dataExists)
@@ -337,19 +337,19 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
     switch (aPath.mAttributeId)
     {
     case Clusters::Globals::Attributes::ClusterRevision::Id:
-        ReturnErrorOnFailure(writer->Put(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), mockClusterRevision));
+        ReturnErrorOnFailure(writer->Put(TLV::ContextTag(AttributeDataIB::Tag::kData), mockClusterRevision));
         break;
     case Clusters::Globals::Attributes::FeatureMap::Id:
-        ReturnErrorOnFailure(writer->Put(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), mockFeatureMap));
+        ReturnErrorOnFailure(writer->Put(TLV::ContextTag(AttributeDataIB::Tag::kData), mockFeatureMap));
         break;
     case MockAttributeId(1):
-        ReturnErrorOnFailure(writer->Put(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), mockAttribute1));
+        ReturnErrorOnFailure(writer->Put(TLV::ContextTag(AttributeDataIB::Tag::kData), mockAttribute1));
         break;
     case MockAttributeId(2):
-        ReturnErrorOnFailure(writer->Put(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), mockAttribute2));
+        ReturnErrorOnFailure(writer->Put(TLV::ContextTag(AttributeDataIB::Tag::kData), mockAttribute2));
         break;
     case MockAttributeId(3):
-        ReturnErrorOnFailure(writer->Put(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), mockAttribute3));
+        ReturnErrorOnFailure(writer->Put(TLV::ContextTag(AttributeDataIB::Tag::kData), mockAttribute3));
         break;
     default:
         // The key should found since we have checked above.

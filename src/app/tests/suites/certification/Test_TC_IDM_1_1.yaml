@@ -38,7 +38,7 @@ tests:
 
           ./chip-tool onoff on 1 1
 
-          On TH all-clusters-app,  Verify we are getting EndpointID, CommandID, ClusterID in the response data (as below) matching with the data sent in the above command
+          On TH(all-clusters-app),  Verify we are getting EndpointID, CommandID, ClusterID in the response data (as below) matching with the data sent in the above command
 
           [1655717373.046081][10909:10909] CHIP:DMG: InvokeRequestMessage =
           [1655717373.046137][10909:10909] CHIP:DMG: {

@@ -34,6 +34,7 @@
 #include <app/data-model/Encode.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
 
 using namespace chip;
@@ -42,6 +43,7 @@ using namespace chip::app::Clusters::KeypadInput;
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 using namespace chip::AppPlatform;
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+using chip::Protocols::InteractionModel::Status;
 
 static constexpr size_t kKeypadInputDelegateTableSize =
     EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
@@ -183,7 +185,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfKeypadInputClusterSendKeyCallback error: %s", err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        command->AddStatus(commandPath, Status::Failure);
     }
     return true;
 }

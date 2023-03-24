@@ -167,10 +167,12 @@ class TestGenerateFactoryData(unittest.TestCase):
                                    '--spake2_it', '2000',
                                    '--spake2_salt', 'U1BBS0UyUCBLZXkgU2FsdA==',
                                    '--passcode', '13243546',
-                                   '--spake2_verifier', 'WN0SgEXLfUN19BbJqp6qn4pS69EtdNLReIMZwv/CIM0ECMP7ytiAJ7txIYJ0Ovlha/rQ3E+88mj3qaqqnviMaZzG+OyXEdSocDIT9ZhmkTCgWwERaHz4Vdh3G37RT6kqbw==',
+                                   '--spake2_verifier', ('WN0SgEXLfUN19BbJqp6qn4pS69EtdNLReIMZwv/CIM0ECMP7ytiAJ7txIYJ0Ovlha/'
+                                                         'rQ3E+88mj3qaqqnviMaZzG+OyXEdSocDIT9ZhmkTCgWwERaHz4Vdh3G37RT6kqbw=='),
                                    '--discriminator', '0xFED',
                                    '--rd_uid', '91a9c12a7c80700a31ddcfa7fce63e44',
                                    '--enable_key', '00112233445566778899aabbccddeeff',
+                                   '--user', '{"name": "product_name", "version": 123, "revision": "0x123"}',
                                    '-o', os.path.join(outdir, 'fd.json')
                                    ])
 
@@ -194,11 +196,21 @@ class TestGenerateFactoryData(unittest.TestCase):
             self.assertEqual(factory_data.get('spake2_it'), 2000)
             self.assertEqual(factory_data.get('spake2_salt'), base64_to_json('U1BBS0UyUCBLZXkgU2FsdA=='))
             self.assertEqual(factory_data.get('spake2_verifier'), base64_to_json(
-                'WN0SgEXLfUN19BbJqp6qn4pS69EtdNLReIMZwv/CIM0ECMP7ytiAJ7txIYJ0Ovlha/rQ3E+88mj3qaqqnviMaZzG+OyXEdSocDIT9ZhmkTCgWwERaHz4Vdh3G37RT6kqbw=='))
+                'WN0SgEXLfUN19BbJqp6qn4pS69EtdNLReIMZwv/CIM0ECMP7ytiAJ7txIYJ0Ovlha/'
+                'rQ3E+88mj3qaqqnviMaZzG+OyXEdSocDIT9ZhmkTCgWwERaHz4Vdh3G37RT6kqbw=='))
             self.assertEqual(factory_data.get('discriminator'), 0xFED)
             self.assertEqual(factory_data.get('passcode'), 13243546)
             self.assertEqual(factory_data.get('rd_uid'), 'hex:91a9c12a7c80700a31ddcfa7fce63e44')
             self.assertEqual(factory_data.get('enable_key'), 'hex:00112233445566778899aabbccddeeff')
+            self.assertEqual(factory_data.get('user'), {'name': 'product_name', 'version': 123, 'revision': '0x123'})
+
+            subprocess.check_call(['python3', os.path.join(TOOLS_DIR, 'nrfconnect_generate_partition.py'),
+                                   '-i', os.path.join(outdir, 'fd.json'),
+                                   '-o', os.path.join(outdir, 'fd'),
+                                   '--offset', "0xfb000",
+                                   '--size', "0x1000",
+                                   '--raw'
+                                   ])
 
     def test_generate_spake2p_verifier_default(self):
         with tempfile.TemporaryDirectory() as outdir:
@@ -223,6 +235,7 @@ class TestGenerateFactoryData(unittest.TestCase):
                                    '--spake2_salt', 'U1BBS0UyUCBLZXkgU2FsdA==',
                                    '--passcode', '20202021',
                                    '--discriminator', '0xFED',
+                                   '--user', '{"name": "product_name", "version": 123, "revision": "0x123"}',
                                    '-o', os.path.join(outdir, 'fd.json')
                                    ])
 
@@ -233,7 +246,17 @@ class TestGenerateFactoryData(unittest.TestCase):
                              base64_to_json('U1BBS0UyUCBLZXkgU2FsdA=='))
             self.assertEqual(factory_data.get('spake2_it'), 1000)
             self.assertEqual(factory_data.get('spake2_verifier'), base64_to_json(
-                'uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/SRPFNRODm3wH/MBiehuFc6FJ/NH6Rmzw=='))
+                'uWFwqugDNGiEck/po7KHwwMwwqZgN10XuyBajPGuyzUEV/'
+                'iree4lOrao5GuwnlQ65CJzbeUB49s31EH+NEkg0JVI5MGCQGMMT/SRPFNRODm3wH/MBiehuFc6FJ/NH6Rmzw=='))
+            self.assertEqual(factory_data.get('user'), {'name': 'product_name', 'version': 123, 'revision': '0x123'})
+
+            subprocess.check_call(['python3', os.path.join(TOOLS_DIR, 'nrfconnect_generate_partition.py'),
+                                   '-i', os.path.join(outdir, 'fd.json'),
+                                   '-o', os.path.join(outdir, 'fd'),
+                                   '--offset', "0xfb000",
+                                   '--size', "0x1000",
+                                   '--raw'
+                                   ])
 
 
 if __name__ == '__main__':

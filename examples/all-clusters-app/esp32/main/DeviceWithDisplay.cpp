@@ -17,6 +17,7 @@
  */
 
 #include "DeviceWithDisplay.h"
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -321,16 +322,15 @@ public:
 
             if (name == "OnOff" && cluster == "OnOff")
             {
-                value                  = (value == "On") ? "Off" : "On";
-                uint8_t attributeValue = (value == "On") ? 1 : 0;
-                emberAfWriteServerAttribute(endpointIndex + 1, app::Clusters::OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID,
-                                            (uint8_t *) &attributeValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+                value               = (value == "On") ? "Off" : "On";
+                bool attributeValue = (value == "On");
+                app::Clusters::OnOff::Attributes::OnOff::Set(endpointIndex + 1, attributeValue);
             }
 
             if (name == "Occupancy" && cluster == "Occupancy Sensor")
             {
-                value                  = (value == "Yes") ? "No" : "Yes";
-                uint8_t attributeValue = (value == "Yes") ? 1 : 0;
+                value               = (value == "Yes") ? "No" : "Yes";
+                bool attributeValue = (value == "Yes");
                 ESP_LOGI(TAG, "Occupancy changed to : %s", value.c_str());
                 // update the current occupancy here for hardcoded endpoint 1
                 app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, attributeValue);
@@ -354,22 +354,22 @@ public:
             else if (name == "Charge level" && cluster == "Power Source")
             {
                 using namespace chip::app::Clusters::PowerSource;
-                auto attributeValue = BatChargeLevel::kOk;
+                auto attributeValue = BatChargeLevelEnum::kOk;
 
                 if (value == "OK")
                 {
                     value          = "Warning";
-                    attributeValue = BatChargeLevel::kWarning;
+                    attributeValue = BatChargeLevelEnum::kWarning;
                 }
                 else if (value == "Warning")
                 {
                     value          = "Critical";
-                    attributeValue = BatChargeLevel::kCritical;
+                    attributeValue = BatChargeLevelEnum::kCritical;
                 }
                 else
                 {
                     value          = "OK";
-                    attributeValue = BatChargeLevel::kOk;
+                    attributeValue = BatChargeLevelEnum::kOk;
                 }
 
                 // update the battery charge level here for hardcoded endpoint 1
@@ -689,7 +689,7 @@ void SetupPretendDevices()
     AddAttribute("Bat remaining", "70");
     app::Clusters::PowerSource::Attributes::BatPercentRemaining::Set(1, static_cast<uint8_t>(70 * 2));
     AddAttribute("Charge level", "0");
-    app::Clusters::PowerSource::Attributes::BatChargeLevel::Set(1, app::Clusters::PowerSource::BatChargeLevel::kOk);
+    app::Clusters::PowerSource::Attributes::BatChargeLevel::Set(1, app::Clusters::PowerSource::BatChargeLevelEnum::kOk);
 }
 
 esp_err_t InitM5Stack(std::string qrCodeText)

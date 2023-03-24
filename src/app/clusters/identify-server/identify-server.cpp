@@ -17,12 +17,9 @@
 
 #include "identify-server.h"
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
@@ -31,6 +28,7 @@
 
 #include <app/util/af.h>
 #include <app/util/common.h>
+#include <app/util/error-mapping.h>
 #include <array>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -46,6 +44,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Identify;
+using chip::Protocols::InteractionModel::Status;
 
 static Identify * firstIdentify = nullptr;
 
@@ -206,9 +205,9 @@ bool emberAfIdentifyClusterIdentifyCallback(CommandHandler * commandObj, const a
     auto & identifyTime = commandData.identifyTime;
 
     // cmd Identify
-    return EMBER_SUCCESS ==
-        emberAfSendImmediateDefaultResponse(
-               Clusters::Identify::Attributes::IdentifyTime::Set(commandPath.mEndpointId, identifyTime));
+    commandObj->AddStatus(commandPath,
+                          ToInteractionModelStatus(Attributes::IdentifyTime::Set(commandPath.mEndpointId, identifyTime)));
+    return true;
 }
 
 bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
@@ -242,7 +241,7 @@ bool emberAfIdentifyClusterTriggerEffectCallback(CommandHandler * commandObj, co
         identify->mOnEffectIdentifier(identify);
     }
 
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    commandObj->AddStatus(commandPath, Status::Success);
     return true;
 }
 

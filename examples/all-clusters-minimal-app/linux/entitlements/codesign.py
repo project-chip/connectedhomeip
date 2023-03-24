@@ -15,8 +15,8 @@
 # limitations under the License.
 
 import argparse
-import subprocess
 import re
+import subprocess
 
 
 def run_command(command):

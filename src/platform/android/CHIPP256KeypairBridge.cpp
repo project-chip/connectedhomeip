@@ -138,7 +138,7 @@ CHIP_ERROR CHIPP256KeypairBridge::ECDSA_sign_msg(const uint8_t * msg, size_t msg
     }
 
     JniByteArray jniSignature(env, static_cast<jbyteArray>(signedResult));
-    MutableByteSpan signatureSpan(out_signature, out_signature.Capacity());
+    MutableByteSpan signatureSpan(out_signature.Bytes(), out_signature.Capacity());
     ReturnErrorOnFailure(EcdsaAsn1SignatureToRaw(CHIP_CRYPTO_GROUP_SIZE_BYTES, jniSignature.byteSpan(), signatureSpan));
     ReturnErrorOnFailure(out_signature.SetLength(signatureSpan.size()));
 

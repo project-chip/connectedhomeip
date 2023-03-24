@@ -90,8 +90,8 @@ struct pbuf
  *      PacketBuffer objects may be chained to accommodate larger payloads.  Chaining, however, is not transparent, and users of the
  *      class must explicitly decide to support chaining.  Examples of classes written with chaining support are as follows:
  *
- *          @ref chip::chipTLVReader
- *          @ref chip::chipTLVWriter
+ *          @ref chip::TLVReader
+ *          @ref chip::TLVWriter
  *
  * ### PacketBuffer format
  *

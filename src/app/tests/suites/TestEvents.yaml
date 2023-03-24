@@ -31,11 +31,13 @@ tests:
     - label: "Check there is no event on the target endpoint"
       command: "readEvent"
       event: "TestEvent"
+      response: []
 
     - label: "Check reading events from an invalid endpoint"
       command: "readEvent"
       event: "TestEvent"
       endpoint: 0
+      response: []
 
     - label: "Generate an event on the accessory"
       command: "TestEmitTestEventRequest"
@@ -69,6 +71,7 @@ tests:
       command: "readEvent"
       event: "TestEvent"
       eventNumber: eventNumber + 1
+      response: []
 
     - label: "Generate a second event on the accessory"
       command: "TestEmitTestEventRequest"

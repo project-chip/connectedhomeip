@@ -28,9 +28,10 @@
 #include <app/ReadClient.h>
 #include <app/StatusResponse.h>
 #include <assert.h>
-#include <lib/core/CHIPTLVTypes.h>
+#include <lib/core/TLVTypes.h>
 #include <lib/support/FibonacciUtils.h>
 #include <messaging/ReliableMessageMgr.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 
 namespace chip {
 namespace app {
@@ -345,7 +346,7 @@ CHIP_ERROR ReadClient::GenerateEventPaths(EventPathIBs::Builder & aEventPathsBui
 {
     for (auto & event : aEventPaths)
     {
-        VerifyOrReturnError(event.IsValidEventPath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
+        VerifyOrReturnError(event.IsValidEventPath(), CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB);
         EventPathIB::Builder & path = aEventPathsBuilder.CreatePath();
         ReturnErrorOnFailure(aEventPathsBuilder.GetError());
         ReturnErrorOnFailure(path.Encode(event));
@@ -639,13 +640,7 @@ CHIP_ERROR ReadClient::ProcessAttributePath(AttributePathIB::Parser & aAttribute
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // The ReportData must contain a concrete attribute path
-    err = aAttributePathParser.GetEndpoint(&(aAttributePath.mEndpointId));
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
-    err = aAttributePathParser.GetCluster(&(aAttributePath.mClusterId));
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
-    err = aAttributePathParser.GetAttribute(&(aAttributePath.mAttributeId));
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
-    err = aAttributePathParser.GetListIndex(aAttributePath);
+    err = aAttributePathParser.GetConcreteAttributePath(aAttributePath);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
     return CHIP_NO_ERROR;
 }
@@ -814,15 +809,21 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
         // computing the Ack timeout from the publisher for the ReportData message being sent to us using our IDLE interval as the
         // basis for that computation.
         //
+        // Make sure to use the retransmission computation that includes backoff.  For purposes of that computation, treat us as
+        // active now (since we are right now sending/receiving messages), and use the default "how long are we guaranteed to stay
+        // active" threshold for now.
+        //
         // TODO: We need to find a good home for this logic that will correctly compute this based on transport. For now, this will
         // suffice since we don't use TCP as a transport currently and subscriptions over BLE aren't really a thing.
         //
+        const auto & ourMrpConfig = GetDefaultMRPConfig();
         auto publisherTransmissionTimeout =
-            GetLocalMRPConfig().ValueOr(GetDefaultMRPConfig()).mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
+            GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
+                                     System::SystemClock().GetMonotonicTimestamp(), Transport::kMinActiveTime);
         timeout = System::Clock::Seconds16(mMaxInterval) + publisherTransmissionTimeout;
     }
 
-    // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned
+    // EFR32/MBED/INFINION/K32W's chrono count return long unsigned, but other platform returns unsigned
     ChipLogProgress(
         DataManagement,
         "Refresh LivenessCheckTime for %lu milliseconds with SubscriptionId = 0x%08" PRIx32 " Peer = %02x:" ChipLogFormatX64,
@@ -1068,7 +1069,8 @@ CHIP_ERROR ReadClient::DefaultResubscribePolicy(CHIP_ERROR aTerminationCause)
     return CHIP_NO_ERROR;
 }
 
-void ReadClient::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+void ReadClient::HandleDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
+                                       const SessionHandle & sessionHandle)
 {
     ReadClient * const _this = static_cast<ReadClient *>(context);
     VerifyOrDie(_this != nullptr);
@@ -1093,7 +1095,8 @@ void ReadClient::HandleDeviceConnectionFailure(void * context, const ScopedNodeI
     _this->Close(err);
 }
 
-void ReadClient::OnResubscribeTimerCallback(System::Layer * apSystemLayer, void * apAppState)
+void ReadClient::OnResubscribeTimerCallback(System::Layer * /* If this starts being used, fix callers that pass nullptr */,
+                                            void * apAppState)
 {
     ReadClient * const _this = static_cast<ReadClient *>(apAppState);
     VerifyOrDie(_this != nullptr);
@@ -1172,5 +1175,18 @@ CHIP_ERROR ReadClient::GetMinEventNumber(const ReadPrepareParams & aReadPrepareP
     }
     return CHIP_NO_ERROR;
 }
+
+void ReadClient::TriggerResubscribeIfScheduled(const char * reason)
+{
+    if (!mIsResubscriptionScheduled)
+    {
+        return;
+    }
+
+    ChipLogDetail(DataManagement, "ReadClient[%p] triggering resubscribe, reason: %s", this, reason);
+    CancelResubscribeTimer();
+    OnResubscribeTimerCallback(nullptr, this);
+}
+
 } // namespace app
 } // namespace chip

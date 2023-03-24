@@ -29,8 +29,8 @@
 #include <app/tests/AppTestContext.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVUtilities.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>

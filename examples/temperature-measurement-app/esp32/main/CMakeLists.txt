@@ -19,14 +19,12 @@
 get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 
 set(PRIV_INCLUDE_DIRS_LIST
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/temperature-measurement-app/"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
 )
 set(SRC_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/temperature-measurement-app/zap-generated"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
@@ -52,12 +50,11 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general-commissioning-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/network-commissioning"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/operational-credentials-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/route_hook"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/common"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
 )
 
-set(PRIV_REQUIRES_LIST chip QRCode bt)
+set(PRIV_REQUIRES_LIST chip QRCode bt nvs_flash)
 
 if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build
@@ -81,7 +78,8 @@ idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
                        PRIV_REQUIRES ${PRIV_REQUIRES_LIST})
 
 include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
-chip_app_component_codegen("${CHIP_ROOT}/examples/temperature-measurement-app/esp32/main/temperature-measurement.matter")
+chip_app_component_codegen("${CHIP_ROOT}/examples/temperature-measurement-app/temperature-measurement-common/temperature-measurement.matter")
+chip_app_component_zapgen("${CHIP_ROOT}/examples/temperature-measurement-app/temperature-measurement-common/temperature-measurement.zap")
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")

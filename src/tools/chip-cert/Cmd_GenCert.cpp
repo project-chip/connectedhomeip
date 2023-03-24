@@ -1181,8 +1181,8 @@ bool Cmd_GenCert(int argc, char * argv[])
         uint32_t chipCertBufLen                = kMaxCHIPCertLength + gCertConfig.GetExtraCertLength();
         std::unique_ptr<uint8_t[]> chipCertBuf = std::unique_ptr<uint8_t[]>(new uint8_t[chipCertBufLen]);
         chip::MutableByteSpan chipCert(chipCertBuf.get(), chipCertBufLen);
-        err = MakeCertChipTLV(gCertType, &gSubjectDN, caCertPtr, caKeyPtr, gValidFrom, gValidDays, gPathLengthConstraint,
-                              gFutureExtensions, gFutureExtensionsCount, newCert.get(), newKey.get(), gCertConfig, chipCert);
+        err = MakeCertTLV(gCertType, &gSubjectDN, caCertPtr, caKeyPtr, gValidFrom, gValidDays, gPathLengthConstraint,
+                          gFutureExtensions, gFutureExtensionsCount, newCert.get(), newKey.get(), gCertConfig, chipCert);
         VerifyTrueOrExit(err == CHIP_NO_ERROR);
 
         res = WriteChipCert(gOutCertFileName, chipCert, gOutCertFormat);

@@ -19,7 +19,7 @@
 #include "LEDWidget.h"
 #include "PigweedLoggerMutex.h"
 #include "pigweed/RpcService.h"
-#include <kernel.h>
+#include <zephyr/kernel.h>
 
 #include "pw_rpc/echo_service_nanopb.h"
 #include "pw_sys_io/sys_io.h"
@@ -28,7 +28,7 @@
 #include <dk_buttons_and_leds.h>
 #include <zephyr/logging/log.h>
 
-LOG_MODULE_REGISTER(app, CONFIG_MATTER_LOG_LEVEL);
+LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
 LEDWidget sStatusLED;

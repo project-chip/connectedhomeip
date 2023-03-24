@@ -18,7 +18,6 @@
 	chosen {
 		nordic,pm-ext-flash = &mx25r64;
 	};
-
 };
 
 /* Disable unused peripherals to reduce power consumption */

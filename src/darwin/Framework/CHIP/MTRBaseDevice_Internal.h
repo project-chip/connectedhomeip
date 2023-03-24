@@ -22,6 +22,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/DeviceProxy.h>
+#include <app/EventLoggingTypes.h>
 
 @class MTRDeviceController;
 
@@ -99,8 +100,8 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 @interface MTREventReport ()
 - (instancetype)initWithPath:(const chip::app::ConcreteEventPath &)path
                  eventNumber:(NSNumber *)eventNumber
-                    priority:(NSNumber *)priority
-                   timestamp:(NSNumber *)timestamp
+                    priority:(chip::app::PriorityLevel)priority
+                   timestamp:(const chip::app::Timestamp &)timestamp
                        value:(id _Nullable)value
                        error:(NSError * _Nullable)error;
 @end

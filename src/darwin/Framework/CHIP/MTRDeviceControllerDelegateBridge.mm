@@ -51,9 +51,6 @@ MTRCommissioningStatus MTRDeviceControllerDelegateBridge::MapStatus(chip::Contro
     case chip::Controller::DevicePairingDelegate::Status::SecurePairingFailed:
         rv = MTRCommissioningStatusFailed;
         break;
-    case chip::Controller::DevicePairingDelegate::Status::SecurePairingDiscoveringMoreDevices:
-        rv = MTRCommissioningStatusDiscoveringMoreDevices;
-        break;
     }
     return rv;
 }

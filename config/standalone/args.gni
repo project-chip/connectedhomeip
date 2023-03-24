@@ -18,5 +18,5 @@ import("//build_overrides/chip.gni")
 # options are used from examples/.
 chip_build_tests = false
 
-pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/constraints.txt" ]
-pw_build_PIP_REQUIREMENTS = [ "${chip_root}/scripts/requirements.txt" ]
+pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/setup/constraints.txt" ]
+pw_build_PIP_REQUIREMENTS = [ "${chip_root}/scripts/setup/requirements.txt" ]

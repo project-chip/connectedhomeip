@@ -20,9 +20,9 @@
 
 #include <app/data-model/FabricScoped.h>
 #include <app/data-model/Nullable.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
+#include <lib/core/TLV.h>
 #include <protocols/interaction_model/Constants.h>
 
 #include <type_traits>

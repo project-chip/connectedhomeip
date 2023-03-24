@@ -18,15 +18,27 @@ import("${chip_root}/src/platform/device.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/third_party/silabs/silabs_board.gni")
 
 silabs_platform_dir = "${chip_root}/src/platform/silabs"
 
 assert(chip_device_platform == "SiWx917")
-
-if (chip_enable_openthread) {
-  import("//build_overrides/openthread.gni")
+if (chip_crypto == "platform") {
+  import("//build_overrides/mbedtls.gni")
 }
 
+config("siwx917-platform-wifi-config") {
+  include_dirs = [ "wifi" ]
+  defines = []
+
+  if (use_rs911x_sockets) {
+    include_dirs += [ "wifi/rsi-sockets" ]
+    defines += [
+      "RS911X_SOCKETS",
+      "RSI_IPV6_ENABLE",
+    ]
+  }
+}
 static_library("SiWx917") {
   sources = [
     "${silabs_platform_dir}/BLEManagerImpl.h",
@@ -40,8 +52,11 @@ static_library("SiWx917") {
     "${silabs_platform_dir}/DiagnosticDataProviderImpl.cpp",
     "${silabs_platform_dir}/DiagnosticDataProviderImpl.h",
     "${silabs_platform_dir}/InetPlatformConfig.h",
+    "${silabs_platform_dir}/KeyValueStoreManagerImpl.cpp",
     "${silabs_platform_dir}/KeyValueStoreManagerImpl.h",
     "${silabs_platform_dir}/Logging.cpp",
+    "${silabs_platform_dir}/MigrationManager.cpp",
+    "${silabs_platform_dir}/MigrationManager.h",
     "${silabs_platform_dir}/PlatformManagerImpl.h",
     "${silabs_platform_dir}/SilabsConfig.cpp",
     "${silabs_platform_dir}/SilabsConfig.h",
@@ -50,7 +65,6 @@ static_library("SiWx917") {
     "../../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "ConfigurationManagerImpl.cpp",
-    "KeyValueStoreManagerImpl.cpp",
     "PlatformManagerImpl.cpp",
     "bluetooth/rsi_ble_config.h",
     "bluetooth/wfx_sl_ble_init.c",
@@ -67,11 +81,22 @@ static_library("SiWx917") {
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
-  if (chip_enable_wifi) {
-    sources += [
-      "${silabs_platform_dir}/ConnectivityManagerImpl_WIFI.cpp",
-      "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.cpp",
-      "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.h",
+  # Add platform crypto implementation
+  if (chip_crypto == "platform") {
+    sources += [ "CHIPCryptoPALTinyCrypt.cpp" ]
+    public_deps += [
+      "${chip_root}/src/crypto",
+      "${mbedtls_root}:mbedtls",
     ]
   }
+
+  sources += [
+    "${silabs_platform_dir}/ConnectivityManagerImpl_WIFI.cpp",
+    "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.cpp",
+    "${silabs_platform_dir}/NetworkCommissioningWiFiDriver.h",
+    "wifi/wfx_host_events.h",
+    "wifi/wfx_msgs.h",
+    "wifi/wifi_config.h",
+  ]
+  public_configs = [ ":siwx917-platform-wifi-config" ]
 }

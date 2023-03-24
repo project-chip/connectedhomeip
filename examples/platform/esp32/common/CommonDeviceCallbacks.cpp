@@ -17,6 +17,7 @@
  */
 #include "CommonDeviceCallbacks.h"
 
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CONFIG_BT_ENABLED
 #include "esp_bt.h"
 #if CONFIG_BT_NIMBLE_ENABLED
@@ -26,12 +27,11 @@
 #include "nimble/nimble_port.h"
 #endif // CONFIG_BT_NIMBLE_ENABLED
 #endif // CONFIG_BT_ENABLED
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include "esp_err.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
-#include "route_hook/esp_route_hook.h"
-#include <app-common/zap-generated/attribute-id.h>
 #include <app/server/Dnssd.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
@@ -46,9 +46,6 @@ using namespace chip::DeviceLayer;
 using namespace chip::System;
 
 DeviceCallbacksDelegate * appDelegate = nullptr;
-#if CONFIG_ENABLE_OTA_REQUESTOR
-static bool isOTAInitialized = false;
-#endif
 
 void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -66,19 +63,20 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
         ESP_LOGI(TAG, "CHIPoBLE disconnected");
         break;
 
-    case DeviceEventType::kThreadConnectivityChange:
+    case DeviceEventType::kDnssdInitialized:
 #if CONFIG_ENABLE_OTA_REQUESTOR
-        if (event->ThreadConnectivityChange.Result == kConnectivity_Established && !isOTAInitialized)
-        {
-            OTAHelpers::Instance().InitOTARequestor();
-            isOTAInitialized = true;
-        }
+        OTAHelpers::Instance().InitOTARequestor();
 #endif
+        appDelegate = DeviceCallbacksDelegate::Instance().GetAppDelegate();
+        if (appDelegate != nullptr)
+        {
+            appDelegate->OnDnssdInitialized();
+        }
         break;
 
     case DeviceEventType::kCommissioningComplete: {
         ESP_LOGI(TAG, "Commissioning complete");
-#if CONFIG_BT_NIMBLE_ENABLED && CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE && CONFIG_BT_NIMBLE_ENABLED && CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING
 
         if (ble_hs_is_enabled())
         {
@@ -119,10 +117,6 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
             // newly selected address.
             chip::app::DnssdServer::Instance().StartServer();
         }
-        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
-        {
-            ESP_ERROR_CHECK(esp_route_hook_init(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF")));
-        }
         break;
     }
 
@@ -140,13 +134,6 @@ void CommonDeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent *
             appDelegate->OnIPv4ConnectivityEstablished();
         }
         chip::app::DnssdServer::Instance().StartServer();
-#if CONFIG_ENABLE_OTA_REQUESTOR
-        if (!isOTAInitialized)
-        {
-            OTAHelpers::Instance().InitOTARequestor();
-            isOTAInitialized = true;
-        }
-#endif
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -160,14 +147,6 @@ void CommonDeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent *
     {
         ESP_LOGI(TAG, "IPv6 Server ready...");
         chip::app::DnssdServer::Instance().StartServer();
-
-#if CONFIG_ENABLE_OTA_REQUESTOR
-        if (!isOTAInitialized)
-        {
-            OTAHelpers::Instance().InitOTARequestor();
-            isOTAInitialized = true;
-        }
-#endif
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {

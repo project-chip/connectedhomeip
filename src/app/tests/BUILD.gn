@@ -54,6 +54,18 @@ source_set("binding-test-srcs") {
   ]
 }
 
+source_set("client-monitoring-test-srcs") {
+  sources = [
+    "${chip_root}/src/app/util/ClientMonitoringRegistrationTable.cpp",
+    "${chip_root}/src/app/util/ClientMonitoringRegistrationTable.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
 source_set("ota-requestor-test-srcs") {
   sources = [
     "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorStorage.cpp",
@@ -77,12 +89,13 @@ chip_test_suite("tests") {
     "TestAttributeValueEncoder.cpp",
     "TestBindingTable.cpp",
     "TestBuilderParser.cpp",
+    "TestClientMonitoringRegistrationTable.cpp",
     "TestClusterInfo.cpp",
     "TestCommandInteraction.cpp",
     "TestCommandPathParams.cpp",
     "TestDataModelSerialization.cpp",
     "TestDefaultOTARequestorStorage.cpp",
-    "TestEventLogging.cpp",
+    "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
@@ -113,10 +126,19 @@ chip_test_suite("tests") {
     test_sources += [ "TestClusterStateCache.cpp" ]
   }
 
+  # On NRF and fake platforms we do not have a realtime clock available, so
+  # TestEventLogging.cpp would be testing the same thing as
+  # TestEventLoggingNoUTCTime, but it's not set up to deal with the timestamps
+  # being that low.
+  if (chip_device_platform != "nrfconnect" && chip_device_platform != "fake") {
+    test_sources += [ "TestEventLogging.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     ":binding-test-srcs",
+    ":client-monitoring-test-srcs",
     ":ota-requestor-test-srcs",
     "${chip_root}/src/app",
     "${chip_root}/src/app/common:cluster-objects",
@@ -131,5 +153,9 @@ chip_test_suite("tests") {
       (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
     test_sources += [ "TestCommissionManager.cpp" ]
     public_deps += [ "${chip_root}/src/app/server" ]
+  }
+
+  if (chip_persist_subscriptions) {
+    test_sources += [ "TestSimpleSubscriptionResumptionStorage.cpp" ]
   }
 }

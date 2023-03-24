@@ -34,9 +34,9 @@
 #include <app/WriteHandler.h>
 #include <app/data-model/Decode.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
+#include <lib/core/TLV.h>
 #include <protocols/interaction_model/Constants.h>
 
 /**

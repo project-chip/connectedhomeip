@@ -9,13 +9,13 @@ import shutil
 import tempfile
 import unittest
 
+import zap_file_parser
+
 try:
     import yaml
 except ImportError:
     print("Missing yaml library. Install with:\npip install pyyaml")
     exit(1)
-
-import zap_file_parser
 
 
 _HERE = os.path.abspath(os.path.dirname(__file__))

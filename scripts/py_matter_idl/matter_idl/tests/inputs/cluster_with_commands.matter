@@ -1,0 +1,44 @@
+
+server cluster OnOff = 6 {
+  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
+    kFadeToOffIn0p8Seconds = 0;
+    kNoFade = 1;
+    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
+  }
+
+  enum OnOffDyingLightEffectVariant : ENUM8 {
+    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
+  }
+
+  enum OnOffEffectIdentifier : ENUM8 {
+    kDelayedAllOff = 0;
+    kDyingLight = 1;
+  }
+
+  enum OnOffStartUpOnOff : ENUM8 {
+    kOff = 0;
+    kOn = 1;
+    kTogglePreviousOnOff = 2;
+  }
+
+  bitmap OnOffControl : BITMAP8 {
+    kAcceptOnlyWhenOn = 0x1;
+  }
+
+  bitmap OnOffFeature : BITMAP32 {
+    kLighting = 0x1;
+  }
+
+  bitmap SceneFeatures : BITMAP32 {
+    kSceneNames = 0x1;
+  }
+
+  readonly attribute boolean onOff = 0;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  command Off(): DefaultSuccess = 0;
+  command On(): DefaultSuccess = 1;
+  command Toggle(): DefaultSuccess = 2;
+}
+

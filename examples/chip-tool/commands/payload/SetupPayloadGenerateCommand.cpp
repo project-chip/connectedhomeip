@@ -17,7 +17,7 @@
  */
 
 #include "SetupPayloadGenerateCommand.h"
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -118,12 +118,12 @@ CHIP_ERROR SetupPayloadGenerateQRCodeCommand::PopulatePayloadTLVFromBytes(SetupP
 {
     // First clear out all the existing TVL bits from the payload.  Ignore
     // errors here, because we don't care if those bits are not present.
-    payload.removeSerialNumber();
+    (void) payload.removeSerialNumber();
 
     auto existingVendorData = payload.getAllOptionalVendorData();
     for (auto & data : existingVendorData)
     {
-        payload.removeOptionalVendorData(data.tag);
+        (void) payload.removeOptionalVendorData(data.tag);
     }
 
     if (tlvBytes.empty())

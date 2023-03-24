@@ -17,6 +17,7 @@ name: Build example - nRF Connect SDK
 on:
     push:
     pull_request:
+    merge_group:
 
 concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
@@ -37,7 +38,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.6.18
+            image: connectedhomeip/chip-build-nrf-platform:0.6.47
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -72,6 +73,15 @@ jobs:
               env:
                   GH_CONTEXT: ${{ toJson(github) }}
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -83,9 +93,10 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
-            - name: Update nRF Connect SDK revision to the currently recommended.
+
+            - name: Check nRF Connect SDK revision.
               timeout-minutes: 15
-              run: scripts/run_in_build_env.sh "python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow"
+              run: scripts/run_in_build_env.sh "python3 scripts/setup/nrfconnect/update_ncs.py --check"
             - name: Run unit tests of factory data generation script
               timeout-minutes: 15
               run: scripts/run_in_build_env.sh "./scripts/tools/nrfconnect/tests/test_generate_factory_data.py"
@@ -231,7 +242,7 @@ jobs:
                     examples/all-clusters-app/nrfconnect/build/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Run unit tests for Zephyr native_posix_64 platform
-              if: github.event_name == 'push' || steps.changed_paths.outputs.tests == 'true'
+              if: github.event_name == 'push' || steps.changed_paths.outputs.tests == 'true' || steps.changed_paths.outputs.nrfconnect == 'true'
               timeout-minutes: 15
               run: |
                   scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target nrf-native-posix-64-tests build"

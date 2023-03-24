@@ -9,6 +9,7 @@
 #import "MTRCluster_Internal.h"
 #import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRCommandPayloadsObjc.h"
+#import "MTRDevice_Internal.h"
 #import "MTRStructsObjc.h"
 
 #include <lib/support/CHIPListUtils.h>
@@ -20,9 +21,13 @@ using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
 using chip::Messaging::ExchangeManager;
 using chip::SessionHandle;
+using chip::Optional;
+using chip::System::Clock::Timeout;
+using chip::System::Clock::Seconds16;
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 {{#chip_client_clusters includeAll=true}}
+{{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
 @implementation MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
 - (instancetype)initWithDevice:(MTRBaseDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
@@ -79,12 +84,20 @@ MTR{{cluster}}Cluster{{command}}Params
       {{/if}}
       ^(ExchangeManager & exchangeManager, const SessionHandle & session, {{>callbackName}}CallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
         auto * typedBridge = static_cast<MTR{{>callbackName}}CallbackBridge *>(bridge);
-        chip::Optional<uint16_t> timedInvokeTimeoutMs;
+        Optional<uint16_t> timedInvokeTimeoutMs;
+        Optional<Timeout> invokeTimeout;
         ListFreer listFreer;
         {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
         if (params != nil) {
           if (params.timedInvokeTimeoutMs != nil) {
+            params.timedInvokeTimeoutMs = MTRClampedNumber(params.timedInvokeTimeoutMs, @(1), @(UINT16_MAX));
             timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+          }
+          if (params.serverSideProcessingTimeout != nil) {
+            // Clamp to a number of seconds that will not overflow 32-bit
+            // int when converted to ms.
+            auto * serverSideProcessingTimeout = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+            invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
           }
         }
         {{#if mustUseTimedInvoke}}
@@ -106,7 +119,7 @@ MTR{{cluster}}Cluster{{command}}Params
           {{/last}}
         {{/chip_cluster_command_arguments}}
 
-        return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb, self->_endpoint, timedInvokeTimeoutMs);
+        return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb, self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
     });
     std::move(*bridge).DispatchAction(self.device);
 }
@@ -116,7 +129,11 @@ MTR{{cluster}}Cluster{{command}}Params
                 command=(asUpperCamelCase name preserveAcronyms=true)}}
 {{/chip_cluster_commands}}
 
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server removeKeys='isOptional'}}
+{{! This is used as the implementation for both the new-name and old-name bits, so check for both here. }}
+{{#unless (and (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))
+               (or (wasRemoved (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
+                   (not wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))))}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (void)read{{>attribute}}With
 {{~#if_is_fabric_scoped_struct type~}}
@@ -214,15 +231,21 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 }
 
 {{/if}}
-{{/chip_server_cluster_attributes}}
+{{/unless}}
+{{/zcl_attributes_server}}
 
 @end
+{{/unless}}
 {{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
+{{#unless (wasRemoved (compatClusterNameRemapping name))}}
 
 @implementation MTRBaseCluster{{compatClusterNameRemapping name}}
 @end
 {{/unless}}
+{{/unless}}
 
+{{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name))
+           (not (wasRemoved (compatClusterNameRemapping name))))}}
 @implementation MTRBaseCluster{{compatClusterNameRemapping name}} (Deprecated)
 
 {{#chip_cluster_commands}}
@@ -245,7 +268,7 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 {{#unless (hasArguments)}}
 - (void){{asLowerCamelCase command}}WithCompletionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
 {
-  [self {{asLowerCamelCase name}}WithParams:nil completionHandler:completionHandler];
+  [self {{asLowerCamelCase command}}WithParams:nil completionHandler:completionHandler];
 }
 {{/unless}}
 {{/unless}}
@@ -254,8 +277,9 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
                 command=(compatCommandNameRemapping parent.name name)}}
 {{/chip_cluster_commands}}
 
-{{#chip_server_cluster_attributes}}
-{{#if (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))}}
+{{#zcl_attributes_server removeKeys='isOptional'}}
+{{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
+           (not (wasRemoved (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))))}}
 {{#*inline "attribute"}}Attribute{{compatAttributeNameRemapping parent.name name}}{{/inline}}
 - (void)read{{>attribute}}With
 {{~#if_is_fabric_scoped_struct type~}}
@@ -309,7 +333,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 }
 {{/if}}
 {{/if}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 
 - (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
                                endpoint:(uint16_t)endpoint
@@ -319,6 +343,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 }
 
 @end
+{{/if}}
 
 {{/chip_client_clusters}}
 

@@ -13,16 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
+import logging
 import re
-from packaging import version
 from time import sleep
 
+import pytest
+from chip import ChipDeviceCtrl, exceptions
 from chip.setup_payload import SetupPayload
-from chip import exceptions
-from chip import ChipDeviceCtrl
 from common.utils import *
-import logging
+from packaging import version
+
 log = logging.getLogger(__name__)
 
 BLE_DEVICE_NAME = "MBED-shell"

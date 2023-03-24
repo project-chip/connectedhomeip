@@ -90,33 +90,29 @@ RgbColor_t XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY)
     float X, Y, Z;
     float r, g, b;
 
-    x = ((float) currentX) / 65535.0f;
-    y = ((float) currentY) / 65535.0f;
+    x = (static_cast<float>(currentX)) / 65535.0f;
+    y = (static_cast<float>(currentY)) / 65535.0f;
 
     z = 1.0f - x - y;
 
     // Calculate XYZ values
 
     // Y - given brightness in 0 - 1 range
-    Y = ((float) Level) / 254.0f;
+    Y = (static_cast<float>(Level)) / 254.0f;
     X = (Y / y) * x;
     Z = (Y / y) * z;
 
     // X, Y and Z input refer to a D65/2° standard illuminant.
     // sR, sG and sB (standard RGB) output range = 0 ÷ 255
     // convert XYZ to RGB - CIE XYZ to sRGB
-    X = X / 100.0f;
-    Y = Y / 100.0f;
-    Z = Z / 100.0f;
-
-    r = (X * 3.2406f) - (Y * 1.5372f) - (Z * 0.4986f);
-    g = -(X * 0.9689f) + (Y * 1.8758f) + (Z * 0.0415f);
-    b = (X * 0.0557f) - (Y * 0.2040f) + (Z * 1.0570f);
+    r = (X * 3.2410f) - (Y * 1.5374f) - (Z * 0.4986f);
+    g = -(X * 0.9692f) + (Y * 1.8760f) + (Z * 0.0416f);
+    b = (X * 0.0556f) - (Y * 0.2040f) + (Z * 1.0570f);
 
     // apply gamma 2.2 correction
-    r = (r <= 0.0031308f ? 12.92f * r : (1.055f) * pow(r, (1.0f / 2.4f)) - 0.055f);
-    g = (g <= 0.0031308f ? 12.92f * g : (1.055f) * pow(g, (1.0f / 2.4f)) - 0.055f);
-    b = (b <= 0.0031308f ? 12.92f * b : (1.055f) * pow(b, (1.0f / 2.4f)) - 0.055f);
+    r = (r <= 0.00304f ? 12.92f * r : (1.055f) * pow(r, (1.0f / 2.4f)) - 0.055f);
+    g = (g <= 0.00304f ? 12.92f * g : (1.055f) * pow(g, (1.0f / 2.4f)) - 0.055f);
+    b = (b <= 0.00304f ? 12.92f * b : (1.055f) * pow(b, (1.0f / 2.4f)) - 0.055f);
 
     // Round off
     r = clamp(r, 0, 1);
@@ -139,7 +135,7 @@ RgbColor_t CTToRgb(CtColor_t ct)
     // Algorithm credits to Tanner Helland: https://tannerhelland.com/2012/09/18/convert-temperature-rgb-algorithm-code.html
 
     // Convert Mireds to centiKelvins. k = 1,000,000/mired
-    float ctCentiKelvin = 10000 / ct.ctMireds;
+    float ctCentiKelvin = 10000 / static_cast<float>(ct.ctMireds);
 
     // Red
     if (ctCentiKelvin <= 66)
@@ -174,7 +170,7 @@ RgbColor_t CTToRgb(CtColor_t ct)
         }
         else
         {
-            b = 138.5177312231 * log(ctCentiKelvin - 10) - 305.0447927307;
+            b = 138.5177312231f * log(ctCentiKelvin - 10) - 305.0447927307f;
         }
     }
     rgb.r = (uint8_t) clamp(r, 0, 255);

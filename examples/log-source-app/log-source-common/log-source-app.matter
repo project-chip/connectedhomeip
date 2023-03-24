@@ -2,10 +2,18 @@
 // It is for view/code review purposes only.
 
 server cluster AccessControl = 31 {
-  enum AuthMode : ENUM8 {
+  enum AccessControlEntryAuthModeEnum : ENUM8 {
     kPase = 1;
     kCase = 2;
     kGroup = 3;
+  }
+
+  enum AccessControlEntryPrivilegeEnum : ENUM8 {
+    kView = 1;
+    kProxyView = 2;
+    kOperate = 3;
+    kManage = 4;
+    kAdminister = 5;
   }
 
   enum ChangeTypeEnum : ENUM8 {
@@ -14,17 +22,9 @@ server cluster AccessControl = 31 {
     kRemoved = 2;
   }
 
-  enum Privilege : ENUM8 {
-    kView = 1;
-    kProxyView = 2;
-    kOperate = 3;
-    kManage = 4;
-    kAdminister = 5;
-  }
-
-  fabric_scoped struct AccessControlEntry {
-    fabric_sensitive Privilege privilege = 1;
-    fabric_sensitive AuthMode authMode = 2;
+  fabric_scoped struct AccessControlEntryStruct {
+    fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
+    fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
     nullable fabric_sensitive int64u subjects[] = 3;
     nullable fabric_sensitive Target targets[] = 4;
     fabric_idx fabricIndex = 254;
@@ -36,7 +36,7 @@ server cluster AccessControl = 31 {
     nullable devtype_id deviceType = 2;
   }
 
-  fabric_scoped struct ExtensionEntry {
+  fabric_scoped struct AccessControlExtensionStruct {
     fabric_sensitive octet_string<128> data = 1;
     fabric_idx fabricIndex = 254;
   }
@@ -45,7 +45,7 @@ server cluster AccessControl = 31 {
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
-    nullable AccessControlEntry latestValue = 4;
+    nullable AccessControlEntryStruct latestValue = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -53,15 +53,18 @@ server cluster AccessControl = 31 {
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
-    nullable ExtensionEntry latestValue = 4;
+    nullable AccessControlExtensionStruct latestValue = 4;
     fabric_idx fabricIndex = 254;
   }
 
-  attribute access(read: administer, write: administer) AccessControlEntry acl[] = 0;
-  attribute access(read: administer, write: administer) ExtensionEntry extension[] = 1;
+  attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
+  attribute access(read: administer, write: administer) AccessControlExtensionStruct extension[] = 1;
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
   readonly attribute int16u targetsPerAccessControlEntry = 3;
   readonly attribute int16u accessControlEntriesPerFabric = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
@@ -90,6 +93,10 @@ server cluster GeneralCommissioning = 48 {
   attribute access(write: administer) int64u breadcrumb = 0;
   readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute boolean supportsConcurrentConnection = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -157,7 +164,7 @@ server cluster NetworkCommissioning = 49 {
 
   bitmap WiFiSecurity : BITMAP8 {
     kUnencrypted = 0x1;
-    kWepPersonal = 0x2;
+    kWep = 0x2;
     kWpaPersonal = 0x4;
     kWpa2Personal = 0x8;
     kWpa3Personal = 0x10;
@@ -183,6 +190,10 @@ server cluster NetworkCommissioning = 49 {
     int8u lqi = 7;
   }
 
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -246,13 +257,13 @@ server cluster NetworkCommissioning = 49 {
 }
 
 client cluster DiagnosticLogs = 50 {
-  enum LogsIntent : ENUM8 {
+  enum IntentEnum : ENUM8 {
     kEndUserSupport = 0;
     kNetworkDiag = 1;
     kCrashLogs = 2;
   }
 
-  enum LogsStatus : ENUM8 {
+  enum StatusEnum : ENUM8 {
     kSuccess = 0;
     kExhausted = 1;
     kNoLogs = 2;
@@ -260,23 +271,27 @@ client cluster DiagnosticLogs = 50 {
     kDenied = 4;
   }
 
-  enum LogsTransferProtocol : ENUM8 {
+  enum TransferProtocolEnum : ENUM8 {
     kResponsePayload = 0;
     kBdx = 1;
   }
 
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 }
 
 server cluster DiagnosticLogs = 50 {
-  enum LogsIntent : ENUM8 {
+  enum IntentEnum : ENUM8 {
     kEndUserSupport = 0;
     kNetworkDiag = 1;
     kCrashLogs = 2;
   }
 
-  enum LogsStatus : ENUM8 {
+  enum StatusEnum : ENUM8 {
     kSuccess = 0;
     kExhausted = 1;
     kNoLogs = 2;
@@ -284,33 +299,42 @@ server cluster DiagnosticLogs = 50 {
     kDenied = 4;
   }
 
-  enum LogsTransferProtocol : ENUM8 {
+  enum TransferProtocolEnum : ENUM8 {
     kResponsePayload = 0;
     kBdx = 1;
   }
 
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
   request struct RetrieveLogsRequestRequest {
-    LogsIntent intent = 0;
-    LogsTransferProtocol requestedProtocol = 1;
-    OCTET_STRING<32> transferFileDesignator = 2;
+    IntentEnum intent = 0;
+    TransferProtocolEnum requestedProtocol = 1;
+    optional CHAR_STRING<32> transferFileDesignator = 2;
   }
 
   response struct RetrieveLogsResponse = 1 {
-    LogsStatus status = 0;
-    OCTET_STRING content = 1;
-    epoch_s timeStamp = 2;
-    INT32U timeSinceBoot = 3;
+    StatusEnum status = 0;
+    LONG_OCTET_STRING logContent = 1;
+    optional epoch_us UTCTimeStamp = 2;
+    optional systime_us timeSinceBoot = 3;
   }
 
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
 }
 
 server cluster OperationalCredentials = 62 {
-  enum OperationalCertStatus : ENUM8 {
-    kSuccess = 0;
+  enum CertificateChainTypeEnum : ENUM8 {
+    kDACCertificate = 1;
+    kPAICertificate = 2;
+  }
+
+  enum NodeOperationalCertStatusEnum : ENUM8 {
+    kOk = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
     kInvalidNOC = 3;
@@ -322,19 +346,23 @@ server cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
-  fabric_scoped struct FabricDescriptor {
+  fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
-    vendor_id vendorId = 2;
-    fabric_id fabricId = 3;
-    node_id nodeId = 4;
+    vendor_id vendorID = 2;
+    fabric_id fabricID = 3;
+    node_id nodeID = 4;
     char_string<32> label = 5;
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute FabricDescriptor fabrics[] = 1;
+  readonly attribute FabricDescriptorStruct fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
@@ -343,7 +371,7 @@ server cluster OperationalCredentials = 62 {
   }
 
   request struct CertificateChainRequestRequest {
-    INT8U certificateType = 0;
+    CertificateChainTypeEnum certificateType = 0;
   }
 
   request struct CSRRequestRequest {
@@ -368,12 +396,12 @@ server cluster OperationalCredentials = 62 {
   }
 
   request struct AddTrustedRootCertificateRequest {
-    OCTET_STRING rootCertificate = 0;
+    OCTET_STRING rootCACertificate = 0;
   }
 
   response struct AttestationResponse = 1 {
     OCTET_STRING attestationElements = 0;
-    OCTET_STRING signature = 1;
+    OCTET_STRING attestationSignature = 1;
   }
 
   response struct CertificateChainResponse = 3 {
@@ -386,7 +414,7 @@ server cluster OperationalCredentials = 62 {
   }
 
   response struct NOCResponse = 8 {
-    OperationalCertStatus statusCode = 0;
+    NodeOperationalCertStatusEnum statusCode = 0;
     optional fabric_idx fabricIndex = 1;
     optional CHAR_STRING debugText = 2;
   }
@@ -404,11 +432,13 @@ endpoint 0 {
   binding cluster DiagnosticLogs;
 
   server cluster AccessControl {
+    emits event AccessControlEntryChanged;
+    emits event AccessControlExtensionChanged;
     callback attribute acl;
     callback attribute extension;
     callback attribute subjectsPerAccessControlEntry default = 4;
     callback attribute targetsPerAccessControlEntry default = 3;
-    callback attribute accessControlEntriesPerFabric default = 3;
+    callback attribute accessControlEntriesPerFabric default = 4;
     callback attribute attributeList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;

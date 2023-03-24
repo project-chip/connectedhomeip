@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from chip_mobly import pigweed_device
-from mobly import asserts
-from mobly import base_test
-from mobly import test_runner
 import time
+
+from chip_mobly import pigweed_device
+from mobly import asserts, base_test, test_runner
 
 
 class PigweedEchoTest(base_test.BaseTestClass):

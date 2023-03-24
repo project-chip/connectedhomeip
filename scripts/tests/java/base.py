@@ -17,17 +17,15 @@
 #    limitations under the License.
 #
 
-# Commissioning test.
-import logging
-import os
-import sys
-import queue
 import datetime
-import asyncio
-import threading
-import typing
-import time
+# Commissioning test.
+import queue
 import subprocess
+import sys
+import threading
+import time
+import typing
+
 from colorama import Fore, Style
 
 
@@ -38,7 +36,7 @@ def EnqueueLogOutput(fp, tag, q):
             try:
                 timestamp = float(line[1:18].decode())
                 line = line[19:]
-            except Exception as ex:
+            except Exception:
                 pass
         sys.stdout.buffer.write(
             (f"[{datetime.datetime.fromtimestamp(timestamp).isoformat(sep=' ')}]").encode() + tag + line)

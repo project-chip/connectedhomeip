@@ -984,6 +984,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
+ *
+ * @brief Defines the number of "endpoint->controlling group" mappings per fabric.
+ *
+ * Binds to number of GroupMapping entries per fabric
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
+#define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 1
+#endif
+
+/**
  * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
  *
  * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
@@ -991,7 +1002,11 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * Binds to number of GroupState entries to support per fabric
  */
 #ifndef CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
-#define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC 3
+#define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC (4 * CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC)
+#endif
+
+#if CHIP_CONFIG_MAX_GROUPS_PER_FABRIC < (4 * CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC)
+#error "Please ensure CHIP_CONFIG_MAX_GROUPS_PER_FABRIC meets minimum requirements. See Group Limits in the specification."
 #endif
 
 /**
@@ -1007,17 +1022,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 
 #if CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC < 1
 #error "Please ensure CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC > 0 to support at least the IPK."
-#endif
-
-/**
- * @def CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
- *
- * @brief Defines the number of "endpoint->controlling group" mappings per fabric.
- *
- * Binds to number of GroupMapping entries per fabric
- */
-#ifndef CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
-#define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 1
 #endif
 
 /**
@@ -1047,7 +1051,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * example access control code.
  */
 #ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC
-#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC 3
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC 4
 #endif
 
 /**
@@ -1168,6 +1172,19 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 #define CHIP_CONFIG_ENABLE_SERVER_IM_EVENT 1
 #endif
+
+/**
+ * Accepts receipt of invalid privacy flag usage that affected some early SVE2 test event implementations.
+ * When SVE2 started, group messages would be sent with the privacy flag enabled, but without privacy encrypting the message header.
+ * The issue was subsequently corrected in master, the 1.0 branch, and the SVE2 branch.
+ * This is a temporary workaround for interoperability with those erroneous early-SVE2 implementations.
+ * The cost of this compatibity mode is twice as many decryption steps per received group message.
+ *
+ * TODO(#24573): Remove this workaround once interoperability with legacy pre-SVE2 is no longer required.
+ */
+#ifndef CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
+#define CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2 1
+#endif // CHIP_CONFIG_PRIVACY_ACCEPT_NONSPEC_SVE2
 
 /**
  *  @def CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS
@@ -1336,6 +1353,18 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC
 #define CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC 1
 #endif // CHIP_CONFIG_MAX_CLIENT_REG_PER_FABRIC
+
 /**
  * @}
  */
+
+/**
+ * @def CHIP_CONFIG_MAX_SUBSCRIPTION_RESUMPTION_STORAGE_CONCURRENT_ITERATORS
+ *
+ * @brief Defines the number of simultaneous subscription resumption iterators that can be allocated
+ *
+ * Number of iterator instances that can be allocated at any one time
+ */
+#ifndef CHIP_CONFIG_MAX_SUBSCRIPTION_RESUMPTION_STORAGE_CONCURRENT_ITERATORS
+#define CHIP_CONFIG_MAX_SUBSCRIPTION_RESUMPTION_STORAGE_CONCURRENT_ITERATORS 2
+#endif

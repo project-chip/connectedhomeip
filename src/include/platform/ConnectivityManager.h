@@ -224,7 +224,7 @@ public:
      *
      * @param[in]  onOff  true if active mode should be enabled and false otherwise.
      */
-    CHIP_ERROR RequestSEDActiveMode(bool onOff);
+    CHIP_ERROR RequestSEDActiveMode(bool onOff, bool delayIdle = false);
 #endif
 
     // CHIPoBLE service methods
@@ -480,9 +480,9 @@ inline CHIP_ERROR ConnectivityManager::SetSEDIntervalsConfig(const SEDIntervalsC
     return static_cast<ImplClass *>(this)->_SetSEDIntervalsConfig(intervalsConfig);
 }
 
-inline CHIP_ERROR ConnectivityManager::RequestSEDActiveMode(bool onOff)
+inline CHIP_ERROR ConnectivityManager::RequestSEDActiveMode(bool onOff, bool delayIdle)
 {
-    return static_cast<ImplClass *>(this)->_RequestSEDActiveMode(onOff);
+    return static_cast<ImplClass *>(this)->_RequestSEDActiveMode(onOff, delayIdle);
 }
 #endif
 

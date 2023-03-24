@@ -12,9 +12,7 @@ import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
-import kotlinx.android.synthetic.main.op_cred_client_fragment.opCredClusterCommandStatus
-import kotlinx.android.synthetic.main.op_cred_client_fragment.view.readCommissionedFabricBtn
-import kotlinx.android.synthetic.main.op_cred_client_fragment.view.readSupportedFabricBtn
+import com.google.chip.chiptool.databinding.OpCredClientFragmentBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -26,22 +24,31 @@ class OpCredClientFragment : Fragment() {
 
   private lateinit var addressUpdateFragment: AddressUpdateFragment
 
+  private var _binding: OpCredClientFragmentBinding? = null
+  private val binding get() = _binding!!
+
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
+    _binding = OpCredClientFragmentBinding.inflate(inflater, container, false)
     scope = viewLifecycleOwner.lifecycleScope
 
-    return inflater.inflate(R.layout.op_cred_client_fragment, container, false).apply {
-      deviceController.setCompletionListener(ChipControllerCallback())
+    deviceController.setCompletionListener(ChipControllerCallback())
 
-      addressUpdateFragment =
-        childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
+    addressUpdateFragment =
+      childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
 
-      readSupportedFabricBtn.setOnClickListener { scope.launch { sendReadOpCredSupportedFabricAttrClick() } }
-      readCommissionedFabricBtn.setOnClickListener { scope.launch { sendReadOpCredCommissionedFabricAttrClick() } }
-    }
+    binding.readSupportedFabricBtn.setOnClickListener { scope.launch { sendReadOpCredSupportedFabricAttrClick() } }
+    binding.readCommissionedFabricBtn.setOnClickListener { scope.launch { sendReadOpCredCommissionedFabricAttrClick() } }
+
+    return binding.root
+  }
+
+  override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
   }
 
   inner class ChipControllerCallback : GenericChipDeviceListener() {
@@ -92,7 +99,7 @@ class OpCredClientFragment : Fragment() {
 
   private fun showMessage(msg: String) {
     requireActivity().runOnUiThread {
-      opCredClusterCommandStatus.text = msg
+      binding.opCredClusterCommandStatus.text = msg
     }
   }
 

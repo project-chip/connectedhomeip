@@ -65,7 +65,7 @@ buildconfig_header("rtt_buildconfig") {
   }
   if (segger_rtt_max_num_down_buffers != -1) {
     defines +=
-        [ "SEGGER_RTT_MAX_NUM_UP_BUFFERS=${segger_rtt_max_num_down_buffers}" ]
+        [ "SEGGER_RTT_MAX_NUM_DOWN_BUFFERS=${segger_rtt_max_num_down_buffers}" ]
   }
   if (segger_rtt_mode_default != -1) {
     defines += [ "SEGGER_RTT_MODE_DEFAULT=${segger_rtt_mode_default}" ]

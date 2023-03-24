@@ -45,8 +45,8 @@
 #endif
 
 #include <dk_buttons_and_leds.h>
+#include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
-#include <zephyr/zephyr.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -185,7 +185,7 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize DFU
 #ifdef CONFIG_MCUMGR_SMP_BT
-    GetDFUOverSMP().Init(RequestSMPAdvertisingStart);
+    GetDFUOverSMP().Init();
     GetDFUOverSMP().ConfirmNewImage();
 #endif
 
@@ -451,7 +451,7 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
         UpdateStatusLED();
         break;
 #if defined(CONFIG_NET_L2_OPENTHREAD)
-    case DeviceEventType::kDnssdPlatformInitialized:
+    case DeviceEventType::kDnssdInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
         InitBasicOTARequestor();
 #endif // CONFIG_CHIP_OTA_REQUESTOR
@@ -645,16 +645,6 @@ void AppTask::FunctionTimerTimeoutCallback(k_timer * timer)
         PostEvent(event);
     }
 }
-
-#ifdef CONFIG_MCUMGR_SMP_BT
-void AppTask::RequestSMPAdvertisingStart(void)
-{
-    AppEvent event;
-    event.Type    = AppEventType::StartSMPAdvertising;
-    event.Handler = [](const AppEvent &) { GetDFUOverSMP().StartBLEAdvertising(); };
-    PostEvent(event);
-}
-#endif
 
 void AppTask::PostEvent(const AppEvent & event)
 {

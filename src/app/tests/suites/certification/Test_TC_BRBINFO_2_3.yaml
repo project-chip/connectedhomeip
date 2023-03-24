@@ -15,6 +15,9 @@
 
 name: 3.2.3. [TC-BRBINFO-2.3] Attributes [DUT-Client]
 
+PICS:
+    - BRBINFO.C
+
 config:
     nodeId: 0x12344321
     cluster: "Basic Information"
@@ -34,7 +37,7 @@ tests:
     - label: "DUT reads VendorName from the TH"
       PICS: BRBINFO.C.A0001
       verification: |
-          ./chip-tool bridgeddevicebasic read vendor-name 1 3
+          ./chip-tool bridgeddevicebasicinformation read vendor-name 1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -61,7 +64,7 @@ tests:
     - label: "DUT reads VendorID from the TH"
       PICS: BRBINFO.C.A0002
       verification: |
-          ./chip-tool bridgeddevicebasic read vendor-id 1 3
+          ./chip-tool bridgeddevicebasicinformation read vendor-id 1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -69,19 +72,19 @@ tests:
           [1662483142.830377][6721:6721] CHIP:IM: Received Read request
           [1662483142.830459][6721:6721] CHIP:DMG: ReadRequestMessage =
           [1662483142.830487][6721:6721] CHIP:DMG: {
-          [1662483142.830510][6721:6721] CHIP:DMG: 	AttributePathIBs =
-          [1662483142.830553][6721:6721] CHIP:DMG: 	[
-          [1662483142.830578][6721:6721] CHIP:DMG: 		AttributePathIB =
-          [1662483142.830616][6721:6721] CHIP:DMG: 		{
-          [1662483142.830650][6721:6721] CHIP:DMG: 			Endpoint = 0x3,
-          [1662483142.830690][6721:6721] CHIP:DMG: 			Cluster = 0x39,
-          [1662483142.830728][6721:6721] CHIP:DMG: 			Attribute = 0x0000_0002,
-          [1662483142.830756][6721:6721] CHIP:DMG: 		}
+          [1662483142.830510][6721:6721] CHIP:DMG:         AttributePathIBs =
+          [1662483142.830553][6721:6721] CHIP:DMG:         [
+          [1662483142.830578][6721:6721] CHIP:DMG:                 AttributePathIB =
+          [1662483142.830616][6721:6721] CHIP:DMG:                 {
+          [1662483142.830650][6721:6721] CHIP:DMG:                         Endpoint = 0x3,
+          [1662483142.830690][6721:6721] CHIP:DMG:                         Cluster = 0x39,
+          [1662483142.830728][6721:6721] CHIP:DMG:                         Attribute = 0x0000_0002,
+          [1662483142.830756][6721:6721] CHIP:DMG:                 }
           [1662483142.830792][6721:6721] CHIP:DMG:
-          [1662483142.830818][6721:6721] CHIP:DMG: 	],
+          [1662483142.830818][6721:6721] CHIP:DMG:         ],
           [1662483142.830856][6721:6721] CHIP:DMG:
-          [1662483142.830883][6721:6721] CHIP:DMG: 	isFabricFiltered = true,
-          [1662483142.830916][6721:6721] CHIP:DMG: 	InteractionModelRevision = 1
+          [1662483142.830883][6721:6721] CHIP:DMG:         isFabricFiltered = true,
+          [1662483142.830916][6721:6721] CHIP:DMG:         InteractionModelRevision = 1
           [1662483142.830940][6721:6721] CHIP:DMG: },
           [1662483142.831024][6721:6721] CHIP:DMG: IM RH moving to [GeneratingReports]
       disabled: true
@@ -89,7 +92,7 @@ tests:
     - label: "DUT reads ProductName from the TH"
       PICS: BRBINFO.C.A0003
       verification: |
-          ./chip-tool bridgeddevicebasic read product-name 1 3
+          ./chip-tool bridgeddevicebasicinformation read product-name 1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -119,49 +122,37 @@ tests:
     - label: "DUT reads NodeLabel from the TH"
       PICS: BRBINFO.C.A0005
       verification: |
-          ./chip-tool bridgeddevicebasic read node-label 1 3
+          ./chip-tool bridgeddevicebasicinformation read node-label 1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
           Example Log:
-          [1662483190.104331][6721:6721] CHIP:IM: Received Read request
-          [1662483190.104408][6721:6721] CHIP:DMG: ReadRequestMessage =
-          [1662483190.104434][6721:6721] CHIP:DMG: {
-          [1662483190.104455][6721:6721] CHIP:DMG:         AttributePathIBs =
-          [1662483190.104481][6721:6721] CHIP:DMG:         [
-          [1662483190.104505][6721:6721] CHIP:DMG:                 AttributePathIB =
-          [1662483190.104534][6721:6721] CHIP:DMG:                 {
-          [1662483190.104562][6721:6721] CHIP:DMG:                         Endpoint = 0x3,
-          [1662483190.104592][6721:6721] CHIP:DMG:                         Cluster = 0x39,
-          [1662483190.104623][6721:6721] CHIP:DMG:                         Attribute = 0x0000_0005,
-          [1662483190.104650][6721:6721] CHIP:DMG:                 }
-          [1662483190.104678][6721:6721] CHIP:DMG:
-          [1662483190.104702][6721:6721] CHIP:DMG:         ],
-          [1662483190.104730][6721:6721] CHIP:DMG:
-          [1662483190.104755][6721:6721] CHIP:DMG:         isFabricFiltered = true,
-          [1662483190.104780][6721:6721] CHIP:DMG:         InteractionModelRevision = 1
-          [1662483190.104803][6721:6721] CHIP:DMG: },
-          [1662483190.104875][6721:6721] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1662483190.104951][6721:6721] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-          [1662483190.104979][6721:6721] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
-      disabled: true
-
-    - label: "DUT reads Location from the TH"
-      PICS: BRBINFO.C.A0006
-      verification: |
-          ./chip-tool bridgeddevicebasic read location 1 3
-
-          Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
-
-
-
-          chip-tool needs to be implemented
+          [1678082556.298595][4469:4469] CHIP:IM: Received Read request
+          [1678082556.298708][4469:4469] CHIP:DMG: ReadRequestMessage =
+          [1678082556.298741][4469:4469] CHIP:DMG: {
+          [1678082556.298765][4469:4469] CHIP:DMG:         AttributePathIBs =
+          [1678082556.298807][4469:4469] CHIP:DMG:         [
+          [1678082556.298834][4469:4469] CHIP:DMG:                 AttributePathIB =
+          [1678082556.298867][4469:4469] CHIP:DMG:                 {
+          [1678082556.298899][4469:4469] CHIP:DMG:                         Endpoint = 0x3,
+          [1678082556.298933][4469:4469] CHIP:DMG:                         Cluster = 0x39,
+          [1678082556.298966][4469:4469] CHIP:DMG:                         Attribute = 0x0000_0005,
+          [1678082556.298998][4469:4469] CHIP:DMG:                 }
+          [1678082556.299030][4469:4469] CHIP:DMG:
+          [1678082556.299059][4469:4469] CHIP:DMG:         ],
+          [1678082556.299089][4469:4469] CHIP:DMG:
+          [1678082556.299118][4469:4469] CHIP:DMG:         isFabricFiltered = true,
+          [1678082556.299145][4469:4469] CHIP:DMG:         InteractionModelRevision = 1
+          [1678082556.299171][4469:4469] CHIP:DMG: },
+          [1678082556.299247][4469:4469] CHIP:DMG: IM RH moving to [GeneratingReports]
+          [1678082556.299380][4469:4469] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
+          [1678082556.299413][4469:4469] CHIP:DMG: <RE:Run> Cluster 39, Attribute 5 is dirty
       disabled: true
 
     - label: "DUT reads HardwareVersion from the TH"
       PICS: BRBINFO.C.A0007
       verification: |
-          ./chip-tool bridgeddevicebasic read  hardware-version 1 3
+          ./chip-tool bridgeddevicebasicinformation read  hardware-version 1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -190,7 +181,7 @@ tests:
     - label: "DUT reads HardwareVersionString from the TH"
       PICS: BRBINFO.C.A0008
       verification: |
-          ./chip-tool bridgeddevicebasic read  hardware-version-string 1 3
+          ./chip-tool bridgeddevicebasicinformation read  hardware-version-string 1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -221,7 +212,7 @@ tests:
     - label: "DUT reads SoftwareVersion from the TH"
       PICS: BRBINFO.C.A0009
       verification: |
-          ./chip-tool bridgeddevicebasic read software-version 1 3
+          ./chip-tool bridgeddevicebasicinformation read software-version 1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -252,7 +243,7 @@ tests:
     - label: "DUT reads SoftwareVersionString from the TH"
       PICS: BRBINFO.C.A000a
       verification: |
-          ./chip-tool bridgeddevicebasic read software-version-string 1 3
+          ./chip-tool bridgeddevicebasicinformation read software-version-string 1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -283,7 +274,7 @@ tests:
     - label: "DUT reads ManufacturingDate from the TH"
       PICS: BRBINFO.C.A000b
       verification: |
-          ./chip-tool bridgeddevicebasic read manufacturing-date  1 3
+          ./chip-tool bridgeddevicebasicinformation read manufacturing-date  1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -313,7 +304,7 @@ tests:
     - label: "DUT reads PartNumber from the TH"
       PICS: BRBINFO.C.A000c
       verification: |
-          ./chip-tool bridgeddevicebasic read part-number  1 3
+          ./chip-tool bridgeddevicebasicinformation read part-number  1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -344,7 +335,7 @@ tests:
     - label: "DUT reads ProductURL from the TH"
       PICS: BRBINFO.C.A000d
       verification: |
-          ./chip-tool bridgeddevicebasic read product-url  1 3
+          ./chip-tool bridgeddevicebasicinformation read product-url  1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -374,7 +365,7 @@ tests:
     - label: "DUT reads ProductLabel from the TH"
       PICS: BRBINFO.C.A000e
       verification: |
-          ./chip-tool bridgeddevicebasic read product-label  1 3
+          ./chip-tool bridgeddevicebasicinformation read product-label  1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -403,7 +394,7 @@ tests:
     - label: "DUT reads SerialNumber from the TH"
       PICS: BRBINFO.C.A000f
       verification: |
-          ./chip-tool bridgeddevicebasic read serial-number  1 3
+          ./chip-tool bridgeddevicebasicinformation read serial-number  1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -434,35 +425,42 @@ tests:
     - label: "DUT reads Reachable from the TH"
       PICS: BRBINFO.C.A0011
       verification: |
-          ./chip-tool bridgeddevicebasic read reachable 1 3
+          ./chip-tool bridgeddevicebasicinformation read reachable 1 3
 
           Verify ReadRequestMessage is displayed on TH(bridge-app) Log
-          [1662483432.994416][6721:6721] CHIP:IM: Received Read request
-          [1662483432.994498][6721:6721] CHIP:DMG: ReadRequestMessage =
-          [1662483432.994524][6721:6721] CHIP:DMG: {
-          [1662483432.994546][6721:6721] CHIP:DMG:         AttributePathIBs =
-          [1662483432.994572][6721:6721] CHIP:DMG:         [
-          [1662483432.994596][6721:6721] CHIP:DMG:                 AttributePathIB =
-          [1662483432.994623][6721:6721] CHIP:DMG:                 {
-          [1662483432.994651][6721:6721] CHIP:DMG:                         Endpoint = 0x3,
-          [1662483432.994684][6721:6721] CHIP:DMG:                         Cluster = 0x39,
-          [1662483432.994714][6721:6721] CHIP:DMG:                         Attribute = 0x0000_0011,
-          [1662483432.994742][6721:6721] CHIP:DMG:                 }
-          [1662483432.994770][6721:6721] CHIP:DMG:
-          [1662483432.994795][6721:6721] CHIP:DMG:         ],
-          [1662483432.994823][6721:6721] CHIP:DMG:
-          [1662483432.994849][6721:6721] CHIP:DMG:         isFabricFiltered = true,
-          [1662483432.994873][6721:6721] CHIP:DMG:         InteractionModelRevision = 1
-          [1662483432.994896][6721:6721] CHIP:DMG: },
-          [1662483432.994968][6721:6721] CHIP:DMG: IM RH moving to [GeneratingReports]
-          [1662483432.995051][6721:6721] CHIP:DMG: Building Reports for ReadHandler with LastReportGeneration = 0 DirtyGeneration = 0
-          [1662483432.995079][6721:6721] CHIP:DMG: <RE:Run> Cluster 39, Attribute 11 is dirty
+          [1674815846.289405][16608:16608] CHIP:DMG: ReportDataMessage =
+          [1674815846.289407][16608:16608] CHIP:DMG: {
+          [1674815846.289409][16608:16608] CHIP:DMG:         AttributeReportIBs =
+          [1674815846.289413][16608:16608] CHIP:DMG:         [
+          [1674815846.289415][16608:16608] CHIP:DMG:                 AttributeReportIB =
+          [1674815846.289419][16608:16608] CHIP:DMG:                 {
+          [1674815846.289422][16608:16608] CHIP:DMG:                         AttributeDataIB =
+          [1674815846.289425][16608:16608] CHIP:DMG:                         {
+          [1674815846.289427][16608:16608] CHIP:DMG:                                 DataVersion = 0xf6524906,
+          [1674815846.289431][16608:16608] CHIP:DMG:                                 AttributePathIB =
+          [1674815846.289434][16608:16608] CHIP:DMG:                                 {
+          [1674815846.289436][16608:16608] CHIP:DMG:                                         Endpoint = 0x3,
+          [1674815846.289439][16608:16608] CHIP:DMG:                                         Cluster = 0x39,
+          [1674815846.289441][16608:16608] CHIP:DMG:                                         Attribute = 0x0000_0011,
+          [1674815846.289446][16608:16608] CHIP:DMG:                                 }
+          [1674815846.289449][16608:16608] CHIP:DMG:
+          [1674815846.289451][16608:16608] CHIP:DMG:                                 Data = true,
+          [1674815846.289454][16608:16608] CHIP:DMG:                         },
+          [1674815846.289457][16608:16608] CHIP:DMG:
+          [1674815846.289459][16608:16608] CHIP:DMG:                 },
+          [1674815846.289464][16608:16608] CHIP:DMG:
+          [1674815846.289465][16608:16608] CHIP:DMG:         ],
+          [1674815846.289468][16608:16608] CHIP:DMG:
+          [1674815846.289471][16608:16608] CHIP:DMG:         SuppressResponse = true,
+          [1674815846.289473][16608:16608] CHIP:DMG:         InteractionModelRevision = 1
+          [1674815846.289475][16608:16608] CHIP:DMG: }
+          [1674815846.289477][16608:16608] CHIP:DMG:
       disabled: true
 
     - label: "DUT reads UniqueID from the TH"
       PICS: BRBINFO.C.A0012
       verification: |
-          ./chip-tool bridgeddevicebasic read unique-id 1 3
+          ./chip-tool bridgeddevicebasicinformation read unique-id 1 3
 
           Optional Attribute - If it is supported, then in TH(bridge-app) log it will results in displaying the ReportDataMessage , else it will display UNSUPPORTED_ATTRIBUTE
 

@@ -482,7 +482,8 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
         scanResponse.lqi             = aResult->mLqi;
         scanResponse.extendedAddress = Encoding::BigEndian::Get64(aResult->mExtAddress.m8);
         scanResponse.extendedPanId   = Encoding::BigEndian::Get64(aResult->mExtendedPanId.m8);
-        scanResponse.networkNameLen  = strnlen(aResult->mNetworkName.m8, OT_NETWORK_NAME_MAX_SIZE);
+        static_assert(OT_NETWORK_NAME_MAX_SIZE <= UINT8_MAX, "Network name length won't fit");
+        scanResponse.networkNameLen = static_cast<uint8_t>(strnlen(aResult->mNetworkName.m8, OT_NETWORK_NAME_MAX_SIZE));
         memcpy(scanResponse.networkName, aResult->mNetworkName.m8, scanResponse.networkNameLen);
 
         mScanResponseIter.Add(&scanResponse);
@@ -1138,7 +1139,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::NeighborTableList::Id: {
+    case ThreadNetworkDiagnostics::Attributes::NeighborTable::Id: {
         err = encoder.EncodeList([this](const auto & aEncoder) -> CHIP_ERROR {
             constexpr uint16_t kFrameErrorRate100Percent   = 0xffff;
             constexpr uint16_t kMessageErrorRate100Percent = 0xffff;
@@ -1168,7 +1169,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
                 }
                 else
                 {
-                    lastRssi.SetNonNull(((neighInfo.mLastRssi > 0) ? 0 : neighInfo.mLastRssi));
+                    lastRssi.SetNonNull(min(static_cast<int8_t>(0), neighInfo.mLastRssi));
                 }
 
                 neighborTable.averageRssi      = averageRssi;
@@ -1196,7 +1197,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
     }
     break;
 
-    case ThreadNetworkDiagnostics::Attributes::RouteTableList::Id: {
+    case ThreadNetworkDiagnostics::Attributes::RouteTable::Id: {
         err = encoder.EncodeList([this](const auto & aEncoder) -> CHIP_ERROR {
             otRouterInfo routerInfo;
 
@@ -1695,6 +1696,19 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPollPeriod(u
 }
 
 template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetRouterPromotion(bool val)
+{
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+    Impl()->LockThreadStack();
+    if (otThreadGetDeviceRole(DeviceLayer::ThreadStackMgrImpl().OTInstance()) != OT_DEVICE_ROLE_ROUTER)
+    {
+        otThreadSetRouterEligible(DeviceLayer::ThreadStackMgrImpl().OTInstance(), val);
+    }
+    Impl()->UnlockThreadStack();
+#endif
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1836,9 +1850,10 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::SetSEDIntervalMode(Connecti
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    mIntervalsMode = intervalType;
 
     Impl()->LockThreadStack();
+
+    mIntervalsMode = intervalType;
 
 // For Thread devices, the intervals are defined as:
 // * poll period for SED devices that poll the parent for data
@@ -1879,10 +1894,9 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::SetSEDIntervalMode(Connecti
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDActiveMode(bool onOff)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDActiveMode(bool onOff, bool delayIdle)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    ConnectivityManager::SEDIntervalMode mode;
 
     if (onOff)
     {
@@ -1894,12 +1908,59 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RequestSEDActiv
             mActiveModeConsumers--;
     }
 
+    if (!onOff && delayIdle && CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD.count() != 0)
+    {
+        // StartTimer will cancel a timer if the same callback & context is used.
+        // This will have the effect of canceling the previous one (if any) and starting
+        // a new timer of the same duration. This effectively prolongs the active threshold
+        // without consuming additional resources.
+        err = DeviceLayer::SystemLayer().StartTimer(CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD, RequestSEDModeUpdate, this);
+        if (CHIP_NO_ERROR == err)
+        {
+            if (!mDelayIdleTimerRunning)
+            {
+                mDelayIdleTimerRunning = true;
+                mActiveModeConsumers++;
+            }
+            return err;
+        }
+
+        ChipLogError(DeviceLayer, "Failed to postpone Idle Mode with error %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    return SEDUpdateMode();
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::SEDUpdateMode()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ConnectivityManager::SEDIntervalMode mode;
+
     mode = mActiveModeConsumers > 0 ? ConnectivityManager::SEDIntervalMode::Active : ConnectivityManager::SEDIntervalMode::Idle;
 
     if (mIntervalsMode != mode)
         err = SetSEDIntervalMode(mode);
 
     return err;
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::RequestSEDModeUpdate(chip::System::Layer * apSystemLayer,
+                                                                               void * apAppState)
+{
+    if (apAppState != nullptr)
+    {
+        GenericThreadStackManagerImpl_OpenThread * obj = static_cast<GenericThreadStackManagerImpl_OpenThread *>(apAppState);
+        if (obj->mActiveModeConsumers > 0)
+        {
+            obj->mActiveModeConsumers--;
+        }
+
+        obj->mDelayIdleTimerRunning = false;
+
+        obj->SEDUpdateMode();
+    }
 }
 #endif
 

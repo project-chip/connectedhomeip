@@ -10,6 +10,7 @@
 [![Examples - nRF Connect SDK](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20nRF%20Connect%20SDK/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-nrfconnect.yaml)
 [![Examples - QPG](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20QPG/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-qpg.yaml)
 [![Examples - TI CC26X2X7](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20TI%20CC26X2X7/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-cc13x2x7_26x2x7.yaml)
+[![Examples - TI CC32XX](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20TI%20CC32XX/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-cc32xx.yaml)
 [![Build example - Infineon](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-infineon.yaml/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-infineon.yaml)
 [![Build example - BouffaloLab](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20BouffaloLab/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-bouffalolab.yaml)
 
@@ -133,10 +134,7 @@ stack captured in the following Figure:
 
 4) **Action Framing:** Once an action is constructed using the Interaction
    Model, it is serialized into a prescribed packed binary format to encode for
-   network transmission. Security: An encoded action frame is then processed by
-   the Security Layer: the message is encrypted and appended with a message
-   authentication code. These actions ensure the data remain confidential and
-   authentic between sender and receiver of the message.
+   network transmission.
 
 5. **Security:** An encoded action frame is then sent down to the Security Layer
    to encrypt and sign the payload to ensure that data is secured and
@@ -176,7 +174,7 @@ We welcome your contributions to Matter. Read our contribution guidelines
 
 # Building and Developing in Matter
 
-Instructions about how to build Matter can be found [here](./docs/README.md).
+Instructions about how to build Matter can be found [here](./docs/README.md) .
 
 # Directory Structure
 

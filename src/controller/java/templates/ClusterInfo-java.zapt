@@ -201,7 +201,7 @@ public class ClusterInfoMapping {
   }
   {{#chip_client_clusters}}
   {{#chip_cluster_responses}}
-      public static class Delegated{{asUpperCamelCase name}}Callback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}Callback, DelegatedClusterCallback {
+      public static class Delegated{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Callback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}Callback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -235,12 +235,11 @@ public class ClusterInfoMapping {
       }
 
   {{/chip_cluster_responses}}
-      {{#chip_server_cluster_attributes}}
-      {{#if isArray}}
-      {{#if isStruct}}
-
-      {{/if}}
-
+      {{#zcl_attributes_server removeKeys='isOptional'}}
+      {{#if_unsupported_attribute_callback type isArray ../id}}
+      {{else}}
+      {{#if_basic_attribute type ../id}}
+      {{else}}
       public static class Delegated{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}AttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
@@ -252,19 +251,29 @@ public class ClusterInfoMapping {
           false. }}
         {{~#*inline "asJavaTypeForEntry"}}{{asJavaType type null parent.name forceNotList=true}}{{/inline~}}
         @Override
+        {{#if isArray}}
         public void onSuccess({{#if isNullable}}@Nullable{{/if}} List<{{> asJavaTypeForEntry isArray=false}}> valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
           CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<{{> asJavaTypeForEntry isArray=false}}>");
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
+        {{else}}
+        public void onSuccess({{#if isNullable}}@Nullable{{/if}} {{>asJavaTypeForEntry isArray=false}} value) {
+          Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+          CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "{{> asJavaTypeForEntry isArray=false}}");
+          responseValues.put(commandResponseInfo, value);
+          callback.onSuccess(responseValues);
+        }
+        {{/if}}
         @Override
         public void onError(Exception ex) {
           callback.onFailure(ex);
         }
       }
-      {{/if}}
-      {{/chip_server_cluster_attributes}}
+      {{/if_basic_attribute}}
+      {{/if_unsupported_attribute_callback}}
+      {{/zcl_attributes_server}}
 
   {{/chip_client_clusters}}
 
@@ -327,7 +336,7 @@ public class ClusterInfoMapping {
            {{#if mustUseTimedInvoke}}, 10000{{/if}}
            );
          },
-         () -> new Delegated{{asUpperCamelCase responseName}}Callback(),
+         () -> new Delegated{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase responseName}}Callback(),
            {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParams
        );
      {{else}}

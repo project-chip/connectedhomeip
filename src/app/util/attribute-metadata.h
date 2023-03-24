@@ -105,6 +105,17 @@ union EmberAfDefaultOrMinMaxAttributeValue
     const EmberAfAttributeMinMaxValue * ptrToMinMaxValue;
 };
 
+enum class EmberAfAttributeWritePermission
+{
+    DenyWrite            = 0,
+    AllowWriteNormal     = 1,
+    AllowWriteOfReadOnly = 2,
+    UnsupportedAttribute = 0x86, // Protocols::InteractionModel::Status::UnsupportedAttribute
+    InvalidValue         = 0x87, // Protocols::InteractionModel::Status::ConstraintError
+    ReadOnly             = 0x88, // Protocols::InteractionModel::Status::UnsupportedWrite
+    InvalidDataType      = 0x8d, // Protocols::InteractionModel::Status::InvalidDataType
+};
+
 // Attribute masks modify how attributes are used by the framework
 //
 // Attribute that has this mask is NOT read-only
@@ -132,27 +143,31 @@ union EmberAfDefaultOrMinMaxAttributeValue
 struct EmberAfAttributeMetadata
 {
     /**
+     * Pointer to the default value union. Actual value stored
+     * depends on the mask.
+     */
+    EmberAfDefaultOrMinMaxAttributeValue defaultValue;
+
+    /**
      * Attribute ID, according to ZCL specs.
      */
     chip::AttributeId attributeId;
-    /**
-     * Attribute type, according to ZCL specs.
-     */
-    EmberAfAttributeType attributeType;
+
     /**
      * Size of this attribute in bytes.
      */
     uint16_t size;
+
+    /**
+     * Attribute type, according to ZCL specs.
+     */
+    EmberAfAttributeType attributeType;
+
     /**
      * Attribute mask, tagging attribute with specific
      * functionality.
      */
     EmberAfAttributeMask mask;
-    /**
-     * Pointer to the default value union. Actual value stored
-     * depends on the mask.
-     */
-    EmberAfDefaultOrMinMaxAttributeValue defaultValue;
 
     /**
      * Check whether this attribute is nullable.

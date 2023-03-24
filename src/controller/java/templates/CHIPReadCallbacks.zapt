@@ -24,8 +24,8 @@ public:
     }
 
     static void CallbackFn(void * context, {{chipCallback.type}} value);
-    static void OnSubscriptionEstablished(void * context) {
-        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(reinterpret_cast<CHIP{{chipCallback.name}}AttributeCallback *>(context)->javaCallbackRef);
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId) {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(reinterpret_cast<CHIP{{chipCallback.name}}AttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -37,9 +37,10 @@ private:
 {{/chip_server_global_responses}}
 
 {{#chip_client_clusters}}
-{{#chip_server_cluster_attributes}}
-{{#unless (isStrEqual chipCallback.name "Unsupported")}}
-{{#if_basic_global_response}}
+{{#zcl_attributes_server removeKeys='isOptional'}}
+{{#if_unsupported_attribute_callback type isArray ../id}}
+{{else}}
+{{#if_basic_attribute type ../id}}
 {{else}}
 class CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback : public chip::Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType>
 {
@@ -56,8 +57,8 @@ public:
     }
 
     static void CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} {{#if isArray}}list{{else}}value{{/if}});
-    static void OnSubscriptionEstablished(void * context) {
-        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback *>(context)->javaCallbackRef);
+    static void OnSubscriptionEstablished(void * context, chip::SubscriptionId subscriptionId) {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback *>(context)->javaCallbackRef, subscriptionId);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -65,10 +66,10 @@ private:
     jobject javaCallbackRef;
     bool keepAlive;
 };
-{{/if_basic_global_response}}
+{{/if_basic_attribute}}
 
-{{/unless}}
-{{/chip_server_cluster_attributes}}
+{{/if_unsupported_attribute_callback}}
+{{/zcl_attributes_server}}
 {{/chip_client_clusters}}
 
 {{/if}}

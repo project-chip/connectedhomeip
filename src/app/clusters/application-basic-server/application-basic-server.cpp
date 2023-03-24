@@ -31,6 +31,7 @@
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
+#include <app/util/config.h>
 #include <platform/CHIPDeviceConfig.h>
 
 #include <list>
@@ -107,15 +108,15 @@ Delegate * GetDefaultDelegate(EndpointId endpoint)
 CHIP_ERROR Delegate::HandleGetApplication(app::AttributeValueEncoder & aEncoder)
 {
     ApplicationBasicApplicationType application;
-    application.catalogVendorId = mCatalogVendorApp.catalogVendorId;
-    application.applicationId   = CharSpan(mCatalogVendorApp.applicationId, strlen(mCatalogVendorApp.applicationId));
+    application.catalogVendorID = mCatalogVendorApp.catalogVendorId;
+    application.applicationID   = CharSpan(mCatalogVendorApp.applicationId, strlen(mCatalogVendorApp.applicationId));
     return aEncoder.Encode(application);
 }
 
-bool Delegate::Matches(ApplicationBasicApplication match)
+bool Delegate::Matches(const ApplicationBasicApplicationType & match)
 {
-    std::string appId(match.applicationId.data(), match.applicationId.size());
-    CatalogVendorApp matchApp(match.catalogVendorId, appId.c_str());
+    std::string appId(match.applicationID.data(), match.applicationID.size());
+    CatalogVendorApp matchApp(match.catalogVendorID, appId.c_str());
     return mCatalogVendorApp.Matches(&matchApp);
 }
 

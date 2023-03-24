@@ -133,7 +133,29 @@ class {{filename}}: public TestCommandBridge
         {{#chip_tests_item_parameters}}
           {{>commandValue ns=parent.cluster container=(asPropertyValue dontUnwrapValue=true) definedValue=definedValue depth=0}}
         {{/chip_tests_item_parameters}}
+        {{#if (and (isStrEqual cluster "CommissionerCommands") (isStrEqual command "GetCommissionerNodeId"))}}
+        return {{command}}("{{identity}}", value, ^(const chip::{{command}}Response & values) {
+            {{#chip_tests_item_responses}}
+            {{#chip_tests_item_response_parameters}}
+            {{#if hasExpectedValue}}
+            {
+              id actualValue = values.{{asStructPropertyName name}}
+              {{>check_test_value actual="actualValue" expected=expectedValue cluster=../cluster}}
+            }
+            {{/if}}
+            {{>maybeCheckExpectedConstraints}}
+            {{#if saveAs}}
+            {
+              {{saveAs}} = [[NSNumber alloc] initWithUnsignedLongLong:values.{{asStructPropertyName name}}];
+            }
+            {{/if}}
+            {{/chip_tests_item_response_parameters}}
+            {{/chip_tests_item_responses}}
+            NextTest();
+        });
+        {{else}}
         return {{command}}("{{identity}}", value);
+        {{/if}}
         {{else}}
         MTRBaseDevice * device = GetDevice("{{identity}}");
         __auto_type * cluster = [[MTRBaseCluster{{>cluster}} alloc] initWithDevice:device endpointID:@({{endpoint}}) queue:mCallbackQueue];
@@ -187,13 +209,6 @@ class {{filename}}: public TestCommandBridge
           [cluster writeAttribute{{>attribute}}WithValue:{{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument{{/chip_tests_item_parameters}} completion:^(NSError * _Nullable err) {
         {{/if}}
             NSLog(@"{{label}} Error: %@", err);
-
-            {{#if optional}}
-            if (err.code == MTRInteractionErrorCodeUnsupportedAttribute) {
-                NextTest();
-                return;
-            }
-            {{/if}}
 
             {{#chip_tests_item_responses}}
             {{#if error}}

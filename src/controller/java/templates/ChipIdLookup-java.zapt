@@ -24,11 +24,11 @@ public final class ChipIdLookup {
   public static String attributeIdToName(long clusterId, long attributeId) {
     {{#chip_client_clusters}}
     if (clusterId == {{code}}L) {
-      {{#chip_server_cluster_attributes}}
+      {{#zcl_attributes_server}}
       if (attributeId == {{code}}L) {
         return "{{asUpperCamelCase name}}";
       }
-      {{/chip_server_cluster_attributes}}
+      {{/zcl_attributes_server}}
       return "";
     }
     {{/chip_client_clusters}}

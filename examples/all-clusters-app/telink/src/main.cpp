@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@
 
 #include <zephyr/kernel.h>
 
-LOG_MODULE_REGISTER(app);
+LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -61,7 +61,9 @@ int main(void)
         goto exit;
     }
 
-#ifdef CONFIG_OPENTHREAD_MTD
+#ifdef CONFIG_OPENTHREAD_MTD_SED
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+#elif CONFIG_OPENTHREAD_MTD
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 #else
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);

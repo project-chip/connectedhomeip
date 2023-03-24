@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
 #import "MTROperationalCertificateIssuer.h"
 
-@implementation MTROperationalCertificateInfo
+@implementation MTROperationalCertificateChain
 
 - (instancetype)initWithOperationalCertificate:(MTRCertificateDERBytes)operationalCertificate
                        intermediateCertificate:(nullable MTRCertificateDERBytes)intermediateCertificate

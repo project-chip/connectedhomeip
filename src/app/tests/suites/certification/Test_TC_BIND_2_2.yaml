@@ -139,7 +139,7 @@ tests:
           "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
           "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }" 2 0
 
-          On DUT, Verify the success response for KeySetWrite
+          On TH1(Chip-tool), Verify the success response for KeySetWrite
 
 
           [1657717291.809861][3361:3366] CHIP:DMG: ICR moving to [ResponseRe]
@@ -197,7 +197,7 @@ tests:
 
           ./chip-tool groupkeymanagement write group-key-map "[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]" 2 0
 
-          On DUT, Verify the success response for GroupKeySetID
+          On TH1(Chip-tool), Verify the success response for GroupKeySetID
 
           StatusIB =
                           {
@@ -227,7 +227,7 @@ tests:
 
           ./chip-tool groups add-group 0x0001 grp1 2 1
 
-          On DUT, Verify the success response for AddGroup
+          On TH1(chip-tool), Verify the success response for AddGroup
 
           [1657717342.599740][3368:3373] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0004 Command 0x0000_0000
           [1657717342.599891][3368:3373] CHIP:TOO:   AddGroupResponse: {
@@ -286,7 +286,7 @@ tests:
 
           ./chip-tool binding write binding "[{"group" : "0x0001"}]" 74 1
 
-          On TH, Verify the success response for binding entry
+          On TH1(chip-tool), Verify the success response for binding entry
 
           [1657717436.184899][4353:4358] CHIP:DMG:                         StatusIB =
           [1657717436.184940][4353:4358] CHIP:DMG:                         {

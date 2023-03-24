@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+
 class Nullable():
     def __repr__(self):
         return 'Null'

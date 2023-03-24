@@ -1,3 +1,7 @@
+---
+orphan: true
+---
+
 # Examples common libraries
 
 ## What is this?

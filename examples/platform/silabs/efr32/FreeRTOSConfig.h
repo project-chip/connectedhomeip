@@ -140,7 +140,7 @@ extern "C" {
 #define configUSE_TICKLESS_IDLE 0
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
 
-#define configTICK_RATE_HZ (1000)
+#define configTICK_RATE_HZ (1024)
 /* Definition used by Keil to replace default system clock source. */
 #define configOVERRIDE_DEFAULT_TICK_CONFIGURATION 1
 
@@ -208,10 +208,18 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 
 #ifndef configTOTAL_HEAP_SIZE
 #ifdef SL_WIFI
+#ifdef DIC_ENABLE
+#define configTOTAL_HEAP_SIZE ((size_t)(50 * 1024))
+#else
 #define configTOTAL_HEAP_SIZE ((size_t)(34 * 1024))
+#endif // DIC
+#else  // SL_WIFI
+#if SL_CONFIG_OPENTHREAD_LIB == 1
+#define configTOTAL_HEAP_SIZE ((size_t)(22 * 1024))
 #else
 #define configTOTAL_HEAP_SIZE ((size_t)(20 * 1024))
-#endif
+#endif // SL_CONFIG_OPENTHREAD_LIB
+#endif // configTOTAL_HEAP_SIZE
 #endif // configTOTAL_HEAP_SIZE
 
 /* Optional functions - most linkers will remove unused functions anyway. */

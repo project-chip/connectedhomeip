@@ -19,17 +19,14 @@
 import datetime
 import logging
 import sys
-
-from typing import cast, Dict, List, Mapping, Optional, Tuple
-
-import pandas as pd  # type: ignore
+from typing import Dict, List, Mapping, Optional, Tuple, cast
 
 import memdf.report
 import memdf.util.config
 import memdf.util.sqlite
-from memdf.sizedb import SizeDatabase
+import pandas as pd  # type: ignore
 from memdf import Config
-
+from memdf.sizedb import SizeDatabase
 
 QUERY_CONFIG = {
     Config.group_map('query'): {

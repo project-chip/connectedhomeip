@@ -31,5 +31,12 @@ target_include_directories(openiotsdk-app
 target_link_libraries(openiotsdk-app 
     PUBLIC
         openiotsdk-chip
-        cmsis-rtos-implementation
+        $<TARGET_OBJECTS:iotsdk-serial-retarget>
 )
+
+if(TFM_SUPPORT)
+    target_compile_definitions(openiotsdk-app 
+        PUBLIC
+            TFM_SUPPORT
+    )
+endif()

@@ -81,7 +81,7 @@ tests:
           value: null
 
     - label: "Change to Supported Mode"
-      command: "changeToMode"
+      command: "ChangeToMode"
       arguments:
           values:
               - name: "NewMode"
@@ -95,7 +95,7 @@ tests:
           saveAs: currentModeBeforeToggle
 
     - label: "Change to Unsupported Mode"
-      command: "changeToMode"
+      command: "ChangeToMode"
       arguments:
           values:
               - name: "NewMode"
@@ -105,11 +105,11 @@ tests:
 
     - label: "Toggle OnOff"
       cluster: "On/Off"
-      command: "off"
+      command: "Off"
 
     - label: "Toggle OnOff"
       cluster: "On/Off"
-      command: "on"
+      command: "On"
 
     - label: "Verify Current Mode does not change when OnMode is null"
       command: "readAttribute"
@@ -140,11 +140,11 @@ tests:
 
     - label: "Toggle OnOff"
       cluster: "On/Off"
-      command: "off"
+      command: "Off"
 
     - label: "Toggle OnOff"
       cluster: "On/Off"
-      command: "on"
+      command: "On"
 
     - label: "Verify Current Mode Changes if OnMode is not null"
       command: "readAttribute"
@@ -173,7 +173,7 @@ tests:
           value: 7
 
     - label: "Change CurrentMode to another value"
-      command: "changeToMode"
+      command: "ChangeToMode"
       arguments:
           values:
               - name: "NewMode"

@@ -17,9 +17,9 @@
 
 #include <cinttypes>
 
-#include "console/console.h"
 #include "pw_sys_io/sys_io.h"
 #include <cassert>
+#include <zephyr/console/console.h>
 #include <zephyr/zephyr.h>
 
 #ifdef CONFIG_USB

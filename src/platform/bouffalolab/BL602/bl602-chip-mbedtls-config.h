@@ -138,5 +138,12 @@ typedef void mbedtls_ecp_restart_ctx;
 
 #define MBEDTLS_SSL_CIPHERSUITES MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
 
+#define MBEDTLS_ENTROPY_HARDWARE_ALT
+
+#define MBEDTLS_SHA1_ALT
+#define MBEDTLS_SHA256_ALT
+#define MBEDTLS_AES_ALT
+#define MBEDTLS_ECP_ALT
+
 //#include "config-device-acceleration.h"
 #include "mbedtls/check_config.h"

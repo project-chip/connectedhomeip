@@ -31,6 +31,8 @@ static constexpr const char * const CHIP_CONTROLLER_QUEUE = "org.csa-iot.matter.
 namespace chip {
 namespace DeviceLayer {
 
+class BleScannerDelegate;
+
 /**
  * Concrete implementation of the PlatformManager singleton object for Darwin platforms.
  */
@@ -54,6 +56,8 @@ public:
         return mWorkQueue;
     }
 
+    CHIP_ERROR StartBleScan(BleScannerDelegate * delegate = nullptr);
+    CHIP_ERROR StopBleScan();
     CHIP_ERROR PrepareCommissioning();
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }

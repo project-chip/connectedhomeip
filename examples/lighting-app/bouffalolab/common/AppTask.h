@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +30,14 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
+#define APP_BUTTON_PRESS_JITTER 50
+#define APP_BUTTON_PRESS_SHORT 1000
+#define APP_BUTTON_PRESS_LONG 4000
+
+#define APP_LIGHT_ENDPOINT_ID 1
+#define APP_REBOOT_RESET_COUNT 3
+#define APP_REBOOT_RESET_COUNT_KEY "app_reset_cnt"
+
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
 #define APP_ERROR_CREATE_TASK_FAILED CHIP_APPLICATION_ERROR(0x02)
@@ -44,6 +51,8 @@ struct Identify;
 class AppTask
 {
 public:
+    friend AppTask & GetAppTask(void);
+
     enum app_event_t
     {
         APP_EVENT_NONE = 0x00000000,
@@ -66,11 +75,10 @@ public:
         APP_EVENT_SYS_ALL_MASK =
             APP_EVENT_SYS_BLE_ADV | APP_EVENT_SYS_BLE_CONN | APP_EVENT_SYS_PROVISIONED | APP_EVENT_FACTORY_RESET,
 
-        APP_EVENT_LIGHTING_ONOFF      = 0x00010000,
-        APP_EVENT_LIGHTING_LEVEL      = 0x00020000,
-        APP_EVENT_LIGHTING_COLOR      = 0x00040000,
-        APP_EVENT_LIGHTING_GO_THROUGH = 0x00100000,
-        APP_EVENT_LIGHTING_MASK       = APP_EVENT_LIGHTING_ONOFF | APP_EVENT_LIGHTING_LEVEL | APP_EVENT_LIGHTING_COLOR,
+        APP_EVENT_LIGHTING_ONOFF = 0x00010000,
+        APP_EVENT_LIGHTING_LEVEL = 0x00020000,
+        APP_EVENT_LIGHTING_COLOR = 0x00040000,
+        APP_EVENT_LIGHTING_MASK  = APP_EVENT_LIGHTING_ONOFF | APP_EVENT_LIGHTING_LEVEL | APP_EVENT_LIGHTING_COLOR,
 
         APP_EVENT_IDENTIFY_START    = 0x01000000,
         APP_EVENT_IDENTIFY_IDENTIFY = 0x02000000,
@@ -94,17 +102,13 @@ public:
     static void IdentifyStartHandler(Identify *);
     static void IdentifyStopHandler(Identify *);
     static void IdentifyHandleOp(app_event_t event);
+    bool mIsConnected;
 
 private:
-    friend AppTask & GetAppTask(void);
     friend void StartAppTask(void);
     friend PlatformManagerImpl;
 
-    static void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg);
     static uint32_t AppRebootCheck(uint32_t time = 0);
-
-    static void LightingSetOnoff(uint8_t bonoff);
-    static void LightingSetStatus(app_event_t status);
 
     static void LightingSetBleAdv(void);
     static void LightingSetProvisioned(void);
@@ -136,7 +140,6 @@ private:
     uint32_t mTimerIntvl;
     uint64_t mButtonPressedTime;
     bool mIsFactoryResetIndicat;
-    bool mIsConnected;
 
     static StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
     static StaticTask_t appTaskStruct;

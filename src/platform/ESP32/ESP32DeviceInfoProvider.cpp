@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -241,7 +241,7 @@ ESP32DeviceInfoProvider::SupportedCalendarTypesIteratorImpl::SupportedCalendarTy
 size_t ESP32DeviceInfoProvider::SupportedCalendarTypesIteratorImpl::Count()
 {
     size_t count = 0;
-    for (uint8_t i = 0; i < to_underlying(CalendarType::kUnknownEnumValue); i++)
+    for (uint8_t i = 0; i < to_underlying(app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kUnknownEnumValue); i++)
     {
         if (mSupportedCalendarTypes & (1 << i))
         {
@@ -254,7 +254,7 @@ size_t ESP32DeviceInfoProvider::SupportedCalendarTypesIteratorImpl::Count()
 
 bool ESP32DeviceInfoProvider::SupportedCalendarTypesIteratorImpl::Next(CalendarType & output)
 {
-    while (mIndex < to_underlying(CalendarType::kUnknownEnumValue))
+    while (mIndex < to_underlying(app::Clusters::TimeFormatLocalization::CalendarTypeEnum::kUnknownEnumValue))
     {
         if (mSupportedCalendarTypes & (1 << mIndex))
         {

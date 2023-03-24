@@ -1,5 +1,5 @@
 steps:
-    - name: "connectedhomeip/chip-build-vscode:0.6.18"
+    - name: "connectedhomeip/chip-build-vscode:0.6.48"
       entrypoint: "bash"
       args:
           - "-c"
@@ -7,7 +7,7 @@ steps:
               git config --global --add safe.directory "*"
               git submodule update --init --recursive
       id: Submodules
-    - name: "connectedhomeip/chip-build-vscode:0.6.18"
+    - name: "connectedhomeip/chip-build-vscode:0.6.48"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -22,7 +22,7 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "connectedhomeip/chip-build-vscode:0.6.18"
+    - name: "connectedhomeip/chip-build-vscode:0.6.48"
       id: ESP32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -30,8 +30,9 @@ steps:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle --target
               esp32-m5stack-all-clusters-ipv6only --target
-              esp32-m5stack-all-clusters-minimal-rpc-ipv6only --target
               esp32-m5stack-all-clusters-rpc --target
+              esp32-m5stack-light --target
+              esp32-m5stack-light-ipv6only --target
               esp32-m5stack-ota-requestor build --create-archives
               /workspace/artifacts/
       waitFor:
@@ -40,8 +41,7 @@ steps:
       volumes:
           - name: pwenv
             path: /pwenv
-
-    - name: "connectedhomeip/chip-build-vscode:0.6.18"
+    - name: "connectedhomeip/chip-build-vscode:0.6.48"
       id: NRFConnect
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -62,7 +62,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.6.18"
+    - name: "connectedhomeip/chip-build-vscode:0.6.48"
       id: EFR32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -71,8 +71,8 @@ steps:
               ./scripts/build/build_examples.py --enable-flashbundle
               --target efr32-brd4161a-light
               --target efr32-brd4161a-light-rpc
-              --target efr32-brd4161a-lock
-              --target efr32-brd4161a-lock-rpc
+              --target efr32-brd4161a-lock-openthread_mtd
+              --target efr32-brd4161a-lock-rpc-openthread_mtd
               --target efr32-brd4161a-unit-test
               build
               --create-archives /workspace/artifacts/
@@ -84,7 +84,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.6.18"
+    - name: "connectedhomeip/chip-build-vscode:0.6.48"
       id: Linux
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -93,32 +93,34 @@ steps:
               ./scripts/build/build_examples.py
               --enable-flashbundle
               --target linux-arm64-all-clusters-clang
-              --target linux-arm64-all-clusters-app-nodeps-ipv6only-clang
+              --target linux-arm64-all-clusters-nodeps-ipv6only
               --target linux-arm64-all-clusters-minimal-ipv6only-clang
               --target linux-arm64-bridge-ipv6only-clang
               --target linux-arm64-chip-tool-ipv6only-clang
-              --target linux-arm64-chip-tool-nodeps-ipv6only-clang
+              --target linux-arm64-chip-tool-nodeps-ipv6only
               --target linux-arm64-dynamic-bridge-ipv6only-clang
               --target linux-arm64-light-clang-rpc-ipv6only
               --target linux-arm64-light-clang-rpc-ipv6only-minmdns-verbose
               --target linux-arm64-lock-ipv6only-clang
               --target linux-arm64-minmdns-clang
-              --target linux-arm64-ota-provider-nodeps-ipv6only-clang
-              --target linux-arm64-ota-requestor-nodeps-ipv6only-clang
+              --target linux-arm64-ota-provider-nodeps-ipv6only
+              --target linux-arm64-ota-requestor-nodeps-ipv6only
               --target linux-arm64-python-bindings-clang
               --target linux-arm64-shell-ipv6only-clang
               --target linux-arm64-thermostat-ipv6only-clang
               --target linux-arm64-tv-app-ipv6only-clang
               --target linux-arm64-tv-casting-app-ipv6only-clang
               --target linux-x64-address-resolve-tool
-              --target linux-x64-all-clusters-app-nodeps-ipv6only
+              --target linux-x64-all-clusters-nodeps
               --target linux-x64-all-clusters-coverage
               --target linux-x64-bridge-ipv6only
               --target linux-x64-chip-cert
               --target linux-x64-chip-tool-ipv6only
               --target linux-x64-chip-tool-ipv6only-minmdns-verbose
+              --target linux-x64-contact-sensor-no-ble-with-ui
               --target linux-x64-dynamic-bridge-ipv6only
               --target linux-x64-efr32-test-runner
+              --target linux-x64-light-no-ble-with-ui
               --target linux-x64-light-rpc-ipv6only
               --target linux-x64-light-rpc-ipv6only-minmdns-verbose
               --target linux-x64-lock-ipv6only
@@ -142,7 +144,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.6.18"
+    - name: "connectedhomeip/chip-build-vscode:0.6.48"
       id: Android
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -150,7 +152,7 @@ steps:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
               --target 'android-arm64-chip-tool'
-              build 
+              build
               --create-archives /workspace/artifacts/
       waitFor:
           - Bootstrap

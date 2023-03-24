@@ -1,0 +1,87 @@
+#pragma once
+
+#include "BridgeGlobalStructs.h"
+#include "GeneratedClusters.h"
+
+namespace clusters {
+struct {{cluster.name}}Cluster : public GeneratedCluster
+{
+  {%-   for struct in cluster.structs %}
+  {%-     if struct.tag == None %}
+  struct {{struct.name}}
+  {
+    CHIP_ERROR Decode(chip::TLV::TLVReader & reader)
+    {
+      chip::app::Clusters::{{cluster.name}}::Structs::{{struct.name}}::DecodableType t;
+      CHIP_ERROR err = t.Decode(reader);
+      if(err == CHIP_NO_ERROR) {
+        {%-      for field in struct.fields %}
+        {{field.name}} = t.{{field.name}};
+        {%-      endfor  %}
+      }
+      return err;
+    }
+
+    CHIP_ERROR Encode(chip::TLV::TLVWriter & writer, chip::TLV::Tag tag) const
+    {
+      chip::app::Clusters::{{cluster.name}}::Structs::{{struct.name}}::Type t;
+      {%-      for field in struct.fields %}
+      t.{{field.name}} = {{field.name}};
+      {%-      endfor  %}
+      return t.Encode(writer, tag);
+    }
+
+    static constexpr bool kIsFabricScoped = false;
+
+    {%-      for field in struct.fields %}
+    {{field | getField(cluster, idl)}} {{field.name}};
+    {%-      endfor  %}
+  };
+  {%-     endif %}
+  {%-   endfor %}
+
+  {{cluster.name}}Cluster() :
+  {%-  for attr in cluster.attributes %}
+      m{{attr.definition.name | capitalcase}}(chip::CharSpan("{{attr.definition.name}}"), {{attr.definition.code}}, {{attr | getMask(cluster, idl)}} | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), {{attr | getRawSizeAndType(cluster, idl)}}{{attr | getInit(cluster, idl)}}){{"," if not loop.last}}
+  {%-  endfor  %}
+  {
+  }
+
+  static constexpr uint32_t kClusterId ={{cluster.code}};
+  chip::ClusterId GetClusterId() override { return kClusterId; }
+
+  std::vector<AttributeInterface*> GetAttributes() override
+  {
+    return std::vector<AttributeInterface*>({
+  {%-  for attr in cluster.attributes %}
+      static_cast<AttributeInterface*>(&m{{attr.definition.name | capitalcase}}),
+  {%-  endfor  %}
+    });
+  }
+
+{%  for attr in cluster.attributes %}
+  {{"List" if attr.definition.is_list}}Attribute<{{attr | getType(cluster, idl)}}> m{{attr.definition.name | capitalcase}};
+{%-  endfor  %}
+
+{%- if cluster.commands | length > 0 %}
+  static const chip::CommandId mIncomingCommandList[];
+  const chip::CommandId * GetIncomingCommandList() override
+  {
+    return mIncomingCommandList;
+  }
+{%- endif %}
+};
+
+{%- if cluster.commands | length > 0 %}
+#ifndef {{cluster.name | constcase}}_CLUSTER_INCOMING_COMMANDS
+#define {{cluster.name | constcase}}_CLUSTER_INCOMING_COMMANDS
+const chip::CommandId {{cluster.name}}Cluster::mIncomingCommandList[] = {
+{%- for command in cluster.commands %}
+  {{command.code}},
+{%- endfor %}
+  chip::kInvalidCommandId
+};
+#endif
+{%- endif %}
+
+}

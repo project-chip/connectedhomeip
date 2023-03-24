@@ -20,19 +20,17 @@ import io
 import logging
 import re
 import sys
-
 from typing import Dict
 
 import fastcore  # type: ignore
-import pandas as pd  # type: ignore
-
 import memdf.report
 import memdf.sizedb
 import memdf.util.config
 import memdf.util.markdown
 import memdf.util.sqlite
-from memdf.util.github import Gh
+import pandas as pd  # type: ignore
 from memdf import Config, ConfigDescription
+from memdf.util.github import Gh
 
 DB_CONFIG: ConfigDescription = {
     Config.group_def('database'): {

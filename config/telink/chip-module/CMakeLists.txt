@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2022 Project CHIP Authors
+#   Copyright (c) 2022-2023 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -191,6 +191,7 @@ chip_gn_arg_string("zephyr_ar"                              ${CMAKE_AR})
 chip_gn_arg_string("zephyr_cc"                              ${CMAKE_C_COMPILER})
 chip_gn_arg_string("zephyr_cxx"                             ${CMAKE_CXX_COMPILER})
 chip_gn_arg_bool  ("is_debug"                               CONFIG_DEBUG)
+chip_gn_arg_bool  ("chip_logging"                           CONFIG_LOG)
 chip_gn_arg_bool  ("chip_enable_openthread"                 CONFIG_NET_L2_OPENTHREAD)
 chip_gn_arg_bool  ("chip_openthread_ftd"                    CONFIG_OPENTHREAD_FTD)
 chip_gn_arg_bool  ("chip_config_network_layer_ble"          CONFIG_BT)
@@ -199,6 +200,10 @@ chip_gn_arg_bool  ("chip_enable_ota_requestor"              CONFIG_CHIP_OTA_REQU
 chip_gn_arg_bool  ("chip_build_tests"                       CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
+chip_gn_arg_bool  ("chip_error_logging"                     CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 1)
+chip_gn_arg_bool  ("chip_progress_logging"                  CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 3)
+chip_gn_arg_bool  ("chip_detail_logging"                    CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 4)
+chip_gn_arg_bool  ("chip_automation_logging"                FALSE)
 
 if (CONFIG_CHIP_FACTORY_DATA)
     chip_gn_arg_bool  ("chip_use_transitional_commissionable_data_provider"  "false")
@@ -294,24 +299,24 @@ add_dependencies(chip chip-gn)
 # Define 'chip-ota-image' target for building CHIP OTA image
 # ==============================================================================
 
+if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BOARD}.overlay")
+    set(GLOBAL_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}.overlay")
+else()
+    unset(GLOBAL_DTC_OVERLAY_FILE)
+endif()
+
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     add_custom_target(build_mcuboot ALL
         COMMAND
-        west build -b tlsr9518adk80d -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
-    )
-
-    add_custom_target(west_sign ALL
-        COMMAND
-        west sign -t imgtool -p ${ZEPHYR_BASE}/../bootloader/mcuboot/scripts/imgtool.py -d ${PROJECT_BINARY_DIR}/.. -- --key ${ZEPHYR_BASE}/../bootloader/mcuboot/root-rsa-2048.pem
-        BYPRODUCTS
-        ${PROJECT_BINARY_DIR}/zephyr.signed.bin
+        west build -b ${BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
+            -- -DCONFIG_BOOT_SWAP_USING_MOVE=y -DDTC_OVERLAY_FILE=${GLOBAL_DTC_OVERLAY_FILE}
     )
 
     add_custom_target(merge_mcuboot ALL
         COMMAND
         dd if=${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin of=${PROJECT_BINARY_DIR}/zephyr.bin
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=96
+        dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=76
     )
 
     chip_ota_image(chip-ota-image
@@ -319,15 +324,14 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
         OUTPUT_FILE ${PROJECT_BINARY_DIR}/zephyr-ota.bin
     )
 
-    add_dependencies(west_sign ${ZEPHYR_FINAL_EXECUTABLE})
-    add_dependencies(merge_mcuboot west_sign)
-    add_dependencies(chip-ota-image west_sign)
+    add_dependencies(merge_mcuboot ${ZEPHYR_FINAL_EXECUTABLE})
+    add_dependencies(chip-ota-image ${ZEPHYR_FINAL_EXECUTABLE})
 endif()
 
 if (CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)
     add_custom_target(merge_factory_data ALL
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=2000
+        dd if=${PROJECT_BINARY_DIR}/factory/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=1040
     )
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     add_dependencies(merge_factory_data merge_mcuboot)

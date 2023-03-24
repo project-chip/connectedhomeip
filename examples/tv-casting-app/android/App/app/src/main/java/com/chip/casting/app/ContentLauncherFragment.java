@@ -61,9 +61,13 @@ public class ContentLauncherFragment extends Fragment {
                 new MatterCallbackHandler() {
                   @Override
                   public void handle(MatterError error) {
-                    Log.d(TAG, "handle() called on LaunchURLResponse with " + error);
-                    TextView launchUrlStatus = getView().findViewById(R.id.launchUrlStatus);
-                    launchUrlStatus.setText(error.isNoError() ? "Success!" : "Failure!");
+                    try {
+                      Log.d(TAG, "handle() called on LaunchURLResponse with " + error);
+                      TextView launchUrlStatus = getView().findViewById(R.id.launchUrlStatus);
+                      launchUrlStatus.setText(error.isNoError() ? "Success!" : "Failure!");
+                    } catch (Exception e) {
+                      Log.e(TAG, "Exception in handler", e);
+                    }
                   }
                 });
           }

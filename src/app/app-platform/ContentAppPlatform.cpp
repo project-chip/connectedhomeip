@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/app-platform/ContentAppPlatform.h>
 #include <app/server/Server.h>
+#include <app/util/config.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPArgParser.hpp>
@@ -59,6 +60,10 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     {
         ret = app->HandleReadAttribute(clusterId, attributeMetadata->attributeId, buffer, maxReadLength);
     }
+    else
+    {
+        ret = AppPlatformExternalAttributeReadCallback(endpoint, clusterId, attributeMetadata, buffer, maxReadLength);
+    }
 
     return ret;
 }
@@ -77,12 +82,30 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
     {
         ret = app->HandleWriteAttribute(clusterId, attributeMetadata->attributeId, buffer);
     }
+    else
+    {
+        ret = AppPlatformExternalAttributeWriteCallback(endpoint, clusterId, attributeMetadata, buffer);
+    }
 
     return ret;
 }
 
 namespace chip {
 namespace AppPlatform {
+
+EmberAfStatus __attribute__((weak)) AppPlatformExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                             const EmberAfAttributeMetadata * attributeMetadata,
+                                                                             uint8_t * buffer, uint16_t maxReadLength)
+{
+    return (EMBER_ZCL_STATUS_FAILURE);
+}
+
+EmberAfStatus __attribute__((weak))
+AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                          const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+{
+    return (EMBER_ZCL_STATUS_FAILURE);
+}
 
 EndpointId ContentAppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep,
                                              const Span<DataVersion> & dataVersionStorage,

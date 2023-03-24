@@ -34,7 +34,7 @@ CHIP_ERROR TargetNavigatorManager::HandleGetTargetList(AttributeValueEncoder & a
         int i = 0;
         for (std::string & entry : mTargets)
         {
-            Structs::TargetInfo::Type outputInfo;
+            Structs::TargetInfoStruct::Type outputInfo;
             outputInfo.identifier = static_cast<uint8_t>(i + 1);
             outputInfo.name       = CharSpan::fromCharString(entry.c_str());
             ReturnErrorOnFailure(encoder.Encode(outputInfo));

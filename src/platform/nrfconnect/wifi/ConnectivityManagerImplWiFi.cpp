@@ -52,27 +52,9 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImplWiFi::_GetWiFiStatio
 
 CHIP_ERROR ConnectivityManagerImplWiFi::_SetWiFiStationMode(ConnectivityManager::WiFiStationMode aMode)
 {
-    VerifyOrReturnError(ConnectivityManager::WiFiStationMode::kWiFiStationMode_NotSupported != aMode,
-                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(ConnectivityManager::WiFiStationMode::kWiFiStationMode_NotSupported != aMode, CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (aMode != mStationMode)
-    {
-        mStationMode = aMode;
-        if (mStationMode != ConnectivityManager::WiFiStationMode::kWiFiStationMode_ApplicationControlled)
-        {
-            bool doEnable{ ConnectivityManager::WiFiStationMode::kWiFiStationMode_Enabled == mStationMode };
-            // TODO: when the connection/disconnection callback API is provided
-            // below calls should be used as a base of disconnect callback
-            if (doEnable)
-            {
-                OnStationConnected();
-            }
-            else
-            {
-                OnStationDisconnected();
-            }
-        }
-    }
+    mStationMode = aMode;
 
     return CHIP_NO_ERROR;
 }
@@ -89,7 +71,7 @@ bool ConnectivityManagerImplWiFi::_IsWiFiStationApplicationControlled(void)
 
 bool ConnectivityManagerImplWiFi::_IsWiFiStationConnected(void)
 {
-    return (WiFiManager::StationStatus::FULLY_PROVISIONED == WiFiManager().Instance().GetStationStatus());
+    return (WiFiManager::StationStatus::CONNECTED == WiFiManager().Instance().GetStationStatus());
 }
 
 System::Clock::Timeout ConnectivityManagerImplWiFi::_GetWiFiStationReconnectInterval(void)
@@ -141,37 +123,25 @@ CHIP_ERROR ConnectivityManagerImplWiFi::_GetAndLogWiFiStatsCounters(void)
     return CHIP_NO_ERROR;
 }
 
-void ConnectivityManagerImplWiFi::OnStationConnected()
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+CHIP_ERROR ConnectivityManagerImplWiFi::_GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & SEDIntervalsConfig)
 {
-    // ensure the station is connected
-    if (_IsWiFiStationConnected())
-    {
-        ChipDeviceEvent connectEvent{};
-        connectEvent.Type                          = DeviceEventType::kWiFiConnectivityChange;
-        connectEvent.WiFiConnectivityChange.Result = kConnectivity_Established;
-        PlatformMgr().PostEventOrDie(&connectEvent);
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "WiFi Station is not connected!");
-    }
+    // For now Wi-Fi uses legacy power save mode that has fixed inactivity interval
+    SEDIntervalsConfig.ActiveIntervalMS =
+        chip::System::Clock::Milliseconds32(WiFiManager::kDefaultDTIMInterval * WiFiManager::kBeaconIntervalMs);
+    SEDIntervalsConfig.IdleIntervalMS =
+        chip::System::Clock::Milliseconds32(WiFiManager::kDefaultDTIMInterval * WiFiManager::kBeaconIntervalMs);
+    return CHIP_NO_ERROR;
 }
-
-void ConnectivityManagerImplWiFi::OnStationDisconnected()
+CHIP_ERROR ConnectivityManagerImplWiFi::_SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
 {
-    // ensure the station is disconnected
-    if (WiFiManager::StationStatus::DISCONNECTED == WiFiManager().Instance().GetStationStatus())
-    {
-        ChipDeviceEvent disconnectEvent{};
-        disconnectEvent.Type                          = DeviceEventType::kWiFiConnectivityChange;
-        disconnectEvent.WiFiConnectivityChange.Result = kConnectivity_Lost;
-        PlatformMgr().PostEventOrDie(&disconnectEvent);
-    }
-    else
-    {
-        ChipLogError(DeviceLayer, "WiFi Station is not disconnected!");
-    }
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
+CHIP_ERROR ConnectivityManagerImplWiFi::_RequestSEDActiveMode(bool onOff, bool delayIdle)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+#endif
 
 ConnectivityManager::WiFiAPMode ConnectivityManagerImplWiFi::_GetWiFiAPMode(void)
 {

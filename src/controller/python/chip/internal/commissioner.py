@@ -13,13 +13,13 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-from chip.configuration import GetLocalNodeId
-from chip.configuration import GetCommissionerCAT
-from chip.native import NativeLibraryHandleMethodArguments, GetLibraryHandle
+import ctypes
 from enum import Enum
 from typing import Optional
+
+from chip.configuration import GetCommissionerCAT, GetLocalNodeId
 from chip.internal.types import NetworkCredentialsRequested, OperationalCredentialsRequested, PairingComplete
-import ctypes
+from chip.native import GetLibraryHandle, NativeLibraryHandleMethodArguments
 
 # Not using c_void_p directly is IMPORTANT. Python auto-casts c_void_p
 # to intergers and this can cause 32/64 bit issues.

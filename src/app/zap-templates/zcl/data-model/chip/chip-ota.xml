@@ -46,40 +46,40 @@ limitations under the License.
         <server tick="false" init="false">true</server>
         <command source="client" code="0x00" name="QueryImage" response="QueryImageResponse" optional="false" cli="chip ota queryimage">
             <description>Determine availability of a new Software Image</description>
-            <arg name="vendorId" type="vendor_id"/>
-            <arg name="productId" type="INT16U"/>
-            <arg name="softwareVersion" type="INT32U"/>
-            <arg name="protocolsSupported" type="OTADownloadProtocol" array="true"/>
-            <arg name="hardwareVersion" type="INT16U" optional="true"/>
-            <arg name="location" type="CHAR_STRING" length="2" optional="true"/>
-            <arg name="requestorCanConsent" type="BOOLEAN" default="false" optional="true"/>
-            <arg name="metadataForProvider" type="OCTET_STRING" length="512" optional="true"/>
+            <arg name="VendorID" type="vendor_id"/>
+            <arg name="ProductID" type="INT16U"/>
+            <arg name="SoftwareVersion" type="INT32U"/>
+            <arg name="ProtocolsSupported" type="OTADownloadProtocol" array="true"/>
+            <arg name="HardwareVersion" type="INT16U" optional="true"/>
+            <arg name="Location" type="CHAR_STRING" length="2" optional="true"/>
+            <arg name="RequestorCanConsent" type="BOOLEAN" default="false" optional="true"/>
+            <arg name="MetadataForProvider" type="OCTET_STRING" length="512" optional="true"/>
         </command>
         <command source="server" code="0x01" name="QueryImageResponse" optional="false" cli="chip ota queryimageresponse">
             <description>Response to QueryImage command</description>
-            <arg name="status" type="OTAQueryStatus"/>
-            <arg name="delayedActionTime" type="INT32U" optional="true"/>
-            <arg name="imageURI" type="CHAR_STRING" length="256" optional="true"/>
-            <arg name="softwareVersion" type="INT32U" optional="true"/>
-            <arg name="softwareVersionString" type="CHAR_STRING" length="64" optional="true"/>
-            <arg name="updateToken" type="OCTET_STRING" length="32" optional="true"/>
-            <arg name="userConsentNeeded" type="BOOLEAN" default="false" optional="true"/>
-            <arg name="metadataForRequestor" type="OCTET_STRING" length="512" optional="true"/>
+            <arg name="Status" type="OTAQueryStatus"/>
+            <arg name="DelayedActionTime" type="INT32U" optional="true"/>
+            <arg name="ImageURI" type="CHAR_STRING" length="256" optional="true"/>
+            <arg name="SoftwareVersion" type="INT32U" optional="true"/>
+            <arg name="SoftwareVersionString" type="CHAR_STRING" length="64" optional="true"/>
+            <arg name="UpdateToken" type="OCTET_STRING" length="32" optional="true"/>
+            <arg name="UserConsentNeeded" type="BOOLEAN" default="false" optional="true"/>
+            <arg name="MetadataForRequestor" type="OCTET_STRING" length="512" optional="true"/>
         </command>
         <command source="client" code="0x02" name="ApplyUpdateRequest" response="ApplyUpdateResponse" optional="false" cli="chip ota applyupdaterequest">
             <description>Determine next action to take for a downloaded Software Image</description>
-            <arg name="updateToken" type="OCTET_STRING" length="32"/>
-            <arg name="newVersion" type="INT32U"/>
+            <arg name="UpdateToken" type="OCTET_STRING" length="32"/>
+            <arg name="NewVersion" type="INT32U"/>
         </command>
         <command source="server" code="0x03" name="ApplyUpdateResponse" optional="false" cli="chip ota applyupdateresponse">
             <description>Reponse to ApplyUpdateRequest command</description>
-            <arg name="action" type="OTAApplyUpdateAction"/>
-            <arg name="delayedActionTime" type="INT32U"/>
+            <arg name="Action" type="OTAApplyUpdateAction"/>
+            <arg name="DelayedActionTime" type="INT32U"/>
         </command>
         <command source="client" code="0x04" name="NotifyUpdateApplied" optional="false" cli="chip ota notifyupdateapplied">
             <description>Notify OTA Provider that an update was applied</description>
-            <arg name="updateToken" type="OCTET_STRING" length="32"/>
-            <arg name="softwareVersion" type="INT32U"/>
+            <arg name="UpdateToken" type="OCTET_STRING" length="32"/>
+            <arg name="SoftwareVersion" type="INT32U"/>
         </command>
     </cluster>
     <enum name="OTAAnnouncementReason" type="ENUM8">
@@ -121,17 +121,17 @@ limitations under the License.
         <define>OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER</define>
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
-        <attribute side="server" code="0x0000" define="DEFAULT_OTA_PROVIDERS" type="ARRAY" entryType="ProviderLocation" writable="true" optional="false">DefaultOtaProviders</attribute>
+        <attribute side="server" code="0x0000" define="DEFAULT_OTA_PROVIDERS" type="ARRAY" entryType="ProviderLocation" writable="true" optional="false">DefaultOTAProviders</attribute>
         <attribute side="server" code="0x0001" define="UPDATE_POSSIBLE" type="BOOLEAN" default="true" writable="false" optional="false">UpdatePossible</attribute>
         <attribute side="server" code="0x0002" define="UPDATE_STATE" type="OTAUpdateStateEnum" default="Unknown" writable="false" optional="false">UpdateState</attribute>
         <attribute side="server" code="0x0003" define="UPDATE_STATE_PROGRESS" type="INT8U" min="0" max="100" writable="false" isNullable="true" optional="false">UpdateStateProgress</attribute>
-        <command source="client" code="0x00" name="AnnounceOtaProvider" optional="true" cli="chip ota announceotaprovider">
+        <command source="client" code="0x00" name="AnnounceOTAProvider" optional="true" cli="chip ota announceotaprovider">
             <description>Announce the presence of an OTA Provider</description>
-            <arg name="providerNodeId" type="node_id"/>
-            <arg name="vendorId" type="vendor_id"/>
-            <arg name="announcementReason" type="OTAAnnouncementReason"/>
-            <arg name="metadataForNode" type="OCTET_STRING" length="512" optional="true"/>
-            <arg name="endpoint" type="endpoint_no"/>
+            <arg name="ProviderNodeID" type="node_id"/>
+            <arg name="VendorID" type="vendor_id"/>
+            <arg name="AnnouncementReason" type="OTAAnnouncementReason"/>
+            <arg name="MetadataForNode" type="OCTET_STRING" length="512" optional="true"/>
+            <arg name="Endpoint" type="endpoint_no"/>
         </command>
         <event side="server" code="0x00" name="StateTransition" priority="info" optional="false">
           <description>This event SHALL be generated when a change of the UpdateState attribute occurs due to an OTA Requestor moving through the states necessary to query for updates.</description>

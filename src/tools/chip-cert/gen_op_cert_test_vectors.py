@@ -1,17 +1,13 @@
 #!/usr/bin/env python
 
 import argparse
-import json
 import os
+import os.path
 import subprocess
 import sys
-import typing
-import cryptography.x509
-import os.path
-import glob
-from binascii import hexlify, unhexlify
 from enum import Enum
-from dacs import copyrightNotice, bytes_from_hex, make_c_array, make_array_header, open_outfile
+
+from dacs import copyrightNotice, make_array_header, make_c_array
 
 
 class CertType(Enum):
@@ -380,7 +376,8 @@ CHIP_TLV_CERT_ERROR_TEST_CASES = [
         "is_get_cert_type_expected_to_fail": False,
     },
     {
-        "description": "Certificate Key Usage extension diginalSignature field is wrong (not present for NOC and present for ICAC/RCAC)",
+        "description": "Certificate Key Usage extension diginalSignature field is wrong "
+        "(not present for NOC and present for ICAC/RCAC)",
         "test_name": 'Ext-KeyUsage-DigSig-Wrong',
         "error_flag": 'ext-key-usage-dig-sig',
         "is_chip_to_x509_expected_to_fail": False,
@@ -516,7 +513,8 @@ class Names:
 
 
 class OpCertBuilder:
-    def __init__(self, cert_type: CertType, cert_form: CertFormat, signer_cert: str, signer_key: str, error_type: str, test_name: str, test_case_out_dir: str, chip_cert: str):
+    def __init__(self, cert_type: CertType, cert_form: CertFormat, signer_cert: str, signer_key: str, error_type: str,
+                 test_name: str, test_case_out_dir: str, chip_cert: str):
         self.cert_type = cert_type
         self.cert_form = cert_form
         self.error_type = error_type
@@ -620,7 +618,8 @@ def main():
             for test_case in DER_CERT_ERROR_TEST_CASES:
                 for cert_type in [CertType.NOC, CertType.ICAC, CertType.RCAC]:
                     # The following error cases are applicable only for NOC
-                    if (test_case["error_flag"] == 'subject-node-id-invalid' or test_case["error_flag"] == 'ext-basic-pathlen-presence-wrong') and cert_type != CertType.NOC:
+                    if (test_case["error_flag"] == 'subject-node-id-invalid' or
+                            test_case["error_flag"] == 'ext-basic-pathlen-presence-wrong') and cert_type != CertType.NOC:
                         break
 
                     if cert_type == CertType.NOC:
@@ -662,7 +661,8 @@ def main():
                         break
 
                     # The following error cases are applicable only for NOC
-                    if (test_case["error_flag"] == 'subject-node-id-invalid' or test_case["error_flag"] == 'subject-fabric-id-missing') and cert_type != CertType.NOC:
+                    if (test_case["error_flag"] == 'subject-node-id-invalid'
+                            or test_case["error_flag"] == 'subject-fabric-id-missing') and cert_type != CertType.NOC:
                         break
 
                     if cert_type == CertType.NOC:
@@ -689,7 +689,8 @@ def main():
                     if test_case["is_validate_chip_rcac_expected_to_fail"]:
                         c_validate_chip_rcac_error_cases += builder.add_cert_to_error_cases()
                         validate_chip_rcac_error_cases_count += 1
-                    if test_case["is_get_cert_type_expected_to_fail"] and not (test_case["error_flag"] == 'subject-cat-twice' and cert_type == CertType.NOC):
+                    if test_case["is_get_cert_type_expected_to_fail"] and not (test_case["error_flag"] == 'subject-cat-twice'
+                                                                               and cert_type == CertType.NOC):
                         c_get_cert_type_error_cases += builder.add_cert_to_error_cases()
                         get_cert_type_error_cases_count += 1
 

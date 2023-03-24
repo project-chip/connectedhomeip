@@ -36,7 +36,7 @@
 #include <lib/asn1/ASN1.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 

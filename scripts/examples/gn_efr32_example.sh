@@ -33,6 +33,7 @@ source "$CHIP_ROOT/scripts/activate.sh"
 set -x
 env
 USE_WIFI=false
+USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
 
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
@@ -82,20 +83,27 @@ if [ "$#" == "0" ]; then
         enable_sleepy_device
             Enable Sleepy end device. (Default false)
             Must also set chip_openthread_ftd=false
-        sl_matter_version_str
-            Set a Matter sotfware version string for the Silabs examples
-            Used and formatted by default in this script.
-            To skip that formatting or use your own version string use --no-version
-        use_rs911x
-            Build wifi example with extension board rs911x. (Default false)
+        use_rs9116
+            Build wifi example with extension board rs9116. (Default false)
+        use_SiWx917
+            Build wifi example with extension board SiWx917. (Default false)
         use_wf200
             Build wifi example with extension board wf200. (Default false)
         'import("//with_pw_rpc.gni")'
             Use to build the example with pigweed RPC
-        OTA_periodic_query_timeout
+        ota_periodic_query_timeout_sec
             Periodic query timeout variable for OTA in seconds
         rs91x_wpa3_only
             Support for WPA3 only mode on RS91x
+        sl_matter_version
+            Use provided software version at build time
+        sl_matter_version_str
+            Set a Matter sotfware version string for the Silabs examples
+            Used and formatted by default in this script.
+        sl_hardware_version
+            Use provided hardware version at build time
+        siwx917_commissionable_data
+            Build with the commissionable data given in DeviceConfig.h (only for SiWx917)
         Presets
         --sed
             enable sleepy end device, set thread mtd
@@ -103,15 +111,19 @@ if [ "$#" == "0" ]; then
         --low-power
             disables all power consuming features for the most power efficient build
             This flag is to be used with --sed
-        --wifi <wf200 | rs911x>
+        --wifi <wf200 | rs9116>
             build wifi example variant for given exansion board
         --additional_data_advertising
             enable Addition data advertissing and rotating device ID
         --use_ot_lib
             use the silabs openthread library
-        --no-version
-            Skip the silabs formating for the Matter software version string
-            Currently : v1.0-<branchName>-<ShortCommitSha>
+        --use_chip_lwip_lib
+            use the chip lwip library
+        --release
+            Remove all logs and debugs features (including the LCD). Yield the smallest image size possible
+        --docker
+            Change GSDK root for docker builds
+
     "
 elif [ "$#" -lt "2" ]; then
     echo "Invalid number of arguments
@@ -132,15 +144,17 @@ else
         case $1 in
             --wifi)
                 if [ -z "$2" ]; then
-                    echo "--wifi requires rs911x or wf200"
+                    echo "--wifi requires rs9116 or SiWx917 or wf200"
                     exit 1
                 fi
-                if [ "$2" = "rs911x" ]; then
-                    optArgs+="use_rs911x=true "
+                if [ "$2" = "rs9116" ]; then
+                    optArgs+="use_rs9116=true "
+                elif [ "$2" = "SiWx917" ]; then
+                    optArgs+="use_SiWx917=true "
                 elif [ "$2" = "wf200" ]; then
                     optArgs+="use_wf200=true "
                 else
-                    echo "Wifi usage: --wifi rs911x|wf200"
+                    echo "Wifi usage: --wifi rs9116|SiWx917|wf200"
                     exit 1
                 fi
                 USE_WIFI=true
@@ -156,7 +170,7 @@ else
                 shift
                 ;;
             --chip_enable_wifi_ipv4)
-                optArgs+="chip_enable_wifi_ipv4=true "
+                ipArgs="chip_enable_wifi_ipv4=true chip_inet_config_enable_ipv4=true "
                 shift
                 ;;
             --additional_data_advertising)
@@ -171,12 +185,33 @@ else
                 optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
                 shift
                 ;;
-            --no-version)
+            --use_chip_lwip_lib)
+                optArgs+="lwip_root=\""//third_party/connectedhomeip/third_party/lwip"\" "
+                shift
+                ;;
+            # Option not to be used until ot-efr32 github is updated
+            # --use_ot_github_sources)
+            #   optArgs+="openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/openthread\" openthread_efr32_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/src/src\""
+            #    shift
+            #    ;;
+            --release)
+                optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
+                shift
+                ;;
+            --docker)
+                optArgs+="efr32_sdk_root=\"$GSDK_ROOT\" "
+                USE_DOCKER=true
+                shift
+                ;;
+
+            *"sl_matter_version_str="*)
+                optArgs+="$1 "
                 USE_GIT_SHA_FOR_VERSION=false
                 shift
                 ;;
+
             *)
-                if [ "$1" =~ *"use_rs911x=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
+                if [ "$1" =~ *"use_rs9116=true"* ] || [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true
                 fi
 
@@ -193,7 +228,7 @@ else
 
     if [ "$USE_GIT_SHA_FOR_VERSION" == true ]; then
         {
-            ShortCommitSha=$(git describe --always --dirty)
+            ShortCommitSha=$(git describe --always --dirty --exclude '*')
             branchName=$(git rev-parse --abbrev-ref HEAD)
             optArgs+="sl_matter_version_str=\"v1.0-$branchName-$ShortCommitSha\" "
         } &>/dev/null
@@ -202,10 +237,17 @@ else
     BUILD_DIR=$OUTDIR/$SILABS_BOARD
     echo BUILD_DIR="$BUILD_DIR"
     if [ "$USE_WIFI" == true ]; then
+        # wifi build
+        # NCP mode EFR32 + wifi module
+        optArgs+="$ipArgs"
         gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
     else
-        # thread build
+        # OpenThread/SoC build
         #
+        if [ "$USE_DOCKER" == true ]; then
+            optArgs+="openthread_root=\"$GSDK_ROOT/util/third_party/openthread\" "
+        fi
+
         if [ -z "$optArgs" ]; then
             gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\"" "$BUILD_DIR"
         else

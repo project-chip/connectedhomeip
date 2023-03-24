@@ -372,7 +372,7 @@ public:
         if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetSerialNumber(response.serial_number, sizeof(response.serial_number)) !=
             CHIP_NO_ERROR)
         {
-            return pw::Status::Internal();
+            response.serial_number[0] = '\0'; // optional serial field not set.
         }
 
         // Create buffer for QR code that can fit max size and null terminator.
@@ -430,7 +430,7 @@ public:
 
         if (Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen() &&
             Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatusForCluster() !=
-                app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen)
+                app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kEnhancedWindowOpen)
         {
             // Cache values before closing to restore them after restart.
             app::DataModel::Nullable<VendorId> vendorId = Server::GetInstance().GetCommissioningWindowManager().GetOpenerVendorId();
@@ -444,7 +444,7 @@ public:
             }
             // Let other tasks possibly work since Commissioning window close/open are "heavy"
             if (Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatusForCluster() !=
-                    app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen &&
+                    app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum::kWindowNotOpen &&
                 !vendorId.IsNull() && !fabricIndex.IsNull())
             {
                 DeviceLayer::StackLock lock;

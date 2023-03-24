@@ -35,7 +35,7 @@ tests:
       verification: |
           To generate the Attestation Nonce give below command
 
-          echo hex:$(hexdump -vn32 -e"4/4 "%08X" " /dev/urandom)
+          echo hex:$(hexdump -vn32 -e'4/4 "%08X"' /dev/urandom)
 
           The generated Attestation Nonce is hex:97B823C0207728BEC509CFE4D413C95AA693140D1F5D60215913ABB1F220E631
       disabled: true
@@ -276,7 +276,7 @@ tests:
           "TH1 Reads the VendorID attribute of the Basic Information cluster and
           saves it as basic_info_vendor_id"
       verification: |
-          ./chip-tool basic read vendor-id 1 0  --trace_decode 1
+          ./chip-tool  basicinformation read vendor-id 1 0  --trace_decode 1
 
           Verify the vendorId in TH (chip-tool) Log , Note this Vendor ID and you are going to verify this matching with CD in the steps below
 
@@ -289,7 +289,7 @@ tests:
           "TH1 Reads the ProductID attribute of the Basic Information cluster
           and saves it as basic_info_product_id"
       verification: |
-          ./chip-tool basic read product-id 1 0  --trace_decode 1
+          ./chip-tool  basicinformation read product-id 1 0  --trace_decode 1
 
           Verify  ProductId in TH (chip-tool) Log,  Note this PID and you are going to verify this matching with CD in the steps below
 
@@ -303,7 +303,7 @@ tests:
           AttestationResponse Command received by TH1 from DUT"
       verification: |
           To get attestation nonce give below command
-           echo hex:$(hexdump -vn32 -e"4/4 "%08X" " /dev/urandom)
+           echo hex:$(hexdump -vn32 -e'4/4 "%08X"' /dev/urandom)
 
 
           ./chip-tool operationalcredentials attestation-request hex:3577CA6EFFFC560E287604663AE5BE2F11D1B1CF99BE326AF5B3B114A2E91395 1 0 --trace_decode 1

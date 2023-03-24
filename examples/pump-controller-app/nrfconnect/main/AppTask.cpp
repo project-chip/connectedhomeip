@@ -23,8 +23,6 @@
 #include "PumpManager.h"
 
 #include <DeviceInfoProviderImpl.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -42,8 +40,8 @@
 #endif
 
 #include <dk_buttons_and_leds.h>
+#include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
-#include <zephyr/zephyr.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -156,7 +154,7 @@ CHIP_ERROR AppTask::Init()
 
 #ifdef CONFIG_MCUMGR_SMP_BT
     // Initialize DFU over SMP
-    GetDFUOverSMP().Init(RequestSMPAdvertisingStart);
+    GetDFUOverSMP().Init();
     GetDFUOverSMP().ConfirmNewImage();
 #endif
 
@@ -315,16 +313,6 @@ void AppTask::FunctionTimerEventHandler(const AppEvent & event)
     }
 }
 
-#ifdef CONFIG_MCUMGR_SMP_BT
-void AppTask::RequestSMPAdvertisingStart(void)
-{
-    AppEvent event;
-    event.Type    = AppEventType::StartSMPAdvertising;
-    event.Handler = [](const AppEvent &) { GetDFUOverSMP().StartBLEAdvertising(); };
-    PostEvent(event);
-}
-#endif
-
 void AppTask::FunctionHandler(const AppEvent & event)
 {
     if (event.ButtonEvent.PinNo != FUNCTION_BUTTON)
@@ -467,7 +455,7 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
         sIsNetworkEnabled     = ConnectivityMgr().IsThreadEnabled();
         UpdateStatusLED();
         break;
-    case DeviceEventType::kDnssdPlatformInitialized:
+    case DeviceEventType::kDnssdInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
         InitBasicOTARequestor();
 #endif

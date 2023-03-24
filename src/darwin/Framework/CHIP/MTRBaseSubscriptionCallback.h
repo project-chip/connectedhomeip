@@ -27,8 +27,8 @@
 #include <app/ReadClient.h>
 #include <app/ReadPrepareParams.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/TLV.h>
 
 #include <memory>
 

@@ -34,8 +34,8 @@
 
 #define APP_BUTTON_PUSH 1
 
-#define CONTACT_SENSOR_STATE_LED LED1
-#define SYSTEM_STATE_LED LED2
+#define CONTACT_SENSOR_STATE_LED LED2
+#define SYSTEM_STATE_LED LED1
 
 // ---- Contact Example SWU Config ----
 #define SWU_INTERVAl_WINDOW_MIN_MS (23 * 60 * 60 * 1000) // 23 hours

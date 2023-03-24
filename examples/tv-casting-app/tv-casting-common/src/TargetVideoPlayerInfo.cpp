@@ -17,6 +17,8 @@
  */
 #include "TargetVideoPlayerInfo.h"
 
+#include <app/server/Server.h>
+
 using namespace chip;
 
 CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> gCASEClientPool;
@@ -24,8 +26,8 @@ CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> gCASEClientPool;
 CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIndex,
                                              std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                                              std::function<void(CHIP_ERROR)> onConnectionFailure, uint16_t vendorId,
-                                             uint16_t productId, uint16_t deviceType, const char * deviceName, size_t numIPs,
-                                             chip::Inet::IPAddress * ipAddress)
+                                             uint16_t productId, chip::DeviceTypeId deviceType, const char * deviceName,
+                                             const char * hostName, size_t numIPs, chip::Inet::IPAddress * ipAddress)
 {
     ChipLogProgress(NotSpecified, "TargetVideoPlayerInfo nodeId=0x" ChipLogFormatX64 " fabricIndex=%d", ChipLogValueX64(nodeId),
                     fabricIndex);
@@ -40,10 +42,18 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
         mIpAddress[i] = ipAddress[i];
     }
 
-    if (deviceName)
+    memset(mDeviceName, '\0', sizeof(mDeviceName));
+    if (deviceName != nullptr)
     {
-        chip::Platform::CopyString(mDeviceName, chip::Dnssd::kMaxDeviceNameLen + 1, deviceName);
+        chip::Platform::CopyString(mDeviceName, chip::Dnssd::kMaxDeviceNameLen, deviceName);
     }
+
+    memset(mHostName, '\0', sizeof(mHostName));
+    if (hostName != nullptr)
+    {
+        chip::Platform::CopyString(mHostName, chip::Dnssd::kHostNameMaxLength, hostName);
+    }
+
     for (auto & endpointInfo : mEndpoints)
     {
         endpointInfo.Reset();
@@ -61,11 +71,14 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
 CHIP_ERROR TargetVideoPlayerInfo::FindOrEstablishCASESession(std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                                                              std::function<void(CHIP_ERROR)> onConnectionFailure)
 {
-    mOnConnectionSuccessClientCallback = onConnectionSuccess;
-    mOnConnectionFailureClientCallback = onConnectionFailure;
-    Server * server                    = &(chip::Server::GetInstance());
-    server->GetCASESessionManager()->FindOrEstablishSession(ScopedNodeId(mNodeId, mFabricIndex), &mOnConnectedCallback,
-                                                            &mOnConnectionFailureCallback);
+    ChipLogProgress(AppServer, "TargetVideoPlayerInfo::FindOrEstablishCASESession called");
+
+    VideoPlayerConnectionContext * connectionContext = new VideoPlayerConnectionContext(
+        this, HandleDeviceConnected, HandleDeviceConnectionFailure, onConnectionSuccess, onConnectionFailure);
+    Server * server = &(chip::Server::GetInstance());
+    server->GetCASESessionManager()->FindOrEstablishSession(ScopedNodeId(mNodeId, mFabricIndex),
+                                                            connectionContext->mOnConnectedCallback,
+                                                            connectionContext->mOnConnectionFailureCallback);
     return CHIP_NO_ERROR;
 }
 
@@ -118,8 +131,8 @@ bool TargetVideoPlayerInfo::HasEndpoint(EndpointId endpointId)
 
 void TargetVideoPlayerInfo::PrintInfo()
 {
-    ChipLogProgress(NotSpecified, " TargetVideoPlayerInfo nodeId=0x" ChipLogFormatX64 " fabric index=%d", ChipLogValueX64(mNodeId),
-                    mFabricIndex);
+    ChipLogProgress(NotSpecified, " TargetVideoPlayerInfo deviceName=%s nodeId=0x" ChipLogFormatX64 " fabric index=%d", mDeviceName,
+                    ChipLogValueX64(mNodeId), mFabricIndex);
     for (auto & endpointInfo : mEndpoints)
     {
         if (endpointInfo.IsInitialized())
@@ -129,16 +142,17 @@ void TargetVideoPlayerInfo::PrintInfo()
     }
 }
 
-bool TargetVideoPlayerInfo::IsSameAs(const chip::Dnssd::DiscoveredNodeData * discoveredNodeData)
+bool TargetVideoPlayerInfo::IsSameAs(const char * hostName, const char * deviceName, size_t numIPs,
+                                     const chip::Inet::IPAddress * ipAddresses)
 {
-    // return false because 'this' VideoPlayer is not null
-    if (discoveredNodeData == nullptr)
+    // return true if the hostNames match
+    if (strcmp(mHostName, hostName) == 0)
     {
-        return false;
+        return true;
     }
 
     // return false because deviceNames are different
-    if (strcmp(mDeviceName, discoveredNodeData->commissionData.deviceName) != 0)
+    if (strcmp(mDeviceName, deviceName) != 0)
     {
         return false;
     }
@@ -149,10 +163,9 @@ bool TargetVideoPlayerInfo::IsSameAs(const chip::Dnssd::DiscoveredNodeData * dis
         bool matchFound = false;
         for (size_t i = 0; i < mNumIPs && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
         {
-            for (size_t j = 0;
-                 j < discoveredNodeData->resolutionData.numIPs && j < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; j++)
+            for (size_t j = 0; j < numIPs && j < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; j++)
             {
-                if (mIpAddress[i] == discoveredNodeData->resolutionData.ipAddress[j])
+                if (mIpAddress[i] == ipAddresses[j])
                 {
                     matchFound = true;
                     break;
@@ -171,4 +184,16 @@ bool TargetVideoPlayerInfo::IsSameAs(const chip::Dnssd::DiscoveredNodeData * dis
     }
 
     return true;
+}
+
+bool TargetVideoPlayerInfo::IsSameAs(const chip::Dnssd::DiscoveredNodeData * discoveredNodeData)
+{
+    // return false because 'this' VideoPlayer is not null
+    if (discoveredNodeData == nullptr)
+    {
+        return false;
+    }
+
+    return IsSameAs(discoveredNodeData->resolutionData.hostName, discoveredNodeData->commissionData.deviceName,
+                    discoveredNodeData->resolutionData.numIPs, discoveredNodeData->resolutionData.ipAddress);
 }

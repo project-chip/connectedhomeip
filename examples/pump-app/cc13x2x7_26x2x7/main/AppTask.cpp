@@ -26,12 +26,12 @@
 #include <app/server/Server.h>
 
 #include "FreeRTOS.h"
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-
 #include <app/EventLogging.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <examples/platform/cc13x2_26x2/CC13X2_26X2DeviceAttestationCreds.h>
 
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR)
 #include <app/clusters/ota-requestor/BDXDownloader.h>
@@ -221,8 +221,12 @@ int AppTask::Init()
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 
-    // Initialize device attestation config
+// Initialize device attestation config
+#ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(CC13X2_26X2::GetCC13X2_26X2DacProvider());
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -469,7 +473,7 @@ void AppTask::UpdateClusterState(void)
 void AppTask::UpdateCluster(intptr_t context)
 {
     EmberStatus status;
-    BitMask<PumpConfigurationAndControl::PumpStatus> pumpStatus;
+    BitMask<PumpConfigurationAndControl::PumpStatusBitmap> pumpStatus;
 
     ChipLogProgress(NotSpecified, "Update Cluster State");
 
@@ -477,34 +481,34 @@ void AppTask::UpdateCluster(intptr_t context)
     PumpConfigurationAndControl::Attributes::PumpStatus::Get(PCC_CLUSTER_ENDPOINT, &pumpStatus);
     if (PumpMgr().IsStopped())
     {
-        pumpStatus.Clear(PumpConfigurationAndControl::PumpStatus::kRunning);
+        pumpStatus.Clear(PumpConfigurationAndControl::PumpStatusBitmap::kRunning);
     }
     else
     {
-        pumpStatus.Set(PumpConfigurationAndControl::PumpStatus::kRunning);
+        pumpStatus.Set(PumpConfigurationAndControl::PumpStatusBitmap::kRunning);
     }
     PumpConfigurationAndControl::Attributes::PumpStatus::Set(PCC_CLUSTER_ENDPOINT, pumpStatus);
 
     status = PumpConfigurationAndControl::Attributes::ControlMode::Set(PCC_CLUSTER_ENDPOINT,
-                                                                       PumpConfigurationAndControl::PumpControlMode::kConstantFlow);
+                                                                       PumpConfigurationAndControl::ControlModeEnum::kConstantFlow);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Constant Flow error  %x", status);
     }
     status = PumpConfigurationAndControl::Attributes::ControlMode::Set(
-        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantPressure);
+        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::ControlModeEnum::kConstantPressure);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Constant Pressure error  %x", status);
     }
     status = PumpConfigurationAndControl::Attributes::ControlMode::Set(
-        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantSpeed);
+        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::ControlModeEnum::kConstantSpeed);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Constant Speed error  %x", status);
     }
     status = PumpConfigurationAndControl::Attributes::ControlMode::Set(
-        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::PumpControlMode::kConstantTemperature);
+        PCC_CLUSTER_ENDPOINT, PumpConfigurationAndControl::ControlModeEnum::kConstantTemperature);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Constant Temperature error  %x", status);

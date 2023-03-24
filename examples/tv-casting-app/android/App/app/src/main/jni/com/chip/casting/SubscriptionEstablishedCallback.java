@@ -17,6 +17,20 @@
  */
 package com.chip.casting;
 
-public interface SubscriptionEstablishedCallback {
-  void handle();
+import android.util.Log;
+
+public abstract class SubscriptionEstablishedCallback {
+  private static final String TAG = SubscriptionEstablishedCallback.class.getSimpleName();
+
+  public abstract void handle();
+
+  private void handleInternal() {
+    try {
+      handle();
+    } catch (Throwable t) {
+      Log.e(
+          TAG,
+          "SubscriptionEstablishedCallback::Caught an unhandled Throwable from the client: " + t);
+    }
+  }
 }

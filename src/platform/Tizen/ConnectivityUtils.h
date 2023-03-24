@@ -28,7 +28,7 @@ namespace Internal {
 class ConnectivityUtils
 {
 public:
-    static app::Clusters::GeneralDiagnostics::InterfaceType GetInterfaceConnectionType(const char * ifname);
+    static app::Clusters::GeneralDiagnostics::InterfaceTypeEnum GetInterfaceConnectionType(const char * ifname);
 };
 
 } // namespace Internal

@@ -53,6 +53,7 @@ qpg_executable("lock_app") {
   output_name = "chip-${qpg_target_ic}-lock-example.out"
 
   sources = [
+    "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerDelegate.cpp",
     "${examples_plat_dir}/app/main.cpp",
     "${examples_plat_dir}/ota/ota.cpp",
     "src/AppTask.cpp",
@@ -63,7 +64,7 @@ qpg_executable("lock_app") {
   deps = [
     ":factorydata_lib",
     ":sdk",
-    "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/examples/lock-app/qpg/zap/",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",

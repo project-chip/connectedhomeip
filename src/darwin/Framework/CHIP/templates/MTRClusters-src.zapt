@@ -3,6 +3,7 @@
 #import <Foundation/Foundation.h>
 
 #import "MTRAsyncCallbackWorkQueue.h"
+#import "MTRBaseClusterUtils.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRClusterConstants.h"
 #import "MTRClusters_Internal.h"
@@ -22,6 +23,9 @@ using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
 using chip::Messaging::ExchangeManager;
 using chip::SessionHandle;
+using chip::Optional;
+using chip::System::Clock::Timeout;
+using chip::System::Clock::Seconds16;
 
 static void MTRClustersLogEnqueue(NSString *logPrefix, MTRAsyncCallbackWorkQueue *workQueue) {
     MTR_LOG_INFO("%@ enqueueWorkItem %@", logPrefix, workQueue);
@@ -37,6 +41,7 @@ static void MTRClustersLogCompletion(NSString *logPrefix, id value, NSError *err
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 {{#chip_client_clusters includeAll=true}}
+{{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
 @implementation MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue
@@ -119,11 +124,21 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
             [workItem endWork];
           },
           ^(ExchangeManager & exchangeManager, const SessionHandle & session, {{>callbackName}}CallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-            chip::Optional<uint16_t> timedInvokeTimeoutMs;
+            auto * typedBridge = static_cast<MTR{{>callbackName}}CallbackBridge *>(bridge);
+            Optional<uint16_t> timedInvokeTimeoutMs;
+            Optional<Timeout> invokeTimeout;
             ListFreer listFreer;
             {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
             if (timedInvokeTimeoutMsParam != nil) {
               timedInvokeTimeoutMs.SetValue(timedInvokeTimeoutMsParam.unsignedShortValue);
+            }
+            if (params != nil) {
+              if (params.serverSideProcessingTimeout != nil) {
+                // Clamp to a number of seconds that will not overflow 32-bit
+                // int when converted to ms.
+                auto * serverSideProcessingTimeout = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+                invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
+              }
             }
             {{#if mustUseTimedInvoke}}
             if (!timedInvokeTimeoutMs.HasValue()) {
@@ -144,8 +159,7 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
               {{/last}}
             {{/chip_cluster_command_arguments}}
 
-            chip::Controller::{{asUpperCamelCase parent.name}}Cluster cppCluster(exchangeManager, session, self->_endpoint);
-            return cppCluster.InvokeCommand(request, bridge, successCb, failureCb, timedInvokeTimeoutMs);
+            return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb, self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
         });
         std::move(*bridge).DispatchAction(baseDevice);
     };
@@ -168,7 +182,11 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
                 command=(asUpperCamelCase name preserveAcronyms=true)}}
 {{/chip_cluster_commands}}
 
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server}}
+{{! This is used as the implementation for both the new-name and old-name bits, so check for both here. }}
+{{#unless (and (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))
+               (or (wasRemoved (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
+                   (not wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))))}}
 {{#*inline "cluster"}}{{asUpperCamelCase parent.name preserveAcronyms=true}}{{/inline}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {
@@ -195,15 +213,20 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 
 {{/if}}
 
-{{/chip_server_cluster_attributes}}
+{{/unless}}
+{{/zcl_attributes_server}}
 
 @end
+{{/unless}}
 {{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
-
+{{#unless (wasRemoved (compatClusterNameRemapping name))}}
 @implementation MTRCluster{{compatClusterNameRemapping name}}
 @end
 {{/unless}}
+{{/unless}}
 
+{{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name))
+           (not (wasRemoved (compatClusterNameRemapping name))))}}
 @implementation MTRCluster{{compatClusterNameRemapping name}} (Deprecated)
 
 - (instancetype)initWithDevice:(MTRDevice *)device endpoint:(uint16_t)endpoint queue:(dispatch_queue_t)queue
@@ -231,7 +254,7 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 {{#unless (hasArguments)}}
 - (void){{asLowerCamelCase command}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
 {
-  [self {{asLowerCamelCase name}}WithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completionHandler:completionHandler];
+  [self {{asLowerCamelCase command}}WithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completionHandler:completionHandler];
 }
 {{/unless}}
 {{/unless}}
@@ -239,9 +262,10 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 {{> commandImpl cluster=(compatClusterNameRemapping parent.name)
                 command=(compatCommandNameRemapping parent.name name)}}
 {{/chip_cluster_commands}}
-{{~#chip_server_cluster_attributes}}
+{{~#zcl_attributes_server}}
 {{~#*inline "attributeImpls"}}
-{{#unless (isStrEqual attribute (asUpperCamelCase name preserveAcronyms=true))}}
+{{#unless (or (isStrEqual attribute (asUpperCamelCase name preserveAcronyms=true))
+              (wasRemoved (compatClusterNameRemapping parent.name) attribute=attribute))}}
 - (NSDictionary<NSString *, id> *)readAttribute{{attribute}}WithParams:(MTRReadParams * _Nullable)params
 {
   return [self readAttribute{{asUpperCamelCase name preserveAcronyms=true}}WithParams:params];
@@ -259,8 +283,9 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 {{/unless}}
 {{/inline~}}
 {{> attributeImpls attribute=(compatAttributeNameRemapping parent.name name)}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 @end
+{{/if}}
 
 {{/chip_client_clusters}}
 

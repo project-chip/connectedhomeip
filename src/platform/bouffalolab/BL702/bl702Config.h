@@ -53,25 +53,29 @@ public:
     static constexpr const char * kConfigKey_UniqueId              = ("unique-id");
 
     /** Config keys, which should be droped after a factory reset */
-    static constexpr const char * kConfigKey_FabricId           = ("fabric-id");
-    static constexpr const char * kConfigKey_ServiceConfig      = ("service-config");
-    static constexpr const char * kConfigKey_PairedAccountId    = ("account-id");
-    static constexpr const char * kConfigKey_ServiceId          = ("service-id");
-    static constexpr const char * kConfigKey_FabricSecret       = ("fabric-secret");
-    static constexpr const char * kConfigKey_HardwareVersion    = ("hardware-rev");
-    static constexpr const char * kConfigKey_LastUsedEpochKeyId = ("last-ek-id");
-    static constexpr const char * kConfigKey_FailSafeArmed      = ("fail-safe-armed");
-    static constexpr const char * kConfigKey_WiFiStationSecType = ("sta-sec-type");
-    static constexpr const char * kConfigKey_RegulatoryLocation = ("regulatory-location");
-    static constexpr const char * kConfigKey_CountryCode        = ("country-code");
-    static constexpr const char * kConfigKey_ActiveLocale       = ("active-locale");
-    static constexpr const char * kConfigKey_Breadcrumb         = ("breadcrumb");
-    static constexpr const char * kConfigKey_GroupKeyIndex      = ("group-key-index");
-    static constexpr const char * kBLConfigKey_wifissid         = ("blConfig_wifi-ssid");
-    static constexpr const char * kBLConfigKey_wifipassword     = ("blConfig_wifi-pwd");
+    static constexpr const char * kConfigKey_FabricId                    = ("fabric-id");
+    static constexpr const char * kConfigKey_ServiceConfig               = ("service-config");
+    static constexpr const char * kConfigKey_PairedAccountId             = ("account-id");
+    static constexpr const char * kConfigKey_ServiceId                   = ("service-id");
+    static constexpr const char * kConfigKey_FabricSecret                = ("fabric-secret");
+    static constexpr const char * kConfigKey_HardwareVersion             = ("hardware-ver");
+    static constexpr const char * kConfigKey_LastUsedEpochKeyId          = ("last-ek-id");
+    static constexpr const char * kConfigKey_FailSafeArmed               = ("fail-safe-armed");
+    static constexpr const char * kConfigKey_WiFiStationSecType          = ("sta-sec-type");
+    static constexpr const char * kConfigKey_OperationalDeviceId         = ("op-device-id");
+    static constexpr const char * kConfigKey_OperationalDeviceCert       = ("op-device-cert");
+    static constexpr const char * kConfigKey_OperationalDeviceICACerts   = ("op-device-ca-certs");
+    static constexpr const char * kConfigKey_OperationalDevicePrivateKey = ("op-device-key");
+    static constexpr const char * kConfigKey_RegulatoryLocation          = ("regulatory-location");
+    static constexpr const char * kConfigKey_CountryCode                 = ("country-code");
+    static constexpr const char * kConfigKey_ActiveLocale                = ("active-locale");
+    static constexpr const char * kConfigKey_Breadcrumb                  = ("breadcrumb");
+    static constexpr const char * kConfigKey_GroupKeyIndex               = ("group-key-index");
+    static constexpr const char * kBLConfigKey_wifissid                  = ("blConfig_wifi-ssid");
+    static constexpr const char * kBLConfigKey_wifipassword              = ("blConfig_wifi-pwd");
 
     /** Counter Keys, diagnostic information  */
-    static constexpr const char * kCounterKey_BootCount             = ("boot-count");
+    static constexpr const char * kCounterKey_RebootCount           = ("reboot-count");
     static constexpr const char * kCounterKey_TotalOperationalHours = ("total-hours");
     static constexpr const char * kCounterKey_UpTime                = ("up-time");
 

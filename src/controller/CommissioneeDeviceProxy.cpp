@@ -26,8 +26,6 @@
 
 #include <controller/CommissioneeDeviceProxy.h>
 
-#include <controller-clusters/zap-generated/CHIPClusters.h>
-
 #include <app/CommandSender.h>
 #include <app/ReadPrepareParams.h>
 #include <app/util/DataModelHandler.h>
@@ -73,11 +71,9 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
 {
     mDeviceAddress = addr;
 
-    mRemoteMRPConfig = config;
-
     // Initialize PASE session state with any MRP parameters that DNS-SD has provided.
     // It can be overridden by PASE session protocol messages that include MRP parameters.
-    mPairing.SetRemoteMRPConfig(mRemoteMRPConfig);
+    mPairing.SetRemoteMRPConfig(config);
 
     if (!mSecureSession)
     {

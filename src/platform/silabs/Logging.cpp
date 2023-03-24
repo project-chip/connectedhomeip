@@ -19,6 +19,14 @@
 #include <string.h>
 #include <task.h>
 
+#ifndef BRD4325A
+#include "rail_types.h"
+
+#ifdef RAIL_ASSERT_DEBUG_STRING
+#include "rail_assert_error_codes.h"
+#endif
+#endif // BRD4325A
+
 #ifdef BRD4325A // For SiWx917 Platform only
 #include "core_cm4.h"
 #endif
@@ -423,7 +431,9 @@ extern "C" __attribute__((naked)) void HardFault_Handler(void)
                    "bx r1                                         \n"
                    "debugHardfault_address: .word debugHardfault  \n");
 }
+#endif // HARD_FAULT_LOG_ENABLE && SILABS_LOG_ENABLED
 
+#if HARD_FAULT_LOG_ENABLE
 extern "C" void vApplicationMallocFailedHook(void)
 {
     /* Called if a call to pvPortMalloc() fails because there is insufficient
@@ -432,8 +442,9 @@ extern "C" void vApplicationMallocFailedHook(void)
     timers, and semaphores.  The size of the FreeRTOS heap is set by the
     configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h. */
 
+#if SILABS_LOG_ENABLED
     SILABS_LOG("Failed do a malloc on HEAP. Is it too small ?");
-
+#endif
     /* Force an assert. */
     configASSERT((volatile void *) NULL);
 }
@@ -447,8 +458,11 @@ extern "C" void vApplicationStackOverflowHook(TaskHandle_t pxTask, char * pcTask
     /* Run time stack overflow checking is performed if
     configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2.  This hook
     function is called if a stack overflow is detected. */
+
+#if SILABS_LOG_ENABLED
     SILABS_LOG("TASK OVERFLOW");
     SILABS_LOG(pcTaskName);
+#endif
     /* Force an assert. */
     configASSERT((volatile void *) NULL);
 }
@@ -507,4 +521,28 @@ extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBu
     configMINIMAL_STACK_SIZE is specified in words, not bytes. */
     *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
 }
-#endif // HARD_FAULT_LOG_ENABLE && SILABS_LOG_ENABLED
+
+#ifndef BRD4325A
+extern "C" void RAILCb_AssertFailed(RAIL_Handle_t railHandle, uint32_t errorCode)
+{
+#if SILABS_LOG_ENABLED
+#ifdef RAIL_ASSERT_DEBUG_STRING
+    static const char * railErrorMessages[] = RAIL_ASSERT_ERROR_MESSAGES;
+    const char * errorMessage               = "Unknown";
+
+    If this error code is within the range of known error messages then use the appropriate error
+        message.if (errorCode < (sizeof(railErrorMessages) / sizeof(char *)))
+    {
+        errorMessage = railErrorMessages[errorCode];
+    }
+    SILABS_LOG("RAIL Assert : %s", errorMessage);
+#else
+    SILABS_LOG("RAIL Assert : %ld", errorCode);
+#endif // RAIL_ASSERT_DEBUG_STRING
+#endif // SILABS_LOG_ENABLED
+    while (1)
+        ;
+}
+#endif // BRD4325A
+
+#endif // HARD_FAULT_LOG_ENABLE
