@@ -45,39 +45,17 @@
   }
 
   {{/zcl_events}}
-  {{#chip_server_cluster_attributes}}
-  {{#unless isGlobalAttribute}}
-  {{! ensure indent }}{{#if mustUseTimedWrite~}}
-    timedwrite {{!marker to place a space even with whitespace removal~}}
-  {{~/if~}}
-  {{~#unless isWritableAttribute~}}
-    readonly {{!marker to place a space even with whitespace removal~}}
-  {{~/unless~}}
-  {{~!TODO: write only attributes should also be supported~}}
-  {{~#unless isReportableAttribute~}}
-    nosubscribe {{!marker to place a space even with whitespace removal~}}
-  {{~/unless~}}
-  {{~!Removes spaces~}} attribute {{!ensure space}}
-    {{~#chip_access_elements entity="attribute"~}}
-      {{~#first~}}access({{~/first~}}
-      {{~#not_first~}}, {{/not_first~}}
-        {{operation}}: {{role}} 
-      {{~#last}}) {{/last~}}
-    {{~/chip_access_elements~}}
-    {{~#if isNullable~}}
-      nullable {{!marker to place a space even with whitespace removal~}}
-    {{~/if~}} {{type}}
-    {{~#unless isArray~}}
-      {{~#if (isString type)~}}
-        {{~#if maxLength~}} 
-          <{{maxLength}}> 
-        {{~/if~}}
-      {{~/if~}}
-    {{/unless}} {{asLowerCamelCase name~}}
-    {{~#if isArray~}} [] {{~/if}} = {{code~}}
-    ;
-  {{/unless~}}
-  {{/chip_server_cluster_attributes~}}
+  {{#if (is_client side)}}
+    {{#zcl_attributes_server}}
+  {{! ensure indent }}{{>idl_attribute_definition}}
+    {{/zcl_attributes_server}}
+
+  {{~else}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
+      {{#unless isGlobalAttribute}}
+  {{! ensure indent }}{{>idl_attribute_definition}}
+      {{/unless}}
+    {{/enabled_attributes_for_cluster_and_side~}}
 
   {{~!--Global attributes: spec 7.13 describes these as mandatory --}}
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -86,8 +64,10 @@
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+  {{~/if}}
 {{!--Open:Generating command request structs for all incoming commands into server side--~}}
   {{#if (is_server side)}}
+
     {{#all_incoming_commands_for_cluster name side}}
       {{~>idl_command_request_struct}}
     {{/all_incoming_commands_for_cluster}}

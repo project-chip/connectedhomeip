@@ -1879,6 +1879,7 @@ client cluster TargetNavigator = 1285 {
   }
 
   readonly attribute TargetInfoStruct targetList[] = 0;
+  readonly attribute int8u currentTarget = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1916,6 +1917,13 @@ client cluster MediaPlayback = 1286 {
     kVariableSpeed = 0x2;
   }
 
+  readonly attribute PlaybackStateEnum currentState = 0;
+  readonly attribute nullable epoch_us startTime = 1;
+  readonly attribute nullable int64u duration = 2;
+  readonly attribute nullable PlaybackPositionStruct sampledPosition = 3;
+  readonly attribute single playbackSpeed = 4;
+  readonly attribute nullable int64u seekRangeEnd = 5;
+  readonly attribute nullable int64u seekRangeStart = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1976,6 +1984,7 @@ client cluster MediaInput = 1287 {
   }
 
   readonly attribute InputInfoStruct inputList[] = 0;
+  readonly attribute int8u currentInput = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2235,6 +2244,7 @@ client cluster AudioOutput = 1291 {
   }
 
   readonly attribute OutputInfoStruct outputList[] = 0;
+  readonly attribute int8u currentOutput = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2272,6 +2282,7 @@ client cluster ApplicationLauncher = 1292 {
   }
 
   readonly attribute INT16U catalogList[] = 0;
+  attribute nullable ApplicationEPStruct currentApp = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2309,8 +2320,10 @@ client cluster ApplicationBasic = 1293 {
   readonly attribute vendor_id vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
   readonly attribute int16u productID = 3;
+  readonly attribute ApplicationStruct application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;
+  readonly attribute vendor_id allowedVendorList[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

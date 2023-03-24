@@ -298,6 +298,9 @@ public final class ChipIdLookup {
       if (attributeId == 4L) {
         return "NameSupport";
       }
+      if (attributeId == 5L) {
+        return "LastConfiguredBy";
+      }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
       }
@@ -445,14 +448,32 @@ public final class ChipIdLookup {
       return "";
     }
     if (clusterId == 15L) {
+      if (attributeId == 4L) {
+        return "ActiveText";
+      }
+      if (attributeId == 28L) {
+        return "Description";
+      }
+      if (attributeId == 46L) {
+        return "InactiveText";
+      }
       if (attributeId == 81L) {
         return "OutOfService";
+      }
+      if (attributeId == 84L) {
+        return "Polarity";
       }
       if (attributeId == 85L) {
         return "PresentValue";
       }
+      if (attributeId == 103L) {
+        return "Reliability";
+      }
       if (attributeId == 111L) {
         return "StatusFlags";
+      }
+      if (attributeId == 256L) {
+        return "ApplicationType";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -1774,6 +1795,15 @@ public final class ChipIdLookup {
       if (attributeId == 3L) {
         return "DoorState";
       }
+      if (attributeId == 4L) {
+        return "DoorOpenEvents";
+      }
+      if (attributeId == 5L) {
+        return "DoorClosedEvents";
+      }
+      if (attributeId == 6L) {
+        return "OpenPeriod";
+      }
       if (attributeId == 17L) {
         return "NumberOfTotalUsersSupported";
       }
@@ -1804,11 +1834,17 @@ public final class ChipIdLookup {
       if (attributeId == 26L) {
         return "MinRFIDCodeLength";
       }
+      if (attributeId == 27L) {
+        return "CredentialRulesSupport";
+      }
       if (attributeId == 28L) {
         return "NumberOfCredentialsSupportedPerUser";
       }
       if (attributeId == 33L) {
         return "Language";
+      }
+      if (attributeId == 34L) {
+        return "LEDSettings";
       }
       if (attributeId == 35L) {
         return "AutoRelockTime";
@@ -1822,11 +1858,23 @@ public final class ChipIdLookup {
       if (attributeId == 38L) {
         return "SupportedOperatingModes";
       }
+      if (attributeId == 39L) {
+        return "DefaultConfigurationRegister";
+      }
+      if (attributeId == 40L) {
+        return "EnableLocalProgramming";
+      }
       if (attributeId == 41L) {
         return "EnableOneTouchLocking";
       }
+      if (attributeId == 42L) {
+        return "EnableInsideStatusLED";
+      }
       if (attributeId == 43L) {
         return "EnablePrivacyModeButton";
+      }
+      if (attributeId == 44L) {
+        return "LocalProgrammingFeatures";
       }
       if (attributeId == 48L) {
         return "WrongCodeEntryLimit";
@@ -1834,8 +1882,14 @@ public final class ChipIdLookup {
       if (attributeId == 49L) {
         return "UserCodeTemporaryDisableTime";
       }
+      if (attributeId == 50L) {
+        return "SendPINOverTheAir";
+      }
       if (attributeId == 51L) {
         return "RequirePINforRemoteOperation";
+      }
+      if (attributeId == 53L) {
+        return "ExpiringUserTimeout";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -1953,6 +2007,24 @@ public final class ChipIdLookup {
       }
       if (attributeId == 3L) {
         return "BarrierCapabilities";
+      }
+      if (attributeId == 4L) {
+        return "BarrierOpenEvents";
+      }
+      if (attributeId == 5L) {
+        return "BarrierCloseEvents";
+      }
+      if (attributeId == 6L) {
+        return "BarrierCommandOpenEvents";
+      }
+      if (attributeId == 7L) {
+        return "BarrierCommandCloseEvents";
+      }
+      if (attributeId == 8L) {
+        return "BarrierOpenPeriod";
+      }
+      if (attributeId == 9L) {
+        return "BarrierClosePeriod";
       }
       if (attributeId == 10L) {
         return "BarrierPosition";
@@ -2752,6 +2824,33 @@ public final class ChipIdLookup {
       if (attributeId == 2L) {
         return "OccupancySensorTypeBitmap";
       }
+      if (attributeId == 16L) {
+        return "PIROccupiedToUnoccupiedDelay";
+      }
+      if (attributeId == 17L) {
+        return "PIRUnoccupiedToOccupiedDelay";
+      }
+      if (attributeId == 18L) {
+        return "PIRUnoccupiedToOccupiedThreshold";
+      }
+      if (attributeId == 32L) {
+        return "UltrasonicOccupiedToUnoccupiedDelay";
+      }
+      if (attributeId == 33L) {
+        return "UltrasonicUnoccupiedToOccupiedDelay";
+      }
+      if (attributeId == 34L) {
+        return "UltrasonicUnoccupiedToOccupiedThreshold";
+      }
+      if (attributeId == 48L) {
+        return "PhysicalContactOccupiedToUnoccupiedDelay";
+      }
+      if (attributeId == 49L) {
+        return "PhysicalContactUnoccupiedToOccupiedDelay";
+      }
+      if (attributeId == 50L) {
+        return "PhysicalContactUnoccupiedToOccupiedThreshold";
+      }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
       }
@@ -3115,8 +3214,140 @@ public final class ChipIdLookup {
       if (attributeId == 0L) {
         return "MeasurementType";
       }
+      if (attributeId == 256L) {
+        return "DcVoltage";
+      }
+      if (attributeId == 257L) {
+        return "DcVoltageMin";
+      }
+      if (attributeId == 258L) {
+        return "DcVoltageMax";
+      }
+      if (attributeId == 259L) {
+        return "DcCurrent";
+      }
+      if (attributeId == 260L) {
+        return "DcCurrentMin";
+      }
+      if (attributeId == 261L) {
+        return "DcCurrentMax";
+      }
+      if (attributeId == 262L) {
+        return "DcPower";
+      }
+      if (attributeId == 263L) {
+        return "DcPowerMin";
+      }
+      if (attributeId == 264L) {
+        return "DcPowerMax";
+      }
+      if (attributeId == 512L) {
+        return "DcVoltageMultiplier";
+      }
+      if (attributeId == 513L) {
+        return "DcVoltageDivisor";
+      }
+      if (attributeId == 514L) {
+        return "DcCurrentMultiplier";
+      }
+      if (attributeId == 515L) {
+        return "DcCurrentDivisor";
+      }
+      if (attributeId == 516L) {
+        return "DcPowerMultiplier";
+      }
+      if (attributeId == 517L) {
+        return "DcPowerDivisor";
+      }
+      if (attributeId == 768L) {
+        return "AcFrequency";
+      }
+      if (attributeId == 769L) {
+        return "AcFrequencyMin";
+      }
+      if (attributeId == 770L) {
+        return "AcFrequencyMax";
+      }
+      if (attributeId == 771L) {
+        return "NeutralCurrent";
+      }
       if (attributeId == 772L) {
         return "TotalActivePower";
+      }
+      if (attributeId == 773L) {
+        return "TotalReactivePower";
+      }
+      if (attributeId == 774L) {
+        return "TotalApparentPower";
+      }
+      if (attributeId == 775L) {
+        return "Measured1stHarmonicCurrent";
+      }
+      if (attributeId == 776L) {
+        return "Measured3rdHarmonicCurrent";
+      }
+      if (attributeId == 777L) {
+        return "Measured5thHarmonicCurrent";
+      }
+      if (attributeId == 778L) {
+        return "Measured7thHarmonicCurrent";
+      }
+      if (attributeId == 779L) {
+        return "Measured9thHarmonicCurrent";
+      }
+      if (attributeId == 780L) {
+        return "Measured11thHarmonicCurrent";
+      }
+      if (attributeId == 781L) {
+        return "MeasuredPhase1stHarmonicCurrent";
+      }
+      if (attributeId == 782L) {
+        return "MeasuredPhase3rdHarmonicCurrent";
+      }
+      if (attributeId == 783L) {
+        return "MeasuredPhase5thHarmonicCurrent";
+      }
+      if (attributeId == 784L) {
+        return "MeasuredPhase7thHarmonicCurrent";
+      }
+      if (attributeId == 785L) {
+        return "MeasuredPhase9thHarmonicCurrent";
+      }
+      if (attributeId == 786L) {
+        return "MeasuredPhase11thHarmonicCurrent";
+      }
+      if (attributeId == 1024L) {
+        return "AcFrequencyMultiplier";
+      }
+      if (attributeId == 1025L) {
+        return "AcFrequencyDivisor";
+      }
+      if (attributeId == 1026L) {
+        return "PowerMultiplier";
+      }
+      if (attributeId == 1027L) {
+        return "PowerDivisor";
+      }
+      if (attributeId == 1028L) {
+        return "HarmonicCurrentMultiplier";
+      }
+      if (attributeId == 1029L) {
+        return "PhaseHarmonicCurrentMultiplier";
+      }
+      if (attributeId == 1280L) {
+        return "InstantaneousVoltage";
+      }
+      if (attributeId == 1281L) {
+        return "InstantaneousLineCurrent";
+      }
+      if (attributeId == 1282L) {
+        return "InstantaneousActiveCurrent";
+      }
+      if (attributeId == 1283L) {
+        return "InstantaneousReactiveCurrent";
+      }
+      if (attributeId == 1284L) {
+        return "InstantaneousPower";
       }
       if (attributeId == 1285L) {
         return "RmsVoltage";
@@ -3144,6 +3375,225 @@ public final class ChipIdLookup {
       }
       if (attributeId == 1293L) {
         return "ActivePowerMax";
+      }
+      if (attributeId == 1294L) {
+        return "ReactivePower";
+      }
+      if (attributeId == 1295L) {
+        return "ApparentPower";
+      }
+      if (attributeId == 1296L) {
+        return "PowerFactor";
+      }
+      if (attributeId == 1297L) {
+        return "AverageRmsVoltageMeasurementPeriod";
+      }
+      if (attributeId == 1299L) {
+        return "AverageRmsUnderVoltageCounter";
+      }
+      if (attributeId == 1300L) {
+        return "RmsExtremeOverVoltagePeriod";
+      }
+      if (attributeId == 1301L) {
+        return "RmsExtremeUnderVoltagePeriod";
+      }
+      if (attributeId == 1302L) {
+        return "RmsVoltageSagPeriod";
+      }
+      if (attributeId == 1303L) {
+        return "RmsVoltageSwellPeriod";
+      }
+      if (attributeId == 1536L) {
+        return "AcVoltageMultiplier";
+      }
+      if (attributeId == 1537L) {
+        return "AcVoltageDivisor";
+      }
+      if (attributeId == 1538L) {
+        return "AcCurrentMultiplier";
+      }
+      if (attributeId == 1539L) {
+        return "AcCurrentDivisor";
+      }
+      if (attributeId == 1540L) {
+        return "AcPowerMultiplier";
+      }
+      if (attributeId == 1541L) {
+        return "AcPowerDivisor";
+      }
+      if (attributeId == 1792L) {
+        return "OverloadAlarmsMask";
+      }
+      if (attributeId == 1793L) {
+        return "VoltageOverload";
+      }
+      if (attributeId == 1794L) {
+        return "CurrentOverload";
+      }
+      if (attributeId == 2048L) {
+        return "AcOverloadAlarmsMask";
+      }
+      if (attributeId == 2049L) {
+        return "AcVoltageOverload";
+      }
+      if (attributeId == 2050L) {
+        return "AcCurrentOverload";
+      }
+      if (attributeId == 2051L) {
+        return "AcActivePowerOverload";
+      }
+      if (attributeId == 2052L) {
+        return "AcReactivePowerOverload";
+      }
+      if (attributeId == 2053L) {
+        return "AverageRmsOverVoltage";
+      }
+      if (attributeId == 2054L) {
+        return "AverageRmsUnderVoltage";
+      }
+      if (attributeId == 2055L) {
+        return "RmsExtremeOverVoltage";
+      }
+      if (attributeId == 2056L) {
+        return "RmsExtremeUnderVoltage";
+      }
+      if (attributeId == 2057L) {
+        return "RmsVoltageSag";
+      }
+      if (attributeId == 2058L) {
+        return "RmsVoltageSwell";
+      }
+      if (attributeId == 2305L) {
+        return "LineCurrentPhaseB";
+      }
+      if (attributeId == 2306L) {
+        return "ActiveCurrentPhaseB";
+      }
+      if (attributeId == 2307L) {
+        return "ReactiveCurrentPhaseB";
+      }
+      if (attributeId == 2309L) {
+        return "RmsVoltagePhaseB";
+      }
+      if (attributeId == 2310L) {
+        return "RmsVoltageMinPhaseB";
+      }
+      if (attributeId == 2311L) {
+        return "RmsVoltageMaxPhaseB";
+      }
+      if (attributeId == 2312L) {
+        return "RmsCurrentPhaseB";
+      }
+      if (attributeId == 2313L) {
+        return "RmsCurrentMinPhaseB";
+      }
+      if (attributeId == 2314L) {
+        return "RmsCurrentMaxPhaseB";
+      }
+      if (attributeId == 2315L) {
+        return "ActivePowerPhaseB";
+      }
+      if (attributeId == 2316L) {
+        return "ActivePowerMinPhaseB";
+      }
+      if (attributeId == 2317L) {
+        return "ActivePowerMaxPhaseB";
+      }
+      if (attributeId == 2318L) {
+        return "ReactivePowerPhaseB";
+      }
+      if (attributeId == 2319L) {
+        return "ApparentPowerPhaseB";
+      }
+      if (attributeId == 2320L) {
+        return "PowerFactorPhaseB";
+      }
+      if (attributeId == 2321L) {
+        return "AverageRmsVoltageMeasurementPeriodPhaseB";
+      }
+      if (attributeId == 2322L) {
+        return "AverageRmsOverVoltageCounterPhaseB";
+      }
+      if (attributeId == 2323L) {
+        return "AverageRmsUnderVoltageCounterPhaseB";
+      }
+      if (attributeId == 2324L) {
+        return "RmsExtremeOverVoltagePeriodPhaseB";
+      }
+      if (attributeId == 2325L) {
+        return "RmsExtremeUnderVoltagePeriodPhaseB";
+      }
+      if (attributeId == 2326L) {
+        return "RmsVoltageSagPeriodPhaseB";
+      }
+      if (attributeId == 2327L) {
+        return "RmsVoltageSwellPeriodPhaseB";
+      }
+      if (attributeId == 2561L) {
+        return "LineCurrentPhaseC";
+      }
+      if (attributeId == 2562L) {
+        return "ActiveCurrentPhaseC";
+      }
+      if (attributeId == 2563L) {
+        return "ReactiveCurrentPhaseC";
+      }
+      if (attributeId == 2565L) {
+        return "RmsVoltagePhaseC";
+      }
+      if (attributeId == 2566L) {
+        return "RmsVoltageMinPhaseC";
+      }
+      if (attributeId == 2567L) {
+        return "RmsVoltageMaxPhaseC";
+      }
+      if (attributeId == 2568L) {
+        return "RmsCurrentPhaseC";
+      }
+      if (attributeId == 2569L) {
+        return "RmsCurrentMinPhaseC";
+      }
+      if (attributeId == 2570L) {
+        return "RmsCurrentMaxPhaseC";
+      }
+      if (attributeId == 2571L) {
+        return "ActivePowerPhaseC";
+      }
+      if (attributeId == 2572L) {
+        return "ActivePowerMinPhaseC";
+      }
+      if (attributeId == 2573L) {
+        return "ActivePowerMaxPhaseC";
+      }
+      if (attributeId == 2574L) {
+        return "ReactivePowerPhaseC";
+      }
+      if (attributeId == 2575L) {
+        return "ApparentPowerPhaseC";
+      }
+      if (attributeId == 2576L) {
+        return "PowerFactorPhaseC";
+      }
+      if (attributeId == 2577L) {
+        return "AverageRmsVoltageMeasurementPeriodPhaseC";
+      }
+      if (attributeId == 2578L) {
+        return "AverageRmsOverVoltageCounterPhaseC";
+      }
+      if (attributeId == 2579L) {
+        return "AverageRmsUnderVoltageCounterPhaseC";
+      }
+      if (attributeId == 2580L) {
+        return "RmsExtremeOverVoltagePeriodPhaseC";
+      }
+      if (attributeId == 2581L) {
+        return "RmsExtremeUnderVoltagePeriodPhaseC";
+      }
+      if (attributeId == 2582L) {
+        return "RmsVoltageSagPeriodPhaseC";
+      }
+      if (attributeId == 2583L) {
+        return "RmsVoltageSwellPeriodPhaseC";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";
@@ -3441,6 +3891,9 @@ public final class ChipIdLookup {
       }
       if (attributeId == 16425L) {
         return "NullableRangeRestrictedInt16s";
+      }
+      if (attributeId == 16426L) {
+        return "WriteOnlyInt8u";
       }
       if (attributeId == 65528L) {
         return "GeneratedCommandList";

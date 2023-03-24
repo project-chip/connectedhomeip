@@ -247,7 +247,7 @@
 [submodule "third_party/silabs/wiseconnect-wifi-bt-sdk"]
 	path = third_party/silabs/wiseconnect-wifi-bt-sdk
 	url = https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git
-	branch = master
+	branch = 2.7.1-Matter
 	platforms = efr32,silabs_docker
 [submodule "editline"]
 	path = third_party/editline/repo

@@ -1642,6 +1642,7 @@ client cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
+  readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptorStruct fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
@@ -1875,6 +1876,7 @@ client cluster ModeSelect = 80 {
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
   attribute nullable int8u startUpMode = 4;
+  attribute nullable int8u onMode = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
