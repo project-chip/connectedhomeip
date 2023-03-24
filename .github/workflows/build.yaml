@@ -273,7 +273,7 @@ jobs:
                     "
             - name: Check no code generation in output
               run: |
-                  CNT=$(find -name "CHIPClusters.h" out | wc -l)
+                  CNT=$(find out -name "CHIPClusters.h" | wc -l)
                   if [ "${CNT}" != "0" ]; then
                      echo "ERROR: found unexpected generated files:"
                      find -name "CHIPClusters.h" out
