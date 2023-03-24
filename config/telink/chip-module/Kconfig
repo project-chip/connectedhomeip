@@ -162,3 +162,9 @@ config CHIP_ENABLE_APPLICATION_STATUS_LED
 	default y
 	help
 	  Enable application status LED.
+
+config CHIP_ENABLE_PM_DURING_BLE
+	bool "Enable PM during BLE operation"
+	default y
+	help
+	  Enable PM during BLE operation.
