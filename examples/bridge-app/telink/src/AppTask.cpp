@@ -349,10 +349,6 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
         MutableByteSpan zclNameSpan(buffer, maxReadLength);
         MakeZclCharString(zclNameSpan, dev->GetName());
     }
-    else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 2))
-    {
-        *buffer = (uint16_t) ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION;
-    }
     else
     {
         return EMBER_ZCL_STATUS_FAILURE;
@@ -368,10 +364,6 @@ EmberAfStatus HandleReadOnOffAttribute(Device * dev, chip::AttributeId attribute
     if ((attributeId == Clusters::OnOff::Attributes::OnOff::Id) && (maxReadLength == 1))
     {
         *buffer = dev->IsOn() ? 1 : 0;
-    }
-    else if ((attributeId == Clusters::OnOff::Attributes::ClusterRevision::Id) && (maxReadLength == 2))
-    {
-        *buffer = (uint16_t) ZCL_ON_OFF_CLUSTER_REVISION;
     }
     else
     {
