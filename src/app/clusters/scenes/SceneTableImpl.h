@@ -59,8 +59,7 @@ public:
 
         // Verify size of list
         ReturnErrorOnFailure(extensionFieldSet.attributeValueList.ComputeSize(&pairTotal));
-        VerifyOrReturnError(pairTotal <= Span<app::Clusters::Scenes::Structs::AttributeValuePair::Type>(mAVPairs).size(),
-                            CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(pairTotal <= ArraySize(mAVPairs), CHIP_ERROR_BUFFER_TOO_SMALL);
 
         auto pair_iterator = extensionFieldSet.attributeValueList.begin();
         while (pair_iterator.Next())
@@ -71,7 +70,7 @@ public:
             uint8_t valueBytesCount         = 0;
 
             ReturnErrorOnFailure(aVPair.attributeValue.ComputeSize(&valueBytesTotal));
-            VerifyOrReturnError(valueBytesTotal <= Span<uint8_t>(mValueBuffer[0]).size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrReturnError(valueBytesTotal <= ArraySize(mValueBuffer[0]), CHIP_ERROR_BUFFER_TOO_SMALL);
 
             auto value_iterator = aVPair.attributeValue.begin();
             while (value_iterator.Next())
@@ -128,8 +127,7 @@ public:
 
         // Verify size of list
         ReturnErrorOnFailure(attributeValueList.ComputeSize(&pairTotal));
-        VerifyOrReturnError(pairTotal <= Span<app::Clusters::Scenes::Structs::AttributeValuePair::Type>(mAVPairs).size(),
-                            CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(pairTotal <= ArraySize(mAVPairs), CHIP_ERROR_BUFFER_TOO_SMALL);
 
         auto pair_iterator = attributeValueList.begin();
         while (pair_iterator.Next())
@@ -141,7 +139,7 @@ public:
 
             // Verify size of attribute value
             ReturnErrorOnFailure(decodePair.attributeValue.ComputeSize(&valueBytesTotal));
-            VerifyOrReturnError(valueBytesTotal <= Span<uint8_t>(mValueBuffer[0]).size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrReturnError(valueBytesTotal <= ArraySize(mValueBuffer[0]), CHIP_ERROR_BUFFER_TOO_SMALL);
 
             auto value_iterator = decodePair.attributeValue.begin();
             while (value_iterator.Next())
