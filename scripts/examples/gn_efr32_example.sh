@@ -123,6 +123,8 @@ if [ "$#" == "0" ]; then
             Remove all logs and debugs features (including the LCD). Yield the smallest image size possible
         --docker
             Change GSDK root for docker builds
+        --uart_log
+            Forward Logs to Uart instead of RTT
 
     "
 elif [ "$#" -lt "2" ]; then
@@ -201,6 +203,10 @@ else
             --docker)
                 optArgs+="efr32_sdk_root=\"$GSDK_ROOT\" "
                 USE_DOCKER=true
+                shift
+                ;;
+            --uart_log)
+                optArgs+="sl_uart_log_output=true "
                 shift
                 ;;
 

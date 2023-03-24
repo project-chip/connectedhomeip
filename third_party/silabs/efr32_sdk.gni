@@ -205,6 +205,13 @@ template("efr32_sdk") {
       #"__STACK_SIZE=0",
     ]
 
+    if (sl_uart_log_output) {
+      defines += [
+        "SILABS_LOG_OUT_UART=1",
+        "SILABS_LOG_OUT_RTT=0",
+      ]
+    }
+
     if (chip_enable_ble_rs911x) {
       defines += [ "RSI_BLE_ENABLE=1" ]
     }
