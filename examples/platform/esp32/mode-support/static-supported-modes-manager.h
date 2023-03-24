@@ -28,20 +28,33 @@ namespace ModeSelect {
 class StaticSupportedModesManager : public chip::app::Clusters::ModeSelect::SupportedModesManager
 {
     using ModeOptionStructType = Structs::ModeOptionStruct::Type;
+	using SemanticTag          = Structs::SemanticTagStruct::Type;
 
 public:
     static const StaticSupportedModesManager instance;
 
-    static char supportedModeLabel[64];
+    //static char supportedModeLabel[255][64];
+
+	struct ModeLabel {
+		char supportedModeLabel[64];
+	};
+
+	static ModeLabel *modeLabelList;
+    static ModeOptionStructType * modeOptionStruct;
+    static SemanticTag * semanticTags;
 
     SupportedModesManager::ModeOptionsProvider getModeOptionsProvider(EndpointId endpointId) const override;
 
     Protocols::InteractionModel::Status getModeOptionByMode(EndpointId endpointId, uint8_t mode,
                                                             const ModeOptionStructType ** dataPtr) const override;
 
-    ~StaticSupportedModesManager(){};
-
     StaticSupportedModesManager() {}
+
+    ~StaticSupportedModesManager(){
+		delete[] modeLabelList;
+		delete[] modeOptionStruct;
+		delete[] semanticTags; 
+	}
 
     static inline const StaticSupportedModesManager & getStaticSupportedModesManagerInstance() { return instance; }
 };

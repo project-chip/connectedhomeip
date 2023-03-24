@@ -13,7 +13,10 @@ using ModeOptionStructType = Structs::ModeOptionStruct::Type;
 using SemanticTag          = Structs::SemanticTagStruct::Type;
 template <typename T>
 using List                                                                                = app::DataModel::List<T>;
-char chip::app::Clusters::ModeSelect::StaticSupportedModesManager::supportedModeLabel[64] = "";
+
+StaticSupportedModesManager::ModeLabel* StaticSupportedModesManager::modeLabelList = nullptr;
+StaticSupportedModesManager::ModeOptionStructType* StaticSupportedModesManager::modeOptionStruct = nullptr;
+StaticSupportedModesManager::SemanticTag* StaticSupportedModesManager::semanticTags = nullptr;
 
 const StaticSupportedModesManager StaticSupportedModesManager::instance = StaticSupportedModesManager();
 
@@ -28,7 +31,8 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
     VerifyOrReturnValue(ESP32Config::ReadConfigValue(countKey, supportedModeCount) == CHIP_NO_ERROR,
                         ModeOptionsProvider(nullptr, nullptr));
 
-    ModeOptionStructType * modeOptionStruct = new ModeOptionStructType[supportedModeCount + 1];
+	modeLabelList = new ModeLabel[supportedModeCount];
+    modeOptionStruct = new ModeOptionStructType[supportedModeCount];
 
     for (int index = 0; index < supportedModeCount; index++)
     {
@@ -37,13 +41,13 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
         uint32_t semanticTagCount  = 0;
         size_t outLen              = 0;
 
-        memset(supportedModeLabel, 0, sizeof(supportedModeLabel));
+        memset(modeLabelList[index].supportedModeLabel, 0, sizeof(modeLabelList[index].supportedModeLabel));
         memset(keyBuf, 0, sizeof(char) * ESP32Config::kMaxConfigKeyNameLength);
         VerifyOrReturnValue(ESP32Config::KeyAllocator::SupportedModesLabel(keyBuf, sizeof(keyBuf), endpointId, index) ==
                                 CHIP_NO_ERROR,
                             ModeOptionsProvider(nullptr, nullptr));
         ESP32Config::Key labelKey(ESP32Config::kConfigNamespace_ChipFactory, keyBuf);
-        VerifyOrReturnValue(ESP32Config::ReadConfigValueStr(labelKey, supportedModeLabel, sizeof(supportedModeLabel), outLen) ==
+        VerifyOrReturnValue(ESP32Config::ReadConfigValueStr(labelKey, modeLabelList[index].supportedModeLabel, sizeof(modeLabelList[index].supportedModeLabel), outLen) ==
                                 CHIP_NO_ERROR,
                             ModeOptionsProvider(nullptr, nullptr));
 
@@ -63,7 +67,7 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
         VerifyOrReturnValue(ESP32Config::ReadConfigValue(stCountKey, semanticTagCount) == CHIP_NO_ERROR,
                             ModeOptionsProvider(nullptr, nullptr));
 
-        SemanticTag * semanticTags = new SemanticTag[semanticTagCount];
+        semanticTags = new SemanticTag[semanticTagCount];
         for (auto stIndex = 0; stIndex < semanticTagCount; stIndex++)
         {
 
@@ -92,7 +96,7 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
             semanticTags[stIndex] = static_cast<const SemanticTag>(tag);
         }
 
-        option.label        = chip::CharSpan::fromCharString(supportedModeLabel);
+        option.label        = chip::CharSpan::fromCharString(modeLabelList[index].supportedModeLabel);
         option.mode         = static_cast<uint8_t>(supportedModeMode);
         option.semanticTags = DataModel::List<const SemanticTag>(semanticTags, semanticTagCount);
 
@@ -110,8 +114,8 @@ Status StaticSupportedModesManager::getModeOptionByMode(unsigned short endpointI
     {
         return Status::UnsupportedCluster;
     }
-    auto * begin = this->getModeOptionsProvider(endpointId).begin();
-    auto * end   = this->getModeOptionsProvider(endpointId).end();
+    auto * begin = modeOptionsProvider.begin();
+    auto * end   = modeOptionsProvider.end();
 
     for (auto * it = begin; it != end; ++it)
     {

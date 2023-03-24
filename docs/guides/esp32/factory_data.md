@@ -34,6 +34,8 @@ Following data can be added to the manufacturing partition using
     -   Fixed Labels
     -   Supported locales
     -   Supported calendar types
+    -   Supported modes
+		- Note: Size of label should be less than 64 and `\0` is being added at last.
 
 ### Configuration Options
 
