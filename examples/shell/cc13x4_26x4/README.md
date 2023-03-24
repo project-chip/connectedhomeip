@@ -120,6 +120,9 @@ the session.
 Select the ELF image to load on the device with the `Browse` button. This file
 is placed in the `out/debug` folder by this guide and ends with the `*.out` file
 extension.
+For OTA enabled applications, the standalone image will instead end with the
+`*-bim.hex` file extension. This this is a combined image with application and
+and BIM included.
 
 Finally click the `Load Image` button to load the executable image onto the
 device. You should be able to see the log output over the XDS110 User UART.
@@ -159,7 +162,7 @@ For help with the shell itself, refer to the
 For technical support, please consider creating a post on TI's [E2E forum][e2e].
 Additionally, we welcome any feedback.
 
-[matter]: https://github.com/project-chip/connectedhomeip
+[matter]: https://csa-iot.org/all-solutions/matter/
 [ccs]: https://www.ti.com/tool/CCSTUDIO
 [ccs_after_launch]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#after-launch

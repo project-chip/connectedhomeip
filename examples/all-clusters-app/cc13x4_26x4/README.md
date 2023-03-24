@@ -1,11 +1,11 @@
-# Matter CC1352 CC2652 Pump Example Application
+# Matter CC1352 CC2652 All-clusters Example Application
 
 An example application showing the use of [Matter][matter] on the Texas
 Instruments CC13XX_26XX family of Wireless MCUs.
 
 ---
 
--   [Matter CC1352 CC2652 Pump Example Application](#matter-cc1352-cc2652-pump-example-application)
+-   [Matter CC1352 CC2652 All Clusters Example Application](#matter-cc1352-cc2652-all-clusters-example-application)
     -   [Introduction](#introduction)
         -   [Device UI](#device-ui)
     -   [Building](#building)
@@ -26,26 +26,26 @@ Instruments CC13XX_26XX family of Wireless MCUs.
 
 ## Introduction
 
-The CC13XX_26XX pump example application provides a working demonstration of a
-connected pump device. This uses the open-source Matter implementation and the
-Texas Instruments SimpleLink™ CC13XX and CC26XX software development kit.
+The CC13XX_26XX all clusters example application provides the basis to query and
+run commands for all currently implemented Matter clusters. This uses the
+open-source Matter implementation and the Texas Instruments SimpleLink™ CC13XX
+and CC26XX software development kit.
 
 This example is enabled to build for CC2652R7 devices.
 
-The pump example is intended to serve both as a means to explore the workings of
-Matter, as well as a template for creating real products based on the Texas
-Instruments devices.
+The all-clusters example is intended to serve both as a means to explore the
+workings of Matter, as well as a template for creating real products based on
+the Texas Instruments devices.
 
 ## Device UI
-
-| Action                                           | Functionality                          |
-| ------------------------------------------------ | -------------------------------------- |
-| Left Button (`BTN-1`) Press (less than 1000 ms)  | BLE Advertisement (Enable/Disable)     |
-| Left Button (`BTN-1`) Press (more than 5000 ms)  | Factory Reset                          |
-| Right Button (`BTN-2`) Press (less than 1000 ms) | Toggle pump state                      |
-| Red & Green LED Blinking State                   | Pump transition from either Start/Stop |
-| Red & Green LED On State                         | Pump is started                        |
-| Red & Green LED Off State                        | Pump stopped                           |
+| Action                                           | Functionality                              |
+| ------------------------------------------------ | --------------------------------------     |
+| Left Button (`BTN-1`) Press (more than 1000 ms)  | Factory Reset                              |
+| Right Button (`BTN-2`) Press (more than 1000 ms) | BLE Advertisement (Enable/Disable)         |
+| Red LED Solid Blinking State                     | Identify Trigger Effect in progress (EP0/1)|
+| Red LED Off State                                | No Identify Trigger Effect in progress     |
+| Green LED Blinking State                         | Identify Trigger Effect in progress (EP 2) |
+| Green LED Off State                              | No Identify Trigger Effect in progress     |
 
 ## Building
 
@@ -95,9 +95,9 @@ Ninja to build the executable.
     step.
 
     ```
-    $ cd ~/connectedhomeip/examples/pump-app/cc13x2x7_26x2x7
+    $ cd ~/connectedhomeip/examples/all-clusters-app/cc13x2x7_26x2x7
     OR
-    $ cd ~/connectedhomeip/examples/pump-app/cc13x4_26x4
+    $ cd ~/connectedhomeip/examples/all-clusters-minimal-app/cc13x4_26x4
     $ gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15.0\""
     $ ninja -C out/debug
 
@@ -105,7 +105,7 @@ Ninja to build the executable.
     If you would like to define arguments on the command line you may add them
     to the GN call.
     ```
-    gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15.0\" target_defines=[\"CC13X2_26X2_ATTESTATION_CREDENTIALS=1\"]"
+    gn gen out/debug --args="ti_sysconfig_root=\"$HOME/ti/sysconfig_1.15.0\" target_defines=[\"CC13X4_26X4_ATTESTATION_CREDENTIALS=1\"]"
     ```
 
 ## Programming
@@ -144,6 +144,7 @@ is connected, use the `Load` button on the toolbar to load the ELF image.
 Note that the default configuration of the CCXML uses 2-wire cJTAG instead of
 the full 4-wire JTAG connection to match the default jumper configuration of the
 LaunchPad.
+
 ### UniFlash
 
 Uniflash is Texas Instrument's uniform programming tool for embedded processors.
@@ -189,6 +190,8 @@ terminal emulator to that port to see the output with the following options:
 | Parity       | `None`   |
 | Flow control | `None`   |
 
+
+
 ## Running the Example
 
 Once a device has been flashed with this example, it can now join and operate in
@@ -222,7 +225,7 @@ Interacting with the application begins by enabling BLE advertisements and then
 pairing the device into a Thread network. To provision this example onto a Matter
 network, the device must be discoverable over Bluetooth LE.
 
-On the LaunchPad, press and hold the right button, labeled `BTN-1`, for more than
+On the LaunchPad, press and hold the right button, labeled `BTN-2`, for more than
 1 second. Upon release, the Bluetooth LE advertising will begin. Once the device is
 fully provisioned, BLE advertising will stop.
 
@@ -246,22 +249,18 @@ Commissioning complete, notify platform driver to persist network credentials.
 
 
 **Step 2**
-The pump configuration & control cluster commands have the following formats:
 
-```
-./chip-tool pumpconfigurationandcontrol <write> <attribute-name> <attribute-values> <destination-id> <endpoint-id-ignored-for-group-commands>
-```
-Send commands to the pump-app. Here are some example commands:
+Send commands to the all-cluster-app. Here are some example commands:
 
-Write normal operation mode (0) to device
+Basic
 ```
-./chip-tool pumpconfigurationandcontrol write operation-mode 0 1 1
-```
-Get current operation mode
-```
-./chip-tool pumpconfigurationandcontrol read effective-operation-mode 1 1
+./chip-tool basic read <attribute-id> <destination-id> <endpoint-id-ignored-for-group-commands> e.g.  ./chip-tool basic read product-id 1 1
 ```
 
+Identify
+```
+./chip-tool identify identify <IdentifyTime> <destination-id> <endpoint-id-ignored-for-group-commands>   e.g.  ./chip-tool identify identify 100 1 1
+```
 
 ### Provisioning
 
@@ -272,7 +271,7 @@ pairing the device into a Thread network.
 
 To provision this example onto a Thread network, the device must be discoverable
 over Bluetooth LE. BLE advertising is started by long pressing the right button
-(greater than 1000ms), labeled `BTN-1` on the silkscreen. Once the device is
+(greater than 1000ms), labeled `BTN-2` on the silkscreen. Once the device is
 fully provisioned, BLE advertising will stop.
 
 #### Bluetooth LE Rendezvous

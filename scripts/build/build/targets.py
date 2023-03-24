@@ -572,7 +572,7 @@ def TITargets():
     yield LP_CC2652R7.Extend('pump', app=TIApp.PUMP)
     yield LP_CC2652R7.Extend('pump-controller', app=TIApp.PUMP_CONTROLLER)
 
-    #yield LP_EM_CC1354P10_6.Extend('all-clusters-app', app=TIApp.ALL_CLUSTERS)
+    yield LP_EM_CC1354P10_6.Extend('all-clusters-app', app=TIApp.ALL_CLUSTERS)
     yield LP_EM_CC1354P10_6.Extend('all-clusters-minimal', app=TIApp.ALL_CLUSTERS_MINIMAL)
     yield LP_EM_CC1354P10_6.Extend('lock-ftd', app=TIApp.LOCK, openthread_ftd=True)
     yield LP_EM_CC1354P10_6.Extend('lock-mtd', app=TIApp.LOCK, openthread_ftd=False)
