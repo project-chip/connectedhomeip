@@ -42,7 +42,7 @@ the Texas Instruments devices.
 | Action                                           | Functionality                              |
 | ------------------------------------------------ | --------------------------------------     |
 | Left Button (`BTN-1`) Press (more than 1000 ms)  | Factory Reset                              |
-| Right Button (`BTN-2`) Press (more than 1000 ms) | BLE Advertisement                          |
+| Right Button (`BTN-2`) Press (more than 1000 ms) | BLE Advertisement (Enable/Disable)         |
 | Red LED Solid Blinking State                     | Identify Trigger Effect in progress (EP0/1)|
 | Red LED Off State                                | No Identify Trigger Effect in progress     |
 | Green LED Blinking State                         | Identify Trigger Effect in progress (EP 2) |
@@ -168,6 +168,8 @@ extension.
 For OTA enabled applications, the standalone image will instead end with the
 `*-bim.hex` file extension. This this is a combined image with application and
 and BIM included.
+The flag to enable or disable the OTA feature is determined by
+"chip_enable_ota_requestor" in the application's args.gni file.
 
 Finally click the `Load Image` button to load the executable image onto the
 device. You should be able to see the log output over the XDS110 User UART.
@@ -286,7 +288,7 @@ commands.
 For technical support, please consider creating a post on TI's [E2E forum][e2e].
 Additionally, we welcome any feedback.
 
-[matter]: https://github.com/project-chip/connectedhomeip
+[matter]: https://csa-iot.org/all-solutions/matter/
 [ccs]: https://www.ti.com/tool/CCSTUDIO
 [ccs_after_launch]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#after-launch

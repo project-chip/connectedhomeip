@@ -212,6 +212,8 @@ extension.
 For OTA enabled applications, the standalone image will instead end with the
 `*-bim.hex` file extension. This this is a combined image with application and
 and BIM included.
+The flag to enable or disable the OTA feature is determined by
+"chip_enable_ota_requestor" in the application's args.gni file.
 
 Finally click the `Load Image` button to load the executable image onto the
 device. You should be able to see the log output over the XDS110 User UART.
@@ -238,7 +240,7 @@ terminal emulator to that port to see the output with the following options:
 For technical support, please consider creating a post on TI's [E2E forum][e2e].
 Additionally, we welcome any feedback.
 
-[matter]: https://github.com/project-chip/connectedhomeip
+[matter]: https://csa-iot.org/all-solutions/matter/
 [ccs]: https://www.ti.com/tool/CCSTUDIO
 [ccs_after_launch]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#after-launch
