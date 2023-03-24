@@ -497,13 +497,14 @@ CHIP_ERROR K32W0FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan
     uint16_t uniqueIdLen = 0;
     err = SearchForId(FactoryDataId::kUniqueId, (uint8_t *) uniqueIdSpan.data(), uniqueIdSpan.size(), uniqueIdLen);
 #if defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
-    if (err == CHIP_ERROR_NOT_FOUND)
+    if (err != CHIP_NO_ERROR)
     {
         constexpr uint8_t uniqueId[] = CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
 
         ReturnErrorCodeIf(sizeof(uniqueId) > uniqueIdSpan.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
         memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
         uniqueIdLen = sizeof(uniqueId);
+        err = CHIP_NO_ERROR;
     }
 #endif // CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID
     ReturnErrorOnFailure(err);
