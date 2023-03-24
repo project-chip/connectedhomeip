@@ -57,10 +57,10 @@ declare_args() {
   silabs_gen_folder = ""
 
   # Calls SLC-CLI at run time
-  generate_slc = false
+  slc_generate = false
 
   # Use SLC generated files
-  use_slc_files = false
+  slc_reuse_files = false
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
@@ -72,7 +72,7 @@ declare_args() {
   sl_openthread_root = "${efr32_sdk_root}/util/third_party/openthread"
 }
 
-if (generate_slc || use_slc_files) {
+if (slc_generate || slc_reuse_files) {
   silabs_gen_folder = "${chip_root}/third_party/silabs/slc_gen/${silabs_board}/"
 } else {
   print("Using pre-generate files")
@@ -175,7 +175,7 @@ template("efr32_sdk") {
       "${silabs_gen_folder}/autogen",
     ]
 
-    if (generate_slc || use_slc_files) {
+    if (slc_generate || slc_reuse_files) {
       _include_dirs +=
           [ "${efr32_sdk_root}/hardware/driver/configuration_over_swo/inc/" ]
     }
@@ -704,7 +704,7 @@ template("efr32_sdk") {
       ]
     }
 
-    if (generate_slc || use_slc_files) {
+    if (slc_generate || slc_reuse_files) {
       sources += [
         "${efr32_sdk_root}/hardware/driver/configuration_over_swo/src/sl_cos.c",
         "${efr32_sdk_root}/platform/driver/debug/src/sl_debug_swo.c",
@@ -952,12 +952,10 @@ template("efr32_sdk") {
       ]
     }
 
-    if (!use_slc_files && !generate_slc) {
-      if (silabs_board == "BRD4186A" || silabs_board == "BRD4186C" ||
-          silabs_board == "BRD4187A" || silabs_board == "BRD4187C" ||
-          silabs_board == "BRD2704A") {
-        sources += [ "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dpll_s2.c" ]
-      }
+    if (silabs_board == "BRD4186A" || silabs_board == "BRD4186C" ||
+        silabs_board == "BRD4187A" || silabs_board == "BRD4187C" ||
+        silabs_board == "BRD2704A") {
+      sources += [ "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dpll_s2.c" ]
     }
 
     if (silabs_board == "BRD2704A" || silabs_board == "BRD4318A") {

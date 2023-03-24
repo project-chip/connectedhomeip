@@ -35,6 +35,7 @@ USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
 USE_SLC=false
 GN_PATH=gn
+GN_PATH_PROVIDED=false
 
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
 USAGE="./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]"
@@ -127,7 +128,7 @@ if [ "$#" == "0" ]; then
             Forward Logs to Uart instead of RTT
         --slc_generate
             Generate files with SLC for current board and options Requires an SLC-CLI installation or running in Docker.
-        --use_slc_files
+        --slc_reuse_files
             Use generated files without running slc again.
 
     "
@@ -219,13 +220,24 @@ else
                 ;;
 
             --slc_generate)
-                optArgs+="generate_slc=true "
+                optArgs+="slc_generate=true "
                 USE_SLC=true
                 shift
                 ;;
-            --use_slc_files)
-                optArgs+="use_slc_files=true "
+            --slc_reuse_files)
+                optArgs+="slc_reuse_files=true "
                 USE_SLC=true
+                shift
+                ;;
+            --gn_path)
+                if [ -z "$2" ]; then
+                    echo "--gn_path requires a path to GN"
+                    exit 1
+                else
+                    GN_PATH="$2"
+                fi
+                GN_PATH_PROVIDED=true
+                shift
                 shift
                 ;;
             *"sl_matter_version_str="*)
@@ -256,7 +268,7 @@ else
         } &>/dev/null
     fi
 
-    if [ "$USE_SLC" == true ]; then
+    if [ "$USE_SLC" == true ] && [ "$GN_PATH_PROVIDED" == false ]; then
         GN_PATH=./.environment/cipd/packages/pigweed/gn
     fi
 
@@ -291,7 +303,7 @@ else
     source "$CHIP_ROOT/scripts/activate.sh"
 
     ninja -v -C "$BUILD_DIR"/
-    # #print stats
+    #print stats
     arm-none-eabi-size -A "$BUILD_DIR"/*.out
 
 fi

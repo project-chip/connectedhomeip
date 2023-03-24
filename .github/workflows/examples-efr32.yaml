@@ -86,6 +86,8 @@ jobs:
         timeout-minutes: 30
         run: |
           scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32 ./out/light-app BRD4187C --slc_generate
+          scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32 ./out/light-app BRD4161A --slc_generate
+          rm -rf ./out/
       - name: Build some BRD4187C variants
         timeout-minutes: 90
         run: |

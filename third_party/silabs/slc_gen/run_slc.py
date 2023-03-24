@@ -10,10 +10,7 @@ if len(sys.argv) != 7:
 
 
 def asBoolean(valueToTest):
-    if valueToTest == "true":
-        return True
-    else:
-        return False
+    return ("true" == valueToTest)
 
 
 root_path = sys.argv[1]
@@ -55,12 +52,12 @@ for filePath in fileList:
     try:
         os.remove(filePath)
     except OSError:
-        print("failed to remove file")
+        print("failed to remove file: {}".format(filePath))
 
 try:
     os.remove(os.path.join(output_path, "vscode.conf"))
 except OSError:
-    print("failed to remove file")
+    print("failed to remove file: {}".format(filePath))
 
 
 # Create a Build.gn files with all of the sources

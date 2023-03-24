@@ -46,7 +46,7 @@ declare_args() {
   chip_print_memory_usage = false
 }
 
-if (generate_slc) {
+if (slc_generate) {
   # Generate Project Specific config (Board, hardware used etc..)
   print(exec_script("${chip_root}/third_party/silabs/slc_gen/run_slc.py",
                     [

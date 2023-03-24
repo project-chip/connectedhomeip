@@ -43,13 +43,16 @@ component:
 - {id: brd4002a}
 - {id: rail_util_pti}
 - {id: bluetooth_feature_gatt}
-- instance: [vcom]
-  id: uartdrv_usart
 - {id: bluetooth_feature_connection}
 - {id: psa_crypto}
 - {id: rail_lib_multiprotocol}
 - {id: bluetooth_feature_system}
 - {id: bluetooth_feature_scanner}
+- instance: [vcom]
+  id: uartdrv_usart
+- instance: [vcom]
+  id: uartdrv_eusart
+
 
 config_file:
   - override:
@@ -73,6 +76,14 @@ configuration:
   value: '128'
 - {name: SL_HEAP_SIZE, value: '16384'}
 - {name: SL_STACK_SIZE, value: '4608'}
+
+requires:
+- condition: [device_series_1]
+  name: uartdrv_usart
+- condition: [device_series_2]
+  name: uartdrv_eusart
+- condition: [device_series_2]
+  name: device_init_dpll  
 
 ui_hints:
   highlight:
