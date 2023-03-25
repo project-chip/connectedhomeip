@@ -111,7 +111,7 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
                 NSDictionary<NSString *, id> * info = [NSDictionary
                     dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:vendorId], @"vendorID",
                     [NSNumber numberWithUnsignedShort:productId], @"productID", [NSNumber numberWithUnsignedShort:wifiEndpointId],
-                    @"wifiEndpointID", [NSNumber numberWithUnsignedShort:threadEndpointId], @"threadEndpointIDiitittidf", nil];
+                    @"wifiEndpointID", [NSNumber numberWithUnsignedShort:threadEndpointId], @"threadEndpointID", nil];
                 [strongDelegate controller:strongController readCommissioningInfo:info];
             });
         }

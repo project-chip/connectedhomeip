@@ -54,10 +54,17 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  */
 - (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error;
 
+/**
+ * Notify the delegate when commissioning is completed.
+ * For getting commissioning controllee's deviceId
+ */
 - (void)controller:(MTRDeviceController *)controller
     commissioningComplete:(NSError * _Nullable)error
                  deviceId:(NSNumber * _Nullable)deviceId;
 
+/**
+ * Notify the delegate when read commissioning Infomation. (vendorID, productID)
+ */
 - (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(NSDictionary<NSString *, id> * _Nullable)info;
 @end
 
