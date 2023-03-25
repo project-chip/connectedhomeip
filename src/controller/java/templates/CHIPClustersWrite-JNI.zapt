@@ -30,8 +30,9 @@ using namespace chip;
 using namespace chip::Controller;
 
 {{#chip_client_clusters}}
-{{#chip_server_cluster_attributes}}
-{{#unless (isStrEqual chipCallback.name "Unsupported")}}
+{{#zcl_attributes_server removeKeys='isOptional'}}
+{{#if_unsupported_attribute_callback type isArray ../id}}
+{{else}}
 {{#if isWritableAttribute}}
 
 JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase name}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, {{asJniBasicType type true}} value, jobject timedWriteTimeoutMs)
@@ -74,8 +75,8 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase na
     onFailure.release();
 }
 {{/if}}
-{{/unless}}
-{{/chip_server_cluster_attributes}}
+{{/if_unsupported_attribute_callback}}
+{{/zcl_attributes_server}}
 {{/chip_client_clusters}}
 {{/if}}
 

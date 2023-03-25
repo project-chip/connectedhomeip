@@ -182,7 +182,7 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
                 command=(asUpperCamelCase name preserveAcronyms=true)}}
 {{/chip_cluster_commands}}
 
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server}}
 {{! This is used as the implementation for both the new-name and old-name bits, so check for both here. }}
 {{#unless (and (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))
                (or (wasRemoved (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
@@ -214,7 +214,7 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 {{/if}}
 
 {{/unless}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 
 @end
 {{/unless}}
@@ -262,7 +262,7 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 {{> commandImpl cluster=(compatClusterNameRemapping parent.name)
                 command=(compatCommandNameRemapping parent.name name)}}
 {{/chip_cluster_commands}}
-{{~#chip_server_cluster_attributes}}
+{{~#zcl_attributes_server}}
 {{~#*inline "attributeImpls"}}
 {{#unless (or (isStrEqual attribute (asUpperCamelCase name preserveAcronyms=true))
               (wasRemoved (compatClusterNameRemapping parent.name) attribute=attribute))}}
@@ -283,7 +283,7 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 {{/unless}}
 {{/inline~}}
 {{> attributeImpls attribute=(compatAttributeNameRemapping parent.name name)}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 @end
 {{/if}}
 

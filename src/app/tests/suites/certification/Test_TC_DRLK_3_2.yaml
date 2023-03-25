@@ -322,7 +322,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Set Week Day Schedule command to TH."
-      PICS: DRLK.S.F04 && DRLK.C.C0b.Tx
+      PICS: DRLK.C.F04 && DRLK.C.C0b.Tx
       verification: |
           ./chip-tool doorlock set-user 0 1 xxx 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
@@ -520,7 +520,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Get Week Day Schedule command to TH."
-      PICS: DRLK.S.F04 && DRLK.C.C0c.Tx
+      PICS: DRLK.C.F04 && DRLK.C.C0c.Tx
       verification: |
           ./chip-tool doorlock get-week-day-schedule 1 1 1 1
           Verify the " Get Week Day Schedule command response" on TH(lock-app):
@@ -617,7 +617,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Clear Week Day Schedule command to TH."
-      PICS: DRLK.S.F04 && DRLK.C.C0d.Tx
+      PICS: DRLK.C.F04 && DRLK.C.C0d.Tx
       verification: |
           ./chip-tool doorlock clear-week-day-schedule 1 1 1 1
 
@@ -713,7 +713,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Set Year Day Schedule command to TH."
-      PICS: DRLK.S.F04 && DRLK.C.C0e.Tx
+      PICS: DRLK.C.F04 && DRLK.C.C0e.Tx
       verification: |
           ./chip-tool doorlock set-year-day-schedule 1 1 1080 2100 1 1
 
@@ -809,7 +809,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Get Year Day Schedule command to TH."
-      PICS: DRLK.S.F04 && DRLK.C.C0f.Tx
+      PICS: DRLK.C.F04 && DRLK.C.C0f.Tx
       verification: |
           ./chip-tool doorlock get-year-day-schedule 1 1 1 1
           Verify the " Get Year Day Schedule command response" on TH(lock-app):
@@ -904,7 +904,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Clear Year Day Schedule command to TH."
-      PICS: DRLK.S.F04 && DRLK.C.C10.Tx
+      PICS: DRLK.C.F04 && DRLK.C.C10.Tx
       verification: |
           ./chip-tool doorlock clear-year-day-schedule 1 1 1 1
 
@@ -997,7 +997,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Set Holiday Day Schedule command to TH."
-      PICS: DRLK.S.F04 && DRLK.C.C11.Tx
+      PICS: DRLK.C.F04 && DRLK.C.C11.Tx
       verification: |
           ./chip-tool doorlock set-holiday-schedule 1 20 30 0 1 1
 
@@ -1089,7 +1089,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Get Holiday Day Schedule command to TH."
-      PICS: DRLK.S.F04 && DRLK.C.C12.Tx
+      PICS: DRLK.C.F04 && DRLK.C.C12.Tx
       verification: |
           ./chip-tool doorlock get-holiday-schedule 1 1 1
           Verify the " Get Holiday Day Schedule command response" on TH(lock-app):
@@ -1181,7 +1181,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Clear Holiday Day Schedule command to TH."
-      PICS: DRLK.S.F04 && DRLK.C.C13.Tx
+      PICS: DRLK.C.F04 && DRLK.C.C13.Tx
       verification: |
           ./chip-tool doorlock clear-holiday-schedule 1 1 1
 
@@ -1271,7 +1271,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Set USer command to TH."
-      PICS: DRLK.S.F08 && DRLK.C.C1a.Tx
+      PICS: DRLK.C.F08 && DRLK.C.C1a.Tx
       verification: |
           ./chip-tool doorlock set-user 0 2 xxx 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
@@ -1373,7 +1373,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Get User to TH."
-      PICS: DRLK.S.F08 && DRLK.C.C1b.Tx
+      PICS: DRLK.C.F08 && DRLK.C.C1b.Tx
       verification: |
           ./chip-tool doorlock get-user 2 1 1 --timedInteractionTimeoutMs 1000
           Verify the " Get User Day Schedule command response" on TH(lock-app):
@@ -1486,7 +1486,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Clear User command to TH.a"
-      PICS: DRLK.S.F08 && DRLK.C.C1d.Tx
+      PICS: DRLK.C.F08 && DRLK.C.C1d.Tx
       verification: |
           ./chip-tool doorlock clear-user 2 1 1 --timedInteractionTimeoutMs 1000
           Verify the " Clear User Day Schedule command response" on TH(lock-app):
@@ -1582,7 +1582,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Set Credential command to TH.a"
-      PICS: DRLK.S.F08 && DRLK.C.C22.Tx
+      PICS: DRLK.C.F08 && DRLK.C.C22.Tx
       verification: |
           ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 
@@ -1715,7 +1715,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Get Credential to TH."
-      PICS: DRLK.S.F08 && DRLK.C.C24.Tx
+      PICS: DRLK.C.F08 && DRLK.C.C24.Tx
       verification: |
           ./chip-tool doorlock get-credential-status  '{ "credentialType" : 1 , "credentialIndex" : 1 }' 1 1 --timedInteractionTimeoutMs 1000
           Verify the " Get Credential  command response" on TH(lock-app):
@@ -1837,7 +1837,7 @@ tests:
       disabled: true
 
     - label: "DUT sends Clear Credential command to TH."
-      PICS: DRLK.S.F08 && DRLK.C.C26.Tx
+      PICS: DRLK.C.F08 && DRLK.C.C26.Tx
       verification: |
           ./chip-tool doorlock clear-credential  '{ "credentialType" : 1 , "credentialIndex" : 1 }' 1 1 --timedInteractionTimeoutMs 1000
           Verify the " Clear Credential  command response" on TH(lock-app):

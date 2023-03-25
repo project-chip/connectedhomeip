@@ -86,7 +86,7 @@ CHIP_ERROR GetData(const char * key, void * data, size_t dataSize, size_t * getD
     }
     ::memcpy(data, decodedData.Get() + offset, copySize);
 
-    ChipLogDetail(DeviceLayer, "Get data [%s]: %u", key, static_cast<unsigned int>(copySize));
+    ChipLogDetail(DeviceLayer, "Get preference data: key=%s len=%u", key, static_cast<unsigned int>(copySize));
     ChipLogByteSpan(DeviceLayer, ByteSpan(reinterpret_cast<uint8_t *>(data), copySize));
 
     return CHIP_NO_ERROR;
@@ -114,7 +114,7 @@ CHIP_ERROR SaveData(const char * key, const void * data, size_t dataSize)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    ChipLogDetail(DeviceLayer, "Save data [%s]: %u", key, static_cast<unsigned int>(dataSize));
+    ChipLogDetail(DeviceLayer, "Save preference data: key=%s len=%u", key, static_cast<unsigned int>(dataSize));
     ChipLogByteSpan(DeviceLayer, ByteSpan(reinterpret_cast<const uint8_t *>(data), dataSize));
 
     return CHIP_NO_ERROR;
@@ -133,7 +133,7 @@ CHIP_ERROR RemoveData(const char * key)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    ChipLogProgress(DeviceLayer, "Remove data [%s]", key);
+    ChipLogProgress(DeviceLayer, "Remove preference data: key=%s", key);
     return CHIP_NO_ERROR;
 }
 

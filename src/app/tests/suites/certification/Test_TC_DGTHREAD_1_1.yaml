@@ -130,7 +130,7 @@ tests:
     - label:
           "TH reads Feature dependent attribute(DGTHREAD.S.F01(ERRCNT)) in
           attributeList"
-      PICS: DGTHREAD.C.A0006 && DGTHREAD.S.F01
+      PICS: DGTHREAD.S.A0006 && DGTHREAD.S.F01
       command: "readAttribute"
       attribute: "AttributeList"
       response:

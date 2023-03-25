@@ -56,7 +56,7 @@ config("qpg_freertos_config") {
 freertos_target("freertos") {
   sources = [
     "${freertos_root}/repo/portable/GCC/ARM_CM3/port.c",
-    #    "${freertos_root}/repo/portable/MemMang/heap_3.c",
+    "${freertos_root}/repo/portable/MemMang/heap_3.c",
   ]
 
   public_configs = [ ":qpg_freertos_config" ]

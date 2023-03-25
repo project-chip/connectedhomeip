@@ -182,14 +182,16 @@ void AllClustersAppCommandHandler::OnGeneralFaultEventHandler(uint32_t eventId)
         GeneralFaults<kMaxHardwareFaults> current;
 
 #if CHIP_CONFIG_TEST
-        // On Linux Simulation, set following hardware faults statically.
-        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_RADIO));
-        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_POWER_SOURCE));
+        using GeneralDiagnostics::HardwareFaultEnum;
 
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_RADIO));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_SENSOR));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_POWER_SOURCE));
-        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_ENUM_USER_INTERFACE_FAULT));
+        // On Linux Simulation, set following hardware faults statically.
+        ReturnOnFailure(previous.add(to_underlying(HardwareFaultEnum::kRadio)));
+        ReturnOnFailure(previous.add(to_underlying(HardwareFaultEnum::kPowerSource)));
+
+        ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kRadio)));
+        ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kSensor)));
+        ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kPowerSource)));
+        ReturnOnFailure(current.add(to_underlying(HardwareFaultEnum::kUserInterfaceFault)));
 #endif
         Clusters::GeneralDiagnosticsServer::Instance().OnHardwareFaultsDetect(previous, current);
     }

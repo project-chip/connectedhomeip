@@ -43,6 +43,10 @@
 #include <zephyr/sys/byteorder.h>
 #include <zephyr/sys/util.h>
 
+#if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
+#include <zephyr/pm/policy.h>
+#endif
+
 #include <array>
 
 // Includes for ieee802154 switchings
@@ -316,6 +320,9 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
         VerifyOrReturnError(err == 0, MapErrorZephyr(err));
         (void) bt_set_name(bt_dev_name);
         BLERadioInitialized = true;
+#if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
+        pm_policy_state_lock_get(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+#endif
     }
 
     // Prepare advertising request
@@ -958,6 +965,10 @@ void BLEManagerImpl::SwitchToIeee802154(void)
     bt_disable();
     // irq_disable(IRQ1_SYSTIMER);
     BLERadioInitialized = false;
+
+#if defined(CONFIG_PM) && !defined(CONFIG_CHIP_ENABLE_PM_DURING_BLE)
+    pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
+#endif
 
     const struct device * radio_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_ieee802154));
     __ASSERT(radio_dev != NULL, "Get radio_dev fail");

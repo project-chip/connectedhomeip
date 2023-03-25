@@ -17,7 +17,6 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/openthread.gni")
 
 import("//build_overrides/openthread.gni")
-import("//build_overrides/ot_efr32.gni")
 
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 import("${efr32_sdk_build_root}/silabs_board.gni")
@@ -32,7 +31,7 @@ config("openthread_efr32_config") {
   include_dirs = [
     "${chip_root}/examples/platform/efr32",
     "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}",
-    "${openthread_efr32_root}",
+    "${sl_ot_efr32_root}",
   ]
 
   # temporarily disable check until gsdk pulls in a more recent version of openthread
@@ -41,9 +40,9 @@ config("openthread_efr32_config") {
 
 source_set("openthread_core_config_efr32") {
   sources = [
-    "${openthread_efr32_root}/openthread-core-efr32-config-check.h",
-    "${openthread_efr32_root}/openthread-core-efr32-config.h",
     "${openthread_root}/src/cli/cli_config.h",
+    "${sl_ot_efr32_root}/openthread-core-efr32-config-check.h",
+    "${sl_ot_efr32_root}/openthread-core-efr32-config.h",
   ]
 
   public_deps = [ "${efr32_sdk_build_root}:efr32_sdk" ]
@@ -53,16 +52,16 @@ source_set("openthread_core_config_efr32") {
 
 source_set("libopenthread-efr32") {
   sources = [
-    "${openthread_efr32_root}/alarm.c",
-    "${openthread_efr32_root}/crypto.c",
-    "${openthread_efr32_root}/entropy.c",
-    "${openthread_efr32_root}/flash.c",
-    "${openthread_efr32_root}/ieee802154-packet-utils.cpp",
-    "${openthread_efr32_root}/misc.c",
-    "${openthread_efr32_root}/radio.c",
-    "${openthread_efr32_root}/sleep.c",
-    "${openthread_efr32_root}/system.c",
     "${openthread_root}/examples/apps/cli/cli_uart.cpp",
+    "${sl_ot_efr32_root}/alarm.c",
+    "${sl_ot_efr32_root}/crypto.c",
+    "${sl_ot_efr32_root}/entropy.c",
+    "${sl_ot_efr32_root}/flash.c",
+    "${sl_ot_efr32_root}/ieee802154-packet-utils.cpp",
+    "${sl_ot_efr32_root}/misc.c",
+    "${sl_ot_efr32_root}/radio.c",
+    "${sl_ot_efr32_root}/sleep.c",
+    "${sl_ot_efr32_root}/system.c",
   ]
 
   public_deps = [

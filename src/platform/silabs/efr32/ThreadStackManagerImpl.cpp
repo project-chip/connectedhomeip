@@ -127,7 +127,7 @@ extern "C" otError otPlatUartEnable(void)
 #ifdef PW_RPC_ENABLED
     return OT_ERROR_NOT_IMPLEMENTED;
 #else
-    uartConsoleInit();
+    // Uart Init is handled in init_efrPlatform.cpp
     return OT_ERROR_NONE;
 #endif
 }

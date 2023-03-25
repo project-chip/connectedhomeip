@@ -35,11 +35,15 @@ tests:
       disabled: true
 
     - label:
-          "If TH knows the DUTs Discovery Capability Bitmask, it starts the
-          commissioning process in any order of priority on all of the
-          networking technologies that are supported by both the TH and the DUT"
+          "If TH is aware of the DUT's Discovery Capability Bitmask, it SHALL
+          initiate Device Discovery in any order of priority on all the
+          networking technologies that are supported by both the TH and the DUT
+          If TH is unaware of the DUT's Discovery Capability Bitmask, it SHALL
+          initiate Device Discovery in any order on all the networking
+          technologies it supports out of Wi-Fi Soft-AP, BLE, and on IP network
+          discovery."
       verification: |
-          TH selects the DUT"s capability bitmask and start the commissiong process accordingly
+          TH selects the DUT's capability bitmask and start the commissiong process accordingly
           No applicable TH or DUT logs.
       disabled: true
 
@@ -78,63 +82,57 @@ tests:
           Observe the DUT advertising in a commissionable state
       disabled: true
 
-    - label: "TH does not respond to DUT and DUT keeps sending ADVs"
+    - label:
+          "DUT begins sending ADVs. TH does not respond to these DUT ADVs so
+          that the DUT can keep sending ADVs"
       PICS: MCORE.COM.BLE
       verification: |
-          Verify in DUT(ALL-CLUSTER-APP)
+          No applicable TH logs.
 
-          [5855][P][DIS]Advertise commission parameter vendorID=65521 productID=32773 discriminator=3840/15
+          1. This step can be verified using a BLE discovery tool of choice.
+          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
+          OR
+          HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
+          2. Observe the Service Data being advertised in Hexidecimal format
+          For example, "F6-FF-00-01-0F-F1-FF-01-80-00" would translate to:
+          0xF6, 0xFF= 0xFFF6 = 16-bit Matter UUID assigned by Bluetooth SIG
+          0x00 = 0x00 (Commissionable) = Matter BLE OpCode
+          0x01, 0x0F = 0x0F01 = 3841 Discriminator
+          0xF1, 0xFF, = 0xFFF1 = 65521 VendorID
+          0x01, 0x80 = 0x8001 = 32769 Product ID
+          0x00 = Additional Data Flag
       disabled: true
 
     - label: "TH does not respond to DUT and DUT keeps sending ADVs"
       PICS: MCORE.COM.BLE
       verification: |
-          No applicable TH or DUT logs.
+          No applicable TH logs.
 
           This step can be verified using a BLE discovery tool of choice.
           Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
           OR
-          HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
+          HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)+++
       disabled: true
 
     - label: "TH does not respond to DUT and DUT keeps sending ADVs"
       PICS: MCORE.COM.BLE
       verification: |
-          This BLE advertisements can be verified using  BLE discovery tool of choice (Try NRF Connect OR HCIDump)
+          No applicable TH logs.
+
+          This BLE advertisements can be verified using  BLE discovery tool of choice.
+          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
+          OR
+          HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
           ->For T0 and 30s we have to get advertisement range between 20ms to 60ms
           ->For 30s and 15mins we have to get advertisement range between 150ms to 1200ms
-          Verify in DUT(ALL-CLUSTER-APP)
-
-          I: 3242 [DL]CHIPoBLE advertising started
-          I: 3279 [DL]NFC Tag emulation started
-          I: 33245 [DL]CHIPoBLE advertising mode changed to slow
-          D: 901346 [DIS]OnExpiration callback for cleared session
-          D: 901351 [DIS]Extended discovery timeout cancelled
-          I: 903097 [SVR]Closing pairing window
-          D: 903100 [IN]SecureSession Released 0x20002c00 Type:1 LSID:27704
-          I: 903106 [DIS]Updating services using commissioning mode 0
-          D: 903111 [DL]Using Thread extended MAC for hostname.
-          D: 903116 [DL]Using Thread extended MAC for hostname.
-          I: 903138 [DIS]Advertise commission parameter vendorID=65521 productID=32784 di5
-          E: 903147 [DIS]Failed to advertise extended commissionable node: Error CHIP:0x03
-
-
-          After 900s (that is 15min) advertisement stops
-          Verify in DUT(ALL-CLUSTER-APP)
-
-          D: 903154 [DIS]Scheduling extended discovery timeout in 900s
-          E: 903160 [DIS]Failed to finalize service update: Error CHIP:0x0000001C
-          D: 903166 [DL]CHIPoBLE advertising set to off
-          I: 903171 [DL]CHIPoBLE advertising stopped
-          I: 903174 [DL]NFC Tag emulation stopped
       disabled: true
 
     - label: "TH does not respond to DUT. User power cycles the DUT"
       PICS: MCORE.COM.BLE
       verification: |
-          1. Reboot the DUT commissionee
+          No applicable TH logs.
 
-          sudo reboot
+          1. Reboot the DUT commissionee according to manufacturer's instructions
       disabled: true
 
     - label:
@@ -142,11 +140,14 @@ tests:
           least 15 minutes"
       PICS: MCORE.COM.BLE
       verification: |
-          Check timestamp, ADV stop after 15 mins
-          Verify in DUT(ALL-CLUSTER-APP)
+          No applicable TH logs.
 
-          D: 903154 [DIS]Scheduling extended discovery timeout in 900s
-          E: 903160 [DIS]Failed to finalize service update: Error CHIP:0x0000001C
+          1. Discover commissionables over BLE using a BLE discovery tool of choice.
+          Try NRF Connect app (https://www.nordicsemi.com/Products/Development-tools/nrf-connect-for-desktop)
+          OR
+          HCIDump (https://ubuntu.com/core/docs/bluez/reference/commands)
+          2. After DUT has been advertising for 2min59sec (right before the minimum 3min mark), check that the DUT is still advertising over BLE
+          3. After DUT has been advertising for 15min, check that the DUT has stopped advertising over BLE
       disabled: true
 
     - label: "TH scans and finds the DUT SSID"
@@ -174,8 +175,11 @@ tests:
       disabled: true
 
     - label:
-          "TH and DUT are connected to the same network and the DUT is sending
-          mandatory Commissionable Node Discovery service records over DNS-SD."
+          "TH and DUT are connected to the same network through vendor-unique
+          means or by commissioning the DUT onto the Matter network and opening
+          a commissioning window. The DUT is sending mandatory Commissionable
+          Node Discovery service records over DNS-SD.|DUT is able to be
+          discovered over DNS-SD."
       verification: |
           ./chip-all-clusters-app
           ...
@@ -193,10 +197,10 @@ tests:
           [1646286638.377915][11651:11651] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
           [1646286638.377986][11651:11651] CHIP:SVR: Manual pairing code: [34970112332]
 
-           ./chip-tool discover commissionables
+          ./chip-tool discover commissionables
           Verify in TH (CHIP-TOOL)
 
-          Example output using all-clusters-app"s advertisements:
+          Example output using all-clusters-app's advertisements:
           [1651256405894] [18453:593886] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.2
           [1651256405894] [18453:593886] CHIP: [DIS]         Vendor ID: 65521
           [1651256405894] [18453:593886] CHIP: [DIS]         Product ID: 32769
@@ -217,47 +221,247 @@ tests:
     - label:
           "TH and DUT are connected to the same network and the DUT is sending
           optional Commissionable Node Discovery service records over DNS-SD."
-      PICS:
-          MCORE.DD.TXT_KEY_VP && MCORE.DD.TXT_KEY_DT && MCORE.DD.TXT_KEY_DN &&
-          MCORE.DD.TXT_KEY_RI && MCORE.DD.TXT_KEY_PH && MCORE.DD.TXT_KEY_PI
+      PICS: MCORE.DD.TXT_KEY_VP
       verification: |
-          ./chip-tool discover commissionables
-          Verify in TH (CHIP-TOOL)
+          $ ./chip-tool discover commissionables
+          Verify in TH as commissioner side:
 
-          Example output using all-clusters-app"s advertisements found on the TH commissioner:
-          [1657218902314] [29617:16663220] CHIP: [DL] Browsing for: _matterc._udp
-          [1657218902488] [29617:16663220] CHIP: [DL] Mdns: OnBrowseAdd  name: 5B4185091B6CAD28, type: _matterc._udp., domain: local., interface: 7
-          [1657218902488] [29617:16663220] CHIP: [DL] Resolve type=_matterc._udp name=5B4185091B6CAD28 interface=7
-          [1657218902489] [29617:16663220] CHIP: [DL] Mdns : OnNewInterface hostname:DCA6328D2B9F0000.local. fullname:5B4185091B6CAD28._matterc._udp.local. interface: 7
-          [1657218902490] [29617:16663220] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:fd54:23a1:c6de:4637:4c4:ee82:2a0f:b5e2
-          [1657218902490] [29617:16663220] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:fe80::1e81:3e0:3865:2d29
-          [1657218902490] [29617:16663220] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.10
-          [1657218902490] [29617:16663220] CHIP: [DIS]         Hostname: DCA6328D2B9F0000
-          [1657218902490] [29617:16663220] CHIP: [DIS]         IP Address #1: fd54:23a1:c6de:4637:4c4:ee82:2a0f:b5e2
-          [1657218902490] [29617:16663220] CHIP: [DIS]         IP Address #2: fe80::1e81:3e0:3865:2d29
-          [1657218902490] [29617:16663220] CHIP: [DIS]         IP Address #3: 192.168.1.10
-          [1657218902490] [29617:16663220] CHIP: [DIS]         Port: 5540
-          [1657218902490] [29617:16663220] CHIP: [DIS]         Mrp Interval idle: 5000 ms
-          [1657218902490] [29617:16663220] CHIP: [DIS]         Mrp Interval active: 300 ms
-          [1657218902490] [29617:16663220] CHIP: [DIS]         Vendor ID: 65521
-          [1657218902490] [29617:16663220] CHIP: [DIS]         Product ID: 32769
-          [1657218902490] [29617:16663220] CHIP: [DIS]         Long Discriminator: 3840
-          [1657218902490] [29617:16663220] CHIP: [DIS]         Pairing Hint: 33
-          [1657218902490] [29617:16663220] CHIP: [DIS]         Instance Name: 5B4185091B6CAD28
-          [1657218902490] [29617:16663220] CHIP: [DIS]         Commissioning Mode: 1
-
+          Example output using all-clusters-app's advertisements found on the TH commissioner:
+          [1674595314229] [66646:12313662] [DIS] Discovered node:
+          [1674595314229] [66646:12313662] [DIS]         Hostname: 010203040506
+          [1674595314229] [66646:12313662] [DIS]         IP Address #1: fe80::2ca0:93c7:6e52:5b12
+          [1674595314229] [66646:12313662] [DIS]         IP Address #2: fd11:1111:1122:2222:c15b:6c2c:eef:3c07
+          [1674595314229] [66646:12313662] [DIS]         IP Address #3: fdf1:228a:1759:0:e96:da4d:3138:a0c5
+          [1674595314229] [66646:12313662] [DIS]         Port: 5540
+          [1674595314229] [66646:12313662] [DIS]         Mrp Interval idle: not present
+          [1674595314229] [66646:12313662] [DIS]         Mrp Interval active: not present
+          [1674595314229] [66646:12313662] [DIS]         TCP Supported: 0
+          [1674595314229] [66646:12313662] [DIS]         Rotating ID: AB
+          [1674595314229] [66646:12313662] [DIS]         Device Name: Test Bulb
+          [1674595314229] [66646:12313662] [DIS]         Vendor ID: 65521
+          [1674595314229] [66646:12313662] [DIS]         Product ID: 32769
+          [1674595314229] [66646:12313662] [DIS]         Device Type: 257
+          [1674595314229] [66646:12313662] [DIS]         Long Discriminator: 840
+          [1674595314229] [66646:12313662] [DIS]         Pairing Instruction: 10
+          [1674595314229] [66646:12313662] [DIS]         Pairing Hint: 33
+          [1674595314229] [66646:12313662] [DIS]         Instance Name: D75A66B8EE701A71
+          [1674595314229] [66646:12313662] [DIS]         Commissioning Mode: 0
 
           OR
           1. User a dns-sd records browser
-          avahi-browse _matterc._udp -r
+          $ avahi-browse _matterc._udp -r
 
-          Example output using all-clusters-app"s advertisements:
-          +   eth0 IPv6 1E36C55245E2908D                              _matterc._udp        local
-          =   eth0 IPv6 1E36C55245E2908D                              _matterc._udp        local
-             hostname = [DCA6328D2B9F0000.local]
-             address = [192.168.1.10]
+          Example output using all-clusters-app's advertisements:
+          =  wlan0 IPv6 32635B3D67B32ABB                              _matterc._udp        local
+            hostname = [010203040506.local]
+            address = [fe80::3d59:5ecc:1961:27b0]
+            port = [5540]
+            txt = ["PI=10" "PH=33" "RI=AB" "CM=0" "D=840" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
+      disabled: true
+
+    - label:
+          "TH and DUT are connected to the same network and the DUT is sending
+          optional Commissionable Node Discovery service records over DNS-SD."
+      PICS: MCORE.DD.TXT_KEY_DT
+      verification: |
+          $ ./chip-tool discover commissionables
+          Verify in TH as commissioner side:
+
+          Example output using all-clusters-app's advertisements found on the TH commissioner:
+          [1674595314229] [66646:12313662] [DIS] Discovered node:
+          [1674595314229] [66646:12313662] [DIS]         Hostname: 010203040506
+          [1674595314229] [66646:12313662] [DIS]         IP Address #1: fe80::2ca0:93c7:6e52:5b12
+          [1674595314229] [66646:12313662] [DIS]         IP Address #2: fd11:1111:1122:2222:c15b:6c2c:eef:3c07
+          [1674595314229] [66646:12313662] [DIS]         IP Address #3: fdf1:228a:1759:0:e96:da4d:3138:a0c5
+          [1674595314229] [66646:12313662] [DIS]         Port: 5540
+          [1674595314229] [66646:12313662] [DIS]         Mrp Interval idle: not present
+          [1674595314229] [66646:12313662] [DIS]         Mrp Interval active: not present
+          [1674595314229] [66646:12313662] [DIS]         TCP Supported: 0
+          [1674595314229] [66646:12313662] [DIS]         Rotating ID: AB
+          [1674595314229] [66646:12313662] [DIS]         Device Name: Test Bulb
+          [1674595314229] [66646:12313662] [DIS]         Vendor ID: 65521
+          [1674595314229] [66646:12313662] [DIS]         Product ID: 32769
+          [1674595314229] [66646:12313662] [DIS]         Device Type: 257
+          [1674595314229] [66646:12313662] [DIS]         Long Discriminator: 840
+          [1674595314229] [66646:12313662] [DIS]         Pairing Instruction: 10
+          [1674595314229] [66646:12313662] [DIS]         Pairing Hint: 33
+          [1674595314229] [66646:12313662] [DIS]         Instance Name: D75A66B8EE701A71
+          [1674595314229] [66646:12313662] [DIS]         Commissioning Mode: 0
+
+          OR
+          1. User a dns-sd records browser
+          $ avahi-browse _matterc._udp -r
+
+          Example output using all-clusters-app's advertisements:
+          =  wlan0 IPv6 32635B3D67B32ABB                              _matterc._udp        local
+            hostname = [010203040506.local]
+            address = [fe80::3d59:5ecc:1961:27b0]
+            port = [5540]
+            txt = ["PI=10" "PH=33" "RI=AB" "CM=0" "D=840" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
+      disabled: true
+
+    - label:
+          "TH and DUT are connected to the same network and the DUT is sending
+          optional Commissionable Node Discovery service records over DNS-SD."
+      PICS: MCORE.DD.TXT_KEY_DN
+      verification: |
+          $ ./chip-tool discover commissionables
+          Verify in TH as commissioner side:
+
+          Example output using all-clusters-app's advertisements found on the TH commissioner:
+          [1674595314229] [66646:12313662] [DIS] Discovered node:
+          [1674595314229] [66646:12313662] [DIS]         Hostname: 010203040506
+          [1674595314229] [66646:12313662] [DIS]         IP Address #1: fe80::2ca0:93c7:6e52:5b12
+          [1674595314229] [66646:12313662] [DIS]         IP Address #2: fd11:1111:1122:2222:c15b:6c2c:eef:3c07
+          [1674595314229] [66646:12313662] [DIS]         IP Address #3: fdf1:228a:1759:0:e96:da4d:3138:a0c5
+          [1674595314229] [66646:12313662] [DIS]         Port: 5540
+          [1674595314229] [66646:12313662] [DIS]         Mrp Interval idle: not present
+          [1674595314229] [66646:12313662] [DIS]         Mrp Interval active: not present
+          [1674595314229] [66646:12313662] [DIS]         TCP Supported: 0
+          [1674595314229] [66646:12313662] [DIS]         Rotating ID: AB
+          [1674595314229] [66646:12313662] [DIS]         Device Name: Test Bulb
+          [1674595314229] [66646:12313662] [DIS]         Vendor ID: 65521
+          [1674595314229] [66646:12313662] [DIS]         Product ID: 32769
+          [1674595314229] [66646:12313662] [DIS]         Device Type: 257
+          [1674595314229] [66646:12313662] [DIS]         Long Discriminator: 840
+          [1674595314229] [66646:12313662] [DIS]         Pairing Instruction: 10
+          [1674595314229] [66646:12313662] [DIS]         Pairing Hint: 33
+          [1674595314229] [66646:12313662] [DIS]         Instance Name: D75A66B8EE701A71
+          [1674595314229] [66646:12313662] [DIS]         Commissioning Mode: 0
+
+          OR
+          1. User a dns-sd records browser
+          $ avahi-browse _matterc._udp -r
+
+          Example output using all-clusters-app's advertisements:
+          =  wlan0 IPv6 32635B3D67B32ABB                              _matterc._udp        local
+            hostname = [010203040506.local]
+            address = [fe80::3d59:5ecc:1961:27b0]
+            port = [5540]
+            txt = ["PI=10" "PH=33" "RI=AB" "CM=0" "D=840" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
+      disabled: true
+
+    - label:
+          "TH and DUT are connected to the same network and the DUT is sending
+          optional Commissionable Node Discovery service records over DNS-SD."
+      PICS: MCORE.DD.TXT_KEY_RI
+      verification: |
+          $ ./chip-tool discover commissionables
+          Verify in TH as commissioner side:
+
+          Example output using all-clusters-app's advertisements found on the TH commissioner:
+          [1674595314229] [66646:12313662] [DIS] Discovered node:
+          [1674595314229] [66646:12313662] [DIS]         Hostname: 010203040506
+          [1674595314229] [66646:12313662] [DIS]         IP Address #1: fe80::2ca0:93c7:6e52:5b12
+          [1674595314229] [66646:12313662] [DIS]         IP Address #2: fd11:1111:1122:2222:c15b:6c2c:eef:3c07
+          [1674595314229] [66646:12313662] [DIS]         IP Address #3: fdf1:228a:1759:0:e96:da4d:3138:a0c5
+          [1674595314229] [66646:12313662] [DIS]         Port: 5540
+          [1674595314229] [66646:12313662] [DIS]         Mrp Interval idle: not present
+          [1674595314229] [66646:12313662] [DIS]         Mrp Interval active: not present
+          [1674595314229] [66646:12313662] [DIS]         TCP Supported: 0
+          [1674595314229] [66646:12313662] [DIS]         Rotating ID: AB
+          [1674595314229] [66646:12313662] [DIS]         Device Name: Test Bulb
+          [1674595314229] [66646:12313662] [DIS]         Vendor ID: 65521
+          [1674595314229] [66646:12313662] [DIS]         Product ID: 32769
+          [1674595314229] [66646:12313662] [DIS]         Device Type: 257
+          [1674595314229] [66646:12313662] [DIS]         Long Discriminator: 840
+          [1674595314229] [66646:12313662] [DIS]         Pairing Instruction: 10
+          [1674595314229] [66646:12313662] [DIS]         Pairing Hint: 33
+          [1674595314229] [66646:12313662] [DIS]         Instance Name: D75A66B8EE701A71
+          [1674595314229] [66646:12313662] [DIS]         Commissioning Mode: 0
+
+          OR
+          1. User a dns-sd records browser
+          $ avahi-browse _matterc._udp -r
+
+          Example output using all-clusters-app's advertisements:
+          =  wlan0 IPv6 32635B3D67B32ABB                              _matterc._udp        local
+            hostname = [010203040506.local]
+            address = [fe80::3d59:5ecc:1961:27b0]
+            port = [5540]
+            txt = ["PI=10" "PH=33" "RI=AB" "CM=0" "D=840" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
+      disabled: true
+
+    - label:
+          "TH and DUT are connected to the same network and the DUT is sending
+          optional Commissionable Node Discovery service records over DNS-SD."
+      PICS: MCORE.DD.TXT_KEY_PH
+      verification: |
+          $ ./chip-tool discover commissionables
+          Verify in TH as commissioner side:
+
+          Example output using all-clusters-app's advertisements found on the TH commissioner:
+          [1674595314229] [66646:12313662] [DIS] Discovered node:
+          [1674595314229] [66646:12313662] [DIS]         Hostname: 010203040506
+          [1674595314229] [66646:12313662] [DIS]         IP Address #1: fe80::2ca0:93c7:6e52:5b12
+          [1674595314229] [66646:12313662] [DIS]         IP Address #2: fd11:1111:1122:2222:c15b:6c2c:eef:3c07
+          [1674595314229] [66646:12313662] [DIS]         IP Address #3: fdf1:228a:1759:0:e96:da4d:3138:a0c5
+          [1674595314229] [66646:12313662] [DIS]         Port: 5540
+          [1674595314229] [66646:12313662] [DIS]         Mrp Interval idle: not present
+          [1674595314229] [66646:12313662] [DIS]         Mrp Interval active: not present
+          [1674595314229] [66646:12313662] [DIS]         TCP Supported: 0
+          [1674595314229] [66646:12313662] [DIS]         Rotating ID: AB
+          [1674595314229] [66646:12313662] [DIS]         Device Name: Test Bulb
+          [1674595314229] [66646:12313662] [DIS]         Vendor ID: 65521
+          [1674595314229] [66646:12313662] [DIS]         Product ID: 32769
+          [1674595314229] [66646:12313662] [DIS]         Device Type: 257
+          [1674595314229] [66646:12313662] [DIS]         Long Discriminator: 840
+          [1674595314229] [66646:12313662] [DIS]         Pairing Instruction: 10
+          [1674595314229] [66646:12313662] [DIS]         Pairing Hint: 33
+          [1674595314229] [66646:12313662] [DIS]         Instance Name: D75A66B8EE701A71
+          [1674595314229] [66646:12313662] [DIS]         Commissioning Mode: 0
+
+          OR
+          1. User a dns-sd records browser
+          $ avahi-browse _matterc._udp -r
+
+          Example output using all-clusters-app's advertisements:
+          =  wlan0 IPv6 32635B3D67B32ABB                              _matterc._udp        local
+             hostname = [010203040506.local]
+             address = [fe80::3d59:5ecc:1961:27b0]
              port = [5540]
-             txt = ["PI=" "PH=33" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
+             txt = ["PI=10" "PH=33" "RI=AB" "CM=0" "D=840" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
+      disabled: true
+
+    - label:
+          "TH and DUT are connected to the same network and the DUT is sending
+          optional Commissionable Node Discovery service records over DNS-SD."
+      PICS: MCORE.DD.TXT_KEY_PI
+      verification: |
+          $ ./chip-tool discover commissionables
+          Verify in TH as commissioner side:
+
+          Example output using all-clusters-app's advertisements found on the TH commissioner:
+          [1674595314229] [66646:12313662] [DIS] Discovered node:
+          [1674595314229] [66646:12313662] [DIS]         Hostname: 010203040506
+          [1674595314229] [66646:12313662] [DIS]         IP Address #1: fe80::2ca0:93c7:6e52:5b12
+          [1674595314229] [66646:12313662] [DIS]         IP Address #2: fd11:1111:1122:2222:c15b:6c2c:eef:3c07
+          [1674595314229] [66646:12313662] [DIS]         IP Address #3: fdf1:228a:1759:0:e96:da4d:3138:a0c5
+          [1674595314229] [66646:12313662] [DIS]         Port: 5540
+          [1674595314229] [66646:12313662] [DIS]         Mrp Interval idle: not present
+          [1674595314229] [66646:12313662] [DIS]         Mrp Interval active: not present
+          [1674595314229] [66646:12313662] [DIS]         TCP Supported: 0
+          [1674595314229] [66646:12313662] [DIS]         Rotating ID: AB
+          [1674595314229] [66646:12313662] [DIS]         Device Name: Test Bulb
+          [1674595314229] [66646:12313662] [DIS]         Vendor ID: 65521
+          [1674595314229] [66646:12313662] [DIS]         Product ID: 32769
+          [1674595314229] [66646:12313662] [DIS]         Device Type: 257
+          [1674595314229] [66646:12313662] [DIS]         Long Discriminator: 840
+          [1674595314229] [66646:12313662] [DIS]         Pairing Instruction: 10
+          [1674595314229] [66646:12313662] [DIS]         Pairing Hint: 33
+          [1674595314229] [66646:12313662] [DIS]         Instance Name: D75A66B8EE701A71
+          [1674595314229] [66646:12313662] [DIS]         Commissioning Mode: 0
+
+          OR
+          1. User a dns-sd records browser
+          $ avahi-browse _matterc._udp -r
+
+          Example output using all-clusters-app's advertisements:
+          =  wlan0 IPv6 32635B3D67B32ABB                              _matterc._udp        local
+            hostname = [010203040506.local]
+            address = [fe80::3d59:5ecc:1961:27b0]
+            port = [5540]
+            txt = ["PI=10" "PH=33" "RI=AB" "CM=0" "D=840" "DN=Test Bulb" "DT=257" "VP=65521+32769"]
       disabled: true
 
     - label: "Place the DUT device into a non-commissionable state"
@@ -279,7 +483,7 @@ tests:
           ./chip-tool discover commissionables
           Verify in TH (CHIP-TOOL)
 
-          Example output using all-clusters-app"s advertisements found on the TH commissioner:
+          Example output using all-clusters-app's advertisements found on the TH commissioner:
           [1651256405894] [18453:593886] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.2
           [1651256405894] [18453:593886] CHIP: [DIS]         Vendor ID: 65521
           [1651256405894] [18453:593886] CHIP: [DIS]         Product ID: 32769
@@ -306,7 +510,7 @@ tests:
           Vendor specific, take DUT out of commissioning mode
            dns-sd -B _services._dns-sd._udp
 
-          Example output using all-clusters-app"s advertisements:
+          Example output using all-clusters-app's advertisements:
           11:30:36.040  Add        3   7 .                    _sub.local.          _L3840
           11:30:36.040  Add        3   7 .                    _sub.local.          _S15
           11:30:36.040  Add        2   7 .                    _sub.local.          _CM
@@ -320,33 +524,33 @@ tests:
       PICS: MCORE.DD.COMMISSIONING_SUBTYPE_V && MCORE.DD.COMMISSIONING_SUBTYPE_T
       verification: |
           Vendor specific, take DUT out of commissioning mode
-           dns-sd -B _services._dns-sd._udp
+          dns-sd -B _services._dns-sd._udp
 
-          Example output using all-clusters-app"s advertisements found on the TH commissioner:
+          Example output using all-clusters-app's advertisements found on the TH commissioner:
           11:56:29.770  Add        3   7 .                    _sub.local.          _V65521
       disabled: true
 
     - label: "Place the DUT device into Commissioning mode"
       verification: |
-          ./chip-tool discover commissionables
-          Verify in TH (CHIP-TOOL)
+          $  ./chip-tool discover commissionables
+          Verify in TH as commissioner side:
 
-          Example output using all-clusters-app"s advertisements found on the TH commissioner:
-          [1651256405894] [18453:593886] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.2
-          [1651256405894] [18453:593886] CHIP: [DIS]         Vendor ID: 65521
-          [1651256405894] [18453:593886] CHIP: [DIS]         Product ID: 32769
-          [1651256405894] [18453:593886] CHIP: [DIS]         Long Discriminator: 3840
-          [1651256405894] [18453:593886] CHIP: [DIS]         Pairing Hint: 33
-          [1651256405894] [18453:593886] CHIP: [DIS]         Hostname: DCA6328D2B9F0000
-          [1651256405894] [18453:593886] CHIP: [DIS]         Instance Name: 8FFEE04E82830E26
-          [1651256405894] [18453:593886] CHIP: [DIS]         IP Address #1: fd54:23a1:c6de:4637:dea6:32ff:fe8d:2b9f
-          [1651256405894] [18453:593886] CHIP: [DIS]         IP Address #2: fe80::dea6:32ff:fe8d:2b9f
-          [1651256405894] [18453:593886] CHIP: [DIS]         IP Address #3: fe80::dea6:32ff:fe8d:2ba0
-          [1651256405894] [18453:593886] CHIP: [DIS]         IP Address #4: 192.168.1.2
-          [1651256405894] [18453:593886] CHIP: [DIS]         Port: 5540
-          [1651256405894] [18453:593886] CHIP: [DIS]         Commissioning Mode: 1
-          [1651256405894] [18453:593886] CHIP: [DIS]         Mrp Interval idle: 5000 ms
-          [1651256405894] [18453:593886] CHIP: [DIS]         Mrp Interval active: 300 ms
+          Example output using all-clusters-app's advertisements found on the TH commissioner:
+          [1674601355.769735][9780:9782] CHIP:DIS: Discovered node:
+          [1674601355.769786][9780:9782] CHIP:DIS:         Hostname: 88665A0BE29E
+          [1674601355.769826][9780:9782] CHIP:DIS:         IP Address #1: fd11:1111:1122:2222:8cd:a043:f97:9d96
+          [1674601355.769852][9780:9782] CHIP:DIS:         IP Address #2: fe80::cab:7cb7:31cb:cd5c
+          [1674601355.769876][9780:9782] CHIP:DIS:         IP Address #3: 17.112.82.171
+          [1674601355.769898][9780:9782] CHIP:DIS:         Port: 5540
+          [1674601355.769920][9780:9782] CHIP:DIS:         Mrp Interval idle: not present
+          [1674601355.769942][9780:9782] CHIP:DIS:         Mrp Interval active: not present
+          [1674601355.769963][9780:9782] CHIP:DIS:         TCP Supported: 1
+          [1674601355.769986][9780:9782] CHIP:DIS:         Vendor ID: 65521
+          [1674601355.770005][9780:9782] CHIP:DIS:         Product ID: 32769
+          [1674601355.770026][9780:9782] CHIP:DIS:         Long Discriminator: 3841
+          [1674601355.770048][9780:9782] CHIP:DIS:         Pairing Hint: 33
+          [1674601355.770070][9780:9782] CHIP:DIS:         Instance Name: A043306EF9D2CB3F
+          [1674601355.770093][9780:9782] CHIP:DIS:         Commissioning Mode: 1
       disabled: true
 
     - label:
@@ -354,27 +558,21 @@ tests:
           command-line test tool (i.e. 'dns-sd -B _matterc._udp' or
           'avahi-browse _matterc._udp -r')"
       verification: |
-          ./chip-tool discover commissionables
-          Verify in TH (CHIP-TOOL)
+          Verify using the DNS-SD records command-line test tool:
+          $ dns-sd -B _matterc._udp
+          Browsing for _matterc._udp
+          DATE: ---Tue 24 Jan 2023---
+          22:56:40.175  ...STARTING...
+          Timestamp     A/R    Flags  if Domain               Service Type         Instance Name
+          22:56:40.175  Add        2   2 local.               _matterc._udp.       A043306EF9D2CB3F
 
-          [1657220492275] [29906:16679893] CHIP: [DL] Browsing for: _matterc._udp
-          [1657220492275] [29906:16679893] CHIP: [DL] Mdns: OnBrowseAdd  name: 74AFA51731B2E373, type: _matterc._udp., domain: local., interface: 7
-          [1657220492275] [29906:16679893] CHIP: [DL] Resolve type=_matterc._udp name=74AFA51731B2E373 interface=7
-          [1657220492276] [29906:16679893] CHIP: [DL] Mdns : OnNewInterface hostname:DCA6328D2B9F0000.local. fullname:74AFA51731B2E373._matterc._udp.local. interface: 7
-          [1657220492277] [29906:16679893] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:fd54:23a1:c6de:4637:4c4:ee82:2a0f:b5e2
-          [1657220492277] [29906:16679893] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:fe80::1e81:3e0:3865:2d29
-          [1657220492277] [29906:16679893] CHIP: [DL] Mdns: OnNewAddress interface: 7 ip:192.168.1.10
-          [1657220492277] [29906:16679893] CHIP: [DIS]         Hostname: DCA6328D2B9F0000
-          [1657220492277] [29906:16679893] CHIP: [DIS]         IP Address #1: fd54:23a1:c6de:4637:4c4:ee82:2a0f:b5e2
-          [1657220492277] [29906:16679893] CHIP: [DIS]         IP Address #2: fe80::1e81:3e0:3865:2d29
-          [1657220492277] [29906:16679893] CHIP: [DIS]         IP Address #3: 192.168.1.10
-          [1657220492277] [29906:16679893] CHIP: [DIS]         Port: 5540
-          [1657220492277] [29906:16679893] CHIP: [DIS]         Mrp Interval idle: 5000 ms
-          [1657220492277] [29906:16679893] CHIP: [DIS]         Mrp Interval active: 300 ms
-          [1657220492277] [29906:16679893] CHIP: [DIS]         Vendor ID: 65521
-          [1657220492277] [29906:16679893] CHIP: [DIS]         Product ID: 32769
-          [1657220492277] [29906:16679893] CHIP: [DIS]         Long Discriminator: 3840
-          [1657220492277] [29906:16679893] CHIP: [DIS]         Pairing Hint: 33
-          [1657220492277] [29906:16679893] CHIP: [DIS]         Instance Name: 74AFA51731B2E373
-          [1657220492277] [29906:16679893] CHIP: [DIS]         Commissioning Mode: 1
+          OR
+
+          $ avahi-browse _matterc._udp -r
+          +   eth0 IPv4 A043306EF9D2CB3F                              _matterc._udp        local
+          =   eth0 IPv4 A043306EF9D2CB3F                              _matterc._udp        local
+            hostname = [88665A0BE29E.local]
+            address = [17.112.82.171]
+            port = [5540]
+            txt = ["PI=" "PH=33" "CM=1" "D=3841" "T=1" "VP=65521+32769"]
       disabled: true

@@ -53,7 +53,7 @@ class SetUpCodePairerParameters : public RendezvousParameters
 public:
     SetUpCodePairerParameters(const Dnssd::CommonResolutionData & data, size_t index);
 #if CONFIG_NETWORK_LAYER_BLE
-    SetUpCodePairerParameters(BLE_CONNECTION_OBJECT connObj);
+    SetUpCodePairerParameters(BLE_CONNECTION_OBJECT connObj, bool connected = true);
 #endif // CONFIG_NETWORK_LAYER_BLE
     char mHostName[Dnssd::kHostNameMaxLength + 1] = {};
     Inet::InterfaceId mInterfaceId;

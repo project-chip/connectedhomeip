@@ -389,6 +389,22 @@ CHIP_ERROR BleLayer::NewBleConnectionByDiscriminator(const SetupDiscriminator & 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR BleLayer::NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj, void * appState,
+                                              BleConnectionDelegate::OnConnectionCompleteFunct onSuccess,
+                                              BleConnectionDelegate::OnConnectionErrorFunct onError)
+{
+    VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mBleTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    mConnectionDelegate->OnConnectionComplete = onSuccess;
+    mConnectionDelegate->OnConnectionError    = onError;
+
+    mConnectionDelegate->NewConnection(this, appState == nullptr ? this : appState, connObj);
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR BleLayer::NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj)
 {
     VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);

@@ -93,8 +93,17 @@ public:
         mConnectionObject = connObj;
         return *this;
     }
+
+    bool HasDiscoveredObject() const { return mDiscoveredObject != BLE_CONNECTION_UNINITIALIZED; }
+    BLE_CONNECTION_OBJECT GetDiscoveredObject() const { return mDiscoveredObject; }
+    RendezvousParameters & SetDiscoveredObject(BLE_CONNECTION_OBJECT connObj)
+    {
+        mDiscoveredObject = connObj;
+        return *this;
+    }
 #else
     bool HasConnectionObject() const { return false; }
+    bool HasDiscoveredObject() const { return false; }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
     bool HasMRPConfig() const { return mMRPConfig.HasValue(); }
@@ -132,6 +141,7 @@ private:
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer               = nullptr;
     BLE_CONNECTION_OBJECT mConnectionObject = BLE_CONNECTION_UNINITIALIZED;
+    BLE_CONNECTION_OBJECT mDiscoveredObject = BLE_CONNECTION_UNINITIALIZED;
 #endif // CONFIG_NETWORK_LAYER_BLE
 };
 
