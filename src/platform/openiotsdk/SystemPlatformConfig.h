@@ -39,4 +39,6 @@
 #define CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME 0
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
 
+#define CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT 1
+
 // ========== Platform-specific Configuration Overrides =========

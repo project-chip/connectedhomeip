@@ -16,7 +16,11 @@
  *    limitations under the License.
  */
 #include "AppConfig.h"
+#include "FreeRTOS.h"
+#include "event_groups.h"
 #include "matter_shell.h"
+#include "semphr.h"
+#include "task.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -96,11 +100,47 @@ static uint8_t sRxDmaBuffer[MAX_DMA_BUFFER_SIZE];
 static uint8_t sRxDmaBuffer2[MAX_DMA_BUFFER_SIZE];
 static uint16_t lastCount; // Nb of bytes already processed from the active dmaBuffer
 
+// uart transmit
+#if SILABS_LOG_OUT_UART
+#define UART_MAX_QUEUE_SIZE 125
+#else
+#define UART_MAX_QUEUE_SIZE 25
+#endif
+#define UART_TASK_SIZE 256
+#define UART_TASK_NAME "UART"
+#define UART_TX_COMPLETE_BIT (1 << 0)
+
+#ifdef CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE
+#define UART_TX_MAX_BUF_LEN (CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE + 2) // \r\n
+#else
+#define UART_TX_MAX_BUF_LEN (258)
+#endif
+
+TaskHandle_t sUartTaskHandle;
+StackType_t uartStack[UART_TASK_SIZE * sizeof(StackType_t)];
+StaticTask_t uartTaskStruct;
+
+typedef struct
+{
+    uint8_t data[UART_TX_MAX_BUF_LEN];
+    uint16_t length = 0;
+} UartTxStruct_t;
+
+uint8_t sUartTxQueueBuffer[UART_MAX_QUEUE_SIZE * sizeof(UartTxStruct_t)];
+StaticQueue_t sUartTxQueueStruct;
+QueueHandle_t sUartTxQueue;
+
+EventGroupHandle_t sUartEventGroup;
+StaticEventGroup_t sUartEventGroupStruct;
+
 // Rx buffer for the receive Fifo
 static uint8_t sRxFifoBuffer[MAX_BUFFER_SIZE];
 static Fifo_t sReceiveFifo;
 
 static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, uint8_t * data, UARTDRV_Count_t transferCount);
+static void UART_tx_callback(struct UARTDRV_HandleData * handle, Ecode_t transferStatus, uint8_t * data,
+                             UARTDRV_Count_t transferCount);
+static void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes);
 
 static bool InitFifo(Fifo_t * fifo, uint8_t * pDataBuffer, uint16_t bufferSize)
 {
@@ -180,7 +220,7 @@ static void WriteToFifo(Fifo_t * fifo, uint8_t * pDataToWrite, uint16_t SizeToWr
  *   @param Ptr to the fifo, ptr to contain the data to process, nb of bytes to pull from the fifo
  *   @return Nb of bytes that were retrieved.
  */
-static uint8_t RetrieveFromFifo(Fifo_t * fifo, uint8_t * pData, uint16_t SizeToRead)
+static uint16_t RetrieveFromFifo(Fifo_t * fifo, uint8_t * pData, uint16_t SizeToRead)
 {
     assert(fifo);
     assert(pData);
@@ -217,7 +257,6 @@ void uartConsoleInit(void)
     InitFifo(&sReceiveFifo, sRxFifoBuffer, MAX_BUFFER_SIZE);
 
     // Activate 2 dma queues to always have one active
-
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer2, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
 
@@ -237,6 +276,19 @@ void uartConsoleInit(void)
 #else
     USART_IntEnable(SL_UARTDRV_USART_VCOM_PERIPHERAL, USART_IF_RXDATAV);
 #endif // EFR32MG24
+
+    uint32_t struct_size = sizeof(UartTxStruct_t);
+
+    sUartTxQueue = xQueueCreateStatic(UART_MAX_QUEUE_SIZE, struct_size, sUartTxQueueBuffer, &sUartTxQueueStruct);
+
+    sUartEventGroup = xEventGroupCreateStatic(&sUartEventGroupStruct);
+
+    // Start App task.
+    sUartTaskHandle = xTaskCreateStatic(uartMainLoop, UART_TASK_NAME, UART_TASK_SIZE, nullptr, 30, uartStack, &uartTaskStruct);
+
+    assert(sUartTaskHandle);
+    assert(sUartEventGroup);
+    assert(sUartTxQueue);
 }
 
 void USART_IRQHandler(void)
@@ -253,6 +305,24 @@ void USART_IRQHandler(void)
 #ifdef SL_CATALOG_UARTDRV_EUSART_PRESENT
     EUSART_IntClear(SL_UARTDRV_EUSART_VCOM_PERIPHERAL, EUSART_IF_RXFL);
 #endif
+}
+
+/**
+ * @brief Transmit complete callback
+ *
+ * @param handle
+ * @param transferStatus
+ * @param data
+ * @param transferCount
+ */
+void UART_tx_callback(struct UARTDRV_HandleData * handle, Ecode_t transferStatus, uint8_t * data, UARTDRV_Count_t transferCount)
+{
+    BaseType_t xHigherPriorityTaskWoken;
+    /* Was the message posted successfully? */
+    if (xEventGroupSetBitsFromISR(sUartEventGroup, UART_TX_COMPLETE_BIT, &xHigherPriorityTaskWoken) == pdPASS)
+    {
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+    }
 }
 
 /*
@@ -281,42 +351,57 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
 #endif
 }
 
-/*
- *   @brief Read the data available from the console Uart
- *   @param Buffer that contains the data to write, number bytes to write.
- *   @return Amount of bytes written or ERROR (-1)
+/**
+ * @brief Read the data available from the console Uart
+ *
+ * @param Buf Buffer that contains the data to write
+ * @param BufLength number bytes to write
+ * @return int16_t Amount of bytes written or ERROR (-1)
  */
 int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
 {
-    if (Buf == NULL || BufLength < 1)
+    if (Buf == NULL || BufLength < 1 || BufLength > UART_TX_MAX_BUF_LEN)
+    {
+        return UART_CONSOLE_ERR;
+    }
+    // Do NOT wait for logs. Better to lost some logging than block
+    // an unknow task that might be critical.
+    UartTxStruct_t workBuffer;
+    memcpy(workBuffer.data, Buf, BufLength);
+    workBuffer.length = BufLength;
+
+    if (pdTRUE == xQueueSend(sUartTxQueue, &workBuffer, 0))
+    {
+        return BufLength;
+    }
+
+    return UART_CONSOLE_ERR;
+}
+
+/**
+ * @brief Write Logs to the Uart. Appends a return character
+ *
+ * @param log pointer to the logs
+ * @param length number of bytes to write
+ * @return int16_t Amount of bytes written or ERROR (-1)
+ */
+int16_t uartLogWrite(const char * log, uint16_t length)
+{
+    if (log == NULL || length < 1 || (length + 2) > UART_TX_MAX_BUF_LEN)
     {
         return UART_CONSOLE_ERR;
     }
 
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
-    sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
-#endif
+    UartTxStruct_t workBuffer;
+    memcpy(workBuffer.data, log, length);
+    memcpy(workBuffer.data + length, "\r\n", 2);
+    workBuffer.length = length + 2;
 
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
-    pre_uart_transfer();
-#endif /* EFR32MG24 && WF200_WIFI */
-
-    // Use of ForceTransmit here. Transmit with DMA was causing errors with PW_RPC
-    // TODO: Use DMA and find/fix what causes the issue with PW
-    Ecode_t ecode_status = UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) Buf, BufLength);
-
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
-    post_uart_transfer();
-#endif /* EFR32MG24 && WF200_WIFI */
-
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
-    sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
-#endif
-
-    if (ECODE_EMDRV_UARTDRV_OK == ecode_status)
+    if (pdTRUE == xQueueSend(sUartTxQueue, &workBuffer, 0))
     {
-        return BufLength;
+        return length;
     }
+
     return UART_CONSOLE_ERR;
 }
 
@@ -346,6 +431,48 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
     }
 
     return (int16_t) RetrieveFromFifo(&sReceiveFifo, (uint8_t *) Buf, NbBytesToRead);
+}
+
+void uartMainLoop(void * args)
+{
+    UartTxStruct_t workBuffer;
+
+    while (1)
+    {
+        while (pdTRUE == xQueueReceive(sUartTxQueue, &workBuffer, portMAX_DELAY))
+        {
+            uartSendBytes(workBuffer.data, workBuffer.length);
+        }
+    }
+}
+
+/**
+ * @brief Send Bytes to UART. This blocks the UART task.
+ *
+ * @param buffer pointer to the buffer containing the data
+ * @param nbOfBytes number of bytes to send
+ */
+void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
+{
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+    sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
+#endif
+
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    pre_uart_transfer();
+#endif /* EFR32MG24 && WF200_WIFI */
+
+    UARTDRV_Transmit(vcom_handle, (uint8_t *) buffer, nbOfBytes, UART_tx_callback);
+
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    post_uart_transfer();
+#endif /* EFR32MG24 && WF200_WIFI */
+
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+    sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
+#endif
+
+    xEventGroupWaitBits(sUartEventGroup, UART_TX_COMPLETE_BIT, pdTRUE, pdFALSE, portMAX_DELAY);
 }
 
 #ifdef __cplusplus

@@ -425,6 +425,16 @@ public:
      */
     void TriggerResubscribeIfScheduled(const char * reason);
 
+    /**
+     * Returns the timeout after which we consider the subscription to have
+     * dropped, if we have received no messages within that amount of time.
+     *
+     * Returns NullOptional if a subscription has not yet been established (and
+     * hence the MaxInterval is not yet known), or if the subscription session
+     * is gone and hence the relevant MRP parameters can no longer be determined.
+     */
+    Optional<System::Clock::Timeout> GetSubscriptionTimeout();
+
 private:
     friend class TestReadInteraction;
     friend class InteractionModelEngine;
@@ -471,6 +481,7 @@ private:
     static void OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void * apAppState);
     CHIP_ERROR ProcessSubscribeResponse(System::PacketBufferHandle && aPayload);
     CHIP_ERROR RefreshLivenessCheckTimer();
+    CHIP_ERROR ComputeLivenessCheckTimerTimeout(System::Clock::Timeout * aTimeout);
     void CancelLivenessCheckTimer();
     void CancelResubscribeTimer();
     void MoveToState(const ClientState aTargetState);
