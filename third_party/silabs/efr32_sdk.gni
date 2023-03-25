@@ -33,7 +33,10 @@ declare_args() {
 
   # Build openthread with prebuilt silabs lib
   use_silabs_thread_lib = false
-  enable_openthread_cli = true
+
+  # This undefined value (-1) is used to set a conditional default
+  # when users don't set it in build args
+  enable_openthread_cli = -1
 
   kvs_max_entries = 255
 
@@ -63,6 +66,11 @@ declare_args() {
   sl_ot_efr32_root =
       "${efr32_sdk_root}/protocol/openthread/platform-abstraction/efr32"
   sl_openthread_root = "${efr32_sdk_root}/util/third_party/openthread"
+}
+
+if (enable_openthread_cli == -1) {
+  # enable by default for thread/non-wifi-ncp builds
+  enable_openthread_cli = !(use_rs9116 || use_wf200 || use_SiWx917)
 }
 
 # Defines an efr32 SDK build target.
