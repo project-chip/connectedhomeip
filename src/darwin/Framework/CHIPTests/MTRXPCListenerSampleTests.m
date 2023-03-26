@@ -439,19 +439,6 @@ static MTRBaseDevice * GetConnectedDevice(void)
     _expectation = nil;
 }
 
-- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error deviceId:(NSNumber * _Nullable)deviceId
-{
-    XCTAssertEqual(error.code, 0);
-    [_expectation fulfill];
-    _expectation = nil;
-}
-
-- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(NSDictionary<NSString *, id> * _Nullable)info
-{
-    [_expectation fulfill];
-    _expectation = nil;
-}
-
 @end
 
 @interface MTRXPCListenerSampleTests : XCTestCase

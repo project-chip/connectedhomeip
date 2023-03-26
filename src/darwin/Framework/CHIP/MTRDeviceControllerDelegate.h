@@ -64,6 +64,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 
 /**
  * Notify the delegate when read commissioning Infomation. (vendorID, productID)
+ * Key : vendorID, productID, wifiEndpointID (device's Wi-Fi suport or not), threadEndpointID (device's Thread support or not)
  */
 - (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(NSDictionary<NSString *, id> * _Nullable)info;
 @end
