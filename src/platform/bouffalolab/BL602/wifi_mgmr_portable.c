@@ -113,38 +113,34 @@ int wifi_mgmr_profile_ssid_get(uint8_t * ssid)
     return profile_msg.ssid_len;
 }
 
-uint32_t wifi_mgmr_get_security_type(void)
+bool wifi_mgmr_security_type_is_open(void)
 {
-    /** return values defined from app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum */
-    if (strlen(wifiMgmr.wifi_mgmr_stat_info.passphr))
+    return strlen(wifiMgmr.wifi_mgmr_stat_info.passphr) == 0;
+}
+
+bool wifi_mgmr_security_type_is_wpa(void)
+{
+    return WPA_PROTO_WPA == gWpaSm.proto;
+}
+
+bool wifi_mgmr_security_type_is_wpa2(void)
+{
+    if (WPA_PROTO_RSN == gWpaSm.proto) 
     {
-        if (gWpaSm.pmk_len)
-        {
-            if (WPA_PROTO_WPA == gWpaSm.proto)
-            {
-                return 3;
-            }
-            else if (WPA_PROTO_RSN == gWpaSm.proto)
-            {
-                if (gWpaSm.key_mgmt & (WPA_KEY_MGMT_PSK | WPA_KEY_MGMT_PSK_SHA256))
-                {
-                    return 4;
-                }
-                else
-                {
-                    return 5;
-                }
-            }
-            else
-            {
-                return 2;
-            }
-        }
-        else
-        {
-            return 2;
-        }
+        return (gWpaSm.key_mgmt & (WPA_KEY_MGMT_IEEE8021X | WPA_KEY_MGMT_PSK | 
+            WPA_KEY_MGMT_PSK_SHA256 | WPA_KEY_MGMT_FT_PSK | WPA_KEY_MGMT_IEEE8021X_SHA256 | 
+            WPA_KEY_MGMT_FT_IEEE8021X)) != 0;
     }
 
-    return 1;
+    return false;
+}
+
+bool wifi_mgmr_security_type_is_wpa3(void)
+{
+    if (WPA_PROTO_RSN == gWpaSm.proto) 
+    {
+        return (gWpaSm.key_mgmt & (WPA_KEY_MGMT_SAE | WPA_KEY_MGMT_FT_SAE)) != 0;
+    }
+
+    return false;
 }

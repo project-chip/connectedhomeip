@@ -44,25 +44,6 @@ extern uint8_t _heap_size;
 namespace chip {
 namespace DeviceLayer {
 
-uint8_t MapAuthModeToSecurityType(int authmode)
-{
-    switch (authmode)
-    {
-    case WIFI_EVENT_BEACON_IND_AUTH_OPEN:
-        return 1;
-    case WIFI_EVENT_BEACON_IND_AUTH_WEP:
-        return 2;
-    case WIFI_EVENT_BEACON_IND_AUTH_WPA_PSK:
-        return 3;
-    case WIFI_EVENT_BEACON_IND_AUTH_WPA2_PSK:
-        return 4;
-    case WIFI_EVENT_BEACON_IND_AUTH_WPA3_SAE:
-        return 5;
-    default:
-        return 0;
-    }
-}
-
 DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 {
     static DiagnosticDataProviderImpl sInstance;
@@ -251,7 +232,27 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
 {
     if (ConnectivityMgrImpl()._IsWiFiStationConnected())
     {
-        securityType = static_cast<app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum>(wifi_mgmr_get_security_type());
+        if (wifi_mgmr_security_type_is_open()) 
+        {
+            securityType = app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum::kNone;
+        }
+        else if (wifi_mgmr_security_type_is_wpa()) 
+        {
+            securityType = app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum::kWpa;
+        }
+        else if (wifi_mgmr_security_type_is_wpa2()) 
+        {
+            securityType = app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum::kWpa2;
+        }
+        else if (wifi_mgmr_security_type_is_wpa3()) 
+        {
+            securityType = app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum::kWpa3;
+        }
+        else 
+        {
+            securityType = app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum::kWep;
+        }
+
         return CHIP_NO_ERROR;
     }
 
