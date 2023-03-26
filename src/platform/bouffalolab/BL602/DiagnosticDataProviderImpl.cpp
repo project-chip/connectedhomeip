@@ -232,23 +232,23 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
 {
     if (ConnectivityMgrImpl()._IsWiFiStationConnected())
     {
-        if (wifi_mgmr_security_type_is_open()) 
+        if (wifi_mgmr_security_type_is_open())
         {
             securityType = app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum::kNone;
         }
-        else if (wifi_mgmr_security_type_is_wpa()) 
+        else if (wifi_mgmr_security_type_is_wpa())
         {
             securityType = app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum::kWpa;
         }
-        else if (wifi_mgmr_security_type_is_wpa2()) 
+        else if (wifi_mgmr_security_type_is_wpa2())
         {
             securityType = app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum::kWpa2;
         }
-        else if (wifi_mgmr_security_type_is_wpa3()) 
+        else if (wifi_mgmr_security_type_is_wpa3())
         {
             securityType = app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum::kWpa3;
         }
-        else 
+        else
         {
             securityType = app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum::kWep;
         }

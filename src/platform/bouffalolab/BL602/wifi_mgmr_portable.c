@@ -125,11 +125,11 @@ bool wifi_mgmr_security_type_is_wpa(void)
 
 bool wifi_mgmr_security_type_is_wpa2(void)
 {
-    if (WPA_PROTO_RSN == gWpaSm.proto) 
+    if (WPA_PROTO_RSN == gWpaSm.proto)
     {
-        return (gWpaSm.key_mgmt & (WPA_KEY_MGMT_IEEE8021X | WPA_KEY_MGMT_PSK | 
-            WPA_KEY_MGMT_PSK_SHA256 | WPA_KEY_MGMT_FT_PSK | WPA_KEY_MGMT_IEEE8021X_SHA256 | 
-            WPA_KEY_MGMT_FT_IEEE8021X)) != 0;
+        return (gWpaSm.key_mgmt &
+                (WPA_KEY_MGMT_IEEE8021X | WPA_KEY_MGMT_PSK | WPA_KEY_MGMT_PSK_SHA256 | WPA_KEY_MGMT_FT_PSK |
+                 WPA_KEY_MGMT_IEEE8021X_SHA256 | WPA_KEY_MGMT_FT_IEEE8021X)) != 0;
     }
 
     return false;
@@ -137,7 +137,7 @@ bool wifi_mgmr_security_type_is_wpa2(void)
 
 bool wifi_mgmr_security_type_is_wpa3(void)
 {
-    if (WPA_PROTO_RSN == gWpaSm.proto) 
+    if (WPA_PROTO_RSN == gWpaSm.proto)
     {
         return (gWpaSm.key_mgmt & (WPA_KEY_MGMT_SAE | WPA_KEY_MGMT_FT_SAE)) != 0;
     }
