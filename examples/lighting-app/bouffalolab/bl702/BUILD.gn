@@ -139,6 +139,7 @@ bouffalolab_executable("lighting_app") {
     "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
+    "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
   ]
@@ -188,7 +189,6 @@ bouffalolab_executable("lighting_app") {
     deps += [
       "$dir_pw_hdlc:rpc_channel_output",
       "$dir_pw_stream:sys_io_stream",
-      "${chip_root}/examples/providers:device_info_provider",
 
       #"$dir_pw_trace",
       #"$dir_pw_trace_tokenized",
