@@ -33,8 +33,9 @@ declare_args() {
 
   # Build openthread with prebuilt silabs lib
   use_silabs_thread_lib = false
-  enable_openthread_cli = true
 
+  # enable by default for thread/non-wifi-ncp builds
+  enable_openthread_cli = !(use_rs9116 || use_wf200 || use_SiWx917)
   kvs_max_entries = 255
 
   # Use Silabs factory data provider example.
