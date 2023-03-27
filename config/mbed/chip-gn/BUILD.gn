@@ -20,11 +20,6 @@ assert(current_os == "mbed")
 
 declare_args() {
   chip_build_pw_rpc_lib = false
-  chip_custom_build_cflags = []
-}
-
-config("chip_custom_cflags_config") {
-  cflags = chip_custom_build_cflags
 }
 
 group("mbed") {
@@ -35,7 +30,7 @@ group("mbed") {
   }
 
   if (chip_build_pw_rpc_lib) {
-    deps += [ "//lib/pw_rpc" ]
+    deps += [ "${chip_root}/config/mbed/chip-gn/lib/pw_rpc" ]
   }
 }
 

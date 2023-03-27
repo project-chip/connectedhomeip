@@ -610,6 +610,9 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
         return;
     }
 
+    auto fabricIndex = commandObj->GetAccessingFabricIndex();
+    auto ourNodeId = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetLocalScopedNodeId();
+
     auto * commandParams = [[MTROTASoftwareUpdateProviderClusterQueryImageParams alloc] init];
     CHIP_ERROR err = ConvertToQueryImageParams(commandData, commandParams);
     if (err != CHIP_NO_ERROR) {
@@ -666,8 +669,6 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                 }
 
                 // If there is an update available, try to prepare for a transfer.
-                auto fabricIndex = handler->GetSubjectDescriptor().fabricIndex;
-                auto nodeId = handler->GetSubjectDescriptor().subject;
                 CHIP_ERROR err = gOtaSender.PrepareForTransfer(fabricIndex, nodeId);
                 if (CHIP_NO_ERROR != err) {
 
@@ -694,11 +695,10 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                     gOtaSender.ResetState();
                     return;
                 }
-                auto targetNodeId = handler->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetLocalScopedNodeId();
 
                 char uriBuffer[kMaxBDXURILen];
                 MutableCharSpan uri(uriBuffer);
-                err = bdx::MakeURI(targetNodeId.GetNodeId(), AsCharSpan(data.imageURI), uri);
+                err = bdx::MakeURI(ourNodeId.GetNodeId(), AsCharSpan(data.imageURI), uri);
                 if (CHIP_NO_ERROR != err) {
                     LogErrorOnFailure(err);
                     handler->AddStatus(cachedCommandPath, StatusIB(err).mStatus);

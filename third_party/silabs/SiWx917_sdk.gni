@@ -83,7 +83,6 @@ template("siwx917_sdk") {
       "SILABS_LOG_ENABLED=${silabs_log_enabled}",
       "SL_HEAP_SIZE=32768",
       "SL_WIFI=1",
-      "SiWx917_WIFI",
       "CCP_SI917_BRINGUP",
       "RS911X_WIFI",
       "RSI_WLAN_ENABLE",

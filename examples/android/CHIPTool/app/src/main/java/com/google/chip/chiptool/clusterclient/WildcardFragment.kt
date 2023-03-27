@@ -442,7 +442,7 @@ class WildcardFragment : Fragment() {
     val devicePointer = ChipClient.getConnectedDevicePointer(context, deviceId)
     return suspendCoroutine { cont ->
       deviceController.readAttributePath(object : ReportCallback {
-        override fun onError(attributePath: ChipAttributePath?, eventPath: ChipEventPath?, e: java.lang.Exception?) {
+        override fun onError(attributePath: ChipAttributePath?, eventPath: ChipEventPath?, e: java.lang.Exception) {
           cont.resume(0u)
         }
 

@@ -77,7 +77,7 @@ Silicon Labs platform.
 *   Build the example application:
 
           cd ~/connectedhomeip
-          ./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/SiWx917/ out/test BRD4325A --wifi rs911x
+          ./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/SiWx917/ out/lighting-app BRD4325B
 
 -   To delete generated executable, libraries and object files use:
 
@@ -167,19 +167,19 @@ passed to the build scripts.
 
 `chip_progress_logging, chip_detail_logging, chip_automation_logging`
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/SiWx917 ./out/lighting-app BRD4325A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false" --wifi rs911x
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/SiWx917 ./out/lighting-app BRD4325B "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
 
 ### Debug build / release build
 
 `is_debug`
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/SiWx917 ./out/lighting-app BRD4325A "is_debug=false" --wifi rs911x
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/SiWx917 ./out/lighting-app BRD4325B "is_debug=false"
 
 ### Disabling LCD
 
 `show_qr_code`
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/SiWx917 ./out/lighting-app BRD4325A "show_qr_code=false" --wifi rs911x
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/SiWx917 ./out/lighting-app BRD4325B "show_qr_code=false"
 
 ### KVS maximum entry count
 
@@ -188,4 +188,4 @@ passed to the build scripts.
     Set the maximum Kvs entries that can be stored in NVM (Default 75)
     Thresholds: 30 <= kvs_max_entries <= 255
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/SiWx917 ./out/lighting-app BRD4325A kvs_max_entries=50 --wifi rs911x
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/SiWx917 ./out/lighting-app BRD4325B kvs_max_entries=50

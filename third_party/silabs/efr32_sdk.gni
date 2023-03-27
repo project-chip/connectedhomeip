@@ -205,6 +205,13 @@ template("efr32_sdk") {
       #"__STACK_SIZE=0",
     ]
 
+    if (sl_uart_log_output) {
+      defines += [
+        "SILABS_LOG_OUT_UART=1",
+        "SILABS_LOG_OUT_RTT=0",
+      ]
+    }
+
     if (chip_enable_ble_rs911x) {
       defines += [ "RSI_BLE_ENABLE=1" ]
     }
@@ -229,10 +236,7 @@ template("efr32_sdk") {
         ]
       }
       if (use_SiWx917) {
-        #Added this flag only for SiwX917 NCP board
-        #TODO: Remove when rsi_wlan_ext_stats gets implemented using Wisemcu SDK
         defines += [
-          "SiWx917_WIFI",
           "EXP_BOARD=1",
           "CHIP_9117=1",
         ]
@@ -313,6 +317,9 @@ template("efr32_sdk") {
         "SL_CATALOG_POWER_MANAGER_PRESENT",
         "SL_CATALOG_SLEEPTIMER_PRESENT",
         "SL_SLEEP_TIME_MS=${sleep_time_ms}",
+
+        # Used for wifi devices to get packet details
+        "WIFI_DEBUG_ENABLED=1",
       ]
     }
 

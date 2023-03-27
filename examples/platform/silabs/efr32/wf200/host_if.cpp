@@ -578,11 +578,6 @@ static void wfx_events_task(void * p_arg)
                 {
                     wfx_ipv6_notify(1);
                     hasNotifiedIPV6 = true;
-
-                    // send device to power save mode
-                    sl_wfx_set_power_mode(WFM_PM_MODE_DTIM, WFM_PM_POLL_FAST_PS, 0);
-                    sl_wfx_enable_device_power_save();
-
                     if (!hasNotifiedWifiConnectivity)
                     {
                         wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &ap_mac);
@@ -611,7 +606,7 @@ static void wfx_events_task(void * p_arg)
             if (!(wfx_get_wifi_state() & SL_WFX_AP_INTERFACE_UP))
             {
                 // Enable the power save
-                sl_wfx_set_power_mode(WFM_PM_MODE_PS, WFM_PM_POLL_UAPSD, BEACON_1);
+                sl_wfx_set_power_mode(WFM_PM_MODE_DTIM, WFM_PM_POLL_FAST_PS, BEACON_1);
                 sl_wfx_enable_device_power_save();
             }
 #endif // SLEEP_ENABLED

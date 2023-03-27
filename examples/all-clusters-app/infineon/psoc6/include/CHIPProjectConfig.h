@@ -104,3 +104,7 @@
  * A size, in bytes, of the individual debug event logging buffer.
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
+
+// All clusters app has 3 group endpoints. This needs to defined here so that
+// CHIP_CONFIG_MAX_GROUPS_PER_FABRIC is properly configured.
+#define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 3

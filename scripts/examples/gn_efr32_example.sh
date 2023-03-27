@@ -123,6 +123,8 @@ if [ "$#" == "0" ]; then
             Remove all logs and debugs features (including the LCD). Yield the smallest image size possible
         --docker
             Change GSDK root for docker builds
+        --uart_log
+            Forward Logs to Uart instead of RTT
 
     "
 elif [ "$#" -lt "2" ]; then
@@ -142,6 +144,10 @@ else
     shift
     while [ $# -gt 0 ]; do
         case $1 in
+            --clean)
+                DIR_CLEAN=true
+                shift
+                ;;
             --wifi)
                 if [ -z "$2" ]; then
                     echo "--wifi requires rs9116 or SiWx917 or wf200"
@@ -203,6 +209,10 @@ else
                 USE_DOCKER=true
                 shift
                 ;;
+            --uart_log)
+                optArgs+="sl_uart_log_output=true "
+                shift
+                ;;
 
             *"sl_matter_version_str="*)
                 optArgs+="$1 "
@@ -214,7 +224,6 @@ else
                 if [ "$1" =~ *"use_rs9116=true"* ] || [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true
                 fi
-
                 optArgs+=$1" "
                 shift
                 ;;
@@ -236,6 +245,11 @@ else
 
     BUILD_DIR=$OUTDIR/$SILABS_BOARD
     echo BUILD_DIR="$BUILD_DIR"
+
+    if [ "$DIR_CLEAN" == true ]; then
+        rm -rf "$BUILD_DIR"
+    fi
+
     if [ "$USE_WIFI" == true ]; then
         # wifi build
         # NCP mode EFR32 + wifi module

@@ -596,6 +596,23 @@ struct LwIPEvent;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP_MONOTONIC_TIME
 
 /**
+ *  @def CHIP_SYSTEM_CONFIG_USE_LWIP_SKIP_INIT
+ *
+ *  @brief
+ *      Skip LwIP initalization during network setup.
+ *
+ *  The platform can provide its own LwIP initialization.
+ *  This option allows skipping initialization steps in network setup e.g. in unit tests.
+ *
+ *  This configuration is overridden if CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT is set.
+ */
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#ifndef CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
+#define CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT 0
+#endif // CHIP_SYSTEM_CONFIG_LWIP_SKIP_INIT
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+/**
  *  @def CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD
  *
  *  @brief

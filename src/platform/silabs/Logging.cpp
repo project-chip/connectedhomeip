@@ -63,9 +63,20 @@
 #define LOG_RTT_BUFFER_SIZE 256
 #endif
 
-// FreeRTOS includes
+#if SILABS_LOG_OUT_UART
+#include "uart.h"
+#endif
+
+// Enable RTT by default
+#ifndef SILABS_LOG_OUT_RTT
+#define SILABS_LOG_OUT_RTT 1
+#endif
+
+// SEGGER_RTT includes
+#if SILABS_LOG_OUT_RTT
 #include "SEGGER_RTT.h"
 #include "SEGGER_RTT_Conf.h"
+#endif
 
 #define LOG_ERROR "[error ]"
 #define LOG_WARN "[warn  ]"
@@ -131,16 +142,23 @@ static void PrintLog(const char * msg)
     {
         size_t sz;
         sz = strlen(msg);
-        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, msg, sz);
-#ifdef PW_RPC_ENABLED
+
+#if SILABS_LOG_OUT_UART
+        uartLogWrite(msg, sz);
+#elif PW_RPC_ENABLED
         PigweedLogger::putString(msg, sz);
+#else
+        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, msg, sz);
 #endif
 
+#if SILABS_LOG_OUT_RTT || PW_RPC_ENABLED
         const char * newline = "\r\n";
         sz                   = strlen(newline);
-        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, sz);
-#ifdef PW_RPC_ENABLED
+#if PW_RPC_ENABLED
         PigweedLogger::putString(newline, sz);
+#else
+        SEGGER_RTT_WriteNoLock(LOG_RTT_BUFFER_INDEX, newline, sz);
+#endif // PW_RPC_ENABLED
 #endif
     }
 }
@@ -152,6 +170,7 @@ static void PrintLog(const char * msg)
 extern "C" void silabsInitLog(void)
 {
 #if SILABS_LOG_ENABLED
+#if SILABS_LOG_OUT_RTT
 #if LOG_RTT_BUFFER_INDEX != 0
     SEGGER_RTT_ConfigUpBuffer(LOG_RTT_BUFFER_INDEX, LOG_RTT_BUFFER_NAME, sLogBuffer, LOG_RTT_BUFFER_SIZE,
                               SEGGER_RTT_MODE_NO_BLOCK_TRIM);
@@ -161,6 +180,7 @@ extern "C" void silabsInitLog(void)
 #else
     SEGGER_RTT_SetFlagsUpBuffer(LOG_RTT_BUFFER_INDEX, SEGGER_RTT_MODE_NO_BLOCK_TRIM);
 #endif
+#endif // SILABS_LOG_OUT_RTT
 
 #ifdef PW_RPC_ENABLED
     PigweedLogger::init();
