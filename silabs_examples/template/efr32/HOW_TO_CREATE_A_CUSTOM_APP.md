@@ -173,7 +173,7 @@ of your application.
 11. Naviguate to the main [BUILD.gn](BUILD.gn) file, perform this modification:
 
     ```gn
-    # Find the "efr32_executable" section of the file. Inside it you will find a sub-section called
+    # Find the "silabs_executable" section of the file. Inside it you will find a sub-section called
     # deps = [
     # Here, there is list of dependencies listed.
     # Remove any DataModel dependencies from this section. They will look like this:
@@ -203,7 +203,7 @@ choice and handle them there. Refer to [Color Lighting][8] to see how this can
 be done.
 
 Note: If you add .cpp files to **your_app**, modify [BUILD.gn](BUILD.gn) to take
-account of it. To do so, navigate to the section "efr32_executable" in the file,
+account of it. To do so, navigate to the section "silabs_executable" in the file,
 locate the "sources" subsection and add your new "file.cpp" there.
 
 Note: Both in the source files and in the [BUILD.gn](BUILD.gn), you might have

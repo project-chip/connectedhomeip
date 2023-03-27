@@ -18,7 +18,7 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/defaults.gni")
-import("${efr32_sdk_build_root}/efr32_executable.gni")
+import("${efr32_sdk_build_root}/silabs_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
@@ -82,7 +82,7 @@ efr32_sdk("sdk") {
   }
 }
 
-efr32_executable("sensors_app") {
+silabs_executable("sensors_app") {
   output_name = "chip-efr32-sensors-example.out"
   include_dirs = [ "include" ]
   defines = []
