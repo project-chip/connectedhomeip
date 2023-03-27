@@ -1295,6 +1295,12 @@ client cluster Thermostat = 513 {
     kAutoMode = 0x20;
   }
 
+  struct ThermostatScheduleTransition {
+    int16u transitionTime = 0;
+    nullable int16s heatSetpoint = 1;
+    nullable int16s coolSetpoint = 2;
+  }
+
   readonly attribute nullable int16s localTemperature = 0;
   readonly attribute nullable int16s outdoorTemperature = 1;
   readonly attribute bitmap8 occupancy = 2;

@@ -636,15 +636,6 @@ client cluster NetworkCommissioning = 49 {
     boolean connected = 1;
   }
 
-  struct WiFiInterfaceScanResult {
-    WiFiSecurity security = 0;
-    octet_string<32> ssid = 1;
-    octet_string<6> bssid = 2;
-    int16u channel = 3;
-    WiFiBand wiFiBand = 4;
-    int8s rssi = 5;
-  }
-
   struct ThreadInterfaceScanResult {
     int16u panId = 0;
     int64u extendedPanId = 1;
@@ -654,6 +645,15 @@ client cluster NetworkCommissioning = 49 {
     octet_string<8> extendedAddress = 5;
     int8s rssi = 6;
     int8u lqi = 7;
+  }
+
+  struct WiFiInterfaceScanResult {
+    WiFiSecurity security = 0;
+    octet_string<32> ssid = 1;
+    octet_string<6> bssid = 2;
+    int16u channel = 3;
+    WiFiBand wiFiBand = 4;
+    int8s rssi = 5;
   }
 
   readonly attribute access(read: administer) int8u maxNetworks = 0;
@@ -1366,18 +1366,18 @@ client cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
-  fabric_scoped struct NOCStruct {
-    fabric_sensitive octet_string noc = 1;
-    nullable fabric_sensitive octet_string icac = 2;
-    fabric_idx fabricIndex = 254;
-  }
-
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
     fabric_id fabricID = 3;
     node_id nodeID = 4;
     char_string<32> label = 5;
+    fabric_idx fabricIndex = 254;
+  }
+
+  fabric_scoped struct NOCStruct {
+    fabric_sensitive octet_string noc = 1;
+    nullable fabric_sensitive octet_string icac = 2;
     fabric_idx fabricIndex = 254;
   }
 
