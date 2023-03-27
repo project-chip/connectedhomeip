@@ -941,9 +941,6 @@ enum class BootReasonEnum : uint8_t
     kUnknownEnumValue = 7,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for HardwareFaultEnum
 enum class HardwareFaultEnum : uint8_t
 {
@@ -964,10 +961,6 @@ enum class HardwareFaultEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 11,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using HardwareFaultEnum                                                                    = EmberAfHardwareFaultEnum;
-static HardwareFaultEnum __attribute__((unused)) kHardwareFaultEnumkUnknownEnumValue       = static_cast<HardwareFaultEnum>(11);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.

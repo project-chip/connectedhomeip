@@ -25,10 +25,17 @@
   }
 
   {{/zcl_bitmaps}}
-  {{#chip_cluster_specific_structs}}
+  {{#if (is_client side)~}}
+    {{#zcl_structs}}
     {{~>idl_structure_definition extraIndent=1}}
 
-  {{/chip_cluster_specific_structs}}
+    {{/zcl_structs}}
+  {{~else~}}
+    {{#chip_cluster_specific_structs}}
+    {{~>idl_structure_definition extraIndent=1}}
+
+    {{/chip_cluster_specific_structs}}
+  {{/if}}
   {{#zcl_events}}
   {{#if isFabricSensitive}}fabric_sensitive {{/if~}} {{priority}} event {{!ensure space}}
   {{~#chip_access_elements entity="event"~}}

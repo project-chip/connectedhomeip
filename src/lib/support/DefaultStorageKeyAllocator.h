@@ -197,6 +197,12 @@ public:
         return StorageKeyName::Formatted("g/su/%x", static_cast<unsigned>(index));
     }
     static StorageKeyName SubscriptionResumptionMaxCount() { return StorageKeyName::Formatted("g/sum"); }
+
+    static StorageKeyName FabricSceneDataKey(chip::FabricIndex fabric) { return StorageKeyName::Formatted("f/%x/sc", fabric); }
+    static StorageKeyName FabricSceneKey(chip::FabricIndex fabric, uint8_t id)
+    {
+        return StorageKeyName::Formatted("f/%x/sc/%x", fabric, id);
+    }
 };
 
 } // namespace chip
