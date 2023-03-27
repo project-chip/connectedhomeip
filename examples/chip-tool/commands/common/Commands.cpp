@@ -399,6 +399,23 @@ void Commands::ShowCluster(std::string executable, std::string clusterName, Comm
         if (shouldPrint)
         {
             fprintf(stderr, "  | * %-82s|\n", command->GetName());
+            const char * helpText = command->GetHelpText();
+            if (command->GetHelpText())
+            {
+                // We leave 82 chars for command names.  The help text starts
+                // two chars further to the right, so there are 80 chars left
+                // for it.
+                if (strlen(helpText) > 80)
+                {
+                    // Add "..." at the end to indicate truncation, and only
+                    // show the first 77 chars, since that's what will fit.
+                    fprintf(stderr, "  |   - %.77s...|\n", helpText);
+                }
+                else
+                {
+                    fprintf(stderr, "  |   - %-80s|\n", helpText);
+                }
+            }
         }
     }
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");

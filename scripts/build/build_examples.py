@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 import os
 import sys
@@ -177,21 +178,29 @@ def cmd_generate(context):
 
 @main.command(
     'targets',
-    help=('List the targets that would be generated/built given '
-          'the input arguments'))
+    help=('Lists the targets that can be used with the build and gen commands'))
 @click.option(
-    '--expand',
-    default=False,
-    is_flag=True,
-    help='Expand all possible targets rather than the shorthand string')
+    '--format',
+    default='summary',
+    type=click.Choice(['summary', 'expanded', 'json'], case_sensitive=False),
+    help="""
+        summary - list of shorthand strings summarzing the available targets;
+
+        expanded - list all possible targets rather than the shorthand string;
+
+        json - a JSON representation of the available targets
+        """)
 @click.pass_context
-def cmd_targets(context, expand):
-    for target in build.targets.BUILD_TARGETS:
-        if expand:
+def cmd_targets(context, format):
+    if format == 'expanded':
+        for target in build.targets.BUILD_TARGETS:
             build.target.report_rejected_parts = False
             for s in target.AllVariants():
                 print(s)
-        else:
+    elif format == 'json':
+        print(json.dumps([target.ToDict() for target in build.targets.BUILD_TARGETS], indent=4))
+    else:
+        for target in build.targets.BUILD_TARGETS:
             print(target.HumanString())
 
 
