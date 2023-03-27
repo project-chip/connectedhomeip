@@ -157,14 +157,14 @@ client cluster Scenes = 5 {
     kCopyAllScenes = 0x1;
   }
 
-  struct ExtensionFieldSet {
-    cluster_id clusterID = 0;
-    AttributeValuePair attributeValueList[] = 1;
-  }
-
   struct AttributeValuePair {
     optional attrib_id attributeID = 0;
     int8u attributeValue[] = 1;
+  }
+
+  struct ExtensionFieldSet {
+    cluster_id clusterID = 0;
+    AttributeValuePair attributeValueList[] = 1;
   }
 
   readonly attribute int8u sceneCount = 0;
