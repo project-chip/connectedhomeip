@@ -80,8 +80,9 @@ public:
     // If False, there's been progress in the transfer.
     bool HasTransferTimedOut();
 
+    static void OnBDXEventReceived(void * context, chip::bdx::TransferSession::OutputEvent & event);
+
 private:
-    void PollTransferSession();
     void CleanupOnError(app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason);
     CHIP_ERROR HandleBdxEvent(const chip::bdx::TransferSession::OutputEvent & outEvent);
     void SetState(State state, app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason);

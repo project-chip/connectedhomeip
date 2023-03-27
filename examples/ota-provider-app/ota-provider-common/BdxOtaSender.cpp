@@ -42,12 +42,14 @@ CHIP_ERROR BdxOtaSender::InitializeTransfer(chip::FabricIndex fabricIndex, chip:
         // Reset stale connection from the Same Node if exists
         if ((mFabricIndex.HasValue() && mFabricIndex.Value() == fabricIndex) && (mNodeId.HasValue() && mNodeId.Value() == nodeId))
         {
+        	ChipLogError(BDX, "InitializeTransfer stale reset %llu", nodeId);
             Reset();
         }
         // Prevent a new node connection since another is active
         else if ((mFabricIndex.HasValue() && mFabricIndex.Value() != fabricIndex) ||
                  (mNodeId.HasValue() && mNodeId.Value() != nodeId))
         {
+        	ChipLogError(BDX, "InitializeTransfer busy");
             return CHIP_ERROR_BUSY;
         }
         else
@@ -57,6 +59,7 @@ CHIP_ERROR BdxOtaSender::InitializeTransfer(chip::FabricIndex fabricIndex, chip:
     }
     mFabricIndex.SetValue(fabricIndex);
     mNodeId.SetValue(nodeId);
+    ChipLogError(BDX, "InitializeTransfer value nodeid %llu", nodeId);
     mInitialized = true;
     return CHIP_NO_ERROR;
 }
@@ -73,23 +76,35 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
     switch (event.EventType)
     {
     case TransferSession::OutputEventType::kNone:
+    	ChipLogError(BDX, "HandleTransferSessionOutput kNone closing exchange");
+    	if (mExchangeCtx != nullptr) {
+    		ChipLogError(BDX, "HandleTransferSessionOutput kNone closed exchange");
+			mExchangeCtx->Close();
+			mExchangeCtx = nullptr;
+		}
         break;
     case TransferSession::OutputEventType::kMsgToSend: {
         chip::Messaging::SendFlags sendFlags;
+        ChipLogError(BDX, "kMsgToSend 1");
         if (!event.msgTypeData.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
         {
             // All messages sent from the Sender expect a response, except for a StatusReport which would indicate an error and the
             // end of the transfer.
+                    ChipLogError(BDX, "kMsgToSend 2");
             sendFlags.Set(chip::Messaging::SendMessageFlags::kExpectResponse);
         }
+                ChipLogError(BDX, "kMsgToSend 3");
         VerifyOrReturn(mExchangeCtx != nullptr);
+                ChipLogError(BDX, "kMsgToSend 4");
         err = mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType, std::move(event.MsgData),
                                         sendFlags);
-
+        ChipLogError(BDX, "kMsgToSend 6");
         if (err == CHIP_NO_ERROR)
         {
+        	        ChipLogError(BDX, "kMsgToSend 6");
             if (!sendFlags.Has(chip::Messaging::SendMessageFlags::kExpectResponse))
             {
+            	        ChipLogError(BDX, "kMsgToSend 7");
                 // After sending the StatusReport, exchange context gets closed so, set mExchangeCtx to null
                 mExchangeCtx = nullptr;
             }
@@ -106,6 +121,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         // TransferSession will automatically reject a transfer if there are no
         // common supported control modes. It will also default to the smaller
         // block size.
+
         TransferSession::TransferAcceptData acceptData;
         acceptData.ControlMode  = TransferControlFlags::kReceiverDrive; // OTA must use receiver drive
         acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
@@ -121,10 +137,11 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
                        ChipLogError(BDX, "Cannot store file designator with length = %d", fdl));
         memcpy(mFileDesignator, fd, fdl);
         mFileDesignator[fdl] = 0;
-
+                ChipLogError(BDX, "kInitReceived 2");
         break;
     }
     case TransferSession::OutputEventType::kQueryReceived: {
+    		ChipLogError(BDX, "kQueryReceived 1");
         TransferSession::BlockData blockData;
         uint16_t blockSize   = mTransfer.GetTransferBlockSize();
         uint16_t bytesToRead = blockSize;
@@ -132,14 +149,17 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         // TODO: This should be a utility function in TransferSession
         if (mTransfer.GetTransferLength() > 0 && mNumBytesSent + blockSize > mTransfer.GetTransferLength())
         {
+        	    		ChipLogError(BDX, "kQueryReceived 2");
             // cast should be safe because of condition above
             bytesToRead = static_cast<uint16_t>(mTransfer.GetTransferLength() - mNumBytesSent);
         }
 
         chip::System::PacketBufferHandle blockBuf = chip::System::PacketBufferHandle::New(bytesToRead);
+            		ChipLogError(BDX, "kQueryReceived 3");
         if (blockBuf.IsNull())
         {
             // TODO(#13981): AbortTransfer() needs to support GeneralStatusCode failures as well as BDX specific errors.
+                		ChipLogError(BDX, "kQueryReceived 4");
             mTransfer.AbortTransfer(StatusCode::kUnknown);
             return;
         }
@@ -151,7 +171,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown);
             return;
         }
-
+    		ChipLogError(BDX, "kQueryReceived 5");
         otaFile.seekg(mNumBytesSent);
         otaFile.read(reinterpret_cast<char *>(blockBuf->Start()), bytesToRead);
         if (!(otaFile.good() || otaFile.eof()))
@@ -167,8 +187,9 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             (mNumBytesSent + static_cast<uint64_t>(blockData.Length) == mTransfer.GetTransferLength() || (otaFile.peek() == EOF));
         mNumBytesSent = static_cast<uint32_t>(mNumBytesSent + blockData.Length);
         otaFile.close();
-
+    		ChipLogError(BDX, "kQueryReceived 6");
         err = mTransfer.PrepareBlock(blockData);
+            		ChipLogError(BDX, "kQueryReceived 7");
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(BDX, "PrepareBlock failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -180,7 +201,6 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         break;
     case TransferSession::OutputEventType::kAckEOFReceived:
         ChipLogDetail(BDX, "Transfer completed, got AckEOF");
-        mStopPolling = true; // Stop polling the TransferSession only after receiving BlockAckEOF
         Reset();
         break;
     case TransferSession::OutputEventType::kStatusReceived:
@@ -210,11 +230,14 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
  */
 void BdxOtaSender::Reset()
 {
+	ChipLogError(BDX, "BdxOtaSender Reset");
     mFabricIndex.ClearValue();
     mNodeId.ClearValue();
-    Responder::ResetTransfer();
+	ChipLogError(BDX, "BdxOtaSender Reset 2");
+    mTransfer.Reset();
     if (mExchangeCtx != nullptr)
     {
+    		ChipLogError(BDX, "BdxOtaSender Reset 3");
         mExchangeCtx->Close();
         mExchangeCtx = nullptr;
     }
@@ -222,4 +245,5 @@ void BdxOtaSender::Reset()
     mInitialized  = false;
     mNumBytesSent = 0;
     memset(mFileDesignator, 0, chip::bdx::kMaxFileDesignatorLen);
+    	ChipLogError(BDX, "BdxOtaSender Reset 4");
 }

@@ -404,7 +404,7 @@ void DefaultOTARequestor::CancelImageUpdate()
     mBdxDownloader->EndDownload(CHIP_ERROR_CONNECTION_ABORTED);
 
     mOtaRequestorDriver->UpdateCancelled();
-
+    ChipLogError(SoftwareUpdate, "CancelImageUpdate");
     Reset();
 }
 
@@ -442,6 +442,7 @@ void DefaultOTARequestor::OnConnected(void * context, Messaging::ExchangeManager
         break;
     }
     case kDownload: {
+        ChipLogError(SoftwareUpdate, "start download");
         CHIP_ERROR err = requestorCore->StartDownload(exchangeMgr, sessionHandle);
 
         if (err != CHIP_NO_ERROR)
@@ -627,14 +628,17 @@ void DefaultOTARequestor::OnDownloadStateChanged(OTADownloader::State state, OTA
     {
     case OTADownloader::State::kComplete:
         mOtaRequestorDriver->UpdateDownloaded();
+        ChipLogError(SoftwareUpdate, "download complete mBdxMessenger reset");
         mBdxMessenger.Reset();
         break;
     case OTADownloader::State::kIdle:
         if (reason != OTAChangeReasonEnum::kSuccess)
         {
             RecordErrorUpdateState(CHIP_ERROR_CONNECTION_ABORTED, reason);
+            ChipLogError(SoftwareUpdate, "kIdle mBdxMessenger reset");
+            mBdxMessenger.Reset();
         }
-        mBdxMessenger.Reset();
+        ChipLogError(SoftwareUpdate, "kIdle mBdxMessenger reset 1");
         break;
     default:
         break;
@@ -798,10 +802,11 @@ CHIP_ERROR DefaultOTARequestor::ExtractUpdateDescription(const QueryImageRespons
 
 CHIP_ERROR DefaultOTARequestor::StartDownload(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
+	ChipLogError(SoftwareUpdate, "start download 1");
     VerifyOrReturnError(mBdxDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // TODO: allow caller to provide their own OTADownloader instance and set BDX parameters
-
+	ChipLogError(SoftwareUpdate, "start download 2");
     TransferSession::TransferInitData initOptions;
     initOptions.TransferCtlFlags = bdx::TransferControlFlags::kReceiverDrive;
     initOptions.MaxBlockSize     = mOtaRequestorDriver->GetMaxDownloadBlockSize();
@@ -810,22 +815,26 @@ CHIP_ERROR DefaultOTARequestor::StartDownload(Messaging::ExchangeManager & excha
 
     chip::Messaging::ExchangeContext * exchangeCtx = exchangeMgr.NewContext(sessionHandle, &mBdxMessenger);
     VerifyOrReturnError(exchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
+    ChipLogError(SoftwareUpdate, "start download 2");
 
     mBdxMessenger.Init(mBdxDownloader, exchangeCtx);
     mBdxDownloader->SetMessageDelegate(&mBdxMessenger);
     mBdxDownloader->SetStateDelegate(this);
-
+	ChipLogError(SoftwareUpdate, "start download 3");
     CHIP_ERROR err = mBdxDownloader->SetBDXParams(initOptions, kDownloadTimeoutSec);
     if (err == CHIP_NO_ERROR)
     {
+    		ChipLogError(SoftwareUpdate, "start download 4");
         err = mBdxDownloader->BeginPrepareDownload();
+        	ChipLogError(SoftwareUpdate, "start download 5");
     }
 
     if (err != CHIP_NO_ERROR)
     {
+    		ChipLogError(SoftwareUpdate, "start download 6");
         mBdxMessenger.Reset();
     }
-
+	ChipLogError(SoftwareUpdate, "start download 7 ");
     return err;
 }
 
@@ -858,6 +867,7 @@ CHIP_ERROR DefaultOTARequestor::SendNotifyUpdateAppliedRequest(Messaging::Exchan
 
     // There is no response for a notify so consider this OTA complete. Clear the provider location and reset any states to indicate
     // so.
+    ChipLogError(SoftwareUpdate, "SendNotifyUpdateAppliedRequest reset");
     Reset();
 
     return cluster.InvokeCommand(args, this, OnNotifyUpdateAppliedResponse, OnNotifyUpdateAppliedFailure);

@@ -144,7 +144,15 @@ private:
                                                        event.MsgData.Retain(), sendFlags);
             if (err != CHIP_NO_ERROR)
             {
+            	ChipLogDetail(SoftwareUpdate, "BDX::SendMessage error reset");
                 Reset();
+            }
+            
+            if (!sendFlags.Has(chip::Messaging::SendMessageFlags::kExpectResponse))
+            {
+            	        ChipLogError(BDX, "kMsgToSend 7");
+                // If no response is expected, exchange context gets closed so set mExchangeCtx to null
+                mExchangeCtx = nullptr;
             }
 
             return err;

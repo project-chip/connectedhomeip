@@ -276,7 +276,7 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
         {
             CHIP_ERROR error =
                 mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender, bdxFlags,
-                                                 kMaxBdxBlockSize, kBdxTimeout, chip::System::Clock::Milliseconds32(mPollInterval));
+                                                 kMaxBdxBlockSize);
             if (error != CHIP_NO_ERROR)
             {
                 ChipLogError(SoftwareUpdate, "Cannot prepare for transfer: %" CHIP_ERROR_FORMAT, error.Format());

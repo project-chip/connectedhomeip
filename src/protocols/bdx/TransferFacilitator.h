@@ -34,18 +34,19 @@ namespace chip {
 namespace bdx {
 
 /**
- * An abstract class with methods for handling BDX messages from an ExchangeContext and polling a TransferSession state machine.
+ * An abstract class with methods for handling BDX messages from an ExchangeContext and gets output events from a TransferSession state machine.
  *
  * This class does not define any methods for beginning a transfer or initializing the underlying TransferSession object (see
  * Initiator and Responder below).
- * This class contains a repeating timer which regurlaly polls the TransferSession state machine.
  * A CHIP node may have many TransferFacilitator instances but only one TransferFacilitator should be used for each BDX transfer.
  */
 class TransferFacilitator : public Messaging::ExchangeDelegate, public Messaging::UnsolicitedMessageHandler
 {
 public:
-    TransferFacilitator() : mExchangeCtx(nullptr), mSystemLayer(nullptr), mPollFreq(kDefaultPollFreq) {}
+    TransferFacilitator() : mExchangeCtx(nullptr) {}
     ~TransferFacilitator() override = default;
+  
+    static void OnOutputEventReceived(void * context, TransferSession::OutputEvent & event);
 
 private:
     //// UnsolicitedMessageHandler Implementation ////
@@ -73,28 +74,9 @@ private:
     virtual void HandleTransferSessionOutput(TransferSession::OutputEvent & event) = 0;
 
 protected:
-    /**
-     * The callback for when the poll timer expires. The poll timer regulates how often the TransferSession is polled.
-     */
-    static void PollTimerHandler(chip::System::Layer * systemLayer, void * appState);
-
-    /**
-     * Polls the TransferSession object and calls HandleTransferSessionOutput.
-     */
-    void PollForOutput();
-
-    /**
-     * Starts the poll timer with a very short timeout.
-     */
-    void ScheduleImmediatePoll();
-
     TransferSession mTransfer;
     Messaging::ExchangeContext * mExchangeCtx;
     System::Layer * mSystemLayer;
-    System::Clock::Timeout mPollFreq;
-    static constexpr System::Clock::Timeout kDefaultPollFreq    = System::Clock::Milliseconds32(500);
-    static constexpr System::Clock::Timeout kImmediatePollDelay = System::Clock::Milliseconds32(1);
-    bool mStopPolling                                           = false;
 };
 
 /**
@@ -107,18 +89,15 @@ class Responder : public TransferFacilitator
 {
 public:
     /**
-     * Initialize the TransferSession state machine to be ready for an incoming transfer request, and start the polling timer.
-     *
-     * @param[in] layer           A System::Layer pointer to use to start the polling timer
+     * Initialize the TransferSession state machine to be ready for an incoming transfer request and set the callback to get the output
+     * event
+     * @param layer               A System::Layer pointer to pass to the session to start the bdx idle timeout timer
      * @param[in] role            The role of the Responder: Sender or Receiver of BDX data
      * @param[in] xferControlOpts Supported transfer modes (see TransferControlFlags)
      * @param[in] maxBlockSize    The supported maximum size of BDX Block data
-     * @param[in] timeout         The chosen timeout delay for the BDX transfer
-     * @param[in] pollFreq        The period for the TransferSession poll timer
      */
     CHIP_ERROR PrepareForTransfer(System::Layer * layer, TransferRole role, BitFlags<TransferControlFlags> xferControlOpts,
-                                  uint16_t maxBlockSize, System::Clock::Timeout timeout,
-                                  System::Clock::Timeout pollFreq = TransferFacilitator::kDefaultPollFreq);
+                                  uint16_t maxBlockSize);
 
     void ResetTransfer();
 };
@@ -133,18 +112,12 @@ class Initiator : public TransferFacilitator
 {
 public:
     /**
-     * Initialize the TransferSession state machine to prepare a transfer request message (does not send the message) and start the
-     * poll timer.
+     * Initialize the TransferSession state machine to prepare a transfer request message and sends the outgoing message
      *
-     * @param[in] layer      A System::Layer pointer to use to start the polling timer
      * @param[in] role       The role of the Initiator: Sender or Receiver of BDX data
      * @param[in] initData   Data needed for preparing a transfer request BDX message
-     * @param[in] timeout    The chosen timeout delay for the BDX transfer in milliseconds
-     * @param[in] pollFreq   The period for the TransferSession poll timer in milliseconds
      */
-    CHIP_ERROR InitiateTransfer(System::Layer * layer, TransferRole role, const TransferSession::TransferInitData & initData,
-                                System::Clock::Timeout timeout,
-                                System::Clock::Timeout pollFreq = TransferFacilitator::kDefaultPollFreq);
+    CHIP_ERROR InitiateTransfer(TransferRole role, const TransferSession::TransferInitData & initData);
 };
 
 } // namespace bdx

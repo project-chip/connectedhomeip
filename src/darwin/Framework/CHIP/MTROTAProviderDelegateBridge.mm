@@ -57,8 +57,6 @@ constexpr System::Clock::Timeout kBdxInitReceivedTimeout = System::Clock::Second
 // OTA.
 constexpr uint32_t kDelayedActionTimeSeconds = 600;
 
-constexpr System::Clock::Timeout kBdxTimeout = System::Clock::Seconds16(5 * 60); // OTA Spec mandates >= 5 minutes
-constexpr System::Clock::Timeout kBdxPollIntervalMs = System::Clock::Milliseconds32(50);
 constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kSender;
 
 class BdxOTASender : public bdx::Responder {
@@ -76,7 +74,7 @@ public:
         ReturnErrorOnFailure(ConfigureState(fabricIndex, nodeId));
 
         BitFlags<bdx::TransferControlFlags> flags(bdx::TransferControlFlags::kReceiverDrive);
-        return Responder::PrepareForTransfer(mSystemLayer, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollIntervalMs);
+        return Responder::PrepareForTransfer(mSystemLayer, kBdxRole, flags, kMaxBdxBlockSize);
     }
 
     CHIP_ERROR Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeMgr)

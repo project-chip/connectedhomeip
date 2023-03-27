@@ -85,6 +85,7 @@ void DefaultOTARequestorDriver::Init(OTARequestorInterface * requestor, OTAImage
     else if ((mRequestor->GetCurrentUpdateState() != OTAUpdateStateEnum::kIdle))
     {
         // Not running a new image for the first time but also not in the idle state may indicate there is a problem
+        ChipLogError(SoftwareUpdate, "Init idel state reset");
         mRequestor->Reset();
     }
     else
