@@ -77,8 +77,16 @@ def module_initialized(module: Module) -> bool:
 
 
 def make_chip_root_safe_directory() -> None:
-    # ensure no errors regarding ownership in the directory. Newer GIT seems to require this:
-    subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', CHIP_ROOT])
+    # Can't use check_output, git will exit(1) if the setting has no existing value
+    config = subprocess.run(['git', 'config', '--global', '--null', '--get-all',
+                            'safe.directory'], stdout=subprocess.PIPE, text=True)
+    existing = []
+    if config.returncode != 1:
+        config.check_returncode()
+        existing = config.stdout.split('\0')
+    if CHIP_ROOT not in existing:
+        logging.info("Adding CHIP_ROOT to global git safe.directory configuration")
+        subprocess.check_call(['git', 'config', '--global', '--add', 'safe.directory', CHIP_ROOT])
 
 
 def checkout_modules(modules: list, shallow: bool, force: bool, recursive: bool) -> None:
@@ -109,6 +117,8 @@ def main():
     logging.basicConfig(format='%(message)s', level=logging.INFO)
 
     parser = argparse.ArgumentParser(description='Checkout or update relevant git submodules')
+    parser.add_argument('--allow-changing-global-git-config', action='store_true',
+                        help='Allow global git options to be modified if necessary, e.g. safe.directory')
     parser.add_argument('--shallow', action='store_true', help='Fetch submodules without history')
     parser.add_argument('--platform', nargs='+', choices=ALL_PLATFORMS, default=[],
                         help='Process submodules for specific platforms only')
@@ -124,7 +134,8 @@ def main():
     unmatched_modules = [m for m in modules if not module_matches_platforms(
         m, selected_platforms) and module_initialized(m)]
 
-    make_chip_root_safe_directory()
+    if args.allow_changing_global_git_config:
+        make_chip_root_safe_directory()  # ignore directory ownership issues for sub-modules
     checkout_modules(selected_modules, args.shallow, args.force, args.recursive)
 
     if args.deinit_unmatched and unmatched_modules:
