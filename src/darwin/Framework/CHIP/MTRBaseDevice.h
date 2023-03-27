@@ -282,12 +282,42 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
                           completion:(MTRDeviceResponseHandler)completion
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * Reads multiple attributes or events from the device.
+ *
+ * Nil values for endpointID, clusterID, attributeID, eventID indicate wildcards
+ * (e.g. nil attributeID means "read all the attributes from the endpoint(s) and
+ * cluster(s) that match endpointID/clusterID").
+ *
+ * If the list of MTRAttributePath class as input parameters, device will be read multiple attributes.
+ * Similarly,If the list of MTRAttributePath class as input parameters, device will be read multiple events.
+ * (Device can be read both of them.)
+ *
+ * The completion will be called with an error if the entire read interaction fails.
+ * Otherwise it will be called with values, which may be empty (e.g. if no paths
+ * matched the wildcard) or may include per-path errors if particular paths
+ * failed.
+ */
 - (void)readWithAttributePaths:(NSArray<MTRAttributePath *> * _Nullable)attributePaths
                     EventPaths:(NSArray<MTREventPath *> * _Nullable)eventPaths
                         params:(MTRReadParams * _Nullable)params
                          queue:(dispatch_queue_t)queue
                     completion:(MTRDeviceResponseHandler)completion;
 
+/**
+ * Subscribes to the specified attributes on the device.
+ *
+ * Nil values for endpointID, clusterID, attributeID, eventID indicate wildcards
+ * (e.g. nil attributeID means "subscribe to all the attributes from the
+ * endpoint(s) and cluster(s) that match endpointID/clusterID").
+ *
+ * If the list of MTRAttributePath class as input parameters, device will be subscribed multiple attributes.
+ * Similarly,If the list of MTRAttributePath class as input parameters, device will be subscribed multiple events.
+ * (Device can be subscribed both of them.)
+ *
+ * A non-nil attributeID along with a nil clusterID will only succeed if the
+ * attribute ID is for a global attribute that applies to all clusters.
+ */
 - (void)subscribeWithAttributePaths:(NSArray<MTRAttributePath *> * _Nullable)attributePaths
                          EventPaths:(NSArray<MTREventPath *> * _Nullable)eventPaths
                              params:(MTRSubscribeParams * _Nullable)params
