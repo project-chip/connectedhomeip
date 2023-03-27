@@ -56,9 +56,14 @@ PlatformManagerImpl PlatformManagerImpl::sInstance;
 namespace {
 
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
-void * GLibMainLoopThread(void * loop)
+void * GLibMainLoopThread(void * userData)
 {
-    g_main_loop_run(static_cast<GMainLoop *>(loop));
+    GMainLoop * loop       = static_cast<GMainLoop *>(userData);
+    GMainContext * context = g_main_loop_get_context(loop);
+
+    g_main_context_push_thread_default(context);
+    g_main_loop_run(loop);
+
     return nullptr;
 }
 #endif
@@ -190,8 +195,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 
-    mGLibMainLoop       = g_main_loop_new(nullptr, FALSE);
+    auto * context      = g_main_context_new();
+    mGLibMainLoop       = g_main_loop_new(context, FALSE);
     mGLibMainLoopThread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop);
+    g_main_context_unref(context);
 
     {
         // Wait for the GLib main loop to start. It is required that the context used
