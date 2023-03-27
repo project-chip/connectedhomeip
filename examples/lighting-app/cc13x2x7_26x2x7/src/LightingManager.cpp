@@ -30,21 +30,6 @@ LightingManager LightingManager::sLight;
 
 TimerHandle_t sLightTimer;
 
-namespace {
-
-/**********************************************************
- * OffWithEffect Callbacks
- *********************************************************/
-
-OnOffEffect gEffect = {
-    chip::EndpointId{ 1 },
-    LightMgr().OnTriggerOffWithEffect,
-    EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF,
-    static_cast<uint8_t>(EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS),
-};
-
-} // namespace
-
 CHIP_ERROR LightingManager::Init()
 {
     // Create FreeRTOS sw timer for light timer.
@@ -91,13 +76,13 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
     State_t new_state;
 
     // Initiate Turn On/Off Action only when the previous one is complete.
-    if (((mState == kState_OffCompleted) || mOffEffectArmed) && aAction == ON_ACTION)
+    if (mState == kState_OffCompleted && aAction == ON_ACTION)
     {
         action_initiated = true;
 
         new_state = kState_OnInitiated;
     }
-    else if (mState == kState_OnCompleted && aAction == OFF_ACTION && mOffEffectArmed == false)
+    else if (mState == kState_OnCompleted && aAction == OFF_ACTION)
     {
         action_initiated = true;
 
@@ -188,48 +173,4 @@ void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
             light->mActionCompleted_CB(actionCompleted);
         }
     }
-}
-
-void LightingManager::OnTriggerOffWithEffect(OnOffEffect * effect)
-{
-    chip::app::Clusters::OnOff::OnOffEffectIdentifier effectId = effect->mEffectIdentifier;
-    uint8_t effectVariant                                      = effect->mEffectVariant;
-    uint32_t offEffectDuration                                 = 0;
-
-    // Temporary print outs and delay to test OffEffect behaviour
-    // Until dimming is supported for dev boards.
-    if (effectId == EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF)
-    {
-        if (effectVariant == EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS)
-        {
-            offEffectDuration = 800;
-            ChipLogProgress(Zcl, "EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS");
-        }
-        else if (effectVariant == EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_NO_FADE)
-        {
-            offEffectDuration = 800;
-            ChipLogProgress(Zcl, "EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_NO_FADE");
-        }
-        else if (effectVariant ==
-                 EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_IN_12_SECONDS)
-        {
-            offEffectDuration = 12800;
-            ChipLogProgress(Zcl,
-                            "EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_"
-                            "IN_12_SECONDS");
-        }
-    }
-    else if (effectId == EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DYING_LIGHT)
-    {
-        if (effectVariant ==
-            EMBER_ZCL_ON_OFF_DYING_LIGHT_EFFECT_VARIANT_20_PERCENTER_DIM_UP_IN_0P5_SECONDS_THEN_FADE_TO_OFF_IN_1_SECOND)
-        {
-            offEffectDuration = 1500;
-            ChipLogProgress(
-                Zcl, "EMBER_ZCL_ON_OFF_DYING_LIGHT_EFFECT_VARIANT_20_PERCENTER_DIM_UP_IN_0P5_SECONDS_THEN_FADE_TO_OFF_IN_1_SECOND");
-        }
-    }
-
-    LightMgr().mOffEffectArmed = true;
-    LightMgr().StartTimer(offEffectDuration);
 }

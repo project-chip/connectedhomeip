@@ -26,8 +26,8 @@
 #include "task.h"
 
 #include "AppEvent.h"
-#include "LockManager.h"
-#include "filogic_button.h"
+#include "LightingManager.h"
+
 
 #include <ti/drivers/apps/Button.h>
 
