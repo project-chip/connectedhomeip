@@ -858,7 +858,8 @@ public:
     using OnDoneCallbackType = std::function<void(BufferedMultipleReadClientCallback * callback)>;
     using OnSubscriptionEstablishedCallbackType = std::function<void()>;
 
-    BufferedMultipleReadClientCallback(std::vector<app::AttributePathParams> aAttributePathParamsList, std::vector<app::EventPathParams> aEventPathParamsList, OnSuccessAttributeCallbackType aOnAttributeSuccess,
+    BufferedMultipleReadClientCallback(std::vector<app::AttributePathParams> aAttributePathParamsList,
+        std::vector<app::EventPathParams> aEventPathParamsList, OnSuccessAttributeCallbackType aOnAttributeSuccess,
         OnSuccessEventCallbackType aOnEventSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
         OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr)
         : mAttributePathParamsList(aAttributePathParamsList)
@@ -897,7 +898,11 @@ private:
         VerifyOrDie(!aPath.IsListItemOperation());
 
         VerifyOrExit(aStatus.IsSuccess(), err = aStatus.ToChipError());
-        VerifyOrExit(std::find_if(mAttributePathParamsList.begin(), mAttributePathParamsList.end(), [aPath](app::AttributePathParams & pathParam) -> bool { return pathParam.IsAttributePathSupersetOf(aPath); }) != mAttributePathParamsList.end(), err = CHIP_ERROR_SCHEMA_MISMATCH);
+        VerifyOrExit(
+            std::find_if(mAttributePathParamsList.begin(), mAttributePathParamsList.end(),
+                [aPath](app::AttributePathParams & pathParam) -> bool { return pathParam.IsAttributePathSupersetOf(aPath); })
+                != mAttributePathParamsList.end(),
+            err = CHIP_ERROR_SCHEMA_MISMATCH);
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         SuccessOrExit(err = app::DataModel::Decode(*apData, value));
@@ -915,7 +920,12 @@ private:
         CHIP_ERROR err = CHIP_NO_ERROR;
         DecodableValueType value;
 
-        VerifyOrExit(std::find_if(mEventPathParamsList.begin(), mEventPathParamsList.end(), [aEventHeader](app::EventPathParams & pathParam) -> bool { return pathParam.IsEventPathSupersetOf(aEventHeader.mPath); }) != mEventPathParamsList.end(), err = CHIP_ERROR_SCHEMA_MISMATCH);
+        VerifyOrExit(std::find_if(mEventPathParamsList.begin(), mEventPathParamsList.end(),
+                         [aEventHeader](app::EventPathParams & pathParam) -> bool {
+                             return pathParam.IsEventPathSupersetOf(aEventHeader.mPath);
+                         })
+                != mEventPathParamsList.end(),
+            err = CHIP_ERROR_SCHEMA_MISMATCH);
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         SuccessOrExit(err = app::DataModel::Decode(*apData, value));
@@ -1284,16 +1294,16 @@ private:
 
                    MTRReadClientContainer * container = [[MTRReadClientContainer alloc] init];
                    container.deviceID = self.nodeID;
-        
+
                    std::vector<app::AttributePathParams> attributePathParamsList;
                    std::vector<app::EventPathParams> eventPathParamsList;
 
                    if (attributePaths != nil) {
-                       for (uint8_t i = 0 ; i < [attributePaths count] ; i++) {
+                       for (uint8_t i = 0; i < [attributePaths count]; i++) {
                            chip::EndpointId endpointId = kInvalidEndpointId;
                            chip::ClusterId clusterId = kInvalidClusterId;
                            chip::AttributeId attributeId = kInvalidAttributeId;
-                           
+
                            if ([attributePaths[i] endpoint]) {
                                endpointId = static_cast<chip::EndpointId>([[attributePaths[i] endpoint] unsignedShortValue]);
                            }
@@ -1305,18 +1315,18 @@ private:
                            if ([attributePaths[i] attribute]) {
                                attributeId = static_cast<chip::AttributeId>([[attributePaths[i] attribute] unsignedLongValue]);
                            }
-                           
+
                            attributePathParamsList.push_back(app::AttributePathParams(endpointId, clusterId, attributeId));
                        }
                        container.pathParamsSize = attributePathParamsList.size();
                        container.pathParams = attributePathParamsList.data();
                    }
                    if (eventPaths != nil) {
-                       for (uint8_t i = 0 ; i < [eventPaths count] ; i++) {
+                       for (uint8_t i = 0; i < [eventPaths count]; i++) {
                            chip::EndpointId endpointId = kInvalidEndpointId;
                            chip::ClusterId clusterId = kInvalidClusterId;
                            chip::EventId eventId = kInvalidEventId;
-                           
+
                            if ([eventPaths[i] endpoint]) {
                                endpointId = static_cast<chip::EndpointId>([[eventPaths[i] endpoint] unsignedShortValue]);
                            }
@@ -1328,7 +1338,7 @@ private:
                            if ([eventPaths[i] event]) {
                                eventId = static_cast<chip::EventId>([[eventPaths[i] event] unsignedLongValue]);
                            }
-                           
+
                            eventPathParamsList.push_back(app::EventPathParams(endpointId, clusterId, eventId));
                        }
                        container.eventPathParamsSize = eventPathParamsList.size();
@@ -1354,7 +1364,8 @@ private:
 
                    auto callback
                        = chip::Platform::MakeUnique<BufferedMultipleReadClientCallback<MTRDataValueDictionaryDecodableType>>(
-                       attributePathParamsList, eventPathParamsList, onAttributeReportCb, onEventReportCb, onFailureCb, onDone, onEstablishedCb);
+                           attributePathParamsList, eventPathParamsList, onAttributeReportCb, onEventReportCb, onFailureCb, onDone,
+                           onEstablishedCb);
 
                    auto readClient = Platform::New<app::ReadClient>(
                        engine, exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
