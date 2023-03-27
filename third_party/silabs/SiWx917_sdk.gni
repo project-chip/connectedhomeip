@@ -223,6 +223,7 @@ template("siwx917_sdk") {
       "${wisemcu_sdk_root}/sapi/common/rsi_apis_rom.c",
       "${wisemcu_sdk_root}/sapi/common/rsi_common_apis.c",
       "${wisemcu_sdk_root}/sapi/common/rsi_device_init_apis.c",
+      "${wisemcu_sdk_root}/sapi/common/rsi_wisemcu_hardware_setup.c",
       "${wisemcu_sdk_root}/sapi/driver/rsi_bt_ble.c",
       "${wisemcu_sdk_root}/sapi/driver/rsi_common.c",
       "${wisemcu_sdk_root}/sapi/driver/rsi_device_init.c",
@@ -248,7 +249,6 @@ template("siwx917_sdk") {
       "${wisemcu_sdk_root}/sapi/network/socket/rsi_socket_rom.c",
       "${wisemcu_sdk_root}/sapi/rtos/freertos_wrapper/rsi_os_wrapper.c",
       "${wisemcu_sdk_root}/sapi/wlan/rsi_wlan_apis.c",
-      "${wisemcu_sdk_root}/sapi/common/rsi_wisemcu_hardware_setup.c",
 
       # platform
       "${wisemcu_sdk_root}/platforms/si91x/boards/brd4325x/src/rsi_board.c",
