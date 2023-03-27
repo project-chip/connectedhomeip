@@ -1917,6 +1917,11 @@ client cluster MediaPlayback = 1286 {
     kVariableSpeed = 0x2;
   }
 
+  struct PlaybackPositionStruct {
+    epoch_us updatedAt = 0;
+    nullable int64u position = 1;
+  }
+
   readonly attribute PlaybackStateEnum currentState = 0;
   readonly attribute nullable epoch_us startTime = 1;
   readonly attribute nullable int64u duration = 2;
@@ -2162,8 +2167,15 @@ client cluster ContentLauncher = 1290 {
     kHls = 0x2;
   }
 
-  struct ContentSearchStruct {
-    ParameterStruct parameterList[] = 0;
+  struct DimensionStruct {
+    double width = 0;
+    double height = 1;
+    MetricTypeEnum metric = 2;
+  }
+
+  struct AdditionalInfoStruct {
+    char_string name = 0;
+    char_string value = 1;
   }
 
   struct ParameterStruct {
@@ -2172,9 +2184,14 @@ client cluster ContentLauncher = 1290 {
     optional AdditionalInfoStruct externalIDList[] = 2;
   }
 
-  struct AdditionalInfoStruct {
-    char_string name = 0;
-    char_string value = 1;
+  struct ContentSearchStruct {
+    ParameterStruct parameterList[] = 0;
+  }
+
+  struct StyleInformationStruct {
+    optional char_string imageURL = 0;
+    optional char_string color = 1;
+    optional DimensionStruct size = 2;
   }
 
   struct BrandingInformationStruct {
@@ -2184,18 +2201,6 @@ client cluster ContentLauncher = 1290 {
     optional StyleInformationStruct progressBar = 3;
     optional StyleInformationStruct splash = 4;
     optional StyleInformationStruct waterMark = 5;
-  }
-
-  struct StyleInformationStruct {
-    optional char_string imageURL = 0;
-    optional char_string color = 1;
-    optional DimensionStruct size = 2;
-  }
-
-  struct DimensionStruct {
-    double width = 0;
-    double height = 1;
-    MetricTypeEnum metric = 2;
   }
 
   readonly attribute CHAR_STRING acceptHeader[] = 0;
@@ -2281,6 +2286,11 @@ client cluster ApplicationLauncher = 1292 {
     char_string applicationID = 1;
   }
 
+  struct ApplicationEPStruct {
+    ApplicationStruct application = 0;
+    optional endpoint_no endpoint = 1;
+  }
+
   readonly attribute INT16U catalogList[] = 0;
   attribute nullable ApplicationEPStruct currentApp = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2314,6 +2324,11 @@ client cluster ApplicationBasic = 1293 {
     kActiveVisibleFocus = 1;
     kActiveHidden = 2;
     kActiveVisibleNotFocus = 3;
+  }
+
+  struct ApplicationStruct {
+    int16u catalogVendorID = 0;
+    char_string applicationID = 1;
   }
 
   readonly attribute char_string<32> vendorName = 0;

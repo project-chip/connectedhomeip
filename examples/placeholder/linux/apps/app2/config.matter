@@ -1642,6 +1642,12 @@ client cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
+  fabric_scoped struct NOCStruct {
+    fabric_sensitive octet_string noc = 1;
+    nullable fabric_sensitive octet_string icac = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptorStruct fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
@@ -1812,6 +1818,11 @@ server cluster OperationalCredentials = 62 {
 }
 
 client cluster FixedLabel = 64 {
+  struct LabelStruct {
+    char_string<16> label = 0;
+    char_string<16> value = 1;
+  }
+
   readonly attribute LabelStruct labelList[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1860,15 +1871,15 @@ client cluster ModeSelect = 80 {
     kDeponoff = 0x1;
   }
 
+  struct SemanticTagStruct {
+    vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
   struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     SemanticTagStruct semanticTags[] = 2;
-  }
-
-  struct SemanticTagStruct {
-    vendor_id mfgCode = 0;
-    enum16 value = 1;
   }
 
   readonly attribute char_string<32> description = 0;
@@ -2900,8 +2911,15 @@ client cluster ContentLauncher = 1290 {
     kHls = 0x2;
   }
 
-  struct ContentSearchStruct {
-    ParameterStruct parameterList[] = 0;
+  struct DimensionStruct {
+    double width = 0;
+    double height = 1;
+    MetricTypeEnum metric = 2;
+  }
+
+  struct AdditionalInfoStruct {
+    char_string name = 0;
+    char_string value = 1;
   }
 
   struct ParameterStruct {
@@ -2910,9 +2928,14 @@ client cluster ContentLauncher = 1290 {
     optional AdditionalInfoStruct externalIDList[] = 2;
   }
 
-  struct AdditionalInfoStruct {
-    char_string name = 0;
-    char_string value = 1;
+  struct ContentSearchStruct {
+    ParameterStruct parameterList[] = 0;
+  }
+
+  struct StyleInformationStruct {
+    optional char_string imageURL = 0;
+    optional char_string color = 1;
+    optional DimensionStruct size = 2;
   }
 
   struct BrandingInformationStruct {
@@ -2922,18 +2945,6 @@ client cluster ContentLauncher = 1290 {
     optional StyleInformationStruct progressBar = 3;
     optional StyleInformationStruct splash = 4;
     optional StyleInformationStruct waterMark = 5;
-  }
-
-  struct StyleInformationStruct {
-    optional char_string imageURL = 0;
-    optional char_string color = 1;
-    optional DimensionStruct size = 2;
-  }
-
-  struct DimensionStruct {
-    double width = 0;
-    double height = 1;
-    MetricTypeEnum metric = 2;
   }
 
   readonly attribute CHAR_STRING acceptHeader[] = 0;
