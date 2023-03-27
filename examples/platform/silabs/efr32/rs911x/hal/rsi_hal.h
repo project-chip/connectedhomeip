@@ -27,6 +27,7 @@
 #define RSI_HAL_SLEEP_CONFIRM_PIN 2
 #define RSI_HAL_WAKEUP_INDICATION_PIN 3
 #define RSI_HAL_MODULE_INTERRUPT_PIN 4
+#define RSI_HAL_LP_SLEEP_CONFIRM_PIN 6
 
 //! Timer related macros
 //! Macro to configure timer type in single shot

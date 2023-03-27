@@ -105,7 +105,13 @@ private:
     bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
-#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    ConnectivityManager::SEDIntervalsConfig mIntervalsConfig;
+    CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
+    CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
+    CHIP_ERROR _RequestSEDActiveMode(bool onOff, bool delayIdle = false);
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION */
     // ===== Members for internal use by the following friends.
 
     friend ConnectivityManager & ConnectivityMgr(void);

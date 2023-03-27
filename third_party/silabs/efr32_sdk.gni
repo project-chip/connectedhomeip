@@ -20,7 +20,11 @@ import("//build_overrides/mbedtls.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("silabs_board.gni")
 
-wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
+if (use_rs9116) {
+  wifi_sapi_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
+} else {
+  wifi_sapi_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
+}
 
 declare_args() {
   # Location of the efr32 SDK.
@@ -47,11 +51,19 @@ declare_args() {
   # Enable Sleepy end device
   enable_sleepy_device = false
 
-  # Argument to Disable IPv4 for wifi(rs911)
+  # Argument to enable IPv4 for wifi
+  # aligning to match chip_inet_config_enable_ipv4 default configuration
   chip_enable_wifi_ipv4 = false
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
+
+declare_args() {
+  sl_ot_libs_path = "${efr32_sdk_root}/protocol/openthread"
+  sl_ot_efr32_root =
+      "${efr32_sdk_root}/protocol/openthread/platform-abstraction/efr32"
+  sl_openthread_root = "${efr32_sdk_root}/util/third_party/openthread"
+}
 
 # Defines an efr32 SDK build target.
 #
@@ -155,9 +167,7 @@ template("efr32_sdk") {
     }
 
     if (chip_enable_ble_rs911x) {
-      _include_dirs += [
-        "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk/sapi/include",
-      ]
+      _include_dirs += [ "${wifi_sapi_root}/sapi/include" ]
     }
 
     # Note that we're setting the mbedTLS and PSA configuration files through a
@@ -195,6 +205,13 @@ template("efr32_sdk") {
       #"__STACK_SIZE=0",
     ]
 
+    if (sl_uart_log_output) {
+      defines += [
+        "SILABS_LOG_OUT_UART=1",
+        "SILABS_LOG_OUT_RTT=0",
+      ]
+    }
+
     if (chip_enable_ble_rs911x) {
       defines += [ "RSI_BLE_ENABLE=1" ]
     }
@@ -219,9 +236,10 @@ template("efr32_sdk") {
         ]
       }
       if (use_SiWx917) {
-        #Added this flag only for SiwX917 NCP board
-        #TODO: Remove when rsi_wlan_ext_stats gets implemented using Wisemcu SDK
-        defines += [ "SiWx917_WIFI" ]
+        defines += [
+          "EXP_BOARD=1",
+          "CHIP_9117=1",
+        ]
       } else if (use_wf200) {
         defines += [
           "SL_HEAP_SIZE=24576",
@@ -236,7 +254,7 @@ template("efr32_sdk") {
         import("${chip_root}/src/platform/silabs/efr32/wifi_args.gni")
 
         defines += [ "LWIP_NETIF_API=1" ]
-        if (lwip_ipv4) {
+        if (chip_enable_wifi_ipv4) {
           defines += [
             "LWIP_IPV4=1",
 
@@ -299,6 +317,9 @@ template("efr32_sdk") {
         "SL_CATALOG_POWER_MANAGER_PRESENT",
         "SL_CATALOG_SLEEPTIMER_PRESENT",
         "SL_SLEEP_TIME_MS=${sleep_time_ms}",
+
+        # Used for wifi devices to get packet details
+        "WIFI_DEBUG_ENABLED=1",
       ]
     }
 
@@ -677,10 +698,10 @@ template("efr32_sdk") {
 
     if (chip_enable_ble_rs911x) {
       sources += [
-        "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
-        "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
-        "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
-        "${wiseconnect_sdk_root}/sapi/driver/rsi_bt_ble.c",
+        "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
+        "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
+        "${wifi_sapi_root}/sapi/bluetooth/rsi_bt_common_apis.c",
+        "${wifi_sapi_root}/sapi/driver/rsi_bt_ble.c",
       ]
     } else {
       sources += [

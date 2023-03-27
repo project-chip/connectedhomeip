@@ -55,7 +55,6 @@ exclude = third_party
           scripts/tools/memory/memdf/__init__.py
           scripts/tools/memory/report_summary.py
           scripts/tools/silabs/FactoryDataProvider.py
-          scripts/tools/telink/mfg_tool.py
           scripts/tools/zap/generate.py
           scripts/tools/zap/prune_outputs.py
           scripts/tools/zap/version_update.py

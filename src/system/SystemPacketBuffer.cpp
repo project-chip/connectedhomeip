@@ -51,6 +51,11 @@
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/mem.h>
 #include <lwip/pbuf.h>
+#if LWIP_VERSION_MAJOR == 2 && LWIP_VERSION_MINOR < 1
+#define PBUF_STRUCT_DATA_CONTIGUOUS(pbuf) (pbuf)->type == PBUF_RAM || (pbuf)->type == PBUF_POOL
+#else
+#define PBUF_STRUCT_DATA_CONTIGUOUS(pbuf) (pbuf)->type_internal & PBUF_TYPE_FLAG_STRUCT_DATA_CONTIGUOUS
+#endif
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
@@ -194,7 +199,7 @@ void PacketBufferHandle::InternalRightSize()
 void PacketBuffer::SetStart(uint8_t * aNewStart)
 {
     uint8_t * const kStart = ReserveStart();
-    uint8_t * const kEnd   = kStart + this->AllocSize();
+    uint8_t * const kEnd   = this->Start() + this->MaxDataLength();
 
     if (aNewStart < kStart)
         aNewStart = kStart;
@@ -236,6 +241,12 @@ void PacketBuffer::SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead)
 
 uint16_t PacketBuffer::MaxDataLength() const
 {
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    if (!(PBUF_STRUCT_DATA_CONTIGUOUS(this)))
+    {
+        return DataLength();
+    }
+#endif
     return static_cast<uint16_t>(AllocSize() - ReservedSize());
 }
 
@@ -253,11 +264,23 @@ uint16_t PacketBuffer::ReservedSize() const
 
 uint8_t * PacketBuffer::ReserveStart()
 {
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    if (!(PBUF_STRUCT_DATA_CONTIGUOUS(this)))
+    {
+        return reinterpret_cast<uint8_t *>(this->Start());
+    }
+#endif
     return reinterpret_cast<uint8_t *>(this) + kStructureSize;
 }
 
 const uint8_t * PacketBuffer::ReserveStart() const
 {
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    if (!(PBUF_STRUCT_DATA_CONTIGUOUS(this)))
+    {
+        return reinterpret_cast<const uint8_t *>(this->Start());
+    }
+#endif
     return reinterpret_cast<const uint8_t *>(this) + kStructureSize;
 }
 
@@ -400,7 +423,12 @@ bool PacketBuffer::EnsureReservedSize(uint16_t aReservedSize)
 
     if ((aReservedSize + this->len) > this->AllocSize())
         return false;
-
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    if (!(PBUF_STRUCT_DATA_CONTIGUOUS(this)) && aReservedSize > 0)
+    {
+        return false;
+    }
+#endif
     // Cast is safe because aReservedSize > kCurrentReservedSize.
     const uint16_t kMoveLength = static_cast<uint16_t>(aReservedSize - kCurrentReservedSize);
     memmove(static_cast<uint8_t *>(this->payload) + kMoveLength, this->payload, this->len);

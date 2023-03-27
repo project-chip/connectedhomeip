@@ -44,6 +44,7 @@ class AttributeQuality(enum.Flag):
     READABLE = enum.auto()
     WRITABLE = enum.auto()
     NOSUBSCRIBE = enum.auto()
+    TIMED_WRITE = enum.auto()
 
 
 class AttributeStorage(enum.Enum):
@@ -134,6 +135,10 @@ class Attribute:
     @property
     def is_subscribable(self):
         return not (AttributeQuality.NOSUBSCRIBE & self.qualities)
+
+    @property
+    def requires_timed_write(self):
+        return AttributeQuality.TIMED_WRITE & self.qualities
 
 
 @dataclass
