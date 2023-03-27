@@ -128,7 +128,7 @@ class TIBuilder(GnBuilder):
                     or self.app == TIApp.PUMP_CONTROLLER):
                 extensions = [".out", ".bin", ".out.map", "-bim.hex"]
 
-            elif self.app == TIApp.ALL_CLUSTERS_MINIMAL or self.app == TIApp.SHELL:
+            else:
                 extensions = [".out", ".out.map"]
 
         else:
