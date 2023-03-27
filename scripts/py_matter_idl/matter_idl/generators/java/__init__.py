@@ -478,7 +478,8 @@ class JavaClassGenerator(__JavaCodeGenerator):
         Renders .java files required for java matter support
         """
 
-        clientClusters = [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT]
+        clientClusters = [
+            c for c in self.idl.clusters if c.side == ClusterSide.CLIENT]
 
         self.internal_render_one_output(
             template_path="java/ClusterReadMapping.jinja",
