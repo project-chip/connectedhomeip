@@ -1310,29 +1310,6 @@ private:
                        }
                        container.pathParamsSize = attributePathParamsList.size();
                        container.pathParams = attributePathParamsList.data();
-//                       container.pathParamsSize = [attributePaths count];
-//                       container.pathParams = static_cast<app::AttributePathParams *>(
-//                           Platform::MemoryCalloc(sizeof(app::AttributePathParams), container.pathParamsSize));
-//                       for (uint8_t i = 0; i < container.pathParamsSize; i++) {
-//                           container.pathParams[i].mEndpointId = kInvalidEndpointId;
-//                           container.pathParams[i].mClusterId = kInvalidClusterId;
-//                           container.pathParams[i].mAttributeId = kInvalidAttributeId;
-//
-//                           if ([attributePaths[i] endpoint]) {
-//                               container.pathParams[i].mEndpointId
-//                                   = static_cast<chip::EndpointId>([[attributePaths[i] endpoint] unsignedShortValue]);
-//                           }
-//
-//                           if ([attributePaths[i] cluster]) {
-//                               container.pathParams[i].mClusterId
-//                                   = static_cast<chip::ClusterId>([[attributePaths[i] cluster] unsignedLongValue]);
-//                           }
-//
-//                           if ([attributePaths[i] attribute]) {
-//                               container.pathParams[i].mAttributeId
-//                                   = static_cast<chip::AttributeId>([[attributePaths[i] attribute] unsignedLongValue]);
-//                           }
-//                       }
                    }
                    if (eventPaths != nil) {
                        for (uint8_t i = 0 ; i < [eventPaths count] ; i++) {
@@ -1356,29 +1333,6 @@ private:
                        }
                        container.eventPathParamsSize = eventPathParamsList.size();
                        container.eventPathParams = eventPathParamsList.data();
-//                       container.eventPathParamsSize = [eventPaths count];
-//                       container.eventPathParams = static_cast<app::EventPathParams *>(
-//                           Platform::MemoryCalloc(sizeof(app::EventPathParams), container.eventPathParamsSize));
-//                       for (uint8_t i = 0; i < container.eventPathParamsSize; i++) {
-//                           container.eventPathParams[i].mEndpointId = kInvalidEndpointId;
-//                           container.eventPathParams[i].mClusterId = kInvalidClusterId;
-//                           container.eventPathParams[i].mEventId = kInvalidEventId;
-//
-//                           if ([eventPaths[i] endpoint]) {
-//                               container.eventPathParams[i].mEndpointId
-//                                   = static_cast<chip::EndpointId>([[eventPaths[i] endpoint] unsignedShortValue]);
-//                           }
-//
-//                           if ([eventPaths[i] cluster]) {
-//                               container.eventPathParams[i].mClusterId
-//                                   = static_cast<chip::ClusterId>([[eventPaths[i] cluster] unsignedLongValue]);
-//                           }
-//
-//                           if ([eventPaths[i] event]) {
-//                               container.eventPathParams[i].mEventId
-//                                   = static_cast<chip::EventId>([[eventPaths[i] event] unsignedLongValue]);
-//                           }
-//                       }
                    }
 
                    app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
