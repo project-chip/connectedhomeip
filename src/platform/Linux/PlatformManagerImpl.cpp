@@ -156,7 +156,7 @@ gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, voi
 
 // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
 // This should be removed or find a better place once we deprecate the rendezvous session.
-CHIP_ERROR RunWiFiIPChangeListener()
+CHIP_ERROR RunWiFiIPChangeListener(GMainContext * context)
 {
     int sock;
     if ((sock = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) == -1)
@@ -177,11 +177,15 @@ CHIP_ERROR RunWiFiIPChangeListener()
         return CHIP_ERROR_INTERNAL;
     }
 
-    GIOChannel * ch = g_io_channel_unix_new(sock);
-    g_io_add_watch_full(ch, G_PRIORITY_DEFAULT, G_IO_IN, WiFiIPChangeListener, nullptr, nullptr);
-
+    GIOChannel * ch       = g_io_channel_unix_new(sock);
+    GSource * watchSource = g_io_create_watch(ch, G_IO_IN);
+    g_source_set_callback(watchSource, reinterpret_cast<GSourceFunc>(WiFiIPChangeListener), nullptr, nullptr);
     g_io_channel_set_close_on_unref(ch, TRUE);
     g_io_channel_set_encoding(ch, nullptr, nullptr);
+
+    g_source_attach(watchSource, context);
+
+    g_source_unref(watchSource);
     g_io_channel_unref(ch);
 
     return CHIP_NO_ERROR;
@@ -228,7 +232,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    ReturnErrorOnFailure(RunWiFiIPChangeListener());
+    ReturnErrorOnFailure(RunWiFiIPChangeListener(g_main_loop_get_context(mGLibMainLoop)));
 #endif
 
     // Initialize the configuration system.
