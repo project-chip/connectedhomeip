@@ -39,6 +39,11 @@
 #include "rsi_wlan.h"
 #include "rsi_wlan_apis.h"
 #include "rsi_wlan_config.h"
+
+#ifdef CHIP_DEVICE_CONFIG_ENABLE_SED
+#include "rsi_wisemcu_hardware_setup.h"
+#endif
+
 //#include "rsi_wlan_non_rom.h"
 #include "rsi_bootup_config.h"
 
@@ -47,6 +52,27 @@
 
 #define VAL(str) #str
 #define TOSTRING(str) VAL(str)
+
+#ifdef CHIP_DEVICE_CONFIG_ENABLE_SED
+
+void M4_sleep_wakeup();
+#ifdef RSI_M4_INTERFACE
+
+#define FLASH_BASED_EXECUTION_ENABLE 1
+#define WKP_RAM_USAGE_LOCATION 0x24061000 /*<!Bootloader RAM usage location upon wake up  */
+
+
+#ifdef COMMON_FLASH_EN
+#define IVT_OFFSET_ADDR 0x8212000 /*<!Application IVT location VTOR offset>        */
+#else
+#define IVT_OFFSET_ADDR 0x8012000 /*<!Application IVT location VTOR offset>        */
+#endif
+#define WKP_RAM_USAGE_LOCATION 0x24061000 /*<!Bootloader RAM usage location upon wake up  */
+
+#define WIRELESS_WAKEUP_IRQHandler NPSS_TO_MCU_WIRELESS_INTR_IRQn
+#endif
+#endif
+
 
 /* Rsi driver Task will use as its stack */
 StackType_t driverRsiTaskStack[WFX_RSI_WLAN_TASK_SZ] = { 0 };
@@ -309,6 +335,11 @@ static int32_t wfx_rsi_init(void)
         return RSI_ERROR_INVALID_PARAM;
     }
 
+#ifdef CHIP_DEVICE_CONFIG_ENABLE_SED
+	/* MCU Hardware Configuration for Low-Power Applications */
+	RSI_WISEMCU_HardwareSetup();
+#endif
+
     /* Initialize WiSeConnect or Module features. */
     WFX_RSI_LOG("%s: rsi_wireless_init", __func__);
     if ((status = rsi_wireless_init(OPER_MODE_0, RSI_OPERMODE_WLAN_BLE)) != RSI_SUCCESS)
@@ -316,6 +347,16 @@ static int32_t wfx_rsi_init(void)
         WFX_RSI_LOG("%s: error: rsi_wireless_init failed with status: %02x", __func__, status);
         return status;
     }
+
+#ifdef CHIP_DEVICE_CONFIG_ENABLE_SED
+    uint8_t xtal_enable = 0;
+    xtal_enable = 1;
+    status      = rsi_cmd_m4_ta_secure_handshake(RSI_ENABLE_XTAL, 1, &xtal_enable, 0, NULL);
+    if (status != RSI_SUCCESS) {
+        return status;
+    }
+#endif
+
 
     WFX_RSI_LOG("%s: get FW version..", __func__);
     /*
@@ -895,6 +936,41 @@ int32_t wfx_rsi_init_platform()
 
     return status;
 }
+
+#ifdef CHIP_DEVICE_CONFIG_ENABLE_SED
+
+/*************************************************************************************
+ * @fn  void M4_sleep_wakeup()
+ * @brief
+ *      API to put M4 core in sleep
+ * @param[in]  None
+ * @return
+ *        None
+ *****************************************************************************************/
+void M4_sleep_wakeup()
+{
+  LOG_PRINT("\r\n Set Wakeup Source\r\n");
+  /* Configure Wakeup-Source */
+  RSI_PS_SetWkpSources(WIRELESS_BASED_WAKEUP);
+
+  /* Enable NVIC */
+  NVIC_EnableIRQ(WIRELESS_WAKEUP_IRQHandler);
+
+  /* Configure RAM Usage and Retention Size */
+  WFX_RSI_LOG("\r\n Retain required RAM size\r\n");
+  RSI_WISEMCU_ConfigRamRetention(WISEMCU_192KB_RAM_IN_USE, WISEMCU_RETAIN_DEFAULT_RAM_DURING_SLEEP);
+
+  /* Trigger M4 Sleep*/
+  WFX_RSI_LOG("\r\n Trigger M4 to Sleep\r\n");
+  RSI_WISEMCU_TriggerSleep(SLEEP_WITH_RETENTION,
+                           DISABLE_LF_MODE,
+                           WKP_RAM_USAGE_LOCATION,
+                           (uint32_t)RSI_PS_RestoreCpuContext,
+                           IVT_OFFSET_ADDR,
+                           RSI_WAKEUP_FROM_FLASH_MODE);
+}
+
+#endif //CHIP_DEVICE_CONFIG_ENABLE_SED
 
 /********************************************************************************************
  * @fn  void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin)

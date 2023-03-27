@@ -41,6 +41,7 @@ extern "C" {
 #include <rsi_driver.h>
 #include <rsi_utils.h>
 #include <stdbool.h>
+void M4_sleep_wakeup();
 }
 #include <ble/CHIPBleServiceData.h>
 #include <lib/support/CodeUtils.h>
@@ -717,6 +718,24 @@ void BLEManagerImpl::HandleConnectionCloseEvent(uint16_t reason)
     uint8_t connHandle = 1;
 
     ChipLogProgress(DeviceLayer, "Disconnect Event for handle : %d", connHandle);
+
+#ifdef CHIP_DEVICE_CONFIG_ENABLE_SED
+    int32_t status;
+    status = rsi_bt_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
+    if (status != RSI_SUCCESS)
+    {
+        WFX_RSI_LOG("BT Powersave Config Failed, Error Code : 0x%lX", status);
+        return;
+    }
+
+    status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
+    if (status != RSI_SUCCESS)
+    {
+        WFX_RSI_LOG("WLAN Powersave Config Failed, Error Code : 0x%lX", status);
+        return;
+    }
+    WFX_RSI_LOG("Powersave Config Success");
+#endif //CHIP_DEVICE_CONFIG_ENABLE_SED
 
     if (RemoveConnection(connHandle))
     {

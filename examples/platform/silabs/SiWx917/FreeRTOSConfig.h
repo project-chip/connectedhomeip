@@ -122,21 +122,21 @@ extern "C" {
 extern uint32_t SystemCoreClock;
 
 /* Energy saving modes. */
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_SED)
 #define configUSE_TICKLESS_IDLE 1
 #else
 #define configUSE_TICKLESS_IDLE 0
-#endif // SL_CATALOG_POWER_MANAGER_PRESENT
+#endif //CHIP_DEVICE_CONFIG_ENABLE_SED
 
 #define configTICK_RATE_HZ (1000)
 /* Definition used by Keil to replace default system clock source. */
 #define configOVERRIDE_DEFAULT_TICK_CONFIGURATION 1
 
 /* Hook function related definitions. */
+#define configUSE_IDLE_HOOK (0)
 #define configUSE_TICK_HOOK (1)
 #define configCHECK_FOR_STACK_OVERFLOW (2)
 #define configUSE_MALLOC_FAILED_HOOK (1)
-#define configUSE_IDLE_HOOK (0)
 
 /* Main functions*/
 /* Run time stats gathering related definitions. */

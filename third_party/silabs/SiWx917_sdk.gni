@@ -91,6 +91,9 @@ template("siwx917_sdk") {
       "RSI_WLAN_API_ENABLE",
       "LITTLE_ENDIAN_ORDER",
       "_CHIP_9118",
+      "TA_DEEP_SLEEP_COMMON_FLASH=1",
+      "FLASH_BASED_EXECUTION_ENABLE=1",
+      "RSI_SAMPLE_HAL=1",
       "NVM3_DEFAULT_NVM_SIZE=40960",
       "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
       "KVS_MAX_ENTRIES=${kvs_max_entries}",
@@ -245,6 +248,7 @@ template("siwx917_sdk") {
       "${wisemcu_sdk_root}/sapi/network/socket/rsi_socket_rom.c",
       "${wisemcu_sdk_root}/sapi/rtos/freertos_wrapper/rsi_os_wrapper.c",
       "${wisemcu_sdk_root}/sapi/wlan/rsi_wlan_apis.c",
+      "${wisemcu_sdk_root}/sapi/common/rsi_wisemcu_hardware_setup.c",
 
       # platform
       "${wisemcu_sdk_root}/platforms/si91x/boards/brd4325x/src/rsi_board.c",
