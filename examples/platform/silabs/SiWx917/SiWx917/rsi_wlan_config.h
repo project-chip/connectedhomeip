@@ -1,19 +1,19 @@
 /*******************************************************************************
-* @file  rsi_wlan_config.h
-* @brief
-*******************************************************************************
-* # License
-* <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
-*******************************************************************************
-*
-* The licensor of this software is Silicon Laboratories Inc. Your use of this
-* software is governed by the terms of Silicon Labs Master Software License
-* Agreement (MSLA) available at
-* www.silabs.com/about-us/legal/master-software-license-agreement. This
-* software is distributed to you in Source Code format and is governed by the
-* sections of the MSLA applicable to Source Code.
-*
-******************************************************************************/
+ * @file  rsi_wlan_config.h
+ * @brief
+ *******************************************************************************
+ * # License
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * The licensor of this software is Silicon Laboratories Inc. Your use of this
+ * software is governed by the terms of Silicon Labs Master Software License
+ * Agreement (MSLA) available at
+ * www.silabs.com/about-us/legal/master-software-license-agreement. This
+ * software is distributed to you in Source Code format and is governed by the
+ * sections of the MSLA applicable to Source Code.
+ *
+ ******************************************************************************/
 
 #ifndef RSI_CONFIG_H
 #define RSI_CONFIG_H
@@ -58,13 +58,12 @@
 
 // Feature frame parameters
 /*=======================================================================*/
-#define PLL_MODE      0
-#define RF_TYPE       1 // 0 - External RF 1- Internal RF
+#define PLL_MODE 0
+#define RF_TYPE 1 // 0 - External RF 1- Internal RF
 #define WIRELESS_MODE 0
-#define ENABLE_PPP    0
-#define AFE_TYPE      1
-#define FEATURE_ENABLES \
-  (RSI_FEAT_FRAME_PREAMBLE_DUTY_CYCLE | RSI_FEAT_FRAME_LP_CHAIN | RSI_FEAT_FRAME_IN_PACKET_DUTY_CYCLE)
+#define ENABLE_PPP 0
+#define AFE_TYPE 1
+#define FEATURE_ENABLES (RSI_FEAT_FRAME_PREAMBLE_DUTY_CYCLE | RSI_FEAT_FRAME_LP_CHAIN | RSI_FEAT_FRAME_IN_PACKET_DUTY_CYCLE)
 /*=======================================================================*/
 
 // Band command parameters
@@ -126,7 +125,7 @@
 
 /*=======================================================================*/
 
-//BG scan command parameters
+// BG scan command parameters
 /*=======================================================================*/
 
 // RSI_ENABLE or RSI_DISABLE BG Scan support
@@ -158,7 +157,7 @@
 
 /*=======================================================================*/
 
-//RSI_ENABLE or RSI_DISABLE to set RTS threshold config
+// RSI_ENABLE or RSI_DISABLE to set RTS threshold config
 #define RSI_WLAN_CONFIG_ENABLE RSI_ENABLE
 
 #define CONFIG_RTSTHRESHOLD 1
@@ -167,7 +166,7 @@
 
 /*=======================================================================*/
 
-//Roaming parameters
+// Roaming parameters
 /*=======================================================================*/
 
 // RSI_ENABLE or RSI_DISABLE Roaming support
@@ -188,8 +187,8 @@
 #define RSI_MODE_11N_ENABLE RSI_DISABLE
 
 // HT caps bit map.
-#define RSI_HT_CAPS_BIT_MAP \
-  (RSI_HT_CAPS_NUM_RX_STBC | RSI_HT_CAPS_SHORT_GI_20MHZ | RSI_HT_CAPS_GREENFIELD_EN | RSI_HT_CAPS_SUPPORT_CH_WIDTH)
+#define RSI_HT_CAPS_BIT_MAP                                                                                                        \
+    (RSI_HT_CAPS_NUM_RX_STBC | RSI_HT_CAPS_SHORT_GI_20MHZ | RSI_HT_CAPS_GREENFIELD_EN | RSI_HT_CAPS_SUPPORT_CH_WIDTH)
 
 /*=======================================================================*/
 
@@ -318,7 +317,7 @@
 // Number of DTIMs to skip during powersave
 #define RSI_NUM_OF_DTIM_SKIP 0
 
-//WMM PS parameters
+// WMM PS parameters
 // set WMM enable or disable
 #define RSI_WMM_PS_ENABLE RSI_DISABLE
 
@@ -339,16 +338,16 @@
 // RSI_ENABLE or RSI_DISABLE High performance socket
 #define HIGH_PERFORMANCE_ENABLE RSI_ENABLE //@ RSI_ENABLE or RSI_DISABLE High performance socket
 
-#define TOTAL_SOCKETS                   1  //@ Total number of sockets. TCP TX + TCP RX + UDP TX + UDP RX
-#define TOTAL_TCP_SOCKETS               1  //@ Total TCP sockets. TCP TX + TCP RX
-#define TOTAL_UDP_SOCKETS               0  //@ Total UDP sockets. UDP TX + UDP RX
-#define TCP_TX_ONLY_SOCKETS             0  //@ Total TCP TX only sockets. TCP TX
-#define TCP_RX_ONLY_SOCKETS             1  //@ Total TCP RX only sockets. TCP RX
-#define UDP_TX_ONLY_SOCKETS             0  //@ Total UDP TX only sockets. UDP TX
-#define UDP_RX_ONLY_SOCKETS             0  //@ Total UDP RX only sockets. UDP RX
-#define TCP_RX_HIGH_PERFORMANCE_SOCKETS 1  //@ Total TCP RX High Performance sockets
-#define TCP_RX_WINDOW_SIZE_CAP          10 //@ TCP RX Window size
-#define TCP_RX_WINDOW_DIV_FACTOR        10 //@ TCP RX Window division factor
+#define TOTAL_SOCKETS 1                   //@ Total number of sockets. TCP TX + TCP RX + UDP TX + UDP RX
+#define TOTAL_TCP_SOCKETS 1               //@ Total TCP sockets. TCP TX + TCP RX
+#define TOTAL_UDP_SOCKETS 0               //@ Total UDP sockets. UDP TX + UDP RX
+#define TCP_TX_ONLY_SOCKETS 0             //@ Total TCP TX only sockets. TCP TX
+#define TCP_RX_ONLY_SOCKETS 1             //@ Total TCP RX only sockets. TCP RX
+#define UDP_TX_ONLY_SOCKETS 0             //@ Total UDP TX only sockets. UDP TX
+#define UDP_RX_ONLY_SOCKETS 0             //@ Total UDP RX only sockets. UDP RX
+#define TCP_RX_HIGH_PERFORMANCE_SOCKETS 1 //@ Total TCP RX High Performance sockets
+#define TCP_RX_WINDOW_SIZE_CAP 10         //@ TCP RX Window size
+#define TCP_RX_WINDOW_DIV_FACTOR 10       //@ TCP RX Window division factor
 /*=======================================================================*/
 
 // Socket Create parameters
@@ -363,7 +362,7 @@
 // Timeout for join or scan
 /*=======================================================================*/
 
-//RSI_ENABLE or RSI_DISABLE Timeout support
+// RSI_ENABLE or RSI_DISABLE Timeout support
 #define RSI_TIMEOUT_SUPPORT RSI_DISABLE
 
 // roaming threshold value
@@ -375,7 +374,7 @@
 // Timeout for ping request
 /*=======================================================================*/
 
-//Timeout for PING_REQUEST
+// Timeout for PING_REQUEST
 #define RSI_PING_REQ_TIMEOUT_MS 1000
 
 // Store Config Profile parameters
@@ -464,7 +463,7 @@
 // To configure channel number
 #define RSI_CONFIG_CLIENT_CHANNEL 0
 // To configure security type
-#define RSI_CONFIG_CLIENT_SECURITY_TYPE 0 //RSI_WPA
+#define RSI_CONFIG_CLIENT_SECURITY_TYPE 0 // RSI_WPA
 // To configure encryption type
 #define RSI_CONFIG_CLIENT_ENCRYPTION_TYPE 0
 // To configure PSK
@@ -511,7 +510,7 @@
 // To Configure scan channel feature bitmap
 #define RSI_CONFIG_EAP_SCAN_FEAT_BITMAP 0
 // scan channel bit map in 2.4GHz band,valid if given channel to scan is 0
-#define RSI_CONFIG_EAP_CHAN_MAGIC_CODE 0 //0x4321
+#define RSI_CONFIG_EAP_CHAN_MAGIC_CODE 0 // 0x4321
 // scan channel bit map in 2.4GHz band,valid if given channel to scan is 0
 #define RSI_CONFIG_EAP_SCAN_CHAN_BITMAP_2_4_GHZ 0
 // scan channel bit map in 5GHz band ,valid if given channel to scan is 0

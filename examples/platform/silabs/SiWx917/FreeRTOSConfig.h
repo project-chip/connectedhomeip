@@ -126,7 +126,7 @@ extern uint32_t SystemCoreClock;
 #define configUSE_TICKLESS_IDLE 1
 #else
 #define configUSE_TICKLESS_IDLE 0
-#endif //CHIP_DEVICE_CONFIG_ENABLE_SED
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 
 #define configTICK_RATE_HZ (1000)
 /* Definition used by Keil to replace default system clock source. */

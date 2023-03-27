@@ -735,7 +735,7 @@ void BLEManagerImpl::HandleConnectionCloseEvent(uint16_t reason)
         return;
     }
     WFX_RSI_LOG("Powersave Config Success");
-#endif //CHIP_DEVICE_CONFIG_ENABLE_SED
+#endif // CHIP_DEVICE_CONFIG_ENABLE_SED
 
     if (RemoveConnection(connHandle))
     {
