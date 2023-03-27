@@ -104,6 +104,7 @@ bouffalolab_executable("lighting_app") {
   }
 
   sources += [
+    "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
     "${example_common_dir}/AppTask.cpp",
     "${example_common_dir}/ZclCallbacks.cpp",
     "${examples_plat_common_dir}/plat/LEDWidget.cpp",
@@ -112,7 +113,6 @@ bouffalolab_executable("lighting_app") {
     "${examples_plat_common_dir}/plat/main.cpp",
     "${examples_plat_common_dir}/plat/platform.cpp",
     "${examples_plat_common_dir}/plat/uart.c",
-    "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
   ]
 
   deps = [
