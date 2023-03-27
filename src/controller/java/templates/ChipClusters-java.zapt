@@ -141,9 +141,10 @@ public class ChipClusters {
 
   {{/chip_cluster_responses}}
 
-  {{#chip_server_cluster_attributes}}
-  {{#unless (isStrEqual chipCallback.name "Unsupported")}}
-  {{#if_basic_global_response}}
+  {{#zcl_attributes_server removeKeys='isOptional'}}
+  {{#if_unsupported_attribute_callback type isArray ../id}}
+  {{else}}
+  {{#if_basic_attribute type ../id}}
   {{else}}
     {{! NOTE: asJavaType ends up sniffing for isArray on the context. Since we want the type of our _entry_, force isArray to
           false. }}
@@ -161,19 +162,20 @@ public class ChipClusters {
         default void onSubscriptionEstablished(long subscriptionId) {}
       }
     {{/if}}
-  {{/if_basic_global_response}}
-  {{/unless}}
-  {{/chip_server_cluster_attributes}}
-  {{#chip_server_cluster_attributes}}
+  {{/if_basic_attribute}}
+  {{/if_unsupported_attribute_callback}}
+  {{/zcl_attributes_server}}
+  {{#zcl_attributes_server removeKeys='isOptional'}}
   {{! TODO: Add support for struct-typed attributes }}
-  {{#unless (isStrEqual chipCallback.name "Unsupported")}}
+  {{#if_unsupported_attribute_callback type isArray ../id}}
+  {{else}}
 
     public void read{{asUpperCamelCase name}}Attribute(
-    {{#if_basic_global_response}}
-      {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
+    {{#if_basic_attribute type ../id}}
+      {{as_underlying_java_zcl_type type ../id boolean="Boolean"}}AttributeCallback callback
     {{else}}
       {{asUpperCamelCase name}}AttributeCallback callback
-    {{/if_basic_global_response}}
+    {{/if_basic_attribute}}
     ) {
       read{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback);
     }
@@ -190,27 +192,28 @@ public class ChipClusters {
   {{/if}}
   {{#if isReportableAttribute}}
     public void subscribe{{asCamelCased name false}}Attribute(
-      {{#if_basic_global_response}}
-        {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
+      {{#if_basic_attribute type ../id}}
+        {{as_underlying_java_zcl_type type ../id boolean="Boolean"}}AttributeCallback callback
       {{else}}
         {{asUpperCamelCase name}}AttributeCallback callback
-      {{/if_basic_global_response}},
+      {{/if_basic_attribute}},
       int minInterval, int maxInterval) {
       subscribe{{asCamelCased name false}}Attribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
   {{/if}}
-  {{/unless}}
-  {{/chip_server_cluster_attributes}}
-  {{#chip_server_cluster_attributes}}
+  {{/if_unsupported_attribute_callback}}
+  {{/zcl_attributes_server}}
+  {{#zcl_attributes_server removeKeys='isOptional'}}
   {{! TODO: Add support for struct-typed attributes }}
-  {{#unless (isStrEqual chipCallback.name "Unsupported")}}
+  {{#if_unsupported_attribute_callback type isArray ../id }}
+  {{else}}
 
     private native void read{{asUpperCamelCase name}}Attribute(long chipClusterPtr,
-      {{#if_basic_global_response}}
-        {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
+      {{#if_basic_attribute type ../id}}
+        {{as_underlying_java_zcl_type type ../id boolean="Boolean"}}AttributeCallback callback
       {{else}}
         {{asUpperCamelCase name}}AttributeCallback callback
-      {{/if_basic_global_response}}
+      {{/if_basic_attribute}}
     );
   {{#if isWritableAttribute}}
 
@@ -218,14 +221,14 @@ public class ChipClusters {
   {{/if}}
   {{#if isReportableAttribute}}
     private native void subscribe{{asCamelCased name false}}Attribute(long chipClusterPtr,
-      {{#if_basic_global_response}}
-        {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
+      {{#if_basic_attribute type ../id}}
+        {{as_underlying_java_zcl_type type ../id boolean="Boolean"}}AttributeCallback callback
       {{else}}
         {{asUpperCamelCase name}}AttributeCallback callback
-      {{/if_basic_global_response}}, int minInterval, int maxInterval);
+      {{/if_basic_attribute}}, int minInterval, int maxInterval);
   {{/if}}
-  {{/unless}}
-  {{/chip_server_cluster_attributes}}
+  {{/if_unsupported_attribute_callback}}
+  {{/zcl_attributes_server}}
   }
   {{#not_last}}
 

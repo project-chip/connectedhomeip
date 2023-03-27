@@ -89,7 +89,13 @@ int main(int argc, char * argv[])
         return -1;
     }
 
-    LightingMgr().Init();
+    CHIP_ERROR err = LightingMgr().Init();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to initialize lighting manager: %" CHIP_ERROR_FORMAT, err.Format());
+        chip::DeviceLayer::PlatformMgr().Shutdown();
+        return -1;
+    }
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
     example::Ui::ImguiUi ui;

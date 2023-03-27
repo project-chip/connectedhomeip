@@ -30,6 +30,7 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
+#include <sys_api.h>
 #include <wifi_conf.h>
 
 namespace chip {
@@ -79,6 +80,20 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
+    if (!AmebaConfig::ConfigValueExists(AmebaConfig::kConfigKey_RegulatoryLocation))
+    {
+        uint32_t regulatoryLocation = to_underlying(app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+        err                         = WriteConfigValue(AmebaConfig::kConfigKey_RegulatoryLocation, regulatoryLocation);
+        SuccessOrExit(err);
+    }
+
+    if (!AmebaConfig::ConfigValueExists(AmebaConfig::kConfigKey_LocationCapability))
+    {
+        uint32_t locationCapability = to_underlying(app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoorOutdoor);
+        err                         = WriteConfigValue(AmebaConfig::kConfigKey_LocationCapability, locationCapability);
+        SuccessOrExit(err);
+    }
+
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<AmebaConfig>::Init();
     SuccessOrExit(err);
@@ -117,6 +132,21 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
 {
     return WriteConfigValue(AmebaConfig::kCounterKey_BootReason, bootReason);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
+{
+    uint32_t value = 0;
+
+    CHIP_ERROR err = ReadConfigValue(AmebaConfig::kConfigKey_LocationCapability, value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        location = static_cast<uint8_t>(value);
+    }
+
+    return err;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
@@ -245,7 +275,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
-    // sys_reset();
+    sys_reset();
 }
 
 ConfigurationManager & ConfigurationMgrImpl()

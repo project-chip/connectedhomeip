@@ -75,6 +75,7 @@ private:
         kFunction_NoneSelected   = 0,
         kFunction_SoftwareUpdate = 1,
         kFunction_FactoryReset   = 2,
+        kFunction_StartBleAdv    = 3,
 
         kFunction_Invalid
     } Function;

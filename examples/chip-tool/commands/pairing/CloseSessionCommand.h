@@ -27,8 +27,8 @@ class CloseSessionCommand : public CHIPCommand
 {
 public:
     CloseSessionCommand(CredentialIssuerCommands * credIssuerCommands) :
-        CHIPCommand("close-session", credIssuerCommands), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
-        mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+        CHIPCommand("close-session", credIssuerCommands, "Sends a CloseSession message to the given destination node id."),
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
     {
         AddArgument("destination-id", 0, UINT64_MAX, &mDestinationId);
         AddArgument("timeout", 0, UINT64_MAX, &mTimeoutSecs,

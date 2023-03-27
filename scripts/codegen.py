@@ -69,7 +69,7 @@ __LOG_LEVELS__ = {
     help='Determines the verbosity of script output')
 @click.option(
     '--generator',
-    default='JAVA',
+    default='java-jni',
     help='What code generator to run.  The choices are: '+'|'.join(GENERATORS.keys())+'. ' +
          'When using custom, provide the plugin path using `--generator custom:<path_to_plugin>:<plugin_module_name>` syntax. ' +
     'For example, `--generator custom:./my_plugin:my_plugin_module` will load `./my_plugin/my_plugin_module/__init.py__` ' +

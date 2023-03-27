@@ -30,7 +30,7 @@ target_include_directories(openiotsdk-app
 
 target_link_libraries(openiotsdk-app 
     PUBLIC
-        openiotsdk-chip
+        chip
         $<TARGET_OBJECTS:iotsdk-serial-retarget>
 )
 

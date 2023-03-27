@@ -1984,4 +1984,12 @@ System::Clock::Timeout CASESession::ComputeSigma1ResponseTimeout(const ReliableM
         kExpectedSigma1ProcessingTime;
 }
 
+System::Clock::Timeout CASESession::ComputeSigma2ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig)
+{
+    return GetRetransmissionTimeout(remoteMrpConfig.mActiveRetransTimeout, remoteMrpConfig.mIdleRetransTimeout,
+                                    // Assume peer is idle, as a worst-case assumption.
+                                    System::Clock::kZero, Transport::kMinActiveTime) +
+        kExpectedHighProcessingTime;
+}
+
 } // namespace chip

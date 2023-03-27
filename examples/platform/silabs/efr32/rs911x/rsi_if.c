@@ -116,10 +116,6 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
  *********************************************************************/
 int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
 {
-#ifdef SiWx917_WIFI
-    // TODO: for wisemcu
-    return 0;
-#else
     int32_t status;
     uint8_t buff[RSI_RESPONSE_MAX_SIZE] = { 0 };
     status                              = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
@@ -139,7 +135,6 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
         extra_info->overrun_count     = test->overrun_count - temp_reset->overrun_count;
     }
     return status;
-#endif
 }
 
 /******************************************************************
@@ -152,10 +147,6 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
  *********************************************************************/
 int32_t wfx_rsi_reset_count()
 {
-#ifdef SiWx917_WIFI
-    // TODO: for wisemcu
-    return 0;
-#else
     int32_t status;
     uint8_t buff[RSI_RESPONSE_MAX_SIZE] = { 0 };
     status                              = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
@@ -175,7 +166,6 @@ int32_t wfx_rsi_reset_count()
         temp_reset->overrun_count     = test->overrun_count;
     }
     return status;
-#endif
 }
 
 /******************************************************************
@@ -192,6 +182,25 @@ int32_t wfx_rsi_disconnect()
     return status;
 }
 
+/******************************************************************
+ * @fn   wfx_rsi_power_save()
+ * @brief
+ *       Setting the RS911x in DTIM sleep based mode
+ *
+ * @param[in] None
+ * @return
+ *        None
+ *********************************************************************/
+void wfx_rsi_power_save()
+{
+    int32_t status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
+    if (status != RSI_SUCCESS)
+    {
+        WFX_RSI_LOG("Powersave Config Failed, Error Code : 0x%lX", status);
+        return;
+    }
+    WFX_RSI_LOG("Powersave Config Success");
+}
 /******************************************************************
  * @fn   wfx_rsi_join_cb(uint16_t status, const uint8_t *buf, const uint16_t len)
  * @brief
@@ -654,6 +663,13 @@ void wfx_rsi_task(void * arg)
                 {
                     wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
                     hasNotifiedIPV4 = true;
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#ifndef RSI_BLE_ENABLE
+                    // enabling the power save mode for RS9116 if sleepy device is enabled
+                    // if BLE is used on the rs9116 then powersave config is done after ble disconnect event
+                    wfx_rsi_power_save();
+#endif /* RSI_BLE_ENABLE */
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
                     if (!hasNotifiedWifiConnectivity)
                     {
                         wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
@@ -673,6 +689,13 @@ void wfx_rsi_task(void * arg)
                 {
                     wfx_ipv6_notify(GET_IPV6_SUCCESS);
                     hasNotifiedIPV6 = true;
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#ifndef RSI_BLE_ENABLE
+                    // enabling the power save mode for RS9116 if sleepy device is enabled
+                    // if BLE is used on the rs9116 then powersave config is done after ble disconnect event
+                    wfx_rsi_power_save();
+#endif /* RSI_BLE_ENABLE */
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
                     if (!hasNotifiedWifiConnectivity)
                     {
                         wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);

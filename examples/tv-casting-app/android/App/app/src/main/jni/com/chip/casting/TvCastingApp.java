@@ -181,6 +181,8 @@ public class TvCastingApp {
 
   public native List<VideoPlayer> getActiveTargetVideoPlayers();
 
+  public native boolean purgeCache();
+
   /*
    * CONTENT LAUNCHER CLUSTER
    *

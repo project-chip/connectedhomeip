@@ -220,6 +220,29 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
     DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+CHIP_ERROR ConnectivityManagerImpl::_GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & SEDIntervalsConfig)
+{
+    // For now Wi-Fi uses DTIM power save mode so it varies from AP to AP
+    // TODO: Change this to DTIM read from DUT once it is done. For now hardcoding it
+    SEDIntervalsConfig.ActiveIntervalMS = CHIP_DEVICE_CONFIG_SED_ACTIVE_INTERVAL;
+    SEDIntervalsConfig.IdleIntervalMS   = CHIP_DEVICE_CONFIG_SED_IDLE_INTERVAL;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
+{
+    // not required
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_RequestSEDActiveMode(bool onOff, bool delayIdle)
+{
+    // not required
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
+
 // == == == == == == == == == == ConnectivityManager Private Methods == == == == == == == == == ==
 
 void ConnectivityManagerImpl::DriveStationState()
@@ -262,7 +285,7 @@ void ConnectivityManagerImpl::DriveStationState()
         // If the WiFi station interface is no longer enabled, or no longer provisioned,
         // disconnect the station from the AP, unless the WiFi station mode is currently
         // under application control.
-#ifndef CHIP_ONNETWORK_PAIRING
+#ifndef SL_ONNETWORK_PAIRING
         // Incase of station interface disabled & provisioned, wifi_station should not be disconnected.
         // Device will try to reconnect.
         if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled &&

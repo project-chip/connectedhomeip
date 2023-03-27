@@ -124,6 +124,9 @@ void sl_ble_event_handling_task(void)
             rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
             BLEMgrImpl().HandleConnectEvent();
             WFX_RSI_LOG("%s Module got connected", __func__);
+            // Requests the connection parameters change with the remote device
+            rsi_ble_conn_params_update(event_msg.resp_enh_conn.dev_addr, BLE_MIN_CONNECTION_INTERVAL_MS,
+                                       BLE_MAX_CONNECTION_INTERVAL_MS, BLE_SLAVE_LATENCY_MS, BLE_TIMEOUT_MS);
         }
         break;
         case RSI_BLE_DISCONN_EVENT: {
@@ -718,6 +721,24 @@ void BLEManagerImpl::HandleConnectionCloseEvent(uint16_t reason)
     uint8_t connHandle = 1;
 
     ChipLogProgress(DeviceLayer, "Disconnect Event for handle : %d", connHandle);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    int32_t status;
+    status = rsi_bt_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
+    if (status != RSI_SUCCESS)
+    {
+        WFX_RSI_LOG("BT Powersave Config Failed, Error Code : 0x%lX", status);
+        return;
+    }
+
+    status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
+    if (status != RSI_SUCCESS)
+    {
+        WFX_RSI_LOG("WLAN Powersave Config Failed, Error Code : 0x%lX", status);
+        return;
+    }
+    WFX_RSI_LOG("Powersave Config Success");
+#endif
 
     if (RemoveConnection(connHandle))
     {

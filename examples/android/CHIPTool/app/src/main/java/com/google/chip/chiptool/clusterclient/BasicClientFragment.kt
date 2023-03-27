@@ -182,7 +182,7 @@ class BasicClientFragment : Fragment() {
   }
 
   private suspend fun sendReadVendorIDAttribute() {
-    getBasicClusterForDevice().readVendorIDAttribute(object : ChipClusters.BasicInformationCluster.VendorIDAttributeCallback {
+    getBasicClusterForDevice().readVendorIDAttribute(object : ChipClusters.IntegerAttributeCallback {
       override fun onSuccess(value: Int) {
         Log.i(TAG,"[Read Success] VendorID: $value")
         showMessage("[Read Success] VendorID: $value")

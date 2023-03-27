@@ -56,6 +56,9 @@ extern "C" {
 #include "sl_component_catalog.h"
 #include "sl_mbedtls.h"
 #include "sl_system_init.h"
+#if SILABS_LOG_OUT_UART || ENABLE_CHIP_SHELL || CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#include "uart.h"
+#endif
 
 #if SL_SYSTEM_VIEW
 #include "SEGGER_SYSVIEW.h"
@@ -80,7 +83,9 @@ void init_efrPlatform(void)
     SEGGER_SYSVIEW_Conf();
     SEGGER_SYSVIEW_Start();
 #endif
-
+#if SILABS_LOG_OUT_UART || ENABLE_CHIP_SHELL || CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+    uartConsoleInit();
+#endif
 #if SILABS_LOG_ENABLED
     silabsInitLog();
 #endif

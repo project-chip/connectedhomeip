@@ -148,11 +148,10 @@ extern "C" void ChipTest(void)
 
     initPref();
 
-    // Initialize device attestation, commissionable data and device instance info
-    // TODO: Use our own DeviceInstanceInfoProvider
-    // SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    mFactoryDataProvider.Init();
     SetCommissionableDataProvider(&mFactoryDataProvider);
     SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
     err = deviceMgr.Init(&EchoCallbacks);
@@ -164,6 +163,10 @@ extern "C" void ChipTest(void)
     {
         ChipLogProgress(DeviceLayer, "DeviceManagerInit() - OK\r\n");
     }
+
+    // Set DeviceInstanceInfoProvider after CHIPDeviceManager init
+    // CHIPDeviceManager init will set GenericDeviceInsanceInfoProvider first
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, 0);
 

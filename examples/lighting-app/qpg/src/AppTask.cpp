@@ -62,7 +62,9 @@ using namespace ::chip::DeviceLayer;
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
-#define APP_TASK_STACK_SIZE (2 * 1024)
+#define OTA_START_TRIGGER_TIMEOUT 1500
+
+#define APP_TASK_STACK_SIZE (3 * 1024)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 #define QPG_LIGHT_ENDPOINT_ID (1)
@@ -268,8 +270,6 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    gpAppFramework_Reset_Init();
-
     PlatformMgr().AddEventHandler(MatterEventHandler, 0);
 
     ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
@@ -404,9 +404,16 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
         return;
     }
 
-    // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
-    // initiate factory reset
-    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
+    {
+        ChipLogProgress(NotSpecified, "[BTN] Release button now to start Software Updater");
+        ChipLogProgress(NotSpecified, "[BTN] Hold to trigger Factory Reset");
+        sAppTask.mFunction = kFunction_SoftwareUpdate;
+        sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT - OTA_START_TRIGGER_TIMEOUT);
+    }
+    // If we reached here, the button was held past OTA_START_TRIGGER_TIMEOUT,
+    // initiate OTA update
+    else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
     {
         ChipLogProgress(NotSpecified, "[BTN] Factory Reset selected. Release within %us to cancel.",
                         FACTORY_RESET_CANCEL_WINDOW_TIMEOUT / 1000);
@@ -450,19 +457,36 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
         {
             ChipLogProgress(NotSpecified, "[BTN] Hold to select function:");
-            ChipLogProgress(NotSpecified, "[BTN] - Trigger OTA (0-3s)");
+            ChipLogProgress(NotSpecified, "[BTN] - Trigger BLE adv (0-1.5s)");
+            ChipLogProgress(NotSpecified, "[BTN] - Trigger OTA (1.5-3s)");
             ChipLogProgress(NotSpecified, "[BTN] - Factory Reset (>6s)");
 
             sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
 
-            sAppTask.mFunction = kFunction_SoftwareUpdate;
+            sAppTask.mFunction = kFunction_StartBleAdv;
         }
     }
     else
     {
-        // If the button was released before factory reset got initiated, trigger a
-        // software update.
-        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartBleAdv)
+        {
+            sAppTask.CancelTimer();
+            sAppTask.mFunction = kFunction_NoneSelected;
+
+            if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+            {
+                ChipLogProgress(NotSpecified, "BLE advertising already in progress.");
+            }
+            else
+            {
+                // Enable BLE advertisements and pairing window
+                if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
+                {
+                    ChipLogProgress(NotSpecified, "BLE advertising started. Waiting for Pairing.");
+                }
+            }
+        }
+        else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
         {
             sAppTask.CancelTimer();
 

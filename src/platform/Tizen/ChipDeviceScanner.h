@@ -30,6 +30,7 @@
 
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -85,7 +86,7 @@ public:
     ~ChipDeviceScanner(void);
 
     /// Initiate a scan for devices, with the given timeout & scan filter data
-    CHIP_ERROR StartChipScan(unsigned timeoutMs, ScanFilterType filterType, ScanFilterData & filterData);
+    CHIP_ERROR StartChipScan(System::Clock::Timeout timeout, ScanFilterType filterType, ScanFilterData & filterData);
 
     /// Stop any currently running scan
     CHIP_ERROR StopChipScan(void);
@@ -107,6 +108,7 @@ private:
     bool mIsScanning                      = false;
     bool mIsStopping                      = false;
     GMainLoop * mAsyncLoop                = nullptr;
+    unsigned int mScanTimeoutMs           = 10000;
     bt_scan_filter_h mScanFilter          = nullptr;
 };
 

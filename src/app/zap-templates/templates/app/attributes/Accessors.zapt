@@ -26,7 +26,7 @@ namespace Attributes {
 {{#if_is_struct type}}
 {{else if (canHaveSimpleAccessors this)}}
 namespace {{asUpperCamelCase label}} {
-EmberAfStatus Get(chip::EndpointId endpoint, {{accessorGetterType this}} value); // {{type}} {{isArray}}
+EmberAfStatus Get(chip::EndpointId endpoint, {{accessorGetterType this}} value); // {{type}}
 EmberAfStatus Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value);
 {{#if isNullable}}
 EmberAfStatus SetNull(chip::EndpointId endpoint);

@@ -30,6 +30,12 @@ declare_args() {
 
   # an option to disable referencing qorvo object archive files (*.a)
   qpg_sdk_include_platform_libs = true
+
+  # Enable Sleepy end device
+  enable_sleepy_device = false
+
+  # Enable mbedtls HW acceleration
+  mbedtls_alt_enabled = true
 }
 
 assert(qpg_sdk_root != "", "qpg_sdk_root must be specified")
@@ -57,6 +63,7 @@ template("qpg_sdk") {
   config("${sdk_target_name}_config") {
     include_dirs = []
     libs = []
+    defines = []
 
     if (defined(invoker.include_dirs)) {
       include_dirs += invoker.include_dirs
@@ -65,19 +72,30 @@ template("qpg_sdk") {
     include_dirs += [
       "${qpg_sdk_root}/Components/Qorvo/Matter/qvCHIP/inc",
       "${qpg_sdk_root}/Components/Qorvo/BSP/qvIO/inc",
-      "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/inc",
-      "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt",
       "${mbedtls_root}/repo/include",
       "${openthread_root}/include",
     ]
 
+    if (mbedtls_alt_enabled) {
+      include_dirs += [
+        "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt",
+        "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/inc",
+      ]
+    } else {
+      include_dirs += [ "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/inc" ]
+    }
+
     lib_dirs = []
 
     #MBed TLS built from third_party/mbedtls tree - OT config not used
-    defines = [
-      "QORVO_CRYPTO_ENGINE",
-      "MBEDTLS_CONFIG_FILE=\"${qpg_target_ic}-mbedtls-config.h\"",
-    ]
+    defines = [ "MBEDTLS_CONFIG_FILE=\"${qpg_target_ic}-mbedtls-config.h\"" ]
+
+    if (mbedtls_alt_enabled) {
+      defines += [ "QORVO_CRYPTO_ENGINE" ]
+    } else {
+      defines += [ "MBEDTLS_SW_ONLY" ]
+    }
+
     cflags = []
 
     # Allow warning due to mbedtls
@@ -86,8 +104,22 @@ template("qpg_sdk") {
       "-Wno-shadow",
     ]
 
+    # Inherit defines from invoker (i.e. examples app)
     if (defined(invoker.defines)) {
       defines += invoker.defines
+    }
+
+    if (defined(invoker.enable_sleepy_device)) {
+      if (invoker.enable_sleepy_device) {
+        defines += [ "CHIP_DEVICE_CONFIG_ENABLE_SED=1" ]
+      } else {
+        defines += [ "CHIP_DEVICE_CONFIG_ENABLE_SED=0" ]
+        if (invoker.chip_openthread_ftd) {
+          defines += [ "CHIP_DEVICE_CONFIG_THREAD_FTD=1" ]
+        } else {
+          defines += [ "CHIP_DEVICE_CONFIG_THREAD_FTD=0" ]
+        }
+      }
     }
   }
 
@@ -104,16 +136,17 @@ template("qpg_sdk") {
     ]
     sources += chip_glue_sources
 
-    mbedtls_alt_sources = [
-      # Add alt src
-      "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/aes_alt.h",
-      "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/ccm_alt.h",
-      "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/ecjpake_alt.h",
-      "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/ecp_alt.h",
-      "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/sha256_alt.h",
-      "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/inc/${qpg_target_ic}-mbedtls-config.h",
-      "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/src/trng.c",
-    ]
+    if (mbedtls_alt_enabled) {
+      mbedtls_alt_sources = [
+        # Add alt src
+        "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/aes_alt.h",
+        "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/ccm_alt.h",
+        "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/ecjpake_alt.h",
+        "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/ecp_alt.h",
+        "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt/sha256_alt.h",
+      ]
+    }
+
     mbedtls_sources = [
       "${chip_root}/third_party/mbedtls/repo/library/asn1parse.c",
       "${chip_root}/third_party/mbedtls/repo/library/asn1write.c",
@@ -139,8 +172,23 @@ template("qpg_sdk") {
       "${chip_root}/third_party/mbedtls/repo/library/sha256.c",
       "${chip_root}/third_party/mbedtls/repo/library/x509_create.c",
       "${chip_root}/third_party/mbedtls/repo/library/x509write_csr.c",
+      "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/inc/${qpg_target_ic}-mbedtls-config.h",
+      "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/src/trng.c",
     ]
-    sources += mbedtls_sources + mbedtls_alt_sources
+
+    sources += mbedtls_sources
+
+    if (mbedtls_alt_enabled) {
+      sources += mbedtls_alt_sources
+    } else {
+      sources += [
+        "${chip_root}/third_party/mbedtls/repo/library/aes.c",
+        "${chip_root}/third_party/mbedtls/repo/library/constant_time.c",
+        "${chip_root}/third_party/mbedtls/repo/library/ecdh.c",
+        "${chip_root}/third_party/mbedtls/repo/library/ecp.c",
+        "${chip_root}/third_party/mbedtls/repo/library/ecp_curves.c",
+      ]
+    }
 
     if (defined(invoker.sources)) {
       sources += invoker.sources
@@ -152,10 +200,14 @@ template("qpg_sdk") {
       public_deps += [
         "${chip_root}/third_party/qpg_sdk:qpg_bootloader_lib",
         "${chip_root}/third_party/qpg_sdk:qpg_glue_lib",
-        "${chip_root}/third_party/qpg_sdk:qpg_mbedtls_alt_lib",
         "${chip_root}/third_party/qpg_sdk:qpg_openthread_glue_lib",
         "${chip_root}/third_party/qpg_sdk:qpg_stack_lib",
       ]
+
+      if (mbedtls_alt_enabled) {
+        public_deps +=
+            [ "${chip_root}/third_party/qpg_sdk:qpg_mbedtls_alt_lib" ]
+      }
     }
   }
 }

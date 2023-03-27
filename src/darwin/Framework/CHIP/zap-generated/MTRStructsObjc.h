@@ -473,26 +473,26 @@ API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy) NSNumber * _Nonnull connectionStatus API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 @end
 
-MTR_NEWLY_AVAILABLE
+API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
 @interface MTRTimeSynchronizationClusterDSTOffsetStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull offset MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull validStarting MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull validUntil MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull offset API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+@property (nonatomic, copy) NSNumber * _Nonnull validStarting API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+@property (nonatomic, copy) NSNumber * _Nonnull validUntil API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 @end
 
-API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-MTR_NEWLY_DEPRECATED("Please use MTRTimeSynchronizationClusterDSTOffsetStruct")
+MTR_DEPRECATED("Please use MTRTimeSynchronizationClusterDSTOffsetStruct", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+    tvos(16.1, 16.5))
 @interface MTRTimeSynchronizationClusterDstOffsetType : MTRTimeSynchronizationClusterDSTOffsetStruct
 @end
-MTR_NEWLY_AVAILABLE
+API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
 @interface MTRTimeSynchronizationClusterTimeZoneStruct : NSObject <NSCopying>
-@property (nonatomic, copy) NSNumber * _Nonnull offset MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSNumber * _Nonnull validAt MTR_NEWLY_AVAILABLE;
-@property (nonatomic, copy) NSString * _Nullable name MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull offset API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+@property (nonatomic, copy) NSNumber * _Nonnull validAt API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+@property (nonatomic, copy) NSString * _Nullable name API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 @end
 
-API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-MTR_NEWLY_DEPRECATED("Please use MTRTimeSynchronizationClusterTimeZoneStruct")
+MTR_DEPRECATED("Please use MTRTimeSynchronizationClusterTimeZoneStruct", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5),
+    tvos(16.1, 16.5))
 @interface MTRTimeSynchronizationClusterTimeZoneType : MTRTimeSynchronizationClusterTimeZoneStruct
 @end
 

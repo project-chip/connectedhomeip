@@ -109,10 +109,24 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
  *********************************************************************/
 int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
 {
-    /* TODO : Place holder until we have similar functionality
-     *        available for SiWx917
-     */
-    int32_t status = 0;
+    int32_t status;
+    uint8_t buff[RSI_RESPONSE_MAX_SIZE] = { 0 };
+    status                              = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
+    if (status != RSI_SUCCESS)
+    {
+        WFX_RSI_LOG("\r\n Failed, Error Code : 0x%lX\r\n", status);
+    }
+    else
+    {
+        rsi_wlan_ext_stats_t * test   = (rsi_wlan_ext_stats_t *) buff;
+        extra_info->beacon_lost_count = test->beacon_lost_count - temp_reset->beacon_lost_count;
+        extra_info->beacon_rx_count   = test->beacon_rx_count - temp_reset->beacon_rx_count;
+        extra_info->mcast_rx_count    = test->mcast_rx_count - temp_reset->mcast_rx_count;
+        extra_info->mcast_tx_count    = test->mcast_tx_count - temp_reset->mcast_tx_count;
+        extra_info->ucast_rx_count    = test->ucast_rx_count - temp_reset->ucast_rx_count;
+        extra_info->ucast_tx_count    = test->ucast_tx_count - temp_reset->ucast_tx_count;
+        extra_info->overrun_count     = test->overrun_count - temp_reset->overrun_count;
+    }
     return status;
 }
 
@@ -126,10 +140,24 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
  *********************************************************************/
 int32_t wfx_rsi_reset_count()
 {
-    /* TODO : Place holder until we have similar functionality
-     *        available for SiWx917
-     */
-    int32_t status = 0;
+    int32_t status;
+    uint8_t buff[RSI_RESPONSE_MAX_SIZE] = { 0 };
+    status                              = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
+    if (status != RSI_SUCCESS)
+    {
+        WFX_RSI_LOG("\r\n Failed, Error Code : 0x%lX\r\n", status);
+    }
+    else
+    {
+        rsi_wlan_ext_stats_t * test   = (rsi_wlan_ext_stats_t *) buff;
+        temp_reset->beacon_lost_count = test->beacon_lost_count;
+        temp_reset->beacon_rx_count   = test->beacon_rx_count;
+        temp_reset->mcast_rx_count    = test->mcast_rx_count;
+        temp_reset->mcast_tx_count    = test->mcast_tx_count;
+        temp_reset->ucast_rx_count    = test->ucast_rx_count;
+        temp_reset->ucast_tx_count    = test->ucast_tx_count;
+        temp_reset->overrun_count     = test->overrun_count;
+    }
     return status;
 }
 

@@ -51,6 +51,8 @@ struct Identify;
 class AppTask
 {
 public:
+    friend AppTask & GetAppTask(void);
+
     enum app_event_t
     {
         APP_EVENT_NONE = 0x00000000,
@@ -73,11 +75,10 @@ public:
         APP_EVENT_SYS_ALL_MASK =
             APP_EVENT_SYS_BLE_ADV | APP_EVENT_SYS_BLE_CONN | APP_EVENT_SYS_PROVISIONED | APP_EVENT_FACTORY_RESET,
 
-        APP_EVENT_LIGHTING_ONOFF      = 0x00010000,
-        APP_EVENT_LIGHTING_LEVEL      = 0x00020000,
-        APP_EVENT_LIGHTING_COLOR      = 0x00040000,
-        APP_EVENT_LIGHTING_GO_THROUGH = 0x00100000,
-        APP_EVENT_LIGHTING_MASK       = APP_EVENT_LIGHTING_ONOFF | APP_EVENT_LIGHTING_LEVEL | APP_EVENT_LIGHTING_COLOR,
+        APP_EVENT_LIGHTING_ONOFF = 0x00010000,
+        APP_EVENT_LIGHTING_LEVEL = 0x00020000,
+        APP_EVENT_LIGHTING_COLOR = 0x00040000,
+        APP_EVENT_LIGHTING_MASK  = APP_EVENT_LIGHTING_ONOFF | APP_EVENT_LIGHTING_LEVEL | APP_EVENT_LIGHTING_COLOR,
 
         APP_EVENT_IDENTIFY_START    = 0x01000000,
         APP_EVENT_IDENTIFY_IDENTIFY = 0x02000000,
@@ -101,17 +102,13 @@ public:
     static void IdentifyStartHandler(Identify *);
     static void IdentifyStopHandler(Identify *);
     static void IdentifyHandleOp(app_event_t event);
+    bool mIsConnected;
 
 private:
-    friend AppTask & GetAppTask(void);
     friend void StartAppTask(void);
     friend PlatformManagerImpl;
 
-    static void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg);
     static uint32_t AppRebootCheck(uint32_t time = 0);
-
-    static void LightingSetOnoff(uint8_t bonoff);
-    static void LightingSetStatus(app_event_t status);
 
     static void LightingSetBleAdv(void);
     static void LightingSetProvisioned(void);
@@ -143,7 +140,6 @@ private:
     uint32_t mTimerIntvl;
     uint64_t mButtonPressedTime;
     bool mIsFactoryResetIndicat;
-    bool mIsConnected;
 
     static StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
     static StaticTask_t appTaskStruct;

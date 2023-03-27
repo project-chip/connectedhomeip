@@ -87,7 +87,7 @@ tests:
       verification: |
           On TH_CR1 send the below command
 
-          ubuntu@ubuntu:~/may16_cntrl/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matterc._udp
+          avahi-browse -rt _matterc._udp
           +   eth0 IPv6 05EB1D3652D2F544                              _matterc._udp        local
           +   eth0 IPv6 7869CD25CBF12D42                              _matterc._udp        local
           =   eth0 IPv6 7869CD25CBF12D42                              _matterc._udp        local
@@ -250,6 +250,15 @@ tests:
                 value: nodeId2
 
     - label:
+          "TH2 reads CurrentFabricIndex attribute and save it for future use."
+      identity: "beta"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: TH2FabricIndex
+
+    - label:
           "TH_CR1 tries to revoke the commissioning window on DUT_CE using
           RevokeCommissioning command"
       cluster: "Administrator Commissioning"
@@ -273,3 +282,14 @@ tests:
                 value: payload
       response:
           error: FAILURE
+
+    - label: "Remove TH2 FabricIndex"
+      PICS: OPCREDS.S.C0a.Rsp && CADMIN.S
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: TH2FabricIndex
