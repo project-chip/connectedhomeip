@@ -156,11 +156,6 @@ public:
     {
     }
 
-    ~WorkHelper()
-    {
-        ChipLogError(SecureChannel, "@@@@@ WorkHelper ~dtor %p", this);
-    }
-
     // Create a work helper using the specified session, work callback, after work callback, and data (template arg).
     // Lifetime is managed by sharing between the caller (typically the session) and the helper itself (while work is scheduled).
     static std::shared_ptr<WorkHelper> Create(CASESession & session, WorkCallback workCallback, AfterWorkCallback afterWorkCallback)
@@ -182,11 +177,9 @@ public:
             return CHIP_ERROR_INCORRECT_STATE;
         }
         mStrongPtr = mWeakPtr.lock(); // set in `Create`
-        ChipLogError(SecureChannel, "@@@@@ scheduling WorkHandler %p", this);
         auto status = DeviceLayer::PlatformMgr().ScheduleBackgroundWork(WorkHandler, reinterpret_cast<intptr_t>(this));
         if (status != CHIP_NO_ERROR)
         {
-            ChipLogError(SecureChannel, "@@@@@ ScheduleWork releasing helper %p", this);
             mStrongPtr.reset();
         }
         return status;
@@ -203,19 +196,14 @@ private:
     static void WorkHandler(intptr_t arg)
     {
         WorkHelper* helper = reinterpret_cast<WorkHelper *>(arg);
-        ChipLogError(SecureChannel, "@@@@@ WorkHandler %p", helper);
         bool cancel = false;
         VerifyOrExit(helper->mSession.load(), ;); // cancelled by `CancelWork`?
-        ChipLogError(SecureChannel, "@@@@@ calling mWorkCallback %p", helper);
         helper->mStatus = helper->mWorkCallback(helper->mData, cancel);
-        ChipLogError(SecureChannel, "@@@@@ done mWorkCallback %p", helper);
         VerifyOrExit(!cancel, ;); // canceled by `mWorkCallback`?
         VerifyOrExit(helper->mSession.load(), ;); // cancelled by `CancelWork`?
-        ChipLogError(SecureChannel, "@@@@@ scheduling AfterWorkHandler %p", helper);
         SuccessOrExit(DeviceLayer::PlatformMgr().ScheduleWork(AfterWorkHandler, reinterpret_cast<intptr_t>(helper)));
         return;
     exit:
-        ChipLogError(SecureChannel, "@@@@@ WorkHandler releasing helper %p", helper);
         helper->mStrongPtr.reset();
     }
 
@@ -226,18 +214,10 @@ private:
         // so shouldn't be deleting the session out from under while this executes
         // (double check that's true, that timers don't run on some other thread, etc.)
         WorkHelper* helper = reinterpret_cast<WorkHelper *>(arg);
-        ChipLogError(SecureChannel, "@@@@@ AfterWorkHandler %p", helper);
         if (auto * session = helper->mSession.load())
         {
-            ChipLogError(SecureChannel, "@@@@@ calling mAfterWorkCallback %p", helper);
             (session->*(helper->mAfterWorkCallback))(helper->mData, helper->mStatus);
-            ChipLogError(SecureChannel, "@@@@@ done mAfterWorkCallback %p", helper);
         }
-        else
-        {
-            ChipLogError(SecureChannel, "@@@@@ session missing %p", helper);
-        }
-        ChipLogError(SecureChannel, "@@@@@ AfterWorkHandler releasing helper %p", helper);
         helper->mStrongPtr.reset();
     }
 
@@ -316,14 +296,12 @@ struct CASESession::HandleSigma3Work
 
 CASESession::~CASESession()
 {
-    ChipLogError(SecureChannel, "@@@@@ CASESession ~dtor %p", this);
     // Let's clear out any security state stored in the object, before destroying it.
     Clear();
 }
 
 void CASESession::OnSessionReleased()
 {
-    ChipLogError(SecureChannel, "@@@@@ OnSessionReleased %p", this);
     // Call into our super-class before we clear our state.
     PairingSession::OnSessionReleased();
     Clear();
@@ -331,7 +309,6 @@ void CASESession::OnSessionReleased()
 
 void CASESession::Clear()
 {
-    ChipLogError(SecureChannel, "@@@@@ Clear %p", this);
     // Cancel any outstanding work.
     if (mSendSigma3Helper)
     {
@@ -440,8 +417,6 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     MATTER_TRACE_EVENT_SCOPE("EstablishSession", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogError(SecureChannel, "@@@@@ EstablishSession %p", this);
-
     // Return early on error here, as we have not initialized any state yet
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -490,7 +465,6 @@ exit:
     {
         Clear();
     }
-    ChipLogError(SecureChannel, "@@@@@ done EstablishSession %p", this);
     return err;
 }
 
@@ -508,7 +482,6 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
 
 void CASESession::AbortPendingEstablish(CHIP_ERROR err)
 {
-    ChipLogError(SecureChannel, "@@@@@ AbortPendingEstablish %p", this);
     Clear();
     // Do this last in case the delegate frees us.
     NotifySessionEstablishmentError(err);
@@ -1314,8 +1287,6 @@ CHIP_ERROR CASESession::SendSigma3a()
     {
         auto & data = helper->mData;
 
-        ChipLogError(SecureChannel, "@@@@@ session %p helper %p", this, helper.get());
-
         VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         data.fabricTable = mFabricsTable;
         data.fabricIndex = mFabricIndex;
@@ -1482,7 +1453,6 @@ CHIP_ERROR CASESession::SendSigma3c(SendSigma3Data & data, CHIP_ERROR status)
     mState = State::kSentSigma3;
 
 exit:
-    ChipLogError(SecureChannel, "@@@@@ session %p releasing helper %p", this, mSendSigma3Helper.get());
     mSendSigma3Helper.reset();
 
     if (err != CHIP_NO_ERROR && !ignoreFailure)
@@ -1491,7 +1461,6 @@ exit:
         mState = State::kInitialized;
     }
 
-    ChipLogError(SecureChannel, "@@@@@ done SendSigma3c %p", this);
     return err;
 }
 
