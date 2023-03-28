@@ -1,6 +1,6 @@
 {{> header}}
 {{#if (chip_has_client_clusters)}}
-#include "CHIPCallbackTypes.h"
+#include <jni/CHIPCallbackTypes.h>
 #include "CHIPInvokeCallbacks.h"
 #include "CHIPReadCallbacks.h"
 

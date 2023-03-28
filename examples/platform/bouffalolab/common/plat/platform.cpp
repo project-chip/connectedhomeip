@@ -58,6 +58,8 @@
 #include "Rpc.h"
 #endif
 
+#include <DeviceInfoProviderImpl.h>
+
 #if CONFIG_ENABLE_CHIP_SHELL || PW_RPC_ENABLED
 #include "uart.h"
 #endif
@@ -76,6 +78,8 @@ chip::app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::BLWiFiDriver::GetInstance()));
 }
 #endif
+
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -201,10 +205,14 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
     chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXT_DISCOVERY_TIMEOUT_SECS);
 #endif
 
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     static CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
     ReturnLogErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 

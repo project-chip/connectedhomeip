@@ -29,6 +29,10 @@ shared_library("jni") {
     output_extension = "dylib"
   }
 
+  # Temporary while we have circular dependencies between codegen.py and zap
+  # generated files
+  check_includes = false
+
   sources = [
     "AndroidCallbacks-JNI.cpp",
     "AndroidCallbacks.cpp",
