@@ -85,8 +85,6 @@ static_library("Linux") {
 
   if (chip_enable_ble) {
     sources += [
-      "bluez/AdapterIterator.cpp",
-      "bluez/AdapterIterator.h",
       "bluez/ChipDeviceScanner.cpp",
       "bluez/ChipDeviceScanner.h",
       "bluez/Helper.cpp",
