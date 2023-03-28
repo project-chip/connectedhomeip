@@ -107,7 +107,7 @@ class TC_CGEN_2_4(MatterBaseTest):
         elif cap == Clusters.GeneralCommissioning.Enums.RegulatoryLocationType.kOutdoor:
             newloc = Clusters.GeneralCommissioning.Enums.RegulatoryLocationType.kIndoor
         else:
-             newloc = Clusters.GeneralCommissioning.Enums.RegulatoryLocationType.extend_enum_if_value_doesnt_exist(3)
+            newloc = Clusters.GeneralCommissioning.Enums.RegulatoryLocationType.extend_enum_if_value_doesnt_exist(3)
 
         logging.info('Step 19 Send SetRgulatoryConfig with incorrect location newloc = {}'.format(newloc))
         cmd = Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig(
