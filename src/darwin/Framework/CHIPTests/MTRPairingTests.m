@@ -72,13 +72,13 @@ static MTRTestKeys * sTestKeys = nil;
 
 @end
 
-@interface MTRPairingTestPairingDelegate : NSObject <MTRDevicePairingDelegate>
+@interface MTRPairingTestControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
 @property (nonatomic, nullable) id<MTRDeviceAttestationDelegate> attestationDelegate;
 @property (nonatomic, nullable) NSNumber * failSafeExtension;
 @end
 
-@implementation MTRPairingTestPairingDelegate
+@implementation MTRPairingTestControllerDelegate
 - (id)initWithExpectation:(XCTestExpectation *)expectation
       attestationDelegate:(id<MTRDeviceAttestationDelegate>)attestationDelegate
         failSafeExtension:(NSNumber *)failSafeExtension
@@ -92,7 +92,7 @@ static MTRTestKeys * sTestKeys = nil;
     return self;
 }
 
-- (void)onPairingComplete:(NSError *)error
+- (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
 {
     XCTAssertEqual(error.code, 0);
 
@@ -101,13 +101,13 @@ static MTRTestKeys * sTestKeys = nil;
     params.failSafeTimeout = self.failSafeExtension;
 
     NSError * commissionError = nil;
-    [sController commissionDevice:sDeviceId commissioningParams:params error:&commissionError];
+    [controller commissionNodeWithID:@(sDeviceId) commissioningParams:params error:&commissionError];
     XCTAssertNil(commissionError);
 
     // Keep waiting for onCommissioningComplete
 }
 
-- (void)onCommissioningComplete:(NSError *)error
+- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error
 {
     XCTAssertEqual(error.code, 0);
     [_expectation fulfill];
@@ -121,15 +121,15 @@ static void DoPairingTest(XCTestCase * testcase, id<MTRDeviceAttestationDelegate
 {
     // Don't reuse node ids, because that will confuse us.
     ++sDeviceId;
-    XCTestExpectation * expectation = [testcase expectationWithDescription:@"Pairing Complete"];
+    XCTestExpectation * expectation = [testcase expectationWithDescription:@"Commissioning Complete"];
     __auto_type * controller = sController;
 
-    __auto_type * pairing = [[MTRPairingTestPairingDelegate alloc] initWithExpectation:expectation
-                                                                   attestationDelegate:attestationDelegate
-                                                                     failSafeExtension:failSafeExtension];
+    __auto_type * controllerDelegate = [[MTRPairingTestControllerDelegate alloc] initWithExpectation:expectation
+                                                                                 attestationDelegate:attestationDelegate
+                                                                                   failSafeExtension:failSafeExtension];
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
 
-    [controller setPairingDelegate:pairing queue:callbackQueue];
+    [controller setDeviceControllerDelegate:controllerDelegate queue:callbackQueue];
 
     NSError * error;
     __auto_type * payload = [MTRSetupPayload setupPayloadWithOnboardingPayload:kOnboardingPayload error:&error];
@@ -166,14 +166,14 @@ static void DoPairingTest(XCTestCase * testcase, id<MTRDeviceAttestationDelegate
 
 - (void)initStack
 {
-    __auto_type * factory = [MTRControllerFactory sharedInstance];
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
     __auto_type * storage = [[MTRTestStorage alloc] init];
-    __auto_type * factoryParams = [[MTRControllerFactoryParams alloc] initWithStorage:storage];
+    __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
     factoryParams.port = @(kLocalPort);
 
-    BOOL ok = [factory startup:factoryParams];
+    BOOL ok = [factory startControllerFactory:factoryParams error:nil];
     XCTAssertTrue(ok);
 
     __auto_type * testKeys = [[MTRTestKeys alloc] init];
@@ -183,10 +183,10 @@ static void DoPairingTest(XCTestCase * testcase, id<MTRDeviceAttestationDelegate
 
     // Needs to match what startControllerOnExistingFabric calls elsewhere in
     // this file do.
-    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithSigningKeypair:testKeys fabricId:1 ipk:testKeys.ipk];
-    params.vendorId = @(kTestVendorId);
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@(1) nocSigner:testKeys];
+    params.vendorID = @(kTestVendorId);
 
-    MTRDeviceController * controller = [factory startControllerOnNewFabric:params];
+    MTRDeviceController * controller = [factory createControllerOnNewFabric:params error:nil];
     XCTAssertNotNil(controller);
 
     sController = controller;
@@ -200,7 +200,7 @@ static void DoPairingTest(XCTestCase * testcase, id<MTRDeviceAttestationDelegate
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
 
-    [[MTRControllerFactory sharedInstance] shutdown];
+    [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
 }
 
 #if !MANUAL_INDIVIDUAL_TEST
