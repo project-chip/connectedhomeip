@@ -158,6 +158,7 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
 {
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
+        std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
         mWiFiStationMode = (mWpaSupplicant.iface != nullptr) ? kWiFiStationMode_Enabled : kWiFiStationMode_Disabled;
     }
 
@@ -724,6 +725,8 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
 
 void ConnectivityManagerImpl::StartWiFiManagement()
 {
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     mConnectivityFlag.ClearAll();
     mWpaSupplicant = GDBusWpaSupplicant{};
 
@@ -746,6 +749,8 @@ void ConnectivityManagerImpl::DriveAPState()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     WiFiAPState targetState;
+
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
     // If the AP interface is not under application control...
     if (mWiFiAPMode != kWiFiAPMode_ApplicationControlled)
@@ -862,6 +867,8 @@ CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
     uint16_t discriminator = 0;
     char ssid[32];
 
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     channel = ConnectivityUtils::MapChannelToFrequency(kWiFi_BAND_2_4_GHZ, CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL);
 
     if (GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator) != CHIP_NO_ERROR)
@@ -956,6 +963,8 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     char ssidStr[kMaxWiFiSSIDLength + 1u] = { 0 };
     char keyStr[kMaxWiFiKeyLength + 1u]   = { 0 };
 
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     VerifyOrReturnError(ssid.size() <= kMaxWiFiSSIDLength, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(credentials.size() <= kMaxWiFiKeyLength, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(mWpaSupplicant.iface != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -1042,6 +1051,9 @@ void ConnectivityManagerImpl::_ConnectWiFiNetworkAsyncCallback(GObject * source_
     ConnectivityManagerImpl * this_ = reinterpret_cast<ConnectivityManagerImpl *>(user_data);
     std::unique_ptr<GVariant, GVariantDeleter> attachRes;
     std::unique_ptr<GError, GErrorDeleter> err;
+
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     {
         gboolean result = wpa_fi_w1_wpa_supplicant1_interface_call_select_network_finish(mWpaSupplicant.iface, res,
                                                                                          &MakeUniquePointerReceiver(err).Get());
@@ -1609,6 +1621,8 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
 
 void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
     ChipLogProgress(DeviceLayer, "wpa_supplicant: network scan done");
     gchar ** bsss    = wpa_fi_w1_wpa_supplicant1_interface_dup_bsss(mWpaSupplicant.iface);
     gchar ** oldBsss = bsss;

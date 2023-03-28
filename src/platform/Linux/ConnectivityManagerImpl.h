@@ -207,7 +207,9 @@ private:
 
     static bool mAssociationStarted;
     static BitFlags<ConnectivityFlags> mConnectivityFlag;
-    static struct GDBusWpaSupplicant mWpaSupplicant;
+    static GDBusWpaSupplicant mWpaSupplicant;
+    // Access to mWpaSupplicant has to be protected by a mutex because it is accessed from
+    // the CHIP event loop thread and dedicated D-Bus thread started by platform manager.
     static std::mutex mWpaSupplicantMutex;
 
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
