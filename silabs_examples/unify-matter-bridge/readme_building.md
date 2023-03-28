@@ -10,10 +10,24 @@ This build guide cross-compiles for arm64 architecture to be run on Unify's refe
 > - _some-other-command_ should be executed inside the Docker container.
 >   - _`root@docker:/<dir>$ some-other-command`_
 
-## Download and Stage the uic Repo
+## Set Up the Matter Build Environment
+
+Once you have all the necessary submodules, source the Matter environment with the following command. This loads a number of build tools and makes sure the correct toolchains and compilers are used for compiling the Unify Matter Bridge.
+
+## Check Out Submodules
+
+Check out the necessary submodules with the following command.
 
 ```bash
-dev-machine:~$ git clone --depth 1 --branch external/matter-bridge-unstable https://github.com/SiliconLabs/UnifySDK.git --recursive ../uic-matter
+dev-machine:~$ ./scripts/checkout_submodules.py --platform linux
+```
+
+## Clone and Stage the Unify SDK Repository 
+
+> 🔴 Assuming you have cloned the matter repo in `~/matter` 
+
+```bash
+dev-machine:~/matter$ git clone --depth 1 https://github.com/SiliconLabs/UnifySDK.git --recursive ../uic-matter
 ```
 
 ## Build the Docker Container (arm64 compilation)
@@ -22,17 +36,28 @@ dev-machine:~$ git clone --depth 1 --branch external/matter-bridge-unstable http
 dev-machine:~$ docker build -t unify-matter silabs_examples/unify-matter-bridge/docker/
 ```
 
-Start the docker:
+## Run the docker container  (arm64 compilation)
 
+> 🔴
+> Make sure the directory structure is like follows where Unify repo `uic-matter/` and matter repo `matter/` are at same directory level
+> 
+> ```
+> .
+> ├── matter
+> └── uic-matter
+> ```
+
+Start the docker from `matter/` directory where you cloned the matter repo: Here we asuume `matter/` is in `~`
 ```bash
-dev-machine:~$ docker run -it -v $PWD:/matter -v $PWD/../uic-matter:/uic unify-matter
+dev-machine:~$ cd matter/
+dev-machine:~/matter$ docker run -it -v $PWD:/matter -v $PWD/../uic-matter:/uic unify-matter
 ```
 
 ## Build libunify
 
 The Unify Matter Bridge depends on the libunify library from the Unify project.
 
-This library must first be compiled for the target system, by changing directory to the `/uic` folder and running the following:
+This library must first be compiled for the target system, by changing directory to the `/uic` directory and running the following:
 
 ```bash
 root@docker:/uic$ cmake -DCMAKE_INSTALL_PREFIX=$PWD/stage -GNinja -DCMAKE_TOOLCHAIN_FILE=../cmake/arm64_debian.cmake  -B build_unify_arm64/ -S components -DBUILD_TESTING=OFF
@@ -54,17 +79,9 @@ If you want to be able to use Zap to generate code from Unify XML files you need
 root@docker:/uic$ export UCL_XML_PATH=$PWD/stage/share/uic/ucl
 ```
 
-## Set Up the Matter Build Environment
+## Run activate in matter 
 
-Once you have all the necessary submodules, source the Matter environment with the following command. This loads a number of build tools and makes sure the correct toolchains and compilers are used for compiling the Unify Matter Bridge.
-
-## Check Out Submodules
-
-Check out the necessary submodules with the following command.
-
-```bash
-dev-machine:~$ ./scripts/checkout_submodules.py --platform linux
-```
+Make sure you are in `matter/` directory
 
 ```bash
 root@docker:/matter$ source ./scripts/activate.sh
@@ -80,7 +97,7 @@ root@docker:/matter/silabs_examples/unify-matter-bridge/linux$ gn gen out/arm64 
 root@docker:/matter/silabs_examples/unify-matter-bridge/linux$ ninja -C out/arm64
 ```
 
-After building, the `unify-matter-bridge` binary is located at `/matter/silabs_examples/unify-matter-bridge/linux/out/arm64/obj/bin/unify-matter-bridge`.
+> 🔴 After building, the `unify-matter-bridge` binary is located at `/matter/silabs_examples/unify-matter-bridge/linux/out/arm64/obj/bin/unify-matter-bridge`.
 
 ## Compile the chip-tool
 
@@ -94,7 +111,7 @@ root@docker:/matter/examples/chip-tool$ gn gen out/arm64 --args='target_cpu="arm
 root@docker:/matter/examples/chip-tool$ ninja -C out/arm64
 ```
 
-After building, the chip-tool binary is located at `/matter/examples/chip-tool/out/arm64/obj/bin/chip-tool`.
+> 🔴 After building, the chip-tool binary is located at `/matter/examples/chip-tool/out/arm64/obj/bin/chip-tool`.
 
 ## Unit Testing
 
@@ -113,3 +130,4 @@ Unit testing is always a good idea for quality software. Documentation on writin
 4. If you encounter errors linking to `libunify`, try redoing the [`libunify` compile steps](#build-libunify).
 5. Encountering problems with the submodules can be due to trying to check out
    the submodules inside the docker container.
+6. If the Unify Matter Bridge gets stuck while booting. Try to pass `--args="chip_config_network_layer_ble=false"` to `gn gen` command while building
