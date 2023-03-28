@@ -53,5 +53,5 @@ application of OTA image.
 ### Note
 
 While trying out example ota-requestor-app bump the software version from
-`CMakeList.txt` and not from `idf.py menuconfig`. And software version of the 
+`CMakeList.txt` and not from `idf.py menuconfig`. And software version of the
 image which is being ota should be greater than current software version.
