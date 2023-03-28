@@ -124,8 +124,8 @@ bouffalolab_executable("lighting_app") {
   ]
 
   deps = [
-    ":sdk",
     ":bouffalolab-lighting",
+    ":sdk",
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",

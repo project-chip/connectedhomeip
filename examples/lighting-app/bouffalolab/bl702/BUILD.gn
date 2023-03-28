@@ -144,8 +144,8 @@ bouffalolab_executable("lighting_app") {
   ]
 
   deps = [
-    ":sdk",
     ":bouffalolab-lighting",
+    ":sdk",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
