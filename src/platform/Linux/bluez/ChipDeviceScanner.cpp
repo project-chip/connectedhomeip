@@ -31,19 +31,44 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
 namespace {
 
-struct GObjectUnref
+struct GDBusCancellableObjectManager
 {
-    template <typename T>
-    void operator()(T * value)
+    GCancellable * cancellable  = nullptr;
+    GDBusObjectManager * object = nullptr;
+
+    GDBusCancellableObjectManager() : cancellable(g_cancellable_new()) {}
+    ~GDBusCancellableObjectManager()
     {
-        g_object_unref(value);
+        if (cancellable != nullptr)
+        {
+            g_object_unref(cancellable);
+        }
+        if (object != nullptr)
+        {
+            g_object_unref(object);
+        }
     }
 };
 
-using GCancellableUniquePtr       = std::unique_ptr<GCancellable, GObjectUnref>;
-using GDBusObjectManagerUniquePtr = std::unique_ptr<GDBusObjectManager, GObjectUnref>;
+CHIP_ERROR MainLoopCreateObjectManager(GDBusCancellableObjectManager * cancellableObjectManager)
+{
+    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
+    // all D-Bus signals will be delivered to the GLib global default main context.
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+
+    std::unique_ptr<GError, GErrorDeleter> err;
+    cancellableObjectManager->object = g_dbus_object_manager_client_new_for_bus_sync(
+        G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/",
+        bluez_object_manager_client_get_proxy_type, nullptr /* unused user data in the Proxy Type Func */,
+        nullptr /* destroy notify */, cancellableObjectManager->cancellable, &MakeUniquePointerReceiver(err).Get());
+    VerifyOrReturnError(cancellableObjectManager->object != nullptr, CHIP_ERROR_INTERNAL,
+                        ChipLogError(Ble, "Failed to get DBUS object manager for device scanning: %s", err->message));
+
+    return CHIP_NO_ERROR;
+}
 
 /// Retrieve CHIP device identification info from the device advertising data
 bool BluezGetChipDeviceInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLEDeviceIdentificationInfo & aDeviceInfo)
@@ -93,33 +118,17 @@ ChipDeviceScanner::~ChipDeviceScanner()
 
 std::unique_ptr<ChipDeviceScanner> ChipDeviceScanner::Create(BluezAdapter1 * adapter, ChipDeviceScannerDelegate * delegate)
 {
-    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
-    // all D-Bus signals will be delivered to the GLib global default main context.
-    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+    GDBusCancellableObjectManager manager;
+    CHIP_ERROR err;
 
-    GError * error = nullptr;
+    VerifyOrExit(manager.cancellable != nullptr, );
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopCreateObjectManager, &manager);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Ble, "Failed to create BLE object manager"));
 
-    GCancellableUniquePtr cancellable(g_cancellable_new(), GObjectUnref());
+    return std::make_unique<ChipDeviceScanner>(manager.object, adapter, manager.cancellable, delegate);
 
-    if (!cancellable)
-    {
-        return std::unique_ptr<ChipDeviceScanner>();
-    }
-
-    GDBusObjectManagerUniquePtr manager(
-        g_dbus_object_manager_client_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE,
-                                                      "/", bluez_object_manager_client_get_proxy_type,
-                                                      nullptr /* unused user data in the Proxy Type Func */,
-                                                      nullptr /*destroy notify */, cancellable.get(), &error),
-        GObjectUnref());
-    if (!manager)
-    {
-        ChipLogError(Ble, "Failed to get DBUS object manager for device scanning: %s", error->message);
-        g_error_free(error);
-        return std::unique_ptr<ChipDeviceScanner>();
-    }
-
-    return std::make_unique<ChipDeviceScanner>(manager.get(), adapter, cancellable.get(), delegate);
+exit:
+    return std::unique_ptr<ChipDeviceScanner>();
 }
 
 CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
