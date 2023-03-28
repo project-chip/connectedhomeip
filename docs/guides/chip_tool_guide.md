@@ -419,8 +419,8 @@ The CHIP Tool can run in one of the following modes:
     it does not complete within the timeout period. However, the CHIP Tool will
     not be terminated and it will not terminate processes that previous commands
     have started. Moreover, when using the interactive mode, the CHIP Tool will
-    establish a new CASE session only when there is no session available yet.
-    On the following commands, it will use the existing session.
+    establish a new CASE session only when there is no session available yet. On
+    the following commands, it will use the existing session.
 
 #### Modifying timeout duration in single-command mode
 
