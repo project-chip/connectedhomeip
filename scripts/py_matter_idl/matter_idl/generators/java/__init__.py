@@ -253,6 +253,7 @@ def attributesWithSupportedCallback(attrs, context: TypeLookupContext):
 
         yield attr
 
+
 def _IsUsingGlobalCallback(field: Field, context: TypeLookupContext):
     """Test to determine if the data type of a field can use one of
     the global callbacks (i.e. it is a basic double/integer/bool etc.)
@@ -296,7 +297,6 @@ def _IsUsingGlobalCallback(field: Field, context: TypeLookupContext):
         "octet_string",
         "long_octet_string",
     }
-
 
 
 def NamedFilter(choices: List, name: str):

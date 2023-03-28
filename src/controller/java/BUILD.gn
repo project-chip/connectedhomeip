@@ -62,7 +62,6 @@ shared_library("jni") {
     "zap-generated/CHIPInvokeCallbacks.cpp",
     "zap-generated/CHIPInvokeCallbacks.h",
     "zap-generated/CHIPReadCallbacks.cpp",
-    "zap-generated/CHIPReadCallbacks.h",
   ]
 
   deps = [
