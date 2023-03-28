@@ -28,13 +28,14 @@ else
     CHIP_ROOT="$MATTER_ROOT"
 fi
 
-source "$CHIP_ROOT/scripts/activate.sh"
-
 set -x
 env
 USE_WIFI=false
 USE_DOCKER=false
 USE_GIT_SHA_FOR_VERSION=true
+USE_SLC=false
+GN_PATH=gn
+GN_PATH_PROVIDED=false
 
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
 USAGE="./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]"
@@ -125,6 +126,10 @@ if [ "$#" == "0" ]; then
             Change GSDK root for docker builds
         --uart_log
             Forward Logs to Uart instead of RTT
+        --slc_generate
+            Generate files with SLC for current board and options Requires an SLC-CLI installation or running in Docker.
+        --slc_reuse_files
+            Use generated files without running slc again.
 
     "
 elif [ "$#" -lt "2" ]; then
@@ -214,12 +219,32 @@ else
                 shift
                 ;;
 
+            --slc_generate)
+                optArgs+="slc_generate=true "
+                USE_SLC=true
+                shift
+                ;;
+            --slc_reuse_files)
+                optArgs+="slc_reuse_files=true "
+                USE_SLC=true
+                shift
+                ;;
+            --gn_path)
+                if [ -z "$2" ]; then
+                    echo "--gn_path requires a path to GN"
+                    exit 1
+                else
+                    GN_PATH="$2"
+                fi
+                GN_PATH_PROVIDED=true
+                shift
+                shift
+                ;;
             *"sl_matter_version_str="*)
                 optArgs+="$1 "
                 USE_GIT_SHA_FOR_VERSION=false
                 shift
                 ;;
-
             *)
                 if [ "$1" =~ *"use_rs9116=true"* ] || [ "$1" =~ *"use_SiWx917=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true
@@ -243,6 +268,10 @@ else
         } &>/dev/null
     fi
 
+    if [ "$USE_SLC" == true ] && [ "$GN_PATH_PROVIDED" == false ]; then
+        GN_PATH=./.environment/cipd/packages/pigweed/gn
+    fi
+
     BUILD_DIR=$OUTDIR/$SILABS_BOARD
     echo BUILD_DIR="$BUILD_DIR"
 
@@ -254,7 +283,7 @@ else
         # wifi build
         # NCP mode EFR32 + wifi module
         optArgs+="$ipArgs"
-        gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
+        "$GN_PATH" gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
     else
         # OpenThread/SoC build
         #
@@ -263,11 +292,16 @@ else
         fi
 
         if [ -z "$optArgs" ]; then
-            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\"" "$BUILD_DIR"
+            "$GN_PATH" gen --check --script-executable="/usr/bin/python3" --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\"" "$BUILD_DIR"
         else
-            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
+            "$GN_PATH" gen --check --script-executable="/usr/bin/python3" --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
         fi
     fi
+
+    # Activation needs to be after SLC generation which is done in gn gen.
+    # Zap generation requires activation and is done in the build phase
+    source "$CHIP_ROOT/scripts/activate.sh"
+
     ninja -v -C "$BUILD_DIR"/
     #print stats
     arm-none-eabi-size -A "$BUILD_DIR"/*.out

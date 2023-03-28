@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Project CHIP Authors
+# Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,27 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-config("websocket_server_config_disable_warnings") {
-  # Unfortunately, some of the libwebsockets headers include -Wshadow failures.
-  cflags = [ "-Wno-shadow" ]
-}
-
-static_library("websocket-server") {
-  output_name = "libWebSocketServer"
+source_set("board_setup") {
+  include_dirs = [ 
+      "autogen/",
+      "config/" 
+      ]
 
   sources = [
-    "WebSocketServer.cpp",
-    "WebSocketServer.h",
-    "WebSocketServerDelegate.h",
+    //REPLACE_ME
   ]
 
-  public_deps = [
-    "${chip_root}/src/lib/support",
-    "${chip_root}/third_party/libwebsockets",
-  ]
-
-  configs += [ ":websocket_server_config_disable_warnings" ]
 }

@@ -256,7 +256,7 @@ class TC_RR_1_1(MatterBaseTest):
         asserts.assert_equal(node_label, BEFORE_LABEL, "NodeLabel must match what was written")
 
         # Step 3: Add 4 Access Control entries on DUT with a list of 4 Subjects and 3 Targets with the following parameters (...)
-        self.send_acl(test_step=3, client_by_name=client_by_name, enable_access_to_group_cluster=False, fabric_table=fabric_table)
+        await self.send_acl(test_step=3, client_by_name=client_by_name, enable_access_to_group_cluster=False, fabric_table=fabric_table)
 
         # Step 4 and 5 (the operations cannot be separated): establish all CASE sessions and subscriptions
 
@@ -420,7 +420,7 @@ class TC_RR_1_1(MatterBaseTest):
             logging.info("Step 9: Skipped due to no UserLabel cluster instances")
         # Step 10: Reconfig ACL to allow test runner access to Groups clusters on all endpoints.
         logging.info("Step 10: Reconfiguring ACL to allow access to Groups Clusters")
-        self.send_acl(test_step=10, client_by_name=client_by_name, enable_access_to_group_cluster=False, fabric_table=fabric_table)
+        await self.send_acl(test_step=10, client_by_name=client_by_name, enable_access_to_group_cluster=True, fabric_table=fabric_table)
         # Step 11: Count all group cluster instances
         # and ensure MaxGroupsPerFabric >= 4 * counted_groups_clusters.
         logging.info("Step 11: Validating groups support minimums")
@@ -532,7 +532,7 @@ class TC_RR_1_1(MatterBaseTest):
             for group_key_cluster_idx in range(1, keys_per_fabric):
                 group_key_list_idx: int = group_key_cluster_idx - 1
 
-                logging.info("Step 12: Setting group key on fabric %d at index '%d'" % (client_idx+1, group_key_cluster_idx))
+                logging.info("Step 13: Setting group key on fabric %d at index '%d'" % (client_idx+1, group_key_cluster_idx))
                 group_keys[client_idx].append(self.build_group_key(client_idx, group_key_cluster_idx, keys_per_fabric))
                 await client.SendCommand(self.dut_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetWrite(
                     group_keys[client_idx][group_key_list_idx]))
@@ -541,7 +541,7 @@ class TC_RR_1_1(MatterBaseTest):
         for client_idx in range(fabrics):
             client: Any = clients[client_idx]
 
-            logging.info("Step 12: Reading back group keys on fabric %d" % (client_idx+1))
+            logging.info("Step 13: Reading back group keys on fabric %d" % (client_idx+1))
             resp = await client.SendCommand(self.dut_node_id, 0,
                                             Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices(),
                                             responseType=Clusters.GroupKeyManagement.Commands.KeySetReadAllIndicesResponse)
@@ -729,32 +729,32 @@ class TC_RR_1_1(MatterBaseTest):
         # - Subjects field: [0xFFFF_FFFD_0001_0001, 0x2000_0000_0000_0001, 0x2000_0000_0000_0002, 0x2000_0000_0000_0003]
         # - Targets field: [
         #                   {Endpoint: 0},
-        #                   {Cluster: 0xFFF1_FC00, DeviceType: 0xFFF1_FC30},
-        #                   {Cluster: 0xFFF1_FC00, DeviceType: 0xFFF1_FC31}
+        #                   {Cluster: 0xFFF1_FC00, DeviceType: 0xFFF1_BC30},
+        #                   {Cluster: 0xFFF1_FC00, DeviceType: 0xFFF1_BC31}
         #                 ]
         # . struct
         # - Privilege field: Manage (4)
         # - AuthMode field: CASE (2)
         # - Subjects field: [0x1000_0000_0000_0001, 0x1000_0000_0000_0002, 0x1000_0000_0000_0003, 0x1000_0000_0000_0004]
         # - Targets field: [
-        #                   {Cluster: 0xFFF1_FC00, DeviceType: 0xFFF1_FC20},
-        #                   {Cluster: 0xFFF1_FC01, DeviceType: 0xFFF1_FC21},
-        #                   {Cluster: 0xFFF1_FC02, DeviceType: 0xFFF1_FC22}
+        #                   {Cluster: 0xFFF1_FC00, DeviceType: 0xFFF1_BC20},
+        #                   {Cluster: 0xFFF1_FC01, DeviceType: 0xFFF1_BC21},
+        #                   {Cluster: 0xFFF1_FC02, DeviceType: 0xFFF1_BC22}
         #                 ]
         # . struct
         # - Privilege field: Operate (3)
         # - AuthMode field: CASE (2)
         # - Subjects field: [0x3000_0000_0000_0001, 0x3000_0000_0000_0002, 0x3000_0000_0000_0003, 0x3000_0000_0000_0004]
-        # - Targets field: [{Cluster: 0xFFF1_FC40, DeviceType: 0xFFF1_FC20},
-        #                  {Cluster: 0xFFF1_FC41, DeviceType: 0xFFF1_FC21},
-        #                  {Cluster: 0xFFF1_FC02, DeviceType: 0xFFF1_FC42}]
+        # - Targets field: [{Cluster: 0xFFF1_FC40, DeviceType: 0xFFF1_BC20},
+        #                  {Cluster: 0xFFF1_FC41, DeviceType: 0xFFF1_BC21},
+        #                  {Cluster: 0xFFF1_FC02, DeviceType: 0xFFF1_BC42}]
         # . struct
         # - Privilege field: View (1)
         # - AuthMode field: CASE (2)
         # - Subjects field: [0x4000_0000_0000_0001, 0x4000_0000_0000_0002, 0x4000_0000_0000_0003, 0x4000_0000_0000_0004]
-        # - Targets field: [{Cluster: 0xFFF1_FC80, DeviceType: 0xFFF1_FC20},
-        #                  {Cluster: 0xFFF1_FC81, DeviceType: 0xFFF1_FC21},
-        #                  {Cluster: 0xFFF1_FC82, DeviceType: 0xFFF1_FC22}]
+        # - Targets field: [{Cluster: 0xFFF1_FC80, DeviceType: 0xFFF1_BC20},
+        #                  {Cluster: 0xFFF1_FC81, DeviceType: 0xFFF1_BC21},
+        #                  {Cluster: 0xFFF1_FC82, DeviceType: 0xFFF1_BC22}]
 
         # Administer ACL entry
         admin_subjects = [0xFFFF_FFFD_0001_0001, 0x2000_0000_0000_0001, 0x2000_0000_0000_0002, 0x2000_0000_0000_0003]

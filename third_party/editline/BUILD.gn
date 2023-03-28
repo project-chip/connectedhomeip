@@ -17,7 +17,9 @@ import("${build_root}/config/compiler/compiler.gni")
 
 config("editline_config") {
   include_dirs = [ "repo/include" ]
+}
 
+config("editline_config_disable_warnings") {
   cflags = [ "-Wno-conversion" ]
 
   if (is_clang) {
@@ -37,6 +39,8 @@ static_library("editline") {
   ]
 
   public_configs = [ ":editline_config" ]
+
+  configs += [ ":editline_config_disable_warnings" ]
 
   include_dirs = [ "include" ]
 }
