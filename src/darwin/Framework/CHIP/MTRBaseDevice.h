@@ -289,8 +289,9 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * Lists of attribute and event paths to read can be provided via attributePaths and eventPaths.
  *
- * The completion will be called with an error if  the input parameter has a problem(e.g., both attributePaths and eventPaths are empty.) or the entire read interaction fails.
- * Otherwise it will be called with values, which may be empty (e.g. if no paths matched the wildcard) or may include per-path errors if particular paths failed.
+ * The completion will be called with an error if  the input parameter has a problem(e.g., both attributePaths and eventPaths are
+ * empty.) or the entire read interaction fails. Otherwise it will be called with values, which may be empty (e.g. if no paths
+ * matched the wildcard) or may include per-path errors if particular paths failed.
  */
 - (void)readWithAttributePaths:(NSArray<MTRAttributePath *> * _Nullable)attributePaths
                     EventPaths:(NSArray<MTREventPath *> * _Nullable)eventPaths
@@ -305,7 +306,8 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  *
  * Lists of attribute and event paths to subscribe can be provided via attributePaths and eventPaths.
  *
- * The reportHandler will be called with an error if the input parameter has a problem(e.g., both attributePaths and eventPaths are empty.).
+ * The reportHandler will be called with an error if the input parameter has a problem(e.g., both attributePaths and eventPaths are
+ * empty.).
  */
 - (void)subscribeWithAttributePaths:(NSArray<MTRAttributePath *> * _Nullable)attributePaths
                          EventPaths:(NSArray<MTREventPath *> * _Nullable)eventPaths

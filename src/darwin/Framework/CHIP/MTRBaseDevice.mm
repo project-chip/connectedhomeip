@@ -939,7 +939,7 @@ private:
             std::vector<app::AttributePathParams> attributePathParamsList { attributePath };
             std::vector<app::EventPathParams> eventPathParamsList;
             auto callback = chip::Platform::MakeUnique<BufferedReadClientCallback<MTRDataValueDictionaryDecodableType>>(
-                              attributePathParamsList, eventPathParamsList, onSuccessCb, nullptr, onFailureCb, onDone, nullptr);
+                attributePathParamsList, eventPathParamsList, onSuccessCb, nullptr, onFailureCb, onDone, nullptr);
             VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
             auto readClient = chip::Platform::MakeUnique<app::ReadClient>(
@@ -970,8 +970,7 @@ private:
                          queue:(dispatch_queue_t)queue
                     completion:(MTRDeviceResponseHandler)completion
 {
-    if ((attributePaths == nil || [attributePaths count] == 0)
-        && (eventPaths == nil || [eventPaths count] == 0)) {
+    if ((attributePaths == nil || [attributePaths count] == 0) && (eventPaths == nil || [eventPaths count] == 0)) {
         dispatch_async(queue, ^{
             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
         });
@@ -1124,8 +1123,7 @@ private:
                       reportHandler:(MTRDeviceResponseHandler)reportHandler
             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
 {
-    if ((attributePaths == nil || [attributePaths count] == 0)
-        && (eventPaths == nil || [eventPaths count] == 0)) {
+    if ((attributePaths == nil || [attributePaths count] == 0) && (eventPaths == nil || [eventPaths count] == 0)) {
         dispatch_async(queue, ^{
             reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
         });
@@ -1279,10 +1277,9 @@ private:
                        chip::Platform::Delete(callback);
                    };
 
-                   auto callback
-                       = chip::Platform::MakeUnique<BufferedReadClientCallback<MTRDataValueDictionaryDecodableType>>(
-                           attributePathParamsList, eventPathParamsList, onAttributeReportCb, onEventReportCb, onFailureCb, onDone,
-                           onEstablishedCb);
+                   auto callback = chip::Platform::MakeUnique<BufferedReadClientCallback<MTRDataValueDictionaryDecodableType>>(
+                       attributePathParamsList, eventPathParamsList, onAttributeReportCb, onEventReportCb, onFailureCb, onDone,
+                       onEstablishedCb);
 
                    auto readClient = Platform::New<app::ReadClient>(
                        engine, exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
@@ -1623,8 +1620,7 @@ exit:
                    std::vector<app::AttributePathParams> attributePathParamsList { *container.pathParams };
                    std::vector<app::EventPathParams> eventPathParamsList;
                    auto callback = chip::Platform::MakeUnique<BufferedReadClientCallback<MTRDataValueDictionaryDecodableType>>(
-                       attributePathParamsList, eventPathParamsList, onReportCb, nullptr, onFailureCb, onDone,
-                       onEstablishedCb);
+                       attributePathParamsList, eventPathParamsList, onReportCb, nullptr, onFailureCb, onDone, onEstablishedCb);
 
                    auto readClient = Platform::New<app::ReadClient>(
                        engine, exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
@@ -2056,8 +2052,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                    std::vector<app::AttributePathParams> attributePathParamsList;
                    std::vector<app::EventPathParams> eventPathParamsList { *container.eventPathParams };
                    auto callback = chip::Platform::MakeUnique<BufferedReadClientCallback<MTRDataValueDictionaryDecodableType>>(
-                       attributePathParamsList, eventPathParamsList, nullptr, onReportCb, onFailureCb, onDone,
-                       onEstablishedCb);
+                       attributePathParamsList, eventPathParamsList, nullptr, onReportCb, onFailureCb, onDone, onEstablishedCb);
 
                    auto readClient = Platform::New<app::ReadClient>(
                        engine, exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
@@ -2210,8 +2205,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
     return self;
 }
 
-- (instancetype)initWithEndpointID:(NSNumber * _Nullable)endpointID
-                         clusterID:(NSNumber * _Nullable)clusterID
+- (instancetype)initWithEndpointID:(NSNumber * _Nullable)endpointID clusterID:(NSNumber * _Nullable)clusterID
 {
     if (self = [super init]) {
         _endpoint = endpointID;
