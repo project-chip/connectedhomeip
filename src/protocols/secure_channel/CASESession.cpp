@@ -208,9 +208,7 @@ private:
     // Handler for the after work callback.
     static void AfterWorkHandler(intptr_t arg)
     {
-        // TODO some notes here about how we should be on the main event thread
-        // so shouldn't be deleting the session out from under while this executes
-        // (double check that's true, that timers don't run on some other thread, etc.)
+        // Since this runs in the main CHIP thread, the session shouldn't be otherwise used (messages, timers, etc.)
         WorkHelper * helper = reinterpret_cast<WorkHelper *>(arg);
         if (auto * session = helper->mSession.load())
         {
@@ -1377,7 +1375,6 @@ exit:
 CHIP_ERROR CASESession::SendSigma3c(SendSigma3Data & data, CHIP_ERROR status)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
-    bool ignoreFailure = true;
 
     System::PacketBufferHandle msg_R3;
     size_t data_len;
@@ -1386,15 +1383,7 @@ CHIP_ERROR CASESession::SendSigma3c(SendSigma3Data & data, CHIP_ERROR status)
 
     AutoReleaseSessionKey sr3k(*mSessionManager->GetSessionKeystore());
 
-    // TODO hopefully can get rid of ignoreFailure and this state check
-    // by ensuring that work is cancelled in cases where state would be unexpected
-
-    // Special case: if for whatever reason not in expected state or sequence,
-    // don't do anything, including sending a status report or aborting the
-    // pending establish.
-    VerifyOrExit(mState == State::kSendSigma3Pending, err = CHIP_ERROR_INCORRECT_STATE);
-
-    ignoreFailure = false;
+    VerifyOrDieWithMsg(mState == State::kSendSigma3Pending, SecureChannel, "Bad internal state.");
 
     SuccessOrExit(err = status);
 
@@ -1453,7 +1442,7 @@ CHIP_ERROR CASESession::SendSigma3c(SendSigma3Data & data, CHIP_ERROR status)
 exit:
     mSendSigma3Helper.reset();
 
-    if (err != CHIP_NO_ERROR && !ignoreFailure)
+    if (err != CHIP_NO_ERROR)
     {
         SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
         mState = State::kInitialized;
