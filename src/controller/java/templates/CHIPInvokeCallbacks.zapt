@@ -9,7 +9,7 @@
 namespace chip {
 
 {{#all_user_clusters}}
-   {{#zcl_commands_source_client}}
+   {{#zcl_commands_source_server}}
 class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase commandName}}Callback : public Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase commandName}}CallbackType>
 {
 public:
@@ -23,7 +23,7 @@ private:
     jobject javaCallbackRef;
 };
 
-  {{/zcl_commands_source_client}}
+  {{/zcl_commands_source_server}}
 {{/all_user_clusters}}
 } // namespace chip
 {{/if}}
