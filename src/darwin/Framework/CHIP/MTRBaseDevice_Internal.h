@@ -77,14 +77,23 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 
 @interface MTRClusterPath ()
 - (instancetype)initWithPath:(const chip::app::ConcreteClusterPath &)path;
+- (instancetype)initWithEndpointID:(NSNumber * _Nullable)endpointID
+                         clusterID:(NSNumber * _Nullable)clusterID;
+
 @end
 
 @interface MTRAttributePath ()
 - (instancetype)initWithPath:(const chip::app::ConcreteDataAttributePath &)path;
+- (instancetype)initWithEndpointID:(NSNumber * _Nullable)endpointID
+                         clusterID:(NSNumber * _Nullable)clusterID
+                       attributeID:(NSNumber * _Nullable)attributeID;
 @end
 
 @interface MTREventPath ()
 - (instancetype)initWithPath:(const chip::app::ConcreteEventPath &)path;
+- (instancetype)initWithEndpointID:(NSNumber * _Nullable)endpointID
+                         clusterID:(NSNumber * _Nullable)clusterID
+                           eventID:(NSNumber * _Nullable)eventID;
 @end
 
 @interface MTRCommandPath ()
