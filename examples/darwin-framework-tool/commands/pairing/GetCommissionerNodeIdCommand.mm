@@ -26,7 +26,7 @@ CHIP_ERROR GetCommissionerNodeIdCommand::RunCommand()
     VerifyOrReturnError(nil != controller, CHIP_ERROR_INCORRECT_STATE);
 
     auto id = [controller.controllerNodeId unsignedLongLongValue];
-    ChipLogProgress(chipTool, "Commissioner Node Id 0x:" ChipLogFormatX64, ChipLogValueX64(id));
+    ChipLogProgress(chipTool, "Commissioner Node Id 0x" ChipLogFormatX64, ChipLogValueX64(id));
 
     SetCommandExitStatus(CHIP_NO_ERROR);
     return CHIP_NO_ERROR;

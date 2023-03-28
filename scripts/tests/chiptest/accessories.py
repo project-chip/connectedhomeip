@@ -106,14 +106,14 @@ class AppsRegister:
             return accessory.waitForMessage(' '.join(message))
         return False
 
-    def createOtaImage(self, otaImageFilePath, rawImageFilePath, rawImageContent):
+    def createOtaImage(self, otaImageFilePath, rawImageFilePath, rawImageContent, vid='0xDEAD', pid='0xBEEF'):
         # Write the raw image content
         with open(rawImageFilePath, 'w') as rawFile:
             rawFile.write(rawImageContent)
 
         # Add an OTA header to the raw file
         otaImageTool = _DEFAULT_CHIP_ROOT + '/src/app/ota_image_tool.py'
-        cmd = [otaImageTool, 'create', '-v', '0xDEAD', '-p', '0xBEEF', '-vn', '2',
+        cmd = [otaImageTool, 'create', '-v', vid, '-p', pid, '-vn', '2',
                '-vs', "2.0", '-da', 'sha256', rawImageFilePath, otaImageFilePath]
         s = subprocess.Popen(cmd)
         s.wait()
