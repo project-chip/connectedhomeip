@@ -16,6 +16,7 @@ guides to get started.
 -   [RPC console and Device Tracing](../../../docs/guides/esp32/rpc_console.md)
 
 ---
+
 ## Prerequisite
 
 Before moving ahead, make sure you have
@@ -51,4 +52,5 @@ application of OTA image.
 
 ### Note
 
-While trying out example ota-requestor-app change the software version from `CMakeList.txt` and not from `idf.py menuconfig`
+While trying out example ota-requestor-app change the software version from
+`CMakeList.txt` and not from `idf.py menuconfig`
