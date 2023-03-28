@@ -631,19 +631,30 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     optional OCTET_STRING<512> metadataForProvider = 7;
   }
 
+  response struct QueryImageResponse = 1 {
+    OTAQueryStatus status = 0;
+    optional INT32U delayedActionTime = 1;
+    optional CHAR_STRING<256> imageURI = 2;
+    optional INT32U softwareVersion = 3;
+    optional CHAR_STRING<64> softwareVersionString = 4;
+    optional OCTET_STRING<32> updateToken = 5;
+    optional BOOLEAN userConsentNeeded = 6;
+    optional OCTET_STRING<512> metadataForRequestor = 7;
+  }
+
   request struct ApplyUpdateRequestRequest {
     OCTET_STRING<32> updateToken = 0;
     INT32U newVersion = 1;
   }
 
-  request struct NotifyUpdateAppliedRequest {
-    OCTET_STRING<32> updateToken = 0;
-    INT32U softwareVersion = 1;
-  }
-
   response struct ApplyUpdateResponse = 3 {
     OTAApplyUpdateAction action = 0;
     INT32U delayedActionTime = 1;
+  }
+
+  request struct NotifyUpdateAppliedRequest {
+    OCTET_STRING<32> updateToken = 0;
+    INT32U softwareVersion = 1;
   }
 
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
