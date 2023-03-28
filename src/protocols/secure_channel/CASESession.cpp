@@ -417,10 +417,6 @@ CHIP_ERROR CASESession::EstablishSession(SessionManager & sessionManager, Fabric
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    // Sequence number used to coordinate foreground/background work for a
-    // particular session establishment.
-    mSequence++;
-
     // Use FabricTable directly to avoid situation of dangling index from stale FabricInfo
     // until we factor-out any FabricInfo direct usage.
     ReturnErrorCodeIf(peerScopedNodeId.GetFabricIndex() == kUndefinedFabricIndex, CHIP_ERROR_INVALID_ARGUMENT);
