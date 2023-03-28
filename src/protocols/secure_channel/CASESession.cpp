@@ -152,15 +152,16 @@ public:
 
     // Create a work helper using the specified session, work callback, after work callback, and data (template arg).
     // Lifetime is not managed, see `Create` for that option.
-    WorkHelper(CASESession & session, WorkCallback workCallback, AfterWorkCallback afterWorkCallback) : mSession(&session), mWorkCallback(workCallback), mAfterWorkCallback(afterWorkCallback)
-    {
-    }
+    WorkHelper(CASESession & session, WorkCallback workCallback, AfterWorkCallback afterWorkCallback) :
+        mSession(&session), mWorkCallback(workCallback), mAfterWorkCallback(afterWorkCallback)
+    {}
 
     // Create a work helper using the specified session, work callback, after work callback, and data (template arg).
     // Lifetime is managed by sharing between the caller (typically the session) and the helper itself (while work is scheduled).
     static std::shared_ptr<WorkHelper> Create(CASESession & session, WorkCallback workCallback, AfterWorkCallback afterWorkCallback)
     {
-        std::shared_ptr<WorkHelper> ptr(Platform::New<WorkHelper>(session, workCallback, afterWorkCallback), Platform::Delete<WorkHelper>);
+        std::shared_ptr<WorkHelper> ptr(Platform::New<WorkHelper>(session, workCallback, afterWorkCallback),
+                                        Platform::Delete<WorkHelper>);
         if (ptr)
         {
             ptr->mWeakPtr = ptr; // used by `ScheduleWork`
@@ -176,7 +177,7 @@ public:
         {
             return CHIP_ERROR_INCORRECT_STATE;
         }
-        mStrongPtr = mWeakPtr.lock(); // set in `Create`
+        mStrongPtr  = mWeakPtr.lock(); // set in `Create`
         auto status = DeviceLayer::PlatformMgr().ScheduleBackgroundWork(WorkHandler, reinterpret_cast<intptr_t>(this));
         if (status != CHIP_NO_ERROR)
         {
@@ -184,22 +185,19 @@ public:
         }
         return status;
     }
- 
+
     // Cancel the work, by clearing the associated session.
-    void CancelWork()
-    {
-        mSession.store(nullptr);
-    }
+    void CancelWork() { mSession.store(nullptr); }
 
 private:
     // Handler for the work callback.
     static void WorkHandler(intptr_t arg)
     {
-        WorkHelper* helper = reinterpret_cast<WorkHelper *>(arg);
-        bool cancel = false;
+        WorkHelper * helper = reinterpret_cast<WorkHelper *>(arg);
+        bool cancel         = false;
         VerifyOrExit(helper->mSession.load(), ;); // cancelled by `CancelWork`?
         helper->mStatus = helper->mWorkCallback(helper->mData, cancel);
-        VerifyOrExit(!cancel, ;); // canceled by `mWorkCallback`?
+        VerifyOrExit(!cancel, ;);                 // canceled by `mWorkCallback`?
         VerifyOrExit(helper->mSession.load(), ;); // cancelled by `CancelWork`?
         SuccessOrExit(DeviceLayer::PlatformMgr().ScheduleWork(AfterWorkHandler, reinterpret_cast<intptr_t>(helper)));
         return;
@@ -213,7 +211,7 @@ private:
         // TODO some notes here about how we should be on the main event thread
         // so shouldn't be deleting the session out from under while this executes
         // (double check that's true, that timers don't run on some other thread, etc.)
-        WorkHelper* helper = reinterpret_cast<WorkHelper *>(arg);
+        WorkHelper * helper = reinterpret_cast<WorkHelper *>(arg);
         if (auto * session = helper->mSession.load())
         {
             (session->*(helper->mAfterWorkCallback))(helper->mData, helper->mStatus);

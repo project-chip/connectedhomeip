@@ -308,8 +308,9 @@ private:
     // particular session establishment.
     int mSequence = 0;
 
-    template <class DATA> class WorkHelper;
-    std::shared_ptr<WorkHelper<SendSigma3Data> > mSendSigma3Helper;
+    template <class DATA>
+    class WorkHelper;
+    std::shared_ptr<WorkHelper<SendSigma3Data>> mSendSigma3Helper;
 
     State mState;
 
