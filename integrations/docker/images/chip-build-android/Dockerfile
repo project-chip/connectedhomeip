@@ -15,14 +15,14 @@ RUN set -x \
 
 # Download and install android SDK
 RUN set -x \
-    && wget -O /tmp/android-21.zip https://dl.google.com/android/repository/android-21_r02.zip \
+    && wget -O /tmp/android-26.zip https://dl.google.com/android/repository/platform-26_r02.zip \
     && mkdir -p /opt/android/sdk/platforms \
     && cd /opt/android/sdk/platforms \
-    && unzip /tmp/android-21.zip \
-    && mv android-5.0.1 android-21 \
-    && rm -f /tmp/android-21.zip \
+    && unzip /tmp/android-26.zip \
+    && mv android-8.0.0 android-26 \
+    && rm -f /tmp/android-26.zip \
     && chmod -R a+rX /opt/android/sdk \
-    && test -d /opt/android/sdk/platforms/android-21 \
+    && test -d /opt/android/sdk/platforms/android-26 \
     && : # last line
 
 # Download and install android command line tool (for installing `sdkmanager`)
@@ -57,9 +57,9 @@ RUN set -x \
     && export PATH=$ANDROID_NDK_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH \
     && cd /tmp && wget https://www.openssl.org/source/openssl-1.1.1g.tar.gz \
     && mkdir -p $OPENSSL_ARMV7 && cd $OPENSSL_ARMV7 && tar xfz /tmp/openssl-1.1.1g.tar.gz \
-    && cd $OPENSSL_ARMV7/openssl-1.1.1g && CC=clang ANDROID_API=21 ./Configure android-arm -D__ANDROID_API__=21 && make SHLIB_VERSION_NUMBER= SHLIB_EXT=.so \
+    && cd $OPENSSL_ARMV7/openssl-1.1.1g && CC=clang ANDROID_API=26 ./Configure android-arm -D__ANDROID_API__=26 && make SHLIB_VERSION_NUMBER= SHLIB_EXT=.so \
     && mkdir -p $OPENSSL_X86 && cd $OPENSSL_X86 && tar xfz /tmp/openssl-1.1.1g.tar.gz \
-    && cd $OPENSSL_X86/openssl-1.1.1g && CC=clang ANDROID_API=21 ./Configure android-x86 -D__ANDROID_API__=21 && make SHLIB_VERSION_NUMBER= SHLIB_EXT=.so \
+    && cd $OPENSSL_X86/openssl-1.1.1g && CC=clang ANDROID_API=26 ./Configure android-x86 -D__ANDROID_API__=26 && make SHLIB_VERSION_NUMBER= SHLIB_EXT=.so \
     && rm -rf /tmp/OpenSSL_1_1_1g.zip \
     && : # last line
 
