@@ -42,6 +42,8 @@ data secure by applying hardware write protection.
         -   [Option 1: Using the php-json-schema tool](#option-1-using-the-php-json-schema-tool)
         -   [Option 2: Using a website validator](#option-2-using-a-website-validator)
         -   [Option 3: Using the nRF Connect Python script](#option-3-using-the-nrf-connect-python-script)
+    -   [Generating onboarding codes](#generating-onboarding-codes)
+        -   [Enabling onboarding codes generation within the build system](#enabling-onboarding-codes-generation-within-the-build-system)
     -   [Preparing factory data partition on a device](#preparing-factory-data-partition-on-a-device)
     -   [Creating a factory data partition with the second script](#creating-a-factory-data-partition-with-the-second-script)
 -   [Building an example with factory data](#building-an-example-with-factory-data)
@@ -492,6 +494,59 @@ as an additional argument. To do this, complete the following steps:
 
 > **Note:** To learn more about the JSON schema, visit
 > [this unofficial JSON Schema tool usage website](https://json-schema.org/understanding-json-schema/).
+
+### Generating onboarding codes
+
+The
+[generate_nrfconnect_chip_factory_data.py](../../scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py)
+script lets you generating a manual code and a QR code from the given factory
+data parameters. You can use these codes to perform commissioning to the Matter
+network over Bluetooth LE since they include all the pairing data required by
+the Matter controller. You can place these codes on the device packaging or on
+the device itself during production.
+
+To generate a manual pairing code and a QR code, complete the following steps:
+
+1. Install all required Python dependencies for Matter:
+
+    ```
+    $ python -m pip install -r ./scripts/setup/requirements.nrfconnect.txt
+    ```
+
+2. Complete steps 1, 2, and 3 from the
+   [Creating the factory data JSON file with the first script](#creating-the-factory-data-json-file-with-the-first-script)
+   section to prepare the final invocation of the Python script.
+
+3. Add the `--generate_onboarding` argument to the Python script final
+   invocation.
+
+4. Run the script.
+
+5. Navigate to the output directory provided as the `-o` argument.
+
+The output directory contains the following files you need:
+
+-   JSON file containing the latest factory data set.
+-   Test file containing the generated manual code and the text version of the
+    QR Code.
+-   PNG file containing the generated QR Code as an image.
+
+#### Enabling onboarding codes generation within the build system
+
+You can generate onboarding codes using the nRF Connect platform build system
+described in
+[Building an example with factory data](#building-an-example-with-factory-data),
+and build an example with the following additional option:
+`-DCONFIG_CHIP_FACTORY_DATA_GENERATE_ONBOARDING_CODES=y`.
+
+For example, the build command for the nRF52840 DK could look like this:
+
+```
+$ west build -b nrf52840dk_nrf52840 -- \
+-DCONFIG_CHIP_FACTORY_DATA=y \
+-DCONFIG_CHIP_FACTORY_DATA_BUILD=y \
+-DCONFIG_CHIP_FACTORY_DATA_GENERATE_ONBOARDING_CODES=y
+```
 
 ### Preparing factory data partition on a device
 
