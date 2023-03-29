@@ -267,9 +267,23 @@ client cluster OnOff = 6 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+  request struct OffWithEffectRequest {
+    OnOffEffectIdentifier effectIdentifier = 0;
+    int8u effectVariant = 1;
+  }
+
+  request struct OnWithTimedOffRequest {
+    OnOffControl onOffControl = 0;
+    int16u onTime = 1;
+    int16u offWaitTime = 2;
+  }
+
   command Off(): DefaultSuccess = 0;
   command On(): DefaultSuccess = 1;
   command Toggle(): DefaultSuccess = 2;
+  command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
+  command OnWithRecallGlobalScene(): DefaultSuccess = 65;
+  command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 
 server cluster OnOff = 6 {
@@ -416,6 +430,10 @@ client cluster LevelControl = 8 {
     LevelControlOptions optionsOverride = 1;
   }
 
+  request struct MoveToClosestFrequencyRequest {
+    INT16U frequency = 0;
+  }
+
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
   command Move(MoveRequest): DefaultSuccess = 1;
   command Step(StepRequest): DefaultSuccess = 2;
@@ -424,6 +442,7 @@ client cluster LevelControl = 8 {
   command MoveWithOnOff(MoveWithOnOffRequest): DefaultSuccess = 5;
   command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
   command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
+  command MoveToClosestFrequency(MoveToClosestFrequencyRequest): DefaultSuccess = 8;
 }
 
 server cluster LevelControl = 8 {
@@ -1852,6 +1871,11 @@ client cluster Channel = 1284 {
     CHAR_STRING match = 0;
   }
 
+  response struct ChangeChannelResponse = 1 {
+    ChannelStatusEnum status = 0;
+    optional CHAR_STRING data = 1;
+  }
+
   request struct ChangeChannelByNumberRequest {
     INT16U majorNumber = 0;
     INT16U minorNumber = 1;
@@ -1889,6 +1913,11 @@ client cluster TargetNavigator = 1285 {
 
   request struct NavigateTargetRequest {
     INT8U target = 0;
+    optional CHAR_STRING data = 1;
+  }
+
+  response struct NavigateTargetResponse = 1 {
+    TargetNavigatorStatusEnum status = 0;
     optional CHAR_STRING data = 1;
   }
 
@@ -1942,6 +1971,11 @@ client cluster MediaPlayback = 1286 {
 
   request struct SkipBackwardRequest {
     INT64U deltaPositionMilliseconds = 0;
+  }
+
+  response struct PlaybackResponse = 10 {
+    MediaPlaybackStatusEnum status = 0;
+    optional CHAR_STRING data = 1;
   }
 
   request struct SeekRequest {
@@ -2125,6 +2159,10 @@ client cluster KeypadInput = 1289 {
     CecKeyCode keyCode = 0;
   }
 
+  response struct SendKeyResponse = 1 {
+    KeypadInputStatusEnum status = 0;
+  }
+
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
 }
 
@@ -2224,6 +2262,11 @@ client cluster ContentLauncher = 1290 {
     optional BrandingInformationStruct brandingInformation = 2;
   }
 
+  response struct LauncherResponse = 2 {
+    ContentLaunchStatusEnum status = 0;
+    optional CHAR_STRING data = 1;
+  }
+
   command LaunchContent(LaunchContentRequest): LauncherResponse = 0;
   command LaunchURL(LaunchURLRequest): LauncherResponse = 1;
 }
@@ -2313,6 +2356,11 @@ client cluster ApplicationLauncher = 1292 {
     optional ApplicationStruct application = 0;
   }
 
+  response struct LauncherResponse = 3 {
+    ApplicationLauncherStatusEnum status = 0;
+    optional OCTET_STRING data = 1;
+  }
+
   command LaunchApp(LaunchAppRequest): LauncherResponse = 0;
   command StopApp(StopAppRequest): LauncherResponse = 1;
   command HideApp(HideAppRequest): LauncherResponse = 2;
@@ -2357,6 +2405,10 @@ client cluster AccountLogin = 1294 {
 
   request struct GetSetupPINRequest {
     CHAR_STRING<100> tempAccountIdentifier = 0;
+  }
+
+  response struct GetSetupPINResponse = 1 {
+    CHAR_STRING setupPIN = 0;
   }
 
   request struct LoginRequest {
