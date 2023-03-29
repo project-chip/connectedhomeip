@@ -19,6 +19,7 @@
 #include "WakeOnLanManager.h"
 #include <fstream>
 #include <iostream>
+#include <lib/support/BytesToHex.h>
 #include <platform/ConfigurationManager.h>
 #include <string>
 
@@ -36,16 +37,11 @@ std::string getMacAddress()
     }
 
     char macStr[chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength * 2 + 1] = { 0 }; // added null char
-
-    uint8_t j = 0;
-    for (uint8_t i = 0; i < sizeof(macBuffer); i++)
+    if (BytesToHex(&macBuffer[0], sizeof(macBuffer), &macStr[0], sizeof(macBuffer) * 2u, chip::Encoding::HexFlags::kUppercase) !=
+        CHIP_NO_ERROR)
     {
-        j         = i * 2;
-        macStr[j] = (((macBuffer[i] & 0xF0) >> 4) & 0xF);
-        macStr[j] += (macStr[j] <= 9) ? '0' : ('A' - 10);
-        j++;
-        macStr[j] = (macBuffer[i] & 0x0F);
-        macStr[j] += (macStr[j] <= 9) ? '0' : ('A' - 10);
+        ChipLogProgress(Zcl, "WakeOnLanManager::getMacAddress hex conversion failed");
+        return "0000000000";
     }
 
     return std::string(macStr);
