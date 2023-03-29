@@ -1370,7 +1370,7 @@ exit:
 
 CHIP_ERROR CASESession::SendSigma3c(SendSigma3Data & data, CHIP_ERROR status)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     System::PacketBufferHandle msg_R3;
     size_t data_len;
