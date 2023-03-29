@@ -20,7 +20,8 @@ from typing import List, Set, Union
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.generators.types import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
                                          ParseDataType, TypeLookupContext)
-from matter_idl.matter_idl_types import Attribute, Cluster, ClusterSide, Command, DataType, Field, FieldQuality, Idl
+from matter_idl.matter_idl_types import (Attribute, Cluster, ClusterSide, Command, DataType, Field, FieldQuality, Idl, Struct,
+                                         StructTag)
 from stringcase import capitalcase
 
 
@@ -388,6 +389,10 @@ def CanGenerateSubscribe(attr: Attribute, lookup: TypeLookupContext) -> bool:
     return not lookup.is_struct_type(attr.definition.data_type.name)
 
 
+def IsResponseStruct(s: Struct) -> bool:
+    return s.tag == StructTag.RESPONSE
+
+
 class __JavaCodeGenerator(CodeGenerator):
     """
     Code generation for java-specific files.
@@ -414,6 +419,8 @@ class __JavaCodeGenerator(CodeGenerator):
         self.jinja_env.filters['createLookupContext'] = CreateLookupContext
         self.jinja_env.filters['canGenerateSubscribe'] = CanGenerateSubscribe
 
+        self.jinja_env.tests['is_response_struct'] = IsResponseStruct
+
 
 class JavaJNIGenerator(__JavaCodeGenerator):
     """Generates JNI java files (i.e. C++ source/headers)."""
@@ -425,6 +432,15 @@ class JavaJNIGenerator(__JavaCodeGenerator):
         """
         Renders .CPP files required for JNI support.
         """
+
+        self.internal_render_one_output(
+            template_path="java/CHIPCallbackTypes.jinja",
+            output_file_name="jni/CHIPCallbackTypes.h",
+            vars={
+                'idl': self.idl,
+                'clientClusters': [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT],
+            }
+        )
 
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
@@ -462,7 +478,8 @@ class JavaClassGenerator(__JavaCodeGenerator):
         Renders .java files required for java matter support
         """
 
-        clientClusters = [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT]
+        clientClusters = [
+            c for c in self.idl.clusters if c.side == ClusterSide.CLIENT]
 
         self.internal_render_one_output(
             template_path="java/ClusterReadMapping.jinja",
