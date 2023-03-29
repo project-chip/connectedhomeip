@@ -200,7 +200,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         fabric_index(fabric)
     {
         max_scenes_per_fabric = (maxScenePerFabric > kMaxScenesPerFabric) ? kMaxScenesPerFabric : maxScenePerFabric;
-        max_scenes_global     = (max_scenes_global > kMaxScenesGlobal) ? kMaxScenesGlobal : maxScenesGlobal;
+        max_scenes_global     = (maxScenesGlobal > kMaxScenesGlobal) ? kMaxScenesGlobal : maxScenesGlobal;
     }
 
     CHIP_ERROR UpdateKey(StorageKeyName & key) override
