@@ -582,16 +582,10 @@ void OperationalSessionSetup::CancelSessionSetupReattempt()
     // at this point, but hopefully that's because everything is torn down
     // anyway and hence the timer will not fire.
     auto * sessionManager = mInitParams.exchangeMgr->GetSessionManager();
-    if (!sessionManager)
-    {
-        return;
-    }
+    VerifyOrReturn(sessionManager != nullptr);
 
     auto * systemLayer = sessionManager->SystemLayer();
-    if (!systemLayer)
-    {
-        return;
-    }
+    VerifyOrReturn(systemLayer != nullptr);
 
     systemLayer->CancelTimer(TrySetupAgain, this);
 }
