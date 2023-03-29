@@ -144,8 +144,8 @@ void pre_lcd_spi_transfer(void)
  *****************************************************************************/
 void post_lcd_spi_transfer(void)
 {
-    sl_wfx_host_spi_cs_assert();
     spi_drv_reinit(SL_BIT_RATE_EXP_HDR);
+    sl_wfx_host_spi_cs_assert();
     xSemaphoreGive(spi_sem_sync_hdl);
 }
 #if (defined(EFR32MG24) && defined(WF200_WIFI))
