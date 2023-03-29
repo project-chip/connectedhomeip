@@ -18,7 +18,9 @@
 
 /**
  *    @file
- *    Provides an implementation of the event flags for the platform.
+ *    Provides a class that serves as a wrapper for the event system of CYW30739
+ *    platform's underlying RTOS. An event instance is comprised of 32 flags.
+ *    Each flag can be utilized for thread synchronization purposes.
  */
 #include "EventFlags.h"
 
