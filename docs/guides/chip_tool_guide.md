@@ -257,14 +257,15 @@ Alternatively, you can also use a QR code payload.
 
 ##### Commissioning with setup PIN code
 
-To discover devices and try to pair with the first discovered device using the
-provided setup code, use the following command pattern:
+To discover devices and try to pair with one of them using the provided setup
+code, use the following command pattern:
 
 ```
 $ ./chip-tool pairing onnetwork <node_id> <pin_code>
 ```
 
-In this command:
+The command keeps trying devices until pairing with one of them succeeds or
+until it runs out of pairing possibilities. In this command:
 
 -   _<node_id\>_ is the user-defined ID of the node being commissioned.
 -   _<pin_code\>_ is device specific _setup PIN code_ determined in the
@@ -273,14 +274,15 @@ In this command:
 
 ##### Commissioning with long discriminator
 
-To discover devices with a long discriminator and try to pair with the first
-discovered one using the provided setup code, use the following command pattern:
+To discover devices with a long discriminator and try to pair with one of them
+using the provided setup code, use the following command pattern:
 
 ```
 $ ./chip-tool pairing onnetwork-long <node_id> <pin_code> <discriminator>
 ```
 
-In this command:
+The command keeps trying devices until pairing with one of them succeeds or
+until it runs out of pairing possibilities. In this command:
 
 -   _<node_id\>_ is the user-defined ID of the node being commissioned.
 -   _<pin_code\>_ and _<discriminator\>_ are device specific keys determined in
@@ -292,14 +294,14 @@ In this command:
 Matter devices log the QR code payload and manual pairing code when they boot.
 
 To discover devices based on the given QR code payload or manual pairing code
-and try to pair with the first discovered one, use the following command
-pattern:
+and try to pair with one of them, use the following command pattern:
 
 ```
 $ ./chip-tool pairing code <node_id> <qrcode_payload-or-manual_code>
 ```
 
-In this command:
+The command keeps trying devices until pairing with one of them succeeds or
+until it runs out of pairing possibilities. In this command:
 
 -   _<node_id\>_ is the user-defined ID of the node being commissioned.
 -   _<qrcode_payload-or-manual_code\>_ is the QR code payload ID, for example
@@ -410,10 +412,15 @@ The CHIP Tool can run in one of the following modes:
     [1650992689511] [32397:1415601] CHIP: [TOO] Run command failure: ../../../examples/chip-tool/commands/common/CHIPCommand.cpp:392: CHIP Error 0x00000032: Timeout
     ```
 
+    Moreover, when using the single-command mode, the CHIP Tool will establish a
+    new CASE session with every command sent.
+
 -   Interactive mode - In this mode, a command will terminate with an error if
     it does not complete within the timeout period. However, the CHIP Tool will
     not be terminated and it will not terminate processes that previous commands
-    have started.
+    have started. Moreover, when using the interactive mode, the CHIP Tool will
+    establish a new CASE session only when there is no session available yet. On
+    the following commands, it will use the existing session.
 
 #### Modifying timeout duration in single-command mode
 
