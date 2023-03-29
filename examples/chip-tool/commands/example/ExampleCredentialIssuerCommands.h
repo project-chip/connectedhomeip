@@ -81,7 +81,7 @@ public:
             {
                 mDacVerifier->EnableCdTestKeySupport(isEnabled);
             }
-
+            break;
         default:
             break;
         }

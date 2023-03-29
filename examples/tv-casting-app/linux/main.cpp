@@ -141,7 +141,11 @@ int main(int argc, char * argv[])
     VerifyOrDie(CHIP_NO_ERROR == initParams.InitializeStaticResourcesBeforeServerInit());
     VerifyOrDie(CHIP_NO_ERROR == chip::Server::GetInstance().Init(initParams));
 
-    if (ConnectToCachedVideoPlayer() == CHIP_NO_ERROR)
+    if (argc > 1)
+    {
+        ChipLogProgress(AppServer, "Command line parameters detected. Skipping auto-start.");
+    }
+    else if (ConnectToCachedVideoPlayer() == CHIP_NO_ERROR)
     {
         ChipLogProgress(AppServer, "Skipping commissioner discovery / User directed commissioning flow.");
     }
