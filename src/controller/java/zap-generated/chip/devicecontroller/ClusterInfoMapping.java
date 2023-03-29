@@ -13780,7 +13780,7 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> groupsgetGroupMembershipCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo groupsgetGroupMembershipgroupListCommandParameterInfo =
-        new CommandParameterInfo("groupList", ArrayList.class, Object.class);
+        new CommandParameterInfo("groupList", ArrayList.class, Integer.class);
     groupsgetGroupMembershipCommandParams.put(
         "groupList", groupsgetGroupMembershipgroupListCommandParameterInfo);
 
@@ -14017,6 +14017,110 @@ public class ClusterInfoMapping {
             scenesgetSceneMembershipCommandParams);
     scenesClusterInteractionInfoMap.put(
         "getSceneMembership", scenesgetSceneMembershipInteractionInfo);
+    Map<String, CommandParameterInfo> scenesenhancedAddSceneCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo scenesenhancedAddScenegroupIDCommandParameterInfo =
+        new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    scenesenhancedAddSceneCommandParams.put(
+        "groupID", scenesenhancedAddScenegroupIDCommandParameterInfo);
+
+    CommandParameterInfo scenesenhancedAddScenesceneIDCommandParameterInfo =
+        new CommandParameterInfo("sceneID", Integer.class, Integer.class);
+    scenesenhancedAddSceneCommandParams.put(
+        "sceneID", scenesenhancedAddScenesceneIDCommandParameterInfo);
+
+    CommandParameterInfo scenesenhancedAddScenetransitionTimeCommandParameterInfo =
+        new CommandParameterInfo("transitionTime", Integer.class, Integer.class);
+    scenesenhancedAddSceneCommandParams.put(
+        "transitionTime", scenesenhancedAddScenetransitionTimeCommandParameterInfo);
+
+    CommandParameterInfo scenesenhancedAddScenesceneNameCommandParameterInfo =
+        new CommandParameterInfo("sceneName", String.class, String.class);
+    scenesenhancedAddSceneCommandParams.put(
+        "sceneName", scenesenhancedAddScenesceneNameCommandParameterInfo);
+
+    InteractionInfo scenesenhancedAddSceneInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ScenesCluster) cluster)
+                  .enhancedAddScene(
+                      (ChipClusters.ScenesCluster.EnhancedAddSceneResponseCallback) callback,
+                      (Integer) commandArguments.get("groupID"),
+                      (Integer) commandArguments.get("sceneID"),
+                      (Integer) commandArguments.get("transitionTime"),
+                      (String) commandArguments.get("sceneName"),
+                      (ArrayList<ChipStructs.ScenesClusterExtensionFieldSet>)
+                          commandArguments.get("extensionFieldSets"));
+            },
+            () -> new DelegatedScenesClusterEnhancedAddSceneResponseCallback(),
+            scenesenhancedAddSceneCommandParams);
+    scenesClusterInteractionInfoMap.put("enhancedAddScene", scenesenhancedAddSceneInteractionInfo);
+    Map<String, CommandParameterInfo> scenesenhancedViewSceneCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo scenesenhancedViewScenegroupIDCommandParameterInfo =
+        new CommandParameterInfo("groupID", Integer.class, Integer.class);
+    scenesenhancedViewSceneCommandParams.put(
+        "groupID", scenesenhancedViewScenegroupIDCommandParameterInfo);
+
+    CommandParameterInfo scenesenhancedViewScenesceneIDCommandParameterInfo =
+        new CommandParameterInfo("sceneID", Integer.class, Integer.class);
+    scenesenhancedViewSceneCommandParams.put(
+        "sceneID", scenesenhancedViewScenesceneIDCommandParameterInfo);
+
+    InteractionInfo scenesenhancedViewSceneInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ScenesCluster) cluster)
+                  .enhancedViewScene(
+                      (ChipClusters.ScenesCluster.EnhancedViewSceneResponseCallback) callback,
+                      (Integer) commandArguments.get("groupID"),
+                      (Integer) commandArguments.get("sceneID"));
+            },
+            () -> new DelegatedScenesClusterEnhancedViewSceneResponseCallback(),
+            scenesenhancedViewSceneCommandParams);
+    scenesClusterInteractionInfoMap.put(
+        "enhancedViewScene", scenesenhancedViewSceneInteractionInfo);
+    Map<String, CommandParameterInfo> scenescopySceneCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo scenescopyScenemodeCommandParameterInfo =
+        new CommandParameterInfo("mode", Integer.class, Integer.class);
+    scenescopySceneCommandParams.put("mode", scenescopyScenemodeCommandParameterInfo);
+
+    CommandParameterInfo scenescopyScenegroupIdentifierFromCommandParameterInfo =
+        new CommandParameterInfo("groupIdentifierFrom", Integer.class, Integer.class);
+    scenescopySceneCommandParams.put(
+        "groupIdentifierFrom", scenescopyScenegroupIdentifierFromCommandParameterInfo);
+
+    CommandParameterInfo scenescopyScenesceneIdentifierFromCommandParameterInfo =
+        new CommandParameterInfo("sceneIdentifierFrom", Integer.class, Integer.class);
+    scenescopySceneCommandParams.put(
+        "sceneIdentifierFrom", scenescopyScenesceneIdentifierFromCommandParameterInfo);
+
+    CommandParameterInfo scenescopyScenegroupIdentifierToCommandParameterInfo =
+        new CommandParameterInfo("groupIdentifierTo", Integer.class, Integer.class);
+    scenescopySceneCommandParams.put(
+        "groupIdentifierTo", scenescopyScenegroupIdentifierToCommandParameterInfo);
+
+    CommandParameterInfo scenescopyScenesceneIdentifierToCommandParameterInfo =
+        new CommandParameterInfo("sceneIdentifierTo", Integer.class, Integer.class);
+    scenescopySceneCommandParams.put(
+        "sceneIdentifierTo", scenescopyScenesceneIdentifierToCommandParameterInfo);
+
+    InteractionInfo scenescopySceneInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ScenesCluster) cluster)
+                  .copyScene(
+                      (ChipClusters.ScenesCluster.CopySceneResponseCallback) callback,
+                      (Integer) commandArguments.get("mode"),
+                      (Integer) commandArguments.get("groupIdentifierFrom"),
+                      (Integer) commandArguments.get("sceneIdentifierFrom"),
+                      (Integer) commandArguments.get("groupIdentifierTo"),
+                      (Integer) commandArguments.get("sceneIdentifierTo"));
+            },
+            () -> new DelegatedScenesClusterCopySceneResponseCallback(),
+            scenescopySceneCommandParams);
+    scenesClusterInteractionInfoMap.put("copyScene", scenescopySceneInteractionInfo);
     commandMap.put("scenes", scenesClusterInteractionInfoMap);
     Map<String, InteractionInfo> onOffClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> onOffoffCommandParams =
@@ -14396,6 +14500,25 @@ public class ClusterInfoMapping {
             levelControlstopWithOnOffCommandParams);
     levelControlClusterInteractionInfoMap.put(
         "stopWithOnOff", levelControlstopWithOnOffInteractionInfo);
+    Map<String, CommandParameterInfo> levelControlmoveToClosestFrequencyCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo levelControlmoveToClosestFrequencyfrequencyCommandParameterInfo =
+        new CommandParameterInfo("frequency", Integer.class, Integer.class);
+    levelControlmoveToClosestFrequencyCommandParams.put(
+        "frequency", levelControlmoveToClosestFrequencyfrequencyCommandParameterInfo);
+
+    InteractionInfo levelControlmoveToClosestFrequencyInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.LevelControlCluster) cluster)
+                  .moveToClosestFrequency(
+                      (DefaultClusterCallback) callback,
+                      (Integer) commandArguments.get("frequency"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            levelControlmoveToClosestFrequencyCommandParams);
+    levelControlClusterInteractionInfoMap.put(
+        "moveToClosestFrequency", levelControlmoveToClosestFrequencyInteractionInfo);
     commandMap.put("levelControl", levelControlClusterInteractionInfoMap);
     Map<String, InteractionInfo> binaryInputBasicClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("binaryInputBasic", binaryInputBasicClusterInteractionInfoMap);
@@ -14725,6 +14848,18 @@ public class ClusterInfoMapping {
         "disableActionWithDuration", actionsdisableActionWithDurationInteractionInfo);
     commandMap.put("actions", actionsClusterInteractionInfoMap);
     Map<String, InteractionInfo> basicInformationClusterInteractionInfoMap = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> basicInformationmfgSpecificPingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo basicInformationmfgSpecificPingInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BasicInformationCluster) cluster)
+                  .mfgSpecificPing((DefaultClusterCallback) callback);
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            basicInformationmfgSpecificPingCommandParams);
+    basicInformationClusterInteractionInfoMap.put(
+        "mfgSpecificPing", basicInformationmfgSpecificPingInteractionInfo);
     commandMap.put("basicInformation", basicInformationClusterInteractionInfoMap);
     Map<String, InteractionInfo> otaSoftwareUpdateProviderClusterInteractionInfoMap =
         new LinkedHashMap<>();
@@ -14746,7 +14881,7 @@ public class ClusterInfoMapping {
         "softwareVersion", otaSoftwareUpdateProviderqueryImagesoftwareVersionCommandParameterInfo);
 
     CommandParameterInfo otaSoftwareUpdateProviderqueryImageprotocolsSupportedCommandParameterInfo =
-        new CommandParameterInfo("protocolsSupported", ArrayList.class, Object.class);
+        new CommandParameterInfo("protocolsSupported", ArrayList.class, Integer.class);
     otaSoftwareUpdateProviderqueryImageCommandParams.put(
         "protocolsSupported",
         otaSoftwareUpdateProviderqueryImageprotocolsSupportedCommandParameterInfo);
@@ -15653,7 +15788,7 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> groupKeyManagementkeySetReadAllIndicesCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo groupKeyManagementkeySetReadAllIndicesgroupKeySetIDsCommandParameterInfo =
-        new CommandParameterInfo("groupKeySetIDs", ArrayList.class, Object.class);
+        new CommandParameterInfo("groupKeySetIDs", ArrayList.class, Integer.class);
     groupKeyManagementkeySetReadAllIndicesCommandParams.put(
         "groupKeySetIDs", groupKeyManagementkeySetReadAllIndicesgroupKeySetIDsCommandParameterInfo);
 
@@ -17819,6 +17954,57 @@ public class ClusterInfoMapping {
     commandMap.put("accountLogin", accountLoginClusterInteractionInfoMap);
     Map<String, InteractionInfo> electricalMeasurementClusterInteractionInfoMap =
         new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> electricalMeasurementgetProfileInfoCommandCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo electricalMeasurementgetProfileInfoCommandInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectricalMeasurementCluster) cluster)
+                  .getProfileInfoCommand((DefaultClusterCallback) callback);
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            electricalMeasurementgetProfileInfoCommandCommandParams);
+    electricalMeasurementClusterInteractionInfoMap.put(
+        "getProfileInfoCommand", electricalMeasurementgetProfileInfoCommandInteractionInfo);
+    Map<String, CommandParameterInfo>
+        electricalMeasurementgetMeasurementProfileCommandCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo
+        electricalMeasurementgetMeasurementProfileCommandattributeIdCommandParameterInfo =
+            new CommandParameterInfo("attributeId", Integer.class, Integer.class);
+    electricalMeasurementgetMeasurementProfileCommandCommandParams.put(
+        "attributeId",
+        electricalMeasurementgetMeasurementProfileCommandattributeIdCommandParameterInfo);
+
+    CommandParameterInfo
+        electricalMeasurementgetMeasurementProfileCommandstartTimeCommandParameterInfo =
+            new CommandParameterInfo("startTime", Long.class, Long.class);
+    electricalMeasurementgetMeasurementProfileCommandCommandParams.put(
+        "startTime",
+        electricalMeasurementgetMeasurementProfileCommandstartTimeCommandParameterInfo);
+
+    CommandParameterInfo
+        electricalMeasurementgetMeasurementProfileCommandnumberOfIntervalsCommandParameterInfo =
+            new CommandParameterInfo("numberOfIntervals", Integer.class, Integer.class);
+    electricalMeasurementgetMeasurementProfileCommandCommandParams.put(
+        "numberOfIntervals",
+        electricalMeasurementgetMeasurementProfileCommandnumberOfIntervalsCommandParameterInfo);
+
+    InteractionInfo electricalMeasurementgetMeasurementProfileCommandInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ElectricalMeasurementCluster) cluster)
+                  .getMeasurementProfileCommand(
+                      (DefaultClusterCallback) callback,
+                      (Integer) commandArguments.get("attributeId"),
+                      (Long) commandArguments.get("startTime"),
+                      (Integer) commandArguments.get("numberOfIntervals"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            electricalMeasurementgetMeasurementProfileCommandCommandParams);
+    electricalMeasurementClusterInteractionInfoMap.put(
+        "getMeasurementProfileCommand",
+        electricalMeasurementgetMeasurementProfileCommandInteractionInfo);
     commandMap.put("electricalMeasurement", electricalMeasurementClusterInteractionInfoMap);
     Map<String, InteractionInfo> clientMonitoringClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> clientMonitoringregisterClientMonitoringCommandParams =
@@ -17872,6 +18058,18 @@ public class ClusterInfoMapping {
             clientMonitoringunregisterClientMonitoringCommandParams);
     clientMonitoringClusterInteractionInfoMap.put(
         "unregisterClientMonitoring", clientMonitoringunregisterClientMonitoringInteractionInfo);
+    Map<String, CommandParameterInfo> clientMonitoringstayAwakeRequestCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo clientMonitoringstayAwakeRequestInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ClientMonitoringCluster) cluster)
+                  .stayAwakeRequest((DefaultClusterCallback) callback);
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            clientMonitoringstayAwakeRequestCommandParams);
+    clientMonitoringClusterInteractionInfoMap.put(
+        "stayAwakeRequest", clientMonitoringstayAwakeRequestInteractionInfo);
     commandMap.put("clientMonitoring", clientMonitoringClusterInteractionInfoMap);
     Map<String, InteractionInfo> unitTestingClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> unitTestingtestCommandParams =
@@ -17946,6 +18144,67 @@ public class ClusterInfoMapping {
             unitTestingtestAddArgumentsCommandParams);
     unitTestingClusterInteractionInfoMap.put(
         "testAddArguments", unitTestingtestAddArgumentsInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestSimpleArgumentRequestCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo unitTestingtestSimpleArgumentRequestarg1CommandParameterInfo =
+        new CommandParameterInfo("arg1", Boolean.class, Boolean.class);
+    unitTestingtestSimpleArgumentRequestCommandParams.put(
+        "arg1", unitTestingtestSimpleArgumentRequestarg1CommandParameterInfo);
+
+    InteractionInfo unitTestingtestSimpleArgumentRequestInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UnitTestingCluster) cluster)
+                  .testSimpleArgumentRequest(
+                      (ChipClusters.UnitTestingCluster.TestSimpleArgumentResponseCallback) callback,
+                      (Boolean) commandArguments.get("arg1"));
+            },
+            () -> new DelegatedUnitTestingClusterTestSimpleArgumentResponseCallback(),
+            unitTestingtestSimpleArgumentRequestCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testSimpleArgumentRequest", unitTestingtestSimpleArgumentRequestInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestStructArrayArgumentRequestCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo unitTestingtestStructArrayArgumentRequestarg3CommandParameterInfo =
+        new CommandParameterInfo("arg3", ArrayList.class, Integer.class);
+    unitTestingtestStructArrayArgumentRequestCommandParams.put(
+        "arg3", unitTestingtestStructArrayArgumentRequestarg3CommandParameterInfo);
+
+    CommandParameterInfo unitTestingtestStructArrayArgumentRequestarg4CommandParameterInfo =
+        new CommandParameterInfo("arg4", ArrayList.class, Integer.class);
+    unitTestingtestStructArrayArgumentRequestCommandParams.put(
+        "arg4", unitTestingtestStructArrayArgumentRequestarg4CommandParameterInfo);
+
+    CommandParameterInfo unitTestingtestStructArrayArgumentRequestarg5CommandParameterInfo =
+        new CommandParameterInfo("arg5", Integer.class, Integer.class);
+    unitTestingtestStructArrayArgumentRequestCommandParams.put(
+        "arg5", unitTestingtestStructArrayArgumentRequestarg5CommandParameterInfo);
+
+    CommandParameterInfo unitTestingtestStructArrayArgumentRequestarg6CommandParameterInfo =
+        new CommandParameterInfo("arg6", Boolean.class, Boolean.class);
+    unitTestingtestStructArrayArgumentRequestCommandParams.put(
+        "arg6", unitTestingtestStructArrayArgumentRequestarg6CommandParameterInfo);
+
+    InteractionInfo unitTestingtestStructArrayArgumentRequestInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UnitTestingCluster) cluster)
+                  .testStructArrayArgumentRequest(
+                      (ChipClusters.UnitTestingCluster.TestStructArrayArgumentResponseCallback)
+                          callback,
+                      (ArrayList<ChipStructs.UnitTestingClusterNestedStructList>)
+                          commandArguments.get("arg1"),
+                      (ArrayList<ChipStructs.UnitTestingClusterSimpleStruct>)
+                          commandArguments.get("arg2"),
+                      (ArrayList<Integer>) commandArguments.get("arg3"),
+                      (ArrayList<Integer>) commandArguments.get("arg4"),
+                      (Integer) commandArguments.get("arg5"),
+                      (Boolean) commandArguments.get("arg6"));
+            },
+            () -> new DelegatedUnitTestingClusterTestStructArrayArgumentResponseCallback(),
+            unitTestingtestStructArrayArgumentRequestCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testStructArrayArgumentRequest", unitTestingtestStructArrayArgumentRequestInteractionInfo);
     Map<String, CommandParameterInfo> unitTestingtestStructArgumentRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo unitTestingtestStructArgumentRequestInteractionInfo =
@@ -17993,7 +18252,7 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> unitTestingtestListInt8UArgumentRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo unitTestingtestListInt8UArgumentRequestarg1CommandParameterInfo =
-        new CommandParameterInfo("arg1", ArrayList.class, Object.class);
+        new CommandParameterInfo("arg1", ArrayList.class, Integer.class);
     unitTestingtestListInt8UArgumentRequestCommandParams.put(
         "arg1", unitTestingtestListInt8UArgumentRequestarg1CommandParameterInfo);
 
@@ -18045,7 +18304,7 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> unitTestingtestListInt8UReverseRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo unitTestingtestListInt8UReverseRequestarg1CommandParameterInfo =
-        new CommandParameterInfo("arg1", ArrayList.class, Object.class);
+        new CommandParameterInfo("arg1", ArrayList.class, Integer.class);
     unitTestingtestListInt8UReverseRequestCommandParams.put(
         "arg1", unitTestingtestListInt8UReverseRequestarg1CommandParameterInfo);
 
@@ -18107,6 +18366,99 @@ public class ClusterInfoMapping {
             unitTestingtestNullableOptionalRequestCommandParams);
     unitTestingClusterInteractionInfoMap.put(
         "testNullableOptionalRequest", unitTestingtestNullableOptionalRequestInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestComplexNullableOptionalRequestCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo
+        unitTestingtestComplexNullableOptionalRequestnullableIntCommandParameterInfo =
+            new CommandParameterInfo("nullableInt", Integer.class, Integer.class);
+    unitTestingtestComplexNullableOptionalRequestCommandParams.put(
+        "nullableInt",
+        unitTestingtestComplexNullableOptionalRequestnullableIntCommandParameterInfo);
+
+    CommandParameterInfo
+        unitTestingtestComplexNullableOptionalRequestoptionalIntCommandParameterInfo =
+            new CommandParameterInfo("optionalInt", Optional.class, Integer.class);
+    unitTestingtestComplexNullableOptionalRequestCommandParams.put(
+        "optionalInt",
+        unitTestingtestComplexNullableOptionalRequestoptionalIntCommandParameterInfo);
+
+    CommandParameterInfo
+        unitTestingtestComplexNullableOptionalRequestnullableOptionalIntCommandParameterInfo =
+            new CommandParameterInfo("nullableOptionalInt", Optional.class, Integer.class);
+    unitTestingtestComplexNullableOptionalRequestCommandParams.put(
+        "nullableOptionalInt",
+        unitTestingtestComplexNullableOptionalRequestnullableOptionalIntCommandParameterInfo);
+
+    CommandParameterInfo
+        unitTestingtestComplexNullableOptionalRequestnullableStringCommandParameterInfo =
+            new CommandParameterInfo("nullableString", String.class, String.class);
+    unitTestingtestComplexNullableOptionalRequestCommandParams.put(
+        "nullableString",
+        unitTestingtestComplexNullableOptionalRequestnullableStringCommandParameterInfo);
+
+    CommandParameterInfo
+        unitTestingtestComplexNullableOptionalRequestoptionalStringCommandParameterInfo =
+            new CommandParameterInfo("optionalString", Optional.class, String.class);
+    unitTestingtestComplexNullableOptionalRequestCommandParams.put(
+        "optionalString",
+        unitTestingtestComplexNullableOptionalRequestoptionalStringCommandParameterInfo);
+
+    CommandParameterInfo
+        unitTestingtestComplexNullableOptionalRequestnullableOptionalStringCommandParameterInfo =
+            new CommandParameterInfo("nullableOptionalString", Optional.class, String.class);
+    unitTestingtestComplexNullableOptionalRequestCommandParams.put(
+        "nullableOptionalString",
+        unitTestingtestComplexNullableOptionalRequestnullableOptionalStringCommandParameterInfo);
+
+    CommandParameterInfo
+        unitTestingtestComplexNullableOptionalRequestnullableListCommandParameterInfo =
+            new CommandParameterInfo("nullableList", ArrayList.class, Integer.class);
+    unitTestingtestComplexNullableOptionalRequestCommandParams.put(
+        "nullableList",
+        unitTestingtestComplexNullableOptionalRequestnullableListCommandParameterInfo);
+
+    CommandParameterInfo
+        unitTestingtestComplexNullableOptionalRequestoptionalListCommandParameterInfo =
+            new CommandParameterInfo("optionalList", Optional.class, Integer.class);
+    unitTestingtestComplexNullableOptionalRequestCommandParams.put(
+        "optionalList",
+        unitTestingtestComplexNullableOptionalRequestoptionalListCommandParameterInfo);
+
+    CommandParameterInfo
+        unitTestingtestComplexNullableOptionalRequestnullableOptionalListCommandParameterInfo =
+            new CommandParameterInfo("nullableOptionalList", Optional.class, Integer.class);
+    unitTestingtestComplexNullableOptionalRequestCommandParams.put(
+        "nullableOptionalList",
+        unitTestingtestComplexNullableOptionalRequestnullableOptionalListCommandParameterInfo);
+
+    InteractionInfo unitTestingtestComplexNullableOptionalRequestInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UnitTestingCluster) cluster)
+                  .testComplexNullableOptionalRequest(
+                      (ChipClusters.UnitTestingCluster.TestComplexNullableOptionalResponseCallback)
+                          callback,
+                      (Integer) commandArguments.get("nullableInt"),
+                      (Optional<Integer>) commandArguments.get("optionalInt"),
+                      (Optional<Integer>) commandArguments.get("nullableOptionalInt"),
+                      (String) commandArguments.get("nullableString"),
+                      (Optional<String>) commandArguments.get("optionalString"),
+                      (Optional<String>) commandArguments.get("nullableOptionalString"),
+                      (ChipStructs.UnitTestingClusterSimpleStruct)
+                          commandArguments.get("nullableStruct"),
+                      (Optional<ChipStructs.UnitTestingClusterSimpleStruct>)
+                          commandArguments.get("optionalStruct"),
+                      (Optional<ChipStructs.UnitTestingClusterSimpleStruct>)
+                          commandArguments.get("nullableOptionalStruct"),
+                      (ArrayList<Integer>) commandArguments.get("nullableList"),
+                      (Optional<ArrayList<Integer>>) commandArguments.get("optionalList"),
+                      (Optional<ArrayList<Integer>>) commandArguments.get("nullableOptionalList"));
+            },
+            () -> new DelegatedUnitTestingClusterTestComplexNullableOptionalResponseCallback(),
+            unitTestingtestComplexNullableOptionalRequestCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testComplexNullableOptionalRequest",
+        unitTestingtestComplexNullableOptionalRequestInteractionInfo);
     Map<String, CommandParameterInfo> unitTestingsimpleStructEchoRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo unitTestingsimpleStructEchoRequestInteractionInfo =
@@ -18184,6 +18536,28 @@ public class ClusterInfoMapping {
             unitTestingtestEmitTestEventRequestCommandParams);
     unitTestingClusterInteractionInfoMap.put(
         "testEmitTestEventRequest", unitTestingtestEmitTestEventRequestInteractionInfo);
+    Map<String, CommandParameterInfo> unitTestingtestEmitTestFabricScopedEventRequestCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo unitTestingtestEmitTestFabricScopedEventRequestarg1CommandParameterInfo =
+        new CommandParameterInfo("arg1", Integer.class, Integer.class);
+    unitTestingtestEmitTestFabricScopedEventRequestCommandParams.put(
+        "arg1", unitTestingtestEmitTestFabricScopedEventRequestarg1CommandParameterInfo);
+
+    InteractionInfo unitTestingtestEmitTestFabricScopedEventRequestInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UnitTestingCluster) cluster)
+                  .testEmitTestFabricScopedEventRequest(
+                      (ChipClusters.UnitTestingCluster
+                              .TestEmitTestFabricScopedEventResponseCallback)
+                          callback,
+                      (Integer) commandArguments.get("arg1"));
+            },
+            () -> new DelegatedUnitTestingClusterTestEmitTestFabricScopedEventResponseCallback(),
+            unitTestingtestEmitTestFabricScopedEventRequestCommandParams);
+    unitTestingClusterInteractionInfoMap.put(
+        "testEmitTestFabricScopedEventRequest",
+        unitTestingtestEmitTestFabricScopedEventRequestInteractionInfo);
     commandMap.put("unitTesting", unitTestingClusterInteractionInfoMap);
     return commandMap;
   }
