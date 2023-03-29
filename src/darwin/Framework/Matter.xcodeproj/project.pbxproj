@@ -137,6 +137,7 @@
 		5136661628067D550025EDAE /* MTRDeviceControllerFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 5136661228067D550025EDAE /* MTRDeviceControllerFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		513DDB862761F69300DAA01A /* MTRAttributeTLVValueDecoder_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 513DDB852761F69300DAA01A /* MTRAttributeTLVValueDecoder_Internal.h */; };
 		513DDB8A2761F6F900DAA01A /* MTRAttributeTLVValueDecoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = 513DDB892761F6F900DAA01A /* MTRAttributeTLVValueDecoder.mm */; };
+		5142E39829D377F000A206F0 /* MTROTAProviderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5142E39729D377F000A206F0 /* MTROTAProviderTests.m */; };
 		514304202914CED9004DC7FE /* generic-callback-stubs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */; };
 		51431AF927D2973E008A7943 /* MTRIMDispatch.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51431AF827D2973E008A7943 /* MTRIMDispatch.mm */; };
 		51431AFB27D29CA4008A7943 /* ota-provider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 51431AFA27D29CA4008A7943 /* ota-provider.cpp */; };
@@ -420,6 +421,7 @@
 		5136661228067D550025EDAE /* MTRDeviceControllerFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDeviceControllerFactory.h; sourceTree = "<group>"; };
 		513DDB852761F69300DAA01A /* MTRAttributeTLVValueDecoder_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRAttributeTLVValueDecoder_Internal.h; sourceTree = "<group>"; };
 		513DDB892761F6F900DAA01A /* MTRAttributeTLVValueDecoder.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRAttributeTLVValueDecoder.mm; sourceTree = "<group>"; };
+		5142E39729D377F000A206F0 /* MTROTAProviderTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTROTAProviderTests.m; sourceTree = "<group>"; };
 		5143041F2914CED9004DC7FE /* generic-callback-stubs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "generic-callback-stubs.cpp"; path = "util/generic-callback-stubs.cpp"; sourceTree = "<group>"; };
 		51431AF827D2973E008A7943 /* MTRIMDispatch.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRIMDispatch.mm; sourceTree = "<group>"; };
 		51431AFA27D29CA4008A7943 /* ota-provider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "ota-provider.cpp"; path = "clusters/ota-provider/ota-provider.cpp"; sourceTree = "<group>"; };
@@ -1051,6 +1053,7 @@
 				510CECA6297F72470064E0B3 /* MTROperationalCertificateIssuerTests.m */,
 				5173A47829C0E82300F67F48 /* MTRFabricInfoTests.m */,
 				51742B4D29CB6B88009974FE /* MTRPairingTests.m */,
+				5142E39729D377F000A206F0 /* MTROTAProviderTests.m */,
 				B202529D2459E34F00F97062 /* Info.plist */,
 			);
 			path = CHIPTests;
@@ -1457,6 +1460,7 @@
 				B2F53AF2245B0DCF0010745E /* MTRSetupPayloadParserTests.m in Sources */,
 				3DFCB3292966684500332B35 /* MTRCertificateInfoTests.m in Sources */,
 				517BF3F3282B62CB00A8B7DB /* MTRCertificateTests.m in Sources */,
+				5142E39829D377F000A206F0 /* MTROTAProviderTests.m in Sources */,
 				51E24E73274E0DAC007CCF6E /* MTRErrorTestUtils.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
