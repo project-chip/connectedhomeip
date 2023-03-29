@@ -1046,10 +1046,25 @@ client cluster GeneralCommissioning = 48 {
     INT64U breadcrumb = 1;
   }
 
+  response struct ArmFailSafeResponse = 1 {
+    CommissioningError errorCode = 0;
+    CHAR_STRING debugText = 1;
+  }
+
   request struct SetRegulatoryConfigRequest {
     RegulatoryLocationType newRegulatoryConfig = 0;
     CHAR_STRING countryCode = 1;
     INT64U breadcrumb = 2;
+  }
+
+  response struct SetRegulatoryConfigResponse = 3 {
+    CommissioningError errorCode = 0;
+    CHAR_STRING debugText = 1;
+  }
+
+  response struct CommissioningCompleteResponse = 5 {
+    CommissioningError errorCode = 0;
+    CHAR_STRING debugText = 1;
   }
 
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
@@ -1696,13 +1711,27 @@ client cluster OperationalCredentials = 62 {
     OCTET_STRING attestationNonce = 0;
   }
 
+  response struct AttestationResponse = 1 {
+    OCTET_STRING attestationElements = 0;
+    OCTET_STRING attestationSignature = 1;
+  }
+
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
+  }
+
+  response struct CertificateChainResponse = 3 {
+    OCTET_STRING certificate = 0;
   }
 
   request struct CSRRequestRequest {
     OCTET_STRING CSRNonce = 0;
     optional boolean isForUpdateNOC = 1;
+  }
+
+  response struct CSRResponse = 5 {
+    OCTET_STRING NOCSRElements = 0;
+    OCTET_STRING attestationSignature = 1;
   }
 
   request struct AddNOCRequest {
@@ -1716,6 +1745,12 @@ client cluster OperationalCredentials = 62 {
   request struct UpdateNOCRequest {
     OCTET_STRING NOCValue = 0;
     optional OCTET_STRING ICACValue = 1;
+  }
+
+  response struct NOCResponse = 8 {
+    NodeOperationalCertStatusEnum statusCode = 0;
+    optional fabric_idx fabricIndex = 1;
+    optional CHAR_STRING debugText = 2;
   }
 
   request struct UpdateFabricLabelRequest {

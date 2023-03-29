@@ -428,16 +428,6 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     optional OCTET_STRING<512> metadataForProvider = 7;
   }
 
-  request struct ApplyUpdateRequestRequest {
-    OCTET_STRING<32> updateToken = 0;
-    INT32U newVersion = 1;
-  }
-
-  request struct NotifyUpdateAppliedRequest {
-    OCTET_STRING<32> updateToken = 0;
-    INT32U softwareVersion = 1;
-  }
-
   response struct QueryImageResponse = 1 {
     OTAQueryStatus status = 0;
     optional INT32U delayedActionTime = 1;
@@ -449,9 +439,19 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     optional OCTET_STRING<512> metadataForRequestor = 7;
   }
 
+  request struct ApplyUpdateRequestRequest {
+    OCTET_STRING<32> updateToken = 0;
+    INT32U newVersion = 1;
+  }
+
   response struct ApplyUpdateResponse = 3 {
     OTAApplyUpdateAction action = 0;
     INT32U delayedActionTime = 1;
+  }
+
+  request struct NotifyUpdateAppliedRequest {
+    OCTET_STRING<32> updateToken = 0;
+    INT32U softwareVersion = 1;
   }
 
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
@@ -1356,6 +1356,35 @@ client cluster Thermostat = 513 {
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetpointRaiseLowerRequest {
+    SetpointAdjustMode mode = 0;
+    INT8S amount = 1;
+  }
+
+  response struct GetWeeklyScheduleResponse = 0 {
+    INT8U numberOfTransitionsForSequence = 0;
+    DayOfWeek dayOfWeekForSequence = 1;
+    ModeForSequence modeForSequence = 2;
+    ThermostatScheduleTransition transitions[] = 3;
+  }
+
+  request struct SetWeeklyScheduleRequest {
+    INT8U numberOfTransitionsForSequence = 0;
+    DayOfWeek dayOfWeekForSequence = 1;
+    ModeForSequence modeForSequence = 2;
+    ThermostatScheduleTransition transitions[] = 3;
+  }
+
+  request struct GetWeeklyScheduleRequest {
+    DayOfWeek daysToReturn = 0;
+    ModeForSequence modeToReturn = 1;
+  }
+
+  command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
+  command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
+  command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
+  command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
 }
 
 server cluster FanControl = 514 {

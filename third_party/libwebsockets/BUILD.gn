@@ -18,14 +18,16 @@ config("libwebsockets_config") {
     "repo/include",
   ]
 
+  defines = []
+}
+
+config("libwebsockets_config_disable_warnings") {
   cflags = [
     "-Wno-shadow",
     "-Wno-unreachable-code",
     "-Wno-format-nonliteral",
     "-Wno-implicit-fallthrough",
   ]
-
-  defines = []
 }
 
 source_set("libwebsockets") {
@@ -107,4 +109,5 @@ source_set("libwebsockets") {
   }
 
   public_configs = [ ":libwebsockets_config" ]
+  configs += [ ":libwebsockets_config_disable_warnings" ]
 }

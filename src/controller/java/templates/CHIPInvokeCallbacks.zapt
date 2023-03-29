@@ -8,22 +8,22 @@
 
 namespace chip {
 
-{{#chip_client_clusters}}
-{{#chip_cluster_responses}}
-class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback : public Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}CallbackType>
+{{#all_user_clusters}}
+   {{#zcl_commands_source_server}}
+class CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase commandName}}Callback : public Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase commandName}}CallbackType>
 {
 public:
-    CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback(jobject javaCallback);
+    CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase commandName}}Callback(jobject javaCallback);
 
-    ~CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback();
+    ~CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase commandName}}Callback();
 
-    static void CallbackFn(void * context, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType & data);
-    
+    static void CallbackFn(void * context, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase commandName}}::DecodableType & data);
+
 private:
     jobject javaCallbackRef;
 };
 
-{{/chip_cluster_responses}}
-{{/chip_client_clusters}}
+  {{/zcl_commands_source_server}}
+{{/all_user_clusters}}
 } // namespace chip
 {{/if}}
