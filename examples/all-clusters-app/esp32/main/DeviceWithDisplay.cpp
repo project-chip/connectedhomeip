@@ -717,11 +717,10 @@ esp_err_t InitM5Stack(std::string qrCodeText)
                        ESP_LOGI(TAG, "Opening Setup list");
                        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<SetupListModel>()));
                    })
-            ->Item("Status",
-                   [=]() {
-                       ESP_LOGI(TAG, "Opening Status screen");
-                       ScreenManager::PushScreen(chip::Platform::New<StatusScreen>());
-                   })));
+            ->Item("Status", [=]() {
+                ESP_LOGI(TAG, "Opening Status screen");
+                ScreenManager::PushScreen(chip::Platform::New<StatusScreen>());
+            })));
     return ESP_OK;
 }
 #endif
