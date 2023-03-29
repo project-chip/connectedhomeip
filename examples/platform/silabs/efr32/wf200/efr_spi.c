@@ -53,7 +53,6 @@
 #include "spi_multiplex.h"
 StaticSemaphore_t spi_sem_peripharal;
 SemaphoreHandle_t spi_sem_sync_hdl;
-peripheraltype_t pr_type = EXP_HDR;
 #endif
 extern SPIDRV_Handle_t sl_spidrv_exp_handle;
 
@@ -113,10 +112,8 @@ sl_status_t sl_wfx_host_init_bus(void)
     spi_sem = xSemaphoreCreateBinaryStatic(&xEfrSpiSemaBuffer);
     xSemaphoreGive(spi_sem);
 
-#if defined(EFR32MG24)
     spi_sem_sync_hdl = xSemaphoreCreateBinaryStatic(&spi_sem_peripharal);
     xSemaphoreGive(spi_sem_sync_hdl);
-#endif
     return SL_STATUS_OK;
 }
 
@@ -130,6 +127,7 @@ sl_status_t sl_wfx_host_init_bus(void)
 sl_status_t sl_wfx_host_deinit_bus(void)
 {
     vSemaphoreDelete(spi_sem);
+    vSemaphoreDelete(spi_sem_sync_hdl);
     // Stop DMAs.
     DMADRV_StopTransfer(rx_dma_channel);
     DMADRV_StopTransfer(tx_dma_channel);
@@ -259,18 +257,6 @@ sl_status_t sl_wfx_host_spi_transfer_no_cs_assert(sl_wfx_host_bus_transfer_type_
                                                   uint8_t * buffer, uint16_t buffer_length)
 {
     sl_status_t result = SL_STATUS_FAIL;
-#if defined(EFR32MG24)
-    if (pr_type != EXP_HDR)
-    {
-        pr_type = EXP_HDR;
-        set_spi_baudrate(pr_type);
-    }
-    if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
-    {
-        return SL_STATUS_TIMEOUT;
-    }
-    sl_wfx_host_spi_cs_assert();
-#endif
     const bool is_read = (type == SL_WFX_BUS_READ);
 
     while (!(MY_USART->STATUS & USART_STATUS_TXBL))
@@ -321,10 +307,6 @@ sl_status_t sl_wfx_host_spi_transfer_no_cs_assert(sl_wfx_host_bus_transfer_type_
             result = SL_STATUS_TIMEOUT;
         }
     }
-#if defined(EFR32MG24)
-    sl_wfx_host_spi_cs_deassert();
-    xSemaphoreGive(spi_sem_sync_hdl);
-#endif
     return result;
 }
 
