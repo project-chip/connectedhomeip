@@ -45,6 +45,8 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
     mThread = wiced_rtos_create_thread();
     VerifyOrExit(mThread != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
+    ReturnErrorOnFailure(mEventFlags.Init());
+
     mMutex = wiced_rtos_create_mutex();
     VerifyOrExit(mMutex != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
@@ -56,6 +58,16 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 
 exit:
     return err;
+}
+
+void ThreadStackManagerImpl::SignalThreadActivityPending()
+{
+    mEventFlags.Set(kActivityPendingEventFlag);
+}
+
+void ThreadStackManagerImpl::SignalThreadActivityPendingFromISR()
+{
+    mEventFlags.Set(kActivityPendingFromISREventFlag);
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
@@ -87,6 +99,12 @@ void ThreadStackManagerImpl::ThreadTaskMain(void)
 {
     while (true)
     {
+        uint32_t flags = 0;
+        if (mEventFlags.WaitAnyForever(flags) != CHIP_NO_ERROR)
+        {
+            continue;
+        }
+
         LockThreadStack();
         ProcessThreadActivity();
         UnlockThreadStack();
@@ -101,6 +119,18 @@ void ThreadStackManagerImpl::ThreadTaskMain(uint32_t arg)
 
 } // namespace DeviceLayer
 } // namespace chip
+
+using namespace ::chip::DeviceLayer;
+
+extern "C" void otTaskletsSignalPending(otInstance * p_instance)
+{
+    ThreadStackMgrImpl().SignalThreadActivityPending();
+}
+
+extern "C" void otSysEventSignalPending(void)
+{
+    ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
+}
 
 extern "C" void * otPlatCAlloc(size_t aNum, size_t aSize)
 {

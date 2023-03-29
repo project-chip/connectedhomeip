@@ -160,6 +160,49 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPScenesClusterEnhancedAddSceneResponseCallback
+    : public Callback::Callback<CHIPScenesClusterEnhancedAddSceneResponseCallbackType>
+{
+public:
+    CHIPScenesClusterEnhancedAddSceneResponseCallback(jobject javaCallback);
+
+    ~CHIPScenesClusterEnhancedAddSceneResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPScenesClusterEnhancedViewSceneResponseCallback
+    : public Callback::Callback<CHIPScenesClusterEnhancedViewSceneResponseCallbackType>
+{
+public:
+    CHIPScenesClusterEnhancedViewSceneResponseCallback(jobject javaCallback);
+
+    ~CHIPScenesClusterEnhancedViewSceneResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPScenesClusterCopySceneResponseCallback : public Callback::Callback<CHIPScenesClusterCopySceneResponseCallbackType>
+{
+public:
+    CHIPScenesClusterCopySceneResponseCallback(jobject javaCallback);
+
+    ~CHIPScenesClusterCopySceneResponseCallback();
+
+    static void CallbackFn(void * context, const chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback
     : public Callback::Callback<CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType>
 {
@@ -597,6 +640,38 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallback
+    : public Callback::Callback<CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallbackType>
+{
+public:
+    CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallback(jobject javaCallback);
+
+    ~CHIPElectricalMeasurementClusterGetProfileInfoResponseCommandCallback();
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallback
+    : public Callback::Callback<CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallbackType>
+{
+public:
+    CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallback(jobject javaCallback);
+
+    ~CHIPElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallback();
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPUnitTestingClusterTestSpecificResponseCallback
     : public Callback::Callback<CHIPUnitTestingClusterTestSpecificResponseCallbackType>
 {
@@ -622,6 +697,36 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPUnitTestingClusterTestSimpleArgumentResponseCallback
+    : public Callback::Callback<CHIPUnitTestingClusterTestSimpleArgumentResponseCallbackType>
+{
+public:
+    CHIPUnitTestingClusterTestSimpleArgumentResponseCallback(jobject javaCallback);
+
+    ~CHIPUnitTestingClusterTestSimpleArgumentResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPUnitTestingClusterTestStructArrayArgumentResponseCallback
+    : public Callback::Callback<CHIPUnitTestingClusterTestStructArrayArgumentResponseCallbackType>
+{
+public:
+    CHIPUnitTestingClusterTestStructArrayArgumentResponseCallback(jobject javaCallback);
+
+    ~CHIPUnitTestingClusterTestStructArrayArgumentResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
@@ -672,6 +777,22 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallback
+    : public Callback::Callback<CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallbackType>
+{
+public:
+    CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallback(jobject javaCallback);
+
+    ~CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallback();
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPUnitTestingClusterBooleanResponseCallback : public Callback::Callback<CHIPUnitTestingClusterBooleanResponseCallbackType>
 {
 public:
@@ -710,6 +831,22 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPUnitTestingClusterTestEmitTestFabricScopedEventResponseCallback
+    : public Callback::Callback<CHIPUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType>
+{
+public:
+    CHIPUnitTestingClusterTestEmitTestFabricScopedEventResponseCallback(jobject javaCallback);
+
+    ~CHIPUnitTestingClusterTestEmitTestFabricScopedEventResponseCallback();
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

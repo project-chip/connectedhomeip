@@ -82,17 +82,16 @@
   {{~!--Close:Generating command request structs for all incoming commands into server side--~}}
   {{~!--Open:Generating command request structs for all outgoing commands from client side--~}}
   {{#if (is_client side)}}
-    {{#all_outgoing_commands_for_cluster name side}}
+    {{#zcl_commands}}
+      {{#if (isStrEqual source "client")}}
       {{~>idl_command_request_struct}}
-    {{/all_outgoing_commands_for_cluster}}
+      {{else}}
+      {{~>idl_command_response_struct}}
+      {{/if}}
+    {{/zcl_commands}}
   {{/if}}
   {{~!--Close:Generating command request structs for all outgoing commands from client side--~}}
   {{~!--Open:Generating command response structs for all incoming commands into client side--~}}
-  {{#if (is_client side)}}
-    {{#all_incoming_commands_for_cluster name side}}
-      {{~>idl_command_response_struct}}
-    {{/all_incoming_commands_for_cluster}}
-  {{/if}}
   {{~!--Close:Generating command response structs for all incoming commands into client side--~}}
   {{~!--Open:Generating command response structs for all outgoing commands from server side--~}}
   {{#if (is_server side)}}
@@ -107,9 +106,9 @@
     {{/all_incoming_commands_for_cluster}}
   {{/if}}
   {{#if (is_client side)}}
-    {{#all_outgoing_commands_for_cluster name side}}
+    {{#zcl_commands_source_client}}
       {{~>idl_command_request_response}}{{~new_line 1~}}
-    {{/all_outgoing_commands_for_cluster}}
+    {{/zcl_commands_source_client}}
   {{/if}}
 }
 
