@@ -20,8 +20,22 @@ StaticSupportedModesManager::SemanticTag* StaticSupportedModesManager::semanticT
 
 const StaticSupportedModesManager StaticSupportedModesManager::instance = StaticSupportedModesManager();
 
+ModeOptionStructType *StaticSupportedModesManager::endpointArray[FIXED_ENDPOINT_COUNT][2];
+
+void StaticSupportedModesManager::InitEndpointArray()
+{
+	for(int i=0; i<FIXED_ENDPOINT_COUNT; i++) {
+		endpointArray[i][0] = nullptr;
+		endpointArray[i][1] = nullptr;
+	} 
+}
+
 SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeOptionsProvider(EndpointId endpointId) const
 {
+	if(endpointArray[endpointId][0] != nullptr && endpointArray[endpointId][1] != nullptr) {
+		return ModeOptionsProvider(endpointArray[endpointId][0], endpointArray[endpointId][1]);
+	}
+
     char keyBuf[ESP32Config::kMaxConfigKeyNameLength];
     uint32_t supportedModeCount = 0;
 
@@ -102,6 +116,8 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
 
         modeOptionStruct[index] = option;
     }
+	endpointArray[endpointId][0] = modeOptionStruct;
+	endpointArray[endpointId][1] = (modeOptionStruct + supportedModeCount);
 
     return ModeOptionsProvider(modeOptionStruct, modeOptionStruct + supportedModeCount);
 }
@@ -134,3 +150,25 @@ const ModeSelect::SupportedModesManager * ModeSelect::getSupportedModesManager()
 {
     return &StaticSupportedModesManager::instance;
 }
+
+void StaticSupportedModesManager::FreeSupportedModes()
+{
+	for(int i=0; i<FIXED_ENDPOINT_COUNT; i++) {
+		if(endpointArray[i][0] != nullptr) {
+    		auto * begin = static_cast<ModeOptionStructType *>(endpointArray[i][0]);
+    		auto * end   = static_cast<ModeOptionStructType *>(endpointArray[i][1]);
+			for(auto *it = begin; it != end; ++it) {
+        		auto & modeOption = *it;
+				delete[] modeOption.label.data();
+				delete[] modeOption.semanticTags.data();
+			}
+			delete[] begin;
+		}
+		endpointArray[i][0] = nullptr;
+		endpointArray[i][1] = nullptr;
+	} 
+	delete[] modeLabelList;
+	delete[] modeOptionStruct;
+	delete[] semanticTags; 
+}
+

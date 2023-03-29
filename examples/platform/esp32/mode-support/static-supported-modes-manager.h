@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/clusters/mode-select-server/supported-modes-manager.h>
+#include <src/app/util/af.h>
 
 namespace chip {
 namespace app {
@@ -27,13 +28,9 @@ namespace ModeSelect {
 
 class StaticSupportedModesManager : public chip::app::Clusters::ModeSelect::SupportedModesManager
 {
+private:
     using ModeOptionStructType = Structs::ModeOptionStruct::Type;
 	using SemanticTag          = Structs::SemanticTagStruct::Type;
-
-public:
-    static const StaticSupportedModesManager instance;
-
-    //static char supportedModeLabel[255][64];
 
 	struct ModeLabel {
 		char supportedModeLabel[64];
@@ -42,18 +39,28 @@ public:
 	static ModeLabel *modeLabelList;
     static ModeOptionStructType * modeOptionStruct;
     static SemanticTag * semanticTags;
+	// TODO : We need to decide wheather the endpointArray shoule be static or dynamic.
+	static ModeOptionStructType *endpointArray[FIXED_ENDPOINT_COUNT][2];
+
+	void InitEndpointArray();
+
+	void FreeSupportedModes();
+
+
+public:
+    static const StaticSupportedModesManager instance;
 
     SupportedModesManager::ModeOptionsProvider getModeOptionsProvider(EndpointId endpointId) const override;
 
     Protocols::InteractionModel::Status getModeOptionByMode(EndpointId endpointId, uint8_t mode,
                                                             const ModeOptionStructType ** dataPtr) const override;
 
-    StaticSupportedModesManager() {}
+    StaticSupportedModesManager() {
+		InitEndpointArray();
+	}
 
     ~StaticSupportedModesManager(){
-		delete[] modeLabelList;
-		delete[] modeOptionStruct;
-		delete[] semanticTags; 
+		FreeSupportedModes();
 	}
 
     static inline const StaticSupportedModesManager & getStaticSupportedModesManagerInstance() { return instance; }
