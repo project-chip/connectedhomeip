@@ -474,6 +474,18 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
     consumerCounter = std::move(consumerCounterToUse);
 }
 
+ResolveContext::ResolveContext(CommissioningResolveDelegate * delegate, chip::Inet::IPAddressType cbAddressType,
+                               const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse) :
+    browseThatCausedResolve(nullptr)
+{
+    type            = ContextType::Resolve;
+    context         = delegate;
+    callback        = nullptr;
+    protocol        = GetProtocol(cbAddressType);
+    instanceName    = instanceNameToResolve;
+    consumerCounter = std::move(consumerCounterToUse);
+}
+
 ResolveContext::~ResolveContext() {}
 
 void ResolveContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
@@ -483,7 +495,14 @@ void ResolveContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
     // ChipDnssdResolveNoLongerNeeded don't find us and try to also remove us.
     bool needDelete = MdnsContexts::GetInstance().RemoveWithoutDeleting(this);
 
-    callback(context, nullptr, Span<Inet::IPAddress>(), err);
+    if (nullptr == callback)
+    {
+        // Nothing to do.
+    }
+    else
+    {
+        callback(context, nullptr, Span<Inet::IPAddress>(), err);
+    }
 
     if (needDelete)
     {
@@ -508,7 +527,20 @@ void ResolveContext::DispatchSuccess()
         }
 
         ChipLogProgress(Discovery, "Mdns: Resolve success on interface %" PRIu32, interface.first);
-        callback(context, &interface.second.service, Span<Inet::IPAddress>(ips.data(), ips.size()), CHIP_NO_ERROR);
+
+        auto & service = interface.second.service;
+        auto addresses = Span<Inet::IPAddress>(ips.data(), ips.size());
+        if (nullptr == callback)
+        {
+            auto delegate = static_cast<CommissioningResolveDelegate *>(context);
+            DiscoveredNodeData nodeData;
+            service.ToDiscoveredNodeData(addresses, nodeData);
+            delegate->OnNodeDiscovered(nodeData);
+        }
+        else
+        {
+            callback(context, &service, addresses, CHIP_NO_ERROR);
+        }
         break;
     }
 
