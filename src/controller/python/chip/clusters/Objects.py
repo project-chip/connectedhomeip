@@ -290,7 +290,7 @@ class Groups(Cluster):
     clusterRevision: 'uint' = None
 
     class Bitmaps:
-        class GroupClusterFeature(IntFlag):
+        class GroupsFeature(IntFlag):
             kGroupNames = 0x1
 
     class Commands:
@@ -615,11 +615,11 @@ class Scenes(Cluster):
     clusterRevision: 'uint' = None
 
     class Bitmaps:
-        class SceneFeatures(IntFlag):
-            kSceneNames = 0x1
-
         class ScenesCopyMode(IntFlag):
             kCopyAllScenes = 0x1
+
+        class ScenesFeature(IntFlag):
+            kSceneNames = 0x1
 
     class Structs:
         @dataclass
@@ -16325,13 +16325,6 @@ class WindowCovering(Cluster):
             kLiftEncoderControlled = 0x20
             kTiltEncoderControlled = 0x40
 
-        class Feature(IntFlag):
-            kLift = 0x1
-            kTilt = 0x2
-            kPositionAwareLift = 0x4
-            kAbsolutePosition = 0x8
-            kPositionAwareTilt = 0x10
-
         class Mode(IntFlag):
             kMotorDirectionReversed = 0x1
             kCalibrationMode = 0x2
@@ -16356,6 +16349,13 @@ class WindowCovering(Cluster):
             kHardwareFailure = 0x200
             kManualOperation = 0x400
             kProtection = 0x800
+
+        class WindowCoveringFeature(IntFlag):
+            kLift = 0x1
+            kTilt = 0x2
+            kPositionAwareLift = 0x4
+            kAbsolutePosition = 0x8
+            kPositionAwareTilt = 0x10
 
     class Commands:
         @dataclass
@@ -17337,7 +17337,7 @@ class PumpConfigurationAndControl(Cluster):
             kUnknownEnumValue = 4,
 
     class Bitmaps:
-        class PumpFeature(IntFlag):
+        class PumpConfigurationAndControlFeature(IntFlag):
             kConstantPressure = 0x1
             kCompensatedPressure = 0x2
             kConstantFlow = 0x4
@@ -22259,7 +22259,7 @@ class PressureMeasurement(Cluster):
     clusterRevision: 'uint' = None
 
     class Bitmaps:
-        class PressureFeature(IntFlag):
+        class PressureMeasurementFeature(IntFlag):
             kExtended = 0x1
 
     class Attributes:

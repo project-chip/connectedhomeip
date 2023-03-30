@@ -51,7 +51,7 @@ server cluster Identify = 3 {
 }
 
 server cluster Groups = 4 {
-  bitmap GroupClusterFeature : BITMAP32 {
+  bitmap GroupsFeature : BITMAP32 {
     kGroupNames = 0x1;
   }
 
@@ -115,12 +115,12 @@ server cluster Groups = 4 {
 }
 
 server cluster Scenes = 5 {
-  bitmap SceneFeatures : BITMAP32 {
-    kSceneNames = 0x1;
-  }
-
   bitmap ScenesCopyMode : BITMAP8 {
     kCopyAllScenes = 0x1;
+  }
+
+  bitmap ScenesFeature : BITMAP32 {
+    kSceneNames = 0x1;
   }
 
   struct ExtensionFieldSet {
@@ -2376,14 +2376,6 @@ server cluster WindowCovering = 258 {
     kTiltEncoderControlled = 0x40;
   }
 
-  bitmap Feature : BITMAP32 {
-    kLift = 0x1;
-    kTilt = 0x2;
-    kPositionAwareLift = 0x4;
-    kAbsolutePosition = 0x8;
-    kPositionAwareTilt = 0x10;
-  }
-
   bitmap Mode : BITMAP8 {
     kMotorDirectionReversed = 0x1;
     kCalibrationMode = 0x2;
@@ -2410,6 +2402,14 @@ server cluster WindowCovering = 258 {
     kHardwareFailure = 0x200;
     kManualOperation = 0x400;
     kProtection = 0x800;
+  }
+
+  bitmap WindowCoveringFeature : BITMAP32 {
+    kLift = 0x1;
+    kTilt = 0x2;
+    kPositionAwareLift = 0x4;
+    kAbsolutePosition = 0x8;
+    kPositionAwareTilt = 0x10;
   }
 
   readonly attribute Type type = 0;
@@ -2446,7 +2446,7 @@ server cluster PumpConfigurationAndControl = 512 {
     kLocal = 3;
   }
 
-  bitmap PumpFeature : BITMAP32 {
+  bitmap PumpConfigurationAndControlFeature : BITMAP32 {
     kConstantPressure = 0x1;
     kCompensatedPressure = 0x2;
     kConstantFlow = 0x4;
@@ -2813,7 +2813,7 @@ server cluster TemperatureMeasurement = 1026 {
 }
 
 server cluster PressureMeasurement = 1027 {
-  bitmap PressureFeature : BITMAP32 {
+  bitmap PressureMeasurementFeature : BITMAP32 {
     kExtended = 0x1;
   }
 
