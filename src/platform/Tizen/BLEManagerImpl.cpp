@@ -503,7 +503,7 @@ void BLEManagerImpl::OnChipDeviceScanned(void * device, const Ble::ChipBLEDevice
     mDeviceScanner->StopChipScan();
 
     /* Initiate Connect */
-    PlatformMgrImpl().GLibMatterContextInvokeSynchronous(ConnectChipThing, const_cast<const char *>(deviceInfo->remote_address));
+    PlatformMgrImpl().GLibMatterContextInvokeSync(ConnectChipThing, const_cast<const char *>(deviceInfo->remote_address));
 }
 
 void BLEManagerImpl::OnScanComplete()
@@ -955,7 +955,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
     ChipLogProgress(DeviceLayer, "Initialize BLE");
-    err = PlatformMgrImpl().GLibMatterContextInvokeSynchronous(_BleInitialize, static_cast<void *>(nullptr));
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(_BleInitialize, static_cast<void *>(nullptr));
     SuccessOrExit(err);
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);

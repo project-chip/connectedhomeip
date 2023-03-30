@@ -62,9 +62,9 @@ public:
      * @returns The result of the function.
      */
     template <typename T>
-    CHIP_ERROR GLibMatterContextInvokeSynchronous(CHIP_ERROR (*func)(T *), T * userData)
+    CHIP_ERROR GLibMatterContextInvokeSync(CHIP_ERROR (*func)(T *), T * userData)
     {
-        return _GLibMatterContextInvokeSynchronous((CHIP_ERROR(*)(void *)) func, (void *) userData);
+        return _GLibMatterContextInvokeSync((CHIP_ERROR(*)(void *)) func, (void *) userData);
     }
 
 private:
@@ -85,9 +85,9 @@ private:
      * @brief Invoke a function on the Matter GLib context.
      *
      * @note This function does not provide type safety for the user data. Please,
-     *       use the GLibMatterContextInvokeSynchronous() template function instead.
+     *       use the GLibMatterContextInvokeSync() template function instead.
      */
-    CHIP_ERROR _GLibMatterContextInvokeSynchronous(CHIP_ERROR (*func)(void *), void * userData);
+    CHIP_ERROR _GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData);
 
     GMainLoop * mGLibMainLoop;
     GThread * mGLibMainLoopThread;
