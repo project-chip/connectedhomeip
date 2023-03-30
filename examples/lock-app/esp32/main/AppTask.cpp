@@ -59,7 +59,6 @@ StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::System;
-// using namespace ESP32DoorLock::LockInitParams;
 
 AppTask AppTask::sAppTask;
 
@@ -86,7 +85,10 @@ CHIP_ERROR AppTask::Init()
                                   (void *) this,    // init timer id = app task obj context
                                   TimerEventHandler // timer callback handler
     );
+
+    PlatformMgr().LockChipStack();
     CHIP_ERROR err = BoltLockMgr().InitLockState();
+    PlatformMgr().UnlockChipStack();
 
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
