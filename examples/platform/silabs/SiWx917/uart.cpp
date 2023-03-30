@@ -181,7 +181,7 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
         return UART_CONSOLE_ERR;
     }
     // storing the contents of rx_buffer in the Buf
-    *Buf = (char)rx_buffer;
+    *Buf = (char) rx_buffer;
     // creating the uart receive and storing in the rx_buffer
     status = UARTdrv->Receive(&rx_buffer, NbBytesToRead);
     if (status != ARM_DRIVER_OK)
