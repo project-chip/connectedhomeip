@@ -69,9 +69,9 @@ config PTHREAD_IPC
     bool
     default n
 
-# Generic networking options
-config NET_SOCKETS_POSIX_NAMES
-    default n
+config POSIX_MAX_FDS
+    int
+    default 16
 
 # Application stack size
 config MAIN_STACK_SIZE
@@ -241,9 +241,6 @@ config NET_IF_UNICAST_IPV6_ADDR_COUNT
 
 config NET_IF_MCAST_IPV6_ADDR_COUNT
     default 8
-
-config NET_SOCKETS_POSIX_NAMES
-    default n
 
 config NET_SOCKETS_POLL_MAX
     default 4
