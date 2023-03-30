@@ -154,5 +154,6 @@ def main():
     for filename, descriptor in descriptors.items():
         dump_table(Path(filename), descriptor)
 
+
 if __name__ == "__main__":
     main()
