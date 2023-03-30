@@ -39,6 +39,8 @@ static_library("CYW30739") {
     "ConnectivityManagerImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
+    "EventFlags.cpp",
+    "EventFlags.h",
     "FactoryDataProvider.cpp",
     "FactoryDataProvider.h",
     "InetPlatformConfig.h",
