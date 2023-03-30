@@ -37,7 +37,8 @@ public:
 
     struct User
     {
-        void set(chip::CharSpan newName, uint32_t userId, UserStatusEnum userStatus, UserTypeEnum type, CredentialRuleEnum credentialRule)
+        void set(chip::CharSpan newName, uint32_t userId, UserStatusEnum userStatus, UserTypeEnum type,
+                 CredentialRuleEnum credentialRule)
         {
             size_t sz = std::min(sizeof(name), newName.size());
             memcpy(name, newName.data(), sz);
@@ -121,7 +122,8 @@ public:
     }
 
     bool setCredential(chip::EndpointId endpointId, uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
-                       DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType, const chip::ByteSpan & credentialData)
+                       DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
+                       const chip::ByteSpan & credentialData)
     {
         auto ep = findEndpoint(endpointId);
         if (!ep)
@@ -177,8 +179,7 @@ private:
     {
         endpoints[0].id = 1;
         uint8_t pin[6]  = { 0x31, 0x32, 0x33, 0x34, 0x35, 0x36 };
-        endpoints[0].credentials[0].set(DlCredentialStatus::kOccupied,
-                                                                                     CredentialTypeEnum::kPin, chip::ByteSpan(pin));
+        endpoints[0].credentials[0].set(DlCredentialStatus::kOccupied, CredentialTypeEnum::kPin, chip::ByteSpan(pin));
         endpoints[0].users[0].set(chip::CharSpan("default"), 1, UserStatusEnum::kOccupiedEnabled, UserTypeEnum::kUnrestrictedUser,
                                   CredentialRuleEnum::kSingle);
         endpoints[0].users[0].addCredential(CredentialTypeEnum::kPin, 1);
