@@ -205,6 +205,8 @@ private:
 
     static bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
 
+    static CHIP_ERROR _StartWiFiManagement(ConnectivityManagerImpl * self);
+
     static bool mAssociationStarted;
     static BitFlags<ConnectivityFlags> mConnectivityFlag;
     static GDBusWpaSupplicant mWpaSupplicant;
