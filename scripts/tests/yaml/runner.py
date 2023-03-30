@@ -71,8 +71,6 @@ def test_runner_options(f):
                      help='Show additional logs provided by the adapter.')(f)
     f = click.option('--show_adapter_logs_on_error', type=bool, default=True, show_default=True,
                      help='Show additional logs provided by the adapter on error.')(f)
-    f = click.option('--runner', type=str, default=None, show_default=True,
-                     help='The runner to run the test with.')(f)
     return f
 
 
@@ -95,6 +93,8 @@ def chip_repl_runner_options(f):
                      help='Path to persistent storage configuration file.')(f)
     f = click.option('--commission_on_network_dut', type=bool, default=False,
                      help='Prior to running test should we try to commission DUT on network.')(f)
+    f = click.option('--runner', type=str, default=None, show_default=True,
+                     help='The runner to run the test with.')(f)
     return f
 
 
