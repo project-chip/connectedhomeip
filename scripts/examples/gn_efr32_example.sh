@@ -270,6 +270,10 @@ else
 
     if [ "$USE_SLC" == true ] && [ "$GN_PATH_PROVIDED" == false ]; then
         GN_PATH=./.environment/cipd/packages/pigweed/gn
+    elif [ "$USE_SLC" == false ]; then
+        # Activation needs to be after SLC generation which is done in gn gen.
+        # Zap generation requires activation and is done in the build phase
+        source "$CHIP_ROOT/scripts/activate.sh"
     fi
 
     BUILD_DIR=$OUTDIR/$SILABS_BOARD
@@ -298,9 +302,11 @@ else
         fi
     fi
 
-    # Activation needs to be after SLC generation which is done in gn gen.
-    # Zap generation requires activation and is done in the build phase
-    source "$CHIP_ROOT/scripts/activate.sh"
+    if [ "$USE_SLC" == true ]; then
+        # Activation needs to be after SLC generation which is done in gn gen.
+        # Zap generation requires activation and is done in the build phase
+        source "$CHIP_ROOT/scripts/activate.sh"
+    fi
 
     ninja -v -C "$BUILD_DIR"/
     #print stats
