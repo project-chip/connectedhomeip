@@ -18822,6 +18822,12 @@ typedef NS_OPTIONS(uint32_t, MTRGroupsFeature) {
     MTRGroupsFeatureGroupNames MTR_NEWLY_AVAILABLE = 0x1,
 } MTR_NEWLY_AVAILABLE;
 
+typedef NS_OPTIONS(uint32_t, MTRGroupsGroupClusterFeature) {
+    MTRGroupsGroupClusterFeatureGroupNames API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRGroupsFeatureGroupNames")
+    = 0x1,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRGroupsFeature");
+
 typedef NS_OPTIONS(uint8_t, MTRScenesCopyMode) {
     MTRScenesCopyModeCopyAllScenes API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
@@ -20813,12 +20819,12 @@ typedef NS_OPTIONS(uint16_t, MTRWindowCoveringSafetyStatus) {
 } API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRWindowCoveringFeature) {
-    MTRWindowCoveringFeatureLift MTR_NEWLY_AVAILABLE = 0x1,
-    MTRWindowCoveringFeatureTilt MTR_NEWLY_AVAILABLE = 0x2,
-    MTRWindowCoveringFeaturePositionAwareLift MTR_NEWLY_AVAILABLE = 0x4,
-    MTRWindowCoveringFeatureAbsolutePosition MTR_NEWLY_AVAILABLE = 0x8,
-    MTRWindowCoveringFeaturePositionAwareTilt MTR_NEWLY_AVAILABLE = 0x10,
-} MTR_NEWLY_AVAILABLE;
+    MTRWindowCoveringFeatureLift API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
+    MTRWindowCoveringFeatureTilt API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
+    MTRWindowCoveringFeaturePositionAwareLift API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
+    MTRWindowCoveringFeatureAbsolutePosition API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x8,
+    MTRWindowCoveringFeaturePositionAwareTilt API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x10,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRPumpConfigurationAndControlControlMode) {
     MTRPumpConfigurationAndControlControlModeConstantSpeed API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x00,
@@ -20896,6 +20902,34 @@ typedef NS_OPTIONS(uint32_t, MTRPumpConfigurationAndControlFeature) {
     MTRPumpConfigurationAndControlFeatureAutomatic MTR_NEWLY_AVAILABLE = 0x20,
     MTRPumpConfigurationAndControlFeatureLocalOperation MTR_NEWLY_AVAILABLE = 0x40,
 } MTR_NEWLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint32_t, MTRPumpConfigurationAndControlPumpFeature) {
+    MTRPumpConfigurationAndControlPumpFeatureConstantPressure API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlFeatureConstantPressure")
+    = 0x1,
+    MTRPumpConfigurationAndControlPumpFeatureCompensatedPressure API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlFeatureCompensatedPressure")
+    = 0x2,
+    MTRPumpConfigurationAndControlPumpFeatureConstantFlow API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlFeatureConstantFlow")
+    = 0x4,
+    MTRPumpConfigurationAndControlPumpFeatureConstantSpeed API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlFeatureConstantSpeed")
+    = 0x8,
+    MTRPumpConfigurationAndControlPumpFeatureConstantTemperature API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlFeatureConstantTemperature")
+    = 0x10,
+    MTRPumpConfigurationAndControlPumpFeatureAutomatic API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlFeatureAutomatic")
+    = 0x20,
+    MTRPumpConfigurationAndControlPumpFeatureLocalOperation API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
+        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlFeatureLocalOperation")
+    = 0x40,
+    MTRPumpConfigurationAndControlPumpFeatureLocal MTR_DEPRECATED("Please use MTRPumpConfigurationAndControlFeatureLocalOperation",
+        ios(16.4, 16.5), macos(13.3, 13.4), watchos(9.4, 9.5), tvos(16.4, 16.5))
+    = 0x40,
+} API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+    MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlFeature");
 
 typedef NS_OPTIONS(uint16_t, MTRPumpConfigurationAndControlPumpStatusBitmap) {
     MTRPumpConfigurationAndControlPumpStatusBitmapDeviceFault API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1,
@@ -21162,6 +21196,15 @@ typedef NS_ENUM(uint8_t, MTRIlluminanceMeasurementLightSensorType) {
 typedef NS_OPTIONS(uint32_t, MTRPressureMeasurementFeature) {
     MTRPressureMeasurementFeatureExtended MTR_NEWLY_AVAILABLE = 0x1,
 } MTR_NEWLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint32_t, MTRPressureMeasurementPressureFeature) {
+    MTRPressureMeasurementPressureFeatureExtended API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+        MTR_NEWLY_DEPRECATED("Please use MTRPressureMeasurementFeatureExtended")
+    = 0x1,
+    MTRPressureMeasurementPressureFeatureEXT MTR_DEPRECATED(
+        "Please use MTRPressureMeasurementFeatureExtended", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0x1,
+} API_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) MTR_NEWLY_DEPRECATED("Please use MTRPressureMeasurementFeature");
 
 typedef NS_ENUM(uint8_t, MTROccupancySensingOccupancySensorType) {
     MTROccupancySensingOccupancySensorTypePIR API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x00,
