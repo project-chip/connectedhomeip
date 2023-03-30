@@ -15,6 +15,7 @@
 from chip.yaml.runner import ReplTestRunner
 from matter_yamltests.adapter import TestAdapter
 
+
 class Adapter(TestAdapter):
     def __init__(self, specifications):
         self._adapter = ReplTestRunner(specifications, None, None)

@@ -23,8 +23,8 @@ import chip.CertificateAuthority
 import chip.native
 from chip.ChipStack import *
 from chip.yaml.runner import ReplTestRunner
-
 from matter_yamltests.runner import TestRunner
+
 
 class Runner(TestRunner):
     def __init__(self, repl_storage_path: str, commission_on_network_dut: bool):

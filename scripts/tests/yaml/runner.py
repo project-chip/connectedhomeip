@@ -89,13 +89,13 @@ def websocket_runner_options(f):
                      help='Optional arguments to pass to the websocket server at launch.')(f)
     return f
 
+
 def chip_repl_runner_options(f):
     f = click.option('--repl_storage_path', type=str, default='/tmp/repl-storage.json',
                      help='Path to persistent storage configuration file.')(f)
     f = click.option('--commission_on_network_dut', type=bool, default=False,
                      help='Prior to running test should we try to commission DUT on network.')(f)
     return f
-
 
 
 @dataclass
