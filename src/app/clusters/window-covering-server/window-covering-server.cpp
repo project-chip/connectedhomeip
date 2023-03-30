@@ -113,7 +113,7 @@ namespace app {
 namespace Clusters {
 namespace WindowCovering {
 
-bool HasFeature(chip::EndpointId endpoint, Feature feature)
+bool HasFeature(chip::EndpointId endpoint, WindowCoveringFeature feature)
 {
     bool hasFeature     = false;
     uint32_t featureMap = 0;
@@ -129,12 +129,12 @@ bool HasFeature(chip::EndpointId endpoint, Feature feature)
 
 bool HasFeaturePaLift(chip::EndpointId endpoint)
 {
-    return (HasFeature(endpoint, Feature::kLift) && HasFeature(endpoint, Feature::kPositionAwareLift));
+    return (HasFeature(endpoint, WindowCoveringFeature::kLift) && HasFeature(endpoint, WindowCoveringFeature::kPositionAwareLift));
 }
 
 bool HasFeaturePaTilt(chip::EndpointId endpoint)
 {
-    return (HasFeature(endpoint, Feature::kTilt) && HasFeature(endpoint, Feature::kPositionAwareTilt));
+    return (HasFeature(endpoint, WindowCoveringFeature::kTilt) && HasFeature(endpoint, WindowCoveringFeature::kPositionAwareTilt));
 }
 
 void TypeSet(chip::EndpointId endpoint, Type type)
@@ -635,11 +635,11 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandO
         return true;
     }
 
-    if (HasFeature(endpoint, Feature::kPositionAwareLift))
+    if (HasFeature(endpoint, WindowCoveringFeature::kPositionAwareLift))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN_OPEN);
     }
-    if (HasFeature(endpoint, Feature::kPositionAwareTilt))
+    if (HasFeature(endpoint, WindowCoveringFeature::kPositionAwareTilt))
     {
         Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN_OPEN);
     }
@@ -647,12 +647,12 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandO
     Delegate * delegate = GetDelegate(endpoint);
     if (delegate)
     {
-        if (HasFeature(endpoint, Feature::kPositionAwareLift))
+        if (HasFeature(endpoint, WindowCoveringFeature::kPositionAwareLift))
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
         }
 
-        if (HasFeature(endpoint, Feature::kPositionAwareTilt))
+        if (HasFeature(endpoint, WindowCoveringFeature::kPositionAwareTilt))
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
         }
@@ -685,11 +685,11 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
         return true;
     }
 
-    if (HasFeature(endpoint, Feature::kPositionAwareLift))
+    if (HasFeature(endpoint, WindowCoveringFeature::kPositionAwareLift))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX_CLOSED);
     }
-    if (HasFeature(endpoint, Feature::kPositionAwareTilt))
+    if (HasFeature(endpoint, WindowCoveringFeature::kPositionAwareTilt))
     {
         Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX_CLOSED);
     }
@@ -698,12 +698,12 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
     Delegate * delegate = GetDelegate(endpoint);
     if (delegate)
     {
-        if (HasFeature(endpoint, Feature::kPositionAwareLift))
+        if (HasFeature(endpoint, WindowCoveringFeature::kPositionAwareLift))
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
         }
 
-        if (HasFeature(endpoint, Feature::kPositionAwareTilt))
+        if (HasFeature(endpoint, WindowCoveringFeature::kPositionAwareTilt))
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
         }
@@ -781,7 +781,7 @@ bool emberAfWindowCoveringClusterGoToLiftValueCallback(app::CommandHandler * com
         return true;
     }
 
-    if (HasFeature(endpoint, Feature::kAbsolutePosition) && HasFeaturePaLift(endpoint))
+    if (HasFeature(endpoint, WindowCoveringFeature::kAbsolutePosition) && HasFeaturePaLift(endpoint))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(endpoint, LiftToPercent100ths(endpoint, liftValue));
         Delegate * delegate = GetDelegate(endpoint);
@@ -873,7 +873,7 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(app::CommandHandler * com
         return true;
     }
 
-    if (HasFeature(endpoint, Feature::kAbsolutePosition) && HasFeaturePaTilt(endpoint))
+    if (HasFeature(endpoint, WindowCoveringFeature::kAbsolutePosition) && HasFeaturePaTilt(endpoint))
     {
         Attributes::TargetPositionTiltPercent100ths::Set(endpoint, TiltToPercent100ths(endpoint, tiltValue));
         Delegate * delegate = GetDelegate(endpoint);
