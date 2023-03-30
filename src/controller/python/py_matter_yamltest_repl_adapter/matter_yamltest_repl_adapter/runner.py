@@ -20,6 +20,7 @@ import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 # isort: on
 
 import chip.CertificateAuthority
+import chip.logging
 import chip.native
 from chip.ChipStack import *
 from chip.yaml.runner import ReplTestRunner
@@ -36,6 +37,7 @@ class Runner(TestRunner):
 
     async def start(self):
         chip.native.Init()
+        chip.logging.RedirectToPythonLogging()
         chip_stack = ChipStack(self._repl_storage_path)
         certificate_authority_manager = chip.CertificateAuthority.CertificateAuthorityManager(
             chip_stack, chip_stack.GetStorageManager())
