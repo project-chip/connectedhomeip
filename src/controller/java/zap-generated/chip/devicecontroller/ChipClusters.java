@@ -755,93 +755,6 @@ public class ChipClusters {
       getSceneMembership(chipClusterPtr, callback, groupID, timedInvokeTimeoutMs);
     }
 
-    public void enhancedAddScene(
-        EnhancedAddSceneResponseCallback callback,
-        Integer groupID,
-        Integer sceneID,
-        Integer transitionTime,
-        String sceneName,
-        ArrayList<ChipStructs.ScenesClusterExtensionFieldSet> extensionFieldSets) {
-      enhancedAddScene(
-          chipClusterPtr,
-          callback,
-          groupID,
-          sceneID,
-          transitionTime,
-          sceneName,
-          extensionFieldSets,
-          null);
-    }
-
-    public void enhancedAddScene(
-        EnhancedAddSceneResponseCallback callback,
-        Integer groupID,
-        Integer sceneID,
-        Integer transitionTime,
-        String sceneName,
-        ArrayList<ChipStructs.ScenesClusterExtensionFieldSet> extensionFieldSets,
-        int timedInvokeTimeoutMs) {
-      enhancedAddScene(
-          chipClusterPtr,
-          callback,
-          groupID,
-          sceneID,
-          transitionTime,
-          sceneName,
-          extensionFieldSets,
-          timedInvokeTimeoutMs);
-    }
-
-    public void enhancedViewScene(
-        EnhancedViewSceneResponseCallback callback, Integer groupID, Integer sceneID) {
-      enhancedViewScene(chipClusterPtr, callback, groupID, sceneID, null);
-    }
-
-    public void enhancedViewScene(
-        EnhancedViewSceneResponseCallback callback,
-        Integer groupID,
-        Integer sceneID,
-        int timedInvokeTimeoutMs) {
-      enhancedViewScene(chipClusterPtr, callback, groupID, sceneID, timedInvokeTimeoutMs);
-    }
-
-    public void copyScene(
-        CopySceneResponseCallback callback,
-        Integer mode,
-        Integer groupIdentifierFrom,
-        Integer sceneIdentifierFrom,
-        Integer groupIdentifierTo,
-        Integer sceneIdentifierTo) {
-      copyScene(
-          chipClusterPtr,
-          callback,
-          mode,
-          groupIdentifierFrom,
-          sceneIdentifierFrom,
-          groupIdentifierTo,
-          sceneIdentifierTo,
-          null);
-    }
-
-    public void copyScene(
-        CopySceneResponseCallback callback,
-        Integer mode,
-        Integer groupIdentifierFrom,
-        Integer sceneIdentifierFrom,
-        Integer groupIdentifierTo,
-        Integer sceneIdentifierTo,
-        int timedInvokeTimeoutMs) {
-      copyScene(
-          chipClusterPtr,
-          callback,
-          mode,
-          groupIdentifierFrom,
-          sceneIdentifierFrom,
-          groupIdentifierTo,
-          sceneIdentifierTo,
-          timedInvokeTimeoutMs);
-    }
-
     private native void addScene(
         long chipClusterPtr,
         AddSceneResponseCallback Callback,
@@ -891,33 +804,6 @@ public class ChipClusters {
         long chipClusterPtr,
         GetSceneMembershipResponseCallback Callback,
         Integer groupID,
-        @Nullable Integer timedInvokeTimeoutMs);
-
-    private native void enhancedAddScene(
-        long chipClusterPtr,
-        EnhancedAddSceneResponseCallback Callback,
-        Integer groupID,
-        Integer sceneID,
-        Integer transitionTime,
-        String sceneName,
-        ArrayList<ChipStructs.ScenesClusterExtensionFieldSet> extensionFieldSets,
-        @Nullable Integer timedInvokeTimeoutMs);
-
-    private native void enhancedViewScene(
-        long chipClusterPtr,
-        EnhancedViewSceneResponseCallback Callback,
-        Integer groupID,
-        Integer sceneID,
-        @Nullable Integer timedInvokeTimeoutMs);
-
-    private native void copyScene(
-        long chipClusterPtr,
-        CopySceneResponseCallback Callback,
-        Integer mode,
-        Integer groupIdentifierFrom,
-        Integer sceneIdentifierFrom,
-        Integer groupIdentifierTo,
-        Integer sceneIdentifierTo,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface AddSceneResponseCallback {
@@ -1976,15 +1862,6 @@ public class ChipClusters {
       stopWithOnOff(chipClusterPtr, callback, optionsMask, optionsOverride, timedInvokeTimeoutMs);
     }
 
-    public void moveToClosestFrequency(DefaultClusterCallback callback, Integer frequency) {
-      moveToClosestFrequency(chipClusterPtr, callback, frequency, null);
-    }
-
-    public void moveToClosestFrequency(
-        DefaultClusterCallback callback, Integer frequency, int timedInvokeTimeoutMs) {
-      moveToClosestFrequency(chipClusterPtr, callback, frequency, timedInvokeTimeoutMs);
-    }
-
     private native void moveToLevel(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
@@ -2053,12 +1930,6 @@ public class ChipClusters {
         DefaultClusterCallback Callback,
         Integer optionsMask,
         Integer optionsOverride,
-        @Nullable Integer timedInvokeTimeoutMs);
-
-    private native void moveToClosestFrequency(
-        long chipClusterPtr,
-        DefaultClusterCallback Callback,
-        Integer frequency,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface CurrentLevelAttributeCallback {
@@ -4126,20 +3997,6 @@ public class ChipClusters {
 
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
-
-    public void mfgSpecificPing(DefaultClusterCallback callback) {
-      mfgSpecificPing(chipClusterPtr, callback, null);
-    }
-
-    public void mfgSpecificPing(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
-
-      mfgSpecificPing(chipClusterPtr, callback, timedInvokeTimeoutMs);
-    }
-
-    private native void mfgSpecificPing(
-        long chipClusterPtr,
-        DefaultClusterCallback Callback,
-        @Nullable Integer timedInvokeTimeoutMs);
 
     public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
@@ -25483,52 +25340,6 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void getProfileInfoCommand(DefaultClusterCallback callback) {
-      getProfileInfoCommand(chipClusterPtr, callback, null);
-    }
-
-    public void getProfileInfoCommand(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
-
-      getProfileInfoCommand(chipClusterPtr, callback, timedInvokeTimeoutMs);
-    }
-
-    public void getMeasurementProfileCommand(
-        DefaultClusterCallback callback,
-        Integer attributeId,
-        Long startTime,
-        Integer numberOfIntervals) {
-      getMeasurementProfileCommand(
-          chipClusterPtr, callback, attributeId, startTime, numberOfIntervals, null);
-    }
-
-    public void getMeasurementProfileCommand(
-        DefaultClusterCallback callback,
-        Integer attributeId,
-        Long startTime,
-        Integer numberOfIntervals,
-        int timedInvokeTimeoutMs) {
-      getMeasurementProfileCommand(
-          chipClusterPtr,
-          callback,
-          attributeId,
-          startTime,
-          numberOfIntervals,
-          timedInvokeTimeoutMs);
-    }
-
-    private native void getProfileInfoCommand(
-        long chipClusterPtr,
-        DefaultClusterCallback Callback,
-        @Nullable Integer timedInvokeTimeoutMs);
-
-    private native void getMeasurementProfileCommand(
-        long chipClusterPtr,
-        DefaultClusterCallback Callback,
-        Integer attributeId,
-        Long startTime,
-        Integer numberOfIntervals,
-        @Nullable Integer timedInvokeTimeoutMs);
-
     public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> valueList);
 
@@ -27780,15 +27591,6 @@ public class ChipClusters {
           chipClusterPtr, callback, clientNodeId, ICid, timedInvokeTimeoutMs);
     }
 
-    public void stayAwakeRequest(DefaultClusterCallback callback) {
-      stayAwakeRequest(chipClusterPtr, callback, null);
-    }
-
-    public void stayAwakeRequest(DefaultClusterCallback callback, int timedInvokeTimeoutMs) {
-
-      stayAwakeRequest(chipClusterPtr, callback, timedInvokeTimeoutMs);
-    }
-
     private native void registerClientMonitoring(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
@@ -27801,11 +27603,6 @@ public class ChipClusters {
         DefaultClusterCallback Callback,
         Long clientNodeId,
         Long ICid,
-        @Nullable Integer timedInvokeTimeoutMs);
-
-    private native void stayAwakeRequest(
-        long chipClusterPtr,
-        DefaultClusterCallback Callback,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface ExpectedClientsAttributeCallback {
@@ -28070,41 +27867,6 @@ public class ChipClusters {
       testAddArguments(chipClusterPtr, callback, arg1, arg2, timedInvokeTimeoutMs);
     }
 
-    public void testSimpleArgumentRequest(
-        TestSimpleArgumentResponseCallback callback, Boolean arg1) {
-      testSimpleArgumentRequest(chipClusterPtr, callback, arg1, null);
-    }
-
-    public void testSimpleArgumentRequest(
-        TestSimpleArgumentResponseCallback callback, Boolean arg1, int timedInvokeTimeoutMs) {
-      testSimpleArgumentRequest(chipClusterPtr, callback, arg1, timedInvokeTimeoutMs);
-    }
-
-    public void testStructArrayArgumentRequest(
-        TestStructArrayArgumentResponseCallback callback,
-        ArrayList<ChipStructs.UnitTestingClusterNestedStructList> arg1,
-        ArrayList<ChipStructs.UnitTestingClusterSimpleStruct> arg2,
-        ArrayList<Integer> arg3,
-        ArrayList<Integer> arg4,
-        Integer arg5,
-        Boolean arg6) {
-      testStructArrayArgumentRequest(
-          chipClusterPtr, callback, arg1, arg2, arg3, arg4, arg5, arg6, null);
-    }
-
-    public void testStructArrayArgumentRequest(
-        TestStructArrayArgumentResponseCallback callback,
-        ArrayList<ChipStructs.UnitTestingClusterNestedStructList> arg1,
-        ArrayList<ChipStructs.UnitTestingClusterSimpleStruct> arg2,
-        ArrayList<Integer> arg3,
-        ArrayList<Integer> arg4,
-        Integer arg5,
-        Boolean arg6,
-        int timedInvokeTimeoutMs) {
-      testStructArrayArgumentRequest(
-          chipClusterPtr, callback, arg1, arg2, arg3, arg4, arg5, arg6, timedInvokeTimeoutMs);
-    }
-
     public void testStructArgumentRequest(
         BooleanResponseCallback callback, ChipStructs.UnitTestingClusterSimpleStruct arg1) {
       testStructArgumentRequest(chipClusterPtr, callback, arg1, null);
@@ -28210,71 +27972,6 @@ public class ChipClusters {
       testNullableOptionalRequest(chipClusterPtr, callback, arg1, timedInvokeTimeoutMs);
     }
 
-    public void testComplexNullableOptionalRequest(
-        TestComplexNullableOptionalResponseCallback callback,
-        @Nullable Integer nullableInt,
-        Optional<Integer> optionalInt,
-        @Nullable Optional<Integer> nullableOptionalInt,
-        @Nullable String nullableString,
-        Optional<String> optionalString,
-        @Nullable Optional<String> nullableOptionalString,
-        @Nullable ChipStructs.UnitTestingClusterSimpleStruct nullableStruct,
-        Optional<ChipStructs.UnitTestingClusterSimpleStruct> optionalStruct,
-        @Nullable Optional<ChipStructs.UnitTestingClusterSimpleStruct> nullableOptionalStruct,
-        @Nullable ArrayList<Integer> nullableList,
-        Optional<ArrayList<Integer>> optionalList,
-        @Nullable Optional<ArrayList<Integer>> nullableOptionalList) {
-      testComplexNullableOptionalRequest(
-          chipClusterPtr,
-          callback,
-          nullableInt,
-          optionalInt,
-          nullableOptionalInt,
-          nullableString,
-          optionalString,
-          nullableOptionalString,
-          nullableStruct,
-          optionalStruct,
-          nullableOptionalStruct,
-          nullableList,
-          optionalList,
-          nullableOptionalList,
-          null);
-    }
-
-    public void testComplexNullableOptionalRequest(
-        TestComplexNullableOptionalResponseCallback callback,
-        @Nullable Integer nullableInt,
-        Optional<Integer> optionalInt,
-        @Nullable Optional<Integer> nullableOptionalInt,
-        @Nullable String nullableString,
-        Optional<String> optionalString,
-        @Nullable Optional<String> nullableOptionalString,
-        @Nullable ChipStructs.UnitTestingClusterSimpleStruct nullableStruct,
-        Optional<ChipStructs.UnitTestingClusterSimpleStruct> optionalStruct,
-        @Nullable Optional<ChipStructs.UnitTestingClusterSimpleStruct> nullableOptionalStruct,
-        @Nullable ArrayList<Integer> nullableList,
-        Optional<ArrayList<Integer>> optionalList,
-        @Nullable Optional<ArrayList<Integer>> nullableOptionalList,
-        int timedInvokeTimeoutMs) {
-      testComplexNullableOptionalRequest(
-          chipClusterPtr,
-          callback,
-          nullableInt,
-          optionalInt,
-          nullableOptionalInt,
-          nullableString,
-          optionalString,
-          nullableOptionalString,
-          nullableStruct,
-          optionalStruct,
-          nullableOptionalStruct,
-          nullableList,
-          optionalList,
-          nullableOptionalList,
-          timedInvokeTimeoutMs);
-    }
-
     public void simpleStructEchoRequest(
         SimpleStructResponseCallback callback, ChipStructs.UnitTestingClusterSimpleStruct arg1) {
       simpleStructEchoRequest(chipClusterPtr, callback, arg1, null);
@@ -28316,18 +28013,6 @@ public class ChipClusters {
       testEmitTestEventRequest(chipClusterPtr, callback, arg1, arg2, arg3, timedInvokeTimeoutMs);
     }
 
-    public void testEmitTestFabricScopedEventRequest(
-        TestEmitTestFabricScopedEventResponseCallback callback, Integer arg1) {
-      testEmitTestFabricScopedEventRequest(chipClusterPtr, callback, arg1, null);
-    }
-
-    public void testEmitTestFabricScopedEventRequest(
-        TestEmitTestFabricScopedEventResponseCallback callback,
-        Integer arg1,
-        int timedInvokeTimeoutMs) {
-      testEmitTestFabricScopedEventRequest(chipClusterPtr, callback, arg1, timedInvokeTimeoutMs);
-    }
-
     private native void test(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
@@ -28353,23 +28038,6 @@ public class ChipClusters {
         TestAddArgumentsResponseCallback Callback,
         Integer arg1,
         Integer arg2,
-        @Nullable Integer timedInvokeTimeoutMs);
-
-    private native void testSimpleArgumentRequest(
-        long chipClusterPtr,
-        TestSimpleArgumentResponseCallback Callback,
-        Boolean arg1,
-        @Nullable Integer timedInvokeTimeoutMs);
-
-    private native void testStructArrayArgumentRequest(
-        long chipClusterPtr,
-        TestStructArrayArgumentResponseCallback Callback,
-        ArrayList<ChipStructs.UnitTestingClusterNestedStructList> arg1,
-        ArrayList<ChipStructs.UnitTestingClusterSimpleStruct> arg2,
-        ArrayList<Integer> arg3,
-        ArrayList<Integer> arg4,
-        Integer arg5,
-        Boolean arg6,
         @Nullable Integer timedInvokeTimeoutMs);
 
     private native void testStructArgumentRequest(
@@ -28427,23 +28095,6 @@ public class ChipClusters {
         @Nullable Optional<Integer> arg1,
         @Nullable Integer timedInvokeTimeoutMs);
 
-    private native void testComplexNullableOptionalRequest(
-        long chipClusterPtr,
-        TestComplexNullableOptionalResponseCallback Callback,
-        @Nullable Integer nullableInt,
-        Optional<Integer> optionalInt,
-        @Nullable Optional<Integer> nullableOptionalInt,
-        @Nullable String nullableString,
-        Optional<String> optionalString,
-        @Nullable Optional<String> nullableOptionalString,
-        @Nullable ChipStructs.UnitTestingClusterSimpleStruct nullableStruct,
-        Optional<ChipStructs.UnitTestingClusterSimpleStruct> optionalStruct,
-        @Nullable Optional<ChipStructs.UnitTestingClusterSimpleStruct> nullableOptionalStruct,
-        @Nullable ArrayList<Integer> nullableList,
-        Optional<ArrayList<Integer>> optionalList,
-        @Nullable Optional<ArrayList<Integer>> nullableOptionalList,
-        @Nullable Integer timedInvokeTimeoutMs);
-
     private native void simpleStructEchoRequest(
         long chipClusterPtr,
         SimpleStructResponseCallback Callback,
@@ -28467,12 +28118,6 @@ public class ChipClusters {
         Integer arg1,
         Integer arg2,
         Boolean arg3,
-        @Nullable Integer timedInvokeTimeoutMs);
-
-    private native void testEmitTestFabricScopedEventRequest(
-        long chipClusterPtr,
-        TestEmitTestFabricScopedEventResponseCallback Callback,
-        Integer arg1,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface TestSpecificResponseCallback {

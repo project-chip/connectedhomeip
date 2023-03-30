@@ -112,8 +112,9 @@ public class ChipClusters {
 
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
-  {{#zcl_commands}}
-    {{#if (is_str_equal source 'client')}}
+  {{#all_user_cluster_generated_commands}}
+    {{#if_compare clusterId ../id operator='=='}}
+      {{#if (is_str_equal commandSource 'client')}}
 
     {{#unless mustUseTimedInvoke}}
     public void {{asLowerCamelCase name}}({{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback
@@ -127,15 +128,18 @@ public class ChipClusters {
       , int timedInvokeTimeoutMs) {
       {{asLowerCamelCase name}}(chipClusterPtr, callback{{#zcl_command_arguments}}, {{asLowerCamelCase label}}{{/zcl_command_arguments}}, timedInvokeTimeoutMs);
     }
-    {{/if}}
-  {{/zcl_commands}}
-  {{#zcl_commands}}
-    {{#if (is_str_equal source 'client')}}
+      {{/if}}
+    {{/if_compare}}
+  {{/all_user_cluster_generated_commands}}
+  {{#all_user_cluster_generated_commands}}
+    {{#if_compare clusterId ../id operator='=='}}
+      {{#if (is_str_equal commandSource 'client')}}
     private native void {{asLowerCamelCase name}}(long chipClusterPtr, {{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} Callback
       {{#zcl_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true clusterId=parent.parent.id}} {{asLowerCamelCase label}}{{/zcl_command_arguments}}
       , @Nullable Integer timedInvokeTimeoutMs);
       {{/if}}
-  {{/zcl_commands}}
+    {{/if_compare}}
+  {{/all_user_cluster_generated_commands}}
     {{#all_user_cluster_generated_commands}}
       {{#if_compare clusterId ../id operator='=='}}
         {{#if (is_str_equal commandSource 'server')}}
