@@ -79,8 +79,9 @@ public:
     virtual ~SetUpCodePairer() {}
 
     CHIP_ERROR PairDevice(chip::NodeId remoteId, const char * setUpCode,
-                          SetupCodePairerBehaviour connectionType = SetupCodePairerBehaviour::kCommission,
-                          DiscoveryType discoveryType             = DiscoveryType::kAll);
+                          SetupCodePairerBehaviour connectionType              = SetupCodePairerBehaviour::kCommission,
+                          DiscoveryType discoveryType                          = DiscoveryType::kAll,
+                          Optional<Dnssd::CommonResolutionData> resolutionData = NullOptional);
 
     // Called by the DeviceCommissioner to notify that we have discovered a new device.
     void NotifyCommissionableDeviceDiscovered(const chip::Dnssd::DiscoveredNodeData & nodeData);
@@ -150,6 +151,8 @@ private:
         kSoftAPTransport,
         kTransportTypeCount,
     };
+
+    void NotifyCommissionableDeviceDiscovered(const chip::Dnssd::CommonResolutionData & resolutionData);
 
     static void OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, void * context);
 
