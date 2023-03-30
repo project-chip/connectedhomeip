@@ -240,6 +240,7 @@ template("efr32_sdk") {
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
       if (enable_dic) {
+        assert(chip_enable_wifi_ipv4, "enable chip_enable_wifi_ipv4")
         defines += [ "DIC_ENABLE=1" ]
       }
       if (chip_enable_wifi_ipv4) {
@@ -288,7 +289,6 @@ template("efr32_sdk") {
             "LWIP_ICMP=1",
             "LWIP_IGMP=1",
             "LWIP_DHCP=1",
-            "LWIP_DNS=0",
           ]
         } else {
           defines += [ "LWIP_IPV4=0" ]
