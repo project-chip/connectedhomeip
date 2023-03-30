@@ -22,6 +22,8 @@ import("${build_root}/config/defaults.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
 
+import("${chip_root}/src/app/chip_data_model.gni")
+
 if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
   import("$dir_pw_build/target_types.gni")
@@ -93,6 +95,13 @@ bl_iot_sdk("sdk") {
   }
 }
 
+chip_data_model("bouffalolab-lighting") {
+  zap_file = "${example_dir}/../data_model/lighting-app-thread.zap"
+
+  zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
+  is_server = true
+}
+
 bouffalolab_executable("lighting_app") {
   output_name = "chip-bl702-lighting-example.out"
   bl_plat_name = "bl702"
@@ -135,8 +144,8 @@ bouffalolab_executable("lighting_app") {
   ]
 
   deps = [
+    ":bouffalolab-lighting",
     ":sdk",
-    "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
