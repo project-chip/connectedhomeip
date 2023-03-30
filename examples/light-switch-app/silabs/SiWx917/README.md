@@ -79,7 +79,7 @@ Silicon Labs platform.
 *   Build the example application:
 
           cd ~/connectedhomeip
-          ./scripts/examples/gn_efr32_example.sh ./examples/light-switch-app/silabs/SiWx917/ ./out/light-switch-app BRD4325B
+          ./scripts/examples/gn_efr32_example.sh ./examples/light-switch-app/silabs/SiWx917/ ./out/light-switch-app BRD4325B
 
 -   To delete generated executable, libraries and object files use:
 

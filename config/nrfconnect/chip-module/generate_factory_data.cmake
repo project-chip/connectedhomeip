@@ -91,6 +91,10 @@ string(APPEND script_args "--passcode ${CONFIG_CHIP_DEVICE_SPAKE2_PASSCODE}\n")
 string(APPEND script_args "--include_passcode\n")
 string(APPEND script_args "--overwrite\n")
 
+if(CONFIG_CHIP_FACTORY_DATA_GENERATE_ONBOARDING_CODES)
+    string(APPEND script_args "--generate_onboarding\n")
+endif()
+
 # check if spake2 verifier should be generated using script
 if(NOT CONFIG_CHIP_FACTORY_DATA_GENERATE_SPAKE2_VERIFIER)
     # Spake2 verifier should be provided using kConfig

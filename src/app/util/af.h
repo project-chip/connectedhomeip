@@ -153,8 +153,34 @@ uint16_t emberAfIndexFromEndpoint(chip::EndpointId endpoint);
 uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(chip::EndpointId endpoint);
 
 /**
- * Returns the endpoint index within a given cluster (Server-side),
- * looking only for standard clusters.
+ * Returns the index of the given endpoint in the list of all defined endpoints
+ * (including disabled ones) that support the given cluster.
+ *
+ * Returns kEmberInvalidEndpointIndex if the given endpoint does not support the
+ * given cluster.
+ *
+ * For fixed endpoints, the returned value never changes, but for dynamic
+ * endpoints it can change if a dynamic endpoint is defined at a lower index
+ * that also supports the given cluster.
+ *
+ * For example, if a device has 4 fixed endpoints (ids 0-3) and 2 dynamic
+ * endpoints, and cluster X is supported on endpoints 1 and 3, then:
+ *
+ * 1) emberAfFindClusterServerEndpointIndex(0, X) returns kEmberInvalidEndpointIndex
+ * 2) emberAfFindClusterServerEndpointIndex(1, X) returns 0
+ * 3) emberAfFindClusterServerEndpointIndex(2, X) returns kEmberInvalidEndpointIndex
+ * 4) emberAfFindClusterServerEndpointIndex(3, X) returns 1
+ *
+ * If the second dynamic endpoint is defined (via
+ * emberAfSetDynamicEndpoint(1, 7, ...)) to
+ * have endpoint id 7, and supports cluster X, but the first dynamic endpoint is
+ * not defined, then emberAfFindClusterServerEndpointIndex(7, X) returns 2.
+ *
+ * If now the first dynamic endpoint is defined (via
+ * emberAfSetDynamicEndpoint(0, 9, ...))
+ * to have endpoint id 9, and supports cluster X, then
+ * emberAfFindClusterServerEndpointIndex(7, X) starts returning 3 and
+ * emberAfFindClusterServerEndpointIndex(9, X) returns 2.
  */
 uint16_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
 

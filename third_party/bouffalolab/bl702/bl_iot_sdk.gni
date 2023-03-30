@@ -643,6 +643,7 @@ template("bl_iot_sdk") {
 
     configs += [
       ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_hosal",
       ":${sdk_target_name}_config_freertos",
       ":${sdk_target_name}_config_utils",
     ]

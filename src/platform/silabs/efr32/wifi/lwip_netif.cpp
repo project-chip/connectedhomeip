@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#ifndef RS911X_SOCKETS
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -155,5 +154,3 @@ struct netif * wfx_get_netif(sl_wfx_interface_t interface)
 #endif
     return (struct netif *) 0;
 }
-
-#endif /* RS911X_SOCKETS */

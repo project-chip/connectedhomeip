@@ -54,6 +54,10 @@
 #include <DeviceInfoProviderImpl.h>
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
+#if CONFIG_SEC_CERT_DAC_PROVIDER
+#include <platform/ESP32/ESP32SecureCertDACProvider.h>
+#endif
+
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
@@ -74,6 +78,22 @@ DeviceLayer::ESP32DeviceInfoProvider gExampleDeviceInfoProvider;
 #else
 DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+
+#if CONFIG_SEC_CERT_DAC_PROVIDER
+DeviceLayer::ESP32SecureCertDACProvider gSecureCertDACProvider;
+#endif // CONFIG_SEC_CERT_DAC_PROVIDER
+
+chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
+{
+#if CONFIG_SEC_CERT_DAC_PROVIDER
+    return &gSecureCertDACProvider;
+#elif CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+    return &sFactoryDataProvider;
+#else // EXAMPLE_DAC_PROVIDER
+    return chip::Credentials::Examples::GetExampleDACProvider();
+#endif
+}
+
 } // namespace
 
 static void InitServer(intptr_t context)
@@ -131,14 +151,12 @@ extern "C" void app_main()
 
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
     SetCommissionableDataProvider(&sFactoryDataProvider);
-    SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
 #if CONFIG_ENABLE_ESP32_DEVICE_INSTANCE_INFO_PROVIDER
     SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
 #endif
-#else
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-#endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
+#endif
 
+    SetDeviceAttestationCredentialsProvider(get_dac_provider());
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     if (ThreadStackMgr().InitThreadStack() != CHIP_NO_ERROR)
     {

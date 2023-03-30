@@ -105,11 +105,11 @@ exit:
 
 JNI_METHOD(void, setDACProvider)(JNIEnv *, jobject, jobject provider)
 {
-    if (!chip::Credentials::IsDeviceAttestationCredentialsProviderSet())
-    {
-        JNIDACProvider * p = new JNIDACProvider(provider);
-        chip::Credentials::SetDeviceAttestationCredentialsProvider(p);
-    }
+    chip::DeviceLayer::StackLock lock;
+    ChipLogProgress(AppServer, "JNI_METHOD setDACProvider called");
+
+    JNIDACProvider * p = new JNIDACProvider(provider);
+    chip::Credentials::SetDeviceAttestationCredentialsProvider(p);
 }
 
 JNI_METHOD(jboolean, openBasicCommissioningWindow)

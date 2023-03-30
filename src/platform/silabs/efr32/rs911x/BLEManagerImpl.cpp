@@ -75,7 +75,7 @@ using namespace ::chip::DeviceLayer::Internal;
 
 void sl_ble_init()
 {
-    WFX_RSI_LOG("%s starting", __func__);
+    SILABS_LOG("%s starting", __func__);
 
     // registering the GAP callback functions
     rsi_ble_gap_register_callbacks(NULL, NULL, rsi_ble_on_disconnect_event, NULL, NULL, NULL, rsi_ble_on_enhance_conn_status_event,
@@ -86,7 +86,7 @@ void sl_ble_init()
                                     rsi_ble_on_mtu_event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                                     rsi_ble_on_event_indication_confirmation, NULL);
 
-    WFX_RSI_LOG("registering rsi_ble_add_service");
+    SILABS_LOG("registering rsi_ble_add_service");
 
     //  Exchange of GATT info with BLE stack
     rsi_ble_add_matter_service();
@@ -94,20 +94,21 @@ void sl_ble_init()
     //  initializing the application events map
     rsi_ble_app_init_events();
 
-    WFX_RSI_LOG("StartAdvertising");
+    SILABS_LOG("StartAdvertising");
     chip::DeviceLayer::Internal::BLEManagerImpl().StartAdvertising(); // TODO:: Called on after init of module
-    WFX_RSI_LOG("%s  Ended", __func__);
+    SILABS_LOG("%s  Ended", __func__);
 }
 
 void sl_ble_event_handling_task(void)
 {
     int32_t event_id;
 
-    WFX_RSI_LOG("%s starting", __func__);
+    SILABS_LOG("%s starting", __func__);
 
     //! This semaphore is waiting for wifi module initialization.
     rsi_semaphore_wait(&sl_rs_ble_init_sem, 0);
 
+    // This function initialize BLE and start BLE advertisement.
     sl_ble_init();
 
     // Application event map
@@ -123,7 +124,7 @@ void sl_ble_event_handling_task(void)
         case RSI_BLE_CONN_EVENT: {
             rsi_ble_app_clear_event(RSI_BLE_CONN_EVENT);
             BLEMgrImpl().HandleConnectEvent();
-            WFX_RSI_LOG("%s Module got connected", __func__);
+            SILABS_LOG("%s Module got connected", __func__);
             // Requests the connection parameters change with the remote device
             rsi_ble_conn_params_update(event_msg.resp_enh_conn.dev_addr, BLE_MIN_CONNECTION_INTERVAL_MS,
                                        BLE_MAX_CONNECTION_INTERVAL_MS, BLE_SLAVE_LATENCY_MS, BLE_TIMEOUT_MS);
@@ -131,7 +132,7 @@ void sl_ble_event_handling_task(void)
         break;
         case RSI_BLE_DISCONN_EVENT: {
             // event invokes when disconnection was completed
-            WFX_RSI_LOG("%s Module got Disconnected", __func__);
+            SILABS_LOG("%s Module got Disconnected", __func__);
             BLEMgrImpl().HandleConnectionCloseEvent(event_msg.reason);
             // clear the served event
             rsi_ble_app_clear_event(RSI_BLE_DISCONN_EVENT);
@@ -139,7 +140,7 @@ void sl_ble_event_handling_task(void)
         break;
         case RSI_BLE_MTU_EVENT: {
             // event invokes when write/notification events received
-            WFX_RSI_LOG("%s RSI_BLE_MTU_EVENT", __func__);
+            SILABS_LOG("%s RSI_BLE_MTU_EVENT", __func__);
             BLEMgrImpl().UpdateMtu(event_msg.rsi_ble_mtu);
             // clear the served event
             rsi_ble_app_clear_event(RSI_BLE_MTU_EVENT);
@@ -147,28 +148,28 @@ void sl_ble_event_handling_task(void)
         break;
         case RSI_BLE_GATT_WRITE_EVENT: {
             // event invokes when write/notification events received
-            WFX_RSI_LOG("%s RSI_BLE_GATT_WRITE_EVENT", __func__);
+            SILABS_LOG("%s RSI_BLE_GATT_WRITE_EVENT", __func__);
             BLEMgrImpl().HandleWriteEvent(event_msg.rsi_ble_write);
             // clear the served event
             rsi_ble_app_clear_event(RSI_BLE_GATT_WRITE_EVENT);
         }
         break;
         case RSI_BLE_GATT_INDICATION_CONFIRMATION: {
-            WFX_RSI_LOG("%s indication confirmation", __func__);
+            SILABS_LOG("%s indication confirmation", __func__);
             BLEMgrImpl().HandleTxConfirmationEvent(1);
             rsi_ble_app_clear_event(RSI_BLE_GATT_INDICATION_CONFIRMATION);
         }
         break;
 
         case RSI_BLE_RESP_ATT_VALUE: {
-            WFX_RSI_LOG("%s RESP_ATT confirmation", __func__);
+            SILABS_LOG("%s RESP_ATT confirmation", __func__);
         }
         default:
             break;
         }
     }
 
-    WFX_RSI_LOG("%s Ended", __func__);
+    SILABS_LOG("%s Ended", __func__);
 }
 
 namespace chip {
@@ -215,7 +216,7 @@ namespace {
 #define BLE_CONFIG_MIN_CE_LENGTH (0)      // Leave to min value
 #define BLE_CONFIG_MAX_CE_LENGTH (0xFFFF) // Leave to max value
 
-#define BLE_DEFAULT_TIMER_PERIOD 1
+#define BLE_DEFAULT_TIMER_PERIOD_MS (1)
 
 TimerHandle_t sbleAdvTimeoutTimer; // FreeRTOS sw timer.
 
@@ -243,7 +244,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     if (wfx_rsi.ble_task == NULL)
     {
-        WFX_RSI_LOG("%s: error: failed to create ble task.", __func__);
+        SILABS_LOG("%s: error: failed to create ble task.", __func__);
     }
 
     // Initialize the CHIP BleLayer.
@@ -255,11 +256,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
-    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",                           // Just a text name, not used by the RTOS kernel
-                                       pdMS_TO_TICKS(BLE_DEFAULT_TIMER_PERIOD), // == default timer period
-                                       false,                                   // no timer reload (==one-shot)
-                                       (void *) this,                           // init timer id = ble obj context
-                                       BleAdvTimeoutHandler                     // timer callback handler
+    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",                              // Just a text name, not used by the RTOS kernel
+                                       pdMS_TO_TICKS(BLE_DEFAULT_TIMER_PERIOD_MS), // == default timer period
+                                       false,                                      // no timer reload (==one-shot)
+                                       (void *) this,                              // init timer id = ble obj context
+                                       BleAdvTimeoutHandler                        // timer callback handler
     );
 
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
@@ -436,12 +437,12 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
                                     PacketBufferHandle data)
 {
     int32_t status = 0;
-    WFX_RSI_LOG("In send indication");
+    SILABS_LOG("In send indication");
     status = rsi_ble_indicate_value(event_msg.resp_enh_conn.dev_addr, event_msg.rsi_ble_measurement_hndl, (data->DataLength()),
                                     data->Start());
     if (status != RSI_SUCCESS)
     {
-        WFX_RSI_LOG("indication %d failed with error code %lx ", status);
+        SILABS_LOG("indication %d failed with error code %lx ", status);
         return false;
     }
 
@@ -727,17 +728,17 @@ void BLEManagerImpl::HandleConnectionCloseEvent(uint16_t reason)
     status = rsi_bt_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
     if (status != RSI_SUCCESS)
     {
-        WFX_RSI_LOG("BT Powersave Config Failed, Error Code : 0x%lX", status);
+        SILABS_LOG("BT Powersave Config Failed, Error Code : 0x%lX", status);
         return;
     }
 
     status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
     if (status != RSI_SUCCESS)
     {
-        WFX_RSI_LOG("WLAN Powersave Config Failed, Error Code : 0x%lX", status);
+        SILABS_LOG("WLAN Powersave Config Failed, Error Code : 0x%lX", status);
         return;
     }
-    WFX_RSI_LOG("Powersave Config Success");
+    SILABS_LOG("Powersave Config Success");
 #endif
 
     if (RemoveConnection(connHandle))
@@ -776,11 +777,11 @@ void BLEManagerImpl::HandleWriteEvent(rsi_ble_event_write_t evt)
     ChipLogProgress(DeviceLayer, "Char Write Req, packet type %d", evt.pkt_type);
     // uint8_t attribute = (uint8_t) event_msg.rsi_ble_measurement_hndl;
 
-    WFX_RSI_LOG("event_msg.rsi_ble_gatt_server_client_config_hndl = %d", event_msg.rsi_ble_gatt_server_client_config_hndl);
+    SILABS_LOG("event_msg.rsi_ble_gatt_server_client_config_hndl = %d", event_msg.rsi_ble_gatt_server_client_config_hndl);
 
     if (evt.handle[0] == (uint8_t) event_msg.rsi_ble_gatt_server_client_config_hndl) // TODO:: compare the handle exactly
     {
-        WFX_RSI_LOG("Inside HandleTXCharCCCDWrite ");
+        SILABS_LOG("Inside HandleTXCharCCCDWrite ");
         HandleTXCharCCCDWrite(&evt);
     }
     else

@@ -36,9 +36,6 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
-// Set the following to 1 in order to run individual test case manually.
-#define MANUAL_INDIVIDUAL_TEST 0
-
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12344321;
@@ -155,24 +152,45 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 @interface MTRDeviceTests : XCTestCase
 @end
 
+static BOOL sStackInitRan = NO;
+static BOOL sNeedsStackShutdown = YES;
+
 @implementation MTRDeviceTests
+
++ (void)tearDown
+{
+    // Global teardown, runs once
+    if (sNeedsStackShutdown) {
+        // We don't need to worry about ResetCommissionee.  If we get here,
+        // we're running only one of our test methods (using
+        // -only-testing:MatterTests/MTROTAProviderTests/testMethodName), since
+        // we did not run test999_TearDown.
+        [self shutdownStack];
+    }
+}
 
 - (void)setUp
 {
+    // Per-test setup, runs before each test.
     [super setUp];
     [self setContinueAfterFailure:NO];
+
+    if (sStackInitRan == NO) {
+        [self initStack];
+        [self waitForCommissionee];
+    }
 }
 
 - (void)tearDown
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self shutdownStack];
-#endif
+    // Per-test teardown, runs after each test.
     [super tearDown];
 }
 
 - (void)initStack
 {
+    sStackInitRan = YES;
+
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
 
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
@@ -217,8 +235,10 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
 }
 
-- (void)shutdownStack
++ (void)shutdownStack
 {
+    sNeedsStackShutdown = NO;
+
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
@@ -236,20 +256,15 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-#if !MANUAL_INDIVIDUAL_TEST
 - (void)test000_SetUp
 {
-    [self initStack];
-    [self waitForCommissionee];
+    // Nothing to do here; our setUp method handled this already.  This test
+    // just exists to make the setup not look like it's happening inside other
+    // tests.
 }
-#endif
 
 - (void)test001_ReadAttribute
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"read DeviceDescriptor DeviceType attribute for all endpoints"];
 
@@ -290,10 +305,6 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 
 - (void)test002_WriteAttribute
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"write LevelControl Brightness attribute"];
 
     MTRBaseDevice * device = GetConnectedDevice();
@@ -333,10 +344,6 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 
 - (void)test003_InvokeCommand
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"invoke MoveToLevelWithOnOff command"];
 
     MTRBaseDevice * device = GetConnectedDevice();
@@ -382,10 +389,6 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
 
 - (void)test004_InvokeTimedCommand
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"invoke Off command"];
 
     MTRBaseDevice * device = GetConnectedDevice();
@@ -429,10 +432,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test005_Subscribe
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -571,10 +570,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test006_ReadAttributeFailure
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"read failed"];
 
     MTRBaseDevice * device = GetConnectedDevice();
@@ -616,10 +611,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test007_WriteAttributeFailure
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"write failed"];
 
     MTRBaseDevice * device = GetConnectedDevice();
@@ -648,10 +639,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test008_InvokeCommandFailure
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"invoke MoveToLevelWithOnOff command"];
 
     MTRBaseDevice * device = GetConnectedDevice();
@@ -685,10 +672,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test009_SubscribeFailure
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
     __block void (^reportHandler)(id _Nullable values, NSError * _Nullable error) = nil;
 
@@ -741,10 +724,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test010_ReadAllAttribute
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"read DeviceDescriptor DeviceType attribute for all endpoints"];
 
@@ -784,11 +763,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test011_ReadCachedAttribute
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
-
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     XCTestExpectation * cleanSubscriptionExpectation = [self expectationWithDescription:@"Previous subscriptions cleaned"];
@@ -1053,10 +1027,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 // Test an error to subscription
 - (void)test012_SubscriptionError
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     XCTestExpectation * deregisterExpectation = [self expectationWithDescription:@"Report handler deregistered"];
@@ -1162,11 +1132,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test013_ReuseChipClusterObject
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
-
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
@@ -1201,10 +1166,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test014_InvokeCommandWithDifferentIdResponse
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"invoke Off command"];
 
     MTRBaseDevice * device = GetConnectedDevice();
@@ -1264,11 +1225,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test015_FailedSubscribeWithQueueAcrossShutdown
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
-
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -1340,11 +1296,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test016_FailedSubscribeWithCacheReadDuringFailure
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
-
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -1399,11 +1350,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test017_TestMTRDeviceBasics
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
-
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -1496,10 +1442,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test018_SubscriptionErrorWhenNotResubscribing
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -1557,11 +1499,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test019_MTRDeviceMultipleCommands
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
-
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -1642,10 +1579,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test900_SubscribeAllAttributes
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
     XCTestExpectation * cleanSubscriptionExpectation = [self expectationWithDescription:@"Previous subscriptions cleaned"];
@@ -1817,13 +1750,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
 }
 
-#if !MANUAL_INDIVIDUAL_TEST
 - (void)test999_TearDown
 {
     ResetCommissionee(GetConnectedDevice(), dispatch_get_main_queue(), self, kTimeoutInSeconds);
-    [self shutdownStack];
+    [[self class] shutdownStack];
 }
-#endif
 
 @end
 

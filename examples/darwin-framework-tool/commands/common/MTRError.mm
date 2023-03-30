@@ -87,6 +87,7 @@ CHIP_ERROR MTRErrorToCHIPErrorCode(NSError * error)
             break;
         }
         // Weird error we did not create.  Fall through.
+        FALLTHROUGH;
     default:
         code = CHIP_ERROR_INTERNAL.AsInteger();
         break;

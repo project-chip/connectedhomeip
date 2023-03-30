@@ -38,7 +38,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.6.47
+            image: connectedhomeip/chip-build-nrf-platform:0.7.0
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -52,7 +52,7 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform nrfconnect
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform nrfconnect
             - name: Detect changed paths
               uses: dorny/paths-filter@v2
               id: changed_paths
@@ -99,7 +99,9 @@ jobs:
               run: scripts/run_in_build_env.sh "python3 scripts/setup/nrfconnect/update_ncs.py --check"
             - name: Run unit tests of factory data generation script
               timeout-minutes: 15
-              run: scripts/run_in_build_env.sh "./scripts/tools/nrfconnect/tests/test_generate_factory_data.py"
+              run: |
+                  scripts/run_in_build_env.sh 'pip3 install -r scripts/setup/requirements.nrfconnect.txt'
+                  scripts/run_in_build_env.sh "./scripts/tools/nrfconnect/tests/test_generate_factory_data.py"
             - name: Build example nRF Connect SDK Lock App on nRF52840 DK
               if: github.event_name == 'push' || steps.changed_paths.outputs.nrfconnect == 'true'
               timeout-minutes: 15

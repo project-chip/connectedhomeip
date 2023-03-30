@@ -435,12 +435,6 @@ CHIP_ERROR SilabsConfig::FactoryResetConfig(void)
                             return err2;
                         });
 
-    // Return success at end of iterations.
-    if (err == CHIP_END_OF_INPUT)
-    {
-        err = CHIP_NO_ERROR;
-    }
-
     return err;
 }
 

@@ -21,8 +21,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// #include "AppEvent.h"
-
 #include "FreeRTOS.h"
 #include "timers.h"
 #include <platform/CHIPDeviceLayer.h>
