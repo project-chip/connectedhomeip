@@ -55,6 +55,13 @@ declare_args() {
   # Argument to enable IPv4 for wifi
   # aligning to match chip_inet_config_enable_ipv4 default configuration
   chip_enable_wifi_ipv4 = false
+  silabs_gen_folder = ""
+
+  # Calls SLC-CLI at run time
+  slc_generate = false
+
+  # Use SLC generated files
+  slc_reuse_files = false
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
@@ -64,6 +71,14 @@ declare_args() {
   sl_ot_efr32_root =
       "${efr32_sdk_root}/protocol/openthread/platform-abstraction/efr32"
   sl_openthread_root = "${efr32_sdk_root}/util/third_party/openthread"
+}
+
+if (slc_generate || slc_reuse_files) {
+  silabs_gen_folder = "${chip_root}/third_party/silabs/slc_gen/${silabs_board}/"
+} else {
+  print("Using pre-generate files")
+  silabs_gen_folder =
+      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/"
 }
 
 # Defines an efr32 SDK build target.
@@ -156,9 +171,15 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/security/sl_component/se_manager/src/",
       "${efr32_sdk_root}/util/third_party/freertos/cmsis/Include",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/include",
-      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/config",
-      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen",
+      "${efr32_sdk_root}/platform/driver/debug/inc",
+      "${silabs_gen_folder}/config",
+      "${silabs_gen_folder}/autogen",
     ]
+
+    if (slc_generate || slc_reuse_files) {
+      _include_dirs +=
+          [ "${efr32_sdk_root}/hardware/driver/configuration_over_swo/inc/" ]
+    }
 
     if (silabs_family != "mgm24") {
       _include_dirs += [
@@ -296,7 +317,6 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/fem_util/",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rssi/",
         "${efr32_sdk_root}/platform/driver/debug/inc/",
-        "${efr32_sdk_root}/hardware/driver/configuration_over_swo/inc/",
       ]
     }
 
@@ -672,11 +692,11 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/mbedtls/library/x509_csr.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/x509write_crt.c",
       "${efr32_sdk_root}/util/third_party/mbedtls/library/x509write_csr.c",
-      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/gatt_db.c",
-      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_bluetooth.c",
-      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_board_default_init.c",
-      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_device_init_clocks.c",
-      "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_event_handler.c",
+      "${silabs_gen_folder}/autogen/gatt_db.c",
+      "${silabs_gen_folder}/autogen/sl_bluetooth.c",
+      "${silabs_gen_folder}/autogen/sl_board_default_init.c",
+      "${silabs_gen_folder}/autogen/sl_device_init_clocks.c",
+      "${silabs_gen_folder}/autogen/sl_event_handler.c",
     ]
     if (enable_dic) {
       sources += [
@@ -684,6 +704,14 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/util/third_party/mbedtls/library/rsa_alt_helpers.c",
       ]
     }
+
+    if (slc_generate || slc_reuse_files) {
+      sources += [
+        "${efr32_sdk_root}/hardware/driver/configuration_over_swo/src/sl_cos.c",
+        "${efr32_sdk_root}/platform/driver/debug/src/sl_debug_swo.c",
+      ]
+    }
+
     if (silabs_family != "mgm24") {
       sources +=
           [ "${efr32_sdk_root}/platform/radio/rail_lib/hal/efr32/hal_efr.c" ]
@@ -693,7 +721,7 @@ template("efr32_sdk") {
       sources += [
         "${efr32_sdk_root}/platform/driver/button/src/sl_button.c",
         "${efr32_sdk_root}/platform/driver/button/src/sl_simple_button.c",
-        "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_simple_button_instances.c",
+        "${silabs_gen_folder}/autogen/sl_simple_button_instances.c",
       ]
     }
 
@@ -728,7 +756,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/driver/leddrv/src/sl_pwm_led.c",
         "${efr32_sdk_root}/platform/driver/leddrv/src/sl_simple_led.c",
         "${efr32_sdk_root}/platform/driver/leddrv/src/sl_simple_rgb_pwm_led.c",
-        "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_simple_led_instances.c",
+        "${silabs_gen_folder}/autogen/sl_simple_led_instances.c",
       ]
     }
 
@@ -736,7 +764,7 @@ template("efr32_sdk") {
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
       sources += [
         "${efr32_sdk_root}/platform/emdrv/spidrv/src/spidrv.c",
-        "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_spidrv_init.c",
+        "${silabs_gen_folder}/autogen/sl_spidrv_init.c",
       ]
     }
 
@@ -761,7 +789,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emlib/src/em_eusart.c",
         "${efr32_sdk_root}/platform/emlib/src/em_leuart.c",
         "${efr32_sdk_root}/platform/emlib/src/em_usart.c",
-        "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/autogen/sl_uartdrv_init.c",
+        "${silabs_gen_folder}/autogen/sl_uartdrv_init.c",
       ]
 
       if (use_external_flash) {
@@ -933,8 +961,6 @@ template("efr32_sdk") {
 
     if (silabs_board == "BRD2704A" || silabs_board == "BRD4318A") {
       sources += [
-        "${efr32_sdk_root}/hardware/driver/configuration_over_swo/src/sl_cos.c",
-        "${efr32_sdk_root}/platform/driver/debug/src/sl_debug_swo.c",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/fem_util/sl_fem_util.c",
         "${efr32_sdk_root}/platform/radio/rail_lib/plugin/rail_util_rssi/sl_rail_util_rssi.c",
       ]

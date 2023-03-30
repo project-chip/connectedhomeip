@@ -116,9 +116,9 @@ static uint16_t lastCount; // Nb of bytes already processed from the active dmaB
 #define UART_TX_MAX_BUF_LEN (258)
 #endif
 
-TaskHandle_t sUartTaskHandle;
-StackType_t uartStack[UART_TASK_SIZE * sizeof(StackType_t)];
-StaticTask_t uartTaskStruct;
+static TaskHandle_t sUartTaskHandle;
+static StackType_t uartStack[UART_TASK_SIZE * sizeof(StackType_t)];
+static StaticTask_t uartTaskStruct;
 
 typedef struct
 {
@@ -127,19 +127,19 @@ typedef struct
 } UartTxStruct_t;
 
 uint8_t sUartTxQueueBuffer[UART_MAX_QUEUE_SIZE * sizeof(UartTxStruct_t)];
-StaticQueue_t sUartTxQueueStruct;
-QueueHandle_t sUartTxQueue;
+static StaticQueue_t sUartTxQueueStruct;
+static QueueHandle_t sUartTxQueue;
 
-EventGroupHandle_t sUartEventGroup;
-StaticEventGroup_t sUartEventGroupStruct;
+static EventGroupHandle_t sUartEventGroup;
+static StaticEventGroup_t sUartEventGroupStruct;
 
 // Rx buffer for the receive Fifo
 static uint8_t sRxFifoBuffer[MAX_BUFFER_SIZE];
 static Fifo_t sReceiveFifo;
 
 static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, uint8_t * data, UARTDRV_Count_t transferCount);
-static void UART_tx_callback(struct UARTDRV_HandleData * handle, Ecode_t transferStatus, uint8_t * data,
-                             UARTDRV_Count_t transferCount);
+// static void UART_tx_callback(struct UARTDRV_HandleData * handle, Ecode_t transferStatus, uint8_t * data,
+//                              UARTDRV_Count_t transferCount);
 static void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes);
 
 static bool InitFifo(Fifo_t * fifo, uint8_t * pDataBuffer, uint16_t bufferSize)
@@ -252,6 +252,12 @@ static uint16_t RetrieveFromFifo(Fifo_t * fifo, uint8_t * pData, uint16_t SizeTo
  */
 void uartConsoleInit(void)
 {
+    if (sUartTaskHandle != NULL)
+    {
+        // Init was already done
+        return;
+    }
+
     sl_board_enable_vcom();
     // Init a fifo for the data received on the uart
     InitFifo(&sReceiveFifo, sRxFifoBuffer, MAX_BUFFER_SIZE);
@@ -259,6 +265,19 @@ void uartConsoleInit(void)
     // Activate 2 dma queues to always have one active
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer2, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
+
+    uint32_t struct_size = sizeof(UartTxStruct_t);
+
+    sUartTxQueue = xQueueCreateStatic(UART_MAX_QUEUE_SIZE, struct_size, sUartTxQueueBuffer, &sUartTxQueueStruct);
+
+    sUartEventGroup = xEventGroupCreateStatic(&sUartEventGroupStruct);
+
+    // Start App task.
+    sUartTaskHandle = xTaskCreateStatic(uartMainLoop, UART_TASK_NAME, UART_TASK_SIZE, nullptr, 30, uartStack, &uartTaskStruct);
+
+    assert(sUartTaskHandle);
+    assert(sUartEventGroup);
+    assert(sUartTxQueue);
 
     // Enable USART0/EUSART0 interrupt to wake OT task when data arrives
     NVIC_ClearPendingIRQ(USART_IRQ);
@@ -276,28 +295,12 @@ void uartConsoleInit(void)
 #else
     USART_IntEnable(SL_UARTDRV_USART_VCOM_PERIPHERAL, USART_IF_RXDATAV);
 #endif // EFR32MG24
-
-    uint32_t struct_size = sizeof(UartTxStruct_t);
-
-    sUartTxQueue = xQueueCreateStatic(UART_MAX_QUEUE_SIZE, struct_size, sUartTxQueueBuffer, &sUartTxQueueStruct);
-
-    sUartEventGroup = xEventGroupCreateStatic(&sUartEventGroupStruct);
-
-    // Start App task.
-    sUartTaskHandle = xTaskCreateStatic(uartMainLoop, UART_TASK_NAME, UART_TASK_SIZE, nullptr, 30, uartStack, &uartTaskStruct);
-
-    assert(sUartTaskHandle);
-    assert(sUartEventGroup);
-    assert(sUartTxQueue);
 }
 
 void USART_IRQHandler(void)
 {
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcessFromISR();
-#endif
-#if defined(SL_WIFI)
-    /* TODO */
 #elif !defined(PW_RPC_ENABLED)
     otSysEventSignalPending();
 #endif
@@ -318,7 +321,7 @@ void USART_IRQHandler(void)
 void UART_tx_callback(struct UARTDRV_HandleData * handle, Ecode_t transferStatus, uint8_t * data, UARTDRV_Count_t transferCount)
 {
     BaseType_t xHigherPriorityTaskWoken;
-    /* Was the message posted successfully? */
+
     if (xEventGroupSetBitsFromISR(sUartEventGroup, UART_TX_COMPLETE_BIT, &xHigherPriorityTaskWoken) == pdPASS)
     {
         portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
@@ -343,9 +346,6 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
 
 #ifdef ENABLE_CHIP_SHELL
     chip::NotifyShellProcessFromISR();
-#endif
-#if defined(SL_WIFI)
-    /* TODO */
 #elif !defined(PW_RPC_ENABLED)
     otSysEventSignalPending();
 #endif
@@ -364,15 +364,24 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
     {
         return UART_CONSOLE_ERR;
     }
-    // Do NOT wait for logs. Better to lost some logging than block
-    // an unknow task that might be critical.
+
     UartTxStruct_t workBuffer;
     memcpy(workBuffer.data, Buf, BufLength);
     workBuffer.length = BufLength;
 
-    if (pdTRUE == xQueueSend(sUartTxQueue, &workBuffer, 0))
+    if (xPortIsInsideInterrupt())
     {
+        BaseType_t xHigherPriorityTaskWoken;
+        xQueueSendFromISR(sUartTxQueue, &workBuffer, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
         return BufLength;
+    }
+    else
+    {
+        if (pdTRUE == xQueueSend(sUartTxQueue, &workBuffer, portMAX_DELAY))
+        {
+            return BufLength;
+        }
     }
 
     return UART_CONSOLE_ERR;
@@ -397,9 +406,19 @@ int16_t uartLogWrite(const char * log, uint16_t length)
     memcpy(workBuffer.data + length, "\r\n", 2);
     workBuffer.length = length + 2;
 
-    if (pdTRUE == xQueueSend(sUartTxQueue, &workBuffer, 0))
+    if (xPortIsInsideInterrupt())
     {
+        BaseType_t xHigherPriorityTaskWoken;
+        xQueueSendFromISR(sUartTxQueue, &workBuffer, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
         return length;
+    }
+    else
+    {
+        if (pdTRUE == xQueueSend(sUartTxQueue, &workBuffer, 0))
+        {
+            return length;
+        }
     }
 
     return UART_CONSOLE_ERR;
@@ -439,9 +458,12 @@ void uartMainLoop(void * args)
 
     while (1)
     {
-        while (pdTRUE == xQueueReceive(sUartTxQueue, &workBuffer, portMAX_DELAY))
+
+        BaseType_t eventReceived = xQueueReceive(sUartTxQueue, &workBuffer, portMAX_DELAY);
+        while (eventReceived == pdTRUE)
         {
             uartSendBytes(workBuffer.data, workBuffer.length);
+            eventReceived = xQueueReceive(sUartTxQueue, &workBuffer, 0);
         }
     }
 }
@@ -454,6 +476,7 @@ void uartMainLoop(void * args)
  */
 void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
 {
+
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
 #endif
@@ -462,7 +485,9 @@ void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
     pre_uart_transfer();
 #endif /* EFR32MG24 && WF200_WIFI */
 
-    UARTDRV_Transmit(vcom_handle, (uint8_t *) buffer, nbOfBytes, UART_tx_callback);
+    // TODO FIXME Swap to iostream driver since UARTDRV is deprecated.
+    // TODO Do no use blocking transmit (hotfix).
+    UARTDRV_TransmitB(vcom_handle, (uint8_t *) buffer, nbOfBytes);
 
 #if (defined(EFR32MG24) && defined(WF200_WIFI))
     post_uart_transfer();
@@ -471,8 +496,6 @@ void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
 #endif
-
-    xEventGroupWaitBits(sUartEventGroup, UART_TX_COMPLETE_BIT, pdTRUE, pdFALSE, portMAX_DELAY);
 }
 
 #ifdef __cplusplus

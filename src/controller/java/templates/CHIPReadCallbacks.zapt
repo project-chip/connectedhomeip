@@ -1,5 +1,4 @@
 {{> header}}
-{{#if (chip_has_client_clusters)}}
 #include <jni/CHIPCallbackTypes.h>
 
 #include <controller/java/AndroidCallbacks.h>
@@ -36,7 +35,7 @@ private:
 {{/unless}}
 {{/chip_server_global_responses}}
 
-{{#chip_client_clusters}}
+{{#all_user_clusters}}
 {{#zcl_attributes_server removeKeys='isOptional'}}
 {{#if_unsupported_attribute_callback type isArray ../id}}
 {{else}}
@@ -70,6 +69,4 @@ private:
 
 {{/if_unsupported_attribute_callback}}
 {{/zcl_attributes_server}}
-{{/chip_client_clusters}}
-
-{{/if}}
+{{/all_user_clusters}}
