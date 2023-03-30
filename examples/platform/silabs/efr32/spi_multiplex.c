@@ -114,8 +114,6 @@ void post_bootloader_spi_transfer(void)
      * De-Assert CS pin for EXT SPI Flash
      */
     spiflash_cs_deassert();
-    spi_drv_reinit(SL_BIT_RATE_EXP_HDR);
-    sl_wfx_host_spi_cs_assert();
     xSemaphoreGive(spi_sem_sync_hdl);
 }
 
@@ -149,8 +147,6 @@ void pre_lcd_spi_transfer(void)
 void post_lcd_spi_transfer(void)
 {
     SILABS_LOG("%s: started", __func__);
-    spi_drv_reinit(SL_BIT_RATE_EXP_HDR);
-    sl_wfx_host_spi_cs_assert();
     xSemaphoreGive(spi_sem_sync_hdl);
     SILABS_LOG("%s: completed", __func__);
 }
@@ -196,7 +192,6 @@ void post_uart_transfer(void)
         return;
     }
     GPIO_PinModeSet(gpioPortA, 8, gpioModeInputPull, 1);
-    spi_drv_reinit(SL_BIT_RATE_EXP_HDR);
     xSemaphoreGive(spi_sem_sync_hdl);
     sl_wfx_host_enable_platform_interrupt();
     sl_wfx_enable_irq();
