@@ -207,7 +207,6 @@ private:
     void NotifyBLEWriteReceived(System::PacketBufferHandle & buf, BLE_CONNECTION_OBJECT conId);
 
     // ==== Connection.
-    // void ConnectHandler(const char * address);
     static CHIP_ERROR ConnectChipThing(const char * userData);
     void NotifyBLEConnectionEstablished(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
     void NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId, CHIP_ERROR error);
