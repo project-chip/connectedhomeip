@@ -21,10 +21,10 @@ import("${chip_root}/build/chip/tools.gni")
 assert(chip_build_tools)
 
 declare_args() {
-   # Enable Wake on LAN cluster
-   chip_enable_wake_on_lan = false
+  # Enable Wake on LAN cluster
+  chip_enable_wake_on_lan = false
 }
- 
+
 config("config") {
   include_dirs = [
     ".",
