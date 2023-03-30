@@ -139,8 +139,7 @@ void uartConsoleInit(void)
         DEBUGOUT("\r\n Receives data success  \r\n");
     }
 
-    // Creating the receive event as a temp buffer
-    // this is not used anywhere
+    // Creating the receive event and storing in the rx_buffer
     status = UARTdrv->Receive(&rx_buffer, 1);
 
     NVIC_EnableIRQ(USART0_IRQn);
@@ -181,7 +180,10 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
     {
         return UART_CONSOLE_ERR;
     }
-    status = UARTdrv->Receive(Buf, NbBytesToRead);
+    // storing the contents of rx_buffer in the Buf
+    *Buf = (char)rx_buffer;
+    // creating the uart receive and storing in the rx_buffer
+    status = UARTdrv->Receive(&rx_buffer, NbBytesToRead);
     if (status != ARM_DRIVER_OK)
     {
         return status;
