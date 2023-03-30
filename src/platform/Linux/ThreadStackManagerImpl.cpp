@@ -53,6 +53,10 @@ ThreadStackManagerImpl::ThreadStackManagerImpl() : mAttached(false) {}
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
+    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
+    // all D-Bus signals will be delivered to the GLib global default main context.
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+
     std::unique_ptr<GError, GErrorDeleter> err;
     mProxy.reset(openthread_io_openthread_border_router_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE,
                                                                                kDBusOpenThreadService, kDBusOpenThreadObjectPath,
