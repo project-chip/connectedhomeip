@@ -33,4 +33,4 @@ tests:
       attribute: "MACAddress"
       response:
           constraints:
-                    minLength: 3
+              minLength: 3
