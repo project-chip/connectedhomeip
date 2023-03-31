@@ -42,12 +42,19 @@ class ExampleDAC : DeviceAttestationCredentialsHolder {
     override func getProductAttestationIntermediateCert() -> Data {
         return KPAI_FFF1_8000_Cert_Array
     }
-
-    override func getDeviceAttestationCertPrivateKey() -> Data {
-        return kDevelopmentDAC_PrivateKey_FFF1_8001
-    }
-
-    override func getDeviceAttestationCertPublicKey() -> Data {
-        return kDevelopmentDAC_PublicKey_FFF1_8001
+    
+    override func getDeviceAttestationCertPrivateKeyRef() -> Unmanaged<SecKey> {
+        var privateKey = Data()
+        privateKey.append(kDevelopmentDAC_PublicKey_FFF1_8001);
+        privateKey.append(kDevelopmentDAC_PrivateKey_FFF1_8001);
+        
+        let privateKeyRef: SecKey = SecKeyCreateWithData(privateKey as NSData,
+                                    [
+                                        kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandom,
+                                        kSecAttrKeyClass: kSecAttrKeyClassPrivate,
+                                        kSecAttrKeySizeInBits: 256
+                                    ] as NSDictionary, nil)!
+        
+        return Unmanaged<SecKey>.passRetained(privateKeyRef);
     }
 }
