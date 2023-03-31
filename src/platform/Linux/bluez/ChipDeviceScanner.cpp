@@ -123,7 +123,7 @@ CHIP_ERROR ChipDeviceScanner::StartScan(System::Clock::Timeout timeout)
     ReturnErrorCodeIf(mIsScanning, CHIP_ERROR_INCORRECT_STATE);
 
     mIsScanning = true; // optimistic, to allow all callbacks to check this
-    if (PlatformMgrImpl().ScheduleOnGLibMainLoopThread(MainLoopStartScan, this, true) != CHIP_NO_ERROR)
+    if (PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopStartScan, this) != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to schedule BLE scan start.");
         mIsScanning = false;
@@ -174,7 +174,7 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
         mInterfaceChangedSignal = 0;
     }
 
-    if (PlatformMgrImpl().ScheduleOnGLibMainLoopThread(MainLoopStopScan, this, true) != CHIP_NO_ERROR)
+    if (PlatformMgrImpl().GLibMatterContextInvokeSync(MainLoopStopScan, this) != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to schedule BLE scan stop.");
         return CHIP_ERROR_INTERNAL;
@@ -183,7 +183,7 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
     return CHIP_NO_ERROR;
 }
 
-int ChipDeviceScanner::MainLoopStopScan(ChipDeviceScanner * self)
+CHIP_ERROR ChipDeviceScanner::MainLoopStopScan(ChipDeviceScanner * self)
 {
     GError * error = nullptr;
 
@@ -199,7 +199,7 @@ int ChipDeviceScanner::MainLoopStopScan(ChipDeviceScanner * self)
     // references to 'self' here)
     delegate->OnScanComplete();
 
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
 void ChipDeviceScanner::SignalObjectAdded(GDBusObjectManager * manager, GDBusObject * object, ChipDeviceScanner * self)
@@ -266,7 +266,7 @@ void ChipDeviceScanner::RemoveDevice(BluezDevice1 * device)
     }
 }
 
-int ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
+CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
 {
     GError * error = nullptr;
 
@@ -308,7 +308,7 @@ int ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
         self->mDelegate->OnScanComplete();
     }
 
-    return 0;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Internal

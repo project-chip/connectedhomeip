@@ -57,22 +57,19 @@ public:
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
     /**
-     * @brief Executes a callback in the GLib main loop thread.
+     * @brief Invoke a function on the Matter GLib context.
      *
-     * @param[in] callback The callback to execute.
-     * @param[in] userData User data to pass to the callback.
-     * @param[in] wait If true, the function will block until the callback has been executed.
-     * @returns CHIP_NO_ERROR if the callback was successfully executed.
+     * If execution of the function will have to be scheduled on other thread,
+     * this call will block the current thread until the function is executed.
+     *
+     * @param[in] function The function to call.
+     * @param[in] userData User data to pass to the function.
+     * @returns The result of the function.
      */
-    CHIP_ERROR RunOnGLibMainLoopThread(GSourceFunc callback, void * userData, bool wait = false);
-
-    /**
-     * @brief Convenience method to require less casts to void pointers.
-     */
-    template <class T>
-    CHIP_ERROR ScheduleOnGLibMainLoopThread(gboolean (*callback)(T *), T * userData, bool wait = false)
+    template <typename T>
+    CHIP_ERROR GLibMatterContextInvokeSync(CHIP_ERROR (*func)(T *), T * userData)
     {
-        return RunOnGLibMainLoopThread(G_SOURCE_FUNC(callback), userData, wait);
+        return _GLibMatterContextInvokeSync((CHIP_ERROR(*)(void *)) func, (void *) userData);
     }
 
 #endif
@@ -97,29 +94,13 @@ private:
 
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 
-    class CallbackIndirection
-    {
-    public:
-        CallbackIndirection(GSourceFunc callback, void * userData) : mCallback(callback), mUserData(userData) {}
-        void Wait(std::unique_lock<std::mutex> & lock);
-        static gboolean Callback(CallbackIndirection * self);
-
-    private:
-        GSourceFunc mCallback;
-        void * mUserData;
-        // Sync primitives to wait for the callback to be executed.
-        std::condition_variable mDoneCond;
-        bool mDone = false;
-    };
-
-    // XXX: Mutex for guarding access to glib main event loop callback indirection
-    //      synchronization primitives. This is a workaround to suppress TSAN warnings.
-    //      TSAN does not know that from the thread synchronization perspective the
-    //      g_source_attach() function should be treated as pthread_create(). Memory
-    //      access to shared data before the call to g_source_attach() without mutex
-    //      is not a race condition - the callback will not be executed on glib main
-    //      event loop thread before the call to g_source_attach().
-    std::mutex mGLibMainLoopCallbackIndirectionMutex;
+    /**
+     * @brief Invoke a function on the Matter GLib context.
+     *
+     * @note This function does not provide type safety for the user data. Please,
+     *       use the GLibMatterContextInvokeSync() template function instead.
+     */
+    CHIP_ERROR _GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData);
 
     GMainLoop * mGLibMainLoop;
     GThread * mGLibMainLoopThread;
