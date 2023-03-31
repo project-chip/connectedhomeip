@@ -215,9 +215,6 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR.AsInteger():
         desc = "Invalid device descriptor";
         break;
-    case CHIP_END_OF_INPUT.AsInteger():
-        desc = "End of input";
-        break;
     case CHIP_ERROR_INVALID_PASE_PARAMETER.AsInteger():
         desc = "Invalid PASE parameter";
         break;
