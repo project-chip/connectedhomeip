@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<iarProjectConnection name="Simplicity Configurator" version="1.8">
+  <files>
+    <group name="config">
+      <path>config\sl_memory_config.h</path>
+      <path>config\SEGGER_RTT_Conf.h</path>
+      <path>config\nvm3_default_config.h</path>
+      <path>config\psa_crypto_config.h</path>
+      <path>config\sl_device_init_dcdc_config.h</path>
+      <path>config\sl_device_init_emu_config.h</path>
+      <path>config\emlib_core_debug_config.h</path>
+      <path>config\sl_mbedtls_config.h</path>
+    </group>
+    <group name="autogen">
+      <path>autogen\RTE_Components.h</path>
+      <path>autogen\sl_component_catalog.h</path>
+      <path>autogen\sl_device_init_clocks.c</path>
+      <path>autogen\sl_event_handler.h</path>
+      <path>autogen\sl_event_handler.c</path>
+      <path>autogen\sl_iostream_handles.h</path>
+      <path>autogen\sl_iostream_handles.c</path>
+      <path>autogen\sl_iostream_init_instances.h</path>
+      <path>autogen\mbedtls_config_autogen.h</path>
+      <path>autogen\sl_mbedtls_config_transform_autogen.h</path>
+      <path>autogen\psa_crypto_config_autogen.h</path>
+      <path>autogen\linkerfile.icf</path>
+      <path>autogen\.crc_config.crc</path>
+    </group>
+    <group name="gecko_sdk_4.2.0">
+      <group name="platform">
+        <group name="Device">
+          <group name="SiliconLabs">
+            <group name="EFR32MG24">
+              <group name="Source">
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Source\system_efr32mg24.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Source\startup_efr32mg24.c</path>
+              </group>
+              <group name="Include">
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24b010f1536im40.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_acmp.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_aes.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_buram.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_burtc.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_cmu.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_dcdc.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_devinfo.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_dma_descriptor.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_dpll.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_emu.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_eusart.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_fsrco.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_gpcrc.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_gpio.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_gpio_port.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_hfrco.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_hfxo.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_i2c.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_iadc.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_icache.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_keyscan.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_ldma.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_ldmaxbar.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_ldmaxbar_defines.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_letimer.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_lfrco.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_lfxo.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_mailbox.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_mpahbram.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_msc.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_mvp.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_pcnt.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_prs.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_prs_signals.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_scratchpad.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_semailbox.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_smu.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_syscfg.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_sysrtc.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_timer.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_ulfrco.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_usart.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_vdac.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\efr32mg24_wdog.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\em_device.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\Device\SiliconLabs\EFR32MG24\Include\system_efr32mg24.h</path>
+              </group>
+            </group>
+          </group>
+        </group>
+        <group name="CMSIS">
+          <group name="Core">
+            <group name="Include">
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\CMSIS\Core\Include\cmsis_compiler.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\CMSIS\Core\Include\cmsis_version.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\CMSIS\Core\Include\tz_context.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\CMSIS\Core\Include\cmsis_iccarm.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\CMSIS\Core\Include\core_cm33.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\CMSIS\Core\Include\mpu_armv8.h</path>
+            </group>
+          </group>
+        </group>
+        <group name="service">
+          <group name="device_init">
+            <group name="inc">
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\service\device_init\inc\sl_device_init_clocks.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\service\device_init\inc\sl_device_init_dcdc.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\service\device_init\inc\sl_device_init_emu.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\service\device_init\inc\sl_device_init_nvic.h</path>
+            </group>
+            <group name="src">
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\service\device_init\src\sl_device_init_dcdc_s2.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\service\device_init\src\sl_device_init_emu_s2.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\service\device_init\src\sl_device_init_nvic.c</path>
+            </group>
+          </group>
+          <group name="iostream">
+            <group name="src">
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\service\iostream\src\sl_iostream.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\service\iostream\src\sl_iostream_rtt.c</path>
+            </group>
+            <group name="inc">
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\service\iostream\inc\sl_iostream.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\service\iostream\inc\sl_iostream_rtt.h</path>
+            </group>
+          </group>
+          <group name="system">
+            <group name="src">
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\service\system\src\sl_system_init.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\service\system\src\sl_system_process_action.c</path>
+            </group>
+            <group name="inc">
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\service\system\inc\sl_system_init.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\service\system\inc\sl_system_process_action.h</path>
+            </group>
+          </group>
+        </group>
+        <group name="emdrv">
+          <group name="common">
+            <group name="inc">
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\emdrv\common\inc\ecode.h</path>
+            </group>
+          </group>
+          <group name="nvm3">
+            <group name="src">
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\emdrv\nvm3\src\nvm3_default_common_linker.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\emdrv\nvm3\src\nvm3_hal_flash.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\emdrv\nvm3\src\nvm3_lock.c</path>
+            </group>
+            <group name="inc">
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\emdrv\nvm3\inc\nvm3_default.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\emdrv\nvm3\inc\nvm3.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\emdrv\nvm3\inc\nvm3_hal.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\emdrv\nvm3\inc\nvm3_hal_flash.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\emdrv\nvm3\inc\nvm3_lock.h</path>
+            </group>
+            <group name="lib">
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\emdrv\nvm3\lib\libnvm3_CM33_iar.a</path>
+            </group>
+          </group>
+        </group>
+        <group name="emlib">
+          <group name="inc">
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\inc\em_chip.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\inc\em_cmu.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\inc\em_cmu_compat.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\inc\sli_em_cmu.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\inc\em_assert.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\inc\em_bus.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\inc\em_common.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\inc\em_ramfunc.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\inc\em_version.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\inc\em_core.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\inc\em_emu.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\inc\em_gpio.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\inc\em_msc.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\inc\em_msc_compat.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\inc\em_se.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\inc\em_syscfg.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\inc\em_system.h</path>
+          </group>
+          <group name="src">
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\src\em_cmu.c</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\src\em_core.c</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\src\em_emu.c</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\src\em_gpio.c</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\src\em_msc.c</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\src\em_se.c</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\emlib\src\em_system.c</path>
+          </group>
+        </group>
+        <group name="common">
+          <group name="inc">
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\common\inc\sl_enum.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\common\inc\sl_assert.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\common\inc\sl_common.h</path>
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\common\inc\sl_status.h</path>
+          </group>
+          <group name="src">
+            <path>..\..\..\third_party\silabs\gecko_sdk\platform\common\src\sl_assert.c</path>
+          </group>
+          <group name="toolchain">
+            <group name="src">
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\common\toolchain\src\sl_memory.c</path>
+            </group>
+            <group name="inc">
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\common\toolchain\inc\sl_memory_region.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\platform\common\toolchain\inc\sl_memory.h</path>
+            </group>
+          </group>
+        </group>
+        <group name="security">
+          <group name="sl_component">
+            <group name="sl_mbedtls_support">
+              <group name="config">
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\config\config-device-acceleration.h</path>
+              </group>
+              <group name="src">
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\src\sl_entropy_hardware.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\src\error.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\src\sl_mbedtls.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\src\se_aes.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\src\mbedtls_ecdsa_ecdh.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\src\mbedtls_sha.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\src\sli_psa_crypto.c</path>
+              </group>
+              <group name="inc">
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\inc\sl_mbedtls.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\inc\aes_alt.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\inc\ccm_alt.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\inc\cmac_alt.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\inc\se_management.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\inc\sha1_alt.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\inc\sha256_alt.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\inc\sha512_alt.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\inc\gcm_alt.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\inc\ecjpake_alt.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_mbedtls_support\inc\sli_psa_crypto.h</path>
+              </group>
+            </group>
+            <group name="sl_psa_driver">
+              <group name="src">
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_psa_trng.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_psa_driver_init.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_psa_driver_common.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_se_version_dependencies.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_se_driver_builtin_keys.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_se_driver_key_management.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_se_driver_key_derivation.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_se_driver_aead.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_se_driver_mac.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_se_driver_signature.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_se_driver_cipher.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_se_transparent_driver_cipher.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_se_transparent_driver_hash.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_se_transparent_driver_aead.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_se_transparent_driver_mac.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_se_transparent_key_derivation.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_se_opaque_driver_mac.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_se_opaque_key_derivation.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_se_opaque_driver_cipher.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sli_se_opaque_driver_aead.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\src\sl_psa_its_nvm3.c</path>
+              </group>
+              <group name="inc">
+                <group name="public">
+                  <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\inc\public\sl_psa_values.h</path>
+                </group>
+                <group name="psa">
+                  <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\inc\psa\internal_trusted_storage.h</path>
+                  <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\inc\psa\sli_internal_trusted_storage.h</path>
+                  <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\inc\psa\error.h</path>
+                </group>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\inc\sli_psa_driver_common.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\inc\sli_se_version_dependencies.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\inc\sli_se_driver_aead.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\inc\sli_se_driver_cipher.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\inc\sli_se_driver_key_derivation.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\inc\sli_se_driver_key_management.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\inc\sli_se_driver_mac.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\inc\sli_se_opaque_functions.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\inc\sli_se_opaque_types.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\inc\sli_se_transparent_functions.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\sl_psa_driver\inc\sli_se_transparent_types.h</path>
+              </group>
+            </group>
+            <group name="se_manager">
+              <group name="src">
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\src\sl_se_manager.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\src\sl_se_manager_util.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\src\sl_se_manager_cipher.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\src\sl_se_manager_entropy.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\src\sl_se_manager_hash.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\src\sl_se_manager_key_derivation.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\src\sl_se_manager_key_handling.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\src\sl_se_manager_signature.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\src\sl_se_manager_attestation.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\src\sli_se_manager_osal.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\src\sli_se_manager_osal_baremetal.h</path>
+              </group>
+              <group name="inc">
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\inc\sl_se_manager.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\inc\sl_se_manager_defines.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\inc\sl_se_manager_types.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\inc\sl_se_manager_util.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\inc\sl_se_manager_internal_keys.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\inc\sli_se_manager_internal.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\inc\sl_se_manager_check_config.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\inc\sl_se_manager_config.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\inc\sl_se_manager_cipher.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\inc\sl_se_manager_entropy.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\inc\sl_se_manager_hash.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\inc\sl_se_manager_key_derivation.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\inc\sl_se_manager_key_handling.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\inc\sl_se_manager_signature.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\platform\security\sl_component\se_manager\inc\sl_se_manager_attestation.h</path>
+              </group>
+            </group>
+          </group>
+        </group>
+      </group>
+      <group name="util">
+        <group name="third_party">
+          <group name="mbedtls">
+            <group name="library">
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\aes.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\asn1parse.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\asn1write.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\base64.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\cipher.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\cipher_wrap.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\ecp.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\ecp_curves.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\md.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\bignum.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\oid.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\pem.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\pkcs5.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\ecdsa.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\pk.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\pkparse.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\pkwrite.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\pk_wrap.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\entropy.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\entropy_poll.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\ctr_drbg.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\hmac_drbg.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\sha256.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\constant_time.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\threading.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\platform.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\platform_util.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\bn_mul.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\bignum_internal.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\cipher_wrap.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\common.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\constant_time_internal.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\constant_time_invasive.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\ecp_internal_alt.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\ecp_invasive.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\entropy_poll.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\md_wrap.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\mps_common.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\mps_error.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\mps_reader.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\mps_trace.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\padlock.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\pk_wrap.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\pkwrite.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\rsa_alt_helpers.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\ssl_debug_helpers.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\ssl_client.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\ssl_misc.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\ssl_tls13_invasive.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\ssl_tls13_keys.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\x509.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\x509_create.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\x509_crl.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\x509_crt.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\x509_csr.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\x509write_crt.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\x509write_csr.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_client.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_aead.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_cipher.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_driver_wrappers.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_slot_management.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_storage.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_ecp.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_hash.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_mac.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_rsa.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_se.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\check_crypto_config.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_aead.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_cipher.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_core.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_driver_wrappers.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_ecp.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_hash.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_invasive.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_its.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_mac.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_random_impl.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_rsa.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_se.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_slot_management.h</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\library\psa_crypto_storage.h</path>
+            </group>
+            <group name="include">
+              <group name="mbedtls">
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\aes.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\aria.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\asn1.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\asn1write.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\base64.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\bignum.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\build_info.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\camellia.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\ccm.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\chacha20.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\chachapoly.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\check_config.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\cipher.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\cmac.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\compat-2.x.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\config_psa.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\constant_time.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\ctr_drbg.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\debug.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\des.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\dhm.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\ecdh.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\ecdsa.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\ecjpake.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\ecp.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\entropy.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\error.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\gcm.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\hkdf.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\hmac_drbg.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\mbedtls_config.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\md.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\md5.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\memory_buffer_alloc.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\net_sockets.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\nist_kw.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\oid.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\pem.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\pk.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\pkcs12.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\pkcs5.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\platform.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\platform_time.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\platform_util.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\poly1305.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\private_access.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\psa_util.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\ripemd160.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\rsa.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\sha1.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\sha256.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\sha512.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\ssl.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\ssl_cache.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\ssl_ciphersuites.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\ssl_cookie.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\ssl_ticket.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\threading.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\timing.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\version.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\x509.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\x509_crl.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\x509_crt.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\mbedtls\x509_csr.h</path>
+              </group>
+              <group name="psa">
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\psa\crypto.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\psa\crypto_builtin_composites.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\psa\crypto_builtin_primitives.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\psa\crypto_compat.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\psa\crypto_config.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\psa\crypto_driver_common.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\psa\crypto_driver_contexts_composites.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\psa\crypto_driver_contexts_primitives.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\psa\crypto_extra.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\psa\crypto_platform.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\psa\crypto_se_driver.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\psa\crypto_sizes.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\psa\crypto_struct.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\psa\crypto_types.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\mbedtls\include\psa\crypto_values.h</path>
+              </group>
+            </group>
+          </group>
+          <group name="segger">
+            <group name="systemview">
+              <group name="SEGGER">
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\segger\systemview\SEGGER\SEGGER_RTT.c</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\segger\systemview\SEGGER\SEGGER.h</path>
+                <path>..\..\..\third_party\silabs\gecko_sdk\util\third_party\segger\systemview\SEGGER\SEGGER_RTT.h</path>
+              </group>
+            </group>
+          </group>
+        </group>
+        <group name="silicon_labs">
+          <group name="silabs_core">
+            <group name="memory_manager">
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\silicon_labs\silabs_core\memory_manager\sl_malloc.c</path>
+              <path>..\..\..\third_party\silabs\gecko_sdk\util\silicon_labs\silabs_core\memory_manager\sl_malloc.h</path>
+            </group>
+          </group>
+        </group>
+      </group>
+    </group>
+    <path>..\..\generator\app.cpp</path>
+    <path>..\..\generator\config.cpp</path>
+    <path>..\..\generator\credentials.cpp</path>
+    <path>..\..\generator\commands.cpp</path>
+    <path>..\..\generator\encoding.cpp</path>
+    <path>..\..\generator\main.cpp</path>
+    <path>..\..\generator\app.h</path>
+    <path>..\..\generator\config.h</path>
+    <path>..\..\generator\credentials.h</path>
+    <path>..\..\generator\commands.h</path>
+    <path>..\..\generator\encoding.h</path>
+    <path>..\..\..\examples\lib\support\Base64.h</path>
+    <path>..\..\..\src\platform\silabs\SilabsConfig.h</path>
+  </files>
+  <SimplicityStudioMetadata>
+    <metadata>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</metadata>
+  </SimplicityStudioMetadata>
+</iarProjectConnection>
