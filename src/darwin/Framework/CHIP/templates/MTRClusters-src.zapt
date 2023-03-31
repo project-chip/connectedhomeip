@@ -60,7 +60,6 @@ static void MTRClustersLogCompletion(NSString *logPrefix, id value, NSError *err
 }
 
 {{#zcl_commands}}
-{{#if (is_str_equal source 'client')}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandImpl"}}
 {{! This is used as the implementation for both the new-name and old-name bits, so check for both here. }}
@@ -76,7 +75,7 @@ MTR{{cluster}}Cluster{{command}}Params
 {{/inline}}
 {{#*inline "clusterId"}}
 {{#if (wasRemoved cluster command=command)}}
-{{asMEI ../../manufacturerCode ../../code}}
+{{asMEI ../manufacturerCode ../code}}
 {{else}}
 MTRClusterIDType{{cluster}}ID
 {{/if}}
@@ -179,6 +178,7 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 }
 {{/unless}}
 {{/inline}}
+{{#if (is_str_equal source 'client')}}
 {{> commandImpl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
                 command=(asUpperCamelCase name preserveAcronyms=true)}}
 {{/if}}
