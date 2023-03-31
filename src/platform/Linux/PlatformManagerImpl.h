@@ -94,6 +94,16 @@ private:
 
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 
+    struct GLibMatterContextInvokeData
+    {
+        CHIP_ERROR (*mFunc)(void *);
+        void * mFuncUserData;
+        CHIP_ERROR mFuncResult;
+        // Sync primitives to wait for the function to be executed
+        std::condition_variable mDoneCond;
+        bool mDone = false;
+    };
+
     /**
      * @brief Invoke a function on the Matter GLib context.
      *
@@ -101,6 +111,15 @@ private:
      *       use the GLibMatterContextInvokeSync() template function instead.
      */
     CHIP_ERROR _GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData);
+
+    // XXX: Mutex for guarding access to glib main event loop callback indirection
+    //      synchronization primitives. This is a workaround to suppress TSAN warnings.
+    //      TSAN does not know that from the thread synchronization perspective the
+    //      g_source_attach() function should be treated as pthread_create(). Memory
+    //      access to shared data before the call to g_source_attach() without mutex
+    //      is not a race condition - the callback will not be executed on glib main
+    //      event loop thread before the call to g_source_attach().
+    std::mutex mGLibMainLoopCallbackIndirectionMutex;
 
     GMainLoop * mGLibMainLoop;
     GThread * mGLibMainLoopThread;
