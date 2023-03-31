@@ -480,6 +480,11 @@ void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
 {
     SetResponseExpected(false);
 
+    // Hold a ref to ourselves so we can make calls into our delegate that might
+    // decrease our refcount (e.g. by expiring out session) without worrying
+    // about use-after-free.
+    ExchangeHandle ref(*this);
+
     // mSession might be null if this timeout is due to the session being
     // evicted.
     if (mSession)
