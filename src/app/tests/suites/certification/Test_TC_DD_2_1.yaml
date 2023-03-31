@@ -51,7 +51,7 @@ tests:
           "If (MCORE.DD.CHIP_DEV) then If !(MCORE.DD.CHIP_DEV) then If
           (MCORE.DD.DEV_LOCK) then If (MCORE.DD.DEV_BARRIER) then"
       PICS:
-          MCORE.DD.CHIP_DEV && !(MCORE.DD.CHIP_DEV) && MCORE.DD.DEV_LOCK &&
+          MCORE.DD.CHIP_DEV || !(MCORE.DD.CHIP_DEV) || MCORE.DD.DEV_LOCK ||
           MCORE.DD.DEV_BARRIER
       verification: |
           If (MCORE.DD.CHIP_DEV) IP/BLE discovery tool should discover the DUT else it should not
@@ -521,7 +521,7 @@ tests:
           '_services._dns-sd._udp' using a DNS-SD records command-line test tool
           (i.e. 'dns-sd -B _services._dns-sd._udp' or 'avahi-browse
           _services._dns-sd._udp -r')"
-      PICS: MCORE.DD.COMMISSIONING_SUBTYPE_V && MCORE.DD.COMMISSIONING_SUBTYPE_T
+      PICS: MCORE.DD.COMMISSIONING_SUBTYPE_V || MCORE.DD.COMMISSIONING_SUBTYPE_T
       verification: |
           Vendor specific, take DUT out of commissioning mode
           dns-sd -B _services._dns-sd._udp
