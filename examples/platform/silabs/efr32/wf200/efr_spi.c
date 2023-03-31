@@ -112,8 +112,10 @@ sl_status_t sl_wfx_host_init_bus(void)
     spi_sem = xSemaphoreCreateBinaryStatic(&xEfrSpiSemaBuffer);
     xSemaphoreGive(spi_sem);
 
+#if defined(EFR32MG24)
     spi_sem_sync_hdl = xSemaphoreCreateBinaryStatic(&spi_sem_peripharal);
     xSemaphoreGive(spi_sem_sync_hdl);
+#endif /* EFR32MG24 */
     return SL_STATUS_OK;
 }
 

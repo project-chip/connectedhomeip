@@ -131,7 +131,6 @@ void pre_lcd_spi_transfer(void)
     {
         return;
     }
-    sl_wfx_host_spi_cs_deassert();
     spi_drv_reinit(SL_BIT_RATE_LCD);
     /*LCD CS is handled as part of LCD gsdk*/
     SILABS_LOG("%s: completed", __func__);
