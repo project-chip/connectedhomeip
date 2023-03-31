@@ -6,7 +6,6 @@ struct LabelStruct {
     char_string<16> value = 1;
 }
 
-
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
   struct DeviceTypeStruct {

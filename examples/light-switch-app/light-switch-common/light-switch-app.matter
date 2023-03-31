@@ -6,7 +6,6 @@ struct LabelStruct {
     char_string<16> value = 1;
 }
 
-
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 client cluster Identify = 3 {
   enum IdentifyEffectIdentifier : ENUM8 {

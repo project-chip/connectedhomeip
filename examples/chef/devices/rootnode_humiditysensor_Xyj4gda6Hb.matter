@@ -1,7 +1,6 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 server cluster Identify = 3 {
   enum IdentifyEffectIdentifier : ENUM8 {

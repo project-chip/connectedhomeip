@@ -5,7 +5,6 @@
 {{>idl_structure_definition extraIndent=0}}
 
 {{/chip_shared_structs}}
-
 {{#all_user_clusters~}}
 /** {{description}} */
 {{side}} cluster {{asUpperCamelCase name}} = {{code}} {
