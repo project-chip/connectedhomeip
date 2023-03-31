@@ -47,11 +47,11 @@ class Runner(TestRunner):
         if len(certificate_authority_manager.activeCaList) == 0:
             if self._commission_on_network_dut == False:
                 raise Exception(
-                    'Provided repl storage does not contain certiciate. Without commission_on_network_dut, there is no reachable DUT')
-            ca = certificate_authority_manager.NewCertificateAuthority()
-            ca.NewFabricAdmin(vendorId=0xFFF1, fabricId=1)
+                    'Provided repl storage does not contain certificate. Without commission_on_network_dut, there is no reachable DUT')
+            certificate_authority_manager.NewCertificateAuthority()
             commission_device = True
-        elif len(certificate_authority_manager.activeCaList[0].adminList) == 0:
+
+        if len(certificate_authority_manager.activeCaList[0].adminList) == 0:
             certificate_authority_manager.activeCaList[0].NewFabricAdmin(
                 vendorId=0xFFF1, fabricId=1)
 
