@@ -17,6 +17,7 @@
 
 #include "FactoryDataProvider.h"
 
+#include "FactoryDataDecoder.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Base64.h>
@@ -26,6 +27,7 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 using namespace ::chip::DeviceLayer::Internal;
@@ -43,29 +45,47 @@ CHIP_ERROR LoadKeypairFromRaw(ByteSpan private_key, ByteSpan public_key, Crypto:
     return keypair.Deserialize(serialized_keypair);
 }
 
+CHIP_ERROR FactoryDataProvider::Init()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    uint8_t buffer[2048]; // FactoryData won't overflow 2KB
+    uint16_t factorydata_len;
+
+    FactoryDataDecoder decoder = FactoryDataDecoder::GetInstance();
+    err                        = decoder.ReadFactoryData(buffer, &factorydata_len);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "ReadFactoryData failed!");
+        return err;
+    }
+    err = decoder.DecodeFactoryData(buffer, &mFactoryData, factorydata_len);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "DecodeFactoryData failed!");
+        return err;
+    }
+
+    ChipLogProgress(DeviceLayer, "FactoryData of length: %d retrieved successfully", factorydata_len);
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
+
+    return err;
+}
+
 CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & outBuffer)
 {
-    // TODO: CD is Hardcoded temporarily, will read from flash/efuse in the future
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
-    //-> format_version = 1
-    //-> vendor_id = 0xFFF1
-    //-> product_id_array = [ 0x8000, 0x8001, 0x8002, 0x8003, 0x8004, 0x8005, 0x8006, 0x8007, 0x8008, 0x8009, 0x800A, 0x800B,
-    // 0x800C, 0x800D, 0x800E, 0x800F, 0x8010, 0x8011, 0x8012, 0x8013, 0x8014, 0x8015, 0x8016, 0x8017, 0x8018, 0x8019, 0x801A,
-    // 0x801B, 0x801C, 0x801D, 0x801E, 0x801F, 0x8020, 0x8021, 0x8022, 0x8023, 0x8024, 0x8025, 0x8026, 0x8027, 0x8028, 0x8029,
-    // 0x802A, 0x802B, 0x802C, 0x802D, 0x802E, 0x802F, 0x8030, 0x8031, 0x8032, 0x8033, 0x8034, 0x8035, 0x8036, 0x8037, 0x8038,
-    // 0x8039, 0x803A, 0x803B, 0x803C, 0x803D, 0x803E, 0x803F, 0x8040, 0x8041, 0x8042, 0x8043, 0x8044, 0x8045, 0x8046, 0x8047,
-    // 0x8048, 0x8049, 0x804A, 0x804B, 0x804C, 0x804D, 0x804E, 0x804F, 0x8050, 0x8051, 0x8052, 0x8053, 0x8054, 0x8055, 0x8056,
-    // 0x8057, 0x8058, 0x8059, 0x805A, 0x805B, 0x805C, 0x805D, 0x805E, 0x805F, 0x8060, 0x8061, 0x8062, 0x8063 ]
-    //-> device_type_id = 0x0016
-    //-> certificate_id = "ZIG20142ZB330003-24"
-    //-> security_level = 0
-    //-> security_information = 0
-    //-> version_number = 0x2694
-    //-> certification_type = 0
-    //-> dac_origin_vendor_id is not present
-    //-> dac_origin_product_id is not present
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    ReturnErrorCodeIf(outBuffer.size() < mFactoryData.dac.cd.len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(!mFactoryData.dac.cd.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
-    const uint8_t kCdForAllExamples[541] = {
+    memcpy(outBuffer.data(), mFactoryData.dac.cd.value, mFactoryData.dac.cd.len);
+
+    outBuffer.reduce_size(mFactoryData.dac.cd.len);
+    err = CHIP_NO_ERROR;
+#else
+    const uint8_t kCdForAllExamples[] = {
         0x30, 0x82, 0x02, 0x19, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x07, 0x02, 0xa0, 0x82, 0x02, 0x0a, 0x30,
         0x82, 0x02, 0x06, 0x02, 0x01, 0x03, 0x31, 0x0d, 0x30, 0x0b, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02,
         0x01, 0x30, 0x82, 0x01, 0x71, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x07, 0x01, 0xa0, 0x82, 0x01, 0x62,
@@ -96,7 +116,10 @@ CHIP_ERROR FactoryDataProvider::GetCertificationDeclaration(MutableByteSpan & ou
         0x7c,
     };
 
-    return CopySpanToMutableSpan(ByteSpan(kCdForAllExamples), outBuffer);
+    err                      = CopySpanToMutableSpan(ByteSpan(kCdForAllExamples), outBuffer);
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
+
+    return err;
 }
 
 CHIP_ERROR FactoryDataProvider::GetFirmwareInformation(MutableByteSpan & out_firmware_info_buffer)
@@ -109,9 +132,18 @@ CHIP_ERROR FactoryDataProvider::GetFirmwareInformation(MutableByteSpan & out_fir
 
 CHIP_ERROR FactoryDataProvider::GetDeviceAttestationCert(MutableByteSpan & outBuffer)
 {
-    // TODO: DAC is Hardcoded temporarily, will read from flash/efuse in the future
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
-    const uint8_t kDacCert[491] = {
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    ReturnErrorCodeIf(outBuffer.size() < mFactoryData.dac.dac_cert.len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(!mFactoryData.dac.dac_cert.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+
+    memcpy(outBuffer.data(), mFactoryData.dac.dac_cert.value, mFactoryData.dac.dac_cert.len);
+
+    outBuffer.reduce_size(mFactoryData.dac.dac_cert.len);
+    err = CHIP_NO_ERROR;
+#else
+    const uint8_t kDacCert[] = {
         0x30, 0x82, 0x01, 0xe7, 0x30, 0x82, 0x01, 0x8e, 0xa0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x08, 0x69, 0xcd, 0xf1, 0x0d, 0xe9,
         0xe5, 0x4e, 0xd1, 0x30, 0x0a, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02, 0x30, 0x3d, 0x31, 0x25, 0x30,
         0x23, 0x06, 0x03, 0x55, 0x04, 0x03, 0x0c, 0x1c, 0x4d, 0x61, 0x74, 0x74, 0x65, 0x72, 0x20, 0x44, 0x65, 0x76, 0x20, 0x50,
@@ -138,14 +170,27 @@ CHIP_ERROR FactoryDataProvider::GetDeviceAttestationCert(MutableByteSpan & outBu
         0x59, 0xe0, 0xaf, 0x45, 0xf3, 0xeb, 0x2a, 0x85, 0xb9, 0x19, 0xd3, 0x57, 0x31, 0x52, 0x8c, 0x60, 0x28, 0xc4, 0x15, 0x23,
         0x95, 0x45, 0xe1, 0x08, 0xe4, 0xe5, 0x4e, 0x70, 0x97, 0x13, 0x53,
     };
-    return CopySpanToMutableSpan(ByteSpan(kDacCert), outBuffer);
+
+    err                      = CopySpanToMutableSpan(ByteSpan(kDacCert), outBuffer);
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
+
+    return err;
 }
 
 CHIP_ERROR FactoryDataProvider::GetProductAttestationIntermediateCert(MutableByteSpan & outBuffer)
 {
-    // TODO: PAI is Hardcoded temporarily, will read from flash/efuse in the future
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    const uint8_t kPaiCert[463] = {
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    ReturnErrorCodeIf(outBuffer.size() < mFactoryData.dac.pai_cert.len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(!mFactoryData.dac.pai_cert.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+
+    memcpy(outBuffer.data(), mFactoryData.dac.pai_cert.value, mFactoryData.dac.pai_cert.len);
+
+    outBuffer.reduce_size(mFactoryData.dac.pai_cert.len);
+    err = CHIP_NO_ERROR;
+#else
+    const uint8_t kPaiCert[] = {
         0x30, 0x82, 0x01, 0xcb, 0x30, 0x82, 0x01, 0x71, 0xa0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x08, 0x56, 0xad, 0x82, 0x22, 0xad,
         0x94, 0x5b, 0x64, 0x30, 0x0a, 0x06, 0x08, 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02, 0x30, 0x30, 0x31, 0x18, 0x30,
         0x16, 0x06, 0x03, 0x55, 0x04, 0x03, 0x0c, 0x0f, 0x4d, 0x61, 0x74, 0x74, 0x65, 0x72, 0x20, 0x54, 0x65, 0x73, 0x74, 0x20,
@@ -171,13 +216,34 @@ CHIP_ERROR FactoryDataProvider::GetProductAttestationIntermediateCert(MutableByt
         0xa6, 0xc6, 0x21, 0x77, 0xb8, 0x25, 0xd7, 0xd0, 0x5e, 0xdb, 0xe7, 0xc2, 0x2f, 0x9f, 0xea, 0x71, 0x22, 0x0e, 0x7e, 0xa7,
         0x03, 0xf8, 0x91,
     };
-    return CopySpanToMutableSpan(ByteSpan{ kPaiCert }, outBuffer);
+
+    err                             = CopySpanToMutableSpan(ByteSpan{ kPaiCert }, outBuffer);
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer)
 {
-    // TODO: DAC keys are Hardcoded temporarily, will read from flash/efuse in the future
+    Crypto::P256ECDSASignature signature;
+    Crypto::P256Keypair keypair;
 
+    VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(IsSpanUsable(messageToSign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
+
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    ReturnErrorCodeIf(!mFactoryData.dac.dac_cert.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    ReturnErrorCodeIf(!mFactoryData.dac.dac_key.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    // Extract public key from DAC cert.
+    ByteSpan dacCertSpan{ reinterpret_cast<uint8_t *>(mFactoryData.dac.dac_cert.value), mFactoryData.dac.dac_cert.len };
+    chip::Crypto::P256PublicKey dacPublicKey;
+
+    ReturnErrorOnFailure(chip::Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey));
+    ReturnErrorOnFailure(
+        LoadKeypairFromRaw(ByteSpan(reinterpret_cast<uint8_t *>(mFactoryData.dac.dac_key.value), mFactoryData.dac.dac_key.len),
+                           ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()), keypair));
+#else
     const uint8_t kDacPublicKey[65] = {
         0x04, 0x46, 0x3a, 0xc6, 0x93, 0x42, 0x91, 0x0a, 0x0e, 0x55, 0x88, 0xfc, 0x6f, 0xf5, 0x6b, 0xb6, 0x3e,
         0x62, 0xec, 0xce, 0xcb, 0x14, 0x8f, 0x7d, 0x4e, 0xb0, 0x3e, 0xe5, 0x52, 0x60, 0x14, 0x15, 0x76, 0x7d,
@@ -190,16 +256,9 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
         0x70, 0x9c, 0xa6, 0x94, 0x6a, 0xf5, 0xf2, 0xf7, 0x53, 0x08, 0x33, 0xa5, 0x2b, 0x44, 0xfb, 0xff,
     };
 
-    Crypto::P256ECDSASignature signature;
-    Crypto::P256Keypair keypair;
-
-    VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(messageToSign), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
-    // Crypto::P256Keypair is only (currently) constructable from raw keys if both private/public keys are present.
     ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan(kDacPrivateKey), ByteSpan(kDacPublicKey), keypair));
+#endif
+
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature));
 
     return CopySpanToMutableSpan(ByteSpan{ signature.ConstBytes(), signature.Length() }, outSignBuffer);
@@ -208,15 +267,19 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
 CHIP_ERROR FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
 {
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    uint32_t val;
 
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    setupDiscriminator = mFactoryData.cdata.discriminator;
+    err                = CHIP_NO_ERROR;
+#else
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
-    val = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
-    err = CHIP_NO_ERROR;
-#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
-
+    uint32_t val;
+    val                = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR;
     setupDiscriminator = static_cast<uint16_t>(val);
-
+    err                = CHIP_NO_ERROR;
+#endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    //
     return err;
 }
 
@@ -229,10 +292,16 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pIterationCount(uint32_t & iterationCou
 {
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
-#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT) && CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
-    iterationCount = CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT;
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    ReturnErrorCodeIf(mFactoryData.cdata.spake2_it == 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    iterationCount = mFactoryData.cdata.spake2_it;
     err            = CHIP_NO_ERROR;
+#else
+#if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT) && CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+    iterationCount     = CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT;
+    err                = CHIP_NO_ERROR;
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT) && CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
 
     return err;
 }
@@ -245,12 +314,19 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
     char saltB64[kSpake2pSalt_MaxBase64Len] = { 0 };
     size_t saltB64Len                       = 0;
 
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    saltB64Len = mFactoryData.cdata.spake2_salt.len;
+    ReturnErrorCodeIf(saltB64Len > sizeof(saltB64), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(saltB64, mFactoryData.cdata.spake2_salt.value, saltB64Len);
+    err = CHIP_NO_ERROR;
+#else
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
-    saltB64Len = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT);
+    saltB64Len         = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT);
     ReturnErrorCodeIf(saltB64Len > sizeof(saltB64), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(saltB64, CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT, saltB64Len);
-    err = CHIP_NO_ERROR;
+    err            = CHIP_NO_ERROR;
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
 
     ReturnErrorOnFailure(err);
     size_t saltLen = chip::Base64Decode32(saltB64, saltB64Len, reinterpret_cast<uint8_t *>(saltB64));
@@ -271,12 +347,19 @@ CHIP_ERROR FactoryDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf
     char verifierB64[kSpake2pSerializedVerifier_MaxBase64Len] = { 0 };
     size_t verifierB64Len                                     = 0;
 
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    verifierB64Len = mFactoryData.cdata.spake2_verifier.len;
+    ReturnErrorCodeIf(verifierB64Len > sizeof(verifierB64), CHIP_ERROR_BUFFER_TOO_SMALL);
+    memcpy(verifierB64, mFactoryData.cdata.spake2_verifier.value, verifierB64Len);
+    err = CHIP_NO_ERROR;
+#else
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
     verifierB64Len = strlen(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER);
     ReturnErrorCodeIf(verifierB64Len > sizeof(verifierB64), CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(verifierB64, CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER, verifierB64Len);
-    err = CHIP_NO_ERROR;
+    err           = CHIP_NO_ERROR;
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
 
     ReturnErrorOnFailure(err);
     verifierLen = chip::Base64Decode32(verifierB64, verifierB64Len, reinterpret_cast<uint8_t *>(verifierB64));
@@ -291,10 +374,16 @@ CHIP_ERROR FactoryDataProvider::GetSetupPasscode(uint32_t & setupPasscode)
 {
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    ReturnErrorCodeIf(mFactoryData.cdata.passcode == 0, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    setupPasscode = mFactoryData.cdata.passcode;
+    err           = CHIP_NO_ERROR;
+#else
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
     setupPasscode = CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE;
     err           = CHIP_NO_ERROR;
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
 
     return err;
 }
@@ -306,28 +395,69 @@ CHIP_ERROR FactoryDataProvider::SetSetupPasscode(uint32_t setupPasscode)
 
 CHIP_ERROR FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
 {
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    ReturnErrorCodeIf(bufSize < mFactoryData.dii.vendor_name.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(!mFactoryData.dii.vendor_name.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    memcpy(buf, mFactoryData.dii.vendor_name.value, mFactoryData.dii.vendor_name.len);
+    buf[mFactoryData.dii.vendor_name.len] = 0;
+    err                                   = CHIP_NO_ERROR;
+#else
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME);
-    return CHIP_NO_ERROR;
+    err      = CHIP_NO_ERROR;
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
+
+    return err;
 }
 
 CHIP_ERROR FactoryDataProvider::GetVendorId(uint16_t & vendorId)
 {
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    vendorId = mFactoryData.dii.vendor_id;
+    err      = CHIP_NO_ERROR;
+#else
     vendorId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID);
-    return CHIP_NO_ERROR;
+    err      = CHIP_NO_ERROR;
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    return err;
 }
 
 CHIP_ERROR FactoryDataProvider::GetProductName(char * buf, size_t bufSize)
 {
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    ReturnErrorCodeIf(bufSize < mFactoryData.dii.product_name.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(!mFactoryData.dii.product_name.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    memcpy(buf, mFactoryData.dii.product_name.value, mFactoryData.dii.product_name.len);
+    buf[mFactoryData.dii.product_name.len] = 0;
+    err                                    = CHIP_NO_ERROR;
+#else
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
-    return CHIP_NO_ERROR;
+    err                 = CHIP_NO_ERROR;
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
+
+    return err;
 }
 
 CHIP_ERROR FactoryDataProvider::GetProductId(uint16_t & productId)
 {
-    productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
-    return CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    productId = mFactoryData.dii.product_id;
+    err       = CHIP_NO_ERROR;
+#else
+    productId           = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+    err                 = CHIP_NO_ERROR;
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
+
+    return err;
 }
 
 CHIP_ERROR FactoryDataProvider::GetPartNumber(char * buf, size_t bufSize)
@@ -347,9 +477,16 @@ CHIP_ERROR FactoryDataProvider::GetProductLabel(char * buf, size_t bufSize)
 
 CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 {
-    ChipError err       = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    size_t serialNumLen = 0; // without counting null-terminator
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    ReturnErrorCodeIf(bufSize < mFactoryData.dii.serial_num.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(!mFactoryData.dii.serial_num.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    memcpy(buf, mFactoryData.dii.serial_num.value, mFactoryData.dii.serial_num.len);
+    buf[mFactoryData.dii.serial_num.len] = 0;
+    err                                  = CHIP_NO_ERROR;
+#else
+    size_t serialNumLen = 0; // without counting null-terminator
 #ifdef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
     if (CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER[0] != 0)
     {
@@ -363,29 +500,98 @@ CHIP_ERROR FactoryDataProvider::GetSerialNumber(char * buf, size_t bufSize)
     ReturnErrorCodeIf(serialNumLen >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
     ReturnErrorCodeIf(buf[serialNumLen] != 0, CHIP_ERROR_INVALID_STRING_LENGTH);
 
+    err = CHIP_NO_ERROR;
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
+
     return err;
 }
 
 CHIP_ERROR FactoryDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    enum
+    {
+        kDateStringLength = 10 // YYYY-MM-DD
+    };
+    char * parseEnd;
+    size_t dateLen;
+    dateLen = mFactoryData.dii.mfg_date.len;
+    VerifyOrExit(dateLen == kDateStringLength, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Cast does not lose information, because we then check that we only parsed
+    // 4 digits, so our number can't be bigger than 9999.
+    year = static_cast<uint16_t>(strtoul((char *) mFactoryData.dii.mfg_date.value, &parseEnd, 10));
+    VerifyOrExit(parseEnd == (char *) mFactoryData.dii.mfg_date.value + 4, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    month = static_cast<uint8_t>(strtoul((char *) mFactoryData.dii.mfg_date.value + 5, &parseEnd, 10));
+    VerifyOrExit(parseEnd == (char *) mFactoryData.dii.mfg_date.value + 7, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Cast does not lose information, because we then check that we only parsed
+    // 2 digits, so our number can't be bigger than 99.
+    day = static_cast<uint8_t>(strtoul((char *) mFactoryData.dii.mfg_date.value + 8, &parseEnd, 10));
+    VerifyOrExit(parseEnd == (char *) mFactoryData.dii.mfg_date.value + 10, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    err = CHIP_NO_ERROR;
+#else
+    err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
+
+exit:
+    if (err != CHIP_NO_ERROR && err != CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND && err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        ChipLogError(DeviceLayer, "Invalid manufacturing date: %s", mFactoryData.dii.mfg_date.value);
+    }
+    return err;
 }
 
 CHIP_ERROR FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    hardwareVersion = mFactoryData.dii.hw_ver;
+    err             = CHIP_NO_ERROR;
+#else
+    err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
+
+    return err;
 }
 
 CHIP_ERROR FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
 {
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    ReturnErrorCodeIf(bufSize < mFactoryData.dii.hw_ver_string.len + 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(!mFactoryData.dii.hw_ver_string.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    memcpy(buf, mFactoryData.dii.hw_ver_string.value, mFactoryData.dii.hw_ver_string.len);
+    buf[mFactoryData.dii.hw_ver_string.len] = 0;
+    err                                     = CHIP_NO_ERROR;
+#else
     ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING);
-    return CHIP_NO_ERROR;
+    err = CHIP_NO_ERROR;
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
+
+    return err;
 }
 
 CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
-    ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;
+    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+
+#if CONFIG_ENABLE_AMEBA_FACTORY_DATA
+    ReturnErrorCodeIf(uniqueIdSpan.size() < mFactoryData.dii.rd_id_uid.len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    ReturnErrorCodeIf(!mFactoryData.dii.rd_id_uid.value, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    memcpy(uniqueIdSpan.data(), mFactoryData.dii.rd_id_uid.value, mFactoryData.dii.rd_id_uid.len);
+    err = CHIP_NO_ERROR;
+#else
+    err = CHIP_ERROR_WRONG_KEY_TYPE;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
     static_assert(ConfigurationManager::kRotatingDeviceIDUniqueIDLength >= ConfigurationManager::kMinRotatingDeviceIDUniqueIDLength,
                   "Length of unique ID for rotating device ID is smaller than minimum.");
@@ -395,8 +601,10 @@ CHIP_ERROR FactoryDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & un
     ReturnErrorCodeIf(sizeof(uniqueId) != ConfigurationManager::kRotatingDeviceIDUniqueIDLength, CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(uniqueIdSpan.data(), uniqueId, sizeof(uniqueId));
     uniqueIdSpan.reduce_size(sizeof(uniqueId));
-    return CHIP_NO_ERROR;
+    err = CHIP_NO_ERROR;
 #endif
+#endif // CONFIG_ENABLE_AMEBA_FACTORY_DATA
+
     return err;
 }
 

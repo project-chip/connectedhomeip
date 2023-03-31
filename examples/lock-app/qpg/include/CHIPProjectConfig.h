@@ -28,12 +28,6 @@
 
 #pragma once
 
-// Use a default setup PIN code if one hasn't been provisioned in flash.
-#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
-#endif
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
-
 // For convenience, enable Chip Security Test Mode and disable the requirement for
 // authentication in various protocols.
 //
@@ -43,32 +37,13 @@
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
+ * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
  *
- * 0xFFF1: Test vendor.
+ * A uint32_t identifying the software version running on the device.
  */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
-#define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID 0x10D0
-#endif // CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
-
-/**
- * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
- *
- * 0x8006: example lock-app
- */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8006
-#endif // CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
-
-/**
- * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
- *
- * The hardware version number assigned to device or product by the device vendor.  This
- * number is scoped to the device product id, and typically corresponds to a revision of the
- * physical device, a change to its packaging, and/or a change to its marketing presentation.
- * This value is generally *not* incremented for device software versions.
- */
-#define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 1
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0x0002
+#endif
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
@@ -78,7 +53,7 @@
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "1.0"
 #endif
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -86,14 +61,6 @@
  * Enable support for Chip-over-BLE (CHIPoBLE).
  */
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
-
-/**
- * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
- *
- * Enables the use of a hard-coded default serial number if none
- * is found in Chip NV storage.
- */
-#define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
 
 /**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
@@ -145,3 +112,16 @@
 #define CHIP_IM_MAX_NUM_WRITE_CLIENT 2
 
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
+
+/**
+ * @def CHIP_DEVICE_CONFIG_ENABLE_SED
+ *
+ * @brief Defines if a matter device is acting as a Sleepy End Device(SED)
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_SED
+#define CHIP_DEVICE_CONFIG_ENABLE_SED 1
+#endif
+
+#ifndef CHIP_DEVICE_CONFIG_THREAD_FTD
+#define CHIP_DEVICE_CONFIG_THREAD_FTD 0
+#endif

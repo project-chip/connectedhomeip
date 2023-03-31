@@ -89,14 +89,14 @@ CHIP_ERROR EventReportIB::Parser::PrettyPrint() const
 CHIP_ERROR EventReportIB::Parser::GetEventStatus(EventStatusIB::Parser * const apEventStatus) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventStatus)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kEventStatus), reader));
     return apEventStatus->Init(reader);
 }
 
 CHIP_ERROR EventReportIB::Parser::GetEventData(EventDataIB::Parser * const apEventData) const
 {
     TLV::TLVReader reader;
-    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventData)), reader));
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(Tag::kEventData), reader));
     return apEventData->Init(reader);
 }
 

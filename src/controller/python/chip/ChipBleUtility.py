@@ -22,11 +22,11 @@
 #      This file is utility for Chip BLE
 #
 
-from __future__ import absolute_import
-from __future__ import print_function
-from ctypes import *
-from .ChipUtility import ChipUtility
+from __future__ import absolute_import, print_function
 
+from ctypes import *
+
+from .ChipUtility import ChipUtility
 
 # Duplicates of BLE definitions in ChipDeviceController-ScriptBinding.cpp
 BLE_EVENT_TYPE_RX = 1

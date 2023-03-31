@@ -14,8 +14,7 @@
 
 from chip_mobly import pigweed_device
 from mobly import asserts  # type: ignore
-from mobly import base_test
-from mobly import test_runner
+from mobly import base_test, test_runner
 
 
 class HelloWorldTest(base_test.BaseTestClass):

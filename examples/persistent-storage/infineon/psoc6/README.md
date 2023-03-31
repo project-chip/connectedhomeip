@@ -4,15 +4,13 @@ An example testing and demonstrating the key value storage API.
 
 <hr>
 
--   [CHIP PSoC6 Persistent Storage Example](#chip-PSoC6-persistent-storage-example)
+-   [CHIP PSoC6 Persistent Storage Example](#chip-psoc6-persistent-storage-example)
     -   [Introduction](#introduction)
-    -   [PSoC6](#PSoC6)
+    -   [PSoC6](#psoc6)
         -   [Building](#building)
         -   [Flashing the Application](#flashing-the-application)
 
 <hr>
-
-<a name="intro"></a>
 
 ## Introduction
 
@@ -23,14 +21,10 @@ to use the API.
 In the future this example can be moved into a unit test when available on all
 platforms.
 
-<a name="PSoC6"></a>
-
 ## PSoC6
 
 The Infineon PSoC6 platform KVS is fully implemented, the KVS is enabled and
 configured by providing a file during the init call.
-
-<a name="building"></a>
 
 ### Building
 
@@ -39,8 +33,6 @@ configured by providing a file during the init call.
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ ./scripts/examples/gn_psoc6_example.sh examples/persistent-storage/infineon/psoc6 out/persistent_storage_app_psoc6
-
-<a name="flashing"></a>
 
 ### Flashing the Application
 

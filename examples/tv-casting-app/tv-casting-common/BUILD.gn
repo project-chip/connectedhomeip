@@ -43,6 +43,9 @@ chip_data_model("tv-casting-common") {
     "${chip_root}/examples/chip-tool/commands/common/Commands.cpp",
     "${chip_root}/examples/chip-tool/commands/common/Commands.h",
     "${chip_root}/examples/chip-tool/commands/common/CredentialIssuerCommands.h",
+    "${chip_root}/examples/chip-tool/commands/common/HexConversion.h",
+    "${chip_root}/examples/chip-tool/commands/common/RemoteDataModelLogger.cpp",
+    "${chip_root}/examples/chip-tool/commands/common/RemoteDataModelLogger.h",
     "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
     "${chip_root}/src/controller/ExamplePersistentStorage.h",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
@@ -62,6 +65,7 @@ chip_data_model("tv-casting-common") {
     "include/MediaPlayback.h",
     "include/MediaReadBase.h",
     "include/MediaSubscriptionBase.h",
+    "include/OnOff.h",
     "include/PersistenceManager.h",
     "include/TargetEndpointInfo.h",
     "include/TargetNavigator.h",
@@ -74,6 +78,7 @@ chip_data_model("tv-casting-common") {
     "src/KeypadInput.cpp",
     "src/LevelControl.cpp",
     "src/MediaPlayback.cpp",
+    "src/OnOff.cpp",
     "src/PersistenceManager.cpp",
     "src/TargetEndpointInfo.cpp",
     "src/TargetNavigator.cpp",
@@ -82,6 +87,7 @@ chip_data_model("tv-casting-common") {
 
   deps = [
     "${chip_root}/src/app/tests/suites/commands/interaction_model",
+    "${chip_root}/src/lib/support/jsontlv",
     "${chip_root}/third_party/inipp",
     "${chip_root}/third_party/jsoncpp",
   ]

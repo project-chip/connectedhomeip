@@ -21,7 +21,7 @@
 #include <app/ConcreteEventPath.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 
 namespace chip {
 

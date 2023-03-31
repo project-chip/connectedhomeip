@@ -89,8 +89,8 @@ static CHIP_ERROR LoadTestFabric_Node01_01(nlTestSuite * inSuite, FabricTable & 
     static Crypto::P256Keypair opKey_Node01_01;
 
     FabricIndex fabricIndex;
-    memcpy((uint8_t *) (opKeysSerialized), TestCerts::sTestCert_Node01_01_PublicKey, TestCerts::sTestCert_Node01_01_PublicKey_Len);
-    memcpy((uint8_t *) (opKeysSerialized) + TestCerts::sTestCert_Node01_01_PublicKey_Len, TestCerts::sTestCert_Node01_01_PrivateKey,
+    memcpy(opKeysSerialized.Bytes(), TestCerts::sTestCert_Node01_01_PublicKey, TestCerts::sTestCert_Node01_01_PublicKey_Len);
+    memcpy(opKeysSerialized.Bytes() + TestCerts::sTestCert_Node01_01_PublicKey_Len, TestCerts::sTestCert_Node01_01_PrivateKey,
            TestCerts::sTestCert_Node01_01_PrivateKey_Len);
 
     ByteSpan rcacSpan(TestCerts::sTestCert_Root01_Chip, TestCerts::sTestCert_Root01_Chip_Len);
@@ -119,8 +119,8 @@ static CHIP_ERROR LoadTestFabric_Node01_02(nlTestSuite * inSuite, FabricTable & 
     FabricIndex fabricIndex;
     static Crypto::P256Keypair opKey_Node01_02;
 
-    memcpy((uint8_t *) (opKeysSerialized), TestCerts::sTestCert_Node01_02_PublicKey, TestCerts::sTestCert_Node01_02_PublicKey_Len);
-    memcpy((uint8_t *) (opKeysSerialized) + TestCerts::sTestCert_Node01_02_PublicKey_Len, TestCerts::sTestCert_Node01_02_PrivateKey,
+    memcpy(opKeysSerialized.Bytes(), TestCerts::sTestCert_Node01_02_PublicKey, TestCerts::sTestCert_Node01_02_PublicKey_Len);
+    memcpy(opKeysSerialized.Bytes() + TestCerts::sTestCert_Node01_02_PublicKey_Len, TestCerts::sTestCert_Node01_02_PrivateKey,
            TestCerts::sTestCert_Node01_02_PrivateKey_Len);
 
     ByteSpan rcacSpan(TestCerts::sTestCert_Root01_Chip, TestCerts::sTestCert_Root01_Chip_Len);
@@ -151,8 +151,8 @@ static CHIP_ERROR LoadTestFabric_Node02_01(nlTestSuite * inSuite, FabricTable & 
     FabricIndex fabricIndex;
     static Crypto::P256Keypair opKey_Node02_01;
 
-    memcpy((uint8_t *) (opKeysSerialized), TestCerts::sTestCert_Node02_01_PublicKey, TestCerts::sTestCert_Node02_01_PublicKey_Len);
-    memcpy((uint8_t *) (opKeysSerialized) + TestCerts::sTestCert_Node02_01_PublicKey_Len, TestCerts::sTestCert_Node02_01_PrivateKey,
+    memcpy(opKeysSerialized.Bytes(), TestCerts::sTestCert_Node02_01_PublicKey, TestCerts::sTestCert_Node02_01_PublicKey_Len);
+    memcpy(opKeysSerialized.Bytes() + TestCerts::sTestCert_Node02_01_PublicKey_Len, TestCerts::sTestCert_Node02_01_PrivateKey,
            TestCerts::sTestCert_Node02_01_PrivateKey_Len);
 
     ByteSpan rcacSpan(TestCerts::sTestCert_Root02_Chip, TestCerts::sTestCert_Root02_Chip_Len);

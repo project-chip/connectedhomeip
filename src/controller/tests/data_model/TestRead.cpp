@@ -190,8 +190,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
         attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
 
-        ReturnErrorOnFailure(
-            DataModel::Encode(*(attributeData.GetWriter()), TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), value));
+        ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()), TLV::ContextTag(AttributeDataIB::Tag::kData), value));
         ReturnErrorOnFailure(attributeData.EndOfAttributeDataIB().GetError());
         return attributeReport.EndOfAttributeReportIB().GetError();
     }
@@ -275,6 +274,7 @@ public:
     static void TestReadHandler_SubscriptionReportingIntervalsTest9(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerResourceExhaustion_MultipleReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadSubscribeAttributeResponseWithCache(nlTestSuite * apSuite, void * apContext);
+    static void TestReadSubscribeAttributeResponseWithVersionOnlyCache(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_KillOldestSubscriptions(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_ParallelReads(nlTestSuite * apSuite, void * apContext);
@@ -316,6 +316,10 @@ private:
     // Establish the given number of subscriptions, then issue the given number
     // of reads in parallel and wait for them all to succeed.
     static void SubscribeThenReadHelper(nlTestSuite * apSuite, TestContext & aCtx, size_t aSubscribeCount, size_t aReadCount);
+
+    // Compute the amount of time it would take a subscription with a given
+    // max-interval to time out.
+    static System::Clock::Timeout ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval);
 
     bool mEmitSubscriptionError      = false;
     int32_t mNumActiveSubscriptions  = 0;
@@ -1419,6 +1423,79 @@ void TestReadInteraction::TestReadSubscribeAttributeResponseWithCache(nlTestSuit
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+void TestReadInteraction::TestReadSubscribeAttributeResponseWithVersionOnlyCache(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    responseDirective = kSendDataResponse;
+
+    MockInteractionModelApp delegate;
+    chip::app::ClusterStateCache cache(delegate, Optional<EventNumber>::Missing(), false /*cachedData*/);
+
+    chip::app::ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    //
+    // Test the application callback as well to ensure we get the right number of SubscriptionEstablishment/Termination
+    // callbacks.
+    //
+    app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
+
+    // read of E2C2A* and E3C2A2. Expect cache E2C2 version
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(),
+                                   cache.GetBufferedCallback(), chip::app::ReadClient::InteractionType::Read);
+        chip::app::AttributePathParams attributePathParams2[2];
+        attributePathParams2[0].mEndpointId  = chip::Test::kMockEndpoint2;
+        attributePathParams2[0].mClusterId   = chip::Test::MockClusterId(3);
+        attributePathParams2[0].mAttributeId = kInvalidAttributeId;
+
+        attributePathParams2[1].mEndpointId            = chip::Test::kMockEndpoint3;
+        attributePathParams2[1].mClusterId             = chip::Test::MockClusterId(2);
+        attributePathParams2[1].mAttributeId           = chip::Test::MockAttributeId(2);
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams2;
+        readPrepareParams.mAttributePathParamsListSize = 2;
+        err                                            = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        // There are supported 2 global and 3 non-global attributes in E2C2A* and  1 E3C2A2
+        NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 6);
+        NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+        Optional<DataVersion> version1;
+        app::ConcreteClusterPath clusterPath1(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath1, version1) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, version1.HasValue() && (version1.Value() == 0));
+        Optional<DataVersion> version2;
+        app::ConcreteClusterPath clusterPath2(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2));
+        NL_TEST_ASSERT(apSuite, cache.GetVersion(clusterPath2, version2) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, !version2.HasValue());
+
+        {
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) != CHIP_NO_ERROR);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint2, chip::Test::MockClusterId(3),
+                                                     chip::Test::MockAttributeId(3));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) != CHIP_NO_ERROR);
+        }
+
+        {
+            app::ConcreteAttributePath attributePath(chip::Test::kMockEndpoint3, chip::Test::MockClusterId(2),
+                                                     chip::Test::MockAttributeId(2));
+            TLV::TLVReader reader;
+            NL_TEST_ASSERT(apSuite, cache.Get(attributePath, reader) != CHIP_NO_ERROR);
+        }
+        delegate.mNumAttributeResponse = 0;
+    }
+
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 void TestReadInteraction::TestReadEventResponse(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx       = *static_cast<TestContext *>(apContext);
@@ -1611,7 +1688,9 @@ void TestReadInteraction::TestResubscribeAttributeTimeout(nlTestSuite * apSuite,
         attributePathParams[0].mClusterId              = app::Clusters::UnitTesting::Id;
         attributePathParams[0].mAttributeId            = app::Clusters::UnitTesting::Attributes::Boolean::Id;
 
-        readPrepareParams.mMaxIntervalCeilingSeconds = 1;
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
 
         auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1628,10 +1707,9 @@ void TestReadInteraction::TestResubscribeAttributeTimeout(nlTestSuite * apSuite,
         //
         // Disable packet transmission, and drive IO till we have reported a re-subscription attempt.
         //
-        // 1.5s should cover the liveness timeout in the client of 1s max interval + 50ms ACK timeout.
         //
         ctx.GetLoopback().mNumMessagesToDrop = chip::Test::LoopbackTransport::kUnlimitedMessageCount;
-        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1500),
+        ctx.GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxIntervalCeilingSeconds)),
                                         [&]() { return callback.mOnResubscriptionsAttempted > 0; });
 
         NL_TEST_ASSERT(apSuite, callback.mOnResubscriptionsAttempted == 1);
@@ -1690,7 +1768,8 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
         //
         // Request a max interval that's very small to reduce time to discovering a liveness failure.
         //
-        readPrepareParams.mMaxIntervalCeilingSeconds = 1;
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
 
         auto err = readClient.SendRequest(readPrepareParams);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1709,11 +1788,11 @@ void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, v
 
         //
         // Drive IO until we get an error on the subscription, which should be caused
-        // by the liveness timer firing within ~1s of the establishment of the subscription.
+        // by the liveness timer firing once we hit our max-interval plus
+        // retransmit timeouts.
         //
-        // 1.5s should cover the liveness timeout in the client of 1s max interval + 50ms ACK timeout.
-        //
-        ctx.GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1500), [&]() { return callback.mOnError >= 1; });
+        ctx.GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxIntervalCeilingSeconds)),
+                                        [&]() { return callback.mOnError >= 1; });
 
         NL_TEST_ASSERT(apSuite, callback.mOnError == 1);
         NL_TEST_ASSERT(apSuite, callback.mLastError == CHIP_ERROR_TIMEOUT);
@@ -1752,7 +1831,8 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * ap
         NL_TEST_ASSERT(apSuite, false);
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
 
@@ -1818,7 +1898,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionAppRejection(nlTestSuite *
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
 
@@ -1882,7 +1963,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest1(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient,
+                                                                                    chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
         CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
@@ -1957,7 +2039,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest2(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient,
+                                                                                    chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
         CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
@@ -2032,7 +2115,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest3(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient,
+                                                                                    chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
         CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
@@ -2107,7 +2191,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest4(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
 
@@ -2172,7 +2257,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest5(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient,
+                                                                                    chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
         CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
@@ -2247,7 +2333,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest6(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient,
+                                                                                    chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
         CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
@@ -2322,7 +2409,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest7(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite](const app::ReadClient & readClient,
+                                                                                    chip::SubscriptionId aSubscriptionId) {
         uint16_t minInterval = 0, maxInterval = 0;
 
         CHIP_ERROR err = readClient.GetReportingIntervals(minInterval, maxInterval);
@@ -2396,7 +2484,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest8(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
     //
@@ -2459,7 +2548,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest9(nl
         numFailureCalls++;
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
 
@@ -2569,7 +2659,8 @@ void TestReadInteraction::SubscribeThenReadHelper(nlTestSuite * apSuite, TestCon
     };
 
     auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls, &apSuite, &aCtx, aSubscribeCount, aReadCount,
-                                        &numReadSuccessCalls, &numReadFailureCalls](const app::ReadClient & readClient) {
+                                        &numReadSuccessCalls, &numReadFailureCalls](const app::ReadClient & readClient,
+                                                                                    chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
         if (numSubscriptionEstablishedCalls == aSubscribeCount)
         {
@@ -2666,7 +2757,8 @@ void TestReadInteraction::TestReadHandler_MultipleSubscriptionsWithDataVersionFi
         NL_TEST_ASSERT(apSuite, false);
     };
 
-    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient) {
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls](const app::ReadClient & readClient,
+                                                                          chip::SubscriptionId aSubscriptionId) {
         numSubscriptionEstablishedCalls++;
     };
 
@@ -2884,12 +2976,12 @@ public:
         mLastError                      = CHIP_NO_ERROR;
     }
 
-    int32_t mAttributeCount                 = 0;
-    int32_t mOnReportEnd                    = 0;
-    int32_t mOnSubscriptionEstablishedCount = 0;
-    int32_t mOnDone                         = 0;
-    int32_t mOnError                        = 0;
-    CHIP_ERROR mLastError                   = CHIP_NO_ERROR;
+    uint32_t mAttributeCount                 = 0;
+    uint32_t mOnReportEnd                    = 0;
+    uint32_t mOnSubscriptionEstablishedCount = 0;
+    uint32_t mOnDone                         = 0;
+    uint32_t mOnError                        = 0;
+    CHIP_ERROR mLastError                    = CHIP_NO_ERROR;
 };
 
 class TestPerpetualListReadCallback : public app::ReadClient::Callback
@@ -2917,7 +3009,7 @@ public:
     int32_t reportsReceived = 0;
 };
 
-void EstablishReadOrSubscriptions(nlTestSuite * apSuite, const SessionHandle & sessionHandle, int32_t numSubs, int32_t pathPerSub,
+void EstablishReadOrSubscriptions(nlTestSuite * apSuite, const SessionHandle & sessionHandle, size_t numSubs, size_t pathPerSub,
                                   app::AttributePathParams path, app::ReadClient::InteractionType type,
                                   app::ReadClient::Callback * callback, std::vector<std::unique_ptr<app::ReadClient>> & readClients)
 {
@@ -2932,7 +3024,7 @@ void EstablishReadOrSubscriptions(nlTestSuite * apSuite, const SessionHandle & s
         readParams.mKeepSubscriptions         = true;
     }
 
-    for (int32_t i = 0; i < numSubs; i++)
+    for (uint32_t i = 0; i < numSubs; i++)
     {
         std::unique_ptr<app::ReadClient> readClient =
             std::make_unique<app::ReadClient>(app::InteractionModelEngine::GetInstance(),
@@ -2992,9 +3084,9 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     TestContext & ctx  = *static_cast<TestContext *>(apContext);
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
-    const int32_t kExpectedParallelSubs =
+    const auto kExpectedParallelSubs =
         app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric * ctx.GetFabricTable().FabricCount();
-    const int32_t kExpectedParallelPaths = kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
+    const auto kExpectedParallelPaths = kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
 
     app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
 
@@ -3043,14 +3135,14 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     ctx.GetIOContext().DriveIOUntil(System::Clock::Seconds16(5), [&]() {
         return readCallback.mOnSubscriptionEstablishedCount == kExpectedParallelSubs + 1 &&
             readCallback.mAttributeCount ==
-            static_cast<int32_t>(kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription +
-                                 app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1);
+            kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription +
+                app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1;
     });
 
     NL_TEST_ASSERT(apSuite,
                    readCallback.mAttributeCount ==
-                       static_cast<int32_t>(kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription +
-                                            app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1));
+                       kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription +
+                           app::InteractionModelEngine::kMinSupportedPathsPerSubscription + 1);
     NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablishedCount == kExpectedParallelSubs + 1);
 
     // We have set up the environment for testing the evicting logic.
@@ -3058,8 +3150,8 @@ void TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions(nlTestSuite
     // subscriptions will require the eviction of existing subscriptions, OR potential rejection of the subscription if it exceeds
     // minimas.
     app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(kExpectedParallelSubs);
-    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(kExpectedParallelPaths);
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(static_cast<int32_t>(kExpectedParallelSubs));
+    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(static_cast<int32_t>(kExpectedParallelPaths));
 
     // Part 1: Test per subscription minimas.
     // Rejection of the subscription that exceeds minimas.
@@ -3217,9 +3309,9 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
     TestContext & ctx  = *static_cast<TestContext *>(apContext);
     auto sessionHandle = ctx.GetSessionBobToAlice();
 
-    const int32_t kExpectedParallelSubs =
+    const auto kExpectedParallelSubs =
         app::InteractionModelEngine::kMinSupportedSubscriptionsPerFabric * ctx.GetFabricTable().FabricCount();
-    const int32_t kExpectedParallelPaths = kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
+    const auto kExpectedParallelPaths = kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription;
 
     app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&gTestReadInteraction);
 
@@ -3227,8 +3319,8 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
     std::vector<std::unique_ptr<app::ReadClient>> readClients;
 
     app::InteractionModelEngine::GetInstance()->SetForceHandlerQuota(true);
-    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(kExpectedParallelSubs);
-    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(kExpectedParallelPaths);
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacityForSubscriptions(static_cast<int32_t>(kExpectedParallelSubs));
+    app::InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(static_cast<int32_t>(kExpectedParallelPaths));
 
     // This should just use all availbale resources.
     EstablishReadOrSubscriptions(
@@ -3240,12 +3332,9 @@ void TestReadInteraction::TestReadHandler_KillOldestSubscriptions(nlTestSuite * 
 
     NL_TEST_ASSERT(apSuite,
                    readCallback.mAttributeCount ==
-                       kExpectedParallelSubs *
-                           static_cast<int32_t>(app::InteractionModelEngine::kMinSupportedPathsPerSubscription));
+                       kExpectedParallelSubs * app::InteractionModelEngine::kMinSupportedPathsPerSubscription);
     NL_TEST_ASSERT(apSuite, readCallback.mOnSubscriptionEstablishedCount == kExpectedParallelSubs);
-    NL_TEST_ASSERT(apSuite,
-                   app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() ==
-                       static_cast<size_t>(kExpectedParallelSubs));
+    NL_TEST_ASSERT(apSuite, app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == kExpectedParallelSubs);
 
     // The following check will trigger the logic in im to kill the read handlers that uses more paths than the limit per fabric.
     {
@@ -4547,6 +4636,18 @@ void TestReadInteraction::TestReadHandler_KeepSubscriptionTest(nlTestSuite * apS
     ctx.DrainAndServiceIO();
 }
 
+System::Clock::Timeout TestReadInteraction::ComputeSubscriptionTimeout(System::Clock::Seconds16 aMaxInterval)
+{
+    // Add 50ms of slack to our max interval to make sure we hit the
+    // subscription liveness timer.
+    const auto & ourMrpConfig = GetDefaultMRPConfig();
+    auto publisherTransmissionTimeout =
+        GetRetransmissionTimeout(ourMrpConfig.mActiveRetransTimeout, ourMrpConfig.mIdleRetransTimeout,
+                                 System::SystemClock().GetMonotonicTimestamp(), Transport::kMinActiveTime);
+
+    return publisherTransmissionTimeout + aMaxInterval + System::Clock::Milliseconds32(50);
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
@@ -4572,6 +4673,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest7", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest7),
     NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest8", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest8),
     NL_TEST_DEF("TestReadHandler_SubscriptionReportingIntervalsTest9", TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest9),
+        NL_TEST_DEF("TestReadSubscribeAttributeResponseWithVersionOnlyCache", TestReadInteraction::TestReadSubscribeAttributeResponseWithVersionOnlyCache),
     NL_TEST_DEF("TestReadSubscribeAttributeResponseWithCache", TestReadInteraction::TestReadSubscribeAttributeResponseWithCache),
     NL_TEST_DEF("TestReadHandler_KillOverQuotaSubscriptions", TestReadInteraction::TestReadHandler_KillOverQuotaSubscriptions),
     NL_TEST_DEF("TestReadHandler_KillOldestSubscriptions", TestReadInteraction::TestReadHandler_KillOldestSubscriptions),

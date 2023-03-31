@@ -23,8 +23,6 @@
 #include "LEDWidget.h"
 
 #include <DeviceInfoProviderImpl.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/identify-server/identify-server.h>
@@ -48,10 +46,10 @@
 #endif
 
 #include <dk_buttons_and_leds.h>
+#include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
-#include <zephyr/zephyr.h>
 
-LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -179,7 +177,7 @@ CHIP_ERROR AppTask::Init()
 
 #ifdef CONFIG_MCUMGR_SMP_BT
     // Initialize DFU over SMP
-    GetDFUOverSMP().Init(RequestSMPAdvertisingStart);
+    GetDFUOverSMP().Init();
     GetDFUOverSMP().ConfirmNewImage();
 #endif
 
@@ -399,16 +397,6 @@ void AppTask::FunctionTimerEventHandler(const AppEvent & event)
     }
 }
 
-#ifdef CONFIG_MCUMGR_SMP_BT
-void AppTask::RequestSMPAdvertisingStart(void)
-{
-    AppEvent event;
-    event.Type    = AppEvent::kEventType_StartSMPAdvertising;
-    event.Handler = [](AppEvent *) { GetDFUOverSMP().StartBLEAdvertising(); };
-    sAppTask.PostEvent(&event);
-}
-#endif
-
 void AppTask::FunctionHandler(const AppEvent & event)
 {
     if (event.ButtonEvent.PinNo != FUNCTION_BUTTON)
@@ -544,7 +532,7 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
         UpdateStatusLED();
         break;
 #if defined(CONFIG_NET_L2_OPENTHREAD)
-    case DeviceEventType::kDnssdPlatformInitialized:
+    case DeviceEventType::kDnssdInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
         InitBasicOTARequestor();
 #endif // CONFIG_CHIP_OTA_REQUESTOR

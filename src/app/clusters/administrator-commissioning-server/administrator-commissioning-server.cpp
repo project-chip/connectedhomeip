@@ -41,6 +41,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AdministratorCommissioning;
 using namespace chip::Protocols;
+using chip::Protocols::InteractionModel::Status;
 
 class AdministratorCommissioningAttrAccess : public AttributeAccessInterface
 {
@@ -82,7 +83,7 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     const Commands::OpenCommissioningWindow::DecodableType & commandData)
 {
     auto commissioningTimeout = System::Clock::Seconds16(commandData.commissioningTimeout);
-    auto & pakeVerifier       = commandData.PAKEVerifier;
+    auto & pakeVerifier       = commandData.PAKEPasscodeVerifier;
     auto & discriminator      = commandData.discriminator;
     auto & iterations         = commandData.iterations;
     auto & salt               = commandData.salt;
@@ -98,36 +99,31 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
     auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
 
-    VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
-    VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
+    VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCode::kPAKEParameterError));
+    VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(StatusCode::kBusy));
 
-    VerifyOrExit(!commissionMgr.IsCommissioningWindowOpen(), status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
-    VerifyOrExit(iterations >= kSpake2p_Min_PBKDF_Iterations,
-                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
-    VerifyOrExit(iterations <= kSpake2p_Max_PBKDF_Iterations,
-                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
-    VerifyOrExit(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length,
-                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
-    VerifyOrExit(salt.size() <= kSpake2p_Max_PBKDF_Salt_Length,
-                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(!commissionMgr.IsCommissioningWindowOpen(), status.Emplace(StatusCode::kBusy));
+    VerifyOrExit(iterations >= kSpake2p_Min_PBKDF_Iterations, status.Emplace(StatusCode::kPAKEParameterError));
+    VerifyOrExit(iterations <= kSpake2p_Max_PBKDF_Iterations, status.Emplace(StatusCode::kPAKEParameterError));
+    VerifyOrExit(salt.size() >= kSpake2p_Min_PBKDF_Salt_Length, status.Emplace(StatusCode::kPAKEParameterError));
+    VerifyOrExit(salt.size() <= kSpake2p_Max_PBKDF_Salt_Length, status.Emplace(StatusCode::kPAKEParameterError));
     VerifyOrExit(commissioningTimeout <= commissionMgr.MaxCommissioningTimeout(),
                  globalStatus = InteractionModel::Status::InvalidCommand);
     VerifyOrExit(commissioningTimeout >= commissionMgr.MinCommissioningTimeout(),
                  globalStatus = InteractionModel::Status::InvalidCommand);
     VerifyOrExit(discriminator <= kMaxDiscriminatorValue, globalStatus = InteractionModel::Status::InvalidCommand);
 
-    VerifyOrExit(verifier.Deserialize(pakeVerifier) == CHIP_NO_ERROR,
-                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(verifier.Deserialize(pakeVerifier) == CHIP_NO_ERROR, status.Emplace(StatusCode::kPAKEParameterError));
     VerifyOrExit(commissionMgr.OpenEnhancedCommissioningWindow(commissioningTimeout, discriminator, verifier, iterations, salt,
                                                                fabricIndex, fabricInfo->GetVendorId()) == CHIP_NO_ERROR,
-                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+                 status.Emplace(StatusCode::kPAKEParameterError));
     ChipLogProgress(Zcl, "Commissioning window is now open");
 
 exit:
     if (status.HasValue())
     {
-        ChipLogError(Zcl, "Failed to open commissioning window. Cluster status %d", status.Value());
-        commandObj->AddClusterSpecificFailure(commandPath, status.Value());
+        ChipLogError(Zcl, "Failed to open commissioning window. Cluster status 0x%02x", to_underlying(status.Value()));
+        commandObj->AddClusterSpecificFailure(commandPath, to_underlying(status.Value()));
     }
     else
     {
@@ -156,24 +152,24 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
     auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
     auto & commissionMgr          = Server::GetInstance().GetCommissioningWindowManager();
 
-    VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCode::kPAKEParameterError));
 
-    VerifyOrExit(!commissionMgr.IsCommissioningWindowOpen(), status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
-    VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
+    VerifyOrExit(!commissionMgr.IsCommissioningWindowOpen(), status.Emplace(StatusCode::kBusy));
+    VerifyOrExit(failSafeContext.IsFailSafeFullyDisarmed(), status.Emplace(StatusCode::kBusy));
     VerifyOrExit(commissioningTimeout <= commissionMgr.MaxCommissioningTimeout(),
                  globalStatus = InteractionModel::Status::InvalidCommand);
     VerifyOrExit(commissioningTimeout >= commissionMgr.MinCommissioningTimeout(),
                  globalStatus = InteractionModel::Status::InvalidCommand);
     VerifyOrExit(commissionMgr.OpenBasicCommissioningWindowForAdministratorCommissioningCluster(
                      commissioningTimeout, fabricIndex, fabricInfo->GetVendorId()) == CHIP_NO_ERROR,
-                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+                 status.Emplace(StatusCode::kPAKEParameterError));
     ChipLogProgress(Zcl, "Commissioning window is now open");
 
 exit:
     if (status.HasValue())
     {
-        ChipLogError(Zcl, "Failed to open commissioning window. Cluster status %d", status.Value());
-        commandObj->AddClusterSpecificFailure(commandPath, status.Value());
+        ChipLogError(Zcl, "Failed to open commissioning window. Cluster status 0x%02x", to_underlying(status.Value()));
+        commandObj->AddClusterSpecificFailure(commandPath, to_underlying(status.Value()));
     }
     else
     {
@@ -193,16 +189,18 @@ bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
 {
     ChipLogProgress(Zcl, "Received command to close commissioning window");
 
+    Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+
     if (!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
     {
         ChipLogError(Zcl, "Commissioning window is currently not open");
-        commandObj->AddClusterSpecificFailure(commandPath, StatusCode::EMBER_ZCL_STATUS_CODE_WINDOW_NOT_OPEN);
+        commandObj->AddClusterSpecificFailure(commandPath, to_underlying(StatusCode::kWindowNotOpen));
     }
     else
     {
         Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
         ChipLogProgress(Zcl, "Commissioning window is now closed");
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        commandObj->AddStatus(commandPath, Status::Success);
     }
     return true;
 }

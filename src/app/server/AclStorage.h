@@ -53,7 +53,7 @@ public:
     class DecodableEntry
     {
         using Entry        = Access::AccessControl::Entry;
-        using StagingEntry = Clusters::AccessControl::Structs::AccessControlEntry::DecodableType;
+        using StagingEntry = Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType;
 
     public:
         DecodableEntry() = default;
@@ -93,7 +93,7 @@ public:
     class EncodableEntry
     {
         using Entry         = Access::AccessControl::Entry;
-        using StagingEntry  = Clusters::AccessControl::Structs::AccessControlEntry::Type;
+        using StagingEntry  = Clusters::AccessControl::Structs::AccessControlEntryStruct::Type;
         using StagingTarget = Clusters::AccessControl::Structs::Target::Type;
 
     public:

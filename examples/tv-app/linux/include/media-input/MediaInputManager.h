@@ -22,7 +22,7 @@
 #include <app/clusters/media-input-server/media-input-server.h>
 #include <vector>
 
-using InputInfoType = chip::app::Clusters::MediaInput::Structs::InputInfo::Type;
+using InputInfoType = chip::app::Clusters::MediaInput::Structs::InputInfoStruct::Type;
 
 class MediaInputManager : public chip::app::Clusters::MediaInput::Delegate
 {
@@ -39,7 +39,7 @@ public:
 
 protected:
     uint8_t mCurrentInput;
-    std::vector<chip::app::Clusters::MediaInput::Structs::InputInfo::Type> mInputs;
+    std::vector<chip::app::Clusters::MediaInput::Structs::InputInfoStruct::Type> mInputs;
     // Magic numbers are here on purpose, please allocate memory
     char mCharDataBuffer[10][32];
 };

@@ -16,14 +16,12 @@
  */
 
 #include "app/util/common.h"
-#include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/command-id.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/print-cluster.h>
-#include <app/util/af-event.h>
 #include <app/util/af.h>
-#include <app/util/ember-compatibility-functions.h>
+#include <app/util/config.h>
 #include <app/util/generic-callbacks.h>
 
 // TODO: figure out a clear path for compile-time codegen
@@ -41,38 +39,10 @@ using namespace chip;
 //------------------------------------------------------------------------------
 // Globals
 
-#ifdef EMBER_AF_ENABLE_STATISTICS
-// a variable containing the number of messages send from the utilities
-// since emberAfInit was called.
-uint32_t afNumPktsSent;
-#endif
-
 const EmberAfClusterName zclClusterNames[] = {
     CLUSTER_IDS_TO_NAMES            // defined in print-cluster.h
     { kInvalidClusterId, nullptr }, // terminator
 };
-
-// A pointer to the current command being processed
-// This struct is allocated inside ember-compatibility-functions.cpp.
-// The pointer below is set to NULL when not processing a command.
-EmberAfClusterCommand * emAfCurrentCommand;
-
-// A pointer to the global exchange manager
-chip::Messaging::ExchangeManager * emAfExchangeMgr = nullptr;
-
-// DEPRECATED.
-uint8_t emberAfIncomingZclSequenceNumber = 0xFF;
-
-// Sequence used for outgoing messages if they are
-// not responses.
-uint8_t emberAfSequenceNumber = 0xFF;
-
-static uint8_t /*enum EmberAfRetryOverride*/ emberAfApsRetryOverride                      = EMBER_AF_RETRY_OVERRIDE_NONE;
-static uint8_t /*enum EmberAfDisableDefaultResponse*/ emAfDisableDefaultResponse          = EMBER_AF_DISABLE_DEFAULT_RESPONSE_NONE;
-static uint8_t /*enum EmberAfDisableDefaultResponse*/ emAfSavedDisableDefaultResponseVale = EMBER_AF_DISABLE_DEFAULT_RESPONSE_NONE;
-
-// Holds the response type
-uint8_t emberAfResponseType = ZCL_UTIL_RESP_NORMAL;
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
@@ -85,8 +55,7 @@ bool emberAfIsDeviceIdentifying(EndpointId endpoint)
 {
 #ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
     uint16_t identifyTime;
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, app::Clusters::Identify::Id, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
-                                                      (uint8_t *) &identifyTime, sizeof(identifyTime));
+    EmberAfStatus status = app::Clusters::Identify::Attributes::IdentifyTime::Get(endpoint, &identifyTime);
     return (status == EMBER_ZCL_STATUS_SUCCESS && 0 < identifyTime);
 #else
     return false;
@@ -132,42 +101,19 @@ EmberAfDifferenceType emberAfGetDifference(uint8_t * pData, EmberAfDifferenceTyp
 // ****************************************
 // Initialize Clusters
 // ****************************************
-void emberAfInit(chip::Messaging::ExchangeManager * exchangeMgr)
+void emberAfInit()
 {
-    uint8_t i;
-#ifdef EMBER_AF_ENABLE_STATISTICS
-    afNumPktsSent = 0;
-#endif
-
-    emAfExchangeMgr = exchangeMgr;
-
-    for (i = 0; i < EMBER_SUPPORTED_NETWORKS; i++)
-    {
-        // FIXME: Do we need to support more than one network?
-        // emberAfPushNetworkIndex(i);
-        emberAfInitializeAttributes(EMBER_BROADCAST_ENDPOINT);
-        // emberAfPopNetworkIndex();
-    }
+    emberAfInitializeAttributes(EMBER_BROADCAST_ENDPOINT);
 
     MATTER_PLUGINS_INIT
 
     emAfCallInits();
 }
 
-void emberAfTick()
-{
-    // Call the AFV2-specific per-endpoint callbacks
-    // Anything that defines callbacks as void *TickCallback(void) is called in
-    // emAfInit(), which is a generated file
-#ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_CALLS
-    EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_CALLS
-#endif
-}
-
 // Cluster init functions that don't have a cluster implementation to define
 // them in.
+void MatterBallastConfigurationPluginServerInitCallback() {}
 void MatterBooleanStatePluginServerInitCallback() {}
-void MatterBridgedDeviceBasicPluginServerInitCallback() {}
 void MatterElectricalMeasurementPluginServerInitCallback() {}
 void MatterRelativeHumidityMeasurementPluginServerInitCallback() {}
 void MatterIlluminanceMeasurementPluginServerInitCallback() {}
@@ -193,16 +139,6 @@ void MatterProxyConfigurationPluginServerInitCallback() {}
 void MatterFanControlPluginServerInitCallback() {}
 
 // ****************************************
-// This function is called by the application when the stack goes down,
-// such as after a leave network. This allows zcl utils to clear state
-// that should not be kept when changing networks
-// ****************************************
-void emberAfStackDown()
-{
-    emberAfRegistrationAbortCallback();
-}
-
-// ****************************************
 // Print out information about each cluster
 // ****************************************
 
@@ -221,162 +157,10 @@ uint16_t emberAfFindClusterNameIndex(ClusterId cluster)
     return 0xFFFF;
 }
 
-// This function parses into the cluster name table, and tries to find
-// the index in the table that has the right cluster id.
-void emberAfDecodeAndPrintCluster(ClusterId cluster)
-{
-    uint16_t index = emberAfFindClusterNameIndex(cluster);
-    if (index == 0xFFFF)
-    {
-        static_assert(sizeof(ClusterId) == 4, "Adjust the print formatting");
-        emberAfPrint(emberAfPrintActiveArea, "(Unknown clus. [" ChipLogFormatMEI "])", ChipLogValueMEI(cluster));
-    }
-    else
-    {
-        emberAfPrint(emberAfPrintActiveArea, "(%p)", zclClusterNames[index].name);
-    }
-}
-
-// This function makes the assumption that
-// emberAfCurrentCommand will either be NULL
-// when invalid, or will have a valid mfgCode
-// when called.
-// If it is invalid, we just return the
-// EMBER_AF_NULL_MANUFACTURER_CODE, which we tend to use
-// for references to the standard library.
-uint16_t emberAfGetMfgCodeFromCurrentCommand()
-{
-    if (emberAfCurrentCommand() != nullptr)
-    {
-        return emberAfCurrentCommand()->mfgCode;
-    }
-
-    return EMBER_AF_NULL_MANUFACTURER_CODE;
-}
-
-// the caller to the library can set a flag to say do not respond to the
-// next ZCL message passed in to the library. Passing true means disable
-// the reply for the next ZCL message. Setting to false re-enables the
-// reply (in the case where the app disables it and then doesnt send a
-// message that gets parsed).
-void emberAfSetNoReplyForNextMessage(bool set)
-{
-    if (set)
-    {
-        emberAfResponseType |= ZCL_UTIL_RESP_NONE;
-    }
-    else
-    {
-        emberAfResponseType = static_cast<uint8_t>(emberAfResponseType & ~ZCL_UTIL_RESP_NONE);
-    }
-}
-
-void emberAfSetRetryOverride(EmberAfRetryOverride value)
-{
-    emberAfApsRetryOverride = value;
-}
-
-EmberAfRetryOverride emberAfGetRetryOverride()
-{
-    return (EmberAfRetryOverride) emberAfApsRetryOverride;
-}
-
-void emAfApplyRetryOverride(EmberApsOption * options)
-{
-    if (options == nullptr)
-    {
-        return;
-    }
-    if (emberAfApsRetryOverride == EMBER_AF_RETRY_OVERRIDE_SET)
-    {
-        *options |= EMBER_APS_OPTION_RETRY;
-    }
-    else if (emberAfApsRetryOverride == EMBER_AF_RETRY_OVERRIDE_UNSET)
-    {
-        *options = static_cast<EmberApsOption>(*options & ~EMBER_APS_OPTION_RETRY);
-    }
-    else
-    {
-        // MISRA requires ..else if.. to have terminating else.
-    }
-}
-
-void emberAfSetDisableDefaultResponse(EmberAfDisableDefaultResponse value)
-{
-    emAfDisableDefaultResponse = value;
-    if (value != EMBER_AF_DISABLE_DEFAULT_RESPONSE_ONE_SHOT)
-    {
-        emAfSavedDisableDefaultResponseVale = value;
-    }
-}
-
-EmberAfDisableDefaultResponse emberAfGetDisableDefaultResponse()
-{
-    return (EmberAfDisableDefaultResponse) emAfDisableDefaultResponse;
-}
-
-void emAfApplyDisableDefaultResponse(uint8_t * frame_control)
-{
-    if (frame_control == nullptr)
-    {
-        return;
-    }
-    if (emAfDisableDefaultResponse == EMBER_AF_DISABLE_DEFAULT_RESPONSE_ONE_SHOT)
-    {
-        emAfDisableDefaultResponse = emAfSavedDisableDefaultResponseVale;
-        *frame_control |= ZCL_DISABLE_DEFAULT_RESPONSE_MASK;
-    }
-    else if (emAfDisableDefaultResponse == EMBER_AF_DISABLE_DEFAULT_RESPONSE_PERMANENT)
-    {
-        *frame_control |= ZCL_DISABLE_DEFAULT_RESPONSE_MASK;
-    }
-    else
-    {
-        // MISRA requires ..else if.. to have terminating else.
-    }
-}
-
-EmberStatus emberAfSendImmediateDefaultResponse(EmberAfStatus status)
-{
-    return emberAfSendDefaultResponse(emberAfCurrentCommand(), status);
-}
-
-EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberAfStatus status)
-{
-    // Default Response commands are only sent in response to unicast commands.
-    if (cmd->type != EMBER_INCOMING_UNICAST && cmd->type != EMBER_INCOMING_UNICAST_REPLY)
-    {
-        return EMBER_SUCCESS;
-    }
-
-    if (!chip::app::Compatibility::IMEmberAfSendDefaultResponseWithCallback(status))
-    {
-        // Caller is not responding to anything!
-        return EMBER_ERR_FATAL;
-    }
-
-    return EMBER_SUCCESS;
-}
-
 void emberAfCopyInt16u(uint8_t * data, uint16_t index, uint16_t x)
 {
     data[index]     = (uint8_t)(((x)) & 0xFF);
     data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
-}
-
-void emberAfCopyInt24u(uint8_t * data, uint16_t index, uint32_t x)
-{
-    data[index]     = (uint8_t)(((x)) & 0xFF);
-    data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
-    data[index + 2] = (uint8_t)(((x) >> 16) & 0xFF);
-}
-
-void emberAfCopyInt32u(uint8_t * data, uint16_t index, uint32_t x)
-{
-    data[index]     = (uint8_t)(((x)) & 0xFF);
-    data[index + 1] = (uint8_t)(((x) >> 8) & 0xFF);
-    data[index + 2] = (uint8_t)(((x) >> 16) & 0xFF);
-    data[index + 3] = (uint8_t)(((x) >> 24) & 0xFF);
 }
 
 void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size)
@@ -508,160 +292,10 @@ int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t
     return 0;
 }
 
-#if 0
-// Moving to time-util.c
-int8_t emberAfCompareDates(EmberAfDate* date1, EmberAfDate* date2)
-{
-  uint32_t val1 = emberAfEncodeDate(date1);
-  uint32_t val2 = emberAfEncodeDate(date2);
-  return (val1 == val2) ? 0 : ((val1 < val2) ? -1 : 1);
-}
-#endif
-
 // Zigbee spec says types between signed 8 bit and signed 64 bit
 bool emberAfIsTypeSigned(EmberAfAttributeType dataType)
 {
     return (dataType >= ZCL_INT8S_ATTRIBUTE_TYPE && dataType <= ZCL_INT64S_ATTRIBUTE_TYPE);
-}
-
-uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, const uint8_t * appendingChars,
-                                uint8_t appendingCharsLen)
-{
-    uint8_t freeChars;
-    uint8_t curLen;
-    uint8_t charsToWrite;
-
-    if ((zclString == nullptr) || (zclStringMaxLen == 0) || (appendingChars == nullptr) || (appendingCharsLen == 0))
-    {
-        return 0;
-    }
-
-    curLen = emberAfStringLength(zclString);
-
-    if ((zclString[0] == 0xFF) || (curLen >= zclStringMaxLen))
-    {
-        return 0;
-    }
-
-    freeChars    = static_cast<uint8_t>(zclStringMaxLen - curLen);
-    charsToWrite = (freeChars > appendingCharsLen) ? appendingCharsLen : freeChars;
-
-    memcpy(&zclString[1 + curLen], // 1 is to account for zcl's length byte
-           appendingChars, charsToWrite);
-    // Cast is safe, because the sum can't be bigger than zclStringMaxLen.
-    zclString[0] = static_cast<uint8_t>(curLen + charsToWrite);
-    return charsToWrite;
-}
-
-/*
-   On each page, first channel maps to channel number zero and so on.
-   Example:
-   page    Band      Rage of 90 channels    Per page channel mapping
-   28     863 MHz        0-26                    0-26
-   29     863 MHz        27-34,62                0-8 (Here 7th channel maps to 34 and 8th to 62)
-   30     863 MHz        35 - 61                 0-26
-   31     915            0-26                    0-26
-
- */
-EmberStatus emAfValidateChannelPages(uint8_t page, uint8_t channel)
-{
-    switch (page)
-    {
-    case 0:
-        if (!((channel <= EMBER_MAX_802_15_4_CHANNEL_NUMBER) &&
-              ((EMBER_MIN_802_15_4_CHANNEL_NUMBER == 0) || (channel >= EMBER_MIN_802_15_4_CHANNEL_NUMBER))))
-        {
-            return EMBER_PHY_INVALID_CHANNEL;
-        }
-        break;
-    case 28:
-    case 30:
-    case 31:
-        if (channel > EMBER_MAX_SUBGHZ_CHANNEL_NUMBER_ON_PAGES_28_30_31)
-        {
-            return EMBER_PHY_INVALID_CHANNEL;
-        }
-        break;
-    case 29:
-        if (channel > EMBER_MAX_SUBGHZ_CHANNEL_NUMBER_ON_PAGE_29)
-        {
-            return EMBER_PHY_INVALID_CHANNEL;
-        }
-        break;
-    default:
-        return EMBER_PHY_INVALID_CHANNEL;
-        break;
-    }
-    return EMBER_SUCCESS;
-}
-
-void slabAssert(const char * file, int line)
-{
-    (void) file; // Unused parameter
-    (void) line; // Unused parameter
-    // Wait forever until the watchdog fires
-    while (true)
-    {
-    }
-}
-
-#define ENCODED_8BIT_CHANPG_PAGE_MASK 0xE0         // top 3 bits
-#define ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_0 0x00  // 0b000xxxxx
-#define ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_28 0x80 // 0b100xxxxx
-#define ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_29 0xA0 // 0b101xxxxx
-#define ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_30 0xC0 // 0b110xxxxx
-#define ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_31 0xE0 // 0b111xxxxx
-
-#define ENCODED_8BIT_CHANPG_CHANNEL_MASK 0x1F // bottom 5 bits
-
-uint8_t emberAfGetPageFrom8bitEncodedChanPg(uint8_t chanPg)
-{
-    switch (chanPg & ENCODED_8BIT_CHANPG_PAGE_MASK)
-    {
-    case ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_0:
-        return 0;
-    case ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_28:
-        return 28;
-    case ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_29:
-        return 29;
-    case ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_30:
-        return 30;
-    case ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_31:
-        return 31;
-    default:
-        return 0xFF;
-    }
-}
-
-uint8_t emberAfGetChannelFrom8bitEncodedChanPg(uint8_t chanPg)
-{
-    return chanPg & ENCODED_8BIT_CHANPG_CHANNEL_MASK;
-}
-
-uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel)
-{
-    if (emAfValidateChannelPages(page, channel) != EMBER_SUCCESS)
-    {
-        return 0xFF;
-    }
-
-    switch (page)
-    {
-    case 28:
-        return channel | ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_28;
-    case 29:
-        return channel | ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_29;
-    case 30:
-        return channel | ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_30;
-    case 31:
-        return channel | ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_31;
-    default:
-        // Strictly speaking, we only need case 0 here, but MISRA in its infinite
-        // wisdom requires a default case. Since we have validated the arguments
-        // already, and 0 is the only remaining case, we simply treat the default
-        // as case 0 to make MISRA happy.
-        return channel | ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_0;
-    }
 }
 
 bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
@@ -679,9 +313,4 @@ bool emberAfIsKnownVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId 
     }
 
     return !metadata->IsAutomaticallyPersisted() && !metadata->IsExternal();
-}
-
-chip::Messaging::ExchangeManager * chip::ExchangeManager()
-{
-    return emAfExchangeMgr;
 }

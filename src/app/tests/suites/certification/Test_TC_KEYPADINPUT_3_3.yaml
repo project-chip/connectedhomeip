@@ -36,11 +36,11 @@ tests:
       command: "SendKey"
       arguments:
           values:
-              - name: "keyCode"
+              - name: "KeyCode"
                 value: 0x21
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Send Numbers2"
@@ -48,11 +48,11 @@ tests:
       command: "SendKey"
       arguments:
           values:
-              - name: "keyCode"
+              - name: "KeyCode"
                 value: 0x22
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Send Numbers3"
@@ -60,11 +60,11 @@ tests:
       command: "SendKey"
       arguments:
           values:
-              - name: "keyCode"
+              - name: "KeyCode"
                 value: 0x23
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Send Numbers4"
@@ -72,11 +72,11 @@ tests:
       command: "SendKey"
       arguments:
           values:
-              - name: "keyCode"
+              - name: "KeyCode"
                 value: 0x24
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Send Numbers5"
@@ -84,11 +84,11 @@ tests:
       command: "SendKey"
       arguments:
           values:
-              - name: "keyCode"
+              - name: "KeyCode"
                 value: 0x25
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Send Numbers6"
@@ -96,11 +96,11 @@ tests:
       command: "SendKey"
       arguments:
           values:
-              - name: "keyCode"
+              - name: "KeyCode"
                 value: 0x26
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Send Numbers7"
@@ -108,11 +108,11 @@ tests:
       command: "SendKey"
       arguments:
           values:
-              - name: "keyCode"
+              - name: "KeyCode"
                 value: 0x27
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Send Numbers8"
@@ -120,11 +120,11 @@ tests:
       command: "SendKey"
       arguments:
           values:
-              - name: "keyCode"
+              - name: "KeyCode"
                 value: 0x28
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
 
     - label: "Send Numbers9"
@@ -132,9 +132,9 @@ tests:
       command: "SendKey"
       arguments:
           values:
-              - name: "keyCode"
+              - name: "KeyCode"
                 value: 0x29
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0

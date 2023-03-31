@@ -309,6 +309,37 @@ cert_lifetime=4294967295
     "$chip_cert_tool" gen-att-cert --type d --subject-cn "Matter Test DAC $dac" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from_1sec_before_in_future" --lifetime "$cert_lifetime_1year" --ca-key "$pai_key_file".pem --ca-cert "$pai_cert_file".pem --out-key "$dac_key_file".pem --out "$dac_cert_file".pem
 }
 
+# Set #7:
+#   - Generate new PAA to resign already generated PAIs
+{
+    vid=FFF2
+    pid=8001
+
+    paa_key_file="$dest_dir/Chip-Test-PAA-NoVID-Key"
+    paa_cert_file="$dest_dir/Chip-Test-PAA-NoVID-ToResignPAIs-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type a --subject-cn "Matter Test PAA To Resign PAIs" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --key "$paa_key_file".pem --out "$paa_cert_file".pem
+
+    pai_key_file="$dest_dir/Chip-Test-PAI-$vid-$pid-Key"
+    pai_cert_file="$dest_dir/Chip-Test-PAI-$vid-$pid-Resigned-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type i --subject-cn "Matter Test PAI" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --ca-key "$paa_key_file".pem --ca-cert "$paa_cert_file".pem --key "$pai_key_file".pem --out "$pai_cert_file".pem
+
+    pai_cert_file="$dest_dir/Chip-Test-PAI-$vid-$pid-ResignedSubjectDiff-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type i --subject-cn "Matter Test PAI Resigned" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --ca-key "$paa_key_file".pem --ca-cert "$paa_cert_file".pem --key "$pai_key_file".pem --out "$pai_cert_file".pem
+
+    pai_key_file="$dest_dir/Chip-Test-PAI-$vid-$pid-ResignedSKIDDiff-Key"
+    pai_cert_file="$dest_dir/Chip-Test-PAI-$vid-$pid-ResignedSKIDDiff-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type i --subject-cn "Matter Test PAI" --subject-vid "$vid" --subject-pid "$pid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --ca-key "$paa_key_file".pem --ca-cert "$paa_cert_file".pem --out-key "$pai_key_file".pem --out "$pai_cert_file".pem
+
+    pai_key_file="$dest_dir/Chip-Test-PAI-$vid-NoPID-Key"
+    pai_cert_file="$dest_dir/Chip-Test-PAI-$vid-NoPID-Resigned-Cert"
+
+    "$chip_cert_tool" gen-att-cert --type i --subject-cn "Matter Test PAI" --subject-vid "$vid" --valid-from "$cert_valid_from" --lifetime "$cert_lifetime" --ca-key "$paa_key_file".pem --ca-cert "$paa_cert_file".pem --key "$pai_key_file".pem --out "$pai_cert_file".pem
+}
+
 # In addition to PEM format also create certificates in DER form.
 for cert_file_pem in "$dest_dir"/*Cert.pem; do
     cert_file_der="${cert_file_pem/.pem/.der}"
@@ -366,7 +397,7 @@ namespace TestCerts {
     printf "$header_includes" >>"$output_cstyle_file".h
     printf "$namespaces_open\n" >>"$output_cstyle_file".cpp
     printf "$namespaces_open\n" >>"$output_cstyle_file".h
-    for cert_file_pem in credentials/test/attestation/*Cert.pem; do
+    for cert_file_pem in "$dest_dir"/*Cert.pem; do
         params_prefix="${cert_file_pem/*Chip-Test/sTestCert}"
         params_prefix="${params_prefix//-/_}"
         params_prefix="${params_prefix/_Cert.pem/}"
@@ -387,24 +418,31 @@ namespace TestCerts {
             printf "};\n\n"
             printf "extern const ByteSpan ${params_prefix}_SKID = ByteSpan(${params_prefix}_SKID_Array);\n\n"
 
-            printf "// \${chip_root}/$key_file_pem\n\n"
+            # Print key data if present
+            if test -f "$key_file_pem"; then
+                printf "// \${chip_root}/$key_file_pem\n\n"
 
-            printf "constexpr uint8_t ${params_prefix}_PublicKey_Array[] = {\n"
-            openssl ec -text -noout -in "$key_file_pem" | sed '0,/pub:$/d' | sed '/ASN1 OID:/,$d' | sed 's/:/ /g' | sed 's/\</0x/g' | sed 's/\>/,/g' | sed "s/^[ \t]*/    /" | sed 's/ *$//'
-            printf "};\n\n"
-            printf "extern const ByteSpan ${params_prefix}_PublicKey = ByteSpan(${params_prefix}_PublicKey_Array);\n\n"
+                printf "constexpr uint8_t ${params_prefix}_PublicKey_Array[] = {\n"
+                openssl ec -text -noout -in "$key_file_pem" | sed '0,/pub:$/d' | sed '/ASN1 OID:/,$d' | sed 's/:/ /g' | sed 's/\</0x/g' | sed 's/\>/,/g' | sed "s/^[ \t]*/    /" | sed 's/ *$//'
+                printf "};\n\n"
+                printf "extern const ByteSpan ${params_prefix}_PublicKey = ByteSpan(${params_prefix}_PublicKey_Array);\n\n"
 
-            printf "constexpr uint8_t ${params_prefix}_PrivateKey_Array[] = {\n"
-            openssl ec -text -noout -in "$key_file_pem" | sed '0,/priv:$/d' | sed '/pub:/,$d' | sed 's/:/ /g' | sed 's/\</0x/g' | sed 's/\>/,/g' | sed "s/^[ \t]*/    /" | sed 's/ *$//'
-            printf "};\n\n"
-            printf "extern const ByteSpan ${params_prefix}_PrivateKey = ByteSpan(${params_prefix}_PrivateKey_Array);\n\n"
+                printf "constexpr uint8_t ${params_prefix}_PrivateKey_Array[] = {\n"
+                openssl ec -text -noout -in "$key_file_pem" | sed '0,/priv:$/d' | sed '/pub:/,$d' | sed 's/:/ /g' | sed 's/\</0x/g' | sed 's/\>/,/g' | sed "s/^[ \t]*/    /" | sed 's/ *$//'
+                printf "};\n\n"
+                printf "extern const ByteSpan ${params_prefix}_PrivateKey = ByteSpan(${params_prefix}_PrivateKey_Array);\n\n"
+            fi
         } >>"$output_cstyle_file".cpp
 
         {
             printf "extern const ByteSpan ${params_prefix}_Cert;\n"
             printf "extern const ByteSpan ${params_prefix}_SKID;\n"
-            printf "extern const ByteSpan ${params_prefix}_PublicKey;\n"
-            printf "extern const ByteSpan ${params_prefix}_PrivateKey;\n\n"
+            # Print key data if present
+            if test -f "$key_file_pem"; then
+                printf "extern const ByteSpan ${params_prefix}_PublicKey;\n"
+                printf "extern const ByteSpan ${params_prefix}_PrivateKey;\n"
+            fi
+            printf "\n"
         } >>"$output_cstyle_file".h
 
     done

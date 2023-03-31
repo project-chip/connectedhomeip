@@ -22,8 +22,8 @@ The selection of enabled clusters and files is done using
 [ZAP](https://github.com/project-chip/zap). You can download a recent release of
 zap from its [releases page](https://github.com/project-chip/zap/releases). It
 is recommended to download a release that is in sync with the currently in use
-version by the SDK (see `integrations/docker/images/chip-build/Dockerfile` and
-check the `ZAP_VERSION` setting).
+version by the SDK (see `scripts/setup/zap.json` and
+`scripts/tools/zap/zap_execution.py` for the minimum supported version).
 
 Beyond basic zap file selection, there are also `.json` zap settings that define
 additional cluster info: source XML files, sdk-access methods and data types.
@@ -36,9 +36,17 @@ There are only two such files currently in use:
 
 ### Installing zap and environment variables
 
-Matter scripts may need to invoke `zap-cli` (for code generation) or `zap` (to
-start the UI tool). For this, scrips need to know where to find the commands. In
-the following order, the scripts process these environment variables:
+ZAP is generally installed as a third-party tool via CIPD during the build
+environment bootstrap (see `scripts/setup/zap.json`), which makes `zap-cli`
+available in `$PATH` when running in a build environment.
+
+**NOTE**: zap packages are currently NOT available for `arm64` (like when
+compiling on Raspberry PI.). In these cases one should check out zap from source
+and set `$ZAP_DEVELOPMENT_PATH` as described below.
+
+When matter scripts need to invoke `zap-cli` (for code generation) or `zap` (to
+start the UI tool), they make use of the following environment variables to
+figure out where the zap tool is located (in order of precedence):
 
 -   if `$ZAP_DEVELOPMENT_PATH` is set, code assumes you are running zap from
     source. Use this if you develop zap. Zap has to be bootstrapped (generally
@@ -48,7 +56,8 @@ the following order, the scripts process these environment variables:
 -   if `$ZAP_INSTALL_PATH` is set, code assumes that `zap` or `zap-cli` is
     available in the given path. This is generally an unpacked release.
 
--   otherwise, scripts will assume `zap`/`zap-cli` is in `$PATH`
+-   otherwise, scripts will assume `zap`/`zap-cli` is in `$PATH` (this is the
+    case when running in a bootstrapped environment)
 
 ### Using a UI to edit `.zap` files
 
@@ -84,9 +93,10 @@ specific codegen.
 ### `*.matter` parsing and codegen
 
 `*.matter` files are both human and machine readable. Code that can process
-these files is available at `scripts/idl` and `scripts/codegen.py`. You can read
-the [scripts/idl/README.md](../scripts/idl/README.md) for details of how things
-work.
+these files is available at `scripts/py_matter_idl` and `scripts/codegen.py`.
+You can read the
+[scripts/py_matter_idl/matter_idl/README.md](../scripts/py_matter_idl/matter_idl/README.md)
+for details of how things work.
 
 `scripts/codegen.py` can generate various outputs based on an input `*.matter`
 file.
@@ -171,17 +181,33 @@ Additionally, individual code regeneration can be done using
 
 ```bash
 /scripts/tools/zap/generate.py                       \
-    examples/bridge-app/bridge-common/bridge-app.zap \
-    -o zzz_generated/bridge-app/zap-generated
+    examples/bridge-app/bridge-common/bridge-app.zap
 ```
 
-### `*.matter` code generation
+The above will just generate a `<app>.matter` file along side the `.zap` file,
+as this is the only file that requires updates for applications. You can code
+generate other things by passing in the `-t/--templates` argument to
+generate.py. In those cases, you may also need to specify an output directory
+via `-o/--output-dir`.
 
-`*.matter` code generation can be done either at compile time or it can use
-pre-generated output.
+#### Flow for updating an application zap file:
 
-Rules for how `codegen.py` is invoked and how includes/sources are set are
-defined at:
+```
+# use zap UI to edit the file (or edit zap file in any other way)
+./scripts/tools/zap/run_zaptool.sh $PATH_TO_ZAP_FILE
+
+# re-generate .matter file. Note that for .matter file generation, output
+# directory is NOT used
+./scripts/tools/zap/generate.py $PATH_TO_ZAP_FILE
+```
+
+### Compile-time code generation / pre-generated code
+
+A subset of code generation (both `codegen.py` and `zap-cli`) is done at compile
+time or can use pre-generated output (based on gn/cmake arguments)
+
+Rules for how `generate.py`/`codegen.py` is invoked at compile time are defined
+at:
 
 -   `src/app/chip_data_model.cmake`
 -   `src/app/chip_data_model.gni`
@@ -198,11 +224,97 @@ Code pre-generation can be used:
     generation at build time or to save the code generation time at the expense
     of running code generation for every possible zap/generation type
 -   To check changes in generated code across versions, beyond the comparisons
-    of golden image tests in `scripts/idl/tests`
+    of golden image tests in `scripts/py_matter_idl/matter_idl/tests`
 
-The script to trigger code pre-generation is `scripts/code_pregenerate.py` and
+The script to trigger code pre-generation is `scripts/codepregen.py` and
 requires the pre-generation output directory as an argument
 
 ```bash
-scripts/code_pregenerate.py ${OUTPUT_DIRECTORY:-./zzz_pregenerated/}
+scripts/codepregen.py ${OUTPUT_DIRECTORY:-./zzz_pregenerated/}
+
+# To generate a single output you can use `--input-glob`:
+
+scripts/codepregen.py --input-glob "*all-clusters*" ${OUTPUT_DIRECTORY:-./zzz_pregenerated/}
+```
+
+### Using pre-generated code
+
+Instead of generating code at compile time, the chip build system accepts usage
+of a pre-generated folder. It assumes the structure that `codepregen.py`
+creates. To invoke use:
+
+-   `build_examples.py` builds accept `--pregen-dir` as an argument, such as:
+
+    ```shell
+    ./scripts/build/build_examples.py --target $TARGET --pregen-dir $PREGEN_DIR build
+    ```
+
+-   `gn` builds allow setting `chip_code_pre_generated_directory` as an
+    argument, such as:
+
+    ```shell
+    gn gen --check --fail-on-unused-args --args='chip_code_pre_generated_directory="/some/pregen/dir"'
+    ```
+
+-   `cmake` builds allow setting `CHIP_CODEGEN_PREGEN_DIR` variable (which will
+    get propagated to the underlying `gn` builds as needed), such as:
+
+    ```shell
+
+    west build --cmake-only \
+        -d /workspace/out/nrf-nrf5340dk-light \
+        -b nrf5340dk_nrf5340_cpuapp \
+        /workspace/examples/lighting-app/nrfconnect
+        -- -DCHIP_CODEGEN_PREGEN_DIR=/some/pregen/dir
+
+    idf.py -C examples/all-clusters-app/esp32 \
+        -B /workspace/out/esp32-m5stack-all-clusters \
+        -DCHIP_CODEGEN_PREGEN_DIR=/some/pregen/dir \
+        reconfigure
+
+    cmake -S /workspace/examples/lighting-app/mbed \
+          -B /workspace/out/mbed-cy8cproto_062_4343w-light \
+          -GNinja \
+          -DMBED_OS_PATH=/workspace/third_party/mbed-os/repo \
+          -DMBED_OS_PATH=/workspace/third_party/mbed-os/repo \
+          -DMBED_OS_POSIX_SOCKET_PATH=/workspace/third_party/mbed-os-posix-socket/repo \
+          -DCHIP_CODEGEN_PREGEN_DIR=/some/pregen/dir
+    ```
+
+### Code generation unit testing
+
+Code generation is assumed stable between builds and the build system aims to
+detect changes in code gen using golden image tests.
+
+#### `codegen.py` tests
+
+These tests run against golden inputs/outputs from `scripts/idl/tests`.
+
+`available_tests.yaml` contains the full list of expected generators and outputs
+and the test is run via `test_generators.py`. Use the environment variable
+`IDL_GOLDEN_REGENERATE` to force golden image replacement during running of
+`ninja check`:
+
+```shell
+IDL_GOLDEN_REGENERATE=1 ninja check
+```
+
+#### `generate.py` tests
+
+These tests run against golden inputs/outputs from `scripts/tools/zap/tests`.
+
+`available_tests.yaml` contains the full list of expected generators and outputs
+and the test is run via `scripts/tools/zap/test_generate.py`. Use the
+environment variable `ZAP_GENERATE_GOLDEN_REGENERATE` to force golden image
+replacement during running of `ninja check`.
+
+```shell
+ZAP_GENERATE_GOLDEN_REGENERATE=1 ninja check
+```
+
+Alternatively, the golden image can also be re-generated by running the
+stand-alone test in a bootstrapped environment:
+
+```shell
+./scripts/tools/zap/test_generate.py --output out/gen --regenerate
 ```

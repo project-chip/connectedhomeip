@@ -53,12 +53,15 @@ class HostApp(Enum):
     CERT_TOOL = auto()
     OTA_PROVIDER = auto()
     OTA_REQUESTOR = auto()
+    SIMULATED_APP1 = auto()
+    SIMULATED_APP2 = auto()
     PYTHON_BINDINGS = auto()
     EFR32_TEST_RUNNER = auto()
     TV_CASTING = auto()
     BRIDGE = auto()
     DYNAMIC_BRIDGE = auto()
     JAVA_MATTER_CONTROLLER = auto()
+    CONTACT_SENSOR = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -87,6 +90,8 @@ class HostApp(Enum):
             return 'shell/standalone'
         elif self == HostApp.OTA_PROVIDER:
             return 'ota-provider-app/linux'
+        elif self in [HostApp.SIMULATED_APP1, HostApp.SIMULATED_APP2]:
+            return 'placeholder/linux/'
         elif self == HostApp.OTA_REQUESTOR:
             return 'ota-requestor-app/linux'
         elif self in [HostApp.ADDRESS_RESOLVE, HostApp.TESTS, HostApp.PYTHON_BINDINGS, HostApp.CERT_TOOL]:
@@ -101,6 +106,8 @@ class HostApp(Enum):
             return 'dynamic-bridge-app/linux'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             return 'java-matter-controller'
+        elif self == HostApp.CONTACT_SENSOR:
+            return 'contact-sensor-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -152,6 +159,12 @@ class HostApp(Enum):
         elif self == HostApp.CERT_TOOL:
             yield 'chip-cert'
             yield 'chip-cert.map'
+        elif self == HostApp.SIMULATED_APP1:
+            yield 'chip-app1'
+            yield 'chip-app1.map'
+        elif self == HostApp.SIMULATED_APP2:
+            yield 'chip-app2'
+            yield 'chip-app2.map'
         elif self == HostApp.OTA_PROVIDER:
             yield 'chip-ota-provider-app'
             yield 'chip-ota-provider-app.map'
@@ -174,6 +187,9 @@ class HostApp(Enum):
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             yield 'java-matter-controller'
             yield 'java-matter-controller.map'
+        elif self == HostApp.CONTACT_SENSOR:
+            yield 'contact-sensor-app'
+            yield 'contact-sensor-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -229,6 +245,7 @@ class HostBuilder(GnBuilder):
                  use_coverage=False, use_dmalloc=False,
                  minmdns_address_policy=None,
                  minmdns_high_verbosity=False,
+                 imgui_ui=False,
                  crypto_library: HostCryptoLibrary = None):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -281,6 +298,9 @@ class HostBuilder(GnBuilder):
 
         if use_libfuzzer:
             self.extra_gn_options.append('is_libfuzzer=true')
+
+        if imgui_ui:
+            self.extra_gn_options.append('chip_examples_enable_imgui_ui=true')
 
         self.use_coverage = use_coverage
         if use_coverage:
@@ -340,6 +360,12 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('enable_rtti=false')
             self.extra_gn_options.append('chip_project_config_include_dirs=["//config/python"]')
             self.build_command = 'chip-repl'
+
+        if self.app == HostApp.SIMULATED_APP1:
+            self.extra_gn_options.append('chip_tests_zap_config="app1"')
+
+        if self.app == HostApp.SIMULATED_APP2:
+            self.extra_gn_options.append('chip_tests_zap_config="app2"')
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:

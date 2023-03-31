@@ -34,7 +34,7 @@ tests:
     - label: "Read the mandatory attribute: TemperatureDisplayMode"
       PICS: TSUIC.S.A0000
       command: "readAttribute"
-      attribute: "temperature display mode"
+      attribute: "TemperatureDisplayMode"
       response:
           constraints:
               type: enum8
@@ -44,7 +44,7 @@ tests:
     - label: "Read the mandatory attribute: KeypadLockout"
       PICS: TSUIC.S.A0001
       command: "readAttribute"
-      attribute: "keypad lockout"
+      attribute: "KeypadLockout"
       response:
           constraints:
               type: enum8
@@ -54,7 +54,7 @@ tests:
     - label: "Read the optional attribute: ScheduleProgrammingVisibility"
       PICS: TSUIC.S.A0002
       command: "readAttribute"
-      attribute: "schedule programming visibility"
+      attribute: "ScheduleProgrammingVisibility"
       response:
           constraints:
               type: enum8

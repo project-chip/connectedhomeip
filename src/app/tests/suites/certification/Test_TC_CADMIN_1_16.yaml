@@ -29,6 +29,9 @@ config:
         type: node_id
         defaultValue: 0xC00FEE
     endpoint: 0
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
     discriminator:
         type: int16u
         defaultValue: 3840
@@ -44,7 +47,7 @@ tests:
 
     - label: "Precondition: Reset Devices to factory defaults"
       verification: |
-          Not implemented in YAML
+          Reset Devices to factory defaults
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -67,7 +70,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -75,8 +78,14 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
@@ -102,7 +111,7 @@ tests:
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
       identity: "alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       PICS: CADMIN.S.C01.Rsp
@@ -110,8 +119,14 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     - label: "TH_CR3 Commissions with DUT_CE"
       PICS: CADMIN.S
@@ -135,6 +150,15 @@ tests:
               - name: "nodeId"
                 value: nodeId3
 
+    - label:
+          "TH3 reads CurrentFabricIndex attribute and save it for future use."
+      identity: "gamma"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: TH3FabricIndex
+
     - label: "TH_CR2 reads the list of Fabrics on DUT_CE"
       identity: "beta"
       cluster: "Operational Credentials"
@@ -145,9 +169,9 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, nodeId: nodeId },
-                  { Label: "", FabricIndex: 2, nodeId: nodeId2 },
-                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 2, NodeID: nodeId2 },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
               ]
           constraints:
               type: list
@@ -184,7 +208,9 @@ tests:
       verification: |
           Using TH_CR2 read attribute
 
-          ./chip-tool basic read node-label 2 0  --commissioner-name beta
+          Verify read command fail as expected since the DUT_CE is no longer on the network on TH_CR2 (chip-tool) log
+
+          ./chip-tool  basicinformation read node-label 2 0  --commissioner-name beta
 
           Received error (protocol code 2) during pairing process. ../../third_party/connectedhomeip/src/protocols/secure_channel/CASESession.cpp:1551: CHIP Error 0x00000054: Invalid CASE parameter
           [1651819620.929567][4359:4364] CHIP:CTL: OperationalDeviceProxy[B8070CD13C99D367:0000000000000002]: State change 3 --> 2
@@ -208,8 +234,8 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, nodeId: nodeId },
-                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
               ]
           constraints:
               type: list
@@ -217,15 +243,21 @@ tests:
     - label: "TH_CR1 opens a commissioning window on DUT_CE using BCM"
       identity: "alpha"
       PICS: CADMIN.S.C01.Rsp
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     - label: "TH_CR2 starts a commissioning process with DUT_CE"
       identity: "beta"
@@ -249,6 +281,15 @@ tests:
               - name: "nodeId"
                 value: nodeId2
 
+    - label:
+          "TH2 reads CurrentFabricIndex attribute and save it for future use."
+      identity: "beta"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: TH2FabricIndex
+
     - label: "TH_CR1 reads the list of Fabrics on DUT_CE"
       identity: "alpha"
       PICS: OPCREDS.S.A0001
@@ -259,9 +300,31 @@ tests:
       response:
           value:
               [
-                  { Label: "", FabricIndex: 1, nodeId: nodeId },
-                  { Label: "", FabricIndex: 4, nodeId: nodeId2 },
-                  { Label: "", FabricIndex: 3, nodeID: nodeId3 },
+                  { Label: "", FabricIndex: 1, NodeID: nodeId },
+                  { Label: "", FabricIndex: 4, NodeID: nodeId2 },
+                  { Label: "", FabricIndex: 3, NodeID: nodeId3 },
               ]
           constraints:
               type: list
+
+    - label: "Remove TH2 FabricIndex"
+      PICS: OPCREDS.S.C0a.Rsp && CADMIN.S
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: TH2FabricIndex
+
+    - label: "Remove TH3 FabricIndex"
+      PICS: OPCREDS.S.C0a.Rsp && CADMIN.S
+      identity: "gamma"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: TH3FabricIndex

@@ -69,6 +69,8 @@ public:
 
     void SetFabricIdForNextNOCRequest(FabricId fabricId) override { mNextFabricId = fabricId; }
 
+    void SetCATValuesForNextNOCRequest(CATValues cats) { mNextCATs = cats; }
+
     /**
      * @brief Initialize the issuer with the keypair in the storage.
      *        If the storage doesn't have one, it'll create one, and it to the storage.
@@ -123,6 +125,7 @@ private:
 
     NodeId mNextRequestedNodeId = 1;
     FabricId mNextFabricId      = 1;
+    CATValues mNextCATs         = kUndefinedCATs;
     bool mNodeIdRequested       = false;
     uint64_t mIndex             = 0;
 };

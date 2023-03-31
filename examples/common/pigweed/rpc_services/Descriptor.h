@@ -20,7 +20,6 @@
 
 #include "descriptor_service/descriptor_service.rpc.pb.h"
 
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>

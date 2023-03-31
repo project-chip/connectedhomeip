@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,9 @@ class Button
 {
 public:
     void Configure(const struct device * port, gpio_pin_t outPin, gpio_pin_t inPin, void (*callback)(void));
+    void Configure(const struct device * port, gpio_pin_t inPin, void (*callback)(void));
     void Poll(Button * previous);
+    void PollIRQ(void);
     void SetCallback(void (*callback)(void));
 
 private:
@@ -46,6 +48,7 @@ class ButtonManager
 public:
     void Init(void);
     void Poll(void);
+    void PollIRQ(void);
     void AddButton(Button & button);
     void SetCallback(unsigned int index, void (*callback)(void));
 

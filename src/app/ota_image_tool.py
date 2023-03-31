@@ -38,7 +38,7 @@ from enum import IntEnum
 
 sys.path.insert(0, os.path.join(
     os.path.dirname(__file__), '../controller/python'))
-from chip.tlv import TLVReader, TLVWriter, uint  # noqa: E402
+from chip.tlv import TLVReader, TLVWriter, uint  # noqa: E402 isort:skip
 
 HEADER_MAGIC = 0x1BEEF11E
 FIXED_HEADER_FORMAT = '<IQI'

@@ -23,11 +23,17 @@
 struct AppEvent;
 typedef void (*EventHandler)(AppEvent *);
 
+class LEDWidget;
+
 struct AppEvent
 {
     enum AppEventTypes
     {
         kEventType_Button = 0,
+        kEventType_Timer,
+        kEventType_UpdateLedState,
+        kEventType_IdentifyStart,
+        kEventType_IdentifyStop,
     };
 
     uint16_t Type;
@@ -38,6 +44,14 @@ struct AppEvent
         {
             uint8_t Action;
         } ButtonEvent;
+        struct
+        {
+            void * Context;
+        } TimerEvent;
+        struct
+        {
+            LEDWidget * LedWidget;
+        } UpdateLedStateEvent;
     };
 
     EventHandler Handler;

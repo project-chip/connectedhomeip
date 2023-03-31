@@ -23,12 +23,12 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_CURRENT_LIST_DIR}"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/pw_sys_io/public"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32"
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/lock"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed/esp32"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/lib/support"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/lock-app/"
                      "${CMAKE_CURRENT_LIST_DIR}/include"
                      "${IDF_PATH}/components/freertos/include/freertos"
                       SRC_DIRS
@@ -40,7 +40,6 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/common/pigweed/esp32"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated"
-                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/lock-app/zap-generated"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"
@@ -68,7 +67,7 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/door-lock-server"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/identify-server"
                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/groups-server"
-                     PRIV_REQUIRES bt chip QRCode)
+                     PRIV_REQUIRES bt chip QRCode nvs_flash driver)
 add_dependencies(${COMPONENT_LIB} app-codegen)
 
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
@@ -144,16 +143,13 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
 
 else (CONFIG_ENABLE_PW_RPC)
 idf_component_register(PRIV_INCLUDE_DIRS
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/lock-app/"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"                      
                       "${CMAKE_CURRENT_LIST_DIR}/include"
                       SRC_DIRS
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated/attributes"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/app-common/app-common/zap-generated"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/zzz_generated/lock-app/zap-generated"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"                      
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/route_hook"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/providers"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/shell_extension"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/common"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
@@ -186,7 +182,8 @@ idf_component_register(PRIV_INCLUDE_DIRS
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/door-lock-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/identify-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/groups-server"
-                      PRIV_REQUIRES chip QRCode bt)
+                     "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/lock"
+                      PRIV_REQUIRES chip QRCode bt nvs_flash driver)
 
 add_dependencies(${COMPONENT_LIB} app-codegen)
 
@@ -203,3 +200,4 @@ get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip
 include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
 
 chip_app_component_codegen("${CHIP_ROOT}/examples/lock-app/lock-common/lock-app.matter")
+chip_app_component_zapgen("${CHIP_ROOT}/examples/lock-app/lock-common/lock-app.zap")

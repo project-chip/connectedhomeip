@@ -89,7 +89,7 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
     CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
-    CHIP_ERROR _RequestSEDActiveMode(bool onOff);
+    CHIP_ERROR _RequestSEDActiveMode(bool onOff, bool delayIdle = false);
 #endif
 
     bool _HaveMeshConnectivity();
@@ -107,6 +107,8 @@ public:
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
 
     CHIP_ERROR _JoinerStart();
+
+    void _SetRouterPromotion(bool val);
 
     void _ResetThreadNetworkDiagnosticsCounts();
 

@@ -27,8 +27,8 @@ class CloseSessionCommand : public CHIPCommand
 {
 public:
     CloseSessionCommand(CredentialIssuerCommands * credIssuerCommands) :
-        CHIPCommand("close-session", credIssuerCommands), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
-        mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
+        CHIPCommand("close-session", credIssuerCommands, "Sends a CloseSession message to the given destination node id."),
+        mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this)
     {
         AddArgument("destination-id", 0, UINT64_MAX, &mDestinationId);
         AddArgument("timeout", 0, UINT64_MAX, &mTimeoutSecs,
@@ -47,7 +47,7 @@ private:
     chip::Optional<uint16_t> mTimeoutSecs;
 
     static void OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
-                                    chip::SessionHandle & sessionHandle);
+                                    const chip::SessionHandle & sessionHandle);
     static void OnDeviceConnectionFailureFn(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
     // Try to send the action CloseSession status report.

@@ -34,7 +34,7 @@ tests:
     - label: "TH reads the MinMeasuredValue attribute from the DUT"
       PICS: RH.S.A0001
       command: "readAttribute"
-      attribute: "min measured value"
+      attribute: "MinMeasuredValue"
       response:
           constraints:
               type: int16u
@@ -44,7 +44,7 @@ tests:
     - label: "TH reads the MaxMeasuredValue attribute from the DUT"
       PICS: RH.S.A0002
       command: "readAttribute"
-      attribute: "max measured value"
+      attribute: "MaxMeasuredValue"
       response:
           constraints:
               type: int16u
@@ -54,7 +54,7 @@ tests:
     - label: "TH reads the MeasuredValue attribute from the DUT"
       PICS: RH.S.A0000
       command: "readAttribute"
-      attribute: "measured value"
+      attribute: "MeasuredValue"
       response:
           constraints:
               type: int16u
@@ -64,7 +64,7 @@ tests:
     - label: "TH reads the Tolerance attribute from the DUT"
       PICS: RH.S.A0003
       command: "readAttribute"
-      attribute: "tolerance"
+      attribute: "Tolerance"
       response:
           constraints:
               type: int16u

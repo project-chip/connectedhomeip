@@ -67,12 +67,21 @@ bool hasNotifiedIPV4 = false;
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 bool hasNotifiedWifiConnectivity = false;
 
+/* Declare a flag to differentiate between after boot-up first IP connection or reconnection */
+bool is_wifi_disconnection_event = false;
+
+/* Declare a variable to hold connection time intervals */
+uint32_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
+
+#if (RSI_BLE_ENABLE)
+extern rsi_semaphore_handle_t sl_rs_ble_init_sem;
+#endif
+
 /*
  * This file implements the interface to the RSI SAPIs
  */
 static uint8_t wfx_rsi_drv_buf[WFX_RSI_BUF_SZ];
 wfx_wifi_scan_ext_t * temp_reset;
-uint8_t security;
 
 /******************************************************************
  * @fn   int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t *ap)
@@ -86,7 +95,7 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
 {
     int32_t status;
     uint8_t rssi;
-    ap->security = security;
+    ap->security = wfx_rsi.sec.security;
     ap->chan     = wfx_rsi.ap_chan;
     memcpy(&ap->bssid[0], &wfx_rsi.ap_mac.octet[0], BSSID_MAX_STR_LEN);
     status = rsi_wlan_get(RSI_RSSI, &rssi, sizeof(rssi));
@@ -174,6 +183,25 @@ int32_t wfx_rsi_disconnect()
 }
 
 /******************************************************************
+ * @fn   wfx_rsi_power_save()
+ * @brief
+ *       Setting the RS911x in DTIM sleep based mode
+ *
+ * @param[in] None
+ * @return
+ *        None
+ *********************************************************************/
+void wfx_rsi_power_save()
+{
+    int32_t status = rsi_wlan_power_save_profile(RSI_SLEEP_MODE_2, RSI_MAX_PSP);
+    if (status != RSI_SUCCESS)
+    {
+        WFX_RSI_LOG("Powersave Config Failed, Error Code : 0x%lX", status);
+        return;
+    }
+    WFX_RSI_LOG("Powersave Config Success");
+}
+/******************************************************************
  * @fn   wfx_rsi_join_cb(uint16_t status, const uint8_t *buf, const uint16_t len)
  * @brief
  *       called when driver join with cb
@@ -195,12 +223,9 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
          * We should enable retry.. (Need config variable for this)
          */
         WFX_RSI_LOG("%s: failed. retry: %d", __func__, wfx_rsi.join_retries);
-#if (WFX_RSI_CONFIG_MAX_JOIN != 0)
-        if (++wfx_rsi.join_retries < WFX_RSI_CONFIG_MAX_JOIN)
-#endif
-        {
+        wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries++);
+        if (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
             xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
-        }
     }
     else
     {
@@ -213,6 +238,8 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
 #else
         xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_CONN);
 #endif
+        wfx_rsi.join_retries = 0;
+        retryInterval        = WLAN_MIN_RETRY_TIMER_MS;
     }
 }
 
@@ -228,9 +255,10 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
  *********************************************************************/
 static void wfx_rsi_join_fail_cb(uint16_t status, uint8_t * buf, uint32_t len)
 {
-    WFX_RSI_LOG("%s: error: failed status: %02x on try %d", __func__, status, wfx_rsi.join_retries);
+    WFX_RSI_LOG("%s: error: failed status: %02x", __func__, status);
     wfx_rsi.join_retries += 1;
-    wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
+    wfx_rsi.dev_state &= ~(WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED);
+    is_wifi_disconnection_event = true;
     xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
 }
 #ifdef RS911X_SOCKETS
@@ -301,7 +329,7 @@ static int32_t wfx_rsi_init(void)
     status = rsi_driver_init(wfx_rsi_drv_buf, WFX_RSI_BUF_SZ);
     if ((status < RSI_DRIVER_STATUS) || (status > WFX_RSI_BUF_SZ))
     {
-        WFX_RSI_LOG("%s: error: RSI drv init failed with status: %02x", __func__, status);
+        WFX_RSI_LOG("%s: error: RSI Driver initialization failed with status: %02x", __func__, status);
         return status;
     }
 
@@ -324,11 +352,14 @@ static int32_t wfx_rsi_init(void)
         return RSI_ERROR_INVALID_PARAM;
     }
 
-    /* Initialize WiSeConnect or Module features. */
-    WFX_RSI_LOG("%s: rsi_wireless_init", __func__);
+#if (RSI_BLE_ENABLE)
+    if ((status = rsi_wireless_init(OPER_MODE_0, RSI_OPERMODE_WLAN_BLE)) != RSI_SUCCESS)
+    {
+#else
     if ((status = rsi_wireless_init(OPER_MODE_0, COEX_MODE_0)) != RSI_SUCCESS)
     {
-        WFX_RSI_LOG("%s: error: rsi_wireless_init failed with status: %02x", __func__, status);
+#endif
+        WFX_RSI_LOG("%s: error: Initialize WiSeConnect failed with status: %02x", __func__, status);
         return status;
     }
 
@@ -381,6 +412,11 @@ static int32_t wfx_rsi_init(void)
         return status;
     }
 #endif
+
+#if (RSI_BLE_ENABLE)
+    rsi_semaphore_post(&sl_rs_ble_init_sem);
+#endif
+
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
     WFX_RSI_LOG("%s: RSI: OK", __func__);
     return RSI_SUCCESS;
@@ -407,7 +443,7 @@ void wfx_show_err(char * msg)
  * @return
  *       None
  *******************************************************************************************/
-static void wfx_rsi_save_ap_info()
+static void wfx_rsi_save_ap_info() // translation
 {
     int32_t status;
     rsi_rsp_scan_t rsp;
@@ -422,22 +458,36 @@ static void wfx_rsi_save_ap_info()
     }
     else
     {
-        wfx_rsi.sec.security = rsp.scan_info->security_mode;
+        wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
         wfx_rsi.ap_chan      = rsp.scan_info->rf_channel;
         memcpy(&wfx_rsi.ap_mac.octet[0], &rsp.scan_info->bssid[0], BSSID_MAX_STR_LEN);
     }
-    if ((wfx_rsi.sec.security == RSI_WPA) || (wfx_rsi.sec.security == RSI_WPA2))
+
+    switch (rsp.scan_info->security_mode)
     {
-        // saving the security before changing into mixed mode
-        security             = wfx_rsi.sec.security;
-        wfx_rsi.sec.security = RSI_WPA_WPA2_MIXED;
+    case SME_OPEN:
+        wfx_rsi.sec.security = WFX_SEC_NONE;
+        break;
+    case SME_WPA:
+    case SME_WPA_ENTERPRISE:
+        wfx_rsi.sec.security = WFX_SEC_WPA;
+        break;
+    case SME_WPA2:
+    case SME_WPA2_ENTERPRISE:
+        wfx_rsi.sec.security = WFX_SEC_WPA2;
+        break;
+    case SME_WEP:
+        wfx_rsi.sec.security = WFX_SEC_WEP;
+        break;
+    case SME_WPA3:
+    case SME_WPA3_TRANSITION:
+        wfx_rsi.sec.security = WFX_SEC_WPA3;
+        break;
+    default:
+        wfx_rsi.sec.security = WFX_SEC_UNSPECIFIED;
+        break;
     }
-    if (wfx_rsi.sec.security == SME_WPA3)
-    {
-        // returning 3 for WPA3 when DGWIFI read security-type is called
-        security             = WPA3_SECURITY;
-        wfx_rsi.sec.security = RSI_WPA3;
-    }
+
     WFX_RSI_LOG("%s: WLAN: connecting to %s==%s, sec=%d, status=%02x", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0],
                 wfx_rsi.sec.security, status);
 }
@@ -452,6 +502,7 @@ static void wfx_rsi_save_ap_info()
 static void wfx_rsi_do_join(void)
 {
     int32_t status;
+    rsi_security_mode_t connect_security_mode;
 
     if (wfx_rsi.dev_state & (WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED))
     {
@@ -459,8 +510,30 @@ static void wfx_rsi_do_join(void)
     }
     else
     {
+
+        switch (wfx_rsi.sec.security)
+        {
+        case WFX_SEC_WEP:
+            connect_security_mode = RSI_WEP;
+            break;
+        case WFX_SEC_WPA:
+        case WFX_SEC_WPA2:
+            connect_security_mode = RSI_WPA_WPA2_MIXED;
+            break;
+        case WFX_SEC_WPA3:
+            connect_security_mode = RSI_WPA3;
+            break;
+        case WFX_SEC_NONE:
+            connect_security_mode = RSI_OPEN;
+            break;
+        default:
+            WFX_RSI_LOG("%s: error: unknown security type.");
+            return;
+        }
+
         WFX_RSI_LOG("%s: WLAN: connecting to %s==%s, sec=%d", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0],
                     wfx_rsi.sec.security);
+
         /*
          * Join the network
          */
@@ -469,37 +542,36 @@ static void wfx_rsi_do_join(void)
          */
         wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTING;
 
+        if ((status = rsi_wlan_register_callbacks(RSI_JOIN_FAIL_CB, wfx_rsi_join_fail_cb)) != RSI_SUCCESS)
+        {
+            WFX_RSI_LOG("%s: RSI callback register join failed with status: %02x", __func__, status);
+        }
+
         /* Try to connect Wifi with given Credentials
          * untill there is a success or maximum number of tries allowed
          */
-        while (++wfx_rsi.join_retries < WFX_RSI_CONFIG_MAX_JOIN)
+        while (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
         {
-
             /* Call rsi connect call with given ssid and password
              * And check there is a success
              */
-            if ((status = rsi_wlan_connect_async((int8_t *) &wfx_rsi.sec.ssid[0], (rsi_security_mode_t) wfx_rsi.sec.security,
-                                                 &wfx_rsi.sec.passkey[0], wfx_rsi_join_cb)) != RSI_SUCCESS)
+            if ((status = rsi_wlan_connect_async((int8_t *) &wfx_rsi.sec.ssid[0], connect_security_mode, &wfx_rsi.sec.passkey[0],
+                                                 wfx_rsi_join_cb)) != RSI_SUCCESS)
             {
 
                 wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
                 WFX_RSI_LOG("%s: rsi_wlan_connect_async failed with status: %02x on try %d", __func__, status,
                             wfx_rsi.join_retries);
-                vTaskDelay(4000);
-                /* TODO - Start a timer.. to retry */
+
+                wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries);
+                wfx_rsi.join_retries++;
             }
             else
             {
+                WFX_RSI_LOG("%s: starting JOIN to %s after %d tries\n", __func__, (char *) &wfx_rsi.sec.ssid[0],
+                            wfx_rsi.join_retries);
                 break; // exit while loop
             }
-        }
-        if (wfx_rsi.join_retries == MAX_JOIN_RETRIES_COUNT)
-        {
-            WFX_RSI_LOG("Connect failed after %d tries", wfx_rsi.join_retries);
-        }
-        else
-        {
-            WFX_RSI_LOG("%s: starting JOIN to %s after %d tries\n", __func__, (char *) &wfx_rsi.sec.ssid[0], wfx_rsi.join_retries);
         }
     }
 }
@@ -591,6 +663,13 @@ void wfx_rsi_task(void * arg)
                 {
                     wfx_dhcp_got_ipv4((uint32_t) sta_netif->ip_addr.u_addr.ip4.addr);
                     hasNotifiedIPV4 = true;
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#ifndef RSI_BLE_ENABLE
+                    // enabling the power save mode for RS9116 if sleepy device is enabled
+                    // if BLE is used on the rs9116 then powersave config is done after ble disconnect event
+                    wfx_rsi_power_save();
+#endif /* RSI_BLE_ENABLE */
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
                     if (!hasNotifiedWifiConnectivity)
                     {
                         wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
@@ -610,6 +689,13 @@ void wfx_rsi_task(void * arg)
                 {
                     wfx_ipv6_notify(GET_IPV6_SUCCESS);
                     hasNotifiedIPV6 = true;
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+#ifndef RSI_BLE_ENABLE
+                    // enabling the power save mode for RS9116 if sleepy device is enabled
+                    // if BLE is used on the rs9116 then powersave config is done after ble disconnect event
+                    wfx_rsi_power_save();
+#endif /* RSI_BLE_ENABLE */
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_SED */
                     if (!hasNotifiedWifiConnectivity)
                     {
                         wfx_connected_notify(CONNECTION_STATUS_SUCCESS, &wfx_rsi.ap_mac);
@@ -709,6 +795,7 @@ void wfx_rsi_task(void * arg)
                             WFX_RSI_LOG("Inside else");
                             ap.security = scan->security_mode;
                             ap.rssi     = (-1) * scan->rssi_val;
+                            ap.chan     = scan->rf_channel;
                             memcpy(&ap.bssid[0], &scan->bssid[0], BSSID_MAX_STR_LEN);
                             (*wfx_rsi.scan_cb)(&ap);
                         }
@@ -759,6 +846,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     WFX_RSI_LOG("%s: DHCP OK: IP=%d.%d.%d.%d", __func__, wfx_rsi.ip4_addr[0], wfx_rsi.ip4_addr[1], wfx_rsi.ip4_addr[2],
                 wfx_rsi.ip4_addr[3]);
     /* Notify the Connectivity Manager - via the app */
+    wfx_rsi.dev_state |= WFX_RSI_ST_STA_DHCP_DONE;
     wfx_ip_changed_notify(IP_STATUS_SUCCESS);
     wfx_rsi.dev_state |= WFX_RSI_ST_STA_READY;
 }

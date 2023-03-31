@@ -18,7 +18,7 @@
 #include "Button.h"
 #include "AppTask.h"
 
-#include "AppConfig.h"
+//#include <lock/AppConfig.h>
 
 esp_err_t Button::Init(gpio_num_t gpioNum, uint16_t debouncePeriod)
 {

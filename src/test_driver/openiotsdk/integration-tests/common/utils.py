@@ -15,21 +15,16 @@
 #    limitations under the License.
 #
 
-import os
-import random
-import shlex
-import re
-import ctypes
 import asyncio
-from time import sleep
-
-from chip.setup_payload import SetupPayload
-from chip import exceptions
-
-from chip.clusters import Objects as GeneratedObjects
-from chip import discovery
-
 import logging
+import random
+import re
+import shlex
+
+from chip import discovery, exceptions
+from chip.clusters import Objects as GeneratedObjects
+from chip.setup_payload import SetupPayload
+
 log = logging.getLogger(__name__)
 
 IP_ADDRESS_BUFFER_LEN = 100
@@ -42,7 +37,7 @@ def get_setup_payload(device):
     :return: setup payload or None
     """
     ret = device.wait_for_output("SetupQRCode")
-    if ret == None or len(ret) < 2:
+    if ret is None or len(ret) < 2:
         return None
 
     qr_code = re.sub(
@@ -87,7 +82,7 @@ def connect_device(setupPayload, commissionableDevice, nodeId=None):
     :param nodeId: device node ID
     :return: node ID if connection successful or None if failed
     """
-    if nodeId == None:
+    if nodeId is None:
         nodeId = random.randint(1, 1000000)
 
     pincode = int(setupPayload.attributes['SetUpPINCode'])
@@ -193,7 +188,7 @@ def send_zcl_command(devCtrl, line, requestTimeoutMs: int = None):
             raise exceptions.UnknownCluster(cluster)
         cmdArgsWithType = allCommands.get(cluster).get(command, None)
         # When command takes no arguments, (not command) is True
-        if command == None:
+        if command is None:
             raise exceptions.UnknownCommand(cluster, command)
 
         args = FormatZCLArguments(cluster, cmdArgsLine, cmdArgsWithType)
@@ -234,7 +229,7 @@ def read_zcl_attribute(devCtrl, line):
             raise exceptions.UnknownCluster(cluster)
 
         attrDetails = allAttrs.get(cluster).get(attribute, None)
-        if attrDetails == None:
+        if attrDetails is None:
             raise exceptions.UnknownAttribute(cluster, attribute)
 
         res = devCtrl.ZCLReadAttribute(cluster, attribute, int(

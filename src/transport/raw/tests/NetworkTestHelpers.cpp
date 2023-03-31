@@ -30,7 +30,7 @@ namespace Test {
 CHIP_ERROR IOContext::Init()
 {
     CHIP_ERROR err = Platform::MemoryInit();
-    chip::DeviceLayer::SetConfigurationMgr(&chip::DeviceLayer::ConfigurationManagerImpl::GetDefaultInstance());
+    chip::DeviceLayer::SetConfigurationMgr(&chip::DeviceLayer::ConfigurationMgrImpl());
 
     gSystemLayer.Init();
 

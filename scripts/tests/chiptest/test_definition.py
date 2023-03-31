@@ -15,14 +15,12 @@
 
 import logging
 import os
-import sys
 import threading
 import time
 import typing
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum, auto
-from random import randrange
 
 TEST_NODE_ID = '0x12344321'
 
@@ -94,7 +92,7 @@ class App:
             if self.killed:
                 return 0
             # If the App was never started, wait cannot be called on the process
-            if self.process == None:
+            if self.process is None:
                 time.sleep(0.1)
                 continue
             code = self.process.wait(timeout)
@@ -165,9 +163,12 @@ class ApplicationPaths:
     ota_requestor_app: typing.List[str]
     tv_app: typing.List[str]
     bridge_app: typing.List[str]
+    chip_repl_yaml_tester_cmd: typing.List[str]
+    chip_tool_with_python_cmd: typing.List[str]
 
     def items(self):
-        return [self.chip_tool, self.all_clusters_app, self.lock_app, self.ota_provider_app, self.ota_requestor_app, self.tv_app, self.bridge_app]
+        return [self.chip_tool, self.all_clusters_app, self.lock_app, self.ota_provider_app, self.ota_requestor_app,
+                self.tv_app, self.bridge_app, self.chip_repl_yaml_tester_cmd, self.chip_tool_with_python_cmd]
 
 
 @dataclass
@@ -209,14 +210,50 @@ class ExecutionCapture:
         logging.error('================ CAPTURED LOG END ====================')
 
 
+class TestTag(Enum):
+    MANUAL = auto()          # requires manual input. Generally not run automatically
+    SLOW = auto()            # test uses Sleep and is generally slow (>=10s is a typical threshold)
+    FLAKY = auto()           # test is considered flaky (usually a bug/time dependent issue)
+    IN_DEVELOPMENT = auto()  # test may not pass or undergoes changes
+
+    def to_s(self):
+        for (k, v) in TestTag.__members__.items():
+            if self == v:
+                return k
+        raise Exception("Unknown tag: %r" % self)
+
+
+class TestRunTime(Enum):
+    CHIP_TOOL_BUILTIN = auto()  # run via chip-tool built-in test commands
+    CHIP_TOOL_PYTHON = auto()  # use the python yaml test parser with chip-tool
+    CHIP_REPL_PYTHON = auto()       # use the python yaml test runner
+
+
 @dataclass
 class TestDefinition:
     name: str
     run_name: str
     target: TestTarget
-    is_manual: bool
+    tags: typing.Set[TestTag] = field(default_factory=set)
 
-    def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str, timeout_seconds: typing.Optional[int], dry_run=False):
+    @property
+    def is_manual(self) -> bool:
+        return TestTag.MANUAL in self.tags
+
+    @property
+    def is_slow(self) -> bool:
+        return TestTag.SLOW in self.tags
+
+    @property
+    def is_flaky(self) -> bool:
+        return TestTag.FLAKY in self.tags
+
+    def tags_str(self) -> str:
+        """Get a human readable list of tags applied to this test"""
+        return ", ".join([t.to_s() for t in self.tags])
+
+    def Run(self, runner, apps_register, paths: ApplicationPaths, pics_file: str,
+            timeout_seconds: typing.Optional[int], dry_run=False, test_runtime: TestRunTime = TestRunTime.CHIP_TOOL_BUILTIN):
         """
         Executes the given test case using the provided runner for execution.
         """
@@ -238,8 +275,15 @@ class TestDefinition:
                                 "don't know which application to run")
 
             for path in paths.items():
-                # Do not add chip-tool to the register
-                if path == paths.chip_tool:
+                # Do not add chip-tool or chip-repl-yaml-tester-cmd to the register
+                if path == paths.chip_tool or path == paths.chip_repl_yaml_tester_cmd or path == paths.chip_tool_with_python_cmd:
+                    continue
+
+                # Skip items where we don't actually have a path.  This can
+                # happen if the relevant application does not exist.  It's
+                # non-fatal as long as we are not trying to run any tests that
+                # need that application.
+                if len(path) == 1 and path[0] is None:
                     continue
 
                 # For the app indicated by self.target, give it the 'default' key to add to the register
@@ -256,7 +300,7 @@ class TestDefinition:
                 # so it will be commissionable again.
                 app.factoryReset()
 
-            tool_cmd = paths.chip_tool
+            tool_cmd = paths.chip_tool if test_runtime != TestRunTime.CHIP_TOOL_PYTHON else paths.chip_tool_with_python_cmd
 
             files_to_unlink = [
                 '/tmp/chip_tool_config.ini',
@@ -274,11 +318,19 @@ class TestDefinition:
             app.start()
             pairing_cmd = tool_cmd + ['pairing', 'code', TEST_NODE_ID, app.setupCode]
             test_cmd = tool_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
+            if test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
+                pairing_cmd += ['--server_path'] + [paths.chip_tool[-1]]
+                test_cmd += ['--server_path'] + [paths.chip_tool[-1]]
 
             if dry_run:
                 logging.info(" ".join(pairing_cmd))
                 logging.info(" ".join(test_cmd))
-
+            elif test_runtime == TestRunTime.CHIP_REPL_PYTHON:
+                chip_repl_yaml_tester_cmd = paths.chip_repl_yaml_tester_cmd
+                python_cmd = chip_repl_yaml_tester_cmd + \
+                    ['--setup-code', app.setupCode] + ['--yaml-path', self.run_name] + ["--pics-file", pics_file]
+                runner.RunSubprocess(python_cmd, name='CHIP_REPL_YAML_TESTER',
+                                     dependencies=[apps_register], timeout_seconds=timeout_seconds)
             else:
                 runner.RunSubprocess(pairing_cmd,
                                      name='PAIR', dependencies=[apps_register])

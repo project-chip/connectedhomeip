@@ -32,8 +32,8 @@
 #include <app/RequiredPrivilege.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
-#include <lib/core/CHIPTLVData.hpp>
-#include <lib/core/CHIPTLVUtilities.hpp>
+#include <lib/core/TLVData.h>
+#include <lib/core/TLVUtilities.h>
 #include <lib/support/TypeTraits.h>
 #include <platform/LockTracker.h>
 #include <protocols/secure_channel/Constants.h>
@@ -93,6 +93,8 @@ void CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, con
         StatusResponse::Send(status, mExchangeCtx.Get(), false /*aExpectResponse*/);
         mSentStatusResponse = true;
     }
+
+    mGoneAsync = true;
 }
 
 Status CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke)
@@ -499,7 +501,7 @@ CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aCommandPa
     ReturnErrorOnFailure(path.Encode(aCommandPath));
     if (aStartDataStruct)
     {
-        ReturnErrorOnFailure(commandData.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kFields)),
+        ReturnErrorOnFailure(commandData.GetWriter()->StartContainer(TLV::ContextTag(CommandDataIB::Tag::kFields),
                                                                      TLV::kTLVType_Structure, mDataElementContainerType));
     }
     MoveToState(State::AddingCommand);
@@ -577,6 +579,7 @@ TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
 
 FabricIndex CommandHandler::GetAccessingFabricIndex() const
 {
+    VerifyOrDie(!mGoneAsync);
     return mExchangeCtx->GetSessionHandle()->GetFabricIndex();
 }
 

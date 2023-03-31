@@ -63,10 +63,11 @@ target_defines=[${target_defines:1}]
 declare target_arch=
 declare target_cpu=
 declare target_cflags=
+declare current_arch="$(uname -m)"
 
 read -r -a archs <<<"$ARCHS"
 for arch in "${archs[@]}"; do
-    if [ -z "$target_arch"] ]; then
+    if [ -z "$target_arch" ] || [ "$arch" = "$current_arch" ]; then
         target_arch="$arch"
         case "$arch" in
             x86_64) target_cpu="x64" ;;
@@ -80,7 +81,10 @@ for arch in "${archs[@]}"; do
 done
 
 [[ $ENABLE_BITCODE == YES ]] && {
-    target_cflags+=',"-flto"'
+    if [ -n "$target_cflags" ]; then
+        target_cflags+=','
+    fi
+    target_cflags+='"-flto"'
 }
 
 declare -a args=(

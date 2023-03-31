@@ -16,11 +16,11 @@
 #
 
 import argparse
-from collections import namedtuple
 import configparser
 import logging
-import subprocess
 import os
+import subprocess
+from collections import namedtuple
 
 CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -46,6 +46,7 @@ ALL_PLATFORMS = set([
     'mw320',
     'genio',
     'openiotsdk',
+    'silabs_docker',
 ])
 
 Module = namedtuple('Module', 'name path platforms')
@@ -60,15 +61,19 @@ def load_module_info() -> None:
             platforms = module.get('platforms', '').split(',')
             platforms = set(filter(None, platforms))
             assert not (platforms - ALL_PLATFORMS), "Submodule's platform not contained in ALL_PLATFORMS"
+            name = name.replace('submodule "', '').replace('"', '')
             yield Module(name=name, path=module['path'], platforms=platforms)
 
 
 def module_matches_platforms(module: Module, platforms: set) -> bool:
-    # If no platforms have been selected, or the module is not associated with any specific
-    # platforms, treat it as a match.
-    if not platforms or not module.platforms:
+    # If the module is not associated with any specific platform, treat it as a match.
+    if not module.platforms:
         return True
     return bool(platforms & module.platforms)
+
+
+def module_initialized(module: Module) -> bool:
+    return bool(os.listdir(os.path.join(CHIP_ROOT, module.path)))
 
 
 def make_chip_root_safe_directory() -> None:
@@ -77,11 +82,10 @@ def make_chip_root_safe_directory() -> None:
 
 
 def checkout_modules(modules: list, shallow: bool, force: bool, recursive: bool) -> None:
-    names = [module.name.replace('submodule "', '').replace('"', '') for module in modules]
-    names = ', '.join(names)
+    names = ', '.join([module.name for module in modules])
     logging.info(f'Checking out: {names}')
 
-    cmd = ['git', '-C', CHIP_ROOT, 'submodule', 'update', '--init']
+    cmd = ['git', '-C', CHIP_ROOT, 'submodule', '--quiet', 'update', '--init']
     cmd += ['--depth', '1'] if shallow else []
     cmd += ['--force'] if force else []
     cmd += ['--recursive'] if recursive else []
@@ -91,11 +95,10 @@ def checkout_modules(modules: list, shallow: bool, force: bool, recursive: bool)
 
 
 def deinit_modules(modules: list, force: bool) -> None:
-    names = [module.name.replace('submodule "', '').replace('"', '') for module in modules]
-    names = ', '.join(names)
+    names = ', '.join([module.name for module in modules])
     logging.info(f'Deinitializing: {names}')
 
-    cmd = ['git', '-C', CHIP_ROOT, 'submodule', 'deinit']
+    cmd = ['git', '-C', CHIP_ROOT, 'submodule', '--quiet', 'deinit']
     cmd += ['--force'] if force else []
     cmd += [module.path for module in modules]
 
@@ -118,12 +121,13 @@ def main():
     modules = list(load_module_info())
     selected_platforms = set(args.platform)
     selected_modules = [m for m in modules if module_matches_platforms(m, selected_platforms)]
-    unmatched_modules = [m for m in modules if not module_matches_platforms(m, selected_platforms)]
+    unmatched_modules = [m for m in modules if not module_matches_platforms(
+        m, selected_platforms) and module_initialized(m)]
 
     make_chip_root_safe_directory()
     checkout_modules(selected_modules, args.shallow, args.force, args.recursive)
 
-    if args.deinit_unmatched:
+    if args.deinit_unmatched and unmatched_modules:
         deinit_modules(unmatched_modules, args.force)
 
 

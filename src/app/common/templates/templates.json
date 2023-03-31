@@ -8,6 +8,9 @@
         "templates/app/helper.js",
         "templates/chip/helper.js"
     ],
+    "resources": {
+        "config-data": "config-data.yaml"
+    },
     "override": "../../zap-templates/common/override.js",
     "partials": [
         {
@@ -29,19 +32,9 @@
     ],
     "templates": [
         {
-            "path": "../../zap-templates/templates/app/af-structs.zapt",
-            "name": "ZCL af-structs header",
-            "output": "af-structs.h"
-        },
-        {
             "path": "../../zap-templates/templates/app/att-storage.zapt",
             "name": "ZCL att-storage header",
             "output": "att-storage.h"
-        },
-        {
-            "path": "../../zap-templates/templates/app/attribute-id.zapt",
-            "name": "ZCL attribute-id header",
-            "output": "attribute-id.h"
         },
         {
             "path": "../../zap-templates/templates/app/attribute-size.zapt",
@@ -57,11 +50,6 @@
             "path": "../../zap-templates/templates/app/callback.zapt",
             "name": "ZCL callback header",
             "output": "callback.h"
-        },
-        {
-            "path": "../../zap-templates/templates/app/command-id.zapt",
-            "name": "ZCL command-id header",
-            "output": "command-id.h"
         },
         {
             "path": "../../zap-templates/templates/app/enums.zapt",

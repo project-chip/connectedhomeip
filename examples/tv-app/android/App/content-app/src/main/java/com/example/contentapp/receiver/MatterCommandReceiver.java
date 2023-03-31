@@ -6,7 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import com.example.contentapp.AttributeHolder;
+import com.example.contentapp.CommandResponseHolder;
 import com.example.contentapp.MainActivity;
+import com.example.contentapp.matter.MatterAgentClient;
 import com.matter.tv.app.api.MatterIntentConstants;
 
 public class MatterCommandReceiver extends BroadcastReceiver {
@@ -14,6 +16,9 @@ public class MatterCommandReceiver extends BroadcastReceiver {
 
   @Override
   public void onReceive(Context context, Intent intent) {
+
+    MatterAgentClient.initialize(context.getApplicationContext());
+
     final String intentAction = intent.getAction();
     Log.i(TAG, "Some Intent received from the matter server " + intentAction);
     if (intentAction == null || intentAction.isEmpty()) {
@@ -39,7 +44,8 @@ public class MatterCommandReceiver extends BroadcastReceiver {
                   .append(command)
                   .toString();
           Log.d(TAG, message);
-          String response = "{\"0\":1, \"1\":\"custom response from content app\"}";
+          String response =
+              CommandResponseHolder.getInstance().getCommandResponse(clusterId, commandId);
 
           Intent in = new Intent(context, MainActivity.class);
           in.putExtra(MatterIntentConstants.EXTRA_COMMAND_PAYLOAD, command);

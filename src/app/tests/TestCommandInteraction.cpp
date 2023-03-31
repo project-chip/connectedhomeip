@@ -29,10 +29,10 @@
 #include <app/data-model/Encode.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/core/CHIPTLVDebug.hpp>
-#include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/core/Optional.h>
+#include <lib/core/TLV.h>
+#include <lib/core/TLVDebug.h>
+#include <lib/core/TLVUtilities.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
@@ -1356,11 +1356,11 @@ void TestCommandInteraction::TestCommandHandlerRejectMultipleCommands(nlTestSuit
             CommandPathIB::Builder & path = invokeRequest.CreatePath();
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.GetError());
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == path.Encode(commandPathParams));
-            NL_TEST_ASSERT(
-                apSuite,
-                CHIP_NO_ERROR ==
-                    invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kFields)),
-                                                              TLV::kTLVType_Structure, commandSender.mDataElementContainerType));
+            NL_TEST_ASSERT(apSuite,
+                           CHIP_NO_ERROR ==
+                               invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(CommandDataIB::Tag::kFields),
+                                                                         TLV::kTLVType_Structure,
+                                                                         commandSender.mDataElementContainerType));
             NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == invokeRequest.GetWriter()->PutBoolean(chip::TLV::ContextTag(1), true));
             NL_TEST_ASSERT(apSuite,
                            CHIP_NO_ERROR == invokeRequest.GetWriter()->EndContainer(commandSender.mDataElementContainerType));

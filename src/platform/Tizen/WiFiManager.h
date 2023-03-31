@@ -37,16 +37,16 @@ class WiFiManager
     friend class ConnectivityManagerImpl;
 
 public:
-    void Init(void);
-    void Deinit(void);
+    void Init();
+    void Deinit();
 
     CHIP_ERROR IsActivated(bool * isWiFiActivated);
-    CHIP_ERROR Activate(void);
-    CHIP_ERROR Deactivate(void);
+    CHIP_ERROR Activate();
+    CHIP_ERROR Deactivate();
     CHIP_ERROR Connect(const char * ssid, const char * key,
                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * apCallback = nullptr);
     CHIP_ERROR Disconnect(const char * ssid);
-    CHIP_ERROR RemoveAllConfigs(void);
+    CHIP_ERROR RemoveAllConfigs();
 
     CHIP_ERROR GetDeviceMACAddress(uint8_t * macAddress, size_t macAddressLen);
     CHIP_ERROR GetDeviceState(wifi_manager_device_state_e * deviceState);
@@ -75,16 +75,16 @@ private:
     static gboolean _WiFiScan(GMainLoop * mainLoop, gpointer userData);
     static gboolean _WiFiConnect(GMainLoop * mainLoop, gpointer userData);
 
-    void _WiFiDeinitialize(void);
-    void _WiFiSetStates(void);
-    void _WiFiSetCallbacks(void);
-    void _WiFiUnsetCallbacks(void);
+    void _WiFiDeinitialize();
+    void _WiFiSetStates();
+    void _WiFiSetCallbacks();
+    void _WiFiUnsetCallbacks();
     void _WiFiSetDeviceState(wifi_manager_device_state_e deviceState);
     void _WiFiSetModuleState(wifi_manager_module_state_e moduleState);
     void _WiFiSetConnectionState(wifi_manager_connection_state_e connectionState);
-    wifi_manager_ap_h _WiFiGetFoundAP(void);
+    wifi_manager_ap_h _WiFiGetFoundAP();
 
-    friend WiFiManager & WiFiMgr(void);
+    friend WiFiManager & WiFiMgr();
 
     static WiFiManager sInstance;
 

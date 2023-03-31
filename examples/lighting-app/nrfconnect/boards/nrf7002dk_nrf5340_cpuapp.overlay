@@ -14,7 +14,6 @@
  *    limitations under the License.
  */
 
-
 / {
 	chosen {
 		nordic,pm-ext-flash = &mx25r64;
@@ -32,7 +31,7 @@
 	pwmleds {
 		compatible = "pwm-leds";
 		pwm_led1: pwm_led_1 {
-			pwms = < &pwm0 1 PWM_MSEC(20) PWM_POLARITY_INVERTED>;
+			pwms = < &pwm0 1 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
 		};
 	};
 };

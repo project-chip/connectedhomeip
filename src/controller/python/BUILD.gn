@@ -51,6 +51,8 @@ shared_library("ChipDeviceCtrl") {
 
   sources += [ "chip/native/CommonStackInit.cpp" ]
 
+  defines = []
+
   if (chip_controller) {
     sources += [
       "ChipCommissionableNodeController-ScriptBinding.cpp",
@@ -66,6 +68,8 @@ shared_library("ChipDeviceCtrl") {
       "OpCredsBinding.cpp",
       "chip/clusters/attribute.cpp",
       "chip/clusters/command.cpp",
+      "chip/credentials/cert.cpp",
+      "chip/crypto/p256keypair.cpp",
       "chip/discovery/NodeResolution.cpp",
       "chip/interaction_model/Delegate.cpp",
       "chip/interaction_model/Delegate.h",
@@ -76,6 +80,8 @@ shared_library("ChipDeviceCtrl") {
       "chip/native/PyChipError.cpp",
       "chip/utils/DeviceProxyUtils.cpp",
     ]
+    defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
+    defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
   } else {
     sources += [
       "chip/server/Options.cpp",
@@ -196,7 +202,6 @@ chip_python_wheel_action("chip-core") {
         "chip/ChipBleUtility.py",
         "chip/ChipBluezMgr.py",
         "chip/ChipCommissionableNodeCtrl.py",
-        "chip/ChipCoreBluetoothMgr.py",
         "chip/ChipStack.py",
         "chip/FabricAdmin.py",
         "chip/__init__.py",
@@ -209,7 +214,14 @@ chip_python_wheel_action("chip-core") {
         "chip/clusters/Attribute.py",
         "chip/clusters/Command.py",
         "chip/clusters/__init__.py",
+        "chip/clusters/enum.py",
+        "chip/commissioning/__init__.py",
+        "chip/commissioning/commissioning_flow_blocks.py",
+        "chip/commissioning/pase.py",
         "chip/configuration/__init__.py",
+        "chip/credentials/cert.py",
+        "chip/crypto/fabric.py",
+        "chip/crypto/p256keypair.py",
         "chip/discovery/__init__.py",
         "chip/discovery/library_handle.py",
         "chip/discovery/types.py",
@@ -230,20 +242,14 @@ chip_python_wheel_action("chip-core") {
         "chip/utils/CommissioningBuildingBlocks.py",
         "chip/utils/__init__.py",
         "chip/yaml/__init__.py",
-        "chip/yaml/constraints.py",
         "chip/yaml/data_model_lookup.py",
         "chip/yaml/errors.py",
         "chip/yaml/format_converter.py",
-        "chip/yaml/parser.py",
-        "chip/yaml/variable_storage.py",
+        "chip/yaml/runner.py",
       ]
 
       if (chip_controller) {
-        sources += [
-          "chip-device-ctrl.py",
-          "chip-repl.py",
-          "chip/ChipDeviceCtrl.py",
-        ]
+        sources += [ "chip/ChipDeviceCtrl.py" ]
       } else {
         sources += [
           "chip/server/__init__.py",
@@ -272,7 +278,10 @@ chip_python_wheel_action("chip-core") {
     "chip.ble",
     "chip.ble.commissioning",
     "chip.configuration",
+    "chip.commissioning",
     "chip.clusters",
+    "chip.credentials",
+    "chip.crypto",
     "chip.utils",
     "chip.discovery",
     "chip.exceptions",
@@ -291,6 +300,7 @@ chip_python_wheel_action("chip-core") {
   }
 
   py_package_reqs = [
+    "aenum",
     "coloredlogs",
     "construct",
     "dacite",
@@ -305,12 +315,6 @@ chip_python_wheel_action("chip-core") {
     "pycrypto",
     "ecdsa",
   ]
-
-  if (current_os == "mac") {
-    py_package_reqs += [ "pyobjc-framework-corebluetooth" ]
-  } else if (current_os == "linux") {
-    py_package_reqs += [ "pygobject" ]
-  }
 
   if (current_cpu == "x64") {
     cpu_tag = "x86_64"
@@ -395,7 +399,11 @@ chip_python_wheel_action("chip-repl") {
   py_manifest_files = [
     {
       src_dir = "."
-      sources = [ "chip/ChipReplStartup.py" ]
+      sources = [
+        "chip/ChipBluezMgr.py",
+        "chip/ChipCoreBluetoothMgr.py",
+        "chip/ChipReplStartup.py",
+      ]
       sources += py_scripts
     },
     {
@@ -423,6 +431,15 @@ chip_python_wheel_action("chip-repl") {
     "ipykernel",
     "mobly",
   ]
+
+  if (current_os == "mac") {
+    py_package_reqs += [ "pyobjc-framework-corebluetooth" ]
+  } else if (current_os == "linux") {
+    py_package_reqs += [
+      "dbus-python==1.2.18",
+      "pygobject",
+    ]
+  }
 
   py_package_name = "${chip_python_package_prefix}-repl"
   py_package_output = string_replace(py_package_name, "-", "_")

@@ -17,17 +17,17 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <struct name="SemanticTag">
+  <struct name="SemanticTagStruct">
     <cluster code="0x0050"/>
-    <item name="MfgCode" type="ENUM16"/>
+    <item name="MfgCode" type="vendor_id"/>
     <item name="Value" type="ENUM16" optional="false"/>
   </struct>
 
   <struct name="ModeOptionStruct">
     <cluster code="0x0050"/>
-    <item name="Label" type="CHAR_STRING" optional="false" length="32"/>
+    <item name="Label" type="CHAR_STRING" optional="false" length="64"/>
     <item name="Mode" type="INT8U" optional="false"/>
-    <item name="SemanticTags" type="SemanticTag" array="true" optional="false"/>
+    <item name="SemanticTags" type="SemanticTagStruct" array="true" optional="false"/>
   </struct>
 
   <cluster>

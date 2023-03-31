@@ -14,9 +14,8 @@
 # limitations under the License.
 
 import pytest
-from echo_service import echo_pb2
-
 from common.pigweed_client import PigweedClient
+from echo_service import echo_pb2
 
 RPC_PROTOS = [echo_pb2]
 PW_ECHO_TEST_MESSAGE = "Test_message"

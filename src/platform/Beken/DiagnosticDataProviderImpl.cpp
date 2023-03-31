@@ -134,7 +134,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 
     Platform::CopyString(ifp->Name, netif->hostname);
     ifp->name = CharSpan::fromCharString(ifp->Name);
-    ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+    ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
     ifp->offPremiseServicesReachableIPv4.SetNonNull(false);
     ifp->offPremiseServicesReachableIPv6.SetNonNull(false);
     memcpy(ifp->MacAddress, netif->hwaddr, sizeof(netif->hwaddr));
@@ -170,41 +170,44 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wifiVersion)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion)
 {
     // Support 802.11a/n Wi-Fi in Beken chipset
-    wifiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/25543
+    wiFiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kN;
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityType)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
+    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
+
     int cipher_type;
     cipher_type = bk_sta_cipher_type();
     switch (cipher_type)
     {
     case BK_SECURITY_TYPE_NONE:
-        securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
+        securityType = SecurityTypeEnum::kNone;
         break;
     case BK_SECURITY_TYPE_WEP:
-        securityType = EMBER_ZCL_SECURITY_TYPE_WEP;
+        securityType = SecurityTypeEnum::kWep;
         break;
     case BK_SECURITY_TYPE_WPA_TKIP:
     case BK_SECURITY_TYPE_WPA_AES:
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA;
+        securityType = SecurityTypeEnum::kWpa;
         break;
     case BK_SECURITY_TYPE_WPA2_AES:
     case BK_SECURITY_TYPE_WPA2_TKIP:
     case BK_SECURITY_TYPE_WPA2_MIXED:
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA2;
+        securityType = SecurityTypeEnum::kWpa2;
         break;
     case BK_SECURITY_TYPE_WPA3_SAE:
     case BK_SECURITY_TYPE_WPA3_WPA2_MIXED:
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA3;
+        securityType = SecurityTypeEnum::kWpa3;
         break;
     case BK_SECURITY_TYPE_AUTO:
     default:
-        securityType = EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED;
+        securityType = SecurityTypeEnum::kUnspecified;
     }
     return CHIP_NO_ERROR;
 }

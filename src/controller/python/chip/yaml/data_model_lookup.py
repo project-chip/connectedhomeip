@@ -16,7 +16,15 @@
 #
 
 from abc import ABC, abstractmethod
+
 import chip.clusters as Clusters
+
+
+def _case_insensitive_getattr(object, attr_name, default):
+    for attr in dir(object):
+        if attr.lower() == attr_name.lower():
+            return getattr(object, attr)
+    return default
 
 
 class DataModelLookup(ABC):
@@ -32,24 +40,35 @@ class DataModelLookup(ABC):
     def get_attribute(self, cluster: str, attribute: str):
         pass
 
+    @abstractmethod
+    def get_event(self, cluster: str, event: str):
+        pass
+
 
 class PreDefinedDataModelLookup(DataModelLookup):
     def get_cluster(self, cluster: str):
         try:
-            return getattr(Clusters, cluster, None)
+            return _case_insensitive_getattr(Clusters, cluster, None)
         except AttributeError:
             return None
 
     def get_command(self, cluster: str, command: str):
         try:
-            commands = getattr(Clusters, cluster, None).Commands
-            return getattr(commands, command, None)
+            commands = _case_insensitive_getattr(Clusters, cluster, None).Commands
+            return _case_insensitive_getattr(commands, command, None)
         except AttributeError:
             return None
 
     def get_attribute(self, cluster: str, attribute: str):
         try:
-            attributes = getattr(Clusters, cluster, None).Attributes
-            return getattr(attributes, attribute, None)
+            attributes = _case_insensitive_getattr(Clusters, cluster, None).Attributes
+            return _case_insensitive_getattr(attributes, attribute, None)
+        except AttributeError:
+            return None
+
+    def get_event(self, cluster: str, event: str):
+        try:
+            events = _case_insensitive_getattr(Clusters, cluster, None).Events
+            return _case_insensitive_getattr(events, event, None)
         except AttributeError:
             return None

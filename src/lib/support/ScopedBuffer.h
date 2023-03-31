@@ -137,7 +137,7 @@ class ScopedMemoryBuffer : public Impl::ScopedMemoryBufferBase<MemoryManagement>
 public:
     using Base = Impl::ScopedMemoryBufferBase<MemoryManagement>;
 
-    static_assert(std::is_trivial<T>::value, "Constructors won't get run");
+    static_assert(std::is_trivially_destructible<T>::value, "Destructors won't get run");
 
     inline T * Get() { return static_cast<T *>(Base::Ptr()); }
     inline T & operator[](size_t index) { return Get()[index]; }
@@ -150,13 +150,40 @@ public:
     ScopedMemoryBuffer & Calloc(size_t elementCount)
     {
         Base::Calloc(elementCount, sizeof(T));
+        ExecuteConstructors(elementCount);
         return *this;
     }
 
-    ScopedMemoryBuffer & Alloc(size_t size)
+    ScopedMemoryBuffer & Alloc(size_t elementCount)
     {
-        Base::Alloc(size * sizeof(T));
+        Base::Alloc(elementCount * sizeof(T));
+        ExecuteConstructors(elementCount);
         return *this;
+    }
+
+private:
+    template <typename U = T, std::enable_if_t<std::is_trivial<U>::value, int> = 0>
+    void ExecuteConstructors(size_t elementCount)
+    {
+        // Do nothing if our type is trivial.  In particular, if we are a buffer
+        // of integers, we should not go zero-initializing them here: either
+        // caller wants that and called Calloc(), or it doesn't and we shouldn't
+        // do it.
+    }
+
+    template <typename U = T, std::enable_if_t<!std::is_trivial<U>::value, int> = 0>
+    void ExecuteConstructors(size_t elementCount)
+    {
+        T * elementPtr = Get();
+        if (elementPtr == nullptr)
+        {
+            // Alloc failed, don't bother.
+            return;
+        }
+        for (size_t i = 0; i < elementCount; ++i)
+        {
+            new (&elementPtr[i]) T();
+        }
     }
 };
 
@@ -177,28 +204,28 @@ public:
     {
         if (this != &other)
         {
-            mSize       = other.mSize;
-            other.mSize = 0;
+            mCount       = other.mCount;
+            other.mCount = 0;
         }
         ScopedMemoryBuffer<T>::operator=(std::move(other));
         return *this;
     }
 
-    ~ScopedMemoryBufferWithSize() { mSize = 0; }
+    ~ScopedMemoryBufferWithSize() { mCount = 0; }
 
-    // return the size in bytes
-    inline size_t AllocatedSize() const { return mSize; }
+    // return the size as count of elements
+    inline size_t AllocatedSize() const { return mCount; }
 
     void Free()
     {
-        mSize = 0;
+        mCount = 0;
         ScopedMemoryBuffer<T>::Free();
     }
 
     T * Release()
     {
         T * buffer = ScopedMemoryBuffer<T>::Release();
-        mSize      = 0;
+        mCount     = 0;
         return buffer;
     }
 
@@ -207,23 +234,23 @@ public:
         ScopedMemoryBuffer<T>::Calloc(elementCount);
         if (this->Get() != nullptr)
         {
-            mSize = elementCount * sizeof(T);
+            mCount = elementCount;
         }
         return *this;
     }
 
-    ScopedMemoryBufferWithSize & Alloc(size_t size)
+    ScopedMemoryBufferWithSize & Alloc(size_t elementCount)
     {
-        ScopedMemoryBuffer<T>::Alloc(size);
+        ScopedMemoryBuffer<T>::Alloc(elementCount);
         if (this->Get() != nullptr)
         {
-            mSize = size * sizeof(T);
+            mCount = elementCount;
         }
         return *this;
     }
 
 private:
-    size_t mSize = 0;
+    size_t mCount = 0;
 };
 
 } // namespace Platform

@@ -83,7 +83,9 @@ struct Nullable : protected Optional<T>
     static constexpr bool kIsFabricScoped = false;
 
     bool operator==(const Nullable & other) const { return Optional<T>::operator==(other); }
-    bool operator!=(const Nullable & other) const { return !(*this == other); }
+    bool operator!=(const Nullable & other) const { return Optional<T>::operator!=(other); }
+    bool operator==(const T & other) const { return Optional<T>::operator==(other); }
+    bool operator!=(const T & other) const { return Optional<T>::operator!=(other); }
 };
 
 template <class T>

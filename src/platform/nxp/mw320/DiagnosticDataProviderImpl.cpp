@@ -163,7 +163,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
     ifp->name                                          = CharSpan::fromCharString(ifp->Name);
     ifp->isOperational                                 = true;
-    ifp->type                                          = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+    ifp->type                                          = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
     if (ConnectivityUtils::GetInterfaceIPv4Addrs("", size, ifp) == CHIP_NO_ERROR)
@@ -289,7 +289,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wiFiVersion)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion)
 {
     return ConnectivityMgrImpl().GetWiFiVersion(wiFiVersion);
 }
@@ -299,7 +299,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & value)
     return ConnectivityMgrImpl().GetWiFiBssId(value);
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityType)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
     return ConnectivityMgrImpl().GetWiFiSecurityType(securityType);
 }

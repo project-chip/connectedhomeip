@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <cstdint>
 
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp> // For VendorId
 #include <lib/core/GroupId.h>
 #include <lib/core/NodeId.h>
@@ -41,10 +42,12 @@ typedef uint64_t FabricId;
 typedef uint8_t FabricIndex;
 typedef uint32_t FieldId;
 typedef uint16_t ListIndex;
+typedef uint16_t LocalizedStringIdentifier;
 typedef uint32_t TransactionId;
 typedef uint16_t KeysetId;
 typedef uint8_t InteractionModelRevision;
 typedef uint32_t SubscriptionId;
+typedef uint8_t SceneId;
 
 constexpr CompressedFabricId kUndefinedCompressedFabricId = 0ULL;
 constexpr FabricId kUndefinedFabricId                     = 0ULL;
@@ -57,6 +60,10 @@ constexpr EndpointId kInvalidEndpointId = 0xFFFF;
 constexpr EndpointId kRootEndpointId    = 0;
 constexpr ListIndex kInvalidListIndex   = 0xFFFF; // List index is a uint16 thus 0xFFFF is a invalid list index.
 constexpr KeysetId kInvalidKeysetId     = 0xFFFF;
+
+// Invalid IC identifier is provisional. Value will most likely change when identifying token is defined
+// https://github.com/project-chip/connectedhomeip/issues/24251
+constexpr uint64_t kInvalidIcId = 0;
 
 // These are MEIs, 0xFFFF is not a valid manufacturer code,
 // thus 0xFFFF'FFFF is not a valid MEI.

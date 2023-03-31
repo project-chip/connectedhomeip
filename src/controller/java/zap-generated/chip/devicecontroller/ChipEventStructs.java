@@ -28,14 +28,14 @@ public class ChipEventStructs {
     public @Nullable Long adminNodeID;
     public @Nullable Integer adminPasscodeID;
     public Integer changeType;
-    public @Nullable ChipStructs.AccessControlClusterAccessControlEntry latestValue;
+    public @Nullable ChipStructs.AccessControlClusterAccessControlEntryStruct latestValue;
     public Integer fabricIndex;
 
     public AccessControlClusterAccessControlEntryChangedEvent(
         @Nullable Long adminNodeID,
         @Nullable Integer adminPasscodeID,
         Integer changeType,
-        @Nullable ChipStructs.AccessControlClusterAccessControlEntry latestValue,
+        @Nullable ChipStructs.AccessControlClusterAccessControlEntryStruct latestValue,
         Integer fabricIndex) {
       this.adminNodeID = adminNodeID;
       this.adminPasscodeID = adminPasscodeID;
@@ -72,14 +72,14 @@ public class ChipEventStructs {
     public @Nullable Long adminNodeID;
     public @Nullable Integer adminPasscodeID;
     public Integer changeType;
-    public @Nullable ChipStructs.AccessControlClusterExtensionEntry latestValue;
+    public @Nullable ChipStructs.AccessControlClusterAccessControlExtensionStruct latestValue;
     public Integer fabricIndex;
 
     public AccessControlClusterAccessControlExtensionChangedEvent(
         @Nullable Long adminNodeID,
         @Nullable Integer adminPasscodeID,
         Integer changeType,
-        @Nullable ChipStructs.AccessControlClusterExtensionEntry latestValue,
+        @Nullable ChipStructs.AccessControlClusterAccessControlExtensionStruct latestValue,
         Integer fabricIndex) {
       this.adminNodeID = adminNodeID;
       this.adminPasscodeID = adminPasscodeID;
@@ -347,6 +347,81 @@ public class ChipEventStructs {
     }
   }
 
+  public static class PowerSourceClusterWiredFaultChangeEvent {
+    public ArrayList<Object> current;
+    public ArrayList<Object> previous;
+
+    public PowerSourceClusterWiredFaultChangeEvent(
+        ArrayList<Object> current, ArrayList<Object> previous) {
+      this.current = current;
+      this.previous = previous;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("PowerSourceClusterWiredFaultChangeEvent {\n");
+      output.append("\tcurrent: ");
+      output.append(current);
+      output.append("\n");
+      output.append("\tprevious: ");
+      output.append(previous);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class PowerSourceClusterBatFaultChangeEvent {
+    public ArrayList<Object> current;
+    public ArrayList<Object> previous;
+
+    public PowerSourceClusterBatFaultChangeEvent(
+        ArrayList<Object> current, ArrayList<Object> previous) {
+      this.current = current;
+      this.previous = previous;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("PowerSourceClusterBatFaultChangeEvent {\n");
+      output.append("\tcurrent: ");
+      output.append(current);
+      output.append("\n");
+      output.append("\tprevious: ");
+      output.append(previous);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
+  public static class PowerSourceClusterBatChargeFaultChangeEvent {
+    public ArrayList<Object> current;
+    public ArrayList<Object> previous;
+
+    public PowerSourceClusterBatChargeFaultChangeEvent(
+        ArrayList<Object> current, ArrayList<Object> previous) {
+      this.current = current;
+      this.previous = previous;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("PowerSourceClusterBatChargeFaultChangeEvent {\n");
+      output.append("\tcurrent: ");
+      output.append(current);
+      output.append("\n");
+      output.append("\tprevious: ");
+      output.append(previous);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class GeneralDiagnosticsClusterHardwareFaultChangeEvent {
     public ArrayList<Object> current;
     public ArrayList<Object> previous;
@@ -578,17 +653,17 @@ public class ChipEventStructs {
     }
   }
 
-  public static class BridgedDeviceBasicClusterStartUpEvent {
+  public static class BridgedDeviceBasicInformationClusterStartUpEvent {
     public Long softwareVersion;
 
-    public BridgedDeviceBasicClusterStartUpEvent(Long softwareVersion) {
+    public BridgedDeviceBasicInformationClusterStartUpEvent(Long softwareVersion) {
       this.softwareVersion = softwareVersion;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BridgedDeviceBasicClusterStartUpEvent {\n");
+      output.append("BridgedDeviceBasicInformationClusterStartUpEvent {\n");
       output.append("\tsoftwareVersion: ");
       output.append(softwareVersion);
       output.append("\n");
@@ -597,43 +672,43 @@ public class ChipEventStructs {
     }
   }
 
-  public static class BridgedDeviceBasicClusterShutDownEvent {
+  public static class BridgedDeviceBasicInformationClusterShutDownEvent {
 
-    public BridgedDeviceBasicClusterShutDownEvent() {}
+    public BridgedDeviceBasicInformationClusterShutDownEvent() {}
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BridgedDeviceBasicClusterShutDownEvent {\n");
+      output.append("BridgedDeviceBasicInformationClusterShutDownEvent {\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
-  public static class BridgedDeviceBasicClusterLeaveEvent {
+  public static class BridgedDeviceBasicInformationClusterLeaveEvent {
 
-    public BridgedDeviceBasicClusterLeaveEvent() {}
+    public BridgedDeviceBasicInformationClusterLeaveEvent() {}
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BridgedDeviceBasicClusterLeaveEvent {\n");
+      output.append("BridgedDeviceBasicInformationClusterLeaveEvent {\n");
       output.append("}\n");
       return output.toString();
     }
   }
 
-  public static class BridgedDeviceBasicClusterReachableChangedEvent {
+  public static class BridgedDeviceBasicInformationClusterReachableChangedEvent {
     public Boolean reachableNewValue;
 
-    public BridgedDeviceBasicClusterReachableChangedEvent(Boolean reachableNewValue) {
+    public BridgedDeviceBasicInformationClusterReachableChangedEvent(Boolean reachableNewValue) {
       this.reachableNewValue = reachableNewValue;
     }
 
     @Override
     public String toString() {
       StringBuilder output = new StringBuilder();
-      output.append("BridgedDeviceBasicClusterReachableChangedEvent {\n");
+      output.append("BridgedDeviceBasicInformationClusterReachableChangedEvent {\n");
       output.append("\treachableNewValue: ");
       output.append(reachableNewValue);
       output.append("\n");
@@ -850,7 +925,7 @@ public class ChipEventStructs {
     public @Nullable Integer userIndex;
     public @Nullable Integer fabricIndex;
     public @Nullable Long sourceNode;
-    public @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterDlCredential>> credentials;
+    public @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterCredentialStruct>> credentials;
 
     public DoorLockClusterLockOperationEvent(
         Integer lockOperationType,
@@ -858,7 +933,7 @@ public class ChipEventStructs {
         @Nullable Integer userIndex,
         @Nullable Integer fabricIndex,
         @Nullable Long sourceNode,
-        @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterDlCredential>> credentials) {
+        @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterCredentialStruct>> credentials) {
       this.lockOperationType = lockOperationType;
       this.operationSource = operationSource;
       this.userIndex = userIndex;
@@ -901,7 +976,7 @@ public class ChipEventStructs {
     public @Nullable Integer userIndex;
     public @Nullable Integer fabricIndex;
     public @Nullable Long sourceNode;
-    public @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterDlCredential>> credentials;
+    public @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterCredentialStruct>> credentials;
 
     public DoorLockClusterLockOperationErrorEvent(
         Integer lockOperationType,
@@ -910,7 +985,7 @@ public class ChipEventStructs {
         @Nullable Integer userIndex,
         @Nullable Integer fabricIndex,
         @Nullable Long sourceNode,
-        @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterDlCredential>> credentials) {
+        @Nullable Optional<ArrayList<ChipStructs.DoorLockClusterCredentialStruct>> credentials) {
       this.lockOperationType = lockOperationType;
       this.operationSource = operationSource;
       this.operationError = operationError;

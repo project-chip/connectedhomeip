@@ -12,32 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import re
-from itertools import combinations
-from typing import List, Any, Optional
-
-from .target import BuildTarget, TargetPart
-
 from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
-from builders.android import AndroidApp, AndroidBoard, AndroidBuilder
+from builders.android import AndroidApp, AndroidBoard, AndroidBuilder, AndroidProfile
+from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
 from builders.cc13x2x7_26x2x7 import cc13x2x7_26x2x7App, cc13x2x7_26x2x7Builder
+from builders.cc32xx import cc32xxApp, cc32xxBuilder
 from builders.cyw30739 import Cyw30739App, Cyw30739Board, Cyw30739Builder
 from builders.efr32 import Efr32App, Efr32Board, Efr32Builder
 from builders.esp32 import Esp32App, Esp32Board, Esp32Builder
+from builders.genio import GenioApp, GenioBuilder
 from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary
+from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
 from builders.k32w import K32WApp, K32WBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
+from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder
 from builders.qpg import QpgApp, QpgBoard, QpgBuilder
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
-from builders.bouffalolab import BouffalolabApp, BouffalolabBoard, BouffalolabBuilder
-from builders.imx import IMXApp, IMXBuilder
-from builders.genio import GenioApp, GenioBuilder
-from builders.openiotsdk import OpenIotSdkApp, OpenIotSdkBuilder
+
+from .target import BuildTarget, TargetPart
 
 
 def BuildHostTestRunnerTarget():
@@ -109,6 +105,8 @@ def BuildHostTarget():
         TargetPart('shell', app=HostApp.SHELL),
         TargetPart('ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False),
         TargetPart('ota-requestor', app=HostApp.OTA_REQUESTOR, enable_ble=False),
+        TargetPart('simulated-app1', app=HostApp.SIMULATED_APP1, enable_ble=False),
+        TargetPart('simulated-app2', app=HostApp.SIMULATED_APP2, enable_ble=False),
         TargetPart('python-bindings', app=HostApp.PYTHON_BINDINGS),
         TargetPart('tv-app', app=HostApp.TV_APP),
         TargetPart('tv-casting-app', app=HostApp.TV_CASTING),
@@ -117,6 +115,7 @@ def BuildHostTarget():
         TargetPart('tests', app=HostApp.TESTS),
         TargetPart('chip-cert', app=HostApp.CERT_TOOL),
         TargetPart('address-resolve-tool', app=HostApp.ADDRESS_RESOLVE),
+        TargetPart('contact-sensor', app=HostApp.CONTACT_SENSOR),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -147,6 +146,7 @@ def BuildHostTarget():
     target.AppendModifier('clang', use_clang=True)
     target.AppendModifier('test', extra_tests=True)
     target.AppendModifier('rpc', enable_rpcs=True)
+    target.AppendModifier('with-ui', imgui_ui=True)
 
     return target
 
@@ -156,7 +156,7 @@ def BuildEsp32Target():
 
     # boards
     target.AppendFixedTargets([
-        TargetPart('m5stack', board=Esp32Board.M5Stack).OnlyIfRe('-(all-clusters|ota-requestor)'),
+        TargetPart('m5stack', board=Esp32Board.M5Stack),
         TargetPart('c3devkit', board=Esp32Board.C3DevKit),
         TargetPart('devkitc', board=Esp32Board.DevKitC),
         TargetPart('qemu', board=Esp32Board.QEMU).OnlyIfRe('-tests'),
@@ -190,6 +190,7 @@ def BuildEfr32Target():
     target.AppendFixedTargets([
         TargetPart('brd4161a', board=Efr32Board.BRD4161A),
         TargetPart('brd4187c', board=Efr32Board.BRD4187C),
+        TargetPart('brd4186c', board=Efr32Board.BRD4186C),
         TargetPart('brd4163a', board=Efr32Board.BRD4163A),
         TargetPart('brd4164a', board=Efr32Board.BRD4164A),
         TargetPart('brd4166a', board=Efr32Board.BRD4166A),
@@ -206,6 +207,7 @@ def BuildEfr32Target():
         TargetPart('unit-test', app=Efr32App.UNIT_TEST),
         TargetPart('light', app=Efr32App.LIGHT),
         TargetPart('lock', app=Efr32App.LOCK),
+        TargetPart('thermostat', app=Efr32App.THERMOSTAT)
     ])
 
     target.AppendModifier('rpc', enable_rpcs=True)
@@ -291,6 +293,9 @@ def BuildAndroidTarget():
         TargetPart('tv-casting-app', app=AndroidApp.TV_CASTING_APP),
         TargetPart('java-matter-controller', app=AndroidApp.JAVA_MATTER_CONTROLLER),
     ])
+
+    # Modifiers
+    target.AppendModifier('no-debug', profile=AndroidProfile.RELEASE)
 
     return target
 
@@ -380,6 +385,8 @@ def BuildK32WTarget():
     target.AppendModifier(name="no-ota", disable_ota=True)
     target.AppendModifier(name="low-power", low_power=True).OnlyIfRe("-nologs")
     target.AppendModifier(name="nologs", disable_logs=True)
+    target.AppendModifier(name="crypto-platform", crypto_platform=True)
+    target.AppendModifier(name="tokenizer", tokenizer=True).ExceptIfRe("-nologs")
 
     return target
 
@@ -403,9 +410,20 @@ def Buildcc13x2x7_26x2x7Target():
     return target
 
 
+def Buildcc32xxTarget():
+    target = BuildTarget('cc32xx', cc32xxBuilder)
+
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('lock', app=cc32xxApp.LOCK),
+
+    ])
+
+    return target
+
+
 def BuildCyw30739Target():
     target = BuildTarget('cyw30739', Cyw30739Builder)
-
     # board
     target.AppendFixedTargets([
         TargetPart('cyw930739m2evb_01', board=Cyw30739Board.CYW930739M2EVB_01),
@@ -456,6 +474,7 @@ def BuildTizenTarget():
         TargetPart('all-clusters-minimal', app=TizenApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('chip-tool', app=TizenApp.CHIP_TOOL),
         TargetPart('light', app=TizenApp.LIGHT),
+        TargetPart('tests', app=TizenApp.TESTS),
     ])
 
     target.AppendModifier(name="no-ble", enable_ble=False)
@@ -476,7 +495,7 @@ def BuildBouffalolabTarget():
         TargetPart('BL602-NIGHT-LIGHT', board=BouffalolabBoard.BL602_NIGHT_LIGHT, module_type="BL602"),
         TargetPart('XT-ZB6-DevKit', board=BouffalolabBoard.XT_ZB6_DevKit, module_type="BL706C-22"),
         TargetPart('BL706-IoT-DVK', board=BouffalolabBoard.BL706_IoT_DVK, module_type="BL706C-22"),
-        TargetPart('BL706-NIGHT-LIGHT', board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL702"),
+        TargetPart('BL706-NIGHT-LIGHT', board=BouffalolabBoard.BL706_NIGHT_LIGHT, module_type="BL706C-22"),
     ])
 
     # Apps
@@ -487,6 +506,7 @@ def BuildBouffalolabTarget():
     target.AppendModifier('shell', enable_shell=True)
     target.AppendModifier('115200', baudrate=115200)
     target.AppendModifier('rpc', enable_rpcs=True)
+    target.AppendModifier('cdc', enable_cdc=True)
 
     return target
 
@@ -527,11 +547,20 @@ def BuildTelinkTarget():
     target.AppendFixedTargets([
         TargetPart('all-clusters', app=TelinkApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=TelinkApp.ALL_CLUSTERS_MINIMAL),
+        TargetPart('contact-sensor', app=TelinkApp.CONTACT_SENSOR),
         TargetPart('light', app=TelinkApp.LIGHT),
         TargetPart('light-switch', app=TelinkApp.SWITCH),
+        TargetPart('lock', app=TelinkApp.LOCK),
         TargetPart('ota-requestor', app=TelinkApp.OTA_REQUESTOR),
+        TargetPart('pump', app=TelinkApp.PUMP),
+        TargetPart('pump-controller', app=TelinkApp.PUMP_CONTROLLER),
+        TargetPart('temperature-measurement', app=TelinkApp.TEMPERATURE_MEASUREMENT),
         TargetPart('thermostat', app=TelinkApp.THERMOSTAT),
+        TargetPart('window-covering', app=TelinkApp.WINDOW_COVERING),
     ])
+
+    target.AppendModifier('rpc', enable_rpcs=True)
+    target.AppendModifier('factory-data', enable_factory_data=True)
 
     return target
 
@@ -552,6 +581,7 @@ BUILD_TARGETS = [
     BuildAndroidTarget(),
     BuildBouffalolabTarget(),
     Buildcc13x2x7_26x2x7Target(),
+    Buildcc32xxTarget(),
     BuildCyw30739Target(),
     BuildEfr32Target(),
     BuildEsp32Target(),

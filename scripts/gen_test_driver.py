@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 
 # Copyright (c) 2020 Project CHIP Authors
@@ -16,8 +15,8 @@
 # limitations under the License.
 
 import optparse
-import sys
 import re
+import sys
 
 TEMPLATE_PREFIX = '''/*
  *
@@ -74,8 +73,8 @@ def main(argv):
     TEST_SUITE_RE = re.compile(r'\s*CHIP_REGISTER_TEST_SUITE\(([^)]*)\)')
 
     with open(options.input_file, 'r') as input_file:
-        for l in input_file.readlines():
-            match = TEST_SUITE_RE.match(l)
+        for line in input_file.readlines():
+            match = TEST_SUITE_RE.match(line)
             if not match:
                 continue
 

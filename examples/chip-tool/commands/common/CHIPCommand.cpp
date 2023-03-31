@@ -102,6 +102,8 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.fabricIndependentStorage = &mDefaultStorage;
     factoryInitParams.operationalKeystore      = &mOperationalKeystore;
     factoryInitParams.opCertStore              = &mOpCertStore;
+    factoryInitParams.enableServerInteractions = NeedsOperationalAdvertising();
+    factoryInitParams.sessionKeystore          = &mSessionKeystore;
 
     // Init group data provider that will be used for all group keys and IPKs for the
     // chip-tool-configured fabrics. This is OK to do once since the fabric tables
@@ -109,6 +111,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     // Different commissioner implementations may want to use alternate implementations
     // of GroupDataProvider for injection through factoryInitParams.
     sGroupDataProvider.SetStorageDelegate(&mDefaultStorage);
+    sGroupDataProvider.SetSessionKeystore(factoryInitParams.sessionKeystore);
     ReturnLogErrorOnFailure(sGroupDataProvider.Init());
     chip::Credentials::SetGroupDataProvider(&sGroupDataProvider);
     factoryInitParams.groupDataProvider = &sGroupDataProvider;
@@ -177,7 +180,7 @@ void CHIPCommand::MaybeTearDownStack()
 CHIP_ERROR CHIPCommand::EnsureCommissionerForIdentity(std::string identity)
 {
     chip::NodeId nodeId;
-    ReturnErrorOnFailure(GetCommissionerNodeId(identity, &nodeId));
+    ReturnErrorOnFailure(GetIdentityNodeId(identity, &nodeId));
     CommissionerIdentity lookupKey{ identity, nodeId };
     if (mCommissioners.find(lookupKey) != mCommissioners.end())
     {
@@ -309,7 +312,7 @@ std::string CHIPCommand::GetIdentity()
     return name;
 }
 
-CHIP_ERROR CHIPCommand::GetCommissionerNodeId(std::string identity, chip::NodeId * nodeId)
+CHIP_ERROR CHIPCommand::GetIdentityNodeId(std::string identity, chip::NodeId * nodeId)
 {
     if (mCommissionerNodeId.HasValue())
     {
@@ -373,7 +376,7 @@ chip::Controller::DeviceCommissioner & CHIPCommand::GetCommissioner(std::string 
     VerifyOrDie(EnsureCommissionerForIdentity(identity) == CHIP_NO_ERROR);
 
     chip::NodeId nodeId;
-    VerifyOrDie(GetCommissionerNodeId(identity, &nodeId) == CHIP_NO_ERROR);
+    VerifyOrDie(GetIdentityNodeId(identity, &nodeId) == CHIP_NO_ERROR);
     CommissionerIdentity lookupKey{ identity, nodeId };
     auto item = mCommissioners.find(lookupKey);
     VerifyOrDie(item != mCommissioners.end());
@@ -503,7 +506,16 @@ CHIP_ERROR CHIPCommand::StartWaiting(chip::System::Clock::Timeout duration)
             mWaitingForResponse = true;
         }
 
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
+        auto err = chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
+        if (CHIP_NO_ERROR != err)
+        {
+            {
+                std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
+                mWaitingForResponse = false;
+            }
+            return err;
+        }
+
         auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(duration);
         {
             std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);

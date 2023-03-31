@@ -348,9 +348,20 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::Discover
     ChipLogProgress(Controller, "Discovered device to be commissioned over DNS-SD");
 
     auto & resolutionData = nodeData.resolutionData;
-    for (size_t i = 0; i < resolutionData.numIPs; i++)
+
+    if (mDiscoveryType == DiscoveryType::kDiscoveryNetworkOnlyWithoutPASEAutoRetry)
     {
-        mDiscoveredParameters.emplace_back(nodeData.resolutionData, i);
+        // If the discovery type does not want the PASE auto retry mechanism, we will just store
+        // a single IP. So the discovery process is stopped as it won't be of any help anymore.
+        StopConnectOverIP();
+        mDiscoveredParameters.emplace_back(nodeData.resolutionData, 0);
+    }
+    else
+    {
+        for (size_t i = 0; i < resolutionData.numIPs; i++)
+        {
+            mDiscoveredParameters.emplace_back(nodeData.resolutionData, i);
+        }
     }
 
     ConnectToDiscoveredDevice();
@@ -447,14 +458,14 @@ void SetUpCodePairer::OnStatusUpdate(DevicePairingDelegate::Status status)
         if (!mDiscoveredParameters.empty())
         {
             ChipLogProgress(Controller, "Ignoring SecurePairingFailed status for now; we have more discovered devices to try");
-            status = DevicePairingDelegate::Status::SecurePairingDiscoveringMoreDevices;
+            return;
         }
 
         if (DiscoveryInProgress())
         {
             ChipLogProgress(Controller,
                             "Ignoring SecurePairingFailed status for now; we are waiting to see if we discover more devices");
-            status = DevicePairingDelegate::Status::SecurePairingDiscoveringMoreDevices;
+            return;
         }
     }
 
@@ -491,7 +502,8 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error)
     if (CHIP_ERROR_TIMEOUT == error && mCurrentPASEParameters.HasValue())
     {
         const auto & params = mCurrentPASEParameters.Value();
-        auto & ip           = params.GetPeerAddress().GetIPAddress();
+        const auto & peer   = params.GetPeerAddress();
+        const auto & ip     = peer.GetIPAddress();
         auto err            = Dnssd::Resolver::Instance().ReconfirmRecord(params.mHostName, ip, params.mInterfaceId);
         if (CHIP_NO_ERROR != err && CHIP_ERROR_NOT_IMPLEMENTED != err)
         {
@@ -573,10 +585,18 @@ SetUpCodePairerParameters::SetUpCodePairerParameters(const Dnssd::CommonResoluti
 }
 
 #if CONFIG_NETWORK_LAYER_BLE
-SetUpCodePairerParameters::SetUpCodePairerParameters(BLE_CONNECTION_OBJECT connObj)
+SetUpCodePairerParameters::SetUpCodePairerParameters(BLE_CONNECTION_OBJECT connObj, bool connected)
 {
     Transport::PeerAddress peerAddress = Transport::PeerAddress::BLE();
-    SetPeerAddress(peerAddress).SetConnectionObject(connObj);
+    SetPeerAddress(peerAddress);
+    if (connected)
+    {
+        SetConnectionObject(connObj);
+    }
+    else
+    {
+        SetDiscoveredObject(connObj);
+    }
 }
 #endif // CONFIG_NETWORK_LAYER_BLE
 

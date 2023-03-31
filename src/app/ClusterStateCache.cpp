@@ -57,16 +57,19 @@ CHIP_ERROR ClusterStateCache::UpdateCache(const ConcreteDataAttributePath & aPat
 
     if (apData)
     {
-        size_t elementSize = 0;
-        ReturnErrorOnFailure(GetElementTLVSize(apData, elementSize));
-        Platform::ScopedMemoryBufferWithSize<uint8_t> backingBuffer;
-        backingBuffer.Calloc(elementSize);
-        VerifyOrReturnError(backingBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
-        TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), elementSize);
-        ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag(), *apData));
-        ReturnErrorOnFailure(writer.Finalize(backingBuffer));
+        if (mCacheData)
+        {
+            size_t elementSize = 0;
+            ReturnErrorOnFailure(GetElementTLVSize(apData, elementSize));
+            Platform::ScopedMemoryBufferWithSize<uint8_t> backingBuffer;
+            backingBuffer.Calloc(elementSize);
+            VerifyOrReturnError(backingBuffer.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
+            TLV::ScopedBufferTLVWriter writer(std::move(backingBuffer), elementSize);
+            ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag(), *apData));
+            ReturnErrorOnFailure(writer.Finalize(backingBuffer));
 
-        state.Set<Platform::ScopedMemoryBufferWithSize<uint8_t>>(std::move(backingBuffer));
+            state.Set<Platform::ScopedMemoryBufferWithSize<uint8_t>>(std::move(backingBuffer));
+        }
         //
         // Clear out the committed data version and only set it again once we have received all data for this cluster.
         // Otherwise, we may have incomplete data that looks like it's complete since it has a valid data version.
@@ -99,7 +102,10 @@ CHIP_ERROR ClusterStateCache::UpdateCache(const ConcreteDataAttributePath & aPat
     }
     else
     {
-        state.Set<StatusIB>(aStatus);
+        if (mCacheData)
+        {
+            state.Set<StatusIB>(aStatus);
+        }
     }
 
     //
@@ -111,8 +117,12 @@ CHIP_ERROR ClusterStateCache::UpdateCache(const ConcreteDataAttributePath & aPat
         mAddedEndpoints.push_back(aPath.mEndpointId);
     }
 
-    mCache[aPath.mEndpointId][aPath.mClusterId].mAttributes[aPath.mAttributeId] = std::move(state);
-    mChangedAttributeSet.insert(aPath);
+    if (mCacheData)
+    {
+        mCache[aPath.mEndpointId][aPath.mClusterId].mAttributes[aPath.mAttributeId] = std::move(state);
+        mChangedAttributeSet.insert(aPath);
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -127,32 +137,37 @@ CHIP_ERROR ClusterStateCache::UpdateEventCache(const EventHeader & aEventHeader,
         {
             return CHIP_NO_ERROR;
         }
-        System::PacketBufferHandle handle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
-        VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
+        if (mCacheData)
+        {
+            System::PacketBufferHandle handle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+            VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY);
 
-        System::PacketBufferTLVWriter writer;
-        writer.Init(std::move(handle), false);
+            System::PacketBufferTLVWriter writer;
+            writer.Init(std::move(handle), false);
 
-        ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag(), *apData));
-        ReturnErrorOnFailure(writer.Finalize(&handle));
+            ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag(), *apData));
+            ReturnErrorOnFailure(writer.Finalize(&handle));
 
-        //
-        // Compact the buffer down to a more reasonably sized packet buffer
-        // if we can.
-        //
-        handle.RightSize();
+            //
+            // Compact the buffer down to a more reasonably sized packet buffer
+            // if we can.
+            //
+            handle.RightSize();
 
-        EventData eventData;
-        eventData.first  = aEventHeader;
-        eventData.second = std::move(handle);
+            EventData eventData;
+            eventData.first  = aEventHeader;
+            eventData.second = std::move(handle);
 
-        mEventDataCache.insert(std::move(eventData));
-
+            mEventDataCache.insert(std::move(eventData));
+        }
         mHighestReceivedEventNumber.SetValue(aEventHeader.mEventNumber);
     }
     else if (apStatus)
     {
-        mEventStatusCache[aEventHeader.mPath] = *apStatus;
+        if (mCacheData)
+        {
+            mEventStatusCache[aEventHeader.mPath] = *apStatus;
+        }
     }
 
     return CHIP_NO_ERROR;

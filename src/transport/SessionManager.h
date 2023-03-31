@@ -29,6 +29,7 @@
 
 #include <credentials/FabricTable.h>
 #include <crypto/RandUtils.h>
+#include <crypto/SessionKeystore.h>
 #include <inet/IPAddress.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -379,13 +380,17 @@ public:
      * @brief
      *   Initialize a Secure Session Manager
      *
-     * @param systemLayer           System, layer to use
+     * @param systemLayer           System layer to use
      * @param transportMgr          Transport to use
      * @param messageCounterManager The message counter manager
+     * @param storageDelegate       Persistent storage implementation
+     * @param fabricTable           Fabric table to hold information about joined fabrics
+     * @param sessionKeystore       Session keystore for management of symmetric encryption keys
      */
     CHIP_ERROR Init(System::Layer * systemLayer, TransportMgrBase * transportMgr,
                     Transport::MessageCounterManagerInterface * messageCounterManager,
-                    chip::PersistentStorageDelegate * storageDelegate, FabricTable * fabricTable);
+                    chip::PersistentStorageDelegate * storageDelegate, FabricTable * fabricTable,
+                    Crypto::SessionKeystore & sessionKeystore);
 
     /**
      * @brief
@@ -446,6 +451,8 @@ public:
 
     FabricTable * GetFabricTable() const { return mFabricTable; }
 
+    Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
+
 private:
     /**
      *    The State of a secure transport object.
@@ -462,8 +469,9 @@ private:
         kPayloadIsUnencrypted,
     };
 
-    System::Layer * mSystemLayer = nullptr;
-    FabricTable * mFabricTable   = nullptr;
+    System::Layer * mSystemLayer               = nullptr;
+    FabricTable * mFabricTable                 = nullptr;
+    Crypto::SessionKeystore * mSessionKeystore = nullptr;
     Transport::UnauthenticatedSessionTable<CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE> mUnauthenticatedSessions;
     Transport::SecureSessionTable mSecureSessions;
     State mState; // < Initialization state of the object
@@ -476,13 +484,35 @@ private:
 
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
 
-    void SecureUnicastMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+    /**
+     * @brief Parse, decrypt, validate, and dispatch a secure unicast message.
+     *
+     * @param[in] partialPacketHeader The partial PacketHeader of the message after processing with DecodeFixed.
+     * If the message decrypts successfully, this will be filled with a fully decoded PacketHeader.
+     * @param[in] peerAddress The PeerAddress of the message as provided by the receiving Transport Endpoint.
+     * @param msg The full message buffer, including header fields.
+     */
+    void SecureUnicastMessageDispatch(const PacketHeader & partialPacketHeader, const Transport::PeerAddress & peerAddress,
                                       System::PacketBufferHandle && msg);
 
-    void SecureGroupMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+    /**
+     * @brief Parse, decrypt, validate, and dispatch a secure group message.
+     *
+     * @param partialPacketHeader The partial PacketHeader of the message once processed with DecodeFixed.
+     * @param peerAddress The PeerAddress of the message as provided by the receiving Transport Endpoint.
+     * @param msg The full message buffer, including header fields.
+     */
+    void SecureGroupMessageDispatch(const PacketHeader & partialPacketHeader, const Transport::PeerAddress & peerAddress,
                                     System::PacketBufferHandle && msg);
 
-    void UnauthenticatedMessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+    /**
+     * @brief Parse, decrypt, validate, and dispatch an unsecured message.
+     *
+     * @param partialPacketHeader The partial PacketHeader of the message after processing with DecodeFixed.
+     * @param peerAddress The PeerAddress of the message as provided by the receiving Transport Endpoint.
+     * @param msg The full message buffer, including header fields.
+     */
+    void UnauthenticatedMessageDispatch(const PacketHeader & partialPacketHeader, const Transport::PeerAddress & peerAddress,
                                         System::PacketBufferHandle && msg);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source);

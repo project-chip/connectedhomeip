@@ -96,6 +96,23 @@ public:
 
     void Delete(GenericContext * context);
 
+    /**
+     * Fill the provided vector with all contexts for which the given predicate
+     * returns true.
+     */
+    template <typename F>
+    void FindAllMatchingPredicate(F predicate, std::vector<GenericContext *> & results)
+    {
+        results.clear();
+        for (auto & ctx : mContexts)
+        {
+            if (predicate(ctx))
+            {
+                results.push_back(ctx);
+            }
+        }
+    }
+
 private:
     MdnsContexts(){};
     static MdnsContexts sInstance;
@@ -133,6 +150,20 @@ struct BrowseContext : public GenericContext
 
     // Dispatch what we have found so far, but don't stop browsing.
     void DispatchPartialSuccess();
+
+    // While we are dispatching partial success, sContextDispatchingSuccess will
+    // be set to the BrowseContext doing the dispatch.  This allows resolves
+    // triggered by the browse dispatch to be associated with the browse.  This
+    // relies on our consumer starting the resolves synchronously from the
+    // partial success callback.
+    //
+    // The other option would be to do the resolve ourselves before signaling
+    // browse success, but that would only allow us to pass in one ip per
+    // discovered hostname, and we want to pass in all the IPs we resolve.
+    //
+    // TODO: Consider fixing the higher-level APIs to make it possible to pass
+    // in multiple IPs for a successful browse result.
+    static BrowseContext * sContextDispatchingSuccess;
 };
 
 struct InterfaceInfo
@@ -156,9 +187,12 @@ struct ResolveContext : public GenericContext
     DNSServiceProtocol protocol;
     std::string instanceName;
     std::shared_ptr<uint32_t> consumerCounter;
+    BrowseContext * const browseThatCausedResolve; // Can be null
 
+    // browseCausingResolve can be null.
     ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
-                   const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse);
+                   const char * instanceNameToResolve, BrowseContext * browseCausingResolve,
+                   std::shared_ptr<uint32_t> && consumerCounterToUse);
     virtual ~ResolveContext();
 
     void DispatchFailure(DNSServiceErrorType err) override;

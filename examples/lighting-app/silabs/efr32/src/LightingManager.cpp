@@ -23,7 +23,10 @@
 #include "AppTask.h"
 #include <FreeRTOS.h>
 
+#include <lib/support/TypeTraits.h>
+
 using namespace chip;
+using namespace ::chip::app::Clusters::OnOff;
 using namespace ::chip::DeviceLayer;
 
 LightingManager LightingManager::sLight;
@@ -39,8 +42,8 @@ namespace {
 OnOffEffect gEffect = {
     chip::EndpointId{ 1 },
     LightMgr().OnTriggerOffWithEffect,
-    EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF,
-    static_cast<uint8_t>(EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS),
+    OnOffEffectIdentifier::kDelayedAllOff,
+    to_underlying(OnOffDelayedAllOffEffectVariant::kFadeToOffIn0p8Seconds),
 };
 
 } // namespace
@@ -49,7 +52,7 @@ CHIP_ERROR LightingManager::Init()
 {
     // Create FreeRTOS sw timer for light timer.
     sLightTimer = xTimerCreate("lightTmr",       // Just a text name, not used by the RTOS kernel
-                               1,                // == default timer period (mS)
+                               pdMS_TO_TICKS(1), // == default timer period
                                false,            // no timer reload (==one-shot)
                                (void *) this,    // init timer id = light obj context
                                TimerEventHandler // timer callback handler
@@ -161,9 +164,9 @@ void LightingManager::StartTimer(uint32_t aTimeoutMs)
     }
 
     // timer is not active, change its period to required value (== restart).
-    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
+    // FreeRTOS- Block for a maximum of 100 ms if the change period command
     // cannot immediately be sent to the timer command queue.
-    if (xTimerChangePeriod(sLightTimer, (aTimeoutMs / portTICK_PERIOD_MS), 100) != pdPASS)
+    if (xTimerChangePeriod(sLightTimer, pdMS_TO_TICKS(aTimeoutMs), pdMS_TO_TICKS(100)) != pdPASS)
     {
         SILABS_LOG("sLightTimer timer start() failed");
         appError(APP_ERROR_START_TIMER_FAILED);
@@ -172,7 +175,7 @@ void LightingManager::StartTimer(uint32_t aTimeoutMs)
 
 void LightingManager::CancelTimer(void)
 {
-    if (xTimerStop(sLightTimer, 0) == pdFAIL)
+    if (xTimerStop(sLightTimer, pdMS_TO_TICKS(0)) == pdFAIL)
     {
         SILABS_LOG("sLightTimer stop() failed");
         appError(APP_ERROR_STOP_TIMER_FAILED);
@@ -279,41 +282,38 @@ void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
 
 void LightingManager::OnTriggerOffWithEffect(OnOffEffect * effect)
 {
-    chip::app::Clusters::OnOff::OnOffEffectIdentifier effectId = effect->mEffectIdentifier;
-    uint8_t effectVariant                                      = effect->mEffectVariant;
-    uint32_t offEffectDuration                                 = 0;
+    auto effectId              = effect->mEffectIdentifier;
+    auto effectVariant         = effect->mEffectVariant;
+    uint32_t offEffectDuration = 0;
 
     // Temporary print outs and delay to test OffEffect behaviour
     // Until dimming is supported for dev boards.
-    if (effectId == EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF)
+    if (effectId == OnOffEffectIdentifier::kDelayedAllOff)
     {
-        if (effectVariant == EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS)
+        auto typedEffectVariant = static_cast<OnOffDelayedAllOffEffectVariant>(effectVariant);
+        if (typedEffectVariant == OnOffDelayedAllOffEffectVariant::kFadeToOffIn0p8Seconds)
         {
             offEffectDuration = 800;
-            ChipLogProgress(Zcl, "EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS");
+            ChipLogProgress(Zcl, "OnOffDelayedAllOffEffectVariant::kFadeToOffIn0p8Seconds");
         }
-        else if (effectVariant == EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_NO_FADE)
+        else if (typedEffectVariant == OnOffDelayedAllOffEffectVariant::kNoFade)
         {
             offEffectDuration = 800;
-            ChipLogProgress(Zcl, "EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_NO_FADE");
+            ChipLogProgress(Zcl, "OnOffDelayedAllOffEffectVariant::kNoFade");
         }
-        else if (effectVariant ==
-                 EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_IN_12_SECONDS)
+        else if (typedEffectVariant == OnOffDelayedAllOffEffectVariant::k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds)
         {
             offEffectDuration = 12800;
-            ChipLogProgress(Zcl,
-                            "EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_"
-                            "IN_12_SECONDS");
+            ChipLogProgress(Zcl, "OnOffDelayedAllOffEffectVariant::k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds");
         }
     }
-    else if (effectId == EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DYING_LIGHT)
+    else if (effectId == OnOffEffectIdentifier::kDyingLight)
     {
-        if (effectVariant ==
-            EMBER_ZCL_ON_OFF_DYING_LIGHT_EFFECT_VARIANT_20_PERCENTER_DIM_UP_IN_0P5_SECONDS_THEN_FADE_TO_OFF_IN_1_SECOND)
+        auto typedEffectVariant = static_cast<OnOffDyingLightEffectVariant>(effectVariant);
+        if (typedEffectVariant == OnOffDyingLightEffectVariant::k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second)
         {
             offEffectDuration = 1500;
-            ChipLogProgress(
-                Zcl, "EMBER_ZCL_ON_OFF_DYING_LIGHT_EFFECT_VARIANT_20_PERCENTER_DIM_UP_IN_0P5_SECONDS_THEN_FADE_TO_OFF_IN_1_SECOND");
+            ChipLogProgress(Zcl, "OnOffDyingLightEffectVariant::k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second");
         }
     }
 

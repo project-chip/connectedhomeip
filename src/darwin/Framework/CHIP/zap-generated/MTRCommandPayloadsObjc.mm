@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _identifyTime = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -36,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.identifyTime = self.identifyTime;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -57,6 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _effectVariant = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -68,6 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.effectIdentifier = self.effectIdentifier;
     other.effectVariant = self.effectVariant;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -85,10 +89,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
         _groupName = @"";
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -97,9 +102,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRGroupsClusterAddGroupParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.groupName = self.groupName;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -107,10 +113,23 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupId:%@; groupName:%@; >", NSStringFromClass([self class]), _groupId, _groupName];
+        [NSString stringWithFormat:@"<%@: groupID:%@; groupName:%@; >", NSStringFromClass([self class]), _groupID, _groupName];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRGroupsClusterAddGroupParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRGroupsClusterAddGroupResponseParams
 - (instancetype)init
@@ -119,7 +138,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -130,7 +149,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRGroupsClusterAddGroupResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -139,18 +158,32 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; >", NSStringFromClass([self class]), _status, _groupId];
+        [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; >", NSStringFromClass([self class]), _status, _groupID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRGroupsClusterAddGroupResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRGroupsClusterViewGroupParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -159,18 +192,32 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRGroupsClusterViewGroupParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; >", NSStringFromClass([self class]), _groupId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; >", NSStringFromClass([self class]), _groupID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRGroupsClusterViewGroupParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRGroupsClusterViewGroupResponseParams
 - (instancetype)init
@@ -179,7 +226,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
 
         _groupName = @"";
         _timedInvokeTimeoutMs = nil;
@@ -192,7 +239,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRGroupsClusterViewGroupResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.groupName = self.groupName;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
@@ -201,11 +248,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; groupName:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupId, _groupName];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; groupName:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupID, _groupName];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRGroupsClusterViewGroupResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRGroupsClusterGetGroupMembershipParams
 - (instancetype)init
@@ -214,6 +274,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _groupList = [NSArray array];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -224,6 +285,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.groupList = self.groupList;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -272,8 +334,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -282,18 +345,32 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRGroupsClusterRemoveGroupParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; >", NSStringFromClass([self class]), _groupId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; >", NSStringFromClass([self class]), _groupID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRGroupsClusterRemoveGroupParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRGroupsClusterRemoveGroupResponseParams
 - (instancetype)init
@@ -302,7 +379,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -313,7 +390,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRGroupsClusterRemoveGroupResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -322,16 +399,30 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; >", NSStringFromClass([self class]), _status, _groupId];
+        [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; >", NSStringFromClass([self class]), _status, _groupID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRGroupsClusterRemoveGroupResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRGroupsClusterRemoveAllGroupsParams
 - (instancetype)init
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -341,6 +432,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRGroupsClusterRemoveAllGroupsParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -357,10 +449,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
         _groupName = @"";
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -369,9 +462,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRGroupsClusterAddGroupIfIdentifyingParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.groupName = self.groupName;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -379,19 +473,32 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupId:%@; groupName:%@; >", NSStringFromClass([self class]), _groupId, _groupName];
+        [NSString stringWithFormat:@"<%@: groupID:%@; groupName:%@; >", NSStringFromClass([self class]), _groupID, _groupName];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRGroupsClusterAddGroupIfIdentifyingParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRScenesClusterAddSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
 
         _transitionTime = @(0);
 
@@ -399,6 +506,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _extensionFieldSets = [NSArray array];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -407,12 +515,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterAddSceneParams alloc] init];
 
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.transitionTime = self.transitionTime;
     other.sceneName = self.sceneName;
     other.extensionFieldSets = self.extensionFieldSets;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -420,11 +529,34 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
-                  NSStringFromClass([self class]), _groupId, _sceneId, _transitionTime, _sceneName, _extensionFieldSets];
+        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
+                  NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterAddSceneParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterAddSceneResponseParams
 - (instancetype)init
@@ -433,9 +565,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -446,8 +578,8 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterAddSceneResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -455,21 +587,45 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupId, _sceneId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupID, _sceneID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterAddSceneResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterViewSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -478,9 +634,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterViewSceneParams alloc] init];
 
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -488,10 +645,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; >", NSStringFromClass([self class]), _groupId, _sceneId];
+        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterViewSceneParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterViewSceneResponseParams
 - (instancetype)init
@@ -500,9 +680,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
 
         _transitionTime = nil;
 
@@ -519,8 +699,8 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterViewSceneResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.transitionTime = self.transitionTime;
     other.sceneName = self.sceneName;
     other.extensionFieldSets = self.extensionFieldSets;
@@ -532,21 +712,45 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
-        NSStringFromClass([self class]), _status, _groupId, _sceneId, _transitionTime, _sceneName, _extensionFieldSets];
+        stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
+        NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterViewSceneResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterRemoveSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -555,9 +759,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterRemoveSceneParams alloc] init];
 
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -565,10 +770,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; >", NSStringFromClass([self class]), _groupId, _sceneId];
+        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterRemoveSceneParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterRemoveSceneResponseParams
 - (instancetype)init
@@ -577,9 +805,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -590,8 +818,8 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterRemoveSceneResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -599,19 +827,43 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupId, _sceneId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupID, _sceneID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterRemoveSceneResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterRemoveAllScenesParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -620,18 +872,32 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterRemoveAllScenesParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; >", NSStringFromClass([self class]), _groupId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; >", NSStringFromClass([self class]), _groupID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterRemoveAllScenesParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRScenesClusterRemoveAllScenesResponseParams
 - (instancetype)init
@@ -640,7 +906,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -651,7 +917,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterRemoveAllScenesResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -660,20 +926,34 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; >", NSStringFromClass([self class]), _status, _groupId];
+        [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; >", NSStringFromClass([self class]), _status, _groupID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterRemoveAllScenesResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRScenesClusterStoreSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -682,9 +962,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterStoreSceneParams alloc] init];
 
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -692,10 +973,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; >", NSStringFromClass([self class]), _groupId, _sceneId];
+        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterStoreSceneParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterStoreSceneResponseParams
 - (instancetype)init
@@ -704,9 +1008,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -717,8 +1021,8 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterStoreSceneResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -726,23 +1030,47 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupId, _sceneId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupID, _sceneID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterStoreSceneResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterRecallSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
 
         _transitionTime = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -751,29 +1079,54 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterRecallSceneParams alloc] init];
 
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.transitionTime = self.transitionTime;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; transitionTime:%@; >",
-                                             NSStringFromClass([self class]), _groupId, _sceneId, _transitionTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; >",
+                                             NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterRecallSceneParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterGetSceneMembershipParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -782,18 +1135,32 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterGetSceneMembershipParams alloc] init];
 
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupId:%@; >", NSStringFromClass([self class]), _groupId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; >", NSStringFromClass([self class]), _groupID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterGetSceneMembershipParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRScenesClusterGetSceneMembershipResponseParams
 - (instancetype)init
@@ -804,7 +1171,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _capacity = nil;
 
-        _groupId = @(0);
+        _groupID = @(0);
 
         _sceneList = nil;
         _timedInvokeTimeoutMs = nil;
@@ -818,7 +1185,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.status = self.status;
     other.capacity = self.capacity;
-    other.groupId = self.groupId;
+    other.groupID = self.groupID;
     other.sceneList = self.sceneList;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
@@ -827,20 +1194,33 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; capacity:%@; groupId:%@; sceneList:%@; >",
-                                             NSStringFromClass([self class]), _status, _capacity, _groupId, _sceneList];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; capacity:%@; groupID:%@; sceneList:%@; >",
+                                             NSStringFromClass([self class]), _status, _capacity, _groupID, _sceneList];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterGetSceneMembershipResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
 @end
 @implementation MTRScenesClusterEnhancedAddSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
 
         _transitionTime = @(0);
 
@@ -848,6 +1228,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _extensionFieldSets = [NSArray array];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -856,12 +1237,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterEnhancedAddSceneParams alloc] init];
 
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.transitionTime = self.transitionTime;
     other.sceneName = self.sceneName;
     other.extensionFieldSets = self.extensionFieldSets;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -869,11 +1251,34 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
-                  NSStringFromClass([self class]), _groupId, _sceneId, _transitionTime, _sceneName, _extensionFieldSets];
+        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
+                  NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterEnhancedAddSceneParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterEnhancedAddSceneResponseParams
 - (instancetype)init
@@ -882,9 +1287,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -895,8 +1300,8 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterEnhancedAddSceneResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -904,21 +1309,45 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupId, _sceneId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupID, _sceneID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterEnhancedAddSceneResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterEnhancedViewSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -927,9 +1356,10 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRScenesClusterEnhancedViewSceneParams alloc] init];
 
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -937,10 +1367,33 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupId:%@; sceneId:%@; >", NSStringFromClass([self class]), _groupId, _sceneId];
+        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterEnhancedViewSceneParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterEnhancedViewSceneResponseParams
 - (instancetype)init
@@ -949,9 +1402,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupId = @(0);
+        _groupID = @(0);
 
-        _sceneId = @(0);
+        _sceneID = @(0);
 
         _transitionTime = nil;
 
@@ -968,8 +1421,8 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterEnhancedViewSceneResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupId = self.groupId;
-    other.sceneId = self.sceneId;
+    other.groupID = self.groupID;
+    other.sceneID = self.sceneID;
     other.transitionTime = self.transitionTime;
     other.sceneName = self.sceneName;
     other.extensionFieldSets = self.extensionFieldSets;
@@ -981,11 +1434,34 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: status:%@; groupId:%@; sceneId:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
-        NSStringFromClass([self class]), _status, _groupId, _sceneId, _transitionTime, _sceneName, _extensionFieldSets];
+        stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
+        NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterEnhancedViewSceneResponseParams (Deprecated)
+
+- (void)setGroupId:(NSNumber * _Nonnull)groupId
+{
+    self.groupID = groupId;
+}
+
+- (NSNumber * _Nonnull)groupId
+{
+    return self.groupID;
+}
+
+- (void)setSceneId:(NSNumber * _Nonnull)sceneId
+{
+    self.sceneID = sceneId;
+}
+
+- (NSNumber * _Nonnull)sceneId
+{
+    return self.sceneID;
+}
 @end
 @implementation MTRScenesClusterCopySceneParams
 - (instancetype)init
@@ -994,14 +1470,15 @@ NS_ASSUME_NONNULL_BEGIN
 
         _mode = @(0);
 
-        _groupIdFrom = @(0);
+        _groupIdentifierFrom = @(0);
 
-        _sceneIdFrom = @(0);
+        _sceneIdentifierFrom = @(0);
 
-        _groupIdTo = @(0);
+        _groupIdentifierTo = @(0);
 
-        _sceneIdTo = @(0);
+        _sceneIdentifierTo = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1011,23 +1488,68 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterCopySceneParams alloc] init];
 
     other.mode = self.mode;
-    other.groupIdFrom = self.groupIdFrom;
-    other.sceneIdFrom = self.sceneIdFrom;
-    other.groupIdTo = self.groupIdTo;
-    other.sceneIdTo = self.sceneIdTo;
+    other.groupIdentifierFrom = self.groupIdentifierFrom;
+    other.sceneIdentifierFrom = self.sceneIdentifierFrom;
+    other.groupIdentifierTo = self.groupIdentifierTo;
+    other.sceneIdentifierTo = self.sceneIdentifierTo;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: mode:%@; groupIdFrom:%@; sceneIdFrom:%@; groupIdTo:%@; sceneIdTo:%@; >",
-                  NSStringFromClass([self class]), _mode, _groupIdFrom, _sceneIdFrom, _groupIdTo, _sceneIdTo];
+    NSString * descriptionString = [NSString
+        stringWithFormat:
+            @"<%@: mode:%@; groupIdentifierFrom:%@; sceneIdentifierFrom:%@; groupIdentifierTo:%@; sceneIdentifierTo:%@; >",
+        NSStringFromClass([self class]), _mode, _groupIdentifierFrom, _sceneIdentifierFrom, _groupIdentifierTo, _sceneIdentifierTo];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterCopySceneParams (Deprecated)
+
+- (void)setGroupIdFrom:(NSNumber * _Nonnull)groupIdFrom
+{
+    self.groupIdentifierFrom = groupIdFrom;
+}
+
+- (NSNumber * _Nonnull)groupIdFrom
+{
+    return self.groupIdentifierFrom;
+}
+
+- (void)setSceneIdFrom:(NSNumber * _Nonnull)sceneIdFrom
+{
+    self.sceneIdentifierFrom = sceneIdFrom;
+}
+
+- (NSNumber * _Nonnull)sceneIdFrom
+{
+    return self.sceneIdentifierFrom;
+}
+
+- (void)setGroupIdTo:(NSNumber * _Nonnull)groupIdTo
+{
+    self.groupIdentifierTo = groupIdTo;
+}
+
+- (NSNumber * _Nonnull)groupIdTo
+{
+    return self.groupIdentifierTo;
+}
+
+- (void)setSceneIdTo:(NSNumber * _Nonnull)sceneIdTo
+{
+    self.sceneIdentifierTo = sceneIdTo;
+}
+
+- (NSNumber * _Nonnull)sceneIdTo
+{
+    return self.sceneIdentifierTo;
+}
 @end
 @implementation MTRScenesClusterCopySceneResponseParams
 - (instancetype)init
@@ -1036,9 +1558,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _groupIdFrom = @(0);
+        _groupIdentifierFrom = @(0);
 
-        _sceneIdFrom = @(0);
+        _sceneIdentifierFrom = @(0);
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -1049,8 +1571,8 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRScenesClusterCopySceneResponseParams alloc] init];
 
     other.status = self.status;
-    other.groupIdFrom = self.groupIdFrom;
-    other.sceneIdFrom = self.sceneIdFrom;
+    other.groupIdentifierFrom = self.groupIdentifierFrom;
+    other.sceneIdentifierFrom = self.sceneIdentifierFrom;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -1058,17 +1580,41 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupIdFrom:%@; sceneIdFrom:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupIdFrom, _sceneIdFrom];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupIdentifierFrom:%@; sceneIdentifierFrom:%@; >",
+                                             NSStringFromClass([self class]), _status, _groupIdentifierFrom, _sceneIdentifierFrom];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRScenesClusterCopySceneResponseParams (Deprecated)
+
+- (void)setGroupIdFrom:(NSNumber * _Nonnull)groupIdFrom
+{
+    self.groupIdentifierFrom = groupIdFrom;
+}
+
+- (NSNumber * _Nonnull)groupIdFrom
+{
+    return self.groupIdentifierFrom;
+}
+
+- (void)setSceneIdFrom:(NSNumber * _Nonnull)sceneIdFrom
+{
+    self.sceneIdentifierFrom = sceneIdFrom;
+}
+
+- (NSNumber * _Nonnull)sceneIdFrom
+{
+    return self.sceneIdentifierFrom;
+}
 @end
 @implementation MTROnOffClusterOffParams
 - (instancetype)init
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1078,6 +1624,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTROnOffClusterOffParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1094,6 +1641,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1103,6 +1651,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTROnOffClusterOnParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1119,6 +1668,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1128,6 +1678,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTROnOffClusterToggleParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1144,10 +1695,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _effectId = @(0);
+        _effectIdentifier = @(0);
 
         _effectVariant = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1156,26 +1708,41 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTROnOffClusterOffWithEffectParams alloc] init];
 
-    other.effectId = self.effectId;
+    other.effectIdentifier = self.effectIdentifier;
     other.effectVariant = self.effectVariant;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: effectId:%@; effectVariant:%@; >", NSStringFromClass([self class]), _effectId, _effectVariant];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: effectIdentifier:%@; effectVariant:%@; >",
+                                             NSStringFromClass([self class]), _effectIdentifier, _effectVariant];
     return descriptionString;
 }
 
+@end
+
+@implementation MTROnOffClusterOffWithEffectParams (Deprecated)
+
+- (void)setEffectId:(NSNumber * _Nonnull)effectId
+{
+    self.effectIdentifier = effectId;
+}
+
+- (NSNumber * _Nonnull)effectId
+{
+    return self.effectIdentifier;
+}
 @end
 @implementation MTROnOffClusterOnWithRecallGlobalSceneParams
 - (instancetype)init
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1185,6 +1752,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTROnOffClusterOnWithRecallGlobalSceneParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1207,6 +1775,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _offWaitTime = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1219,6 +1788,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.onTime = self.onTime;
     other.offWaitTime = self.offWaitTime;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1244,6 +1814,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1257,6 +1828,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1283,6 +1855,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1296,6 +1869,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1323,6 +1897,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1337,6 +1912,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1359,6 +1935,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1370,6 +1947,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1395,6 +1973,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1408,6 +1987,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1434,6 +2014,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1447,6 +2028,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1474,6 +2056,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1488,6 +2071,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1510,6 +2094,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1521,6 +2106,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1540,6 +2126,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _frequency = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1550,6 +2137,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.frequency = self.frequency;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1570,6 +2158,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _invokeID = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1581,6 +2170,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1604,6 +2194,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1616,6 +2207,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.invokeID = self.invokeID;
     other.transitionTime = self.transitionTime;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1637,6 +2229,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _invokeID = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1648,6 +2241,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1671,6 +2265,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _duration = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1683,6 +2278,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.invokeID = self.invokeID;
     other.duration = self.duration;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1704,6 +2300,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _invokeID = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1715,6 +2312,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1736,6 +2334,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _invokeID = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1747,6 +2346,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1770,6 +2370,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _duration = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1782,6 +2383,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.invokeID = self.invokeID;
     other.duration = self.duration;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1803,6 +2405,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _invokeID = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1814,6 +2417,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1835,6 +2439,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _invokeID = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1846,6 +2451,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1869,6 +2475,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _duration = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1881,6 +2488,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.invokeID = self.invokeID;
     other.duration = self.duration;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1902,6 +2510,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _invokeID = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1913,6 +2522,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.actionID = self.actionID;
     other.invokeID = self.invokeID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1936,6 +2546,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _duration = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1948,6 +2559,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.invokeID = self.invokeID;
     other.duration = self.duration;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1965,6 +2577,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -1974,6 +2587,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRBasicClusterMfgSpecificPingParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -1990,9 +2604,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _vendorId = @(0);
+        _vendorID = @(0);
 
-        _productId = @(0);
+        _productID = @(0);
 
         _softwareVersion = @(0);
 
@@ -2006,6 +2620,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _metadataForProvider = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2014,8 +2629,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTROTASoftwareUpdateProviderClusterQueryImageParams alloc] init];
 
-    other.vendorId = self.vendorId;
-    other.productId = self.productId;
+    other.vendorID = self.vendorID;
+    other.productID = self.productID;
     other.softwareVersion = self.softwareVersion;
     other.protocolsSupported = self.protocolsSupported;
     other.hardwareVersion = self.hardwareVersion;
@@ -2023,6 +2638,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.requestorCanConsent = self.requestorCanConsent;
     other.metadataForProvider = self.metadataForProvider;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2030,9 +2646,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: vendorId:%@; productId:%@; softwareVersion:%@; protocolsSupported:%@; "
+        [NSString stringWithFormat:@"<%@: vendorID:%@; productID:%@; softwareVersion:%@; protocolsSupported:%@; "
                                    @"hardwareVersion:%@; location:%@; requestorCanConsent:%@; metadataForProvider:%@; >",
-                  NSStringFromClass([self class]), _vendorId, _productId, _softwareVersion, _protocolsSupported, _hardwareVersion,
+                  NSStringFromClass([self class]), _vendorID, _productID, _softwareVersion, _protocolsSupported, _hardwareVersion,
                   _location, _requestorCanConsent, [_metadataForProvider base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
@@ -2040,6 +2656,29 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTROtaSoftwareUpdateProviderClusterQueryImageParams
+@end
+
+@implementation MTROTASoftwareUpdateProviderClusterQueryImageParams (Deprecated)
+
+- (void)setVendorId:(NSNumber * _Nonnull)vendorId
+{
+    self.vendorID = vendorId;
+}
+
+- (NSNumber * _Nonnull)vendorId
+{
+    return self.vendorID;
+}
+
+- (void)setProductId:(NSNumber * _Nonnull)productId
+{
+    self.productID = productId;
+}
+
+- (NSNumber * _Nonnull)productId
+{
+    return self.productID;
+}
 @end
 @implementation MTROTASoftwareUpdateProviderClusterQueryImageResponseParams
 - (instancetype)init
@@ -2107,6 +2746,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _newVersion = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2118,6 +2758,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.updateToken = self.updateToken;
     other.newVersion = self.newVersion;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2178,6 +2819,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _softwareVersion = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2189,6 +2831,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.updateToken = self.updateToken;
     other.softwareVersion = self.softwareVersion;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2205,14 +2848,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
 @end
-@implementation MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams
+@implementation MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _providerNodeId = @(0);
+        _providerNodeID = @(0);
 
-        _vendorId = @(0);
+        _vendorID = @(0);
 
         _announcementReason = @(0);
 
@@ -2220,20 +2863,22 @@ NS_ASSUME_NONNULL_BEGIN
 
         _endpoint = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTROTASoftwareUpdateRequestorClusterAnnounceOtaProviderParams alloc] init];
+    auto other = [[MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams alloc] init];
 
-    other.providerNodeId = self.providerNodeId;
-    other.vendorId = self.vendorId;
+    other.providerNodeID = self.providerNodeID;
+    other.vendorID = self.vendorID;
     other.announcementReason = self.announcementReason;
     other.metadataForNode = self.metadataForNode;
     other.endpoint = self.endpoint;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2241,8 +2886,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: providerNodeId:%@; vendorId:%@; announcementReason:%@; metadataForNode:%@; endpoint:%@; >",
-        NSStringFromClass([self class]), _providerNodeId, _vendorId, _announcementReason,
+        stringWithFormat:@"<%@: providerNodeID:%@; vendorID:%@; announcementReason:%@; metadataForNode:%@; endpoint:%@; >",
+        NSStringFromClass([self class]), _providerNodeID, _vendorID, _announcementReason,
         [_metadataForNode base64EncodedStringWithOptions:0], _endpoint];
     return descriptionString;
 }
@@ -2250,6 +2895,29 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams
+@end
+
+@implementation MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams (Deprecated)
+
+- (void)setProviderNodeId:(NSNumber * _Nonnull)providerNodeId
+{
+    self.providerNodeID = providerNodeId;
+}
+
+- (NSNumber * _Nonnull)providerNodeId
+{
+    return self.providerNodeID;
+}
+
+- (void)setVendorId:(NSNumber * _Nonnull)vendorId
+{
+    self.vendorID = vendorId;
+}
+
+- (NSNumber * _Nonnull)vendorId
+{
+    return self.vendorID;
+}
 @end
 @implementation MTRGeneralCommissioningClusterArmFailSafeParams
 - (instancetype)init
@@ -2260,6 +2928,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _breadcrumb = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2271,6 +2940,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.expiryLengthSeconds = self.expiryLengthSeconds;
     other.breadcrumb = self.breadcrumb;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2326,6 +2996,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _breadcrumb = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2338,6 +3009,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.countryCode = self.countryCode;
     other.breadcrumb = self.breadcrumb;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2387,6 +3059,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2396,6 +3069,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRGeneralCommissioningClusterCommissioningCompleteParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2448,6 +3122,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _breadcrumb = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2459,6 +3134,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.ssid = self.ssid;
     other.breadcrumb = self.breadcrumb;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2521,6 +3197,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _breadcrumb = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2533,6 +3210,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.credentials = self.credentials;
     other.breadcrumb = self.breadcrumb;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2555,6 +3233,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _breadcrumb = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2566,6 +3245,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.operationalDataset = self.operationalDataset;
     other.breadcrumb = self.breadcrumb;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2588,6 +3268,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _breadcrumb = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2599,6 +3280,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.networkID = self.networkID;
     other.breadcrumb = self.breadcrumb;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2656,6 +3338,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _breadcrumb = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2667,6 +3350,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.networkID = self.networkID;
     other.breadcrumb = self.breadcrumb;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2726,6 +3410,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _breadcrumb = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2738,6 +3423,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.networkIndex = self.networkIndex;
     other.breadcrumb = self.breadcrumb;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2760,8 +3446,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _requestedProtocol = @(0);
 
-        _transferFileDesignator = [NSData data];
+        _transferFileDesignator = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2774,6 +3461,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.requestedProtocol = self.requestedProtocol;
     other.transferFileDesignator = self.transferFileDesignator;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2781,8 +3469,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: intent:%@; requestedProtocol:%@; transferFileDesignator:%@; >",
-                                             NSStringFromClass([self class]), _intent, _requestedProtocol,
-                                             [_transferFileDesignator base64EncodedStringWithOptions:0]];
+                                             NSStringFromClass([self class]), _intent, _requestedProtocol, _transferFileDesignator];
     return descriptionString;
 }
 
@@ -2794,11 +3481,11 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _content = [NSData data];
+        _logContent = [NSData data];
 
-        _timeStamp = @(0);
+        _utcTimeStamp = nil;
 
-        _timeSinceBoot = @(0);
+        _timeSinceBoot = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -2809,8 +3496,8 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRDiagnosticLogsClusterRetrieveLogsResponseParams alloc] init];
 
     other.status = self.status;
-    other.content = self.content;
-    other.timeStamp = self.timeStamp;
+    other.logContent = self.logContent;
+    other.utcTimeStamp = self.utcTimeStamp;
     other.timeSinceBoot = self.timeSinceBoot;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
@@ -2819,12 +3506,35 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; content:%@; timeStamp:%@; timeSinceBoot:%@; >",
-                                             NSStringFromClass([self class]), _status, [_content base64EncodedStringWithOptions:0],
-                                             _timeStamp, _timeSinceBoot];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: status:%@; logContent:%@; utcTimeStamp:%@; timeSinceBoot:%@; >", NSStringFromClass([self class]),
+        _status, [_logContent base64EncodedStringWithOptions:0], _utcTimeStamp, _timeSinceBoot];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRDiagnosticLogsClusterRetrieveLogsResponseParams (Deprecated)
+
+- (void)setContent:(NSData * _Nonnull)content
+{
+    self.logContent = content;
+}
+
+- (NSData * _Nonnull)content
+{
+    return self.logContent;
+}
+
+- (void)setTimeStamp:(NSNumber * _Nullable)timeStamp
+{
+    self.utcTimeStamp = timeStamp;
+}
+
+- (NSNumber * _Nullable)timeStamp
+{
+    return self.utcTimeStamp;
+}
 @end
 @implementation MTRGeneralDiagnosticsClusterTestEventTriggerParams
 - (instancetype)init
@@ -2835,6 +3545,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _eventTrigger = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2846,6 +3557,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.enableKey = self.enableKey;
     other.eventTrigger = self.eventTrigger;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2864,6 +3576,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2873,6 +3586,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRSoftwareDiagnosticsClusterResetWatermarksParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2889,6 +3603,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2898,6 +3613,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRThreadNetworkDiagnosticsClusterResetCountsParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2914,6 +3630,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2923,6 +3640,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRWiFiNetworkDiagnosticsClusterResetCountsParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2939,6 +3657,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2948,6 +3667,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTREthernetNetworkDiagnosticsClusterResetCountsParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -2970,6 +3690,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _timeSource = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -2982,6 +3703,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.granularity = self.granularity;
     other.timeSource = self.timeSource;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3001,7 +3723,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _commissioningTimeout = @(0);
 
-        _pakeVerifier = [NSData data];
+        _pakePasscodeVerifier = [NSData data];
 
         _discriminator = @(0);
 
@@ -3009,6 +3731,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _salt = [NSData data];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3018,24 +3741,38 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRAdministratorCommissioningClusterOpenCommissioningWindowParams alloc] init];
 
     other.commissioningTimeout = self.commissioningTimeout;
-    other.pakeVerifier = self.pakeVerifier;
+    other.pakePasscodeVerifier = self.pakePasscodeVerifier;
     other.discriminator = self.discriminator;
     other.iterations = self.iterations;
     other.salt = self.salt;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: commissioningTimeout:%@; pakeVerifier:%@; discriminator:%@; iterations:%@; salt:%@; >",
-                  NSStringFromClass([self class]), _commissioningTimeout, [_pakeVerifier base64EncodedStringWithOptions:0],
-                  _discriminator, _iterations, [_salt base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: commissioningTimeout:%@; pakePasscodeVerifier:%@; discriminator:%@; iterations:%@; salt:%@; >",
+        NSStringFromClass([self class]), _commissioningTimeout, [_pakePasscodeVerifier base64EncodedStringWithOptions:0],
+        _discriminator, _iterations, [_salt base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRAdministratorCommissioningClusterOpenCommissioningWindowParams (Deprecated)
+
+- (void)setPakeVerifier:(NSData * _Nonnull)pakeVerifier
+{
+    self.pakePasscodeVerifier = pakeVerifier;
+}
+
+- (NSData * _Nonnull)pakeVerifier
+{
+    return self.pakePasscodeVerifier;
+}
 @end
 @implementation MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams
 - (instancetype)init
@@ -3044,6 +3781,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _commissioningTimeout = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3054,6 +3792,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.commissioningTimeout = self.commissioningTimeout;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3071,6 +3810,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3080,6 +3820,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRAdministratorCommissioningClusterRevokeCommissioningParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3098,6 +3839,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _attestationNonce = [NSData data];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3108,6 +3850,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.attestationNonce = self.attestationNonce;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3127,7 +3870,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _attestationElements = [NSData data];
 
-        _signature = [NSData data];
+        _attestationSignature = [NSData data];
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -3138,7 +3881,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTROperationalCredentialsClusterAttestationResponseParams alloc] init];
 
     other.attestationElements = self.attestationElements;
-    other.signature = self.signature;
+    other.attestationSignature = self.attestationSignature;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
 
     return other;
@@ -3146,12 +3889,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: attestationElements:%@; signature:%@; >", NSStringFromClass([self class]),
-                  [_attestationElements base64EncodedStringWithOptions:0], [_signature base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString
+        stringWithFormat:@"<%@: attestationElements:%@; attestationSignature:%@; >", NSStringFromClass([self class]),
+        [_attestationElements base64EncodedStringWithOptions:0], [_attestationSignature base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
+@end
+
+@implementation MTROperationalCredentialsClusterAttestationResponseParams (Deprecated)
+
+- (void)setSignature:(NSData * _Nonnull)signature
+{
+    self.attestationSignature = signature;
+}
+
+- (NSData * _Nonnull)signature
+{
+    return self.attestationSignature;
+}
 @end
 @implementation MTROperationalCredentialsClusterCertificateChainRequestParams
 - (instancetype)init
@@ -3160,6 +3916,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _certificateType = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3170,6 +3927,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.certificateType = self.certificateType;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3220,6 +3978,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _isForUpdateNOC = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3231,6 +3990,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.csrNonce = self.csrNonce;
     other.isForUpdateNOC = self.isForUpdateNOC;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3292,6 +4052,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _adminVendorId = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3306,6 +4067,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.caseAdminSubject = self.caseAdminSubject;
     other.adminVendorId = self.adminVendorId;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3330,6 +4092,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _icacValue = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3341,6 +4104,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.nocValue = self.nocValue;
     other.icacValue = self.icacValue;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3396,6 +4160,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _label = @"";
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3406,6 +4171,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.label = self.label;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3424,6 +4190,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _fabricIndex = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3434,6 +4201,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.fabricIndex = self.fabricIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3451,8 +4219,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _rootCertificate = [NSData data];
+        _rootCACertificate = [NSData data];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3461,19 +4230,33 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTROperationalCredentialsClusterAddTrustedRootCertificateParams alloc] init];
 
-    other.rootCertificate = self.rootCertificate;
+    other.rootCACertificate = self.rootCACertificate;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rootCertificate:%@; >", NSStringFromClass([self class]),
-                                             [_rootCertificate base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rootCACertificate:%@; >", NSStringFromClass([self class]),
+                                             [_rootCACertificate base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
+@end
+
+@implementation MTROperationalCredentialsClusterAddTrustedRootCertificateParams (Deprecated)
+
+- (void)setRootCertificate:(NSData * _Nonnull)rootCertificate
+{
+    self.rootCACertificate = rootCertificate;
+}
+
+- (NSData * _Nonnull)rootCertificate
+{
+    return self.rootCACertificate;
+}
 @end
 @implementation MTRGroupKeyManagementClusterKeySetWriteParams
 - (instancetype)init
@@ -3482,6 +4265,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _groupKeySet = [MTRGroupKeyManagementClusterGroupKeySetStruct new];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3492,6 +4276,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.groupKeySet = self.groupKeySet;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3511,6 +4296,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _groupKeySetID = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3521,6 +4307,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.groupKeySetID = self.groupKeySetID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3569,6 +4356,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _groupKeySetID = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3579,6 +4367,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.groupKeySetID = self.groupKeySetID;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3598,6 +4387,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _groupKeySetIDs = [NSArray array];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3608,6 +4398,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.groupKeySetIDs = self.groupKeySetIDs;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3656,6 +4447,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _newMode = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3666,6 +4458,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.newMode = self.newMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3684,6 +4477,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _pinCode = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3694,6 +4488,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.pinCode = self.pinCode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3713,6 +4508,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _pinCode = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3723,6 +4519,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.pinCode = self.pinCode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3744,6 +4541,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _pinCode = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3755,6 +4553,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.timeout = self.timeout;
     other.pinCode = self.pinCode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3786,6 +4585,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _endMinute = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3802,6 +4602,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.endHour = self.endHour;
     other.endMinute = self.endMinute;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3825,6 +4626,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userIndex = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3836,6 +4638,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.weekDayIndex = self.weekDayIndex;
     other.userIndex = self.userIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3909,6 +4712,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userIndex = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3920,6 +4724,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.weekDayIndex = self.weekDayIndex;
     other.userIndex = self.userIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3945,6 +4750,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _localEndTime = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3958,6 +4764,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.localStartTime = self.localStartTime;
     other.localEndTime = self.localEndTime;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -3980,6 +4787,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userIndex = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -3991,6 +4799,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.yearDayIndex = self.yearDayIndex;
     other.userIndex = self.userIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4054,6 +4863,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userIndex = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4065,6 +4875,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.yearDayIndex = self.yearDayIndex;
     other.userIndex = self.userIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4090,6 +4901,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _operatingMode = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4103,6 +4915,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.localEndTime = self.localEndTime;
     other.operatingMode = self.operatingMode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4123,6 +4936,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _holidayIndex = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4133,6 +4947,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.holidayIndex = self.holidayIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4194,6 +5009,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _holidayIndex = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4204,6 +5020,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.holidayIndex = self.holidayIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4227,7 +5044,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userName = nil;
 
-        _userUniqueId = nil;
+        _userUniqueID = nil;
 
         _userStatus = nil;
 
@@ -4235,6 +5052,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _credentialRule = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4246,11 +5064,12 @@ NS_ASSUME_NONNULL_BEGIN
     other.operationType = self.operationType;
     other.userIndex = self.userIndex;
     other.userName = self.userName;
-    other.userUniqueId = self.userUniqueId;
+    other.userUniqueID = self.userUniqueID;
     other.userStatus = self.userStatus;
     other.userType = self.userType;
     other.credentialRule = self.credentialRule;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4259,12 +5078,25 @@ NS_ASSUME_NONNULL_BEGIN
 {
     NSString * descriptionString = [NSString
         stringWithFormat:
-            @"<%@: operationType:%@; userIndex:%@; userName:%@; userUniqueId:%@; userStatus:%@; userType:%@; credentialRule:%@; >",
-        NSStringFromClass([self class]), _operationType, _userIndex, _userName, _userUniqueId, _userStatus, _userType,
+            @"<%@: operationType:%@; userIndex:%@; userName:%@; userUniqueID:%@; userStatus:%@; userType:%@; credentialRule:%@; >",
+        NSStringFromClass([self class]), _operationType, _userIndex, _userName, _userUniqueID, _userStatus, _userType,
         _credentialRule];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRDoorLockClusterSetUserParams (Deprecated)
+
+- (void)setUserUniqueId:(NSNumber * _Nullable)userUniqueId
+{
+    self.userUniqueID = userUniqueId;
+}
+
+- (NSNumber * _Nullable)userUniqueId
+{
+    return self.userUniqueID;
+}
 @end
 @implementation MTRDoorLockClusterGetUserParams
 - (instancetype)init
@@ -4273,6 +5105,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userIndex = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4283,6 +5116,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.userIndex = self.userIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4303,7 +5137,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userName = nil;
 
-        _userUniqueId = nil;
+        _userUniqueID = nil;
 
         _userStatus = nil;
 
@@ -4329,7 +5163,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.userIndex = self.userIndex;
     other.userName = self.userName;
-    other.userUniqueId = self.userUniqueId;
+    other.userUniqueID = self.userUniqueID;
     other.userStatus = self.userStatus;
     other.userType = self.userType;
     other.credentialRule = self.credentialRule;
@@ -4345,13 +5179,26 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: userIndex:%@; userName:%@; userUniqueId:%@; userStatus:%@; userType:%@; credentialRule:%@; "
+        stringWithFormat:@"<%@: userIndex:%@; userName:%@; userUniqueID:%@; userStatus:%@; userType:%@; credentialRule:%@; "
                          @"credentials:%@; creatorFabricIndex:%@; lastModifiedFabricIndex:%@; nextUserIndex:%@; >",
-        NSStringFromClass([self class]), _userIndex, _userName, _userUniqueId, _userStatus, _userType, _credentialRule,
+        NSStringFromClass([self class]), _userIndex, _userName, _userUniqueID, _userStatus, _userType, _credentialRule,
         _credentials, _creatorFabricIndex, _lastModifiedFabricIndex, _nextUserIndex];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRDoorLockClusterGetUserResponseParams (Deprecated)
+
+- (void)setUserUniqueId:(NSNumber * _Nullable)userUniqueId
+{
+    self.userUniqueID = userUniqueId;
+}
+
+- (NSNumber * _Nullable)userUniqueId
+{
+    return self.userUniqueID;
+}
 @end
 @implementation MTRDoorLockClusterClearUserParams
 - (instancetype)init
@@ -4360,6 +5207,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userIndex = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4370,6 +5218,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.userIndex = self.userIndex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4388,7 +5237,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _operationType = @(0);
 
-        _credential = [MTRDoorLockClusterDlCredential new];
+        _credential = [MTRDoorLockClusterCredentialStruct new];
 
         _credentialData = [NSData data];
 
@@ -4398,6 +5247,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userType = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4413,6 +5263,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.userStatus = self.userStatus;
     other.userType = self.userType;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4467,8 +5318,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _credential = [MTRDoorLockClusterDlCredential new];
+        _credential = [MTRDoorLockClusterCredentialStruct new];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4479,6 +5331,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.credential = self.credential;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4542,6 +5395,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _credential = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4552,6 +5406,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.credential = self.credential;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4569,6 +5424,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4578,6 +5434,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRWindowCoveringClusterUpOrOpenParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4594,6 +5451,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4603,6 +5461,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRWindowCoveringClusterDownOrCloseParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4619,6 +5478,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4628,6 +5488,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRWindowCoveringClusterStopMotionParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4646,6 +5507,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _liftValue = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4656,6 +5518,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.liftValue = self.liftValue;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4674,6 +5537,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _liftPercent100thsValue = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4684,6 +5548,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.liftPercent100thsValue = self.liftPercent100thsValue;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4703,6 +5568,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _tiltValue = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4713,6 +5579,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.tiltValue = self.tiltValue;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4731,6 +5598,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _tiltPercent100thsValue = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4741,6 +5609,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.tiltPercent100thsValue = self.tiltPercent100thsValue;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4760,6 +5629,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _percentOpen = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4770,6 +5640,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.percentOpen = self.percentOpen;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4787,6 +5658,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4796,6 +5668,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRBarrierControlClusterBarrierControlStopParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4816,6 +5689,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _amount = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4827,6 +5701,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.mode = self.mode;
     other.amount = self.amount;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4891,6 +5766,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitions = [NSArray array];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4904,6 +5780,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.modeForSequence = self.modeForSequence;
     other.transitions = self.transitions;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4926,6 +5803,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _modeToReturn = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4937,6 +5815,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.daysToReturn = self.daysToReturn;
     other.modeToReturn = self.modeToReturn;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4954,6 +5833,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -4963,6 +5843,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRThermostatClusterClearWeeklyScheduleParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -4989,6 +5870,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5003,6 +5885,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5029,6 +5912,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5042,6 +5926,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5069,6 +5954,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5083,6 +5969,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5109,6 +5996,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5122,6 +6010,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5148,6 +6037,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5161,6 +6051,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5188,6 +6079,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5202,6 +6094,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5230,6 +6123,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5244,6 +6138,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5272,6 +6167,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5286,6 +6182,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5312,6 +6209,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5325,6 +6223,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5352,6 +6251,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5366,6 +6266,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5384,7 +6285,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _colorTemperature = @(0);
+        _colorTemperatureMireds = @(0);
 
         _transitionTime = @(0);
 
@@ -5392,6 +6293,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5400,11 +6302,12 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRColorControlClusterMoveToColorTemperatureParams alloc] init];
 
-    other.colorTemperature = self.colorTemperature;
+    other.colorTemperatureMireds = self.colorTemperatureMireds;
     other.transitionTime = self.transitionTime;
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5412,11 +6315,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: colorTemperature:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _colorTemperature, _transitionTime, _optionsMask, _optionsOverride];
+        [NSString stringWithFormat:@"<%@: colorTemperatureMireds:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
+                  NSStringFromClass([self class]), _colorTemperatureMireds, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
+@end
+
+@implementation MTRColorControlClusterMoveToColorTemperatureParams (Deprecated)
+
+- (void)setColorTemperature:(NSNumber * _Nonnull)colorTemperature
+{
+    self.colorTemperatureMireds = colorTemperature;
+}
+
+- (NSNumber * _Nonnull)colorTemperature
+{
+    return self.colorTemperatureMireds;
+}
 @end
 @implementation MTRColorControlClusterEnhancedMoveToHueParams
 - (instancetype)init
@@ -5433,6 +6349,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5447,6 +6364,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5473,6 +6391,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5486,6 +6405,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5513,6 +6433,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5527,6 +6448,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5555,6 +6477,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5569,6 +6492,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5601,6 +6525,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5617,6 +6542,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5640,6 +6566,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5651,6 +6578,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5680,6 +6608,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5695,6 +6624,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5729,6 +6659,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _optionsOverride = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5745,6 +6676,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionsMask = self.optionsMask;
     other.optionsOverride = self.optionsOverride;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5767,6 +6699,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _match = @"";
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5777,6 +6710,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.match = self.match;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5829,6 +6763,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _minorNumber = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5840,6 +6775,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.majorNumber = self.majorNumber;
     other.minorNumber = self.minorNumber;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5859,6 +6795,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _count = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5869,6 +6806,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.count = self.count;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5889,6 +6827,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _data = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5900,6 +6839,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.target = self.target;
     other.data = self.data;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5949,6 +6889,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5958,6 +6899,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRMediaPlaybackClusterPlayParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5974,6 +6916,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -5983,6 +6926,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRMediaPlaybackClusterPauseParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -5994,20 +6938,22 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRMediaPlaybackClusterStopPlaybackParams
+@implementation MTRMediaPlaybackClusterStopParams
 - (instancetype)init
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRMediaPlaybackClusterStopPlaybackParams alloc] init];
+    auto other = [[MTRMediaPlaybackClusterStopParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6019,11 +6965,15 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRMediaPlaybackClusterStopPlaybackParams
+@end
 @implementation MTRMediaPlaybackClusterStartOverParams
 - (instancetype)init
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6033,6 +6983,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRMediaPlaybackClusterStartOverParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6049,6 +7000,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6058,6 +7010,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRMediaPlaybackClusterPreviousParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6074,6 +7027,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6083,6 +7037,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRMediaPlaybackClusterNextParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6099,6 +7054,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6108,6 +7064,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRMediaPlaybackClusterRewindParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6124,6 +7081,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6133,6 +7091,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRMediaPlaybackClusterFastForwardParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6151,6 +7110,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _deltaPositionMilliseconds = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6161,6 +7121,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.deltaPositionMilliseconds = self.deltaPositionMilliseconds;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6180,6 +7141,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _deltaPositionMilliseconds = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6190,6 +7152,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.deltaPositionMilliseconds = self.deltaPositionMilliseconds;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6241,6 +7204,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _position = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6251,6 +7215,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.position = self.position;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6269,6 +7234,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _index = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6279,6 +7245,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.index = self.index;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6295,6 +7262,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6304,6 +7272,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRMediaInputClusterShowInputStatusParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6320,6 +7289,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6329,6 +7299,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRMediaInputClusterHideInputStatusParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6349,6 +7320,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _name = @"";
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6360,6 +7332,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.index = self.index;
     other.name = self.name;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6377,6 +7350,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6386,6 +7360,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRLowPowerClusterSleepParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6404,6 +7379,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _keyCode = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6414,6 +7390,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.keyCode = self.keyCode;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6458,12 +7435,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _search = [MTRContentLauncherClusterContentSearch new];
+        _search = [MTRContentLauncherClusterContentSearchStruct new];
 
         _autoPlay = @(0);
 
         _data = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6476,6 +7454,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.autoPlay = self.autoPlay;
     other.data = self.data;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6499,6 +7478,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _brandingInformation = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6511,6 +7491,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.displayString = self.displayString;
     other.brandingInformation = self.brandingInformation;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6523,7 +7504,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRContentLauncherClusterLaunchResponseParams
+@implementation MTRContentLauncherClusterLauncherResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6538,7 +7519,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRContentLauncherClusterLaunchResponseParams alloc] init];
+    auto other = [[MTRContentLauncherClusterLauncherResponseParams alloc] init];
 
     other.status = self.status;
     other.data = self.data;
@@ -6555,6 +7536,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
+
+@implementation MTRContentLauncherClusterLaunchResponseParams
+@end
 @implementation MTRAudioOutputClusterSelectOutputParams
 - (instancetype)init
 {
@@ -6562,6 +7546,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _index = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6572,6 +7557,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.index = self.index;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6592,6 +7578,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _name = @"";
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6603,6 +7590,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.index = self.index;
     other.name = self.name;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6620,10 +7608,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [MTRApplicationLauncherClusterApplication new];
+        _application = nil;
 
         _data = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6635,6 +7624,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.application = self.application;
     other.data = self.data;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6652,8 +7642,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [MTRApplicationLauncherClusterApplication new];
+        _application = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6664,6 +7655,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.application = self.application;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6681,8 +7673,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [MTRApplicationLauncherClusterApplication new];
+        _application = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6693,6 +7686,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.application = self.application;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6712,7 +7706,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _data = [NSData data];
+        _data = nil;
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -6744,6 +7738,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _tempAccountIdentifier = @"";
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6754,6 +7749,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.tempAccountIdentifier = self.tempAccountIdentifier;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6803,6 +7799,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _setupPIN = @"";
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6814,6 +7811,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.tempAccountIdentifier = self.tempAccountIdentifier;
     other.setupPIN = self.setupPIN;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6831,6 +7829,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6840,6 +7839,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRAccountLoginClusterLogoutParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6895,6 +7895,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6904,6 +7905,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRElectricalMeasurementClusterGetProfileInfoCommandParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6972,6 +7974,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _numberOfIntervals = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -6984,6 +7987,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.startTime = self.startTime;
     other.numberOfIntervals = self.numberOfIntervals;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -6996,68 +8000,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 @end
-@implementation MTRClientMonitoringClusterRegisterClientMonitoringParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _clientNodeId = @(0);
-
-        _iCid = @(0);
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRClientMonitoringClusterRegisterClientMonitoringParams alloc] init];
-
-    other.clientNodeId = self.clientNodeId;
-    other.iCid = self.iCid;
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: clientNodeId:%@; iCid:%@; >", NSStringFromClass([self class]), _clientNodeId, _iCid];
-    return descriptionString;
-}
-
-@end
-@implementation MTRClientMonitoringClusterStayAwakeRequestParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-        _timedInvokeTimeoutMs = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone;
-{
-    auto other = [[MTRClientMonitoringClusterStayAwakeRequestParams alloc] init];
-
-    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
-    return descriptionString;
-}
-
-@end
 @implementation MTRUnitTestingClusterTestParams
 - (instancetype)init
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -7067,6 +8015,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRUnitTestingClusterTestParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -7118,6 +8067,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -7127,6 +8077,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRUnitTestingClusterTestNotHandledParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -7178,6 +8129,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -7187,6 +8139,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRUnitTestingClusterTestSpecificParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -7238,6 +8191,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -7247,6 +8201,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRUnitTestingClusterTestUnknownCommandParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -7317,6 +8272,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _arg2 = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -7328,6 +8284,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.arg1 = self.arg1;
     other.arg2 = self.arg2;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -7381,6 +8338,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _arg1 = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -7391,6 +8349,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -7457,6 +8416,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _arg6 = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -7472,6 +8432,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.arg5 = self.arg5;
     other.arg6 = self.arg6;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -7535,6 +8496,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _arg1 = [MTRUnitTestingClusterSimpleStruct new];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -7545,6 +8507,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -7693,6 +8656,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _arg1 = [MTRUnitTestingClusterNestedStruct new];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -7703,6 +8667,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -7755,6 +8720,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _arg1 = [NSArray array];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -7765,6 +8731,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -7817,6 +8784,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _arg1 = [NSArray array];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -7827,6 +8795,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -7879,6 +8848,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _arg1 = [MTRUnitTestingClusterNestedStructList new];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -7889,6 +8859,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -7941,6 +8912,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _arg1 = [NSArray array];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -7951,6 +8923,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -7972,6 +8945,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _arg1 = [NSArray array];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -7982,6 +8956,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -8005,6 +8980,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _arg2 = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -8016,6 +8992,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.arg1 = self.arg1;
     other.arg2 = self.arg2;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -8038,6 +9015,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _arg1 = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -8048,6 +9026,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -8091,6 +9070,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _nullableOptionalList = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -8112,6 +9092,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.optionalList = self.optionalList;
     other.nullableOptionalList = self.nullableOptionalList;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -8139,6 +9120,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _arg1 = [MTRUnitTestingClusterSimpleStruct new];
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -8149,6 +9131,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -8168,6 +9151,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -8177,6 +9161,7 @@ NS_ASSUME_NONNULL_BEGIN
     auto other = [[MTRUnitTestingClusterTimedInvokeRequestParams alloc] init];
 
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -8198,6 +9183,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _arg1 = nil;
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -8208,6 +9194,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -8233,6 +9220,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _arg3 = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -8245,6 +9233,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.arg2 = self.arg2;
     other.arg3 = self.arg3;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -8267,6 +9256,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _arg1 = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -8277,6 +9267,7 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.arg1 = self.arg1;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -8306,6 +9297,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _takeMutex = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -8320,6 +9312,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.numCallsToFail = self.numCallsToFail;
     other.takeMutex = self.takeMutex;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }
@@ -8344,6 +9337,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _percentage = @(0);
         _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
     }
     return self;
 }
@@ -8356,6 +9350,7 @@ NS_ASSUME_NONNULL_BEGIN
     other.id = self.id;
     other.percentage = self.percentage;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
 
     return other;
 }

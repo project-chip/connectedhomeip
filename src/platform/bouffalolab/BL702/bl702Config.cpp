@@ -25,7 +25,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-// #include <blog.h>
 #include <easyflash.h>
 
 namespace chip {

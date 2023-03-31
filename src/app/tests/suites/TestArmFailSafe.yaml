@@ -36,7 +36,7 @@ tests:
       cluster: "Operational Credentials"
       attribute: "Fabrics"
       response:
-          value: [{ Label: "", NodeId: nodeId }]
+          value: [{ Label: "", NodeID: nodeId }]
           constraints:
               type: list
 
@@ -45,13 +45,13 @@ tests:
       command: "ArmFailSafe"
       arguments:
           values:
-              - name: "expiryLengthSeconds"
+              - name: "ExpiryLengthSeconds"
                 value: 0
-              - name: "breadcrumb"
+              - name: "Breadcrumb"
                 value: 0
       response:
           values:
-              - name: "errorCode"
+              - name: "ErrorCode"
                 value: 0
 
     - label: "Reads NodeLabel mandatory attribute of target device"
@@ -66,7 +66,7 @@ tests:
       cluster: "Operational Credentials"
       arguments:
           values:
-              - name: RootCertificate
+              - name: RootCACertificate
                 value: "00000000"
 
       response:

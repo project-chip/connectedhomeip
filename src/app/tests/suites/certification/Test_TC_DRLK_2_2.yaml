@@ -36,48 +36,48 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
 
     - label: "Read the user back and verify its fields"
       command: "GetUser"
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
-              - name: "credentials"
-                value: null
-              - name: "creatorFabricIndex"
+              - name: "Credentials"
+                value: []
+              - name: "CreatorFabricIndex"
                 value: 1
-              - name: "lastModifiedFabricIndex"
+              - name: "LastModifiedFabricIndex"
                 value: 1
-              - name: "nextUserIndex"
+              - name: "NextUserIndex"
                 value: null
 
     - label: "Create new PIN credential and lock/unlock user"
@@ -85,44 +85,44 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
-              - name: "credentialData"
+              - name: "CredentialData"
                 value: "123456"
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: null
-              - name: "userType"
+              - name: "UserType"
                 value: null
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: null
-              - name: "nextCredentialIndex"
+              - name: "NextCredentialIndex"
                 value: 2
 
     - label: "Verify created PIN credential"
       command: "GetCredentialStatus"
       arguments:
           values:
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
       response:
           values:
-              - name: "credentialExists"
+              - name: "CredentialExists"
                 value: true
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "creatorFabricIndex"
+              - name: "CreatorFabricIndex"
                 value: 1
-              - name: "lastModifiedFabricIndex"
+              - name: "LastModifiedFabricIndex"
                 value: 1
-              - name: "nextCredentialIndex"
+              - name: "NextCredentialIndex"
                 value: null
 
     - label:
@@ -156,8 +156,6 @@ tests:
       PICS: DRLK.S.C00.Rsp
       command: "LockDoor"
       timedInteractionTimeoutMs: 1000
-      response:
-          error: 0x00
 
     - label: "TH sends Lock Door Command to the DUT with valid PINCode"
       PICS: DRLK.S.C00.Rsp
@@ -165,7 +163,7 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "pinCode"
+              - name: "PINCode"
                 value: "123456"
 
     - label:
@@ -201,7 +199,7 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "pinCode"
+              - name: "PINCode"
                 value: "123456"
 
     - label: "TH sends Lock Door Command to the DUT without valid PINCode"
@@ -210,7 +208,7 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "pinCode"
+              - name: "PINCode"
                 value: "645321"
       response:
           error: FAILURE
@@ -227,9 +225,10 @@ tests:
       PICS: DRLK.S.A0030
       command: "readAttribute"
       attribute: "WrongCodeEntryLimit"
-      constraints:
-          minValue: 1
-          maxValue: 255
+      response:
+          constraints:
+              minValue: 1
+              maxValue: 255
 
     #currently for loop is not implemented in yaml framework so converted this step as user prompt
     - label:
@@ -237,7 +236,7 @@ tests:
           Repeat this step PIXIT.DRLK.WrongCodeEntryLimit times and Verify that
           DUT sends failure response to the TH"
       verification: |
-          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 1234568
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 1234568
 
           Verify " DUT sends failure response" on the TH(Chip-tool) Log:
 
@@ -277,7 +276,7 @@ tests:
           "TH sends an Unlock Door Command from User1 to the DUT with the valid
           PINCode and verify the DUT response"
       verification: |
-          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 123456
 
           Verify " DUT sends failure response" on the TH(Chip-tool) Log:
 
@@ -317,7 +316,7 @@ tests:
           [1661767967.006958][131055:131060] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Attribute 0x0000_0031 DataVersion: 683420143
           [1661767967.006988][131055:131060] CHIP:TOO:   UserCodeTemporaryDisableTime: 10
 
-          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 123456
 
           Verify " DUT sends success response" on the TH(Chip-tool) Log:
 
@@ -370,9 +369,10 @@ tests:
       PICS: DRLK.S.A0031
       command: "readAttribute"
       attribute: "UserCodeTemporaryDisableTime"
-      constraints:
-          minValue: 1
-          maxValue: 255
+      response:
+          constraints:
+              minValue: 1
+              maxValue: 255
 
     - label:
           "TH writes UserCodeTemporaryDisableTime attribute value as between 1
@@ -399,7 +399,7 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
 
     - label: "Cleanup the created credential"
@@ -408,5 +408,5 @@ tests:
       timedInteractionTimeoutMs: 1000
       arguments:
           values:
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }

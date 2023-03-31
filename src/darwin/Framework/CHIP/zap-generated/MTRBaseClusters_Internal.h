@@ -20,7 +20,7 @@
 #import "MTRBaseClusters.h"
 #import "MTRBaseDevice.h"
 
-#include <controller-clusters/zap-generated/CHIPClusters.h>
+#include <zap-generated/CHIPClusters.h>
 
 @interface MTRBaseClusterIdentify ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
@@ -157,7 +157,7 @@
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end
 
-@interface MTRBaseClusterBridgedDeviceBasic ()
+@interface MTRBaseClusterBridgedDeviceBasicInformation ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @property (nonatomic, assign, readonly) chip::EndpointId endpoint;
 @end

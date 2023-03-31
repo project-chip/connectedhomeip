@@ -16,22 +16,67 @@
 #
 
 import argparse
-import os
-from pathlib import Path
-import sys
-import subprocess
 import logging
 import multiprocessing
-
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+import traceback
+import urllib.request
 from dataclasses import dataclass
+from enum import Flag, auto
+from pathlib import Path
 
 CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
 
 
+# Type of targets that can be re-generated
+class TargetType(Flag):
+
+    # Tests for golden images
+    TESTS = auto()
+
+    # Global templates: generally examples and chip controller
+    GLOBAL = auto()
+
+    # codgen.py templates (generally java templates, which cannot be built
+    # at compile time currently)
+    IDL_CODEGEN = auto()
+
+    # App-specific templates (see getSpecificTemplatesTargets)
+    SPECIFIC = auto()
+
+    # Golden compares for unit tests of zap codegen
+    GOLDEN_TEST_IMAGES = auto()
+
+    # All possible targets. Convenience constant
+    ALL = TESTS | GLOBAL | IDL_CODEGEN | SPECIFIC | GOLDEN_TEST_IMAGES
+
+
+__TARGET_TYPES__ = {
+    'tests': TargetType.TESTS,
+    'global': TargetType.GLOBAL,
+    'idl_codegen': TargetType.IDL_CODEGEN,
+    'specific': TargetType.SPECIFIC,
+    'golden_test_images': TargetType.GOLDEN_TEST_IMAGES,
+    'all': TargetType.ALL,
+}
+
+
+@dataclass
+class TargetRunStats:
+    config: str
+    template: str
+    generate_time: float
+
+
 @dataclass(eq=True, frozen=True)
 class ZapDistinctOutput:
-    """Defines the properties that determine if some output seems unique or 
+    """Defines the properties that determine if some output seems unique or
        not, for the purposes of detecting codegen overlap.
 
        Not perfect, since separate templates may use the same file names, but
@@ -43,7 +88,14 @@ class ZapDistinctOutput:
 
 
 class ZAPGenerateTarget:
-    def __init__(self, zap_config, template=None, output_dir=None):
+
+    @staticmethod
+    def MatterIdlTarget(zap_config):
+        # NOTE: this assumes `src/app/zap-templates/matter-idl.json` is the
+        #       DEFAULT generation target and it needs no output_dir
+        return ZAPGenerateTarget(zap_config, template=None, output_dir=None)
+
+    def __init__(self, zap_config, template, output_dir=None):
         self.script = './scripts/tools/zap/generate.py'
         self.zap_config = str(zap_config)
         self.template = template
@@ -55,7 +107,16 @@ class ZAPGenerateTarget:
             self.output_dir = None
 
     def distinct_output(self):
-        return ZapDistinctOutput(input_template=self.template, output_directory=self.output_dir)
+        if not self.template and not self.output_dir:
+            # Matter IDL templates have no template/output dir as they go with the
+            # default.
+            #
+            # output_directory is MIS-USED here because zap files may reside in the same
+            # directory (e.g. chef) so we claim the zap config is an output directory
+            # for uniqueness
+            return ZapDistinctOutput(input_template=None, output_directory=self.zap_config)
+        else:
+            return ZapDistinctOutput(input_template=self.template, output_directory=self.output_dir)
 
     def log_command(self):
         """Log the command that will get run for this target
@@ -79,22 +140,122 @@ class ZAPGenerateTarget:
 
         return cmd
 
-    def generate(self):
+    def generate(self) -> TargetRunStats:
         """Runs a ZAP generate command on the configured zap/template/outputs.
         """
         cmd = self.build_cmd()
         logging.info("Generating target: %s" % " ".join(cmd))
+
+        generate_start = time.time()
         subprocess.check_call(cmd)
+        generate_end = time.time()
+
         if "chef" in self.zap_config:
-            af_gen_event = os.path.join(self.output_dir, "af-gen-event.h")
-            with open(af_gen_event, "w+"):  # Empty file needed for linux
-                pass
             idl_path = self.zap_config.replace(".zap", ".matter")
             target_path = os.path.join("examples",
                                        "chef",
                                        "devices",
                                        os.path.basename(idl_path))
             os.rename(idl_path, target_path)
+        return TargetRunStats(
+            generate_time=generate_end - generate_start,
+            config=self.zap_config,
+            template=self.template,
+        )
+
+
+class GoldenTestImageTarget():
+    def __init__(self):
+        # NOTE: output-path is inside the tree. This is because clang-format
+        #       will search for a .clang-format file in the directory tree
+        #       so attempts to format outside the tree will generate diffs.
+        # NOTE: relative path because this script generally does a
+        #       os.chdir to CHIP_ROOT anyway.
+        os.makedirs('./out', exist_ok=True)
+        self.tempdir = tempfile.mkdtemp(prefix='test_golden', dir='./out')
+
+        # This runs a test, but the important bit is we pass `--regenerate`
+        # to it and this will cause it to OVERWRITE golden images.
+        self.command = ["./scripts/tools/zap/test_generate.py",
+                        "--output", self.tempdir, "--regenerate"]
+
+    def __del__(self):
+        # Clean up
+        if os.path.isdir(self.tempdir):
+            shutil.rmtree(self.tempdir)
+
+    def generate(self) -> TargetRunStats:
+        generate_start = time.time()
+        subprocess.check_call(self.command)
+        generate_end = time.time()
+
+        return TargetRunStats(
+            generate_time=generate_end - generate_start,
+            config='./scripts/tools/zap/test_generate.py',
+            template='./scripts/tools/zap/test_generate.py',
+        )
+
+    def distinct_output(self):
+        # Fake output - this is a single target that generates golden images
+        return ZapDistinctOutput(input_template='GOLDEN_IMAGES', output_directory='GOLDEN_IMAGES')
+
+    def log_command(self):
+        logging.info("  %s" % " ".join(self.command))
+
+
+class JinjaCodegenTarget():
+    def __init__(self, generator: str, output_directory: str, idl_path: str):
+        # This runs a test, but the important bit is we pass `--regenerate`
+        # to it and this will cause it to OVERWRITE golden images.
+        self.idl_path = idl_path
+        self.generator = generator
+        self.output_directory = output_directory
+        self.command = ["./scripts/codegen.py", "--output-dir", output_directory,
+                        "--generator", generator, idl_path]
+
+    def runJavaPrettifier(self):
+        try:
+            java_outputs = subprocess.check_output(["./scripts/codegen.py", "--name-only", "--generator",
+                                                   self.generator, "--log-level", "fatal", self.idl_path]).decode("utf8").split("\n")
+            java_outputs = [os.path.join(self.output_directory, name) for name in java_outputs if name]
+
+            logging.info("Prettifying %d java files:", len(java_outputs))
+            for name in java_outputs:
+                logging.info("    %s" % name)
+
+            # Keep this version in sync with what restyler uses (https://github.com/project-chip/connectedhomeip/blob/master/.restyled.yaml).
+            FORMAT_VERSION = "1.6"
+            URL_PREFIX = 'https://github.com/google/google-java-format/releases/download/google-java-format'
+            JAR_NAME = f"google-java-format-{FORMAT_VERSION}-all-deps.jar"
+            jar_url = f"{URL_PREFIX}-{FORMAT_VERSION}/{JAR_NAME}"
+
+            path, http_message = urllib.request.urlretrieve(jar_url, Path.home().joinpath(JAR_NAME).as_posix())
+
+            subprocess.check_call(['java', '-jar', path, '--replace'] + java_outputs)
+        except Exception as err:
+            traceback.print_exception(err)
+            print('google-java-format error:', err)
+
+    def generate(self) -> TargetRunStats:
+        generate_start = time.time()
+
+        subprocess.check_call(self.command)
+        self.runJavaPrettifier()
+
+        generate_end = time.time()
+
+        return TargetRunStats(
+            generate_time=generate_end - generate_start,
+            config=f'codegen:{self.generator}',
+            template=self.idl_path,
+        )
+
+    def distinct_output(self):
+        # Fake output - this is a single target that generates golden images
+        return ZapDistinctOutput(input_template=f'{self.generator}{self.idl_path}', output_directory=self.output_directory)
+
+    def log_command(self):
+        logging.info("  %s" % " ".join(self.command))
 
 
 def checkPythonVersion():
@@ -107,7 +268,7 @@ def checkPythonVersion():
 def setupArgumentsParser():
     parser = argparse.ArgumentParser(
         description='Generate content from ZAP files')
-    parser.add_argument('--type', default='all', choices=['all', 'tests'],
+    parser.add_argument('--type', action='append', choices=__TARGET_TYPES__.keys(),
                         help='Choose which content type to generate (default: all)')
     parser.add_argument('--tests', default='all', choices=['all', 'chip-tool', 'darwin-framework-tool', 'app1', 'app2'],
                         help='When generating tests only target, Choose which tests to generate (default: all)')
@@ -120,7 +281,21 @@ def setupArgumentsParser():
     parser.add_argument('--no-parallel', action='store_false', dest='parallel')
     parser.set_defaults(parallel=True)
 
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    # Convert a list of target_types (as strings)
+    # into a single flag value
+    if not args.type:
+        args.type = TargetType.ALL  # default instead of a list
+    else:
+        # convert the list into a single flag value
+        types = [t for t in map(lambda x: __TARGET_TYPES__[
+                                x.lower()], args.type)]
+        args.type = types[0]
+        for t in types:
+            args.type = args.type | t
+
+    return args
 
 
 def getGlobalTemplatesTargets():
@@ -144,11 +319,11 @@ def getGlobalTemplatesTargets():
             # a name like <zap-generated/foo.h>
             output_dir = os.path.join(
                 'zzz_generated', 'placeholder', example_name, 'zap-generated')
-            template = 'examples/placeholder/templates/templates.json'
+            template = os.path.join(
+                'examples', 'placeholder', 'linux', 'apps', example_name, 'templates', 'templates.json')
 
-            targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir))
-            targets.append(
-                ZAPGenerateTarget(filepath, output_dir=output_dir, template=template))
+            targets.append(ZAPGenerateTarget.MatterIdlTarget(filepath))
+            targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir, template=template))
             continue
 
         if example_name == "chef":
@@ -162,7 +337,7 @@ def getGlobalTemplatesTargets():
         generate_subdir = example_name
 
         # Special casing lighting app because separate folders
-        if example_name == "lighting-app":
+        if example_name == "lighting-app" or example_name == "lock-app":
             if 'nxp' in str(filepath):
                 generate_subdir = f"{example_name}/nxp"
 
@@ -170,11 +345,30 @@ def getGlobalTemplatesTargets():
         # a name like <zap-generated/foo.h>
         output_dir = os.path.join(
             'zzz_generated', generate_subdir, 'zap-generated')
-        targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir))
+        targets.append(ZAPGenerateTarget.MatterIdlTarget(filepath))
 
+    targets.append(ZAPGenerateTarget.MatterIdlTarget('src/controller/data_model/controller-clusters.zap'))
+
+    # This generates app headers for darwin only, for easier/clearer include
+    # in .pbxproj files.
+    #
+    # TODO: These files can be code generated at compile time, we should figure
+    #       out a path for this codegen to not be required.
     targets.append(ZAPGenerateTarget(
         'src/controller/data_model/controller-clusters.zap',
-        output_dir=os.path.join('zzz_generated/controller-clusters/zap-generated')))
+        template="src/app/zap-templates/app-templates.json",
+        output_dir='zzz_generated/darwin/controller-clusters/zap-generated'))
+
+    return targets
+
+
+def getCodegenTemplates():
+    targets = []
+
+    targets.append(JinjaCodegenTarget(
+        generator="java-class",
+        idl_path="src/controller/data_model/controller-clusters.matter",
+        output_directory="src/controller/java/generated"))
 
     return targets
 
@@ -204,6 +398,10 @@ def getTestsTemplatesTargets(test_target):
     return targets
 
 
+def getGoldenTestImageTargets():
+    return [GoldenTestImageTarget()]
+
+
 def getSpecificTemplatesTargets():
     zap_filepath = 'src/controller/data_model/controller-clusters.zap'
 
@@ -230,12 +428,20 @@ def getSpecificTemplatesTargets():
 def getTargets(type, test_target):
     targets = []
 
-    if type == 'all':
-        targets.extend(getGlobalTemplatesTargets())
-        targets.extend(getTestsTemplatesTargets('all'))
-        targets.extend(getSpecificTemplatesTargets())
-    elif type == 'tests':
+    if type & TargetType.TESTS:
         targets.extend(getTestsTemplatesTargets(test_target))
+
+    if type & TargetType.GLOBAL:
+        targets.extend(getGlobalTemplatesTargets())
+
+    if type & TargetType.SPECIFIC:
+        targets.extend(getSpecificTemplatesTargets())
+
+    if type & TargetType.IDL_CODEGEN:
+        targets.extend(getCodegenTemplates())
+
+    if type & TargetType.GOLDEN_TEST_IMAGES:
+        targets.extend(getGoldenTestImageTargets())
 
     logging.info("Targets to be generated:")
     for target in targets:
@@ -265,7 +471,7 @@ def _ParallelGenerateOne(target):
     Helper method to be passed to multiprocessing parallel generation of
     items.
     """
-    target.generate()
+    return target.generate()
 
 
 def main():
@@ -279,20 +485,44 @@ def main():
 
     targets = getTargets(args.type, args.tests)
 
-    if not args.dry_run:
+    if args.dry_run:
+        sys.exit(0)
 
-        if args.run_bootstrap:
-            subprocess.check_call(os.path.join(CHIP_ROOT_DIR, "scripts/tools/zap/zap_bootstrap.sh"), shell=True)
+    if args.run_bootstrap:
+        subprocess.check_call(os.path.join(
+            CHIP_ROOT_DIR, "scripts/tools/zap/zap_bootstrap.sh"), shell=True)
 
-        if args.parallel:
-            # Ensure each zap run is independent
-            os.environ['ZAP_TEMPSTATE'] = '1'
-            with multiprocessing.Pool() as pool:
-                for _ in pool.imap_unordered(_ParallelGenerateOne, targets):
-                    pass
-        else:
-            for target in targets:
-                target.generate()
+    timings = []
+    if args.parallel:
+        # Ensure each zap run is independent
+        os.environ['ZAP_TEMPSTATE'] = '1'
+        with multiprocessing.Pool() as pool:
+            for timing in pool.imap_unordered(_ParallelGenerateOne, targets):
+                timings.append(timing)
+    else:
+        for target in targets:
+            timings.append(target.generate())
+
+    timings.sort(key=lambda t: t.generate_time)
+
+    print(" Time (s) | {:^50} | {:^50}".format("Config", "Template"))
+    for timing in timings:
+        tmpl = timing.template
+
+        if tmpl is None:
+            tmpl = '[NONE (matter idl generation)]'
+
+        if len(tmpl) > 50:
+            # easier to distinguish paths ... shorten common in-fixes
+            tmpl = tmpl.replace("/zap-templates/", "/../")
+            tmpl = tmpl.replace("/templates/", "/../")
+
+        print(" %8d | %50s | %50s" % (
+            timing.generate_time,
+            ".." + timing.config[len(timing.config) -
+                                 48:] if len(timing.config) > 50 else timing.config,
+            ".." + tmpl[len(tmpl) - 48:] if len(tmpl) > 50 else tmpl,
+        ))
 
 
 if __name__ == '__main__':

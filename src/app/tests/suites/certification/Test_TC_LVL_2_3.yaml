@@ -29,7 +29,7 @@ config:
 
 tests:
     - label: "Note"
-      verifaction: |
+      verification: |
           For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
@@ -346,6 +346,7 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
+
           ./chip-tool levelcontrol write on-level 5 (replace with your value) 1 1
           Verify DUT receives on-level attribute write response on the TH(all-clusters-app) Log:
           [1657913667.893875][3126:3126] CHIP:DMG: WriteRequestMessage =
@@ -379,7 +380,8 @@ tests:
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
 
-          ./chip-tool levelcontrol write on-off-transition-time 5 (replace with your own value) 123123 1
+
+          ./chip-tool levelcontrol write on-off-transition-time 5 (replace with your own value) 1 1
           Verify DUT receives on-off-transition-time attribute write response on the TH(all-clusters-app) Log:
           [1657913716.044424][3126:3126] CHIP:DMG: WriteRequestMessage =
           [1657913716.044478][3126:3126] CHIP:DMG: {
@@ -522,7 +524,6 @@ tests:
           AttributeList. Commission DUT to TH again"
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
-
 
 
           ./chip-tool levelcontrol read current-level 1 1

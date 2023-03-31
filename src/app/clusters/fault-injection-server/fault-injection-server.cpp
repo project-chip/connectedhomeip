@@ -16,7 +16,6 @@
  */
 
 #include "app/server/Server.h"
-#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -80,7 +79,7 @@ bool emberAfFaultInjectionClusterFailAtFaultCallback(CommandHandler * commandObj
 
     if (faultInjectionMgr != nullptr)
     {
-        ChipLogProgress(Zcl, "FaultInjection: Configure a fault of type: %d and Id: %d to be triggered deterministically",
+        ChipLogProgress(Zcl, "FaultInjection: Configure a fault of type: %u and Id: %" PRIu32 " to be triggered deterministically",
                         static_cast<uint8_t>(commandData.type), commandData.id);
         int32_t err = faultInjectionMgr->FailAtFault(commandData.id, commandData.numCallsToSkip, commandData.numCallsToFail,
                                                      commandData.takeMutex);
@@ -126,7 +125,7 @@ bool emberAfFaultInjectionClusterFailRandomlyAtFaultCallback(CommandHandler * co
 
     if (faultInjectionMgr != nullptr)
     {
-        ChipLogProgress(Zcl, "FaultInjection: Configure a fault of type: %d and Id: %d to be triggered randomly",
+        ChipLogProgress(Zcl, "FaultInjection: Configure a fault of type: %u and Id: %" PRIu32 " to be triggered randomly",
                         static_cast<uint8_t>(commandData.type), commandData.id);
         int32_t err = faultInjectionMgr->FailRandomlyAtFault(commandData.id, commandData.percentage);
 

@@ -17,7 +17,9 @@ import("//build_overrides/chip.gni")
 
 config("jsoncpp_config") {
   include_dirs = [ "repo/include" ]
+}
 
+config("jsoncpp_config_disable_warnings") {
   cflags = [ "-Wno-implicit-fallthrough" ]
 }
 
@@ -40,6 +42,8 @@ source_set("jsoncpp") {
   ]
 
   public_configs = [ ":jsoncpp_config" ]
+
+  configs += [ ":jsoncpp_config_disable_warnings" ]
 
   defines = [
     "JSON_USE_EXCEPTION=0",

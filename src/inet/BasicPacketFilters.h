@@ -68,7 +68,7 @@ public:
      *
      * @param maxAllowedQueuedPackets - number of packets currently pending allowed.
      */
-    void SetMaxQueuedPacketsLimit(int maxAllowedQueuedPackets) { mMaxAllowedQueuedPackets.store(maxAllowedQueuedPackets); }
+    void SetMaxQueuedPacketsLimit(size_t maxAllowedQueuedPackets) { mMaxAllowedQueuedPackets.store(maxAllowedQueuedPackets); }
 
     /**
      * @return the total number of packets dropped so far by the filter
@@ -158,16 +158,16 @@ public:
             return FilterOutcome::kAllowPacket;
         }
 
+        // If we ever go negative, we have mismatch ingress/egress filter via predicate and
+        // device may eventually starve.
+        VerifyOrDie(mNumQueuedPackets != 0);
+
         --mNumQueuedPackets;
-        int numQueuedPackets = mNumQueuedPackets.load();
+        size_t numQueuedPackets = mNumQueuedPackets.load();
         if (numQueuedPackets == 0)
         {
             OnLastMatchDequeued(endpoint, pktInfo, pktPayload);
         }
-
-        // If we ever go negative, we have mismatch ingress/egress filter via predicate and
-        // device may eventually starve.
-        VerifyOrDie(numQueuedPackets >= 0);
 
         // We always allow the packet and just do accounting, since all dropping is prior to queue entry.
         return FilterOutcome::kAllowPacket;
@@ -176,8 +176,8 @@ public:
 protected:
     PacketMatchPredicateFunc mPredicate = nullptr;
     void * mContext                     = nullptr;
-    std::atomic_int mNumQueuedPackets{ 0 };
-    std::atomic_int mMaxAllowedQueuedPackets{ 0 };
+    std::atomic_size_t mNumQueuedPackets{ 0 };
+    std::atomic_size_t mMaxAllowedQueuedPackets{ 0 };
     std::atomic_size_t mNumDroppedPackets{ 0u };
 };
 

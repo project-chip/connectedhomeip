@@ -55,11 +55,6 @@
             "output": "src/controller/java/zap-generated/CHIPInvokeCallbacks.cpp"
         },
         {
-            "path": "CHIPCallbackTypes.zapt",
-            "name": "CHIP cluster callback types",
-            "output": "src/controller/java/zap-generated/CHIPCallbackTypes.h"
-        },
-        {
             "path": "CHIPClustersWrite-JNI.zapt",
             "name": "CHIP ZCL API for Java (native code for writes)",
             "output": "src/controller/java/zap-generated/CHIPClustersWrite-JNI.cpp"
@@ -98,16 +93,6 @@
             "path": "ClusterInfo-java.zapt",
             "name": "Cluster information mapping for Java",
             "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterInfoMapping.java"
-        },
-        {
-            "path": "ClusterInfo-read-interaction.zapt",
-            "name": "Generate read interaction for cluster information map",
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterReadMapping.java"
-        },
-        {
-            "path": "ClusterInfo-write-interaction.zapt",
-            "name": "Generate write interaction for cluster information map",
-            "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterWriteMapping.java"
         }
     ]
 }

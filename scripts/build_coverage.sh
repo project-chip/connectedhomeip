@@ -169,4 +169,5 @@ lcov --capture --directory "$OUTPUT_ROOT/obj/src" --exclude="$PWD"/zzz_generated
 lcov --add-tracefile "$COVERAGE_ROOT/lcov_base.info" --add-tracefile "$COVERAGE_ROOT/lcov_test.info" --output-file "$COVERAGE_ROOT/lcov_final.info"
 genhtml "$COVERAGE_ROOT/lcov_final.info" --output-directory "$COVERAGE_ROOT/html"
 
-tar czvf "$COVERAGE_ROOT/coverage_html.tar.gz" -C "$COVERAGE_ROOT/html" .
+# Copy webapp's YAML file to the coverage output directory
+cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" "$COVERAGE_ROOT/webapp_config.yaml"

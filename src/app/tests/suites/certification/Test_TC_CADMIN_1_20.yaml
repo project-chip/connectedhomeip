@@ -109,7 +109,7 @@ tests:
       disabled: true
 
     - label:
-          "THn starts a commissioning process and opens a commissioning window
+          "THn_1 starts a commissioning process and opens a commissioning window
           with DUT_CE"
       PICS: CADMIN.S.C01.Rsp
       verification: |
@@ -117,7 +117,7 @@ tests:
 
           ./chip-tool pairing onnetwork 6 20202021 --commissioner-name 4
 
-          Verify DUT_CE responds with NOCResponse with a StatusCode of 0x05 on THn (chip-tool) log
+          Verify DUT_CE responds with NOCResponse with a StatusCode of 0x05 on TH (chip-tool) log
 
           CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_003E Command=0x0000_0008
           [1649756670.402192][10794:10799] CHIP:CTL: Device returned status 5 on receiving the NOC

@@ -32,13 +32,13 @@ tests:
       command: "MoveToLevel"
       arguments:
           values:
-              - name: "level"
+              - name: "Level"
                 value: 1
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 1
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 1
 
     - label: "Wait 100 ms"
@@ -155,13 +155,13 @@ tests:
       command: "MoveToLevel"
       arguments:
           values:
-              - name: "level"
+              - name: "Level"
                 value: 127
-              - name: "transitionTime"
+              - name: "TransitionTime"
                 value: 0
-              - name: "optionsMask"
+              - name: "OptionsMask"
                 value: 1
-              - name: "optionsOverride"
+              - name: "OptionsOverride"
                 value: 1
 
     - label: "Wait 100 ms"

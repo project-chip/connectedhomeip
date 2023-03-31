@@ -33,6 +33,7 @@ class MockResolver : public Resolver
 {
 public:
     CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override { return InitStatus; }
+    bool IsInitialized() override { return true; }
     void Shutdown() override {}
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override {}
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override {}

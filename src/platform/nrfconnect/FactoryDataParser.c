@@ -17,8 +17,8 @@
 
 #include "FactoryDataParser.h"
 
-#include <logging/log.h>
 #include <zcbor_decode.h>
+#include <zephyr/logging/log.h>
 
 #include <ctype.h>
 #include <string.h>
@@ -38,6 +38,77 @@ static inline bool uint16_decode(zcbor_state_t * states, uint16_t * value)
     }
 
     return false;
+}
+
+static bool DecodeEntry(zcbor_state_t * states, void * buffer, size_t bufferSize, size_t * outlen)
+{
+    struct zcbor_string tempString;
+    int32_t tempInt = 0;
+
+    // Try to decode entry as string
+    bool res = zcbor_tstr_decode(states, &tempString);
+    if (res)
+    {
+        if (bufferSize < tempString.len)
+        {
+            return false;
+        }
+        memcpy(buffer, tempString.value, tempString.len);
+        *outlen = tempString.len;
+        return res;
+    }
+
+    // Try to decode entry as int32
+    res = zcbor_int32_decode(states, &tempInt);
+    if (res)
+    {
+        if (bufferSize < sizeof(tempInt))
+        {
+            return false;
+        }
+        memcpy(buffer, &tempInt, sizeof(tempInt));
+        *outlen = sizeof(tempInt);
+        return res;
+    }
+
+    return res;
+}
+
+bool FindUserDataEntry(struct FactoryData * factoryData, const char * entry, void * buffer, size_t bufferSize, size_t * outlen)
+{
+    if ((!factoryData) || (!factoryData->user.data) || (!buffer) || (!outlen))
+    {
+        return false;
+    }
+
+    ZCBOR_STATE_D(states, MAX_FACTORY_DATA_NESTING_LEVEL - 1, factoryData->user.data, factoryData->user.len, 1);
+
+    bool res      = zcbor_map_start_decode(states);
+    bool keyFound = false;
+    struct zcbor_string currentString;
+
+    while (res)
+    {
+        res = zcbor_tstr_decode(states, &currentString);
+
+        if (!res)
+        {
+            break;
+        }
+
+        if (strncmp(entry, (const char *) currentString.value, currentString.len) == 0)
+        {
+            res      = DecodeEntry(states, buffer, bufferSize, outlen);
+            keyFound = true;
+            break;
+        }
+        else
+        {
+            res = res && zcbor_any_skip(states, NULL);
+        }
+    }
+
+    return res && keyFound && zcbor_list_map_end_force_decode(states);
 }
 
 bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData * factoryData)
@@ -167,7 +238,9 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
         }
         else if (strncmp("user", (const char *) currentString.value, currentString.len) == 0)
         {
-            res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->user);
+            factoryData->user.data = (void *) states->payload;
+            res                    = res && zcbor_any_skip(states, NULL);
+            factoryData->user.len  = (void *) states->payload - factoryData->user.data;
         }
         else
         {

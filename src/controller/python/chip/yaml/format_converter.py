@@ -15,78 +15,113 @@
 #    limitations under the License.
 #
 
-import typing
-from chip.clusters.Types import Nullable, NullValue
-from chip.tlv import uint, float32
 import enum
+import typing
+from dataclasses import dataclass
+
+from chip.clusters.enum import MatterIntEnum
+from chip.clusters.Types import Nullable, NullValue
+from chip.tlv import float32, uint
 from chip.yaml.errors import ValidationError
-import binascii
+from matter_idl import matter_idl_types
 
 
-def substitute_in_config_variables(field_value, config_values: dict):
-    ''' Substitutes values that are config variables.
+@dataclass
+class _TargetTypeInfo:
+    field: typing.Union[list[matter_idl_types.Field], matter_idl_types.Field]
+    is_fabric_scoped: bool
 
-    YAML values can contain a string of a configuration variable name. In these instances we
-    substitute the configuration variable name with the actual value.
 
-    For examples see unittest src/controller/python/test/unit_tests/test_yaml_format_converter.py
+def _case_insensitive_getattr(object, attr_name, default):
+    for attr in dir(object):
+        if attr.lower() == attr_name.lower():
+            return getattr(object, attr)
+    return default
 
-    # TODO This should also substitue any saveAs values as well as perform any required
-    # evaluations.
+
+def _get_target_type_info(test_spec_definition, cluster_name, target_name) -> _TargetTypeInfo:
+    element = test_spec_definition.get_type_by_name(cluster_name, target_name)
+    if hasattr(element, 'fields'):
+        is_fabric_scoped = test_spec_definition.is_fabric_scoped(element)
+        return _TargetTypeInfo(element.fields, is_fabric_scoped)
+    return _TargetTypeInfo(None, False)
+
+
+def from_data_model_to_test_definition(test_spec_definition, cluster_name, response_definition,
+                                       response_value, is_fabric_scoped=False):
+    '''Converts value from data model to definitions provided in test_spec_definition.
 
     Args:
-        'field_value': Value as extracted from YAML.
-        'config_values': Dictionary of global configuration variables.
-    Returns:
-        Value with all global configuration variables substituted with the real value.
+        'test_spec_definition': The spec cluster definition used by the test parser.
+        'cluster_name': Used when we need to look up information in 'test_spec_definition'.
+        'response_definition': Type we are converting 'response_value' to. This will be one of
+            two types: list[idl.matter_idl_types.Field] or idl.matter_idl_types.Field
+        'response_value': Response value that we want to convert to
     '''
-    if isinstance(field_value, dict):
-        return {key: substitute_in_config_variables(
-            field_value[key], config_values) for key in field_value}
-    if isinstance(field_value, list):
-        return [substitute_in_config_variables(item, config_values) for item in field_value]
-    if isinstance(field_value, str) and field_value in config_values:
-        config_value = config_values[field_value]
-        if isinstance(config_value, dict) and 'defaultValue' in config_value:
-            # TODO currently we don't validate that if config_value['type'] is provided
-            # that the type does in fact match our expectation.
-            return config_value['defaultValue']
-        return config_values[field_value]
+    if response_value is None:
+        return response_value
 
-    return field_value
+    # We first check to see if response_definition is list[idl.matter_idl_types.Field]. When we
+    # have list[idl.matter_idl_types.Field] that means we have a structure with multiple fields
+    # that need to be worked through recursively to properly convert the value to the right type.
+    if isinstance(response_definition, list):
+        rv = {}
+        # is_fabric_scoped will only be relevant for struct types, hence why it is only checked
+        # here.
+        if is_fabric_scoped:
+            rv['FabricIndex'] = _case_insensitive_getattr(response_value, 'fabricIndex', None)
+        for item in response_definition:
+            value = _case_insensitive_getattr(response_value, item.name, None)
+            if item.is_optional and value is None:
+                continue
+            rv[item.name] = from_data_model_to_test_definition(test_spec_definition, cluster_name,
+                                                               item, value)
+        return rv
+
+    # We convert uint to python int because constraints first check that it is an expected type.
+    response_value_type = type(response_value)
+    if response_value_type == uint:
+        return int(response_value)
+
+    if response_definition is None:
+        return response_value
+
+    if response_value is NullValue:
+        return None
+
+    # For single float values types there seems to be a floating precision issue. By using '%g'
+    # it naturally give 6 most significat digits for us which is the amount of prcision we are
+    # looking for to give parity results to what chip-tool was getting (For TestCluster.yaml it
+    # give value back of `0.100000`.
+    if response_value_type == float32 and response_definition.data_type.name.lower() == 'single':
+        return float('%g' % response_value)
+
+    target_type_info = _get_target_type_info(test_spec_definition, cluster_name,
+                                             response_definition.data_type.name)
+
+    response_sub_definition = target_type_info.field
+    is_sub_definition_fabric_scoped = target_type_info.is_fabric_scoped
+
+    # Check below is to see if the field itself is an array, for example array of ints.
+    if response_definition.is_list:
+        return [
+            from_data_model_to_test_definition(test_spec_definition, cluster_name,
+                                               response_sub_definition, item,
+                                               is_sub_definition_fabric_scoped) for item in response_value
+        ]
+
+    return from_data_model_to_test_definition(test_spec_definition, cluster_name,
+                                              response_sub_definition, response_value,
+                                              is_sub_definition_fabric_scoped)
 
 
-def convert_yaml_octet_string_to_bytes(s: str) -> bytes:
-    '''Convert YAML octet string body to bytes.
+def convert_list_of_name_value_pair_to_dict(arg_values):
+    '''Converts list of dict with items with keys 'name' and 'value' into single dict.
 
-    Included handling any c-style hex escapes (e.g. \x5a) and 'hex:' prefix.
-    '''
-    # Step 1: handle explicit "hex:" prefix
-    if s.startswith('hex:'):
-        return binascii.unhexlify(s[4:])
-
-    # Step 2: convert non-hex-prefixed to bytes
-    # TODO(#23669): This does not properly support utf8 octet strings. We mimic
-    # javascript codegen behavior. Behavior of javascript is:
-    #   * Octet string character >= u+0200 errors out.
-    #   * Any character greater than 0xFF has the upper bytes chopped off.
-    as_bytes = [ord(c) for c in s]
-
-    if any([value > 0x200 for value in as_bytes]):
-        raise ValueError('Unsupported char in octet string %r' % as_bytes)
-    accumulated_hex = ''.join([f"{(v & 0xFF):02x}" for v in as_bytes])
-    return binascii.unhexlify(accumulated_hex)
-
-
-def convert_name_value_pair_to_dict(arg_values):
-    ''' Fix yaml command arguments.
-
-    For some reason, instead of treating the entire data payload of a
-    command as a singular struct, the top-level args are specified as 'name'
-    and 'value' pairs, while the payload of each argument is itself
-    correctly encapsulated. This fixes up this oddity to create a new
-    key/value pair with the key being the value of the 'name' field, and
-    the value being 'value' field.
+    The test step contains a list of arguments that have multiple properties other than
+    'name' and 'value'. For the purposes of executing a test all these other attributes are not
+    important. We only want a simple dictionary of a new key/value where with the key being the
+    value of the 'name' field, and the value being 'value' field.
     '''
     ret_value = {}
 
@@ -96,21 +131,16 @@ def convert_name_value_pair_to_dict(arg_values):
     return ret_value
 
 
-def convert_yaml_type(field_value, field_type, inline_cast_dict_to_struct):
-    ''' Converts yaml value to provided pythonic type.
+def convert_to_data_model_type(field_value, field_type):
+    '''Converts value to provided data model pythonic object type.
 
-    The YAML representation when converted to a dictionary does not line up to
-    the python type data model for the various command/attribute/event object
-    types. This function converts 'field_value' to the appropriate provided
+    The values provided by parser does not line up to the python data model for the various
+    command/attribute/event object types. This function converts 'field_value' to the provided
     'field_type'.
 
     Args:
-        'field_value': Value as extracted from yaml
-        'field_type': Pythonic command/attribute/event object type that we
-            are converting value to.
-        'inline_cast_dict_to_struct': If true, for any dictionary 'field_value'
-            types provided we will do a convertion to the corresponding data
-            model class in `field_type` by doing field_type.FromDict(...).
+        'field_value': Value as extracted by YAML parser.
+        'field_type': Pythonic command/attribute/event object type that we are converting value to.
     '''
     origin = typing.get_origin(field_type)
 
@@ -152,21 +182,18 @@ def convert_yaml_type(field_value, field_type, inline_cast_dict_to_struct):
                 raise ValidationError(
                     f'Did not find field "{item}" in {str(field_type)}') from None
 
-            return_field_value[field_descriptor.Label] = convert_yaml_type(
-                field_value[item], field_descriptor.Type, inline_cast_dict_to_struct)
-        if inline_cast_dict_to_struct:
-            return field_type.FromDict(return_field_value)
+            return_field_value[field_descriptor.Label] = convert_to_data_model_type(
+                field_value[item], field_descriptor.Type)
         return return_field_value
-    elif(type(field_value) is float):
+    elif (type(field_value) is float):
         return float32(field_value)
     # list represents a data model list
-    elif(type(field_value) is list):
+    elif (type(field_value) is list):
         list_element_type = typing.get_args(field_type)[0]
 
         # The field type passed in is the type of the list element and not list[T].
         for idx, item in enumerate(field_value):
-            field_value[idx] = convert_yaml_type(item, list_element_type,
-                                                 inline_cast_dict_to_struct)
+            field_value[idx] = convert_to_data_model_type(item, list_element_type)
         return field_value
     # YAML conversion treats all numbers as ints. Convert to a uint type if the schema
     # type indicates so.
@@ -175,33 +202,8 @@ def convert_yaml_type(field_value, field_type, inline_cast_dict_to_struct):
         value = int(field_value)
         return field_type(value)
     # YAML treats enums as ints. Convert to the typed enum class.
-    elif (issubclass(field_type, enum.Enum)):
-        return field_type(field_value)
-    # YAML treats bytes as strings. Convert to a byte string.
-    elif (field_type == bytes and type(field_value) != bytes):
-        return convert_yaml_octet_string_to_bytes(field_value)
+    elif (issubclass(field_type, MatterIntEnum)):
+        return field_type.extend_enum_if_value_doesnt_exist(field_value)
     # By default, just return the field_value casted to field_type.
     else:
         return field_type(field_value)
-
-
-def parse_and_convert_yaml_value(field_value, field_type, config_values: dict,
-                                 inline_cast_dict_to_struct: bool = False):
-    ''' Parse and converts YAML type
-
-    Parsing the YAML value means performing required substitutions and evaluations. Parsing is
-    then followed by converting from the YAML type done using yaml.safe_load() to the type used in
-    the various command/attribute/event object data model types.
-
-    Args:
-        'field_value': Value as extracted from yaml to be parsed
-        'field_type': Pythonic command/attribute/event object type that we
-            are converting value to.
-        'config_values': Dictionary of global configuration variables.
-        'inline_cast_dict_to_struct': If true, for any dictionary 'field_value'
-            types provided we will do an inline convertion to the corresponding
-            struct in `field_type` by doing field_type.FromDict(...).
-    '''
-    field_value_with_config_variables = substitute_in_config_variables(field_value, config_values)
-    return convert_yaml_type(field_value_with_config_variables, field_type,
-                             inline_cast_dict_to_struct)

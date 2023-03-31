@@ -16,7 +16,7 @@
 
 #pragma once
 
-#import "Foundation/Foundation.h"
+#import <Foundation/Foundation.h>
 
 #include <lib/support/Span.h>
 

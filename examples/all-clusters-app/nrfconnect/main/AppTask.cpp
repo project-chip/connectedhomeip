@@ -26,8 +26,6 @@
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerDelegate.h>
 #include <app/util/attribute-storage.h>
@@ -45,8 +43,8 @@
 #endif
 
 #include <dk_buttons_and_leds.h>
+#include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
-#include <zephyr/zephyr.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -332,16 +330,6 @@ void AppTask::FunctionTimerEventHandler(const AppEvent & event)
     }
 }
 
-#ifdef CONFIG_MCUMGR_SMP_BT
-void AppTask::RequestSMPAdvertisingStart(void)
-{
-    AppEvent event;
-    event.Type    = AppEvent::kEventType_StartSMPAdvertising;
-    event.Handler = [](AppEvent *) { GetDFUOverSMP().StartBLEAdvertising(); };
-    sAppTask.PostEvent(&event);
-}
-#endif
-
 void AppTask::FunctionHandler(const AppEvent & event)
 {
     if (event.ButtonEvent.PinNo != FUNCTION_BUTTON)
@@ -477,7 +465,7 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
         UpdateStatusLED();
         break;
 #if defined(CONFIG_NET_L2_OPENTHREAD)
-    case DeviceEventType::kDnssdPlatformInitialized:
+    case DeviceEventType::kDnssdInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
         InitBasicOTARequestor();
 #endif // CONFIG_CHIP_OTA_REQUESTOR

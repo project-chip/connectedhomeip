@@ -18,6 +18,7 @@
 #include "AppMediaPlaybackManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/util/config.h>
 #include <cstdint>
 #include <jni.h>
 #include <json/json.h>
@@ -170,7 +171,7 @@ Commands::PlaybackResponse::Type AppMediaPlaybackManager::HandleMediaRequest(Med
 
 CHIP_ERROR AppMediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncoder & aEncoder)
 {
-    Structs::PlaybackPosition::Type response;
+    Structs::PlaybackPositionStruct::Type response;
     response.updatedAt = 0;
     response.position  = Nullable<uint64_t>(0);
 
@@ -192,9 +193,9 @@ CHIP_ERROR AppMediaPlaybackManager::HandleGetSampledPosition(AttributeValueEncod
             if (!value[attrId].empty() && value[attrId].isObject())
             {
                 std::string updatedAt = to_string(
-                    static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Fields::kUpdatedAt));
+                    static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::Fields::kUpdatedAt));
                 std::string position = to_string(
-                    static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Fields::kPosition));
+                    static_cast<uint32_t>(chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::Fields::kPosition));
                 if (!value[attrId][updatedAt].empty() && !value[attrId][position].empty() && value[attrId][updatedAt].isUInt() &&
                     value[attrId][position].isUInt())
                 {

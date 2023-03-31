@@ -31,6 +31,7 @@
 #include "PWR_Interface.h"
 #include "TimersManager.h"
 #include "board.h"
+#include "pdm_ram_storage_glue.h"
 
 /* Bluetooth Low Energy */
 #include "ble_config.h"
@@ -51,6 +52,24 @@
         } while (0);
 #else
 #define APP_DBG_LOG(...)
+#endif
+
+#if (configUSE_TICKLESS_IDLE != 0)
+#define DBG_PostStepTickAssess 0
+#if DBG_PostStepTickAssess && !gTimestampUseWtimer_c
+#error "gTimestampUseWtimer_c required for DBG_PostStepTickAssess"
+#endif
+#if defined(gPWR_FreqScalingWFI) && (gPWR_FreqScalingWFI != 0)
+/* this MACRO is required when gPWR_FreqScalingWFI is not equal to zero (system clock frequency
+    reduced in WFI)           */
+#define App_SuppressTickInStopMode 1
+#else
+#define App_SuppressTickInStopMode 0
+#endif
+#if gPWR_CpuClk_48MHz
+/* for systick accuracy, this is recommended to enable FRO calibration */
+#define gApp_SystemClockCalibration 1
+#endif
 #endif
 
 #define PDM_MAX_WRITES_INFINITE 0xFF
@@ -236,11 +255,13 @@ extern void OTAIdleActivities(void);
 
 void vApplicationIdleHook(void)
 {
-    vTaskSuspendAll();
-    PDM_vIdleTask(PDM_MAX_WRITES_INFINITE);
-    xTaskResumeAll();
+    FS_vIdleTask(PDM_MAX_WRITES_INFINITE);
 
     OTAIdleActivities();
+
+#if gAdcUsed_d
+    BOARD_ADCMeasure();
+#endif
 
     BOARD_ActionOnIdle();
 }

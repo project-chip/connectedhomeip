@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,26 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
 import logging
-import enum
 import sys
+
+import click
 
 try:
     import coloredlogs
     _has_coloredlogs = True
-except:
+except ImportError:
     _has_coloredlogs = False
 
 try:
-    from idl.matter_idl_parser import CreateParser
-except:
+    from matter_idl.matter_idl_parser import CreateParser
+except ImportError:
     import os
-    sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-    from idl.matter_idl_parser import CreateParser
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'py_matter_idl')))
+    from matter_idl.matter_idl_parser import CreateParser
 
-from idl.generators import FileSystemGeneratorStorage, GeneratorStorage
-from idl.generators.registry import CodeGenerator, GENERATORS
+# isort: off
+from matter_idl.generators import FileSystemGeneratorStorage, GeneratorStorage
+from matter_idl.generators.registry import CodeGenerator, GENERATORS
 
 
 class ListGeneratedFilesStorage(GeneratorStorage):
@@ -68,9 +69,11 @@ __LOG_LEVELS__ = {
     help='Determines the verbosity of script output')
 @click.option(
     '--generator',
-    default='JAVA',
-    type=click.Choice(GENERATORS.keys(), case_sensitive=False),
-    help='What code generator to run')
+    default='java-jni',
+    help='What code generator to run.  The choices are: '+'|'.join(GENERATORS.keys())+'. ' +
+         'When using custom, provide the plugin path using `--generator custom:<path_to_plugin>:<plugin_module_name>` syntax. ' +
+    'For example, `--generator custom:./my_plugin:my_plugin_module` will load `./my_plugin/my_plugin_module/__init.py__` ' +
+         'that defines a subclass of CodeGenerator named CustomGenerator.')
 @click.option(
     '--output-dir',
     type=click.Path(exists=False),
@@ -109,16 +112,28 @@ def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs,
             datefmt='%Y-%m-%d %H:%M:%S'
         )
 
-    logging.info("Parsing idl from %s" % idl_path)
-    idl_tree = CreateParser().parse(open(idl_path, "rt").read())
-
     if name_only:
         storage = ListGeneratedFilesStorage()
     else:
         storage = FileSystemGeneratorStorage(output_dir)
 
+    logging.info("Parsing idl from %s" % idl_path)
+    idl_tree = CreateParser().parse(open(idl_path, "rt").read())
+
+    plugin_module = None
+    if generator.startswith('custom'):
+        # check that the plugin path is provided
+        if ':' not in generator:
+            logging.fatal("Custom generator plugin path not provided. Use --generator custom:<path_to_plugin>")
+            sys.exit(1)
+        custom_params = generator.split(':')
+        (generator, plugin_path, plugin_module) = custom_params
+        logging.info("Using CustomGenerator at plugin path %s.%s" % (plugin_path, plugin_module))
+        sys.path.append(plugin_path)
+        generator = 'CUSTOM'
+
     logging.info("Running code generator %s" % generator)
-    generator = CodeGenerator.FromString(generator).Create(storage, idl=idl_tree)
+    generator = CodeGenerator.FromString(generator).Create(storage, idl=idl_tree, plugin_module=plugin_module)
     generator.render(dry_run)
 
     if expected_outputs:

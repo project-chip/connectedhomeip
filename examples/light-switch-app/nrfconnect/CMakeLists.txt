@@ -59,7 +59,6 @@ target_sources(app PRIVATE
                main/LightSwitch.cpp
                main/ShellCommands.cpp
                main/BindingHandler.cpp
-               ${GEN_DIR}/light-switch-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp)
 
 

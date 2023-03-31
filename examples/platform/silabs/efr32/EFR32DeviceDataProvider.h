@@ -29,11 +29,11 @@ namespace EFR32 {
  */
 
 class EFR32DeviceDataProvider : public CommissionableDataProvider,
-                                public Internal::GenericDeviceInstanceInfoProvider<Internal::SILABSConfig>
+                                public Internal::GenericDeviceInstanceInfoProvider<Internal::SilabsConfig>
 {
 public:
     EFR32DeviceDataProvider() :
-        CommissionableDataProvider(), Internal::GenericDeviceInstanceInfoProvider<Internal::SILABSConfig>(
+        CommissionableDataProvider(), Internal::GenericDeviceInstanceInfoProvider<Internal::SilabsConfig>(
                                           ConfigurationManagerImpl::GetDefaultInstance())
     {}
 
@@ -60,6 +60,9 @@ public:
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override;
     CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override;
+    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetProductURL(char * buf, size_t bufSzie) override;
+    CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override;
 };
 
 } // namespace EFR32

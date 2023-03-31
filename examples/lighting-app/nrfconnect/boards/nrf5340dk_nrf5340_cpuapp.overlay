@@ -34,7 +34,6 @@
 			pwms = < &pwm0 1 PWM_MSEC(20) PWM_POLARITY_INVERTED>;
 		};
 	};
-
 };
 
 &pwm0 {

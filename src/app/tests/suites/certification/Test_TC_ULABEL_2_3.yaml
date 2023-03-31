@@ -37,13 +37,13 @@ tests:
     - label: "TH writes LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "writeAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       arguments:
           value:
               [
                   {
-                      label: "room",
-                      value: "17_bytesIsTooLongforuserlabelnotexpected",
+                      Label: "room",
+                      Value: "17_bytesIsTooLongforuserlabelnotexpected",
                   },
               ]
       response:
@@ -52,13 +52,13 @@ tests:
     - label: "TH writes LabelList attribute of the DUT"
       PICS: ULABEL.S.A0000
       command: "writeAttribute"
-      attribute: "label list"
+      attribute: "LabelList"
       arguments:
           value:
               [
                   {
-                      label: "17_bytesIsTooLongforuserlabelnotexpected",
-                      value: "foobar",
+                      Label: "17_bytesIsTooLongforuserlabelnotexpected",
+                      Value: "foobar",
                   },
               ]
       response:

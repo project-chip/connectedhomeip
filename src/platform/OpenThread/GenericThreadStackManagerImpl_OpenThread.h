@@ -103,7 +103,9 @@ protected:
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     CHIP_ERROR _GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
     CHIP_ERROR _SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig);
-    CHIP_ERROR _RequestSEDActiveMode(bool onOff);
+    CHIP_ERROR _RequestSEDActiveMode(bool onOff, bool delayIdle);
+    CHIP_ERROR SEDUpdateMode();
+    static void RequestSEDModeUpdate(chip::System::Layer * apSystemLayer, void * apAppState);
 #endif
 
     bool _HaveMeshConnectivity(void);
@@ -115,6 +117,7 @@ protected:
     void _ResetThreadNetworkDiagnosticsCounts(void);
     CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
     CHIP_ERROR _GetPollPeriod(uint32_t & buf);
+    void _SetRouterPromotion(bool val);
     void _OnWoBLEAdvertisingStart(void);
     void _OnWoBLEAdvertisingStop(void);
 
@@ -162,6 +165,7 @@ private:
     ConnectivityManager::SEDIntervalsConfig mIntervalsConfig;
     ConnectivityManager::SEDIntervalMode mIntervalsMode = ConnectivityManager::SEDIntervalMode::Idle;
     uint32_t mActiveModeConsumers                       = 0;
+    bool mDelayIdleTimerRunning                         = false;
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT

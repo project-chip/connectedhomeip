@@ -160,7 +160,7 @@ void OnCurrentStateReadResponseFailure(void * context, CHIP_ERROR err)
     ChipLogProgress(AppServer, "OnCurrentStateReadResponseFailure called with %" CHIP_ERROR_FORMAT, err.Format());
 }
 
-void OnCurrentStateSubscriptionEstablished(void * context)
+void OnCurrentStateSubscriptionEstablished(void * context, SubscriptionId aSubscriptionId)
 {
     ChipLogProgress(AppServer, "OnCurrentStateSubscriptionEstablished called");
     if (context != nullptr)

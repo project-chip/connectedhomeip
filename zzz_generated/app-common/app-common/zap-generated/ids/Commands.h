@@ -334,9 +334,9 @@ static constexpr CommandId Id = 0x00000004;
 namespace OtaSoftwareUpdateRequestor {
 namespace Commands {
 
-namespace AnnounceOtaProvider {
+namespace AnnounceOTAProvider {
 static constexpr CommandId Id = 0x00000000;
-} // namespace AnnounceOtaProvider
+} // namespace AnnounceOTAProvider
 
 } // namespace Commands
 } // namespace OtaSoftwareUpdateRequestor
@@ -904,9 +904,9 @@ namespace Pause {
 static constexpr CommandId Id = 0x00000001;
 } // namespace Pause
 
-namespace StopPlayback {
+namespace Stop {
 static constexpr CommandId Id = 0x00000002;
-} // namespace StopPlayback
+} // namespace Stop
 
 namespace StartOver {
 static constexpr CommandId Id = 0x00000003;
@@ -1004,9 +1004,9 @@ namespace LaunchURL {
 static constexpr CommandId Id = 0x00000001;
 } // namespace LaunchURL
 
-namespace LaunchResponse {
+namespace LauncherResponse {
 static constexpr CommandId Id = 0x00000002;
-} // namespace LaunchResponse
+} // namespace LauncherResponse
 
 } // namespace Commands
 } // namespace ContentLauncher
@@ -1098,8 +1098,12 @@ namespace RegisterClientMonitoring {
 static constexpr CommandId Id = 0x00000000;
 } // namespace RegisterClientMonitoring
 
-namespace StayAwakeRequest {
+namespace UnregisterClientMonitoring {
 static constexpr CommandId Id = 0x00000001;
+} // namespace UnregisterClientMonitoring
+
+namespace StayAwakeRequest {
+static constexpr CommandId Id = 0x00000002;
 } // namespace StayAwakeRequest
 
 } // namespace Commands

@@ -99,6 +99,12 @@ bool hasNotifiedWifiConnectivity = false;
 static uint8_t retryJoin         = 0;
 bool retryInProgress             = false;
 
+/* Declare a flag to differentiate between after boot-up first IP connection or reconnection */
+bool is_wifi_disconnection_event = false;
+
+/* Declare a variable to hold connection time intervals */
+uint32_t retryInterval = WLAN_MIN_RETRY_TIMER_MS;
+
 #ifdef SL_WFX_CONFIG_SCAN
 static struct scan_result_holder
 {
@@ -306,6 +312,7 @@ static void sl_wfx_scan_result_callback(sl_wfx_scan_result_ind_body_t * scan_res
         ap->scan.ssid[scan_result->ssid_def.ssid_length] = 0; /* make sure about null terminate */
         /* We do it in this order WPA3 first */
         /* No EAP supported - Is this required */
+        ap->scan.security = WFX_SEC_UNSPECIFIED;
         if (scan_result->security_mode.wpa3)
         {
             ap->scan.security = WFX_SEC_WPA3;
@@ -394,7 +401,7 @@ static void sl_wfx_connect_callback(sl_wfx_connect_ind_body_t connect_indication
     }
     }
 
-    if ((status != WFM_STATUS_SUCCESS) && retryJoin < MAX_JOIN_RETRIES_COUNT)
+    if ((status != WFM_STATUS_SUCCESS) && (!is_wifi_disconnection_event ? (retryJoin < MAX_JOIN_RETRIES_COUNT) : true))
     {
         retryJoin += 1;
         retryInProgress = false;
@@ -417,7 +424,9 @@ static void sl_wfx_disconnect_callback(uint8_t * mac, uint16_t reason)
     SILABS_LOG("WFX Disconnected %d\r\n", reason);
     sl_wfx_context->state =
         static_cast<sl_wfx_state_t>(static_cast<int>(sl_wfx_context->state) & ~static_cast<int>(SL_WFX_STA_INTERFACE_CONNECTED));
-    xEventGroupSetBits(sl_wfx_event_group, SL_WFX_DISCONNECT);
+    retryInProgress             = false;
+    is_wifi_disconnection_event = true;
+    xEventGroupSetBits(sl_wfx_event_group, SL_WFX_RETRY_CONNECT);
 }
 
 #ifdef SL_WFX_CONFIG_SOFTAP
@@ -534,9 +543,10 @@ static void wfx_events_task(void * p_arg)
         {
             if (!retryInProgress)
             {
+                retryInProgress = true;
+                wfx_retry_interval_handler(is_wifi_disconnection_event, retryJoin);
                 SILABS_LOG("WFX sending the connect command");
                 wfx_connect_to_ap();
-                retryInProgress = true;
             }
         }
 
@@ -545,7 +555,7 @@ static void wfx_events_task(void * p_arg)
             if ((now = xTaskGetTickCount()) > (last_dhcp_poll + pdMS_TO_TICKS(250)))
             {
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
-                uint8_t dhcp_state = dhcpclient_poll(&sta_netif);
+                uint8_t dhcp_state = dhcpclient_poll(sta_netif);
 
                 if ((dhcp_state == DHCP_ADDRESS_ASSIGNED) && !hasNotifiedIPV4)
                 {
@@ -589,12 +599,14 @@ static void wfx_events_task(void * p_arg)
             hasNotifiedWifiConnectivity = false;
             SILABS_LOG("WIFI: Connected to AP");
             wifi_extra |= WE_ST_STA_CONN;
+            retryJoin     = 0;
+            retryInterval = WLAN_MIN_RETRY_TIMER_MS;
             wfx_lwip_set_sta_link_up();
 #ifdef SLEEP_ENABLED
             if (!(wfx_get_wifi_state() & SL_WFX_AP_INTERFACE_UP))
             {
                 // Enable the power save
-                sl_wfx_set_power_mode(WFM_PM_MODE_PS, WFM_PM_POLL_UAPSD, BEACON_1);
+                sl_wfx_set_power_mode(WFM_PM_MODE_DTIM, WFM_PM_POLL_FAST_PS, BEACON_1);
                 sl_wfx_enable_device_power_save();
             }
 #endif // SLEEP_ENABLED
@@ -956,27 +968,8 @@ void wfx_set_wifi_provision(wfx_wifi_provision_t * wifiConfig)
 {
     memcpy(wifi_provision.ssid, wifiConfig->ssid, sizeof(wifiConfig->ssid));
     memcpy(wifi_provision.passkey, wifiConfig->passkey, sizeof(wifiConfig->passkey));
+    wifi_provision.security = wifiConfig->security;
     SILABS_LOG("WIFI: Provision SSID=%s", &wifi_provision.ssid[0]);
-
-    /* Not very good - To be improved */
-    switch (wifiConfig->security)
-    {
-    case WFX_SEC_WPA:
-        wifi_provision.security = static_cast<uint8_t>(sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA2_WPA1_PSK);
-        break;
-    case WFX_SEC_WPA3:
-        wifi_provision.security = WFM_SECURITY_MODE_WPA3_SAE;
-        break;
-    case WFX_SEC_WPA2:
-        wifi_provision.security = static_cast<uint8_t>(sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA2_WPA1_PSK);
-        break;
-    case WFX_SEC_WPA_WPA2_MIXED:
-        wifi_provision.security = static_cast<uint8_t>(sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA2_WPA1_PSK);
-        break;
-    default:
-        wifi_provision.security = WFM_SECURITY_MODE_WPA2_PSK;
-        break;
-    }
 }
 
 /****************************************************************************
@@ -1028,6 +1021,7 @@ bool wfx_is_sta_provisioned(void)
 sl_status_t wfx_connect_to_ap(void)
 {
     sl_status_t result;
+    sl_wfx_security_mode_t connect_security_mode;
 
     if (wifi_provision.ssid[0] == 0)
     {
@@ -1039,10 +1033,28 @@ sl_status_t wfx_connect_to_ap(void)
                "Time: %d, Number of prob: %d",
                ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
     (void) sl_wfx_set_scan_parameters(ACTIVE_CHANNEL_TIME, PASSIVE_CHANNEL_TIME, NUM_PROBE_REQUEST);
-    result =
-        sl_wfx_send_join_command((uint8_t *) wifi_provision.ssid, strlen(wifi_provision.ssid), NULL, CHANNEL_0,
-                                 static_cast<sl_wfx_security_mode_t>(wifi_provision.security), PREVENT_ROAMING, DISABLE_PMF_MODE,
-                                 (uint8_t *) wifi_provision.passkey, strlen(wifi_provision.passkey), NULL, IE_DATA_LENGTH);
+    switch (wifi_provision.security)
+    {
+    case WFX_SEC_WEP:
+        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WEP;
+        break;
+    case WFX_SEC_WPA:
+    case WFX_SEC_WPA2:
+        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA2_WPA1_PSK;
+        break;
+    case WFX_SEC_WPA3:
+        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_WPA3_SAE;
+        break;
+    case WFX_SEC_NONE:
+        connect_security_mode = sl_wfx_security_mode_e::WFM_SECURITY_MODE_OPEN;
+        break;
+    default:
+        SILABS_LOG("%s: error: unknown security type.");
+        return SL_STATUS_INVALID_STATE;
+    }
+    result = sl_wfx_send_join_command((uint8_t *) wifi_provision.ssid, strlen(wifi_provision.ssid), NULL, CHANNEL_0,
+                                      connect_security_mode, PREVENT_ROAMING, DISABLE_PMF_MODE, (uint8_t *) wifi_provision.passkey,
+                                      strlen(wifi_provision.passkey), NULL, IE_DATA_LENGTH);
 
     return result;
 }

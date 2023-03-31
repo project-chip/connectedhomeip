@@ -20,8 +20,10 @@ package chip.devicecontroller;
 import android.bluetooth.BluetoothGatt;
 import android.util.Log;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
+import chip.devicecontroller.model.AttributeWriteRequest;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
+import chip.devicecontroller.model.InvokeElement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -82,6 +84,39 @@ public class ChipDeviceController {
   public void setNOCChainIssuer(NOCChainIssuer issuer) {
     setUseJavaCallbackForNOCRequest(deviceControllerPtr, issuer != null);
     nocChainIssuer = issuer;
+  }
+
+  /**
+   * If DeviceAttestationDelegate is setted, then it will always be called when device attestation
+   * completes. In case the device attestation fails, the client can decide to continue or stop the
+   * commissioning.
+   *
+   * <p>When {@link DeviceAttestationDelegate#onDeviceAttestationCompleted(long, long,
+   * AttestationInfo, int)} is received, {@link #continueCommissioning(long, boolean)} must be
+   * called.
+   *
+   * @param failSafeExpiryTimeoutSecs the value to set for the fail-safe timer before
+   *     onDeviceAttestationCompleted is invoked. The unit is seconds.
+   * @param deviceAttestationDelegate the delegate for device attestation completed with device info
+   *     for additional verification.
+   */
+  public void setDeviceAttestationDelegate(
+      int failSafeExpiryTimeoutSecs, DeviceAttestationDelegate deviceAttestationDelegate) {
+    setDeviceAttestationDelegate(
+        deviceControllerPtr, failSafeExpiryTimeoutSecs, deviceAttestationDelegate);
+  }
+
+  /**
+   * Set the delegate of attestation trust store for device attestation.
+   *
+   * <p>It will replace the built-in attestation trust store, please make sure you have the required
+   * paa certificates before commissioning.
+   *
+   * @param attestationTrustStoreDelegate Delegate for attestation trust store
+   */
+  public void setAttestationTrustStoreDelegate(
+      AttestationTrustStoreDelegate attestationTrustStoreDelegate) {
+    setAttestationTrustStoreDelegate(deviceControllerPtr, attestationTrustStoreDelegate);
   }
 
   public void pairDevice(
@@ -199,6 +234,17 @@ public class ChipDeviceController {
   }
 
   /**
+   * This function instructs the commissioner to proceed to the next stage of commissioning after
+   * attestation is reported.
+   *
+   * @param devicePtr a pointer to the device which is being commissioned.
+   * @param ignoreAttestationFailure whether to ignore device attestation failure.
+   */
+  public void continueCommissioning(long devicePtr, boolean ignoreAttestationFailure) {
+    continueCommissioning(deviceControllerPtr, devicePtr, ignoreAttestationFailure);
+  }
+
+  /**
    * When a NOCChainIssuer is set for this controller, then onNOCChainGenerationNeeded will be
    * called when the NOC CSR needs to be signed. This allows for custom credentials issuer
    * implementations, for example, when a proprietary cloud API will perform the CSR signing.
@@ -236,6 +282,10 @@ public class ChipDeviceController {
 
   public void unpairDevice(long deviceId) {
     unpairDevice(deviceControllerPtr, deviceId);
+  }
+
+  public void unpairDeviceCallback(long deviceId, UnpairDeviceCallback callback) {
+    unpairDeviceCallback(deviceControllerPtr, deviceId, callback);
   }
 
   /**
@@ -417,7 +467,11 @@ public class ChipDeviceController {
   }
 
   public boolean openPairingWindowWithPIN(
-      long devicePtr, int duration, long iteration, int discriminator, long setupPinCode) {
+      long devicePtr,
+      int duration,
+      long iteration,
+      int discriminator,
+      @Nullable Long setupPinCode) {
     return openPairingWindowWithPIN(
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode);
   }
@@ -432,15 +486,50 @@ public class ChipDeviceController {
       int duration,
       long iteration,
       int discriminator,
-      long setupPinCode,
+      @Nullable Long setupPinCode,
       OpenCommissioningCallback callback) {
     return openPairingWindowWithPINCallback(
         deviceControllerPtr, devicePtr, duration, iteration, discriminator, setupPinCode, callback);
   }
 
-  /* Shutdown all cluster attribute subscriptions for a given device */
-  public void shutdownSubscriptions(long devicePtr) {
-    shutdownSubscriptions(deviceControllerPtr, devicePtr);
+  public int getFabricIndex() {
+    return getFabricIndex(deviceControllerPtr);
+  }
+
+  /* Shuts down all active subscriptions. */
+  public void shutdownSubscriptions() {
+    shutdownSubscriptions(deviceControllerPtr, null, null, null);
+  }
+
+  /* Shuts down all active subscriptions for the fabric at the given fabricIndex */
+  public void shutdownSubscriptions(int fabricIndex) {
+    shutdownSubscriptions(deviceControllerPtr, Integer.valueOf(fabricIndex), null, null);
+  }
+
+  /**
+   * Shuts down all subscriptions for a particular node.
+   *
+   * @param fabricIndex the fabric index of to which the node belongs
+   * @param peerNodeId the node ID of the device for which subscriptions should be canceled
+   */
+  public void shutdownSubscriptions(int fabricIndex, long peerNodeId) {
+    shutdownSubscriptions(
+        deviceControllerPtr, Integer.valueOf(fabricIndex), Long.valueOf(peerNodeId), null);
+  }
+
+  /**
+   * Shuts down all subscriptions for a particular node.
+   *
+   * @param fabricIndex the fabric index of to which the node belongs
+   * @param peerNodeId the node ID of the device for which subscriptions should be canceled
+   * @param subscriptionId the ID of the subscription on the node which should be canceled
+   */
+  public void shutdownSubscriptions(int fabricIndex, long peerNodeId, long subscriptionId) {
+    shutdownSubscriptions(
+        deviceControllerPtr,
+        Integer.valueOf(fabricIndex),
+        Long.valueOf(peerNodeId),
+        Long.valueOf(subscriptionId));
   }
 
   /**
@@ -454,14 +543,29 @@ public class ChipDeviceController {
     return getAttestationChallenge(deviceControllerPtr, devicePtr);
   }
 
-  /** Subscribe to the given attribute path. */
+  /**
+   * @brief Auto-Resubscribe to the given attribute path with keepSubscriptions and isFabricFiltered
+   * @param SubscriptionEstablishedCallback Callback when a subscribe response has been received and
+   *     processed
+   * @param ResubscriptionAttemptCallback Callback when a resubscirption haoppens, the termination
+   *     cause is provided to help inform subsequent re-subscription logic.
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param attributePaths a list of attribute paths
+   * @param minInterval the requested minimum interval boundary floor in seconds
+   * @param maxInterval the requested maximum interval boundary ceiling in seconds
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
   public void subscribeToAttributePath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ReportCallback reportCallback,
       long devicePtr,
       List<ChipAttributePath> attributePaths,
       int minInterval,
-      int maxInterval) {
+      int maxInterval,
+      int imTimeoutMs) {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
     subscribe(
@@ -473,17 +577,34 @@ public class ChipDeviceController {
         minInterval,
         maxInterval,
         false,
-        false);
+        false,
+        imTimeoutMs,
+        null);
   }
 
-  /** Subscribe to the given event path */
+  /**
+   * @brief Auto-Resubscribe to the given event path with keepSubscriptions and isFabricFiltered
+   * @param SubscriptionEstablishedCallback Callback when a subscribe response has been received and
+   *     processed
+   * @param ResubscriptionAttemptCallback Callback when a resubscirption haoppens, the termination
+   *     cause is provided to help inform subsequent re-subscription logic.
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param eventPaths a list of event paths
+   * @param minInterval the requested minimum interval boundary floor in seconds
+   * @param maxInterval the requested maximum interval boundary ceiling in seconds
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
   public void subscribeToEventPath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ReportCallback reportCallback,
       long devicePtr,
       List<ChipEventPath> eventPaths,
       int minInterval,
-      int maxInterval) {
+      int maxInterval,
+      int imTimeoutMs) {
     ReportCallbackJni jniCallback =
         new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
     subscribe(
@@ -495,10 +616,56 @@ public class ChipDeviceController {
         minInterval,
         maxInterval,
         false,
-        false);
+        false,
+        imTimeoutMs,
+        null);
   }
 
-  /** Subscribe to the given attribute/event path with keepSubscriptions and isFabricFiltered. */
+  public void subscribeToEventPath(
+      SubscriptionEstablishedCallback subscriptionEstablishedCallback,
+      ReportCallback reportCallback,
+      long devicePtr,
+      List<ChipEventPath> eventPaths,
+      int minInterval,
+      int maxInterval,
+      int imTimeoutMs,
+      @Nullable Long eventMin) {
+    ReportCallbackJni jniCallback =
+        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
+    subscribe(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        null,
+        eventPaths,
+        minInterval,
+        maxInterval,
+        false,
+        false,
+        imTimeoutMs,
+        eventMin);
+  }
+
+  /**
+   * @brief Auto-Resubscribe to the given attribute/event path with keepSubscriptions and
+   *     isFabricFiltered
+   * @param SubscriptionEstablishedCallback Callback when a subscribe response has been received and
+   *     processed
+   * @param ResubscriptionAttemptCallback Callback when a resubscirption haoppens, the termination
+   *     cause is provided to help inform subsequent re-subscription logic.
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param attributePaths a list of attribute paths
+   * @param eventPaths a list of event paths
+   * @param minInterval the requested minimum interval boundary floor in seconds
+   * @param maxInterval the requested maximum interval boundary ceiling in seconds
+   * @param keepSubscriptions If KeepSubscriptions is FALSE, all existing or pending subscriptions
+   *     on the publisher for this subscriber SHALL be terminated.
+   * @param isFabricFiltered limits the data read within fabric-scoped lists to the accessing fabric
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
   public void subscribeToPath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ResubscriptionAttemptCallback resubscriptionAttemptCallback,
@@ -509,7 +676,38 @@ public class ChipDeviceController {
       int minInterval,
       int maxInterval,
       boolean keepSubscriptions,
-      boolean isFabricFiltered) {
+      boolean isFabricFiltered,
+      int imTimeoutMs) {
+    ReportCallbackJni jniCallback =
+        new ReportCallbackJni(
+            subscriptionEstablishedCallback, reportCallback, resubscriptionAttemptCallback);
+    subscribe(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        attributePaths,
+        eventPaths,
+        minInterval,
+        maxInterval,
+        keepSubscriptions,
+        isFabricFiltered,
+        imTimeoutMs,
+        null);
+  }
+
+  public void subscribeToPath(
+      SubscriptionEstablishedCallback subscriptionEstablishedCallback,
+      ResubscriptionAttemptCallback resubscriptionAttemptCallback,
+      ReportCallback reportCallback,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths,
+      List<ChipEventPath> eventPaths,
+      int minInterval,
+      int maxInterval,
+      boolean keepSubscriptions,
+      boolean isFabricFiltered,
+      int imTimeoutMs,
+      @Nullable Long eventMin) {
     // TODO: pass resubscriptionAttemptCallback to ReportCallbackJni since jni layer is not ready
     // for auto-resubscribe
     ReportCallbackJni jniCallback =
@@ -523,12 +721,25 @@ public class ChipDeviceController {
         minInterval,
         maxInterval,
         keepSubscriptions,
-        isFabricFiltered);
+        isFabricFiltered,
+        imTimeoutMs,
+        eventMin);
   }
 
-  /** Read the given attribute path. */
+  /**
+   * @brief read the given attribute path with isFabricFiltered
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param attributePaths a list of attribute paths
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
   public void readAttributePath(
-      ReportCallback callback, long devicePtr, List<ChipAttributePath> attributePaths) {
+      ReportCallback callback,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths,
+      int imTimeoutMs) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
     read(
         deviceControllerPtr,
@@ -536,14 +747,80 @@ public class ChipDeviceController {
         devicePtr,
         attributePaths,
         null,
-        true);
+        true,
+        imTimeoutMs,
+        null);
+  }
+
+  /**
+   * @brief read the given event path with isFabricFiltered
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param eventPaths a list of event paths
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
+  public void readEventPath(
+      ReportCallback callback, long devicePtr, List<ChipEventPath> eventPaths, int imTimeoutMs) {
+    ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
+    read(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        null,
+        eventPaths,
+        true,
+        imTimeoutMs,
+        null);
   }
 
   /** Read the given event path. */
   public void readEventPath(
-      ReportCallback callback, long devicePtr, List<ChipEventPath> eventPaths) {
+      ReportCallback callback,
+      long devicePtr,
+      List<ChipEventPath> eventPaths,
+      int imTimeoutMs,
+      @Nullable Long eventMin) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
-    read(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, null, eventPaths, true);
+    read(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        null,
+        eventPaths,
+        true,
+        imTimeoutMs,
+        eventMin);
+  }
+
+  /**
+   * @brief read the given attribute/event path with isFabricFiltered
+   * @param ReportCallback Callback when a report data has been received and processed for the given
+   *     paths.
+   * @param devicePtr connected device pointer
+   * @param attributePaths a list of attribute paths
+   * @param eventPaths a list of event paths
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
+  public void readPath(
+      ReportCallback callback,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths,
+      List<ChipEventPath> eventPaths,
+      boolean isFabricFiltered,
+      int imTimeoutMs) {
+    ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
+    read(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        attributePaths,
+        eventPaths,
+        isFabricFiltered,
+        imTimeoutMs,
+        null);
   }
 
   /** Read the given attribute/event path with isFabricFiltered flag. */
@@ -552,7 +829,9 @@ public class ChipDeviceController {
       long devicePtr,
       List<ChipAttributePath> attributePaths,
       List<ChipEventPath> eventPaths,
-      boolean isFabricFiltered) {
+      boolean isFabricFiltered,
+      int imTimeoutMs,
+      @Nullable Long eventMin) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
     read(
         deviceControllerPtr,
@@ -560,7 +839,61 @@ public class ChipDeviceController {
         devicePtr,
         attributePaths,
         eventPaths,
-        isFabricFiltered);
+        isFabricFiltered,
+        imTimeoutMs,
+        eventMin);
+  }
+
+  /**
+   * @brief Write a list of attributes into target device
+   * @param WriteAttributesCallback Callback when a write response has been received and processed
+   *     for the given path.
+   * @param devicePtr connected device pointer
+   * @param attributeList a list of attributes
+   * @param timedRequestTimeoutMs this is timed request if this value is larger than 0
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
+  public void write(
+      WriteAttributesCallback callback,
+      long devicePtr,
+      List<AttributeWriteRequest> attributeList,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs) {
+    WriteAttributesCallbackJni jniCallback = new WriteAttributesCallbackJni(callback);
+    write(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        attributeList,
+        timedRequestTimeoutMs,
+        imTimeoutMs);
+  }
+
+  /**
+   * @brief Invoke command to target device
+   * @param InvokeCallback Callback when an invoke response has been received and processed for the
+   *     given invoke command.
+   * @param devicePtr connected device pointer
+   * @param invokeElement invoke command's path and arguments
+   * @param timedRequestTimeoutMs this is timed request if this value is larger than 0
+   * @param imTimeoutMs im interaction time out value, it would override the default value in c++ im
+   *     layer if this value is non-zero.
+   */
+  public void invoke(
+      InvokeCallback callback,
+      long devicePtr,
+      InvokeElement invokeElement,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs) {
+    InvokeCallbackJni jniCallback = new InvokeCallbackJni(callback);
+    invoke(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        invokeElement,
+        timedRequestTimeoutMs,
+        imTimeoutMs);
   }
 
   /**
@@ -570,6 +903,14 @@ public class ChipDeviceController {
    *     memory, invalid certificate format)
    */
   public native byte[] convertX509CertToMatterCert(byte[] x509Cert);
+
+  /**
+   * Extract skid from paa cert.
+   *
+   * @param paaCert The product attestation authority (PAA) cert
+   * @return The subject key identifier (SKID)
+   */
+  public native byte[] extractSkidFromPaaCert(byte[] paaCert);
 
   /**
    * Generates a new PASE verifier for the given setup PIN code.
@@ -600,7 +941,9 @@ public class ChipDeviceController {
       int minInterval,
       int maxInterval,
       boolean keepSubscriptions,
-      boolean isFabricFiltered);
+      boolean isFabricFiltered,
+      int imTimeoutMs,
+      @Nullable Long eventMin);
 
   private native void read(
       long deviceControllerPtr,
@@ -608,9 +951,33 @@ public class ChipDeviceController {
       long devicePtr,
       List<ChipAttributePath> attributePaths,
       List<ChipEventPath> eventPaths,
-      boolean isFabricFiltered);
+      boolean isFabricFiltered,
+      int imTimeoutMs,
+      @Nullable Long eventMin);
+
+  private native void write(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      List<AttributeWriteRequest> attributeList,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs);
+
+  private native void invoke(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      InvokeElement invokeElement,
+      int timedRequestTimeoutMs,
+      int imTimeoutMs);
 
   private native long newDeviceController(ControllerParams params);
+
+  private native void setDeviceAttestationDelegate(
+      long deviceControllerPtr, int failSafeExpiryTimeoutSecs, DeviceAttestationDelegate delegate);
+
+  private native void setAttestationTrustStoreDelegate(
+      long deviceControllerPtr, AttestationTrustStoreDelegate delegate);
 
   private native void pairDevice(
       long deviceControllerPtr,
@@ -641,7 +1008,13 @@ public class ChipDeviceController {
       @Nullable byte[] csrNonce,
       @Nullable NetworkCredentials networkCredentials);
 
+  private native void continueCommissioning(
+      long deviceControllerPtr, long devicePtr, boolean ignoreAttestationFailure);
+
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
+
+  private native void unpairDeviceCallback(
+      long deviceControllerPtr, long deviceId, UnpairDeviceCallback callback);
 
   private native long getDeviceBeingCommissionedPointer(long deviceControllerPtr, long nodeId);
 
@@ -670,7 +1043,7 @@ public class ChipDeviceController {
       int duration,
       long iteration,
       int discriminator,
-      long setupPinCode);
+      @Nullable Long setupPinCode);
 
   private native boolean openPairingWindowCallback(
       long deviceControllerPtr, long devicePtr, int duration, OpenCommissioningCallback callback);
@@ -681,7 +1054,7 @@ public class ChipDeviceController {
       int duration,
       long iteration,
       int discriminator,
-      long setupPinCode,
+      @Nullable Long setupPinCode,
       OpenCommissioningCallback callback);
 
   private native byte[] getAttestationChallenge(long deviceControllerPtr, long devicePtr);
@@ -694,7 +1067,13 @@ public class ChipDeviceController {
 
   private native int onNOCChainGeneration(long deviceControllerPtr, ControllerParams params);
 
-  private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
+  private native int getFabricIndex(long deviceControllerPtr);
+
+  private native void shutdownSubscriptions(
+      long deviceControllerPtr,
+      @Nullable Integer fabricIndex,
+      @Nullable Long peerNodeId,
+      @Nullable Long subscriptionId);
 
   private native void shutdownCommissioning(long deviceControllerPtr);
 

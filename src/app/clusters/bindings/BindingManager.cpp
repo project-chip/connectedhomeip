@@ -83,13 +83,19 @@ CHIP_ERROR BindingManager::Init(const BindingManagerInitParams & params)
     }
     else
     {
-        for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
+        // In case the application does not want the BindingManager to establish a CASE session
+        // to the available bindings, it can be disabled by setting mEstablishConnectionOnInit
+        // to false.
+        if (params.mEstablishConnectionOnInit)
         {
-            if (entry.type == EMBER_UNICAST_BINDING)
+            for (const EmberBindingTableEntry & entry : BindingTable::GetInstance())
             {
-                // The CASE connection can also fail if the unicast peer is offline.
-                // There is recovery mechanism to retry connection on-demand so ignore error.
-                (void) UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+                if (entry.type == EMBER_UNICAST_BINDING)
+                {
+                    // The CASE connection can also fail if the unicast peer is offline.
+                    // There is recovery mechanism to retry connection on-demand so ignore error.
+                    (void) UnicastBindingCreated(entry.fabricIndex, entry.nodeId);
+                }
             }
         }
     }
@@ -102,6 +108,8 @@ CHIP_ERROR BindingManager::EstablishConnection(const ScopedNodeId & nodeId)
 
     mLastSessionEstablishmentError = CHIP_NO_ERROR;
     auto * connectionCallback      = Platform::New<ConnectionCallback>(*this);
+    VerifyOrReturnError(connectionCallback != nullptr, CHIP_ERROR_NO_MEMORY);
+
     mInitParams.mCASESessionManager->FindOrEstablishSession(nodeId, connectionCallback->GetOnDeviceConnected(),
                                                             connectionCallback->GetOnDeviceConnectionFailure());
     if (mLastSessionEstablishmentError == CHIP_ERROR_NO_MEMORY)
@@ -123,7 +131,7 @@ CHIP_ERROR BindingManager::EstablishConnection(const ScopedNodeId & nodeId)
     return mLastSessionEstablishmentError;
 }
 
-void BindingManager::HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+void BindingManager::HandleDeviceConnected(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     FabricIndex fabricToRemove = kUndefinedFabricIndex;
     NodeId nodeToRemove        = kUndefinedNodeId;
@@ -169,7 +177,7 @@ void BindingManager::FabricRemoved(FabricIndex fabricIndex)
 CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context)
 {
     VerifyOrReturnError(mInitParams.mFabricTable != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mBoundDeviceChangedHandler, CHIP_NO_ERROR);
+    VerifyOrReturnError(mBoundDeviceChangedHandler != nullptr, CHIP_ERROR_HANDLER_NOT_SET);
 
     CHIP_ERROR error      = CHIP_NO_ERROR;
     auto * bindingContext = mPendingNotificationMap.NewPendingNotificationContext(context);

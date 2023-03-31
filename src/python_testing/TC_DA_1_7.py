@@ -15,20 +15,19 @@
 #    limitations under the License.
 #
 
-from matter_testing_support import MatterBaseTest, default_matter_test_main, async_test_body
-from matter_testing_support import hex_from_bytes, bytes_from_hex
-from chip.interaction_model import Status
-import chip.clusters as Clusters
 import logging
-from mobly import asserts
-from pathlib import Path
 from glob import glob
-from cryptography.x509 import load_der_x509_certificate, SubjectKeyIdentifier, AuthorityKeyIdentifier, Certificate
+from pathlib import Path
+from typing import Optional
+
+import chip.clusters as Clusters
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
-from cryptography.hazmat.primitives.serialization import PublicFormat, Encoding
-from typing import Optional
+from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+from cryptography.x509 import AuthorityKeyIdentifier, Certificate, SubjectKeyIdentifier, load_der_x509_certificate
+from matter_testing_support import MatterBaseTest, async_test_body, bytes_from_hex, default_matter_test_main, hex_from_bytes
+from mobly import asserts
 
 FORBIDDEN_AKID = [
     bytes_from_hex("78:5C:E7:05:B8:6B:8F:4E:6F:C7:93:AA:60:CB:43:EA:69:68:82:D5"),
@@ -79,13 +78,15 @@ class TC_DA_1_7(MatterBaseTest):
         dev_ctrl = self.default_controller
 
         logging.info("Step 2: Get PAI of DUT1 with certificate chain request")
-        result = await dev_ctrl.SendCommand(self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.CertificateChainRequest(2))
+        result = await dev_ctrl.SendCommand(self.dut_node_id, 0,
+                                            Clusters.OperationalCredentials.Commands.CertificateChainRequest(2))
         pai_1 = result.certificate
         asserts.assert_less_equal(len(pai_1), 600, "PAI cert must be at most 600 bytes")
         self.record_data({"pai_1": hex_from_bytes(pai_1)})
 
         logging.info("Step 3: Get DAC of DUT1 with certificate chain request")
-        result = await dev_ctrl.SendCommand(self.dut_node_id, 0, Clusters.OperationalCredentials.Commands.CertificateChainRequest(1))
+        result = await dev_ctrl.SendCommand(self.dut_node_id, 0,
+                                            Clusters.OperationalCredentials.Commands.CertificateChainRequest(1))
         dac_1 = result.certificate
         asserts.assert_less_equal(len(dac_1), 600, "DAC cert must be at most 600 bytes")
         self.record_data({"dac_1": hex_from_bytes(dac_1)})

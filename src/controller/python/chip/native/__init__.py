@@ -1,11 +1,12 @@
 import ctypes
+import enum
 import glob
 import os
 import platform
-import construct
-import chip.exceptions
 import typing
-import enum
+
+import chip.exceptions
+import construct
 
 NATIVE_LIBRARY_BASE_NAME = "_ChipDeviceCtrl.so"
 

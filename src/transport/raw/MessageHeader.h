@@ -34,6 +34,7 @@
 #include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/BufferReader.h>
 #include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
@@ -134,6 +135,13 @@ using ExFlags = BitFlags<ExFlagValues>;
 class PacketHeader
 {
 public:
+    enum
+    {
+        kHeaderMinLength        = 8,
+        kPrivacyHeaderMinLength = 4,
+        kPrivacyHeaderOffset    = 4,
+    };
+
     /**
      * Gets the message counter set in the header.
      *
@@ -172,6 +180,10 @@ public:
 
     bool HasPrivacyFlag() const { return mSecFlags.Has(Header::SecFlagValues::kPrivacyFlag); }
 
+    bool HasSourceNodeId() const { return mMsgFlags.Has(Header::MsgFlagValues::kSourceNodeIdPresent); }
+    bool HasDestinationNodeId() const { return mMsgFlags.Has(Header::MsgFlagValues::kDestinationNodeIdPresent); }
+    bool HasDestinationGroupId() const { return mMsgFlags.Has(Header::MsgFlagValues::kDestinationGroupIdPresent); }
+
     void SetFlags(Header::SecFlagValues value) { mSecFlags.Set(value); }
     void SetFlags(Header::MsgFlagValues value) { mMsgFlags.Set(value); }
 
@@ -202,15 +214,13 @@ public:
     bool IsValidGroupMsg() const
     {
         // Check is based on spec 4.11.2
-        return (IsGroupSession() && GetSourceNodeId().HasValue() && GetDestinationGroupId().HasValue() &&
-                !IsSecureSessionControlMsg());
+        return (IsGroupSession() && HasSourceNodeId() && HasDestinationGroupId() && !IsSecureSessionControlMsg());
     }
 
     bool IsValidMCSPMsg() const
     {
         // Check is based on spec 4.9.2.4
-        return (IsGroupSession() && GetSourceNodeId().HasValue() && GetDestinationNodeId().HasValue() &&
-                IsSecureSessionControlMsg());
+        return (IsGroupSession() && HasSourceNodeId() && HasDestinationNodeId() && IsSecureSessionControlMsg());
     }
 
     bool IsEncrypted() const { return !((mSessionId == kMsgUnicastSessionIdUnsecured) && IsUnicastSession()); }
@@ -317,12 +327,55 @@ public:
     }
 
     /**
+     * Returns a pointer to the start of the privacy header
+     * given a pointer to the start of the message.
+     */
+    uint8_t * PrivacyHeader(uint8_t * msgBuf) const { return msgBuf + PacketHeader::kPrivacyHeaderOffset; }
+
+    size_t PrivacyHeaderLength() const
+    {
+        size_t length = kPrivacyHeaderMinLength;
+        if (mMsgFlags.Has(Header::MsgFlagValues::kSourceNodeIdPresent))
+        {
+            length += sizeof(NodeId);
+        }
+        if (mMsgFlags.Has(Header::MsgFlagValues::kDestinationNodeIdPresent))
+        {
+            length += sizeof(NodeId);
+        }
+        else if (mMsgFlags.Has(Header::MsgFlagValues::kDestinationGroupIdPresent))
+        {
+            length += sizeof(GroupId);
+        }
+        return length;
+    }
+
+    size_t PayloadOffset() const
+    {
+        size_t offset = kPrivacyHeaderMinLength;
+        offset += PrivacyHeaderLength();
+        return offset;
+    }
+
+    /**
      * A call to `Encode` will require at least this many bytes on the current
      * object to be successful.
      *
      * @return the number of bytes needed in a buffer to be able to Encode.
      */
     uint16_t EncodeSizeBytes() const;
+
+    /**
+     * Decodes the fixed portion of the header fields from the given buffer.
+     * The fixed header includes: message flags, session id, and security flags.
+     *
+     * @return CHIP_NO_ERROR on success.
+     *
+     * Possible failures:
+     *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
+     *    CHIP_ERROR_VERSION_MISMATCH if header version is not supported.
+     */
+    CHIP_ERROR DecodeFixed(const System::PacketBufferHandle & buf);
 
     /**
      * Decodes a header from the given buffer.
@@ -397,6 +450,18 @@ public:
     }
 
 private:
+    /**
+     * Decodes the fixed portion of the header fields from the stream reader.
+     * The fixed header includes: message flags, session id, and security flags.
+     *
+     * @return CHIP_NO_ERROR on success.
+     *
+     * Possible failures:
+     *    CHIP_ERROR_INVALID_ARGUMENT on insufficient buffer size
+     *    CHIP_ERROR_VERSION_MISMATCH if header version is not supported.
+     */
+    CHIP_ERROR DecodeFixedCommon(Encoding::LittleEndian::Reader & reader);
+
     /// Represents the current encode/decode header version (4 bits)
     static constexpr uint8_t kMsgHeaderVersion = 0x00;
 

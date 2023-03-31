@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #import "MTRBaseDevice_Internal.h"
 #import "MTRBaseSubscriptionCallback.h"
 #import "MTRCluster.h"
+#import "MTRClusterConstants.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -36,6 +37,12 @@
 #include <app/ClusterStateCache.h>
 #include <app/InteractionModelEngine.h>
 #include <platform/PlatformManager.h>
+
+NSString * const MTREventNumberKey = @"eventNumber";
+NSString * const MTREventPriorityKey = @"eventPriority";
+NSString * const MTREventTimeTypeKey = @"eventTimeType";
+NSString * const MTREventSystemUpTimeKey = @"eventSystemUpTime";
+NSString * const MTREventTimestampDateKey = @"eventTimestampDate";
 
 typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 
@@ -58,7 +65,7 @@ typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 }
 + (instancetype)pairWithFirst:(id)first second:(id)second
 {
-    return [[MTRPair alloc] initWithFirst:first second:second];
+    return [[self alloc] initWithFirst:first second:second];
 }
 @end
 
@@ -84,7 +91,7 @@ typedef void (^MTRDeviceAttributeReportHandler)(NSArray * _Nonnull);
 }
 + (instancetype)weakReferenceWithObject:(id)object
 {
-    return [[MTRWeakReference alloc] initWithObject:object];
+    return [[self alloc] initWithObject:object];
 }
 - (id)strongObject
 {
@@ -100,6 +107,41 @@ NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max)
         return max;
     }
     return aNumber;
+}
+
+NSTimeInterval MTRTimeIntervalForEventTimestampValue(uint64_t timeValue)
+{
+    // Note: The event timestamp value as written in the spec is in microseconds, but the released 1.0 SDK implemented it in
+    // milliseconds. The following issue was filed to address the inconsistency:
+    //    https://github.com/CHIP-Specifications/connectedhomeip-spec/issues/6236
+    // For consistency with the released behavior, calculations here will be done in milliseconds.
+
+    // First convert the event timestamp value (in milliseconds) to NSTimeInterval - to minimize potential loss of precision
+    // of uint64 => NSTimeInterval (double), convert whole seconds and remainder separately and then combine
+    uint64_t eventTimestampValueSeconds = timeValue / chip::kMillisecondsPerSecond;
+    uint64_t eventTimestampValueRemainderMilliseconds = timeValue % chip::kMillisecondsPerSecond;
+    NSTimeInterval eventTimestampValueRemainder
+        = NSTimeInterval(eventTimestampValueRemainderMilliseconds) / chip::kMillisecondsPerSecond;
+    NSTimeInterval eventTimestampValue = eventTimestampValueSeconds + eventTimestampValueRemainder;
+
+    return eventTimestampValue;
+}
+
+BOOL MTRPriorityLevelIsValid(chip::app::PriorityLevel priorityLevel)
+{
+    return (priorityLevel >= chip::app::PriorityLevel::Debug) && (priorityLevel <= chip::app::PriorityLevel::Critical);
+}
+
+MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel priorityLevel)
+{
+    switch (priorityLevel) {
+    case chip::app::PriorityLevel::Debug:
+        return MTREventPriorityDebug;
+    case chip::app::PriorityLevel::Info:
+        return MTREventPriorityInfo;
+    default:
+        return MTREventPriorityCritical;
+    }
 }
 
 #pragma mark - SubscriptionCallback class declaration
@@ -136,11 +178,22 @@ private:
 @property (nonatomic) dispatch_queue_t delegateQueue;
 @property (nonatomic) NSArray<NSDictionary<NSString *, id> *> * unreportedEvents;
 
+/**
+ * If subscriptionActive is true that means that either we are in the middle of
+ * trying to get a CASE session for the publisher or we have a live ReadClient
+ * right now (possibly with a lost subscription and trying to re-subscribe).
+ */
 @property (nonatomic) BOOL subscriptionActive;
 
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS (1)
 #define MTRDEVICE_SUBSCRIPTION_ATTEMPT_MAX_WAIT_SECONDS (3600)
 @property (nonatomic) uint32_t lastSubscriptionAttemptWait;
+
+/**
+ * If reattemptingSubscription is true, that means that we have failed to get a
+ * CASE session for the publisher and are now waiting to try again.  In this
+ * state we never have subscriptionActive true or a non-null currentReadClient.
+ */
 @property (nonatomic) BOOL reattemptingSubscription;
 
 // Read cache is attributePath => NSDictionary of value.
@@ -152,6 +205,14 @@ private:
 @property (nonatomic) NSMutableDictionary<MTRAttributePath *, MTRPair<NSDate *, NSDictionary *> *> * expectedValueCache;
 
 @property (nonatomic) BOOL expirationCheckScheduled;
+
+/**
+ * If currentReadClient is non-null, that means that we successfully
+ * called SendAutoResubscribeRequest on the ReadClient and have not yet gotten
+ * an OnDone for that ReadClient.
+ */
+@property (nonatomic) ReadClient * currentReadClient;
+
 @end
 
 @implementation MTRDevice
@@ -179,7 +240,7 @@ private:
     return [NSString stringWithFormat:@"<MTRDevice: %p>[fabric: %u, nodeID: %@]", self, _fabricIndex, _nodeID];
 }
 
-+ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
++ (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
 {
     return [controller deviceForNodeID:nodeID];
 }
@@ -212,16 +273,51 @@ private:
     os_unfair_lock_unlock(&self->_lock);
 }
 
+- (void)nodeMayBeAdvertisingOperational
+{
+    MTR_LOG_DEFAULT("%@ saw new operational advertisement", self);
+
+    // We might want to trigger a resubscribe on our existing ReadClient.  Do
+    // that outside the scope of our lock, so we're not calling arbitrary code
+    // we don't control with the lock held.  This is safe, because when
+    // nodeMayBeAdvertisingOperational is called we are running on the Matter
+    // queue, and the ReadClient can't get destroyed while we are on that queue.
+    ReadClient * readClientToResubscribe = nullptr;
+
+    os_unfair_lock_lock(&self->_lock);
+
+    // Don't change state to MTRDeviceStateReachable, since the device might not
+    // in fact be reachable yet; we won't know until we have managed to
+    // establish a CASE session.  And at that point, our subscription will
+    // trigger the state change as needed.
+    if (self.reattemptingSubscription) {
+        [self _reattemptSubscriptionNowIfNeeded];
+    } else {
+        readClientToResubscribe = self->_currentReadClient;
+    }
+    os_unfair_lock_unlock(&self->_lock);
+
+    if (readClientToResubscribe) {
+        readClientToResubscribe->TriggerResubscribeIfScheduled("operational advertisement seen");
+    }
+}
+
 // assume lock is held
 - (void)_changeState:(MTRDeviceState)state
 {
+    os_unfair_lock_assert_owner(&self->_lock);
     MTRDeviceState lastState = _state;
     _state = state;
-    id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (delegate && (lastState != state)) {
-        dispatch_async(_delegateQueue, ^{
-            [delegate device:self stateChanged:state];
-        });
+    if (lastState != state) {
+        if (state != MTRDeviceStateReachable) {
+            _estimatedStartTime = nil;
+        }
+        id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
+        if (delegate) {
+            dispatch_async(_delegateQueue, ^{
+                [delegate device:self stateChanged:state];
+            });
+        }
     }
 }
 
@@ -290,13 +386,23 @@ private:
     MTR_LOG_INFO("%@ scheduling to reattempt subscription in %u seconds", self, _lastSubscriptionAttemptWait);
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_lastSubscriptionAttemptWait * NSEC_PER_SEC)), self.queue, ^{
         os_unfair_lock_lock(&self->_lock);
-        MTR_LOG_INFO("%@ reattempting subscription", self);
-        self.reattemptingSubscription = NO;
-        [self _setupSubscription];
+        [self _reattemptSubscriptionNowIfNeeded];
         os_unfair_lock_unlock(&self->_lock);
     });
 
     os_unfair_lock_unlock(&self->_lock);
+}
+
+- (void)_reattemptSubscriptionNowIfNeeded
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+    if (!self.reattemptingSubscription) {
+        return;
+    }
+
+    MTR_LOG_INFO("%@ reattempting subscription", self);
+    self.reattemptingSubscription = NO;
+    [self _setupSubscription];
 }
 
 - (void)_handleUnsolicitedMessageFromPublisher
@@ -306,15 +412,18 @@ private:
     [self _changeState:MTRDeviceStateReachable];
 
     id<MTRDeviceDelegate> delegate = _weakDelegate.strongObject;
-    if (delegate && [delegate respondsToSelector:@selector(didReceiveCommunicationFromDevice:)]) {
+    if (delegate && [delegate respondsToSelector:@selector(deviceBecameActive:)]) {
         dispatch_async(_delegateQueue, ^{
-            [delegate didReceiveCommunicationFromDevice:self];
+            [delegate deviceBecameActive:self];
         });
     }
 
-    // in case this is called dyring exponential back off of subscription
+    // in case this is called during exponential back off of subscription
     // reestablishment, this starts the attempt right away
-    [self _setupSubscription];
+    // TODO: This doesn't really make sense.  If we _don't_ have a live
+    // ReadClient how did we get this notification and if we _do_ have an active
+    // ReadClient, this call or _setupSubscription would be no-ops.
+    [self _reattemptSubscriptionNowIfNeeded];
 
     os_unfair_lock_unlock(&self->_lock);
 }
@@ -347,7 +456,41 @@ private:
 {
     os_unfair_lock_lock(&self->_lock);
 
-    // first combine with previous unreported events, if they exist
+    NSDate * oldEstimatedStartTime = _estimatedStartTime;
+    for (NSDictionary<NSString *, id> * eventDict in eventReport) {
+        // Whenever a StartUp event is received, reset the estimated start time
+        MTREventPath * eventPath = eventDict[MTREventPathKey];
+        BOOL isStartUpEvent = (eventPath.cluster.unsignedLongValue == MTRClusterIDTypeBasicInformationID)
+            && (eventPath.event.unsignedLongValue == MTREventIDTypeClusterBasicInformationEventStartUpID);
+        if (isStartUpEvent) {
+            _estimatedStartTime = nil;
+        }
+
+        // If event time is of MTREventTimeTypeSystemUpTime type, then update estimated start time as needed
+        NSNumber * eventTimeTypeNumber = eventDict[MTREventTimeTypeKey];
+        if (!eventTimeTypeNumber) {
+            MTR_LOG_ERROR("Event %@ missing event time type", eventDict);
+            continue;
+        }
+        MTREventTimeType eventTimeType = (MTREventTimeType) eventTimeTypeNumber.unsignedIntegerValue;
+        if (eventTimeType == MTREventTimeTypeSystemUpTime) {
+            NSNumber * eventTimeValueNumber = eventDict[MTREventSystemUpTimeKey];
+            if (!eventTimeValueNumber) {
+                MTR_LOG_ERROR("Event %@ missing event time value", eventDict);
+                continue;
+            }
+            NSTimeInterval eventTimeValue = eventTimeValueNumber.doubleValue;
+            NSDate * potentialSystemStartTime = [NSDate dateWithTimeIntervalSinceNow:-eventTimeValue];
+            if (!_estimatedStartTime || ([potentialSystemStartTime compare:_estimatedStartTime] == NSOrderedAscending)) {
+                _estimatedStartTime = potentialSystemStartTime;
+            }
+        }
+    }
+    if (oldEstimatedStartTime != _estimatedStartTime) {
+        MTR_LOG_INFO("%@ updated estimated start time to %@", self, _estimatedStartTime);
+    }
+
+    // Combine with previous unreported events, if they exist
     if (_unreportedEvents) {
         eventReport = [_unreportedEvents arrayByAddingObjectsFromArray:eventReport];
         _unreportedEvents = nil;
@@ -456,6 +599,12 @@ private:
                                       },
                                       ^(void) {
                                           MTR_LOG_INFO("%@ got subscription done", self);
+                                          // Drop our pointer to the ReadClient immediately, since
+                                          // it's about to be destroyed and we don't want to be
+                                          // holding a dangling pointer.
+                                          os_unfair_lock_lock(&self->_lock);
+                                          self->_currentReadClient = nullptr;
+                                          os_unfair_lock_unlock(&self->_lock);
                                           dispatch_async(self.queue, ^{
                                               // OnDone
                                               [self _handleSubscriptionReset];
@@ -495,7 +644,10 @@ private:
                                   }
 
                                   // Callback and ClusterStateCache and ReadClient will be deleted
-                                  // when OnDone is called or an error is encountered.
+                                  // when OnDone is called.
+                                  os_unfair_lock_lock(&self->_lock);
+                                  self->_currentReadClient = readClient.get();
+                                  os_unfair_lock_unlock(&self->_lock);
                                   callback->AdoptReadClient(std::move(readClient));
                                   callback->AdoptClusterStateCache(std::move(clusterStateCache));
                                   callback.release();
@@ -901,7 +1053,7 @@ private:
 
 @implementation MTRDevice (Deprecated)
 
-+ (instancetype)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
++ (MTRDevice *)deviceWithNodeID:(uint64_t)nodeID deviceController:(MTRDeviceController *)deviceController
 {
     return [self deviceWithNodeID:@(nodeID) controller:deviceController];
 }
@@ -950,7 +1102,40 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
     } else {
         id value = MTRDecodeDataValueDictionaryFromCHIPTLV(apData);
         if (value) {
-            [mEventReports addObject:@ { MTREventPathKey : eventPath, MTRDataKey : value }];
+            // Construct the right type, and key/value depending on the type
+            NSNumber * eventTimeType;
+            NSString * timestampKey;
+            id timestampValue;
+            if (aEventHeader.mTimestamp.mType == Timestamp::Type::kSystem) {
+                eventTimeType = @(MTREventTimeTypeSystemUpTime);
+                timestampKey = MTREventSystemUpTimeKey;
+                timestampValue = @(MTRTimeIntervalForEventTimestampValue(aEventHeader.mTimestamp.mValue));
+            } else if (aEventHeader.mTimestamp.mType == Timestamp::Type::kEpoch) {
+                eventTimeType = @(MTREventTimeTypeTimestampDate);
+                timestampKey = MTREventTimestampDateKey;
+                timestampValue =
+                    [NSDate dateWithTimeIntervalSince1970:MTRTimeIntervalForEventTimestampValue(aEventHeader.mTimestamp.mValue)];
+            } else {
+                MTR_LOG_INFO(
+                    "%@ Unsupported event timestamp type %u - ignoring", eventPath, (unsigned int) aEventHeader.mTimestamp.mType);
+                ReportError(CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+                return;
+            }
+
+            if (!MTRPriorityLevelIsValid(aEventHeader.mPriorityLevel)) {
+                MTR_LOG_INFO("%@ Unsupported event priority %u - ignoring", eventPath, (unsigned int) aEventHeader.mPriorityLevel);
+                ReportError(CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+                return;
+            }
+
+            [mEventReports addObject:@{
+                MTREventPathKey : eventPath,
+                MTRDataKey : value,
+                MTREventNumberKey : @(aEventHeader.mEventNumber),
+                MTREventPriorityKey : @(MTREventPriorityForValidPriorityLevel(aEventHeader.mPriorityLevel)),
+                MTREventTimeTypeKey : eventTimeType,
+                timestampKey : timestampValue
+            }];
         }
     }
 }

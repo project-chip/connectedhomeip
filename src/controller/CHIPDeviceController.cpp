@@ -38,13 +38,13 @@
 #include <app-common/zap-generated/enums.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <controller-clusters/zap-generated/CHIPClusters.h>
 
 #include <app/server/Dnssd.h>
 
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalSessionSetup.h>
 #include <app/util/error-mapping.h>
+#include <controller/CurrentFabricRemover.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -398,6 +398,9 @@ ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 
 DeviceCommissioner::DeviceCommissioner() :
     mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    mOnDeviceConnectionRetryCallback(OnDeviceConnectionRetryFn, this),
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this)
 {
@@ -701,6 +704,16 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
         {
             SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetConnectionObject()));
         }
+        else if (params.HasDiscoveredObject())
+        {
+            // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
+            // for later.
+            mRendezvousParametersForDeviceDiscoveredOverBle = params;
+            SuccessOrExit(err = mSystemState->BleLayer()->NewBleConnectionByObject(params.GetDiscoveredObject(), this,
+                                                                                   OnDiscoveredDeviceOverBleSuccess,
+                                                                                   OnDiscoveredDeviceOverBleError));
+            ExitNow(CHIP_NO_ERROR);
+        }
         else if (params.HasDiscriminator())
         {
             // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
@@ -894,8 +907,10 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
 
 CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 {
-    // TODO: Send unpairing message to the remote device.
-    return CHIP_NO_ERROR;
+    MATTER_TRACE_EVENT_SCOPE("UnpairDevice", "DeviceCommissioner");
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+
+    return AutoCurrentFabricRemover::RemoveCurrentFabric(this, remoteDeviceId);
 }
 
 void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
@@ -965,9 +980,8 @@ CHIP_ERROR DeviceCommissioner::SendCertificateChainRequestCommand(DeviceProxy * 
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     OperationalCredentials::Commands::CertificateChainRequest::Type request;
-    request.certificateType = certificateType;
-    return SendCommand<OperationalCredentialsCluster>(device, request, OnCertificateChainResponse,
-                                                      OnCertificateChainFailureResponse, timeout);
+    request.certificateType = static_cast<OperationalCredentials::CertificateChainTypeEnum>(certificateType);
+    return SendCommand(device, request, OnCertificateChainResponse, OnCertificateChainFailureResponse, timeout);
 
     return CHIP_NO_ERROR;
 }
@@ -1003,8 +1017,7 @@ CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(DeviceProxy * devic
     OperationalCredentials::Commands::AttestationRequest::Type request;
     request.attestationNonce = attestationNonce;
 
-    ReturnErrorOnFailure(
-        SendCommand<OperationalCredentialsCluster>(device, request, OnAttestationResponse, OnAttestationFailureResponse, timeout));
+    ReturnErrorOnFailure(SendCommand(device, request, OnAttestationResponse, OnAttestationFailureResponse, timeout));
     ChipLogDetail(Controller, "Sent Attestation request, waiting for the Attestation Information");
     return CHIP_NO_ERROR;
 }
@@ -1025,7 +1038,7 @@ void DeviceCommissioner::OnAttestationResponse(void * context,
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
 
     CommissioningDelegate::CommissioningReport report;
-    report.Set<AttestationResponse>(AttestationResponse(data.attestationElements, data.signature));
+    report.Set<AttestationResponse>(AttestationResponse(data.attestationElements, data.attestationSignature));
     commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
 }
 
@@ -1128,16 +1141,39 @@ void DeviceCommissioner::OnFailedToExtendedArmFailSafeDeviceAttestation(void * c
     commissioner->CommissioningStageComplete(CHIP_ERROR_INTERNAL, report);
 }
 
-void DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
+bool DeviceCommissioner::ExtendArmFailSafe(DeviceProxy * proxy, CommissioningStage step, uint16_t armFailSafeTimeout,
                                            Optional<System::Clock::Timeout> commandTimeout, OnExtendFailsafeSuccess onSuccess,
                                            OnExtendFailsafeFailure onFailure)
 {
+    using namespace System;
+    using namespace System::Clock;
+    auto now                = SystemClock().GetMonotonicTimestamp();
+    auto newFailSafeTimeout = now + Seconds16(armFailSafeTimeout);
+    if (newFailSafeTimeout < proxy->GetFailSafeExpirationTimestamp())
+    {
+        ChipLogProgress(
+            Controller, "Skipping arming failsafe: new time (%u seconds from now) before old time (%u seconds from now)",
+            armFailSafeTimeout, std::chrono::duration_cast<Seconds16>(proxy->GetFailSafeExpirationTimestamp() - now).count());
+        return false;
+    }
+
     uint64_t breadcrumb = static_cast<uint64_t>(step);
     GeneralCommissioning::Commands::ArmFailSafe::Type request;
     request.expiryLengthSeconds = armFailSafeTimeout;
     request.breadcrumb          = breadcrumb;
     ChipLogProgress(Controller, "Arming failsafe (%u seconds)", request.expiryLengthSeconds);
-    SendCommand<GeneralCommissioningCluster>(proxy, request, onSuccess, onFailure, kRootEndpointId, commandTimeout);
+    CHIP_ERROR err = SendCommand(proxy, request, onSuccess, onFailure, kRootEndpointId, commandTimeout);
+    if (err != CHIP_NO_ERROR)
+    {
+        onFailure(this, err);
+    }
+    else
+    {
+        // TODO: Handle the situation when our command ends up erroring out
+        // asynchronously?
+        proxy->SetFailSafeExpirationTimestamp(newFailSafeTimeout);
+    }
+    return true;
 }
 
 void DeviceCommissioner::ExtendArmFailSafeForDeviceAttestation(const Credentials::DeviceAttestationVerifier::AttestationInfo & info,
@@ -1150,22 +1186,25 @@ void DeviceCommissioner::ExtendArmFailSafeForDeviceAttestation(const Credentials
 
     mAttestationDeviceInfo = Platform::MakeUnique<Credentials::DeviceAttestationVerifier::AttestationDeviceInfo>(info);
 
-    auto expiryLengthSeconds = deviceAttestationDelegate->FailSafeExpiryTimeoutSecs();
-    if (expiryLengthSeconds.HasValue())
+    auto expiryLengthSeconds      = deviceAttestationDelegate->FailSafeExpiryTimeoutSecs();
+    bool waitForFailsafeExtension = expiryLengthSeconds.HasValue();
+    if (waitForFailsafeExtension)
     {
-        GeneralCommissioning::Commands::ArmFailSafe::Type request;
-        request.expiryLengthSeconds = expiryLengthSeconds.Value();
-        request.breadcrumb          = mCommissioningStage;
-        ChipLogProgress(Controller, "Changing fail-safe timer to %u seconds to handle DA failure", request.expiryLengthSeconds);
+        ChipLogProgress(Controller, "Changing fail-safe timer to %u seconds to handle DA failure", expiryLengthSeconds.Value());
         // Per spec, anything we do with the fail-safe armed must not time out
         // in less than kMinimumCommissioningStepTimeout.
-        SendCommand<GeneralCommissioningCluster>(mDeviceBeingCommissioned, request, OnArmFailSafeExtendedForDeviceAttestation,
-                                                 OnFailedToExtendedArmFailSafeDeviceAttestation,
-                                                 MakeOptional(kMinimumCommissioningStepTimeout));
+        waitForFailsafeExtension =
+            ExtendArmFailSafe(mDeviceBeingCommissioned, mCommissioningStage, expiryLengthSeconds.Value(),
+                              MakeOptional(kMinimumCommissioningStepTimeout), OnArmFailSafeExtendedForDeviceAttestation,
+                              OnFailedToExtendedArmFailSafeDeviceAttestation);
     }
     else
     {
         ChipLogProgress(Controller, "Proceeding without changing fail-safe timer value as delegate has not set it");
+    }
+
+    if (!waitForFailsafeExtension)
+    {
         // Callee does not use data argument.
         const GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType data;
         OnArmFailSafeExtendedForDeviceAttestation(this, data);
@@ -1214,8 +1253,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(D
     OperationalCredentials::Commands::CSRRequest::Type request;
     request.CSRNonce = csrNonce;
 
-    ReturnErrorOnFailure(SendCommand<OperationalCredentialsCluster>(device, request, OnOperationalCertificateSigningRequest,
-                                                                    OnCSRFailureResponse, timeout));
+    ReturnErrorOnFailure(SendCommand(device, request, OnOperationalCertificateSigningRequest, OnCSRFailureResponse, timeout));
     ChipLogDetail(Controller, "Sent CSR request, waiting for the CSR");
     return CHIP_NO_ERROR;
 }
@@ -1241,7 +1279,7 @@ void DeviceCommissioner::OnOperationalCertificateSigningRequest(
 }
 
 void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
-                                                    const ByteSpan & rcac, Optional<AesCcm128KeySpan> ipk,
+                                                    const ByteSpan & rcac, Optional<IdentityProtectionKeySpan> ipk,
                                                     Optional<NodeId> adminSubject)
 {
     MATTER_TRACE_EVENT_SCOPE("OnDeviceNOCChainGeneration", "DeviceCommissioner");
@@ -1250,14 +1288,14 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
     // The placeholder IPK is not satisfactory, but is there to fill the NocChain struct on error. It will still fail.
     const uint8_t placeHolderIpk[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-    if (!ipk.HasValue())
+    if (status == CHIP_NO_ERROR && !ipk.HasValue())
     {
         ChipLogError(Controller, "Did not have an IPK from the OperationalCredentialsIssuer! Cannot commission.");
         status = CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     ChipLogProgress(Controller, "Received callback from the CA for NOC Chain generation. Status %s", ErrorStr(status));
-    if (commissioner->mState != State::Initialized)
+    if (status == CHIP_NO_ERROR && commissioner->mState != State::Initialized)
     {
         status = CHIP_ERROR_INCORRECT_STATE;
     }
@@ -1268,7 +1306,7 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
 
     // TODO - Verify that the generated root cert matches with commissioner's root cert
     CommissioningDelegate::CommissioningReport report;
-    report.Set<NocChain>(NocChain(noc, icac, rcac, ipk.HasValue() ? ipk.Value() : AesCcm128KeySpan(placeHolderIpk),
+    report.Set<NocChain>(NocChain(noc, icac, rcac, ipk.HasValue() ? ipk.Value() : IdentityProtectionKeySpan(placeHolderIpk),
                                   adminSubject.HasValue() ? adminSubject.Value() : commissioner->GetNodeId()));
     commissioner->CommissioningStageComplete(status, report);
 }
@@ -1322,8 +1360,9 @@ CHIP_ERROR DeviceCommissioner::ProcessCSR(DeviceProxy * proxy, const ByteSpan & 
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf,
-                                                          const Optional<ByteSpan> & icaCertBuf, const AesCcm128KeySpan ipk,
-                                                          const NodeId adminSubject, Optional<System::Clock::Timeout> timeout)
+                                                          const Optional<ByteSpan> & icaCertBuf,
+                                                          const IdentityProtectionKeySpan ipk, const NodeId adminSubject,
+                                                          Optional<System::Clock::Timeout> timeout)
 {
     MATTER_TRACE_EVENT_SCOPE("SendOperationalCertificate", "DeviceCommissioner");
 
@@ -1336,40 +1375,39 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(DeviceProxy * device, 
     request.caseAdminSubject = adminSubject;
     request.adminVendorId    = mVendorId;
 
-    ReturnErrorOnFailure(SendCommand<OperationalCredentialsCluster>(device, request, OnOperationalCertificateAddResponse,
-                                                                    OnAddNOCFailureResponse, timeout));
+    ReturnErrorOnFailure(SendCommand(device, request, OnOperationalCertificateAddResponse, OnAddNOCFailureResponse, timeout));
 
     ChipLogProgress(Controller, "Sent operational certificate to the device");
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCredentials::OperationalCertStatus err)
+CHIP_ERROR DeviceCommissioner::ConvertFromOperationalCertStatus(OperationalCredentials::NodeOperationalCertStatusEnum err)
 {
-    using OperationalCredentials::OperationalCertStatus;
+    using OperationalCredentials::NodeOperationalCertStatusEnum;
     switch (err)
     {
-    case OperationalCertStatus::kSuccess:
+    case NodeOperationalCertStatusEnum::kOk:
         return CHIP_NO_ERROR;
-    case OperationalCertStatus::kInvalidPublicKey:
+    case NodeOperationalCertStatusEnum::kInvalidPublicKey:
         return CHIP_ERROR_INVALID_PUBLIC_KEY;
-    case OperationalCertStatus::kInvalidNodeOpId:
+    case NodeOperationalCertStatusEnum::kInvalidNodeOpId:
         return CHIP_ERROR_WRONG_NODE_ID;
-    case OperationalCertStatus::kInvalidNOC:
+    case NodeOperationalCertStatusEnum::kInvalidNOC:
         return CHIP_ERROR_UNSUPPORTED_CERT_FORMAT;
-    case OperationalCertStatus::kMissingCsr:
+    case NodeOperationalCertStatusEnum::kMissingCsr:
         return CHIP_ERROR_INCORRECT_STATE;
-    case OperationalCertStatus::kTableFull:
+    case NodeOperationalCertStatusEnum::kTableFull:
         return CHIP_ERROR_NO_MEMORY;
-    case OperationalCertStatus::kInvalidAdminSubject:
+    case NodeOperationalCertStatusEnum::kInvalidAdminSubject:
         return CHIP_ERROR_INVALID_ADMIN_SUBJECT;
-    case OperationalCertStatus::kFabricConflict:
+    case NodeOperationalCertStatusEnum::kFabricConflict:
         return CHIP_ERROR_FABRIC_EXISTS;
-    case OperationalCertStatus::kLabelConflict:
+    case NodeOperationalCertStatusEnum::kLabelConflict:
         return CHIP_ERROR_INVALID_ARGUMENT;
-    case OperationalCertStatus::kInvalidFabricIndex:
+    case NodeOperationalCertStatusEnum::kInvalidFabricIndex:
         return CHIP_ERROR_INVALID_FABRIC_INDEX;
-    case OperationalCertStatus::kUnknownEnumValue:
+    case NodeOperationalCertStatusEnum::kUnknownEnumValue:
         // Is this a reasonable value?
         return CHIP_ERROR_CERT_LOAD_FAILED;
     }
@@ -1420,9 +1458,8 @@ CHIP_ERROR DeviceCommissioner::SendTrustedRootCertificate(DeviceProxy * device, 
     ChipLogProgress(Controller, "Sending root certificate to the device");
 
     OperationalCredentials::Commands::AddTrustedRootCertificate::Type request;
-    request.rootCertificate = rcac;
-    ReturnErrorOnFailure(
-        SendCommand<OperationalCredentialsCluster>(device, request, OnRootCertSuccessResponse, OnRootCertFailureResponse, timeout));
+    request.rootCACertificate = rcac;
+    ReturnErrorOnFailure(SendCommand(device, request, OnRootCertSuccessResponse, OnRootCertFailureResponse, timeout));
 
     ChipLogProgress(Controller, "Sent root certificate to the device");
 
@@ -1572,8 +1609,8 @@ void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId
         ChipLogProgress(Controller, "Expiring failsafe on proxy %p", proxy);
         mDeviceBeingCommissioned = proxy;
         // We actually want to do the same thing on success or failure because we're already in a failure state
-        SendCommand<GeneralCommissioningCluster>(proxy, request, OnDisarmFailsafe, OnDisarmFailsafeFailure,
-                                                 /* timeout = */ NullOptional);
+        SendCommand(proxy, request, OnDisarmFailsafe, OnDisarmFailsafeFailure,
+                    /* timeout = */ NullOptional);
     }
 }
 
@@ -1676,7 +1713,7 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err, Commissionin
 }
 
 void DeviceCommissioner::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                             SessionHandle & sessionHandle)
+                                             const SessionHandle & sessionHandle)
 {
     // CASE session established.
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
@@ -1733,6 +1770,62 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, const Scope
         commissioner->CommissioningStageComplete(error);
     }
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+// No specific action to take on either success or failure here; we're just
+// trying to bump the fail-safe, and if that fails it's not clear there's much
+// we can to with that.
+static void OnExtendFailsafeForCASERetryFailure(void * context, CHIP_ERROR error)
+{
+    ChipLogError(Controller, "Failed to extend fail-safe for CASE retry: %" CHIP_ERROR_FORMAT, error.Format());
+}
+static void
+OnExtendFailsafeForCASERetrySuccess(void * context,
+                                    const app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
+{
+    ChipLogProgress(Controller, "Status of extending fail-safe for CASE retry: %u", to_underlying(data.errorCode));
+}
+
+void DeviceCommissioner::OnDeviceConnectionRetryFn(void * context, const ScopedNodeId & peerId, CHIP_ERROR error,
+                                                   System::Clock::Seconds16 retryTimeout)
+{
+    ChipLogError(Controller,
+                 "Session establishment failed for " ChipLogFormatScopedNodeId ", error: %" CHIP_ERROR_FORMAT
+                 ".  Next retry expected to get a response to Sigma1 or fail within %d seconds",
+                 ChipLogValueScopedNodeId(peerId), error.Format(), retryTimeout.count());
+
+    auto self = static_cast<DeviceCommissioner *>(context);
+
+    // We need to do the fail-safe arming over the PASE session.
+    auto * commissioneeDevice = self->FindCommissioneeDevice(peerId.GetNodeId());
+    if (!commissioneeDevice)
+    {
+        // Commissioning canceled, presumably.  Just ignore the notification,
+        // not much we can do here.
+        return;
+    }
+
+    // Extend by the default failsafe timeout plus our retry timeout, so we can
+    // be sure the fail-safe will not expire before we try the next time, if
+    // there will be a next time.
+    //
+    // TODO: Make it possible for our clients to control the exact timeout here?
+    uint16_t failsafeTimeout;
+    if (UINT16_MAX - retryTimeout.count() < kDefaultFailsafeTimeout)
+    {
+        failsafeTimeout = UINT16_MAX;
+    }
+    else
+    {
+        failsafeTimeout = static_cast<uint16_t>(retryTimeout.count() + kDefaultFailsafeTimeout);
+    }
+    // A false return from ExtendArmFailSafe is fine; we don't want to make the
+    // fail-safe shorter here.
+    self->ExtendArmFailSafe(commissioneeDevice, CommissioningStage::kFindOperational, failsafeTimeout,
+                            MakeOptional(kMinimumCommissioningStepTimeout), OnExtendFailsafeForCASERetrySuccess,
+                            OnExtendFailsafeForCASERetryFailure);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
 // ClusterStateCache::Callback impl
 void DeviceCommissioner::OnDone(app::ReadClient *)
@@ -1825,9 +1918,9 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
                 ChipLogProgress(Controller,
                                 "DeviceCommissioner::OnDone - fabric.vendorId=0x%04X fabric.fabricId=0x" ChipLogFormatX64
                                 " fabric.nodeId=0x" ChipLogFormatX64,
-                                fabricDescriptor.vendorId, ChipLogValueX64(fabricDescriptor.fabricId),
-                                ChipLogValueX64(fabricDescriptor.nodeId));
-                if (GetFabricId() == fabricDescriptor.fabricId)
+                                fabricDescriptor.vendorID, ChipLogValueX64(fabricDescriptor.fabricID),
+                                ChipLogValueX64(fabricDescriptor.nodeID));
+                if (GetFabricId() == fabricDescriptor.fabricID)
                 {
                     ChipLogProgress(Controller, "DeviceCommissioner::OnDone - found a matching fabric id");
                     chip::ByteSpan rootKeySpan = fabricDescriptor.rootPublicKey;
@@ -1849,7 +1942,7 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
                     else if (commissionerRootPublicKey.Matches(deviceRootPublicKey))
                     {
                         ChipLogProgress(Controller, "DeviceCommissioner::OnDone - fabric root keys match");
-                        info.nodeId = fabricDescriptor.nodeId;
+                        info.nodeId = fabricDescriptor.nodeID;
                     }
                 }
             }
@@ -2114,8 +2207,11 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     {
     case CommissioningStage::kArmFailsafe: {
         VerifyOrDie(endpoint == kRootEndpointId);
-        ExtendArmFailSafe(proxy, step, params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeTimeout), timeout, OnArmFailSafe,
-                          OnBasicFailure);
+        // Make sure the fail-safe value we set here actually ends up being used
+        // no matter what.
+        proxy->SetFailSafeExpirationTimestamp(System::Clock::kZero);
+        VerifyOrDie(ExtendArmFailSafe(proxy, step, params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeTimeout), timeout,
+                                      OnArmFailSafe, OnBasicFailure));
     }
     break;
     case CommissioningStage::kReadCommissioningInfo: {
@@ -2183,7 +2279,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             request.ssid.Emplace(params.GetWiFiCredentials().Value().ssid);
         }
         request.breadcrumb.Emplace(breadcrumb);
-        SendCommand<NetworkCommissioningCluster>(proxy, request, OnScanNetworksResponse, OnScanNetworksFailure, endpoint, timeout);
+        SendCommand(proxy, request, OnScanNetworksResponse, OnScanNetworksFailure, endpoint, timeout);
         break;
     }
     case CommissioningStage::kNeedsNetworkCreds: {
@@ -2249,7 +2345,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         request.newRegulatoryConfig = regulatoryConfig;
         request.countryCode         = countryCode;
         request.breadcrumb          = breadcrumb;
-        SendCommand<GeneralCommissioningCluster>(proxy, request, OnSetRegulatoryConfigResponse, OnBasicFailure, endpoint, timeout);
+        SendCommand(proxy, request, OnSetRegulatoryConfigResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
     case CommissioningStage::kSendPAICertificateRequest:
@@ -2394,7 +2490,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         request.ssid        = params.GetWiFiCredentials().Value().ssid;
         request.credentials = params.GetWiFiCredentials().Value().credentials;
         request.breadcrumb.Emplace(breadcrumb);
-        SendCommand<NetworkCommissioningCluster>(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
+        SendCommand(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
     case CommissioningStage::kThreadNetworkSetup: {
@@ -2407,9 +2503,17 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
         request.operationalDataset = params.GetThreadOperationalDataset().Value();
         request.breadcrumb.Emplace(breadcrumb);
-        SendCommand<NetworkCommissioningCluster>(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
+        SendCommand(proxy, request, OnNetworkConfigResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
+    case CommissioningStage::kFailsafeBeforeWiFiEnable:
+        FALLTHROUGH;
+    case CommissioningStage::kFailsafeBeforeThreadEnable:
+        // Before we try to do network enablement, make sure that our fail-safe
+        // is set far enough out that we can later try to do operational
+        // discovery without it timing out.
+        ExtendFailsafeBeforeNetworkEnable(proxy, params, step);
+        break;
     case CommissioningStage::kWiFiNetworkEnable: {
         if (!params.GetWiFiCredentials().HasValue())
         {
@@ -2420,7 +2524,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         NetworkCommissioning::Commands::ConnectNetwork::Type request;
         request.networkID = params.GetWiFiCredentials().Value().ssid;
         request.breadcrumb.Emplace(breadcrumb);
-        SendCommand<NetworkCommissioningCluster>(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
+        SendCommand(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
     case CommissioningStage::kThreadNetworkEnable: {
@@ -2437,20 +2541,24 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         NetworkCommissioning::Commands::ConnectNetwork::Type request;
         request.networkID = extendedPanId;
         request.breadcrumb.Emplace(breadcrumb);
-        SendCommand<NetworkCommissioningCluster>(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
+        SendCommand(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
     case CommissioningStage::kFindOperational: {
         // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
         auto scopedPeerId = GetPeerScopedId(proxy->GetDeviceId());
         mSystemState->CASESessionMgr()->FindOrEstablishSession(scopedPeerId, &mOnDeviceConnectedCallback,
-                                                               &mOnDeviceConnectionFailureCallback);
+                                                               &mOnDeviceConnectionFailureCallback
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+                                                               ,
+                                                               /* attemptCount = */ 3, &mOnDeviceConnectionRetryCallback
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+        );
     }
     break;
     case CommissioningStage::kSendComplete: {
         GeneralCommissioning::Commands::CommissioningComplete::Type request;
-        SendCommand<NetworkCommissioningCluster>(proxy, request, OnCommissioningCompleteResponse, OnBasicFailure, endpoint,
-                                                 timeout);
+        SendCommand(proxy, request, OnCommissioningCompleteResponse, OnBasicFailure, endpoint, timeout);
     }
     break;
     case CommissioningStage::kCleanup:
@@ -2461,6 +2569,43 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         break;
     case CommissioningStage::kSecurePairing:
         break;
+    }
+}
+
+void DeviceCommissioner::ExtendFailsafeBeforeNetworkEnable(DeviceProxy * device, CommissioningParameters & params,
+                                                           CommissioningStage step)
+{
+    auto * commissioneeDevice = FindCommissioneeDevice(device->GetDeviceId());
+    if (device != commissioneeDevice)
+    {
+        // Not a commissionee device; just return.
+        ChipLogError(Controller, "Trying to extend fail-safe for an unknown commissionee with device id " ChipLogFormatX64,
+                     ChipLogValueX64(device->GetDeviceId()));
+        CommissioningStageComplete(CHIP_ERROR_INCORRECT_STATE, CommissioningDelegate::CommissioningReport());
+        return;
+    }
+
+    // Try to make sure we have at least enough time for our expected
+    // commissioning bits plus the MRP retries for a Sigma1.
+    uint16_t failSafeTimeoutSecs = params.GetFailsafeTimerSeconds().ValueOr(kDefaultFailsafeTimeout);
+    auto sigma1Timeout           = CASESession::ComputeSigma1ResponseTimeout(commissioneeDevice->GetPairing().GetRemoteMRPConfig());
+    uint16_t sigma1TimeoutSecs   = std::chrono::duration_cast<System::Clock::Seconds16>(sigma1Timeout).count();
+    if (UINT16_MAX - failSafeTimeoutSecs < sigma1TimeoutSecs)
+    {
+        failSafeTimeoutSecs = UINT16_MAX;
+    }
+    else
+    {
+        failSafeTimeoutSecs = static_cast<uint16_t>(failSafeTimeoutSecs + sigma1TimeoutSecs);
+    }
+
+    // A false return from ExtendArmFailSafe is fine; we don't want to make the
+    // fail-safe shorter here.
+    if (!ExtendArmFailSafe(commissioneeDevice, step, failSafeTimeoutSecs, MakeOptional(kMinimumCommissioningStepTimeout),
+                           OnArmFailSafe, OnBasicFailure))
+    {
+        // Just move on to the next step.
+        CommissioningStageComplete(CHIP_NO_ERROR, CommissioningDelegate::CommissioningReport());
     }
 }
 

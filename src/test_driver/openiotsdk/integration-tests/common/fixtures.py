@@ -15,23 +15,19 @@
 #    limitations under the License.
 #
 
-import pytest
+import logging
 import os
 import pathlib
-from time import sleep
 import shutil
 
-from .telnet_connection import TelnetConnection
-from .fvp_device import FvpDevice
-
+import chip.CertificateAuthority
+import chip.native
+import pytest
 from chip import exceptions
 
-from chip import ChipDeviceCtrl
-from chip.ChipStack import *
-import chip.native
-import chip.CertificateAuthority
+from .fvp_device import FvpDevice
+from .telnet_connection import TelnetConnection
 
-import logging
 log = logging.getLogger(__name__)
 
 
@@ -115,7 +111,7 @@ def controller(vendor_id, fabric_id, node_id):
     except exceptions.ChipStackException as ex:
         log.error("Controller initialization failed {}".format(ex))
         return None
-    except:
+    except Exception:
         log.error("Controller initialization failed")
         return None
 

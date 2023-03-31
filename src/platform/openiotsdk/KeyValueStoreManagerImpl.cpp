@@ -27,101 +27,77 @@
 
 #include <lib/support/CHIPMem.h>
 #include <platform/KeyValueStoreManager.h>
-#include <platform/openiotsdk/OpenIoTSDKConfig.h>
 
-using chip::DeviceLayer::Internal::OpenIoTSDKConfig;
+#include CHIP_OPEN_IOT_SDK_KV_STORE_CONFIG_INCLUDE
+
+using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
 namespace DeviceLayer {
 namespace PersistedStorage {
 
-class KeyBuilder
+CHIP_ERROR KeyValueStoreManagerImpl::ToKeyValueStoreManagerError(CHIP_ERROR err)
 {
-public:
-    KeyBuilder(const char * key)
-    {
-        // Check sign by sign if key contains illegal characters
-        // Each illegal character will be replaced by '!' + capital encoded letter value
-        char * out = buffer + strlen(buffer);
-        char * illegal_ptr;
-        while ((out < buffer + sizeof(buffer) - 3) && *key) // 2 chars for potential illegal char + 1 for \0
-        {
-            illegal_ptr = strchr(illegalCharacters, *key);
-            if (illegal_ptr)
-            {
-                *out++ = '!';
-                *out++ = 'A' + (int) (illegal_ptr - illegalCharacters);
-            }
-            else
-            {
-                *out++ = *key;
-            }
-            key++;
-        }
-        valid = true;
-    }
+    return err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND ? CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND : err;
+}
 
-    const char * str() const { return valid ? buffer : nullptr; }
+CHIP_ERROR KeyValueStoreManagerImpl::Init(void)
+{
+    return KVStoreConfig::Init();
+}
 
-private:
-    char buffer[100] = "chip-kvs-";
-    bool valid;
-    // Mbed KV storage does not accept these characters in the key definition
-    const char * illegalCharacters = " */?:;\"|<>\\";
-};
-
-// NOTE: Currently this platform does not support partial and offset reads
-//       these will return CHIP_ERROR_NOT_IMPLEMENTED.
 CHIP_ERROR
 KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size, size_t offset)
 {
-    if (offset > 0)
-    {
-        // Offset and partial reads are not supported.
-        // Support can be added in the future if this is needed.
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
-    KeyBuilder key_builder(key);
-    if (!key_builder.str())
+    KVStoreKeyBuilder key_builder(key);
+    if (!key_builder.GetKey())
     {
         return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
-    auto err =
-        OpenIoTSDKConfig::ReadConfigValueBin(key_builder.str(), reinterpret_cast<uint8_t *>(value), value_size, *read_bytes_size);
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    size_t outLen;
+    CHIP_ERROR err = ToKeyValueStoreManagerError(
+        KVStoreConfig::ReadConfigValueBin(key_builder.GetKey(), reinterpret_cast<uint8_t *>(value), value_size, outLen, offset));
+    if (read_bytes_size)
     {
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        *read_bytes_size = outLen;
     }
     return err;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
-    KeyBuilder key_builder(key);
-    if (!key_builder.str())
+    KVStoreKeyBuilder key_builder(key);
+    if (!key_builder.GetKey())
     {
         return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
-    auto err = OpenIoTSDKConfig::ClearConfigValue(key_builder.str());
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    CHIP_ERROR err = ToKeyValueStoreManagerError(KVStoreConfig::ClearConfigValue(key_builder.GetKey()));
+    if (err == CHIP_NO_ERROR)
     {
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
+        key_builder.RemoveKey();
     }
+
     return err;
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
-    KeyBuilder key_builder(key);
-    if (!key_builder.str())
+    KVStoreKeyBuilder key_builder(key);
+    if (!key_builder.GetKey())
     {
         return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
-    return OpenIoTSDKConfig::WriteConfigValueBin(key_builder.str(), reinterpret_cast<const uint8_t *>(value), value_size);
+    CHIP_ERROR err = ToKeyValueStoreManagerError(
+        KVStoreConfig::WriteConfigValueBin(key_builder.GetKey(), reinterpret_cast<const uint8_t *>(value), value_size));
+    if (err == CHIP_NO_ERROR)
+    {
+        key_builder.AddKey();
+    }
+
+    return err;
 }
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;

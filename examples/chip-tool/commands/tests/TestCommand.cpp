@@ -52,7 +52,7 @@ CHIP_ERROR TestCommand::WaitForCommissionee(const char * identity,
 }
 
 void TestCommand::OnDeviceConnectedFn(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
-                                      chip::SessionHandle & sessionHandle)
+                                      const chip::SessionHandle & sessionHandle)
 {
     ChipLogProgress(chipTool, " **** Test Setup: Device Connected\n");
     auto * command = static_cast<TestCommand *>(context);

@@ -60,8 +60,9 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
+#include <crypto/RawKeySessionKeystore.h>
 #include <inet/IPAddress.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
@@ -102,6 +103,7 @@ chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 chip::Controller::ScriptPairingDeviceDiscoveryDelegate sPairingDeviceDiscoveryDelegate;
 chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
 chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
+chip::Crypto::RawKeySessionKeystore sSessionKeystore;
 
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
@@ -174,6 +176,8 @@ PyChipError pychip_ScriptDevicePairingDelegate_SetCommissioningCompleteCallback(
 PyChipError pychip_ScriptDevicePairingDelegate_SetCommissioningStatusUpdateCallback(
     chip::Controller::DeviceCommissioner * devCtrl,
     chip::Controller::DevicePairingDelegate_OnCommissioningStatusUpdateFunct callback);
+PyChipError pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(
+    chip::Controller::DeviceCommissioner * devCtrl, chip::Controller::DevicePairingDelegate_OnWindowOpenCompleteFunct callback);
 
 // BLE
 PyChipError pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::DeviceCommissioner * devCtrl);
@@ -229,9 +233,12 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
     FactoryInitParams factoryParams;
 
     factoryParams.fabricIndependentStorage = storageAdapter;
+    factoryParams.sessionKeystore          = &sSessionKeystore;
 
     sGroupDataProvider.SetStorageDelegate(storageAdapter);
+    sGroupDataProvider.SetSessionKeystore(factoryParams.sessionKeystore);
     PyReturnErrorOnFailure(ToPyChipError(sGroupDataProvider.Init()));
+    Credentials::SetGroupDataProvider(&sGroupDataProvider);
     factoryParams.groupDataProvider = &sGroupDataProvider;
 
     PyReturnErrorOnFailure(ToPyChipError(sPersistentStorageOpCertStore.Init(storageAdapter)));
@@ -346,6 +353,7 @@ void pychip_DeviceController_SetLogFilter(uint8_t category)
 PyChipError pychip_DeviceController_ConnectBLE(chip::Controller::DeviceCommissioner * devCtrl, uint16_t discriminator,
                                                uint32_t setupPINCode, chip::NodeId nodeid)
 {
+    sPairingDelegate.SetExpectingPairingComplete(true);
     return ToPyChipError(devCtrl->PairDevice(nodeid,
                                              chip::RendezvousParameters()
                                                  .SetPeerAddress(Transport::PeerAddress(Transport::Type::kBle))
@@ -367,12 +375,14 @@ PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommission
     addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
     params.SetPeerAddress(addr).SetDiscriminator(0);
 
+    sPairingDelegate.SetExpectingPairingComplete(true);
     return ToPyChipError(devCtrl->PairDevice(nodeid, params, sCommissioningParameters));
 }
 
 PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
                                                     chip::NodeId nodeid)
 {
+    sPairingDelegate.SetExpectingPairingComplete(true);
     return ToPyChipError(devCtrl->PairDevice(nodeid, onboardingPayload, sCommissioningParameters));
 }
 
@@ -465,6 +475,7 @@ PyChipError pychip_DeviceController_EstablishPASESessionIP(chip::Controller::Dev
     VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr), ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT));
     addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
     params.SetPeerAddress(addr).SetDiscriminator(0);
+    sPairingDelegate.SetExpectingPairingComplete(true);
     return ToPyChipError(devCtrl->EstablishPASEConnection(nodeid, params));
 }
 
@@ -475,6 +486,7 @@ PyChipError pychip_DeviceController_EstablishPASESessionBLE(chip::Controller::De
     RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
     addr.SetTransportType(chip::Transport::Type::kBle);
     params.SetPeerAddress(addr).SetDiscriminator(discriminator);
+    sPairingDelegate.SetExpectingPairingComplete(true);
     return ToPyChipError(devCtrl->EstablishPASEConnection(nodeid, params));
 }
 
@@ -524,6 +536,13 @@ PyChipError pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnab
     return ToPyChipError(devCtrl->DiscoverCommissionableNodes(filter));
 }
 
+PyChipError pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(
+    chip::Controller::DeviceCommissioner * devCtrl, chip::Controller::DevicePairingDelegate_OnWindowOpenCompleteFunct callback)
+{
+    sPairingDelegate.SetCommissioningWindowOpenCallback(callback);
+    return ToPyChipError(CHIP_NO_ERROR);
+}
+
 PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid,
                                                             uint16_t timeout, uint32_t iteration, uint16_t discriminator,
                                                             uint8_t optionInt)
@@ -538,8 +557,12 @@ PyChipError pychip_DeviceController_OpenCommissioningWindow(chip::Controller::De
     if (option == Controller::CommissioningWindowOpener::CommissioningWindowOption::kTokenWithRandomPIN)
     {
         SetupPayload payload;
-        return ToPyChipError(Controller::AutoCommissioningWindowOpener::OpenCommissioningWindow(
-            devCtrl, nodeid, System::Clock::Seconds16(timeout), iteration, discriminator, NullOptional, NullOptional, payload));
+        auto opener =
+            Platform::New<Controller::CommissioningWindowOpener>(static_cast<chip::Controller::DeviceController *>(devCtrl));
+        PyChipError err = ToPyChipError(opener->OpenCommissioningWindow(nodeid, System::Clock::Seconds16(timeout), iteration,
+                                                                        discriminator, NullOptional, NullOptional,
+                                                                        sPairingDelegate.GetOpenWindowCallback(opener), payload));
+        return err;
     }
 
     return ToPyChipError(CHIP_ERROR_INVALID_ARGUMENT);
@@ -587,7 +610,7 @@ struct GetDeviceCallbacks
         mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnConnectionFailureFn, this), mCallback(callback)
     {}
 
-    static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle)
+    static void OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
     {
         auto * self                   = static_cast<GetDeviceCallbacks *>(context);
         auto * operationalDeviceProxy = new OperationalDeviceProxy(&exchangeMgr, sessionHandle);

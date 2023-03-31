@@ -21,7 +21,7 @@
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/FabricScoped.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 
 namespace chip {
 namespace app {
@@ -49,6 +49,14 @@ struct List : public Span<T>
     // List<T> instances as though they were just Spans.
     //
     using Span<T>::Span;
+
+    // Inherited copy constructors are _not_ imported by the using statement
+    // above, though, so we need to implement that ourselves.  This is templated
+    // on the span's type to allow us to init a List<const Foo> from Span<Foo>.
+    // Span's constructor handles the checks on the types for us.
+    template <class U>
+    constexpr List(const Span<U> & other) : Span<T>(other)
+    {}
 
     template <size_t N>
     constexpr List & operator=(T (&databuf)[N])

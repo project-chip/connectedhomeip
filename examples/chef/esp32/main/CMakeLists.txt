@@ -18,7 +18,6 @@
 
 get_filename_component(CHIP_ROOT ../third_party/connectedhomeip REALPATH)
 get_filename_component(CHEF ${CMAKE_CURRENT_SOURCE_DIR}/../../ REALPATH)
-get_filename_component(GEN_DIR ${CHEF}/out/${SAMPLE_NAME}/zap-generated REALPATH)
 
 # include(${CMAKE_CURRENT_LIST_DIR}/../../project_include.cmake)
 
@@ -33,7 +32,6 @@ set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/platform/esp32/"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/third_party/nlio/repo/include"
                       "${CMAKE_SOURCE_DIR}/../"
-                      "${GEN_DIR}/../"
                       "${CMAKE_SOURCE_DIR}/main/include/"
 )
 
@@ -62,7 +60,6 @@ message(STATUS "** End of Cluster List **")
 set(SRC_DIRS_LIST
                       ${SRC_DIRS_LIST}
                       "${CMAKE_CURRENT_LIST_DIR}"
-                      "${GEN_DIR}"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/util"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/reporting"
@@ -87,8 +84,14 @@ set(PRIV_INCLUDE_DIRS_LIST  "${PRIV_INCLUDE_DIRS_LIST}"
                      "${CMAKE_SOURCE_DIR}/../../common/pigweed/esp32"
                      "${CMAKE_SOURCE_DIR}/../../common/screen-framework/include/"
                      "${CMAKE_SOURCE_DIR}/../../../src/lib/support"
-                     "${IDF_PATH}/components/freertos/include/freertos"
 )
+
+if (${IDF_VERSION_MAJOR} LESS 5)
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${IDF_PATH}/components/freertos/include/freertos")
+else()
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${IDF_PATH}/components/freertos/FreeRTOS-Kernel/include/freertos")
+endif()
+
 set(SRC_DIRS_LIST  "${SRC_DIRS_LIST}"
                      "${CMAKE_SOURCE_DIR}/../../platform/esp32"
                      "${CMAKE_SOURCE_DIR}/../../common/pigweed"
@@ -109,6 +112,7 @@ idf_component_register(PRIV_INCLUDE_DIRS
 
 include("${CHIP_ROOT}/build/chip/esp32/esp32_codegen.cmake")
 chip_app_component_codegen("${CHEF}/devices/${SAMPLE_NAME}.matter")
+chip_app_component_zapgen("${CHEF}/devices/${SAMPLE_NAME}.zap")
 
 set_property(TARGET ${COMPONENT_LIB} PROPERTY CXX_STANDARD 17)
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")

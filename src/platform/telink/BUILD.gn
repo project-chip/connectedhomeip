@@ -22,6 +22,8 @@ assert(chip_device_platform == "telink")
 static_library("telink") {
   sources = [
     "../SingletonConfigurationManager.cpp",
+    "../Zephyr/BLEAdvertisingArbiter.cpp",
+    "../Zephyr/BLEAdvertisingArbiter.h",
     "../Zephyr/ConfigurationManagerImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.h",

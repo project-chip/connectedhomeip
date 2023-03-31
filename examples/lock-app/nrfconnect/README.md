@@ -5,10 +5,8 @@ device with one basic bolt. It uses buttons to test changing the lock and device
 states and LEDs to show the state of these changes. You can use this example as
 a reference for creating your own application.
 
-<p align="center">
-  <img src="../../platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
-  <img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
-</p>
+<img src="../../platform/nrfconnect/doc/images/Logo_RGB_H-small.png" alt="Nordic Semiconductor logo"/>
+<img src="../../platform/nrfconnect/doc/images/nRF52840-DK-small.png" alt="nRF52840 DK">
 
 The example is based on
 [Matter](https://github.com/project-chip/connectedhomeip) and Nordic
@@ -23,33 +21,6 @@ both Thread and Wi-Fi is mutually exclusive and depends on the hardware
 platform, so only one protocol can be supported for a specific lock device.
 
 <hr>
-
--   [Overview](#overview)
-    -   [Bluetooth LE advertising](#bluetooth-le-advertising)
-    -   [Bluetooth LE rendezvous](#bluetooth-le-rendezvous)
-    -   [Device Firmware Upgrade](#device-firmware-upgrade)
--   [Requirements](#requirements)
-    -   [Supported devices](#supported_devices)
-    -   [IPv6 network support](#ipv6-network-support)
--   [Device UI](#device-ui)
--   [Setting up the environment](#setting-up-the-environment)
-    -   [Using Docker container for setup](#using-docker-container-for-setup)
-    -   [Using native shell for setup](#using-native-shell-for-setup)
--   [Building](#building)
-    -   [Removing build artifacts](#removing-build-artifacts)
-    -   [Building with release configuration](#building-with-release-configuration)
-    -   [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
--   [Configuring the example](#configuring-the-example)
-    -   [Example build types](#example-build-types)
--   [Flashing and debugging](#flashing-and-debugging)
--   [Testing the example](#testing-the-example)
-    -   [Testing using Linux CHIPTool](#testing-using-linux-chiptool)
-    -   [Testing using Android CHIPTool](#testing-using-android-chiptool)
-    -   [Testing Device Firmware Upgrade](#testing-device-firmware-upgrade)
-
-<hr>
-
-<a name="overview"></a>
 
 ## Overview
 
@@ -165,25 +136,21 @@ section to learn how to change MCUboot and flash configuration in this example.
 
 <hr>
 
-<a name="requirements"></a>
-
 ## Requirements
 
 The application requires a specific revision of the nRF Connect SDK to work
 correctly. See [Setting up the environment](#setting-up-the-environment) for
 more information.
 
-<a name="supported_devices"></a>
-
 ### Supported devices
 
 The example supports building and running on the following devices:
 
-| Hardware platform                                                                                               | Build target               | Platform image                                                                                                                                   |
-| --------------------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)                       | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details> |
-| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)                         | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>    |
-| [nRF7002 DK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/ug_nrf7002.html#nrf7002dk-nrf5340) | `nrf7002dk_nrf5340_cpuapp` | <details><summary>nRF7002DK</summary><img src="../../platform/nrfconnect/doc/images/nrf7002dk.jpg" alt="nRF7002 DK"/></details>                  |
+| Hardware platform                                                                         | Build target               | Platform image                                                                                                                                   |
+| ----------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details> |
+| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)   | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>    |
+| [nRF7002 DK](https://www.nordicsemi.com/Products/Development-hardware/nRF7002-DK)         | `nrf7002dk_nrf5340_cpuapp` | <details><summary>nRF7002 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF7002-DK_Front-small.png" alt="nRF7002 DK"/></details>    |
 
 <hr>
 
@@ -195,8 +162,6 @@ for Matter:
 -   Matter over Thread is supported for `nrf52840dk_nrf52840` and
     `nrf5340dk_nrf5340_cpuapp`.
 -   Matter over Wi-Fi is supported for `nrf7002dk_nrf5340_cpuapp`.
-
-<a name="device-ui"></a>
 
 ## Device UI
 
@@ -297,7 +262,7 @@ image that has the tools pre-installed.
 If you are a macOS user, you won't be able to use the Docker container to flash
 the application onto a Nordic development kit due to
 [certain limitations of Docker for macOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container).
-Use the [native shell](#using-native-shell) for building instead.
+Use the [native shell](#using-native-shell-for-setup) for building instead.
 
 ### Using Docker container for setup
 
@@ -379,8 +344,6 @@ To use the native shell for setup, complete the following steps:
 Now you can proceed with the [Building](#building) instruction.
 
 <hr>
-
-<a name="building"></a>
 
 ## Building
 
@@ -470,8 +433,6 @@ example `nrf52840dk_nrf52840`), edit the `pm_static_dfu.yml` file located in the
 
 <hr>
 
-<a name="configuring"></a>
-
 ## Configuring the example
 
 The Zephyr ecosystem is based on Kconfig files and the settings can be modified
@@ -519,8 +480,6 @@ For more information, see the
 page.
 
 <hr>
-
-<a name="flashing"></a>
 
 ## Flashing and debugging
 

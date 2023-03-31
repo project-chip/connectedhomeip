@@ -42,6 +42,14 @@
         {
             "name": "attribute_data_callback_name",
             "path": "partials/attribute_data_callback_name.zapt"
+        },
+        {
+            "name": "struct_field_decl",
+            "path": "partials/struct_field_decl.zapt"
+        },
+        {
+            "name": "renamed_struct_field_impl",
+            "path": "partials/renamed_struct_field_impl.zapt"
         }
     ],
     "templates": [

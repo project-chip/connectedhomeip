@@ -1,12 +1,14 @@
+#include <app/util/config.h>
 #include <static-supported-modes-manager.h>
 
 using namespace std;
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeSelect;
+using chip::Protocols::InteractionModel::Status;
 
 using ModeOptionStructType = Structs::ModeOptionStruct::Type;
-using SemanticTag          = Structs::SemanticTag::Type;
+using SemanticTag          = Structs::SemanticTagStruct::Type;
 template <typename T>
 using List               = app::DataModel::List<T>;
 using storage_value_type = const ModeOptionStructType;
@@ -51,13 +53,13 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
     return ModeOptionsProvider(nullptr, nullptr);
 }
 
-EmberAfStatus StaticSupportedModesManager::getModeOptionByMode(unsigned short endpointId, unsigned char mode,
-                                                               const ModeOptionStructType ** dataPtr) const
+Status StaticSupportedModesManager::getModeOptionByMode(unsigned short endpointId, unsigned char mode,
+                                                        const ModeOptionStructType ** dataPtr) const
 {
     auto modeOptionsProvider = this->getModeOptionsProvider(endpointId);
     if (modeOptionsProvider.begin() == nullptr)
     {
-        return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
+        return Status::UnsupportedCluster;
     }
     auto * begin = this->getModeOptionsProvider(endpointId).begin();
     auto * end   = this->getModeOptionsProvider(endpointId).end();
@@ -68,11 +70,11 @@ EmberAfStatus StaticSupportedModesManager::getModeOptionByMode(unsigned short en
         if (modeOption.mode == mode)
         {
             *dataPtr = &modeOption;
-            return EMBER_ZCL_STATUS_SUCCESS;
+            return Status::Success;
         }
     }
     emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Cannot find the mode %u", mode);
-    return EMBER_ZCL_STATUS_INVALID_COMMAND;
+    return Status::InvalidCommand;
 }
 
 const ModeSelect::SupportedModesManager * ModeSelect::getSupportedModesManager()

@@ -46,9 +46,10 @@ struct TvCastingApp: App {
                         
                         appParameters.onboardingPayload = onboardingParameters
                         
-                        castingServerBridge.initApp(appParameters, clientQueue: DispatchQueue.main, initAppStatusHandler: { (result: Bool) -> () in
-                            self.Log.info("initApp result \(result)")
+                        let err = castingServerBridge.initializeApp(appParameters, clientQueue: DispatchQueue.main, initAppStatusHandler: { (result: Bool) -> () in
+                            self.Log.info("initializeApp result \(result)")
                         })
+                        self.Log.info("initializeApp return value \(err)")
                     }
                 })
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
@@ -64,7 +65,11 @@ struct TvCastingApp: App {
                     {
                         if let castingServerBridge = CastingServerBridge.getSharedInstance()
                         {
-                            castingServerBridge.startMatterServer()
+                            castingServerBridge.startMatterServer(DispatchQueue.main, startMatterServerCompletionCallback: { (error: MatterError) -> () in
+                                DispatchQueue.main.async {
+                                    self.Log.info("TvCastingApp.startMatterServerCompletionCallback called with \(error)")
+                                }
+                            })
                         }
                     }
                     firstAppActivation = false

@@ -21,17 +21,18 @@
 # For usage please run:.
 #     python ./credentials/fetch-paa-certs-from-dcl.py --help
 
-from contextlib import nullcontext
-import os
-import sys
-import subprocess
 import copy
+import os
 import re
-from cryptography.hazmat.primitives import serialization
-from cryptography import x509
+import subprocess
+import sys
+from contextlib import nullcontext
+
 import click
-from click_option_group import optgroup, RequiredMutuallyExclusiveOptionGroup
 import requests
+from click_option_group import RequiredMutuallyExclusiveOptionGroup, optgroup
+from cryptography import x509
+from cryptography.hazmat.primitives import serialization
 
 PRODUCTION_NODE_URL = "https://on.dcl.csa-iot.org:26657"
 PRODUCTION_NODE_URL_REST = "https://on.dcl.csa-iot.org"

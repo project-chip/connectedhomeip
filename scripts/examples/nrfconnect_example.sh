@@ -40,8 +40,12 @@ source "../scripts/activate.sh"
 # Activate Zephyr environment
 [[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh"
 
-# Use toolchain from Pigweed CIPD
-export GNUARMEMB_TOOLCHAIN_PATH="$PW_ARM_CIPD_INSTALL_DIR"
+# Use Zephyr SDK toolchain
+export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
+
+if [[ -z "$ZEPHYR_SDK_INSTALL_DIR" && -n "$NRF5_TOOLS_ROOT" ]]; then
+    export ZEPHYR_SDK_INSTALL_DIR="$NRF5_TOOLS_ROOT"/zephyr-sdk-0.15.2
+fi
 
 # Set ccache base directory to improve the cache hit ratio
 export CCACHE_BASEDIR="$PWD/$APP/nrfconnect"

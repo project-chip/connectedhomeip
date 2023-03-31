@@ -21,33 +21,6 @@ platform, so only one protocol can be supported for a specific device.
 
 <hr>
 
--   [Overview](#overview)
-    -   [Bluetooth LE advertising](#bluetooth-le-advertising)
-    -   [Bluetooth LE rendezvous](#bluetooth-le-rendezvous)
--   [Requirements](#requirements)
-    -   [Supported devices](#supported_devices)
-    -   [IPv6 network support](#ipv6-network-support)
--   [Device UI](#device-ui)
--   [Setting up the environment](#setting-up-the-environment)
-    -   [Using Docker container for setup](#using-docker-container-for-setup)
-    -   [Using native shell for setup](#using-native-shell-for-setup)
--   [Building](#building)
-    -   [Removing build artifacts](#removing-build-artifacts)
-    -   [Building with release configuration](#building-with-release-configuration)
-    -   [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
--   [Configuring the example](#configuring-the-example)
-    -   [Example build types](#example-build-types)
--   [Flashing and debugging](#flashing-and-debugging)
-    -   [Flashing on the development kits](#nrfdks_flashing)
-    -   [Flashing on the nRF52840 Dongle](#nrf52840dongle_flashing)
--   [Testing the example](#testing-the-example)
-    -   [Testing using Linux CHIPTool](#testing-using-linux-chiptool)
-    -   [Testing using Android CHIPTool](#testing-using-android-chiptool)
-
-<hr>
-
-<a name="overview"></a>
-
 ## Overview
 
 This example is running on the nRF Connect platform, which is based on Nordic
@@ -100,26 +73,22 @@ can communicate with other devices in the network.
 
 <hr>
 
-<a name="requirements"></a>
-
 ## Requirements
 
 The application requires a specific revision of the nRF Connect SDK to work
 correctly. See [Setting up the environment](#setting-up-the-environment) for
 more information.
 
-<a name="supported_devices"></a>
-
 ### Supported devices
 
 The example supports building and running on the following devices:
 
-| Hardware platform                                                                                               | Build target               | Platform image                                                                                                                                          |
-| --------------------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)                       | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details>        |
-| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)                         | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>           |
-| [nRF52840 Dongle](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-Dongle)               | `nrf52840dongle_nrf52840`  | <details><summary>nRF52840 Dongle</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_Dongle-medium.jpg" alt="nRF52840 Dongle"/></details> |
-| [nRF7002 DK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/ug_nrf7002.html#nrf7002dk-nrf5340) | `nrf7002dk_nrf5340_cpuapp` | <details><summary>nRF7002DK</summary><img src="../../platform/nrfconnect/doc/images/nrf7002dk.jpg" alt="nRF7002 DK"/></details>                         |
+| Hardware platform                                                                                 | Build target               | Platform image                                                                                                                                          |
+| ------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)         | `nrf52840dk_nrf52840`      | <details><summary>nRF52840 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_DK_info-medium.jpg" alt="nRF52840 DK"/></details>        |
+| [nRF5340 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF5340-DK)           | `nrf5340dk_nrf5340_cpuapp` | <details><summary>nRF5340 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF5340_DK_info-medium.jpg" alt="nRF5340 DK"/></details>           |
+| [nRF52840 Dongle](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-Dongle) | `nrf52840dongle_nrf52840`  | <details><summary>nRF52840 Dongle</summary><img src="../../platform/nrfconnect/doc/images/nRF52840_Dongle-medium.jpg" alt="nRF52840 Dongle"/></details> |
+| [nRF7002 DK](https://www.nordicsemi.com/Products/Development-hardware/nRF7002-DK)                 | `nrf7002dk_nrf5340_cpuapp` | <details><summary>nRF7002 DK</summary><img src="../../platform/nrfconnect/doc/images/nRF7002-DK_Front-small.png" alt="nRF7002 DK"/></details>           |
 
 <hr>
 
@@ -131,8 +100,6 @@ for Matter:
 -   Matter over Thread is supported for `nrf52840dk_nrf52840` and
     `nrf5340dk_nrf5340_cpuapp`.
 -   Matter over Wi-Fi is supported for `nrf7002dk_nrf5340_cpuapp`.
-
-<a name="device-ui"></a>
 
 ## Device UI
 
@@ -218,7 +185,7 @@ image that has the tools pre-installed.
 If you are a macOS user, you won't be able to use the Docker container to flash
 the application onto a Nordic development kit due to
 [certain limitations of Docker for macOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container).
-Use the [native shell](#using-native-shell) for building instead.
+Use the [native shell](#using-native-shell-for-setup) for building instead.
 
 ### Using Docker container for setup
 
@@ -301,8 +268,6 @@ Now you can proceed with the [Building](#building) instruction.
 
 <hr>
 
-<a name="building"></a>
-
 ## Building
 
 Complete the following steps, regardless of the method used for setting up the
@@ -382,8 +347,6 @@ example `nrf52840dk_nrf52840`), edit the `pm_static_dfu.yml` file located in the
 
 <hr>
 
-<a name="configuring"></a>
-
 ## Configuring the example
 
 The Zephyr ecosystem is based on Kconfig files and the settings can be modified
@@ -434,14 +397,10 @@ page.
 
 <hr>
 
-<a name="flashing"></a>
-
 ## Flashing and debugging
 
 The flashing and debugging procedure is different for the development kits and
 the nRF52840 Dongle.
-
-<a name="nrfdks_flashing"></a>
 
 ### Flashing on the development kits
 
@@ -457,8 +416,6 @@ To debug the application on target, run the following command from the example
 directory:
 
         $ west debug
-
-<a name="nrf52840dongle_flashing"></a>
 
 ### Flashing on the nRF52840 Dongle
 

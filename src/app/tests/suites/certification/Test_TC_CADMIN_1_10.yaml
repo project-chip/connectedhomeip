@@ -33,6 +33,9 @@ config:
         type: node_id
         defaultValue: 0xC00FEE
     endpoint: 0
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
     discriminator:
         type: int16u
         defaultValue: 3840
@@ -51,7 +54,7 @@ tests:
 
     - label: "Precondition: Reset Devices to factory defaults"
       verification: |
-          Not implemented in YAML
+          Reset Devices to factory defaults
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -72,7 +75,7 @@ tests:
                 value: nodeId
 
     - label: "TH_CR1 opens a commissioning window on DUT_CE"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       PICS: CADMIN.S.C01.Rsp
       timedInteractionTimeoutMs: 10000
@@ -80,6 +83,14 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 900
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     #Check for DNS-SD advertisement CM is not possible in YAML
     - label: "Verify that the DNS-SD advertisement shows CM=1"
@@ -103,6 +114,7 @@ tests:
               - name: "expectedValue"
                 value: "y"
 
+    #As per issue https://github.com/CHIP-Specifications/chip-test-scripts/issues/495 adding --discover-once flag
     - label:
           "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
           code"
@@ -116,6 +128,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -132,6 +146,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -148,6 +164,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -164,6 +182,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -180,6 +200,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -196,6 +218,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -212,6 +236,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -228,6 +254,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -244,6 +272,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -259,22 +289,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
-      response:
-          error: FAILURE
-
-    - label:
-          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
-          code"
-      identity: "beta"
-      cluster: "CommissionerCommands"
-      command: "PairWithCode"
-      PICS: CADMIN.S
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId2
-              - name: "payload"
-                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -291,6 +307,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -307,6 +325,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -323,6 +343,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -339,6 +361,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -355,6 +379,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -371,6 +397,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -387,6 +415,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -403,6 +433,8 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -419,6 +451,26 @@ tests:
                 value: nodeId2
               - name: "payload"
                 value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
+      response:
+          error: FAILURE
+
+    - label:
+          "TH_CR2 starts a commissioning process with DUT_CE using Invalid setup
+          code"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId2
+              - name: "payload"
+                value: incorrectSetupCodePayload
+              - name: discoverOnce
+                value: true
       response:
           error: FAILURE
 
@@ -434,6 +486,20 @@ tests:
           values:
               - name: "nodeId"
                 value: nodeId2
+              - name: "payload"
+                value: correctPayload
+      response:
+          error: FAILURE
+
+    - label: "TH_CR3 starts a commissioning process with DUT_CE"
+      identity: "gamma"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId3
               - name: "payload"
                 value: correctPayload
       response:

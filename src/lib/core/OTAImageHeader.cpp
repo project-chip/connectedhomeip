@@ -17,7 +17,7 @@
 
 #include "OTAImageHeader.h"
 
-#include <lib/core/CHIPTLV.h>
+#include <lib/core/TLV.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/CodeUtils.h>
 
@@ -131,42 +131,41 @@ CHIP_ERROR OTAImageHeaderParser::DecodeTlv(OTAImageHeader & header)
     TLV::TLVType outerType;
     ReturnErrorOnFailure(tlvReader.EnterContainer(outerType));
 
-    ReturnErrorOnFailure(tlvReader.Next(TLV::ContextTag(to_underlying(Tag::kVendorId))));
+    ReturnErrorOnFailure(tlvReader.Next(TLV::ContextTag(Tag::kVendorId)));
     ReturnErrorOnFailure(tlvReader.Get(header.mVendorId));
-    ReturnErrorOnFailure(tlvReader.Next(TLV::ContextTag(to_underlying(Tag::kProductId))));
+    ReturnErrorOnFailure(tlvReader.Next(TLV::ContextTag(Tag::kProductId)));
     ReturnErrorOnFailure(tlvReader.Get(header.mProductId));
-    ReturnErrorOnFailure(tlvReader.Next(TLV::ContextTag(to_underlying(Tag::kSoftwareVersion))));
+    ReturnErrorOnFailure(tlvReader.Next(TLV::ContextTag(Tag::kSoftwareVersion)));
     ReturnErrorOnFailure(tlvReader.Get(header.mSoftwareVersion));
-    ReturnErrorOnFailure(tlvReader.Next(TLV::ContextTag(to_underlying(Tag::kSoftwareVersionString))));
+    ReturnErrorOnFailure(tlvReader.Next(TLV::ContextTag(Tag::kSoftwareVersionString)));
     ReturnErrorOnFailure(tlvReader.Get(header.mSoftwareVersionString));
     ReturnErrorCodeIf(header.mSoftwareVersionString.size() > kMaxSoftwareVersionStringSize, CHIP_ERROR_INVALID_STRING_LENGTH);
-    ReturnErrorOnFailure(tlvReader.Next(TLV::ContextTag(to_underlying(Tag::kPayloadSize))));
+    ReturnErrorOnFailure(tlvReader.Next(TLV::ContextTag(Tag::kPayloadSize)));
     ReturnErrorOnFailure(tlvReader.Get(header.mPayloadSize));
     ReturnErrorOnFailure(tlvReader.Next());
 
-    if (tlvReader.GetTag() == TLV::ContextTag(to_underlying(Tag::kMinApplicableVersion)))
+    if (tlvReader.GetTag() == TLV::ContextTag(Tag::kMinApplicableVersion))
     {
         ReturnErrorOnFailure(tlvReader.Get(header.mMinApplicableVersion.Emplace()));
         ReturnErrorOnFailure(tlvReader.Next());
     }
 
-    if (tlvReader.GetTag() == TLV::ContextTag(to_underlying(Tag::kMaxApplicableVersion)))
+    if (tlvReader.GetTag() == TLV::ContextTag(Tag::kMaxApplicableVersion))
     {
         ReturnErrorOnFailure(tlvReader.Get(header.mMaxApplicableVersion.Emplace()));
         ReturnErrorOnFailure(tlvReader.Next());
     }
 
-    if (tlvReader.GetTag() == TLV::ContextTag(to_underlying(Tag::kReleaseNotesURL)))
+    if (tlvReader.GetTag() == TLV::ContextTag(Tag::kReleaseNotesURL))
     {
         ReturnErrorOnFailure(tlvReader.Get(header.mReleaseNotesURL));
         ReturnErrorCodeIf(header.mReleaseNotesURL.size() > kMaxReleaseNotesURLSize, CHIP_ERROR_INVALID_STRING_LENGTH);
         ReturnErrorOnFailure(tlvReader.Next());
     }
 
-    VerifyOrReturnError(tlvReader.GetTag() == TLV::ContextTag(to_underlying(Tag::kImageDigestType)),
-                        CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    VerifyOrReturnError(tlvReader.GetTag() == TLV::ContextTag(Tag::kImageDigestType), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
     ReturnErrorOnFailure(tlvReader.Get(header.mImageDigestType));
-    ReturnErrorOnFailure(tlvReader.Next(TLV::ContextTag(to_underlying(Tag::kImageDigest))));
+    ReturnErrorOnFailure(tlvReader.Next(TLV::ContextTag(Tag::kImageDigest)));
     ReturnErrorOnFailure(tlvReader.Get(header.mImageDigest));
 
     ReturnErrorOnFailure(tlvReader.ExitContainer(outerType));

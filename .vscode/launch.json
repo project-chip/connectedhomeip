@@ -435,7 +435,13 @@
             "armToolchainPath": "${env:ARM_GCC_TOOLCHAIN_PATH}/bin",
             "servertype": "external",
             "gdbTarget": "${input:openiotsdkRemoteHost}:31627", //GDBserver port on FVP
-            "overrideLaunchCommands": ["-enable-pretty-printing"],
+            "overrideLaunchCommands": [
+                "-enable-pretty-printing",
+                "add-symbol-file ./build/bl2.elf 0x10000000",
+                "add-symbol-file ./build/tfm_s.elf 0x38000400",
+                "add-symbol-file ./build/chip-openiotsdk-${input:openiotsdkApp}-example_ns.elf 0x28060400",
+                "break main_ns.cpp:main"
+            ],
             "runToEntryPoint": "main",
             "preLaunchTask": "Debug Open IoT SDK example",
             "showDevDebugOutput": "parsed"

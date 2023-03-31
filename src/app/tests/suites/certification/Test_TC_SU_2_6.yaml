@@ -29,11 +29,9 @@ tests:
           installing the software update."
       PICS: OTAR.C.M.NotifyUpdateApplied
       verification: |
-          Verify that the OTA Provider show NotifyUpdateApplied message received from DUT in the logs
-          UpdateToken - verify that it is the same as the one provided by the OTA provider in the QueryImageResponse.
-          SoftwareVersion - verify the software version on the DUT to match the version downloaded for the software update
+          Verify that the NotifyUpdateApplied message received on the OTA Provider with UpdateToken and SoftwareVersion fields from DUT
 
-          [1645743059329] [97806:20280748] CHIP: [ZCL] OTA Provider received NotifyUpdateApplied
-          [1645743059329] [97806:20280748] CHIP: [ZCL]   Update Token: 32
-          [1645743059329] [97806:20280748] CHIP: [ZCL]   Software Version: 1
+          [1673956344.449775][17737:17737] CHIP:ZCL: OTA Provider received NotifyUpdateApplied
+          [1673956344.449805][17737:17737] CHIP:ZCL:   Update Token: 32
+          [1673956344.449833][17737:17737] CHIP:ZCL:   Software Version: 2
       disabled: true

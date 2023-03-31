@@ -39,9 +39,10 @@ if (current_os == "android" || build_java_matter_controller) {
 
   chip_codegen("java-jni-generate") {
     input = "controller-clusters.matter"
-    generator = "java"
+    generator = "java-jni"
 
     outputs = [
+      "jni/CHIPCallbackTypes.h",
       "jni/IdentifyClient-ReadImpl.cpp",
       "jni/IdentifyClient-InvokeSubscribeImpl.cpp",
       "jni/GroupsClient-ReadImpl.cpp",
@@ -96,8 +97,8 @@ if (current_os == "android" || build_java_matter_controller) {
       "jni/WiFiNetworkDiagnosticsClient-InvokeSubscribeImpl.cpp",
       "jni/EthernetNetworkDiagnosticsClient-ReadImpl.cpp",
       "jni/EthernetNetworkDiagnosticsClient-InvokeSubscribeImpl.cpp",
-      "jni/BridgedDeviceBasicClient-ReadImpl.cpp",
-      "jni/BridgedDeviceBasicClient-InvokeSubscribeImpl.cpp",
+      "jni/BridgedDeviceBasicInformationClient-ReadImpl.cpp",
+      "jni/BridgedDeviceBasicInformationClient-InvokeSubscribeImpl.cpp",
       "jni/SwitchClient-ReadImpl.cpp",
       "jni/SwitchClient-InvokeSubscribeImpl.cpp",
       "jni/AdministratorCommissioningClient-ReadImpl.cpp",
@@ -172,6 +173,8 @@ if (current_os == "android" || build_java_matter_controller) {
       "jni/ElectricalMeasurementClient-InvokeSubscribeImpl.cpp",
       "jni/UnitTestingClient-ReadImpl.cpp",
       "jni/UnitTestingClient-InvokeSubscribeImpl.cpp",
+      "jni/ClientMonitoringClient-ReadImpl.cpp",
+      "jni/ClientMonitoringClient-InvokeSubscribeImpl.cpp",
     ]
 
     deps = [
@@ -185,6 +188,7 @@ if (current_os == "android" || build_java_matter_controller) {
   source_set("java-jni-sources") {
     public_configs = [
       ":java-build-config",
+      ":java-jni-generate_config",
       "${chip_root}/src:includes",
     ]
 
@@ -197,7 +201,11 @@ if (current_os == "android" || build_java_matter_controller) {
     ]
 
     if (build_java_matter_controller) {
-      deps += [ "${chip_root}/src/platform/Linux" ]
+      if (current_os == "mac") {
+        deps += [ "${chip_root}/src/platform/Darwin" ]
+      } else {
+        deps += [ "${chip_root}/src/platform/Linux" ]
+      }
     } else {
       deps += [ "${chip_root}/src/platform/android" ]
     }

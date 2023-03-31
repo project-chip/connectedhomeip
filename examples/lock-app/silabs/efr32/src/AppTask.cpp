@@ -36,9 +36,6 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
-#include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
@@ -66,8 +63,8 @@
 #define APP_LOCK_SWITCH &sl_button_btn1
 
 using chip::app::Clusters::DoorLock::DlLockState;
-using chip::app::Clusters::DoorLock::DlOperationError;
-using chip::app::Clusters::DoorLock::DlOperationSource;
+using chip::app::Clusters::DoorLock::OperationErrorEnum;
+using chip::app::Clusters::DoorLock::OperationSourceEnum;
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -252,6 +249,21 @@ CHIP_ERROR AppTask::Init()
     sLockLED.Set(state.Value() == DlLockState::kUnlocked);
 #endif // ENABLE_WSTK_LEDS
 
+    // Update the LCD with the Stored value. Show QR Code if not provisioned
+#ifdef DISPLAY_ENABLED
+    GetLCD().WriteDemoUI(state.Value() != DlLockState::kUnlocked);
+#ifdef QR_CODE_ENABLED
+#ifdef SL_WIFI
+    if (!ConnectivityMgr().IsWiFiStationProvisioned())
+#else
+    if (!ConnectivityMgr().IsThreadProvisioned())
+#endif /* !SL_WIFI */
+    {
+        GetLCD().ShowQRCode(true, true);
+    }
+#endif // QR_CODE_ENABLED
+#endif
+
     chip::DeviceLayer::PlatformMgr().ScheduleWork(UpdateClusterState, reinterpret_cast<intptr_t>(nullptr));
 
     ConfigurationMgr().LogDeviceConfig();
@@ -434,7 +446,7 @@ void AppTask::UpdateClusterState(intptr_t context)
     bool unlocked        = LockMgr().NextState();
     DlLockState newState = unlocked ? DlLockState::kUnlocked : DlLockState::kLocked;
 
-    DlOperationSource source = DlOperationSource::kUnspecified;
+    OperationSourceEnum source = OperationSourceEnum::kUnspecified;
 
     // write the new lock value
     EmberAfStatus status =

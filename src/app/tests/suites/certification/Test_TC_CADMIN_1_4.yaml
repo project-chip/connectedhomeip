@@ -31,6 +31,9 @@ config:
     payload:
         type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00"
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
 
 tests:
     - label: "Precondition: Reset Devices to factory defaults"
@@ -40,7 +43,7 @@ tests:
 
     - label: "Precondition: Reset Devices to factory defaults"
       verification: |
-          Not implemented in YAML
+          Reset Devices to factory defaults
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_SKIP_SAMPLE_APP
@@ -60,8 +63,16 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label:
+          "TH1 reads CurrentFabricIndex attribute and save it for future use."
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: TH1FabricIndex
+
     - label: "TH_CR1 opens a commissioning window on DUT_CE using BCM"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       PICS: CADMIN.S.C01.Rsp
       timedInteractionTimeoutMs: 10000
@@ -69,15 +80,21 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     #Check for DNS-SD advertisement CM is not possible in YAML
     - label: "Verify that the DNS-SD advertisement shows CM=1"
       verification: |
           On TH_CR1 send the below command
 
-          ubuntu@ubuntu:~/may16_cntrl/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matterc._udp
+          avahi-browse -rt _matterc._udp
           +   eth0 IPv6 B2822245F1F43570                              _matterc._udp        local
           =   eth0 IPv6 B2822245F1F43570                              _matterc._udp        local
             hostname = [E45F010F27530000.local]
@@ -138,6 +155,15 @@ tests:
               - name: "nodeId"
                 value: nodeId2
 
+    - label:
+          "TH2 reads CurrentFabricIndex attribute and save it for future use."
+      identity: "beta"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: TH2FabricIndex
+
     #Check for DNS-SD advertisement is not possible in YAML
     - label:
           "Verify DUT_CE is now discoverable over DNS-SD with two SRV Records"
@@ -146,7 +172,7 @@ tests:
 
           Verify if the DUT_CE is broadcasting using
 
-          ubuntu@ubuntu:~/may16_cntrl2/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matter._tcp
+          avahi-browse -rt _matter._tcp
           +   eth0 IPv6 C8A60CCA27F33379-0000000000000002             _matter._tcp         local
           +   eth0 IPv6 3C26C93CF201458F-0000000000000001             _matter._tcp         local
           =   eth0 IPv6 C8A60CCA27F33379-0000000000000002             _matter._tcp         local
@@ -176,7 +202,11 @@ tests:
       attribute: "Fabrics"
       fabricFiltered: false
       response:
-          value: [{ Label: "", nodeId: nodeId }, { Label: "", nodeId: nodeId2 }]
+          value:
+              [
+                  { Label: "", FabricIndex: TH1FabricIndex, NodeID: nodeId },
+                  { Label: "", FabricIndex: TH2FabricIndex, NodeID: nodeId2 },
+              ]
           constraints:
               type: list
 
@@ -188,7 +218,11 @@ tests:
       PICS: OPCREDS.S.A0001
       fabricFiltered: false
       response:
-          value: [{ Label: "", nodeId: nodeId }, { Label: "", nodeId: nodeId2 }]
+          value:
+              [
+                  { Label: "", FabricIndex: TH1FabricIndex, NodeID: nodeId },
+                  { Label: "", FabricIndex: TH2FabricIndex, NodeID: nodeId2 },
+              ]
           constraints:
               type: list
 
@@ -241,7 +275,7 @@ tests:
               maxLength: 32
 
     - label: "TH_CR2 opens a commissioning window on DUT_CE using BCM"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       identity: "beta"
       PICS: CADMIN.S.C01.Rsp
@@ -250,8 +284,6 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
 
     - label: "Wait for the commissioning window in step 13 to timeout"
       cluster: "DelayCommands"
@@ -263,7 +295,7 @@ tests:
 
     - label:
           "TH_CR2 reads the window status to verify the DUT_CE window is closed"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       PICS: CADMIN.S.A0000
       command: "readAttribute"
       attribute: "WindowStatus"
@@ -271,7 +303,7 @@ tests:
           value: 0
 
     - label: "TH_CR2 opens a commissioning window on DUT_CE using BCM"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       identity: "beta"
       PICS: CADMIN.S.C01.Rsp
@@ -280,8 +312,14 @@ tests:
           values:
               - name: "CommissioningTimeout"
                 value: 180
-              - name: "discriminator"
-                value: discriminator
+
+    - label: "Waiting after opening commissioning window"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     - label:
           "TH_CR1 starts a commissioning process with DUT_CE before the timeout
@@ -298,3 +336,21 @@ tests:
       response:
           error: FAILURE
           clusterError: 9
+
+    - label: "TH_CR2 revokes the commissioning window"
+      identity: "beta"
+      cluster: "Administrator Commissioning"
+      command: "RevokeCommissioning"
+      PICS: CADMIN.S.C02.Rsp && CADMIN.S.C01.Rsp
+      timedInteractionTimeoutMs: 10000
+
+    - label: "Remove TH2 FabricIndex"
+      PICS: OPCREDS.S.C0a.Rsp && CADMIN.S
+      identity: "beta"
+      cluster: "Operational Credentials"
+      command: "RemoveFabric"
+      timedInteractionTimeoutMs: 10000
+      arguments:
+          values:
+              - name: "FabricIndex"
+                value: TH2FabricIndex

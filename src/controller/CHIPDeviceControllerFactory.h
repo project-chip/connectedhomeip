@@ -94,15 +94,16 @@ struct SetupParams
     CommissioningDelegate * defaultCommissioner                        = nullptr;
 };
 
-// TODO everything other than the fabric storage, group data provider, OperationalKeystore
-// and OperationalCertificateStore here should be removed. We're blocked because of the
-// need to support !CHIP_DEVICE_LAYER
+// TODO everything other than the fabric storage, group data provider, OperationalKeystore,
+// OperationalCertificateStore and SessionKeystore here should be removed. We're blocked
+// because of the need to support !CHIP_DEVICE_LAYER
 struct FactoryInitParams
 {
     System::Layer * systemLayer                                        = nullptr;
     PersistentStorageDelegate * fabricIndependentStorage               = nullptr;
     Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
     Credentials::GroupDataProvider * groupDataProvider                 = nullptr;
+    Crypto::SessionKeystore * sessionKeystore                          = nullptr;
     Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager      = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager      = nullptr;
     FabricTable * fabricTable                                          = nullptr;

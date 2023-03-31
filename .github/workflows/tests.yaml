@@ -17,6 +17,7 @@ name: Tests
 on:
     push:
     pull_request:
+    merge_group:
     workflow_dispatch:
 
 concurrency:
@@ -31,7 +32,7 @@ env:
 jobs:
     test_suites_linux:
         name: Test Suites - Linux
-        timeout-minutes: 145
+        timeout-minutes: 180
 
         strategy:
             matrix:
@@ -47,7 +48,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.18
+            image: connectedhomeip/chip-build:0.6.47
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -78,6 +79,15 @@ jobs:
                   mkdir /tmp/cores || true
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
                   mkdir objdir-clone || true
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -89,6 +99,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Validate that xml are parsable
               timeout-minutes: 10
               # The sub-items being run here are the same as the input XMLs listed
@@ -98,14 +109,9 @@ jobs:
               # does not enforce that the content is understood (that part is covered by parser
               # unit tests)
               #
-              # Also note ordering: global attributes are parsed first because other XML files may
-              # reference these.
-              #
-              # TODO: some multipass/postprocess may be more appropriate to allow any ordering of
-              #       things.
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/idl/xml_parser.py \
+                    "./scripts/py_matter_idl/matter_idl/xml_parser.py \
                       --no-print \
                       --log-level info \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
@@ -116,36 +122,42 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/application-basic-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/application-launcher-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/audio-output-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/ballast-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/basic-information-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/binding-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/boolean-state-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/actions-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/bridged-device-basic.xml \
+                      src/app/zap-templates/zcl/data-model/chip/bridged-device-basic-information.xml \
                       src/app/zap-templates/zcl/data-model/chip/chip-ota.xml \
                       src/app/zap-templates/zcl/data-model/chip/chip-types.xml \
                       src/app/zap-templates/zcl/data-model/chip/channel-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/clusters-extensions.xml \
+                      src/app/zap-templates/zcl/data-model/chip/color-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/content-launch-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/descriptor-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/diagnostic-logs-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/door-lock-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/ethernet-network-diagnostics-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/fan-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/fault-injection-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/fixed-label-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/flow-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/general-commissioning-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/general-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/global-attributes.xml \
+                      src/app/zap-templates/zcl/data-model/chip/groups-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/group-key-mgmt-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/identify-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/illuminance-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/keypad-input-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/level-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/localization-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/low-power-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/media-input-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/media-playback-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/mode-select-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/network-commissioning-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/occupancy-sensing-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/onoff-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/operational-credentials-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/pressure-measurement-cluster.xml \
@@ -163,6 +175,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/target-navigator-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/temperature-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/test-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/thermostat-user-interface-configuration-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/thermostat-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/thread-network-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/time-format-localization-cluster.xml \
@@ -173,17 +186,15 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/wifi-network-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/window-covering.xml \
                       src/app/zap-templates/zcl/data-model/chip/matter-devices.xml \
-                      src/app/zap-templates/zcl/data-model/silabs/general.xml \
-                      src/app/zap-templates/zcl/data-model/silabs/ha-devices.xml \
-                      src/app/zap-templates/zcl/data-model/silabs/ha.xml \
-                      src/app/zap-templates/zcl/data-model/silabs/lo-devices.xml \
-                      src/app/zap-templates/zcl/data-model/silabs/types.xml \
-                      src/app/zap-templates/zcl/data-model/silabs/zll-devices.xml \
-                      src/app/zap-templates/zcl/data-model/silabs/zll.xml \
+                      src/app/zap-templates/zcl/data-model/draft/barrier-control-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/draft/electrical-measurement-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/draft/input-output-value-clusters.xml \
+                      src/app/zap-templates/zcl/data-model/draft/onoff-switch-configuration-cluster.xml \
                     "
             - name: Build Apps
-              timeout-minutes: 45
+              timeout-minutes: 60
               run: |
+                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env --include_yamltests'
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT} \
@@ -202,6 +213,63 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
                      --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     run \
+                     --iterations 1 \
+                     --test-timeout-seconds 120 \
+                     --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --lock-app ./out/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
+                     --ota-provider-app ./out/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-requestor-app ./out/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --bridge-app ./out/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                  "
+
+            - name: Run Tests using the python parser sending commands to chip-tool
+              timeout-minutes: 65
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                  "./scripts/tests/run_test_suite.py \
+                     --runner chip_tool_python \
+                     --chip-tool ./out/linux-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     run \
+                     --iterations 1 \
+                     --test-timeout-seconds 120 \
+                     --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --lock-app ./out/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
+                     --ota-provider-app ./out/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-requestor-app ./out/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --bridge-app ./out/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                  "
+
+            - name: Run Tests using chip-repl (skip slow)
+              timeout-minutes: 45
+              if: github.event_name == 'pull_request'
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                  "./scripts/tests/run_test_suite.py \
+                     --runner chip_repl_python \
+                     --exclude-tags MANUAL \
+                     --exclude-tags FLAKY \
+                     --exclude-tags IN_DEVELOPMENT \
+                     --exclude-tags SLOW \
+                     run \
+                     --iterations 1 \
+                     --test-timeout-seconds 120 \
+                     --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --lock-app ./out/linux-x64-lock-${BUILD_VARIANT}/chip-lock-app \
+                     --ota-provider-app ./out/linux-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-requestor-app ./out/linux-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --bridge-app ./out/linux-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                  "
+            - name: Run Tests using chip-repl (including slow)
+              timeout-minutes: 45
+              if: github.event_name == 'push'
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                  "./scripts/tests/run_test_suite.py \
+                     --runner chip_repl_python \
                      run \
                      --iterations 1 \
                      --test-timeout-seconds 120 \
@@ -231,7 +299,7 @@ jobs:
 
     test_suites_darwin:
         name: Test Suites - Darwin
-        timeout-minutes: 150
+        timeout-minutes: 180
 
         strategy:
             matrix:
@@ -259,7 +327,7 @@ jobs:
               run: scripts/checkout_submodules.py --shallow --platform darwin
             - name: Setup Environment
               # coreutils for stdbuf
-              run: brew install openssl pkg-config coreutils
+              run: brew install coreutils
             - name:
                   Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
@@ -267,14 +335,15 @@ jobs:
                   sudo chown ${USER} /cores || true
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
                   mkdir objdir-clone || true
-            - name: Fix pkgconfig link
-              working-directory: /usr/local/lib/pkgconfig
-              run: |
-                  pwd
-                  ls -la /usr/local/Cellar/
-                  ls -la /usr/local/Cellar/openssl@1.1
-                  OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
-                  ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -286,8 +355,9 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Build Apps
-              timeout-minutes: 75
+              timeout-minutes: 90
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
@@ -318,6 +388,26 @@ jobs:
                      --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                      --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
                   "
+
+            - name: Run Tests using the python parser sending commands to chip-tool
+              timeout-minutes: 80
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                  "./scripts/tests/run_test_suite.py \
+                     --runner chip_tool_python \
+                     --chip-tool ./out/darwin-x64-chip-tool${CHIP_TOOL_VARIANT}-${BUILD_VARIANT}/chip-tool \
+                     --target-skip-glob '{Test_TC_DGTHREAD_2_1,Test_TC_DGTHREAD_2_2,Test_TC_DGTHREAD_2_3,Test_TC_DGTHREAD_2_4}' \
+                     run \
+                     --iterations 1 \
+                     --test-timeout-seconds 120 \
+                     --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --lock-app ./out/darwin-x64-lock-${BUILD_VARIANT}/chip-lock-app \
+                     --ota-provider-app ./out/darwin-x64-ota-provider-${BUILD_VARIANT}/chip-ota-provider-app \
+                     --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
+                     --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                  "
+
             - name: Uploading core files
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
@@ -352,13 +442,13 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.18
+            image: connectedhomeip/chip-build:0.6.47
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
             - name: Try to ensure the directories for core dumping exist and we
@@ -367,6 +457,15 @@ jobs:
                   mkdir /tmp/cores || true
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
                   mkdir objdir-clone || true
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -378,6 +477,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Build Python REPL and example apps
               timeout-minutes: 50
               run: |
@@ -397,6 +497,8 @@ jobs:
                   scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_SC_3_6.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021"'
                   scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_DA_1_7.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --bool-arg allow_sdk_dac:true"'
                   scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1 --enable-key 000102030405060708090a0b0c0d0e0f" --script "src/python_testing/TC_TestEventTrigger.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --bool-arg allow_sdk_dac:true"'
+                  scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_ACE_1_4.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --int-arg PIXIT.ACE.APPENDPOINT:1 PIXIT.ACE.APPDEVTYPEID:0x0100 --string-arg PIXIT.ACE.APPCLUSTER:OnOff PIXIT.ACE.APPATTRIBUTE:OnOff"'
+                  scripts/run_in_build_env.sh './scripts/tests/run_python_test.py --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app  --factoryreset --app-args "--discriminator 1234 --KVS kvs1 --trace_decode 1" --script "src/python_testing/TC_ACE_1_3.py" --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021"'
             - name: Uploading core files
               uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
@@ -426,13 +528,13 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build:0.6.18
+            image: connectedhomeip/chip-build-java:0.6.47
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform linux
             - name: Try to ensure the directories for core dumping exist and we
@@ -441,6 +543,15 @@ jobs:
                   mkdir /tmp/cores || true
                   sysctl -w kernel.core_pattern=/tmp/cores/core.%u.%p.%t || true
                   mkdir objdir-clone || true
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -452,7 +563,8 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
-            - name: Build Java Mattter Controller and all clusters app
+
+            - name: Build Java Matter Controller and all clusters app
               timeout-minutes: 50
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_wheel build-env'
@@ -462,8 +574,8 @@ jobs:
                       --target linux-x64-java-matter-controller \
                       build \
                    "
-            - name: Run Discover Tests
-              timeout-minutes: 65
+            - name: Run Discover Commissionables Test
+              timeout-minutes: 10
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -474,8 +586,8 @@ jobs:
                      --tool-args "commissionables" \
                      --factoryreset \
                   '
-            - name: Run Pairing Tests
-              timeout-minutes: 65
+            - name: Run Pairing Onnetwork Test
+              timeout-minutes: 10
               run: |
                   scripts/run_in_build_env.sh \
                   './scripts/tests/run_java_test.py \
@@ -483,7 +595,79 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "pairing" \
-                     --tool-args "onnetwork-long --nodeid 1 --setup-payload 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --factoryreset \
+                  '
+            - name: Run IM Invoke Test
+              timeout-minutes: 10
+              run: |
+                  scripts/run_in_build_env.sh \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "im" \
+                     --tool-args "onnetwork-long-im-invoke --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --factoryreset \
+                  '
+            - name: Run IM Read Test
+              timeout-minutes: 10
+              run: |
+                  scripts/run_in_build_env.sh \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "im" \
+                     --tool-args "onnetwork-long-im-read --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --factoryreset \
+                  '
+            - name: Run IM Write Test
+              timeout-minutes: 10
+              run: |
+                  scripts/run_in_build_env.sh \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "im" \
+                     --tool-args "onnetwork-long-im-write --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --factoryreset \
+                  '
+            - name: Run IM Subscribe Test
+              timeout-minutes: 10
+              run: |
+                  scripts/run_in_build_env.sh \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "im" \
+                     --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --factoryreset \
+                  '
+            - name: Run Pairing AlreadyDiscovered Test
+              timeout-minutes: 10
+              run: |
+                  scripts/run_in_build_env.sh \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "pairing" \
+                     --tool-args "already-discovered --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
+                     --factoryreset \
+                  '
+            - name: Run Pairing Address-PaseOnly Test
+              timeout-minutes: 10
+              run: |
+                  scripts/run_in_build_env.sh \
+                  './scripts/tests/run_java_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-java-matter-controller \
+                     --tool-cluster "pairing" \
+                     --tool-args "address-paseonly --nodeid 1 --setup-pin-code 20202021 --address ::1 --port 5540 -t 1000" \
                      --factoryreset \
                   '
             - name: Uploading core files
@@ -519,12 +703,12 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
             - name: Checkout submodules
               run: scripts/checkout_submodules.py --shallow --platform darwin
             - name: Setup Environment
               # coreutils for stdbuf
-              run: brew install openssl pkg-config coreutils
+              run: brew install coreutils
             - name:
                   Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
@@ -532,14 +716,15 @@ jobs:
                   sudo chown ${USER} /cores || true
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
                   mkdir objdir-clone || true
-            - name: Fix pkgconfig link
-              working-directory: /usr/local/lib/pkgconfig
-              run: |
-                  pwd
-                  ls -la /usr/local/Cellar/
-                  ls -la /usr/local/Cellar/openssl@1.1
-                  OPEN_SSL_VERSION=`ls -la /usr/local/Cellar/openssl@1.1 | cat | tail -n1 | awk '{print $NF}'`
-                  ln -s /usr/local/Cellar/openssl@1.1/$OPEN_SSL_VERSION/lib/pkgconfig/* .
+
+            - name: Bootstrap cache
+              uses: actions/cache@v3
+              timeout-minutes: 10
+              with:
+                  key: ${{ runner.os }}-env-${{ hashFiles('scripts/setup/*', 'third_party/pigweed/**') }}
+                  path: |
+                      .environment
+                      build_overrides/pigweed_environment.gni
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -551,6 +736,7 @@ jobs:
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
+
             - name: Build Python REPL and example apps
               timeout-minutes: 50
               run: |

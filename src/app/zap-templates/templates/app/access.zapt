@@ -15,7 +15,7 @@
 // Parallel array data (*cluster*, attribute, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
     {{/first}}
-    {{#chip_server_cluster_attributes}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "read")}}
@@ -23,11 +23,11 @@
                         {{#if (isStrEqual role "view")}}
     /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "operate")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else}}
     ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
                         {{/if}}
@@ -37,7 +37,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/chip_server_cluster_attributes}}
+    {{/enabled_attributes_for_cluster_and_side}}
     {{#last}}
 }
     {{/last}}
@@ -48,7 +48,7 @@
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
     {{/first}}
-    {{#chip_server_cluster_attributes}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "read")}}
@@ -56,11 +56,11 @@
                         {{#if (isStrEqual role "view")}}
     /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "operate")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.manufacturerCode parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.manufacturerCode parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.manufacturerCode parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else}}
     ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
                         {{/if}}
@@ -70,7 +70,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/chip_server_cluster_attributes}}
+    {{/enabled_attributes_for_cluster_and_side}}
     {{#last}}
 }
     {{/last}}
@@ -81,7 +81,7 @@
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
     {{/first}}
-    {{#chip_server_cluster_attributes}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "read")}}
@@ -103,7 +103,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/chip_server_cluster_attributes}}
+    {{/enabled_attributes_for_cluster_and_side}}
     {{#last}}
 }
     {{/last}}
@@ -116,7 +116,7 @@
 // Parallel array data (*cluster*, attribute, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
     {{/first}}
-    {{#chip_server_cluster_attributes}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "write")}}
@@ -126,9 +126,9 @@
                         {{else if (isStrEqual role "operate")}}
     /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else}}
     ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
                         {{/if}}
@@ -138,7 +138,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/chip_server_cluster_attributes}}
+    {{/enabled_attributes_for_cluster_and_side}}
     {{#last}}
 }
     {{/last}}
@@ -149,7 +149,7 @@
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
     {{/first}}
-    {{#chip_server_cluster_attributes}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "write")}}
@@ -159,9 +159,9 @@
                         {{else if (isStrEqual role "operate")}}
     /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.manufacturerCode parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.manufacturerCode parent.code}}, /* Cluster: {{parent.parent.name}}, Attribute: {{parent.name}}, Privilege: {{role}} */ \
                         {{else}}
     ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Attribute: {{parent.name}} ]
                         {{/if}}
@@ -171,7 +171,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/chip_server_cluster_attributes}}
+    {{/enabled_attributes_for_cluster_and_side}}
     {{#last}}
 }
     {{/last}}
@@ -182,7 +182,7 @@
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
     {{/first}}
-    {{#chip_server_cluster_attributes}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
         {{#access entity="attribute"}}
             {{#if hasOperation}}
                 {{#if (isStrEqual operation "write")}}
@@ -204,7 +204,7 @@
                 {{/if}}
             {{/if}}
         {{/access}}
-    {{/chip_server_cluster_attributes}}
+    {{/enabled_attributes_for_cluster_and_side}}
     {{#last}}
 }
     {{/last}}
@@ -227,9 +227,9 @@
                         {{else if (isStrEqual role "operate")}}
     /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else}}
     ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
                         {{/if}}
@@ -260,9 +260,9 @@
                         {{else if (isStrEqual role "operate")}}
     /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
+    {{asMEI parent.commandMfgCode parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
+    {{asMEI parent.commandMfgCode parent.code}}, /* Cluster: {{parent.parent.name}}, Command: {{parent.commandName}}, Privilege: {{role}} */ \
                         {{else}}
     ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Command: {{parent.commandName}} ]
                         {{/if}}
@@ -326,11 +326,11 @@
                         {{#if (isStrEqual role "view")}}
     /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "operate")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.parent.manufacturerCode parent.parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
                         {{else}}
     ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Event: {{parent.name}} ]
                         {{/if}}
@@ -359,11 +359,11 @@
                         {{#if (isStrEqual role "view")}}
     /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "operate")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.manufacturerCode parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "manage")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.manufacturerCode parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
                         {{else if (isStrEqual role "administer")}}
-    {{parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
+    {{asMEI parent.manufacturerCode parent.code}}, /* Cluster: {{parent.parent.name}}, Event: {{parent.name}}, Privilege: {{role}} */ \
                         {{else}}
     ERROR: access has unrecognized role/privilege [ Cluster: {{parent.parent.name}}, Event: {{parent.name}} ]
                         {{/if}}
