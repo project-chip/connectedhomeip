@@ -267,14 +267,14 @@ CHIP_ERROR PlatformManagerImpl::_GLibMatterContextInvokeSync(CHIP_ERROR (*func)(
             auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
 
             // XXX: Temporary workaround for TSAN false positives.
-            std::unique_lock<std::mutex> lock(PlatformMgrImpl().mGLibMainLoopCallbackIndirectionMutex);
+            std::unique_lock<std::mutex> lock_(PlatformMgrImpl().mGLibMainLoopCallbackIndirectionMutex);
 
-            auto func     = data->mFunc;
-            auto userData = data->mFuncUserData;
+            auto mFunc     = data->mFunc;
+            auto mUserData = data->mFuncUserData;
 
-            lock.unlock();
-            auto result = func(userData);
-            lock.lock();
+            lock_.unlock();
+            auto result = mFunc(mUserData);
+            lock_.lock();
 
             data->mDone       = true;
             data->mFuncResult = result;
