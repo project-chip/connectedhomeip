@@ -54,7 +54,7 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
-#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 
     /**
      * @brief Invoke a function on the Matter GLib context.
