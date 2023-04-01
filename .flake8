@@ -90,6 +90,7 @@ exclude = third_party
           src/controller/python/chip/yaml/__init__.py
           src/controller/python/chip/yaml/format_converter.py
           src/controller/python/chip/yaml/runner.py
+          src/controller/python/py_matter_yamltest_repl_adapter/matter_yamltest_repl_adapter/runner.py
           src/lib/asn1/gen_asn1oid.py
           src/pybindings/pycontroller/build-chip-wheel.py
           src/pybindings/pycontroller/pychip/__init__.py
