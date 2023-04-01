@@ -26,9 +26,6 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
-// Set the following to 1 in order to run individual test case manually.
-#define MANUAL_INDIVIDUAL_TEST 0
-
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId1 = 0x12341234;
@@ -213,6 +210,21 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
     completion(responseParams, nil);
 }
 
+- (void)respondAvailableWithDelay:(NSNumber *)delay uri:(NSString *)uri completion:(QueryImageCompletion)completion
+{
+    __auto_type * responseParams = [[MTROTASoftwareUpdateProviderClusterQueryImageResponseParams alloc] init];
+    responseParams.status = @(MTROTASoftwareUpdateProviderOTAQueryStatusUpdateAvailable);
+    responseParams.delayedActionTime = delay;
+    responseParams.imageURI = uri;
+    // TODO: Figure out whether we need better
+    // SoftwareVersion/SoftwareVersionString/UpdateToken bits.
+    responseParams.softwareVersion = @(18);
+    responseParams.softwareVersionString = @"18";
+    const char updateToken[] = "12345678";
+    responseParams.updateToken = [NSData dataWithBytes:updateToken length:sizeof(updateToken)];
+    completion(responseParams, nil);
+}
+
 - (void)respondWithErrorToApplyUpdateRequestWithCompletion:(ApplyUpdateRequestCompletion)completion
 {
     [self respondErrorWithCompletion:^(NSError * _Nullable error) {
@@ -247,20 +259,53 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
 @interface MTROTAProviderTests : XCTestCase
 @end
 
+static BOOL sStackInitRan = NO;
+static BOOL sNeedsStackShutdown = YES;
+
 @implementation MTROTAProviderTests
+
++ (void)tearDown
+{
+    // Global teardown, runs once
+    if (sNeedsStackShutdown) {
+        // We don't need to worry about ResetCommissionee.  If we get here,
+        // we're running only one of our test methods (using
+        // -only-testing:MatterTests/MTROTAProviderTests/testMethodName), since
+        // we did not run test999_TearDown.
+        [self shutdownStack];
+    }
+}
 
 - (void)setUp
 {
+    // Per-test setup, runs before each test.
     [super setUp];
     [self setContinueAfterFailure:NO];
+
+    if (sStackInitRan == NO) {
+        [self initStack];
+    }
+
+    XCTAssertNil(sOTAProviderDelegate.queryImageHandler);
+    XCTAssertNil(sOTAProviderDelegate.applyUpdateRequestHandler);
+    XCTAssertNil(sOTAProviderDelegate.notifyUpdateAppliedHandler);
+    XCTAssertNil(sOTAProviderDelegate.transferBeginHandler);
+    XCTAssertNil(sOTAProviderDelegate.blockQueryHandler);
+    XCTAssertNil(sOTAProviderDelegate.transferEndHandler);
 }
 
 - (void)tearDown
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self shutdownStack];
-#endif
+    // Per-test teardown, runs after each test.
     [super tearDown];
+
+    // Reset all handlers so tests don't interfere with each other.
+    sOTAProviderDelegate.queryImageHandler = nil;
+    sOTAProviderDelegate.applyUpdateRequestHandler = nil;
+    sOTAProviderDelegate.notifyUpdateAppliedHandler = nil;
+    sOTAProviderDelegate.transferBeginHandler = nil;
+    sOTAProviderDelegate.blockQueryHandler = nil;
+    sOTAProviderDelegate.transferEndHandler = nil;
 }
 
 - (MTRDevice *)commissionDeviceWithPayload:(NSString *)payloadString nodeID:(NSNumber *)nodeID
@@ -288,6 +333,8 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
 
 - (void)initStack
 {
+    sStackInitRan = YES;
+
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
@@ -321,8 +368,10 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
     sConnectedDevice2 = [self commissionDeviceWithPayload:kOnboardingPayload2 nodeID:@(kDeviceId2)];
 }
 
-- (void)shutdownStack
++ (void)shutdownStack
 {
+    sNeedsStackShutdown = NO;
+
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
@@ -332,12 +381,12 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
 }
 
-#if !MANUAL_INDIVIDUAL_TEST
 - (void)test000_SetUp
 {
-    [self initStack];
+    // Nothing to do here; our setUp method handled this already.  This test
+    // just exists to make the setup not look like it's happening inside other
+    // tests.
 }
-#endif
 
 - (XCTestExpectation *)announceProviderToDevice:(MTRDevice *)device
 {
@@ -366,10 +415,8 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
 
 - (void)test001_ReceiveOTAQuery
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-#endif
-
+    // Test that if we advertise ourselves as a provider we end up getting a
+    // QueryImage callbacks that we can respond to.
     __auto_type * device = sConnectedDevice1;
 
     XCTestExpectation * queryExpectation = [self expectationWithDescription:@"handleQueryImageForNodeID called"];
@@ -391,25 +438,18 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
 
 - (void)test002_ReceiveTwoQueriesExplicitBusy
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-#endif
-
-    // TODO: This test fails so far because the OTA requestor is following the
-    // spec and clamping the delay to a minimum of 120 seconds.  We don't really
-    // want to spend 2 minutes waiting in this test, so just disable it for
-    // now.  See https://github.com/project-chip/connectedhomeip/issues/25922
-    // for a proposal to address this.
-#if 0
+    // Test that if we advertise ourselves as a provider and respond BUSY to
+    // QueryImage callback, then we get a second QueryImage callback later on
+    // that we can then respond to however we wish.
     __auto_type * device = sConnectedDevice1;
 
     XCTestExpectation * queryExpectation1 = [self expectationWithDescription:@"handleQueryImageForNodeID called first time"];
     XCTestExpectation * queryExpectation2 = [self expectationWithDescription:@"handleQueryImageForNodeID called second time"];
-    const uint16_t busyDelay = 1; // Second
+    const uint16_t busyDelay = 1; // 1 second
 
     __block QueryImageHandler handleSecondQuery;
-    sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, MTROTASoftwareUpdateProviderClusterQueryImageParams * params,
-                                               QueryImageCompletion completion) {
+    sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+        MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
         sOTAProviderDelegate.queryImageHandler = handleSecondQuery;
         XCTAssertEqualObjects(nodeID, @(kDeviceId1));
         XCTAssertEqual(controller, sController);
@@ -417,8 +457,8 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
         [queryExpectation1 fulfill];
     };
 
-    handleSecondQuery = ^(NSNumber * nodeID, MTRDeviceController * controller, MTROTASoftwareUpdateProviderClusterQueryImageParams * params,
-                                               QueryImageCompletion completion) {
+    handleSecondQuery = ^(NSNumber * nodeID, MTRDeviceController * controller,
+        MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
         XCTAssertEqualObjects(nodeID, @(kDeviceId1));
         XCTAssertEqual(controller, sController);
         [sOTAProviderDelegate respondNotAvailableWithCompletion:completion];
@@ -430,15 +470,93 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
 
     // Make sure we get our queries in order.  Give it a bit more time, because
     // there will be a delay between the two queries.
-    [self waitForExpectations:@[ queryExpectation1, queryExpectation2 ] timeout:(kTimeoutInSeconds+busyDelay) enforceOrder:YES];
+    [self waitForExpectations:@[ queryExpectation1, queryExpectation2 ] timeout:(kTimeoutInSeconds + busyDelay) enforceOrder:YES];
 
     [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
-
-    sOTAProviderDelegate.queryImageHandler = nil;
-#endif
 }
 
-#if !MANUAL_INDIVIDUAL_TEST
+- (void)test003_ReceiveSecondQueryWhileHandlingBDX
+{
+    // In this test we do the following:
+    //
+    // 1) Advertise ourselves to device1.
+    // 2) When device1 queries for an image, claim to have one.
+    // 3) When device1 tries to start a bdx transfer, stall it and advertise to device2.
+    // 4) When device2 queries for an image, claim to have one. Since we are
+    //    in the middle of doing BDX with device1, this actually responds with Busy.
+    // 5) Error out of the device1 transfer.
+    // 6) Wait for device2 to query us again.
+    __auto_type * device1 = sConnectedDevice1;
+    __auto_type * device2 = sConnectedDevice2;
+
+    __block XCTestExpectation * announceResponseExpectation2;
+    XCTestExpectation * queryExpectation1 = [self expectationWithDescription:@"handleQueryImageForNodeID called first time"];
+    XCTestExpectation * queryExpectation2 = [self expectationWithDescription:@"handleQueryImageForNodeID called second time"];
+    XCTestExpectation * queryExpectation3 = [self expectationWithDescription:@"handleQueryImageForNodeID called third time"];
+
+    const uint16_t busyDelay = 1; // 1 second
+    NSString * fakeImageURI = @"No such image, really";
+
+    __block QueryImageHandler handleThirdQuery;
+    sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+        MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+        XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+        XCTAssertEqual(controller, sController);
+        [sOTAProviderDelegate respondAvailableWithDelay:@(0) uri:fakeImageURI completion:completion];
+        [queryExpectation1 fulfill];
+    };
+    sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSString * fileDesignator,
+        NSNumber * offset, MTRStatusCompletion outerCompletion) {
+        XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+        XCTAssertEqual(controller, sController);
+
+        // Don't actually respond until the second requestor has queried us for
+        // an image.  We need to reset queryImageHandler here, so we can close
+        // over outerCompletion.
+        sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+            MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion innerCompletion) {
+            sOTAProviderDelegate.queryImageHandler = handleThirdQuery;
+            sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+                NSString * fileDesignator, NSNumber * offset, MTRStatusCompletion completion) {
+                // Should be no more queries.
+                XCTFail(@"Unexpected attempt to begin BDX transfer");
+            };
+
+            XCTAssertEqualObjects(nodeID, @(kDeviceId2));
+            XCTAssertEqual(controller, sController);
+
+            // We respond UpdateAvailable, but since we are in the middle of
+            // handling OTA for device1 we expect the requestor to get Busy and
+            // try again.
+            [sOTAProviderDelegate respondAvailableWithDelay:@(busyDelay) uri:fakeImageURI completion:innerCompletion];
+            [sOTAProviderDelegate respondErrorWithCompletion:outerCompletion];
+            [queryExpectation2 fulfill];
+        };
+
+        announceResponseExpectation2 = [self announceProviderToDevice:device2];
+    };
+
+    handleThirdQuery = ^(NSNumber * nodeID, MTRDeviceController * controller,
+        MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+        XCTAssertEqualObjects(nodeID, @(kDeviceId2));
+        XCTAssertEqual(controller, sController);
+
+        [sOTAProviderDelegate respondNotAvailableWithCompletion:completion];
+        [queryExpectation3 fulfill];
+    };
+
+    // Advertise ourselves as an OTA provider.
+    XCTestExpectation * announceResponseExpectation1 = [self announceProviderToDevice:device1];
+
+    // Make sure we get our queries in order.  Give it a bit more time, because
+    // there will be a delay between the two queries.
+    [self waitForExpectations:@[ queryExpectation1, queryExpectation2, queryExpectation3 ]
+                      timeout:(kTimeoutInSeconds + busyDelay * 3)
+                 enforceOrder:YES];
+
+    [self waitForExpectations:@[ announceResponseExpectation1, announceResponseExpectation2 ] timeout:kTimeoutInSeconds];
+}
+
 - (void)test999_TearDown
 {
     __auto_type * device = [MTRBaseDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
@@ -446,8 +564,7 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
 
     device = [MTRBaseDevice deviceWithNodeID:@(kDeviceId2) controller:sController];
     ResetCommissionee(device, dispatch_get_main_queue(), self, kTimeoutInSeconds);
-    [self shutdownStack];
+    [[self class] shutdownStack];
 }
-#endif
 
 @end
