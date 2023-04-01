@@ -31,7 +31,7 @@ tests:
           ./chip-tool wakeonlan read macaddress 1 1
           ./chip-tv-casting-app wakeonlan read macaddress 1 1
 
-          On TH Verify that the response contains a 48-bit MAC Address. Record the MAC address.
+          On TH, verify that the response contains a 48-bit MAC Address of the DUT and verify if the value reported in this is matching with the actual Mac address.
           [1654248817.394846][3637:3643] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0503 Attribute 0x0000_0000 DataVersion: 3900236652
           [1654248817.394895][3637:3643] CHIP:TOO:   MACAddress: e4:5f:01:69:61:b1
           [1654248817.394982][3637:3643] CHIP:EM: Sending Standalone Ack for MessageCounter:15292555 on exchange 12123i
