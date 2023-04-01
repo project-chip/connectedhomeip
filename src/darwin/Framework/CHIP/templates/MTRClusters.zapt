@@ -8,7 +8,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 
 
 {{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
@@ -23,19 +23,21 @@ NS_ASSUME_NONNULL_BEGIN
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER {{availability (asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
 
-{{#chip_cluster_commands}}
+{{#zcl_commands}}
+{{#if (is_str_equal source 'client')}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandDecl"}}
 {{#unless (wasRemoved cluster command=command)}}
-- (void){{asLowerCamelCase name}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion {{availability cluster command=command minimalRelease="First major API revamp"}};
-{{#unless (hasArguments)}}
+- (void){{asLowerCamelCase name}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion {{availability cluster command=command minimalRelease="First major API revamp"}};
+{{#unless hasArguments}}
 - (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion {{availability cluster command=command minimalRelease="First major API revamp"}};
 {{/unless}}
 {{/unless}}
 {{/inline}}
 {{> commandDecl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
                 command=(asUpperCamelCase name preserveAcronyms=true)}}
-{{/chip_cluster_commands}}
+{{/if}}
+{{/zcl_commands}}
 
 {{#zcl_attributes_server}}
 {{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
@@ -57,9 +59,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 {{/unless}}
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 {{#unless (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatClusterNameRemapping name))}}
 {{#unless (wasRemoved (compatClusterNameRemapping name))}}
 {{availability (compatClusterNameRemapping name) deprecationMessage=(concat "Please use MTRCluster" (asUpperCamelCase name preserveAcronyms=true))}}
@@ -68,9 +70,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{/unless}}
 {{/unless}}
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 {{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping name))
            (not (wasRemoved (compatClusterNameRemapping name))))}}
 @interface MTRCluster{{compatClusterNameRemapping name}} (Deprecated)
@@ -79,20 +81,22 @@ NS_ASSUME_NONNULL_BEGIN
                                endpoint:(uint16_t)endpoint
                                   queue:(dispatch_queue_t)queue {{availability (compatClusterNameRemapping name) deprecatedRelease="First major API revamp" deprecationMessage="Please use initWithDevice:endpoindID:queue:"}};
 
-{{#chip_cluster_commands}}
+{{#zcl_commands}}
+{{#if (is_str_equal source 'client')}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandDecl"}}
 {{#if (and (wasIntroducedBeforeRelease "First major API revamp" cluster command=command)
            (not (wasRemoved cluster command=command)))}}
-- (void){{asLowerCamelCase command}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler {{availability cluster command=command deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithParams:expectedValues:expectedValueInterval:completion:")}};
-{{#unless (hasArguments)}}
+- (void){{asLowerCamelCase command}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler {{availability cluster command=command deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithParams:expectedValues:expectedValueInterval:completion:")}};
+{{#unless hasArguments}}
 - (void){{asLowerCamelCase command}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler {{availability cluster command=command deprecatedRelease="First major API revamp" deprecationMessage=(concat "Please use " (asLowerCamelCase name) "WithExpectedValues:expectedValueInterval:completion:")}};
 {{/unless}}
 {{/if}}
 {{/inline}}
 {{> commandDecl cluster=(compatClusterNameRemapping parent.name)
                 command=(compatCommandNameRemapping parent.name name)}}
-{{/chip_cluster_commands}}
+{{/if}}
+{{/zcl_commands}}
 {{~#zcl_attributes_server}}
 {{~#*inline "attributeDecls"}}
 {{#unless (isStrEqual attribute (asUpperCamelCase name preserveAcronyms=true))}}
@@ -109,6 +113,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 {{/if}}
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 
 NS_ASSUME_NONNULL_END

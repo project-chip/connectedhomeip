@@ -40,7 +40,7 @@ static void MTRClustersLogCompletion(NSString *logPrefix, id value, NSError *err
 }
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 {{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
 @implementation MTRCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
@@ -59,7 +59,7 @@ static void MTRClustersLogCompletion(NSString *logPrefix, id value, NSError *err
     return self;
 }
 
-{{#chip_cluster_commands}}
+{{#zcl_commands}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandImpl"}}
 {{! This is used as the implementation for both the new-name and old-name bits, so check for both here. }}
@@ -87,13 +87,13 @@ MTRClusterIDType{{cluster}}ID
 MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 {{/if}}
 {{/inline}}
-{{#unless (hasArguments)}}
+{{#unless hasArguments}}
 - (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {
   [self {{asLowerCamelCase name}}WithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
 {{/unless}}
-- (void){{asLowerCamelCase name}}WithParams: ({{> paramsType}} * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
+- (void){{asLowerCamelCase name}}WithParams: ({{> paramsType}} * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {
     NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, _endpoint, (unsigned int){{> clusterId}}, (unsigned int){{> commandId}}];
     // Make a copy of params before we go async.
@@ -145,19 +145,19 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
               timedInvokeTimeoutMs.SetValue(10000);
             }
             {{/if}}
-            {{#chip_cluster_command_arguments}}
+            {{#zcl_command_arguments}}
               {{#first}}
-                {{#unless (commandHasRequiredField parent)}}
+                {{#unless parent.commandHasRequiredField}}
                 if (params != nil) {
                 {{/unless}}
               {{/first}}
               {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(concat "params." (asStructPropertyName label)) cluster=parent.parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
               {{#last}}
-                {{#unless (commandHasRequiredField parent)}}
+                {{#unless parent.commandHasRequiredField}}
                 }
                {{/unless}}
               {{/last}}
-            {{/chip_cluster_command_arguments}}
+            {{/zcl_command_arguments}}
 
             return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb, self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
         });
@@ -178,9 +178,11 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 }
 {{/unless}}
 {{/inline}}
+{{#if (is_str_equal source 'client')}}
 {{> commandImpl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
                 command=(asUpperCamelCase name preserveAcronyms=true)}}
-{{/chip_cluster_commands}}
+{{/if}}
+{{/zcl_commands}}
 
 {{#zcl_attributes_server}}
 {{! This is used as the implementation for both the new-name and old-name bits, so check for both here. }}
@@ -234,11 +236,12 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
     return [self initWithDevice:device endpointID:@(endpoint) queue:queue];
 }
 
-{{#chip_cluster_commands}}
+{{#zcl_commands}}
+{{#if (is_str_equal source 'client')}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandImpl"}}
 {{#unless (wasRemoved cluster command=command)}}
-- (void){{asLowerCamelCase command}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
+- (void){{asLowerCamelCase command}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
 {
   [self {{asLowerCamelCase name}}WithParams:params expectedValues:expectedDataValueDictionaries expectedValueInterval:expectedValueIntervalMs completion:
       {{#if hasSpecificResponse}}
@@ -251,7 +254,7 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
     {{/if}}
     ];
 }
-{{#unless (hasArguments)}}
+{{#unless hasArguments}}
 - (void){{asLowerCamelCase command}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
 {
   [self {{asLowerCamelCase command}}WithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completionHandler:completionHandler];
@@ -261,7 +264,8 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 {{/inline}}
 {{> commandImpl cluster=(compatClusterNameRemapping parent.name)
                 command=(compatCommandNameRemapping parent.name name)}}
-{{/chip_cluster_commands}}
+{{/if}}
+{{/zcl_commands}}
 {{~#zcl_attributes_server}}
 {{~#*inline "attributeImpls"}}
 {{#unless (or (isStrEqual attribute (asUpperCamelCase name preserveAcronyms=true))
@@ -287,6 +291,6 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
 @end
 {{/if}}
 
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 
 // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)
