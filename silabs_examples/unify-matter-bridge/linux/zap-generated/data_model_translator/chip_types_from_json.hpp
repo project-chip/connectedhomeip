@@ -95,26 +95,26 @@ inline std::optional<Identify::IdentifyIdentifyType> from_json(const nlohmann::j
 }
 /***************************** Bitmap Converters **************/
 template <>
-inline std::optional<chip::BitMask<Groups::GroupClusterFeature>> from_json(const nlohmann::json& obj)
+inline std::optional<chip::BitMask<Groups::GroupsFeature>> from_json(const nlohmann::json& obj)
 {
-    chip::BitMask<Groups::GroupClusterFeature> r;
-    r.SetField(Groups::GroupClusterFeature::kGroupNames, obj.value("GroupNames", false));
+    chip::BitMask<Groups::GroupsFeature> r;
+    r.SetField(Groups::GroupsFeature::kGroupNames, obj.value("GroupNames", false));
     return r;
 }
 
 /***************************** Bitmap Converters **************/
 template <>
-inline std::optional<chip::BitMask<Scenes::SceneFeatures>> from_json(const nlohmann::json& obj)
-{
-    chip::BitMask<Scenes::SceneFeatures> r;
-    r.SetField(Scenes::SceneFeatures::kSceneNames, obj.value("SceneNames", false));
-    return r;
-}
-template <>
 inline std::optional<chip::BitMask<Scenes::ScenesCopyMode>> from_json(const nlohmann::json& obj)
 {
     chip::BitMask<Scenes::ScenesCopyMode> r;
     r.SetField(Scenes::ScenesCopyMode::kCopyAllScenes, obj.value("CopyAllScenes", false));
+    return r;
+}
+template <>
+inline std::optional<chip::BitMask<Scenes::ScenesFeature>> from_json(const nlohmann::json& obj)
+{
+    chip::BitMask<Scenes::ScenesFeature> r;
+    r.SetField(Scenes::ScenesFeature::kSceneNames, obj.value("SceneNames", false));
     return r;
 }
 
@@ -1200,10 +1200,10 @@ inline std::optional<IlluminanceMeasurement::LightSensorType> from_json(const nl
 
 /***************************** Bitmap Converters **************/
 template <>
-inline std::optional<chip::BitMask<PressureMeasurement::PressureFeature>> from_json(const nlohmann::json& obj)
+inline std::optional<chip::BitMask<PressureMeasurement::PressureMeasurementFeature>> from_json(const nlohmann::json& obj)
 {
-    chip::BitMask<PressureMeasurement::PressureFeature> r;
-    r.SetField(PressureMeasurement::PressureFeature::kExtended, obj.value("Extended", false));
+    chip::BitMask<PressureMeasurement::PressureMeasurementFeature> r;
+    r.SetField(PressureMeasurement::PressureMeasurementFeature::kExtended, obj.value("Extended", false));
     return r;
 }
 

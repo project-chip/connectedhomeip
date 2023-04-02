@@ -52,7 +52,7 @@ server cluster Identify = 3 {
 }
 
 server cluster Groups = 4 {
-  bitmap GroupClusterFeature : BITMAP32 {
+  bitmap GroupsFeature : BITMAP32 {
     kGroupNames = 0x1;
   }
 
@@ -172,18 +172,18 @@ client cluster AccessControl = 31 {
     kRemoved = 2;
   }
 
+  struct Target {
+    nullable cluster_id cluster = 0;
+    nullable endpoint_no endpoint = 1;
+    nullable devtype_id deviceType = 2;
+  }
+
   fabric_scoped struct AccessControlEntryStruct {
     fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
     fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
     nullable fabric_sensitive int64u subjects[] = 3;
     nullable fabric_sensitive Target targets[] = 4;
     fabric_idx fabricIndex = 254;
-  }
-
-  struct Target {
-    nullable cluster_id cluster = 0;
-    nullable endpoint_no endpoint = 1;
-    nullable devtype_id deviceType = 2;
   }
 
   fabric_scoped struct AccessControlExtensionStruct {

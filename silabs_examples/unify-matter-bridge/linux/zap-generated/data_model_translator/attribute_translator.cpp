@@ -65,24 +65,28 @@ IdentifyAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeV
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::IdentifyType::Id: { // type is enum8
             MN::IdentifyType::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {
@@ -205,18 +209,21 @@ GroupsAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeVal
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {
@@ -332,48 +339,56 @@ ScenesAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeVal
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::CurrentScene::Id: { // type is int8u
             MN::CurrentScene::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::CurrentGroup::Id: { // type is group_id
             MN::CurrentGroup::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::SceneValid::Id: { // type is boolean
             MN::SceneValid::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::NameSupport::Id: { // type is bitmap8
             MN::NameSupport::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::LastConfiguredBy::Id: { // type is node_id
             MN::LastConfiguredBy::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {
@@ -554,42 +569,49 @@ OnOffAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValu
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::GlobalSceneControl::Id: { // type is boolean
             MN::GlobalSceneControl::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::OnTime::Id: { // type is int16u
             MN::OnTime::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::OffWaitTime::Id: { // type is int16u
             MN::OffWaitTime::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::StartUpOnOff::Id: { // type is OnOffStartUpOnOff
             MN::StartUpOnOff::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {
@@ -775,96 +797,112 @@ LevelControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attrib
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RemainingTime::Id: { // type is int16u
             MN::RemainingTime::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MinLevel::Id: { // type is int8u
             MN::MinLevel::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MaxLevel::Id: { // type is int8u
             MN::MaxLevel::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::CurrentFrequency::Id: { // type is int16u
             MN::CurrentFrequency::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MinFrequency::Id: { // type is int16u
             MN::MinFrequency::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MaxFrequency::Id: { // type is int16u
             MN::MaxFrequency::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Options::Id: { // type is LevelControlOptions
             MN::Options::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::OnOffTransitionTime::Id: { // type is int16u
             MN::OnOffTransitionTime::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::OnLevel::Id: { // type is int8u
             MN::OnLevel::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::OnTransitionTime::Id: { // type is int16u
             MN::OnTransitionTime::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::OffTransitionTime::Id: { // type is int16u
             MN::OffTransitionTime::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DefaultMoveRate::Id: { // type is int8u
             MN::DefaultMoveRate::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::StartUpCurrentLevel::Id: { // type is int8u
             MN::StartUpCurrentLevel::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {
@@ -1191,228 +1229,266 @@ DoorLockAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeV
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::LockType::Id: { // type is DlLockType
             MN::LockType::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ActuatorEnabled::Id: { // type is boolean
             MN::ActuatorEnabled::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DoorState::Id: { // type is DoorStateEnum
             MN::DoorState::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DoorOpenEvents::Id: { // type is int32u
             MN::DoorOpenEvents::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DoorClosedEvents::Id: { // type is int32u
             MN::DoorClosedEvents::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::OpenPeriod::Id: { // type is int16u
             MN::OpenPeriod::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::NumberOfTotalUsersSupported::Id: { // type is int16u
             MN::NumberOfTotalUsersSupported::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::NumberOfPINUsersSupported::Id: { // type is int16u
             MN::NumberOfPINUsersSupported::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::NumberOfRFIDUsersSupported::Id: { // type is int16u
             MN::NumberOfRFIDUsersSupported::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::NumberOfWeekDaySchedulesSupportedPerUser::Id: { // type is int8u
             MN::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::NumberOfYearDaySchedulesSupportedPerUser::Id: { // type is int8u
             MN::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::NumberOfHolidaySchedulesSupported::Id: { // type is int8u
             MN::NumberOfHolidaySchedulesSupported::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MaxPINCodeLength::Id: { // type is int8u
             MN::MaxPINCodeLength::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MinPINCodeLength::Id: { // type is int8u
             MN::MinPINCodeLength::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MaxRFIDCodeLength::Id: { // type is int8u
             MN::MaxRFIDCodeLength::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MinRFIDCodeLength::Id: { // type is int8u
             MN::MinRFIDCodeLength::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::CredentialRulesSupport::Id: { // type is DlCredentialRuleMask
             MN::CredentialRulesSupport::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::NumberOfCredentialsSupportedPerUser::Id: { // type is int8u
             MN::NumberOfCredentialsSupportedPerUser::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Language::Id: { // type is char_string
             MN::Language::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::LEDSettings::Id: { // type is int8u
             MN::LEDSettings::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AutoRelockTime::Id: { // type is int32u
             MN::AutoRelockTime::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::SoundVolume::Id: { // type is int8u
             MN::SoundVolume::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::OperatingMode::Id: { // type is OperatingModeEnum
             MN::OperatingMode::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::SupportedOperatingModes::Id: { // type is DlSupportedOperatingModes
             MN::SupportedOperatingModes::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DefaultConfigurationRegister::Id: { // type is DlDefaultConfigurationRegister
             MN::DefaultConfigurationRegister::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::EnableLocalProgramming::Id: { // type is boolean
             MN::EnableLocalProgramming::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::EnableOneTouchLocking::Id: { // type is boolean
             MN::EnableOneTouchLocking::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::EnableInsideStatusLED::Id: { // type is boolean
             MN::EnableInsideStatusLED::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::EnablePrivacyModeButton::Id: { // type is boolean
             MN::EnablePrivacyModeButton::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::LocalProgrammingFeatures::Id: { // type is DlLocalProgrammingFeatures
             MN::LocalProgrammingFeatures::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::WrongCodeEntryLimit::Id: { // type is int8u
             MN::WrongCodeEntryLimit::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::UserCodeTemporaryDisableTime::Id: { // type is int8u
             MN::UserCodeTemporaryDisableTime::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::SendPINOverTheAir::Id: { // type is boolean
             MN::SendPINOverTheAir::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RequirePINforRemoteOperation::Id: { // type is boolean
             MN::RequirePINforRemoteOperation::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ExpiringUserTimeout::Id: { // type is int16u
             MN::ExpiringUserTimeout::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {
@@ -2037,72 +2113,84 @@ BarrierControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attr
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::BarrierSafetyStatus::Id: { // type is bitmap16
             MN::BarrierSafetyStatus::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::BarrierCapabilities::Id: { // type is bitmap8
             MN::BarrierCapabilities::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::BarrierOpenEvents::Id: { // type is int16u
             MN::BarrierOpenEvents::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::BarrierCloseEvents::Id: { // type is int16u
             MN::BarrierCloseEvents::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::BarrierCommandOpenEvents::Id: { // type is int16u
             MN::BarrierCommandOpenEvents::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::BarrierCommandCloseEvents::Id: { // type is int16u
             MN::BarrierCommandCloseEvents::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::BarrierOpenPeriod::Id: { // type is int16u
             MN::BarrierOpenPeriod::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::BarrierClosePeriod::Id: { // type is int16u
             MN::BarrierClosePeriod::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::BarrierPosition::Id: { // type is int8u
             MN::BarrierPosition::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {
@@ -2373,306 +2461,357 @@ ThermostatAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::OutdoorTemperature::Id: { // type is int16s
             MN::OutdoorTemperature::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Occupancy::Id: { // type is bitmap8
             MN::Occupancy::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AbsMinHeatSetpointLimit::Id: { // type is int16s
             MN::AbsMinHeatSetpointLimit::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AbsMaxHeatSetpointLimit::Id: { // type is int16s
             MN::AbsMaxHeatSetpointLimit::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AbsMinCoolSetpointLimit::Id: { // type is int16s
             MN::AbsMinCoolSetpointLimit::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AbsMaxCoolSetpointLimit::Id: { // type is int16s
             MN::AbsMaxCoolSetpointLimit::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::PICoolingDemand::Id: { // type is int8u
             MN::PICoolingDemand::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::PIHeatingDemand::Id: { // type is int8u
             MN::PIHeatingDemand::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::HVACSystemTypeConfiguration::Id: { // type is bitmap8
             MN::HVACSystemTypeConfiguration::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::LocalTemperatureCalibration::Id: { // type is int8s
             MN::LocalTemperatureCalibration::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::OccupiedCoolingSetpoint::Id: { // type is int16s
             MN::OccupiedCoolingSetpoint::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::OccupiedHeatingSetpoint::Id: { // type is int16s
             MN::OccupiedHeatingSetpoint::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::UnoccupiedCoolingSetpoint::Id: { // type is int16s
             MN::UnoccupiedCoolingSetpoint::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::UnoccupiedHeatingSetpoint::Id: { // type is int16s
             MN::UnoccupiedHeatingSetpoint::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MinHeatSetpointLimit::Id: { // type is int16s
             MN::MinHeatSetpointLimit::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MaxHeatSetpointLimit::Id: { // type is int16s
             MN::MaxHeatSetpointLimit::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MinCoolSetpointLimit::Id: { // type is int16s
             MN::MinCoolSetpointLimit::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MaxCoolSetpointLimit::Id: { // type is int16s
             MN::MaxCoolSetpointLimit::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MinSetpointDeadBand::Id: { // type is int8s
             MN::MinSetpointDeadBand::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RemoteSensing::Id: { // type is bitmap8
             MN::RemoteSensing::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ControlSequenceOfOperation::Id: { // type is ThermostatControlSequence
             MN::ControlSequenceOfOperation::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::SystemMode::Id: { // type is enum8
             MN::SystemMode::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ThermostatRunningMode::Id: { // type is enum8
             MN::ThermostatRunningMode::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::StartOfWeek::Id: { // type is enum8
             MN::StartOfWeek::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::NumberOfWeeklyTransitions::Id: { // type is int8u
             MN::NumberOfWeeklyTransitions::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::NumberOfDailyTransitions::Id: { // type is int8u
             MN::NumberOfDailyTransitions::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::TemperatureSetpointHold::Id: { // type is enum8
             MN::TemperatureSetpointHold::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::TemperatureSetpointHoldDuration::Id: { // type is int16u
             MN::TemperatureSetpointHoldDuration::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ThermostatProgrammingOperationMode::Id: { // type is bitmap8
             MN::ThermostatProgrammingOperationMode::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ThermostatRunningState::Id: { // type is bitmap16
             MN::ThermostatRunningState::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::SetpointChangeSource::Id: { // type is enum8
             MN::SetpointChangeSource::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::SetpointChangeAmount::Id: { // type is int16s
             MN::SetpointChangeAmount::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::SetpointChangeSourceTimestamp::Id: { // type is epoch_s
             MN::SetpointChangeSourceTimestamp::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::OccupiedSetback::Id: { // type is int8u
             MN::OccupiedSetback::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::OccupiedSetbackMin::Id: { // type is int8u
             MN::OccupiedSetbackMin::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::OccupiedSetbackMax::Id: { // type is int8u
             MN::OccupiedSetbackMax::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::UnoccupiedSetback::Id: { // type is int8u
             MN::UnoccupiedSetback::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::UnoccupiedSetbackMin::Id: { // type is int8u
             MN::UnoccupiedSetbackMin::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::UnoccupiedSetbackMax::Id: { // type is int8u
             MN::UnoccupiedSetbackMax::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::EmergencyHeatDelta::Id: { // type is int8u
             MN::EmergencyHeatDelta::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ACType::Id: { // type is enum8
             MN::ACType::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ACCapacity::Id: { // type is int16u
             MN::ACCapacity::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ACRefrigerantType::Id: { // type is enum8
             MN::ACRefrigerantType::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ACCompressorType::Id: { // type is enum8
             MN::ACCompressorType::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ACErrorCode::Id: { // type is bitmap32
             MN::ACErrorCode::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ACLouverPosition::Id: { // type is enum8
             MN::ACLouverPosition::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ACCoilTemperature::Id: { // type is int16s
             MN::ACCoilTemperature::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ACCapacityformat::Id: { // type is enum8
             MN::ACCapacityformat::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {
@@ -3584,78 +3723,91 @@ FanControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FanModeSequence::Id: { // type is FanModeSequenceType
             MN::FanModeSequence::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::PercentSetting::Id: { // type is int8u
             MN::PercentSetting::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::PercentCurrent::Id: { // type is int8u
             MN::PercentCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::SpeedMax::Id: { // type is int8u
             MN::SpeedMax::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::SpeedSetting::Id: { // type is int8u
             MN::SpeedSetting::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::SpeedCurrent::Id: { // type is int8u
             MN::SpeedCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RockSupport::Id: { // type is bitmap8
             MN::RockSupport::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RockSetting::Id: { // type is bitmap8
             MN::RockSetting::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::WindSupport::Id: { // type is bitmap8
             MN::WindSupport::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::WindSetting::Id: { // type is bitmap8
             MN::WindSetting::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {
@@ -3801,30 +3953,35 @@ ThermostatUserInterfaceConfigurationAttributeAccess::Read(const ConcreteReadAttr
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::KeypadLockout::Id: { // type is enum8
             MN::KeypadLockout::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ScheduleProgrammingVisibility::Id: { // type is enum8
             MN::ScheduleProgrammingVisibility::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {
@@ -3989,324 +4146,378 @@ ColorControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attrib
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::CurrentSaturation::Id: { // type is int8u
             MN::CurrentSaturation::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RemainingTime::Id: { // type is int16u
             MN::RemainingTime::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::CurrentX::Id: { // type is int16u
             MN::CurrentX::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::CurrentY::Id: { // type is int16u
             MN::CurrentY::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DriftCompensation::Id: { // type is enum8
             MN::DriftCompensation::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::CompensationText::Id: { // type is char_string
             MN::CompensationText::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorTemperatureMireds::Id: { // type is int16u
             MN::ColorTemperatureMireds::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorMode::Id: { // type is enum8
             MN::ColorMode::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Options::Id: { // type is bitmap8
             MN::Options::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::NumberOfPrimaries::Id: { // type is int8u
             MN::NumberOfPrimaries::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary1X::Id: { // type is int16u
             MN::Primary1X::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary1Y::Id: { // type is int16u
             MN::Primary1Y::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary1Intensity::Id: { // type is int8u
             MN::Primary1Intensity::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary2X::Id: { // type is int16u
             MN::Primary2X::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary2Y::Id: { // type is int16u
             MN::Primary2Y::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary2Intensity::Id: { // type is int8u
             MN::Primary2Intensity::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary3X::Id: { // type is int16u
             MN::Primary3X::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary3Y::Id: { // type is int16u
             MN::Primary3Y::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary3Intensity::Id: { // type is int8u
             MN::Primary3Intensity::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary4X::Id: { // type is int16u
             MN::Primary4X::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary4Y::Id: { // type is int16u
             MN::Primary4Y::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary4Intensity::Id: { // type is int8u
             MN::Primary4Intensity::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary5X::Id: { // type is int16u
             MN::Primary5X::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary5Y::Id: { // type is int16u
             MN::Primary5Y::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary5Intensity::Id: { // type is int8u
             MN::Primary5Intensity::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary6X::Id: { // type is int16u
             MN::Primary6X::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary6Y::Id: { // type is int16u
             MN::Primary6Y::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Primary6Intensity::Id: { // type is int8u
             MN::Primary6Intensity::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::WhitePointX::Id: { // type is int16u
             MN::WhitePointX::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::WhitePointY::Id: { // type is int16u
             MN::WhitePointY::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorPointRX::Id: { // type is int16u
             MN::ColorPointRX::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorPointRY::Id: { // type is int16u
             MN::ColorPointRY::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorPointRIntensity::Id: { // type is int8u
             MN::ColorPointRIntensity::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorPointGX::Id: { // type is int16u
             MN::ColorPointGX::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorPointGY::Id: { // type is int16u
             MN::ColorPointGY::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorPointGIntensity::Id: { // type is int8u
             MN::ColorPointGIntensity::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorPointBX::Id: { // type is int16u
             MN::ColorPointBX::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorPointBY::Id: { // type is int16u
             MN::ColorPointBY::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorPointBIntensity::Id: { // type is int8u
             MN::ColorPointBIntensity::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::EnhancedCurrentHue::Id: { // type is int16u
             MN::EnhancedCurrentHue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::EnhancedColorMode::Id: { // type is enum8
             MN::EnhancedColorMode::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorLoopActive::Id: { // type is int8u
             MN::ColorLoopActive::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorLoopDirection::Id: { // type is int8u
             MN::ColorLoopDirection::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorLoopTime::Id: { // type is int16u
             MN::ColorLoopTime::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorLoopStartEnhancedHue::Id: { // type is int16u
             MN::ColorLoopStartEnhancedHue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorLoopStoredEnhancedHue::Id: { // type is int16u
             MN::ColorLoopStoredEnhancedHue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorCapabilities::Id: { // type is bitmap16
             MN::ColorCapabilities::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorTempPhysicalMinMireds::Id: { // type is int16u
             MN::ColorTempPhysicalMinMireds::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ColorTempPhysicalMaxMireds::Id: { // type is int16u
             MN::ColorTempPhysicalMaxMireds::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::CoupleColorTempToLevelMinMireds::Id: { // type is int16u
             MN::CoupleColorTempToLevelMinMireds::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::StartUpColorTemperatureMireds::Id: { // type is int16u
             MN::StartUpColorTemperatureMireds::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {
@@ -5170,42 +5381,49 @@ IlluminanceMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPa
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MinMeasuredValue::Id: { // type is int16u
             MN::MinMeasuredValue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MaxMeasuredValue::Id: { // type is int16u
             MN::MaxMeasuredValue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Tolerance::Id: { // type is int16u
             MN::Tolerance::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::LightSensorType::Id: { // type is enum8
             MN::LightSensorType::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {
@@ -5377,36 +5595,42 @@ TemperatureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPa
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MinMeasuredValue::Id: { // type is int16s
             MN::MinMeasuredValue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MaxMeasuredValue::Id: { // type is int16s
             MN::MaxMeasuredValue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Tolerance::Id: { // type is int16u
             MN::Tolerance::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {
@@ -5564,66 +5788,77 @@ PressureMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPath,
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MinMeasuredValue::Id: { // type is int16s
             MN::MinMeasuredValue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MaxMeasuredValue::Id: { // type is int16s
             MN::MaxMeasuredValue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Tolerance::Id: { // type is int16u
             MN::Tolerance::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ScaledValue::Id: { // type is int16s
             MN::ScaledValue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MinScaledValue::Id: { // type is int16s
             MN::MinScaledValue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MaxScaledValue::Id: { // type is int16s
             MN::MaxScaledValue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ScaledTolerance::Id: { // type is int16u
             MN::ScaledTolerance::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Scale::Id: { // type is int8s
             MN::Scale::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {
@@ -5846,36 +6081,42 @@ FlowMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Att
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MinMeasuredValue::Id: { // type is int16u
             MN::MinMeasuredValue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MaxMeasuredValue::Id: { // type is int16u
             MN::MaxMeasuredValue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Tolerance::Id: { // type is int16u
             MN::Tolerance::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {
@@ -6030,36 +6271,42 @@ RelativeHumidityMeasurementAttributeAccess::Read(const ConcreteReadAttributePath
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MinMeasuredValue::Id: { // type is int16u
             MN::MinMeasuredValue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MaxMeasuredValue::Id: { // type is int16u
             MN::MaxMeasuredValue::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Tolerance::Id: { // type is int16u
             MN::Tolerance::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {
@@ -6219,84 +6466,98 @@ OccupancySensingAttributeAccess::Read(const ConcreteReadAttributePath& aPath, At
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::OccupancySensorType::Id: { // type is OccupancySensorTypeEnum
             MN::OccupancySensorType::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::OccupancySensorTypeBitmap::Id: { // type is OccupancySensorTypeBitmap
             MN::OccupancySensorTypeBitmap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::PIROccupiedToUnoccupiedDelay::Id: { // type is int16u
             MN::PIROccupiedToUnoccupiedDelay::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::PIRUnoccupiedToOccupiedDelay::Id: { // type is int16u
             MN::PIRUnoccupiedToOccupiedDelay::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::PIRUnoccupiedToOccupiedThreshold::Id: { // type is int8u
             MN::PIRUnoccupiedToOccupiedThreshold::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::UltrasonicOccupiedToUnoccupiedDelay::Id: { // type is int16u
             MN::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::UltrasonicUnoccupiedToOccupiedDelay::Id: { // type is int16u
             MN::UltrasonicUnoccupiedToOccupiedDelay::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::UltrasonicUnoccupiedToOccupiedThreshold::Id: { // type is int8u
             MN::UltrasonicUnoccupiedToOccupiedThreshold::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::PhysicalContactOccupiedToUnoccupiedDelay::Id: { // type is int16u
             MN::PhysicalContactOccupiedToUnoccupiedDelay::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::PhysicalContactUnoccupiedToOccupiedDelay::Id: { // type is int16u
             MN::PhysicalContactUnoccupiedToOccupiedDelay::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::PhysicalContactUnoccupiedToOccupiedThreshold::Id: { // type is int8u
             MN::PhysicalContactUnoccupiedToOccupiedThreshold::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {
@@ -6620,780 +6881,910 @@ ElectricalMeasurementAttributeAccess::Read(const ConcreteReadAttributePath& aPat
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DcVoltage::Id: { // type is int16s
             MN::DcVoltage::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DcVoltageMin::Id: { // type is int16s
             MN::DcVoltageMin::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DcVoltageMax::Id: { // type is int16s
             MN::DcVoltageMax::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DcCurrent::Id: { // type is int16s
             MN::DcCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DcCurrentMin::Id: { // type is int16s
             MN::DcCurrentMin::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DcCurrentMax::Id: { // type is int16s
             MN::DcCurrentMax::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DcPower::Id: { // type is int16s
             MN::DcPower::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DcPowerMin::Id: { // type is int16s
             MN::DcPowerMin::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DcPowerMax::Id: { // type is int16s
             MN::DcPowerMax::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DcVoltageMultiplier::Id: { // type is int16u
             MN::DcVoltageMultiplier::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DcVoltageDivisor::Id: { // type is int16u
             MN::DcVoltageDivisor::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DcCurrentMultiplier::Id: { // type is int16u
             MN::DcCurrentMultiplier::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DcCurrentDivisor::Id: { // type is int16u
             MN::DcCurrentDivisor::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DcPowerMultiplier::Id: { // type is int16u
             MN::DcPowerMultiplier::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::DcPowerDivisor::Id: { // type is int16u
             MN::DcPowerDivisor::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AcFrequency::Id: { // type is int16u
             MN::AcFrequency::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AcFrequencyMin::Id: { // type is int16u
             MN::AcFrequencyMin::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AcFrequencyMax::Id: { // type is int16u
             MN::AcFrequencyMax::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::NeutralCurrent::Id: { // type is int16u
             MN::NeutralCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::TotalActivePower::Id: { // type is int32s
             MN::TotalActivePower::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::TotalReactivePower::Id: { // type is int32s
             MN::TotalReactivePower::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::TotalApparentPower::Id: { // type is int32u
             MN::TotalApparentPower::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Measured1stHarmonicCurrent::Id: { // type is int16s
             MN::Measured1stHarmonicCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Measured3rdHarmonicCurrent::Id: { // type is int16s
             MN::Measured3rdHarmonicCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Measured5thHarmonicCurrent::Id: { // type is int16s
             MN::Measured5thHarmonicCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Measured7thHarmonicCurrent::Id: { // type is int16s
             MN::Measured7thHarmonicCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Measured9thHarmonicCurrent::Id: { // type is int16s
             MN::Measured9thHarmonicCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::Measured11thHarmonicCurrent::Id: { // type is int16s
             MN::Measured11thHarmonicCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MeasuredPhase1stHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase1stHarmonicCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MeasuredPhase3rdHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase3rdHarmonicCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MeasuredPhase5thHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase5thHarmonicCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MeasuredPhase7thHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase7thHarmonicCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MeasuredPhase9thHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase9thHarmonicCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::MeasuredPhase11thHarmonicCurrent::Id: { // type is int16s
             MN::MeasuredPhase11thHarmonicCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AcFrequencyMultiplier::Id: { // type is int16u
             MN::AcFrequencyMultiplier::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AcFrequencyDivisor::Id: { // type is int16u
             MN::AcFrequencyDivisor::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::PowerMultiplier::Id: { // type is int32u
             MN::PowerMultiplier::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::PowerDivisor::Id: { // type is int32u
             MN::PowerDivisor::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::HarmonicCurrentMultiplier::Id: { // type is int8s
             MN::HarmonicCurrentMultiplier::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::PhaseHarmonicCurrentMultiplier::Id: { // type is int8s
             MN::PhaseHarmonicCurrentMultiplier::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::InstantaneousVoltage::Id: { // type is int16s
             MN::InstantaneousVoltage::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::InstantaneousLineCurrent::Id: { // type is int16u
             MN::InstantaneousLineCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::InstantaneousActiveCurrent::Id: { // type is int16s
             MN::InstantaneousActiveCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::InstantaneousReactiveCurrent::Id: { // type is int16s
             MN::InstantaneousReactiveCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::InstantaneousPower::Id: { // type is int16s
             MN::InstantaneousPower::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsVoltage::Id: { // type is int16u
             MN::RmsVoltage::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsVoltageMin::Id: { // type is int16u
             MN::RmsVoltageMin::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsVoltageMax::Id: { // type is int16u
             MN::RmsVoltageMax::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsCurrent::Id: { // type is int16u
             MN::RmsCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsCurrentMin::Id: { // type is int16u
             MN::RmsCurrentMin::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsCurrentMax::Id: { // type is int16u
             MN::RmsCurrentMax::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ActivePower::Id: { // type is int16s
             MN::ActivePower::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ActivePowerMin::Id: { // type is int16s
             MN::ActivePowerMin::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ActivePowerMax::Id: { // type is int16s
             MN::ActivePowerMax::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ReactivePower::Id: { // type is int16s
             MN::ReactivePower::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ApparentPower::Id: { // type is int16u
             MN::ApparentPower::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::PowerFactor::Id: { // type is int8s
             MN::PowerFactor::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AverageRmsVoltageMeasurementPeriod::Id: { // type is int16u
             MN::AverageRmsVoltageMeasurementPeriod::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AverageRmsUnderVoltageCounter::Id: { // type is int16u
             MN::AverageRmsUnderVoltageCounter::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsExtremeOverVoltagePeriod::Id: { // type is int16u
             MN::RmsExtremeOverVoltagePeriod::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsExtremeUnderVoltagePeriod::Id: { // type is int16u
             MN::RmsExtremeUnderVoltagePeriod::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsVoltageSagPeriod::Id: { // type is int16u
             MN::RmsVoltageSagPeriod::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsVoltageSwellPeriod::Id: { // type is int16u
             MN::RmsVoltageSwellPeriod::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AcVoltageMultiplier::Id: { // type is int16u
             MN::AcVoltageMultiplier::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AcVoltageDivisor::Id: { // type is int16u
             MN::AcVoltageDivisor::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AcCurrentMultiplier::Id: { // type is int16u
             MN::AcCurrentMultiplier::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AcCurrentDivisor::Id: { // type is int16u
             MN::AcCurrentDivisor::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AcPowerMultiplier::Id: { // type is int16u
             MN::AcPowerMultiplier::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AcPowerDivisor::Id: { // type is int16u
             MN::AcPowerDivisor::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::OverloadAlarmsMask::Id: { // type is bitmap8
             MN::OverloadAlarmsMask::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::VoltageOverload::Id: { // type is int16s
             MN::VoltageOverload::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::CurrentOverload::Id: { // type is int16s
             MN::CurrentOverload::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AcOverloadAlarmsMask::Id: { // type is bitmap16
             MN::AcOverloadAlarmsMask::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AcVoltageOverload::Id: { // type is int16s
             MN::AcVoltageOverload::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AcCurrentOverload::Id: { // type is int16s
             MN::AcCurrentOverload::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AcActivePowerOverload::Id: { // type is int16s
             MN::AcActivePowerOverload::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AcReactivePowerOverload::Id: { // type is int16s
             MN::AcReactivePowerOverload::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AverageRmsOverVoltage::Id: { // type is int16s
             MN::AverageRmsOverVoltage::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AverageRmsUnderVoltage::Id: { // type is int16s
             MN::AverageRmsUnderVoltage::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsExtremeOverVoltage::Id: { // type is int16s
             MN::RmsExtremeOverVoltage::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsExtremeUnderVoltage::Id: { // type is int16s
             MN::RmsExtremeUnderVoltage::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsVoltageSag::Id: { // type is int16s
             MN::RmsVoltageSag::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsVoltageSwell::Id: { // type is int16s
             MN::RmsVoltageSwell::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::LineCurrentPhaseB::Id: { // type is int16u
             MN::LineCurrentPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ActiveCurrentPhaseB::Id: { // type is int16s
             MN::ActiveCurrentPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ReactiveCurrentPhaseB::Id: { // type is int16s
             MN::ReactiveCurrentPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsVoltagePhaseB::Id: { // type is int16u
             MN::RmsVoltagePhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsVoltageMinPhaseB::Id: { // type is int16u
             MN::RmsVoltageMinPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsVoltageMaxPhaseB::Id: { // type is int16u
             MN::RmsVoltageMaxPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsCurrentPhaseB::Id: { // type is int16u
             MN::RmsCurrentPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsCurrentMinPhaseB::Id: { // type is int16u
             MN::RmsCurrentMinPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsCurrentMaxPhaseB::Id: { // type is int16u
             MN::RmsCurrentMaxPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ActivePowerPhaseB::Id: { // type is int16s
             MN::ActivePowerPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ActivePowerMinPhaseB::Id: { // type is int16s
             MN::ActivePowerMinPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ActivePowerMaxPhaseB::Id: { // type is int16s
             MN::ActivePowerMaxPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ReactivePowerPhaseB::Id: { // type is int16s
             MN::ReactivePowerPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ApparentPowerPhaseB::Id: { // type is int16u
             MN::ApparentPowerPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::PowerFactorPhaseB::Id: { // type is int8s
             MN::PowerFactorPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AverageRmsVoltageMeasurementPeriodPhaseB::Id: { // type is int16u
             MN::AverageRmsVoltageMeasurementPeriodPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AverageRmsOverVoltageCounterPhaseB::Id: { // type is int16u
             MN::AverageRmsOverVoltageCounterPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AverageRmsUnderVoltageCounterPhaseB::Id: { // type is int16u
             MN::AverageRmsUnderVoltageCounterPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsExtremeOverVoltagePeriodPhaseB::Id: { // type is int16u
             MN::RmsExtremeOverVoltagePeriodPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsExtremeUnderVoltagePeriodPhaseB::Id: { // type is int16u
             MN::RmsExtremeUnderVoltagePeriodPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsVoltageSagPeriodPhaseB::Id: { // type is int16u
             MN::RmsVoltageSagPeriodPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsVoltageSwellPeriodPhaseB::Id: { // type is int16u
             MN::RmsVoltageSwellPeriodPhaseB::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::LineCurrentPhaseC::Id: { // type is int16u
             MN::LineCurrentPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ActiveCurrentPhaseC::Id: { // type is int16s
             MN::ActiveCurrentPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ReactiveCurrentPhaseC::Id: { // type is int16s
             MN::ReactiveCurrentPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsVoltagePhaseC::Id: { // type is int16u
             MN::RmsVoltagePhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsVoltageMinPhaseC::Id: { // type is int16u
             MN::RmsVoltageMinPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsVoltageMaxPhaseC::Id: { // type is int16u
             MN::RmsVoltageMaxPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsCurrentPhaseC::Id: { // type is int16u
             MN::RmsCurrentPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsCurrentMinPhaseC::Id: { // type is int16u
             MN::RmsCurrentMinPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsCurrentMaxPhaseC::Id: { // type is int16u
             MN::RmsCurrentMaxPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ActivePowerPhaseC::Id: { // type is int16s
             MN::ActivePowerPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ActivePowerMinPhaseC::Id: { // type is int16s
             MN::ActivePowerMinPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ActivePowerMaxPhaseC::Id: { // type is int16s
             MN::ActivePowerMaxPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ReactivePowerPhaseC::Id: { // type is int16s
             MN::ReactivePowerPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ApparentPowerPhaseC::Id: { // type is int16u
             MN::ApparentPowerPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::PowerFactorPhaseC::Id: { // type is int8s
             MN::PowerFactorPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AverageRmsVoltageMeasurementPeriodPhaseC::Id: { // type is int16u
             MN::AverageRmsVoltageMeasurementPeriodPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AverageRmsOverVoltageCounterPhaseC::Id: { // type is int16u
             MN::AverageRmsOverVoltageCounterPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::AverageRmsUnderVoltageCounterPhaseC::Id: { // type is int16u
             MN::AverageRmsUnderVoltageCounterPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsExtremeOverVoltagePeriodPhaseC::Id: { // type is int16u
             MN::RmsExtremeOverVoltagePeriodPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsExtremeUnderVoltagePeriodPhaseC::Id: { // type is int16u
             MN::RmsExtremeUnderVoltagePeriodPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsVoltageSagPeriodPhaseC::Id: { // type is int16u
             MN::RmsVoltageSagPeriodPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::RmsVoltageSwellPeriodPhaseC::Id: { // type is int16u
             MN::RmsVoltageSwellPeriodPhaseC::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::FeatureMap::Id: { // type is bitmap32
             MN::FeatureMap::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         case MN::ClusterRevision::Id: { // type is int16u
             MN::ClusterRevision::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
+            break;
         }
         }
     } catch (const std::out_of_range& e) {

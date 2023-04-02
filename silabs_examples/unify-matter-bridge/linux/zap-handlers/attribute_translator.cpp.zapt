@@ -75,6 +75,7 @@ CHIP_ERROR
       if(attribute_state_cache::get_instance().get(atr_path,value)) {
         return aEncoder.Encode(value);
       }
+      break;
     }
     {{/if_is_struct}}
     {{/zcl_attributes_server}}

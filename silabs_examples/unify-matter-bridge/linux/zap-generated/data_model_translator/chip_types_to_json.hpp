@@ -107,30 +107,30 @@ nlohmann::json inline to_json(const chip::app::Clusters::Identify::IdentifyIdent
 /***************************** Bitmap Converter FIXME**************/
 
 template <>
-nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Groups::GroupClusterFeature>& value)
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Groups::GroupsFeature>& value)
 {
     using namespace chip::app::Clusters::Groups;
     nlohmann::json obj;
-    obj["GroupNames"] = static_cast<bool>(value.GetField(GroupClusterFeature::kGroupNames));
+    obj["GroupNames"] = static_cast<bool>(value.GetField(GroupsFeature::kGroupNames));
     return obj;
 }
 
 /***************************** Bitmap Converter FIXME**************/
 
 template <>
-nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Scenes::SceneFeatures>& value)
-{
-    using namespace chip::app::Clusters::Scenes;
-    nlohmann::json obj;
-    obj["SceneNames"] = static_cast<bool>(value.GetField(SceneFeatures::kSceneNames));
-    return obj;
-}
-template <>
 nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Scenes::ScenesCopyMode>& value)
 {
     using namespace chip::app::Clusters::Scenes;
     nlohmann::json obj;
     obj["CopyAllScenes"] = static_cast<bool>(value.GetField(ScenesCopyMode::kCopyAllScenes));
+    return obj;
+}
+template <>
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Scenes::ScenesFeature>& value)
+{
+    using namespace chip::app::Clusters::Scenes;
+    nlohmann::json obj;
+    obj["SceneNames"] = static_cast<bool>(value.GetField(ScenesFeature::kSceneNames));
     return obj;
 }
 
@@ -1273,11 +1273,11 @@ nlohmann::json inline to_json(const chip::app::Clusters::IlluminanceMeasurement:
 /***************************** Bitmap Converter FIXME**************/
 
 template <>
-nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::PressureMeasurement::PressureFeature>& value)
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::PressureMeasurement::PressureMeasurementFeature>& value)
 {
     using namespace chip::app::Clusters::PressureMeasurement;
     nlohmann::json obj;
-    obj["Extended"] = static_cast<bool>(value.GetField(PressureFeature::kExtended));
+    obj["Extended"] = static_cast<bool>(value.GetField(PressureMeasurementFeature::kExtended));
     return obj;
 }
 
