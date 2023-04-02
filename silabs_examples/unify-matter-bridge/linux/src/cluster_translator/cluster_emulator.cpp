@@ -115,6 +115,13 @@ ClusterEmulator::ClusterEmulator()
 
 uint32_t ClusterEmulator::read_cluster_revision(const ConcreteReadAttributePath & aPath) const
 {
+    sl_log_debug(LOG_TAG, "Reading Cluster Revision for cluster %d", aPath.mClusterId);
+    switch (aPath.mClusterId)
+    {
+    case TemperatureMeasurement::Id: {
+                                       return 4;
+                                     }
+    }
     if (zap_cluster_revisions.count(aPath.mClusterId))
     {
         return zap_cluster_revisions.at(aPath.mClusterId);

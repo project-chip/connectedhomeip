@@ -151,24 +151,6 @@ client cluster Binding = 30 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster Binding = 30 {
-  fabric_scoped struct TargetStruct {
-    optional node_id node = 1;
-    optional group_id group = 2;
-    optional endpoint_no endpoint = 3;
-    optional cluster_id cluster = 4;
-    fabric_idx fabricIndex = 254;
-  }
-
-  attribute TargetStruct binding[] = 0;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 client cluster AccessControl = 31 {
   enum AccessControlEntryAuthModeEnum : ENUM8 {
     kPase = 1;
@@ -1074,9 +1056,6 @@ endpoint 0 {
     callback attribute attributeList;
     ram      attribute featureMap;
     callback attribute clusterRevision default = 1;
-  }
-
-  server cluster Binding {
   }
 
   server cluster AccessControl {

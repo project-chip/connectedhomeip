@@ -51,7 +51,7 @@ using namespace chip::DeviceLayer;
 
 using namespace unify::matter_bridge;
 
-#define CMAKE_PROJECT_VERSION "1.0"
+#define CMAKE_PROJECT_VERSION "1.1"
 
 constexpr const char * LOG_TAG = "unify_matter_bridge";
 

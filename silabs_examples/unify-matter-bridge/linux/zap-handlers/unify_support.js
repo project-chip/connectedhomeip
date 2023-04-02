@@ -58,7 +58,8 @@ function unifyEnumValName(n) {
   if(unify.model.enums.hasOwnProperty(name)) {
     return unify.model.enums[name][n.index]
   } else {
-    return n.label + " FIXME"
+    console.log("--->  Enum " + name + " was not mapped, make sure that this is ok " );
+    return n.label
   }
 }
 
@@ -67,7 +68,8 @@ function unifyBitmapValName(n) {
   if(unify.model.bitmaps.hasOwnProperty(name)) {
     return unify.model.bitmaps[name][n.mask]
   } else {
-    return n.label + " FIXME"
+    console.log("---> Bitmap " + name + " was not mapped, make sure that this is ok " );
+    return n.label
   }
 }
 

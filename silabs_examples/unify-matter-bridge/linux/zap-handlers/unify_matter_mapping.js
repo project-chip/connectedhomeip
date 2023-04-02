@@ -8,6 +8,8 @@ const bitmaps_unify_to_matter = {
     "BatteryAlarmMask" : "BatteryAlarmMask",
     "BatteryAlarmState" : "",  // FIXME
     "CCColorOptions" : "ColorControlOptions",
+    "CCStepMode": "SaturationStepMode",
+    "CCMoveMode": "SaturationMoveMode",
     "ColorControlColorCapabilities" : "ColorCapabilities",
     "ColorLoopSetUpdateFlags" : "ColorLoopUpdateFlags",
     "CopySceneMode" : "ScenesCopyMode",
@@ -16,13 +18,13 @@ const bitmaps_unify_to_matter = {
     "DoorLockDefaultConfigurationRegister" : "DlDefaultConfigurationRegister",
     "DoorLockKeypadOperationEventMask" : "DlKeypadOperationEventMask",
     "DoorLockKeypadProgrammingEventMask" : "DlKeypadProgrammingEventMask",
-    "DoorLockManualOperationEventMask" : "",  // FIXME: DoorLockOperationEventCode is Enum in Matter
+    "DoorLockManualOperationEventMask" : "DlManualOperationEventMask",
     "DoorLockRFIDOperationEventMask" : "DlRFIDOperationEventMask",
     "DoorLockRFIDProgrammingEventMask" : "DlRFIDProgrammingEventMask",
     "DoorLockRFOperationEventMask" : "DlRemoteOperationEventMask",
     "DoorLockRFProgrammingEventMask" : "DlRemoteProgrammingEventMask",
-    "DoorLockSupportedOperatingModes" : "",  //FIXME: DoorLockOperatingMode is Enum in Matter
-    "DrlkDaysMask" : "DlDaysMaskMap",
+    "DoorLockSupportedOperatingModes" : "DlSupportedOperatingModes",
+    "DrlkDaysMask" : "DaysMaskMap",
     "ElectricalMeasurementACAlarmsMask" : "",  // FIXME
     "ElectricalMeasurementDCOverloadAlarmsMask" : "",  // FIXME
     "ElectricalMeasurementMeasurementType" : "",  // FIXME
@@ -31,7 +33,7 @@ const bitmaps_unify_to_matter = {
     "ImageBlockRequestFieldControl" : "",  // Not used
     "ImagePageRequestFieldControl" : "",  // Not used
     "LevelOptions" : "LevelControlOptions",
-    "OccupancySensingOccupancy" : "Occupancy",
+    "OccupancySensingOccupancy" : "OccupancyBitmap",
     "OccupancySensingOccupancySensorTypeBitmap" : "OccupancySensorTypeBitmap",
     "OnWithTimedOffOnOffControl" : "OnOffControl",
     "PowerConfigurationMainsAlarmMask" : "MainsAlarmMask",
@@ -69,7 +71,8 @@ const bitmaps_unify_to_matter = {
     "map64" : "",  // FIXME
     "map8" : "",  // FIXME
 }
-var bitmaps_matter_to_unify = {} // Leave this empty, will be filled by unify_bitmap_name function
+var bitmaps_matter_to_unify = {
+} // Leave this empty, will be filled by unify_bitmap_name function
 
 
 const enums_unify_to_matter = {
@@ -99,7 +102,7 @@ const enums_unify_to_matter = {
     "DehumidificationControlDehumidificationLockout" : "DehumidifcationLockout",
     "DehumidificationControlRelativeHumidityDisplay" : "RelativeHumidityDisplay",
     "DehumidificationControlRelativeHumidityMode" : "RelativeHumidityMode",
-    "DoorLockDoorState" : "DlDoorState",
+    "DoorLockDoorState" : "DoorStateEnum",
     "DoorLockLEDSettings" : "",  // FIXME
     "DoorLockLockState" : "DlLockState",
     "DoorLockLockType" : "DlLockType",
@@ -112,7 +115,7 @@ const enums_unify_to_matter = {
     "DrlkSettableUserStatus" : "",  // FIXME
     "DrlkUserStatus" : "DoorLockUserStatus",
     "DrlkUserType" : "DoorLockUserType",
-    "FanControlFanMode" : "FanMode",
+    "FanControlFanMode" : "FanModeType",
     "FanControlFanModeSequence" : "FanModeSequence",
     "GetLogRecordResponseEventType" : "DoorLockEventType",
     "GetMeasurementProfileResponseStatus" : "",  // FIXME
@@ -135,7 +138,7 @@ const enums_unify_to_matter = {
     "OTAUpgradeImageUpgradeStatus" : "",  // Not used
     "OTAUpgradeUpgradeActivationPolicy" : "",  // Not used
     "OTAUpgradeUpgradeTimeoutPolicy" : "",  // Not used
-    "OccupancySensingOccupancySensorType" : "OccupancySensorType",
+    "OccupancySensingOccupancySensorType" : "OccupancySensorTypeEnum",
     "OffWithEffectEffectIdentifier" : "OnOffEffectIdentifier",
     "OnOffStartUpOnOff" : "OnOffStartUpOnOff",
     "OperatingEventNotificationOperationEventCode" : "DoorLockOperationEventCode",
@@ -217,6 +220,9 @@ function matter_bitmap_name(unify_bitmap_name) {
 
 // Get Unify enum name from Matter enum name
 function unify_enum_name(matter_enum_name) {
+    if(matter_enum_name == "SaturationMoveMode") return "CCMoveMode";
+    if(matter_enum_name == "SaturationStepMode") return "CCStepMode";
+
     // Check bitmaps_matter_to_unify is initialized or initialize it
     if (Object.keys(enums_matter_to_unify).length == 0) {
         for (const key in enums_unify_to_matter) {

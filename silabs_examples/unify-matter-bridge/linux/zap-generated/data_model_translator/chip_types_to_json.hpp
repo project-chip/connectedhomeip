@@ -89,17 +89,17 @@ nlohmann::json inline to_json(const chip::app::Clusters::Identify::IdentifyIdent
     using namespace chip::app::Clusters::Identify;
     switch (value) {
     case IdentifyIdentifyType::kNone:
-        return "None FIXME";
+        return "None";
     case IdentifyIdentifyType::kVisibleLight:
-        return "VisibleLight FIXME";
+        return "VisibleLight";
     case IdentifyIdentifyType::kVisibleLED:
-        return "VisibleLED FIXME";
+        return "VisibleLED";
     case IdentifyIdentifyType::kAudibleBeep:
-        return "AudibleBeep FIXME";
+        return "AudibleBeep";
     case IdentifyIdentifyType::kDisplay:
-        return "Display FIXME";
+        return "Display";
     case IdentifyIdentifyType::kActuator:
-        return "Actuator FIXME";
+        return "Actuator";
     default:
         return "{}";
     }
@@ -111,7 +111,7 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Groups::G
 {
     using namespace chip::app::Clusters::Groups;
     nlohmann::json obj;
-    obj["GroupNames FIXME"] = static_cast<bool>(value.GetField(GroupClusterFeature::kGroupNames));
+    obj["GroupNames"] = static_cast<bool>(value.GetField(GroupClusterFeature::kGroupNames));
     return obj;
 }
 
@@ -122,7 +122,7 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Scenes::S
 {
     using namespace chip::app::Clusters::Scenes;
     nlohmann::json obj;
-    obj["SceneNames FIXME"] = static_cast<bool>(value.GetField(SceneFeatures::kSceneNames));
+    obj["SceneNames"] = static_cast<bool>(value.GetField(SceneFeatures::kSceneNames));
     return obj;
 }
 template <>
@@ -149,7 +149,7 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::OnOff::On
 {
     using namespace chip::app::Clusters::OnOff;
     nlohmann::json obj;
-    obj["Lighting FIXME"] = static_cast<bool>(value.GetField(OnOffFeature::kLighting));
+    obj["Lighting"] = static_cast<bool>(value.GetField(OnOffFeature::kLighting));
     return obj;
 }
 
@@ -165,7 +165,7 @@ nlohmann::json inline to_json(const chip::app::Clusters::OnOff::OnOffDyingLightE
     using namespace chip::app::Clusters::OnOff;
     switch (value) {
     case OnOffDyingLightEffectVariant::k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second:
-        return "20PercenterDimUpIn_0p5SecondsThenFadeToOffIn_1Second FIXME";
+        return "20PercenterDimUpIn_0p5SecondsThenFadeToOffIn_1Second";
     default:
         return "{}";
     }
@@ -205,9 +205,9 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::LevelCont
 {
     using namespace chip::app::Clusters::LevelControl;
     nlohmann::json obj;
-    obj["OnOff FIXME"] = static_cast<bool>(value.GetField(LevelControlFeature::kOnOff));
-    obj["Lighting FIXME"] = static_cast<bool>(value.GetField(LevelControlFeature::kLighting));
-    obj["Frequency FIXME"] = static_cast<bool>(value.GetField(LevelControlFeature::kFrequency));
+    obj["OnOff"] = static_cast<bool>(value.GetField(LevelControlFeature::kOnOff));
+    obj["Lighting"] = static_cast<bool>(value.GetField(LevelControlFeature::kLighting));
+    obj["Frequency"] = static_cast<bool>(value.GetField(LevelControlFeature::kFrequency));
     return obj;
 }
 template <>
@@ -253,13 +253,13 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::DoorLock:
 {
     using namespace chip::app::Clusters::DoorLock;
     nlohmann::json obj;
-    obj["Sunday FIXME"] = static_cast<bool>(value.GetField(DaysMaskMap::kSunday));
-    obj["Monday FIXME"] = static_cast<bool>(value.GetField(DaysMaskMap::kMonday));
-    obj["Tuesday FIXME"] = static_cast<bool>(value.GetField(DaysMaskMap::kTuesday));
-    obj["Wednesday FIXME"] = static_cast<bool>(value.GetField(DaysMaskMap::kWednesday));
-    obj["Thursday FIXME"] = static_cast<bool>(value.GetField(DaysMaskMap::kThursday));
-    obj["Friday FIXME"] = static_cast<bool>(value.GetField(DaysMaskMap::kFriday));
-    obj["Saturday FIXME"] = static_cast<bool>(value.GetField(DaysMaskMap::kSaturday));
+    obj["Sun"] = static_cast<bool>(value.GetField(DaysMaskMap::kSunday));
+    obj["Mon"] = static_cast<bool>(value.GetField(DaysMaskMap::kMonday));
+    obj["Tue"] = static_cast<bool>(value.GetField(DaysMaskMap::kTuesday));
+    obj["Wed"] = static_cast<bool>(value.GetField(DaysMaskMap::kWednesday));
+    obj["Thu"] = static_cast<bool>(value.GetField(DaysMaskMap::kThursday));
+    obj["Fri"] = static_cast<bool>(value.GetField(DaysMaskMap::kFriday));
+    obj["Sat"] = static_cast<bool>(value.GetField(DaysMaskMap::kSaturday));
     return obj;
 }
 template <>
@@ -267,9 +267,9 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::DoorLock:
 {
     using namespace chip::app::Clusters::DoorLock;
     nlohmann::json obj;
-    obj["Single FIXME"] = static_cast<bool>(value.GetField(DlCredentialRuleMask::kSingle));
-    obj["Dual FIXME"] = static_cast<bool>(value.GetField(DlCredentialRuleMask::kDual));
-    obj["Tri FIXME"] = static_cast<bool>(value.GetField(DlCredentialRuleMask::kTri));
+    obj["Single"] = static_cast<bool>(value.GetField(DlCredentialRuleMask::kSingle));
+    obj["Dual"] = static_cast<bool>(value.GetField(DlCredentialRuleMask::kDual));
+    obj["Tri"] = static_cast<bool>(value.GetField(DlCredentialRuleMask::kTri));
     return obj;
 }
 template <>
@@ -277,9 +277,9 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::DoorLock:
 {
     using namespace chip::app::Clusters::DoorLock;
     nlohmann::json obj;
-    obj["Single FIXME"] = static_cast<bool>(value.GetField(DlCredentialRulesSupport::kSingle));
-    obj["Dual FIXME"] = static_cast<bool>(value.GetField(DlCredentialRulesSupport::kDual));
-    obj["Tri FIXME"] = static_cast<bool>(value.GetField(DlCredentialRulesSupport::kTri));
+    obj["Single"] = static_cast<bool>(value.GetField(DlCredentialRulesSupport::kSingle));
+    obj["Dual"] = static_cast<bool>(value.GetField(DlCredentialRulesSupport::kDual));
+    obj["Tri"] = static_cast<bool>(value.GetField(DlCredentialRulesSupport::kTri));
     return obj;
 }
 template <>
@@ -327,10 +327,10 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::DoorLock:
 {
     using namespace chip::app::Clusters::DoorLock;
     nlohmann::json obj;
-    obj["AddUsersCredentialsSchedulesLocally FIXME"] = static_cast<bool>(value.GetField(DlLocalProgrammingFeatures::kAddUsersCredentialsSchedulesLocally));
-    obj["ModifyUsersCredentialsSchedulesLocally FIXME"] = static_cast<bool>(value.GetField(DlLocalProgrammingFeatures::kModifyUsersCredentialsSchedulesLocally));
-    obj["ClearUsersCredentialsSchedulesLocally FIXME"] = static_cast<bool>(value.GetField(DlLocalProgrammingFeatures::kClearUsersCredentialsSchedulesLocally));
-    obj["AdjustLockSettingsLocally FIXME"] = static_cast<bool>(value.GetField(DlLocalProgrammingFeatures::kAdjustLockSettingsLocally));
+    obj["AddUsersCredentialsSchedulesLocally"] = static_cast<bool>(value.GetField(DlLocalProgrammingFeatures::kAddUsersCredentialsSchedulesLocally));
+    obj["ModifyUsersCredentialsSchedulesLocally"] = static_cast<bool>(value.GetField(DlLocalProgrammingFeatures::kModifyUsersCredentialsSchedulesLocally));
+    obj["ClearUsersCredentialsSchedulesLocally"] = static_cast<bool>(value.GetField(DlLocalProgrammingFeatures::kClearUsersCredentialsSchedulesLocally));
+    obj["AdjustLockSettingsLocally"] = static_cast<bool>(value.GetField(DlLocalProgrammingFeatures::kAdjustLockSettingsLocally));
     return obj;
 }
 template <>
@@ -338,17 +338,17 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::DoorLock:
 {
     using namespace chip::app::Clusters::DoorLock;
     nlohmann::json obj;
-    obj["Unknown FIXME"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kUnknown));
-    obj["ThumbturnLock FIXME"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kThumbturnLock));
-    obj["ThumbturnUnlock FIXME"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kThumbturnUnlock));
-    obj["OneTouchLock FIXME"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kOneTouchLock));
-    obj["KeyLock FIXME"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kKeyLock));
-    obj["KeyUnlock FIXME"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kKeyUnlock));
-    obj["AutoLock FIXME"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kAutoLock));
-    obj["ScheduleLock FIXME"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kScheduleLock));
-    obj["ScheduleUnlock FIXME"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kScheduleUnlock));
-    obj["ManualLock FIXME"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kManualLock));
-    obj["ManualUnlock FIXME"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kManualUnlock));
+    obj["ManualOpUnknownOrMS"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kUnknown));
+    obj["ManualOpThumbturnLock"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kThumbturnLock));
+    obj["ManualOpThumbturnUnlock"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kThumbturnUnlock));
+    obj["ManualOpOneTouchLock"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kOneTouchLock));
+    obj["ManualOpKeyLock"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kKeyLock));
+    obj["ManualOpKeyUnlock"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kKeyUnlock));
+    obj["ManualOpAutoLock"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kAutoLock));
+    obj["ManualOpScheduleLock"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kScheduleLock));
+    obj["ManualOpScheduleUnlock"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kScheduleUnlock));
+    obj["ManualOpLock"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kManualLock));
+    obj["ManualOpUnlock"] = static_cast<bool>(value.GetField(DlManualOperationEventMask::kManualUnlock));
     return obj;
 }
 template <>
@@ -408,11 +408,11 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::DoorLock:
 {
     using namespace chip::app::Clusters::DoorLock;
     nlohmann::json obj;
-    obj["Normal FIXME"] = static_cast<bool>(value.GetField(DlSupportedOperatingModes::kNormal));
-    obj["Vacation FIXME"] = static_cast<bool>(value.GetField(DlSupportedOperatingModes::kVacation));
-    obj["Privacy FIXME"] = static_cast<bool>(value.GetField(DlSupportedOperatingModes::kPrivacy));
-    obj["NoRemoteLockUnlock FIXME"] = static_cast<bool>(value.GetField(DlSupportedOperatingModes::kNoRemoteLockUnlock));
-    obj["Passage FIXME"] = static_cast<bool>(value.GetField(DlSupportedOperatingModes::kPassage));
+    obj["NormalModeSupported"] = static_cast<bool>(value.GetField(DlSupportedOperatingModes::kNormal));
+    obj["VacationModeSupported"] = static_cast<bool>(value.GetField(DlSupportedOperatingModes::kVacation));
+    obj["PrivacyModeSupported"] = static_cast<bool>(value.GetField(DlSupportedOperatingModes::kPrivacy));
+    obj["NoRFLockOrUnlockModeSupported"] = static_cast<bool>(value.GetField(DlSupportedOperatingModes::kNoRemoteLockUnlock));
+    obj["PassageModeSupported"] = static_cast<bool>(value.GetField(DlSupportedOperatingModes::kPassage));
     return obj;
 }
 template <>
@@ -420,13 +420,13 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::DoorLock:
 {
     using namespace chip::app::Clusters::DoorLock;
     nlohmann::json obj;
-    obj["Sunday FIXME"] = static_cast<bool>(value.GetField(DoorLockDayOfWeek::kSunday));
-    obj["Monday FIXME"] = static_cast<bool>(value.GetField(DoorLockDayOfWeek::kMonday));
-    obj["Tuesday FIXME"] = static_cast<bool>(value.GetField(DoorLockDayOfWeek::kTuesday));
-    obj["Wednesday FIXME"] = static_cast<bool>(value.GetField(DoorLockDayOfWeek::kWednesday));
-    obj["Thursday FIXME"] = static_cast<bool>(value.GetField(DoorLockDayOfWeek::kThursday));
-    obj["Friday FIXME"] = static_cast<bool>(value.GetField(DoorLockDayOfWeek::kFriday));
-    obj["Saturday FIXME"] = static_cast<bool>(value.GetField(DoorLockDayOfWeek::kSaturday));
+    obj["Sunday"] = static_cast<bool>(value.GetField(DoorLockDayOfWeek::kSunday));
+    obj["Monday"] = static_cast<bool>(value.GetField(DoorLockDayOfWeek::kMonday));
+    obj["Tuesday"] = static_cast<bool>(value.GetField(DoorLockDayOfWeek::kTuesday));
+    obj["Wednesday"] = static_cast<bool>(value.GetField(DoorLockDayOfWeek::kWednesday));
+    obj["Thursday"] = static_cast<bool>(value.GetField(DoorLockDayOfWeek::kThursday));
+    obj["Friday"] = static_cast<bool>(value.GetField(DoorLockDayOfWeek::kFriday));
+    obj["Saturday"] = static_cast<bool>(value.GetField(DoorLockDayOfWeek::kSaturday));
     return obj;
 }
 template <>
@@ -434,18 +434,18 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::DoorLock:
 {
     using namespace chip::app::Clusters::DoorLock;
     nlohmann::json obj;
-    obj["PIN Credential FIXME"] = static_cast<bool>(value.GetField(DoorLockFeature::kPinCredential));
-    obj["RFID Credential FIXME"] = static_cast<bool>(value.GetField(DoorLockFeature::kRfidCredential));
-    obj["Finger Credentials FIXME"] = static_cast<bool>(value.GetField(DoorLockFeature::kFingerCredentials));
-    obj["Logging FIXME"] = static_cast<bool>(value.GetField(DoorLockFeature::kLogging));
-    obj["Week Day Access Schedules FIXME"] = static_cast<bool>(value.GetField(DoorLockFeature::kWeekDayAccessSchedules));
-    obj["Door Position Sensor FIXME"] = static_cast<bool>(value.GetField(DoorLockFeature::kDoorPositionSensor));
-    obj["Face Credentials FIXME"] = static_cast<bool>(value.GetField(DoorLockFeature::kFaceCredentials));
-    obj["Credentials Over-the-Air Access FIXME"] = static_cast<bool>(value.GetField(DoorLockFeature::kCredentialsOverTheAirAccess));
-    obj["User FIXME"] = static_cast<bool>(value.GetField(DoorLockFeature::kUser));
-    obj["Notification FIXME"] = static_cast<bool>(value.GetField(DoorLockFeature::kNotification));
-    obj["Year Day Access Schedules FIXME"] = static_cast<bool>(value.GetField(DoorLockFeature::kYearDayAccessSchedules));
-    obj["Holiday Schedules FIXME"] = static_cast<bool>(value.GetField(DoorLockFeature::kHolidaySchedules));
+    obj["PIN Credential"] = static_cast<bool>(value.GetField(DoorLockFeature::kPinCredential));
+    obj["RFID Credential"] = static_cast<bool>(value.GetField(DoorLockFeature::kRfidCredential));
+    obj["Finger Credentials"] = static_cast<bool>(value.GetField(DoorLockFeature::kFingerCredentials));
+    obj["Logging"] = static_cast<bool>(value.GetField(DoorLockFeature::kLogging));
+    obj["Week Day Access Schedules"] = static_cast<bool>(value.GetField(DoorLockFeature::kWeekDayAccessSchedules));
+    obj["Door Position Sensor"] = static_cast<bool>(value.GetField(DoorLockFeature::kDoorPositionSensor));
+    obj["Face Credentials"] = static_cast<bool>(value.GetField(DoorLockFeature::kFaceCredentials));
+    obj["Credentials Over-the-Air Access"] = static_cast<bool>(value.GetField(DoorLockFeature::kCredentialsOverTheAirAccess));
+    obj["User"] = static_cast<bool>(value.GetField(DoorLockFeature::kUser));
+    obj["Notification"] = static_cast<bool>(value.GetField(DoorLockFeature::kNotification));
+    obj["Year Day Access Schedules"] = static_cast<bool>(value.GetField(DoorLockFeature::kYearDayAccessSchedules));
+    obj["Holiday Schedules"] = static_cast<bool>(value.GetField(DoorLockFeature::kHolidaySchedules));
     return obj;
 }
 
@@ -455,21 +455,21 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::AlarmCodeEnum
     using namespace chip::app::Clusters::DoorLock;
     switch (value) {
     case AlarmCodeEnum::kLockJammed:
-        return "LockJammed FIXME";
+        return "LockJammed";
     case AlarmCodeEnum::kLockFactoryReset:
-        return "LockFactoryReset FIXME";
+        return "LockFactoryReset";
     case AlarmCodeEnum::kLockRadioPowerCycled:
-        return "LockRadioPowerCycled FIXME";
+        return "LockRadioPowerCycled";
     case AlarmCodeEnum::kWrongCodeEntryLimit:
-        return "WrongCodeEntryLimit FIXME";
+        return "WrongCodeEntryLimit";
     case AlarmCodeEnum::kFrontEsceutcheonRemoved:
-        return "FrontEsceutcheonRemoved FIXME";
+        return "FrontEsceutcheonRemoved";
     case AlarmCodeEnum::kDoorForcedOpen:
-        return "DoorForcedOpen FIXME";
+        return "DoorForcedOpen";
     case AlarmCodeEnum::kDoorAjar:
-        return "DoorAjar FIXME";
+        return "DoorAjar";
     case AlarmCodeEnum::kForcedUser:
-        return "ForcedUser FIXME";
+        return "ForcedUser";
     default:
         return "{}";
     }
@@ -480,11 +480,11 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::CredentialRul
     using namespace chip::app::Clusters::DoorLock;
     switch (value) {
     case CredentialRuleEnum::kSingle:
-        return "Single FIXME";
+        return "Single";
     case CredentialRuleEnum::kDual:
-        return "Dual FIXME";
+        return "Dual";
     case CredentialRuleEnum::kTri:
-        return "Tri FIXME";
+        return "Tri";
     default:
         return "{}";
     }
@@ -495,17 +495,17 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::CredentialTyp
     using namespace chip::app::Clusters::DoorLock;
     switch (value) {
     case CredentialTypeEnum::kProgrammingPIN:
-        return "ProgrammingPIN FIXME";
+        return "ProgrammingPIN";
     case CredentialTypeEnum::kPin:
-        return "PIN FIXME";
+        return "PIN";
     case CredentialTypeEnum::kRfid:
-        return "RFID FIXME";
+        return "RFID";
     case CredentialTypeEnum::kFingerprint:
-        return "Fingerprint FIXME";
+        return "Fingerprint";
     case CredentialTypeEnum::kFingerVein:
-        return "FingerVein FIXME";
+        return "FingerVein";
     case CredentialTypeEnum::kFace:
-        return "Face FIXME";
+        return "Face";
     default:
         return "{}";
     }
@@ -516,11 +516,11 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::DataOperation
     using namespace chip::app::Clusters::DoorLock;
     switch (value) {
     case DataOperationTypeEnum::kAdd:
-        return "Add FIXME";
+        return "Add";
     case DataOperationTypeEnum::kClear:
-        return "Clear FIXME";
+        return "Clear";
     case DataOperationTypeEnum::kModify:
-        return "Modify FIXME";
+        return "Modify";
     default:
         return "{}";
     }
@@ -577,19 +577,19 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::DlStatus& val
     using namespace chip::app::Clusters::DoorLock;
     switch (value) {
     case DlStatus::kSuccess:
-        return "Success FIXME";
+        return "Success";
     case DlStatus::kFailure:
-        return "Failure FIXME";
+        return "Failure";
     case DlStatus::kDuplicate:
-        return "Duplicate FIXME";
+        return "Duplicate";
     case DlStatus::kOccupied:
-        return "Occupied FIXME";
+        return "Occupied";
     case DlStatus::kInvalidField:
-        return "InvalidField FIXME";
+        return "InvalidField";
     case DlStatus::kResourceExhausted:
-        return "ResourceExhausted FIXME";
+        return "ResourceExhausted";
     case DlStatus::kNotFound:
-        return "NotFound FIXME";
+        return "NotFound";
     default:
         return "{}";
     }
@@ -717,17 +717,17 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::DoorStateEnum
     using namespace chip::app::Clusters::DoorLock;
     switch (value) {
     case DoorStateEnum::kDoorOpen:
-        return "DoorOpen FIXME";
+        return "Open";
     case DoorStateEnum::kDoorClosed:
-        return "DoorClosed FIXME";
+        return "Closed";
     case DoorStateEnum::kDoorJammed:
-        return "DoorJammed FIXME";
+        return "ErrorJammed";
     case DoorStateEnum::kDoorForcedOpen:
-        return "DoorForcedOpen FIXME";
+        return "ErrorForcedOpen";
     case DoorStateEnum::kDoorUnspecifiedError:
-        return "DoorUnspecifiedError FIXME";
+        return "ErrorUnspecified";
     case DoorStateEnum::kDoorAjar:
-        return "DoorAjar FIXME";
+        return "Undefined";
     default:
         return "{}";
     }
@@ -738,27 +738,27 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::LockDataTypeE
     using namespace chip::app::Clusters::DoorLock;
     switch (value) {
     case LockDataTypeEnum::kUnspecified:
-        return "Unspecified FIXME";
+        return "Unspecified";
     case LockDataTypeEnum::kProgrammingCode:
-        return "ProgrammingCode FIXME";
+        return "ProgrammingCode";
     case LockDataTypeEnum::kUserIndex:
-        return "UserIndex FIXME";
+        return "UserIndex";
     case LockDataTypeEnum::kWeekDaySchedule:
-        return "WeekDaySchedule FIXME";
+        return "WeekDaySchedule";
     case LockDataTypeEnum::kYearDaySchedule:
-        return "YearDaySchedule FIXME";
+        return "YearDaySchedule";
     case LockDataTypeEnum::kHolidaySchedule:
-        return "HolidaySchedule FIXME";
+        return "HolidaySchedule";
     case LockDataTypeEnum::kPin:
-        return "PIN FIXME";
+        return "PIN";
     case LockDataTypeEnum::kRfid:
-        return "RFID FIXME";
+        return "RFID";
     case LockDataTypeEnum::kFingerprint:
-        return "Fingerprint FIXME";
+        return "Fingerprint";
     case LockDataTypeEnum::kFingerVein:
-        return "FingerVein FIXME";
+        return "FingerVein";
     case LockDataTypeEnum::kFace:
-        return "Face FIXME";
+        return "Face";
     default:
         return "{}";
     }
@@ -769,13 +769,13 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::LockOperation
     using namespace chip::app::Clusters::DoorLock;
     switch (value) {
     case LockOperationTypeEnum::kLock:
-        return "Lock FIXME";
+        return "Lock";
     case LockOperationTypeEnum::kUnlock:
-        return "Unlock FIXME";
+        return "Unlock";
     case LockOperationTypeEnum::kNonAccessUserEvent:
-        return "NonAccessUserEvent FIXME";
+        return "NonAccessUserEvent";
     case LockOperationTypeEnum::kForcedUserEvent:
-        return "ForcedUserEvent FIXME";
+        return "ForcedUserEvent";
     default:
         return "{}";
     }
@@ -786,15 +786,15 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::OperatingMode
     using namespace chip::app::Clusters::DoorLock;
     switch (value) {
     case OperatingModeEnum::kNormal:
-        return "Normal FIXME";
+        return "Normal";
     case OperatingModeEnum::kVacation:
-        return "Vacation FIXME";
+        return "Vacation";
     case OperatingModeEnum::kPrivacy:
-        return "Privacy FIXME";
+        return "Privacy";
     case OperatingModeEnum::kNoRemoteLockUnlock:
-        return "NoRemoteLockUnlock FIXME";
+        return "NoRemoteLockUnlock";
     case OperatingModeEnum::kPassage:
-        return "Passage FIXME";
+        return "Passage";
     default:
         return "{}";
     }
@@ -805,15 +805,15 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::OperationErro
     using namespace chip::app::Clusters::DoorLock;
     switch (value) {
     case OperationErrorEnum::kUnspecified:
-        return "Unspecified FIXME";
+        return "Unspecified";
     case OperationErrorEnum::kInvalidCredential:
-        return "InvalidCredential FIXME";
+        return "InvalidCredential";
     case OperationErrorEnum::kDisabledUserDenied:
-        return "DisabledUserDenied FIXME";
+        return "DisabledUserDenied";
     case OperationErrorEnum::kRestricted:
-        return "Restricted FIXME";
+        return "Restricted";
     case OperationErrorEnum::kInsufficientBattery:
-        return "InsufficientBattery FIXME";
+        return "InsufficientBattery";
     default:
         return "{}";
     }
@@ -824,25 +824,25 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::OperationSour
     using namespace chip::app::Clusters::DoorLock;
     switch (value) {
     case OperationSourceEnum::kUnspecified:
-        return "Unspecified FIXME";
+        return "Unspecified";
     case OperationSourceEnum::kManual:
-        return "Manual FIXME";
+        return "Manual";
     case OperationSourceEnum::kProprietaryRemote:
-        return "ProprietaryRemote FIXME";
+        return "ProprietaryRemote";
     case OperationSourceEnum::kKeypad:
-        return "Keypad FIXME";
+        return "Keypad";
     case OperationSourceEnum::kAuto:
-        return "Auto FIXME";
+        return "Auto";
     case OperationSourceEnum::kButton:
-        return "Button FIXME";
+        return "Button";
     case OperationSourceEnum::kSchedule:
-        return "Schedule FIXME";
+        return "Schedule";
     case OperationSourceEnum::kRemote:
-        return "Remote FIXME";
+        return "Remote";
     case OperationSourceEnum::kRfid:
-        return "RFID FIXME";
+        return "RFID";
     case OperationSourceEnum::kBiometric:
-        return "Biometric FIXME";
+        return "Biometric";
     default:
         return "{}";
     }
@@ -853,11 +853,11 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::UserStatusEnu
     using namespace chip::app::Clusters::DoorLock;
     switch (value) {
     case UserStatusEnum::kAvailable:
-        return "Available FIXME";
+        return "Available";
     case UserStatusEnum::kOccupiedEnabled:
-        return "OccupiedEnabled FIXME";
+        return "OccupiedEnabled";
     case UserStatusEnum::kOccupiedDisabled:
-        return "OccupiedDisabled FIXME";
+        return "OccupiedDisabled";
     default:
         return "{}";
     }
@@ -868,25 +868,25 @@ nlohmann::json inline to_json(const chip::app::Clusters::DoorLock::UserTypeEnum&
     using namespace chip::app::Clusters::DoorLock;
     switch (value) {
     case UserTypeEnum::kUnrestrictedUser:
-        return "UnrestrictedUser FIXME";
+        return "UnrestrictedUser";
     case UserTypeEnum::kYearDayScheduleUser:
-        return "YearDayScheduleUser FIXME";
+        return "YearDayScheduleUser";
     case UserTypeEnum::kWeekDayScheduleUser:
-        return "WeekDayScheduleUser FIXME";
+        return "WeekDayScheduleUser";
     case UserTypeEnum::kProgrammingUser:
-        return "ProgrammingUser FIXME";
+        return "ProgrammingUser";
     case UserTypeEnum::kNonAccessUser:
-        return "NonAccessUser FIXME";
+        return "NonAccessUser";
     case UserTypeEnum::kForcedUser:
-        return "ForcedUser FIXME";
+        return "ForcedUser";
     case UserTypeEnum::kDisposableUser:
-        return "DisposableUser FIXME";
+        return "DisposableUser";
     case UserTypeEnum::kExpiringUser:
-        return "ExpiringUser FIXME";
+        return "ExpiringUser";
     case UserTypeEnum::kScheduleRestrictedUser:
-        return "ScheduleRestrictedUser FIXME";
+        return "ScheduleRestrictedUser";
     case UserTypeEnum::kRemoteOnlyUser:
-        return "RemoteOnlyUser FIXME";
+        return "RemoteOnlyUser";
     default:
         return "{}";
     }
@@ -924,12 +924,12 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Thermosta
 {
     using namespace chip::app::Clusters::Thermostat;
     nlohmann::json obj;
-    obj["Heating FIXME"] = static_cast<bool>(value.GetField(ThermostatFeature::kHeating));
-    obj["Cooling FIXME"] = static_cast<bool>(value.GetField(ThermostatFeature::kCooling));
-    obj["Occupancy FIXME"] = static_cast<bool>(value.GetField(ThermostatFeature::kOccupancy));
-    obj["ScheduleConfiguration FIXME"] = static_cast<bool>(value.GetField(ThermostatFeature::kScheduleConfiguration));
-    obj["Setback FIXME"] = static_cast<bool>(value.GetField(ThermostatFeature::kSetback));
-    obj["AutoMode FIXME"] = static_cast<bool>(value.GetField(ThermostatFeature::kAutoMode));
+    obj["Heating"] = static_cast<bool>(value.GetField(ThermostatFeature::kHeating));
+    obj["Cooling"] = static_cast<bool>(value.GetField(ThermostatFeature::kCooling));
+    obj["Occupancy"] = static_cast<bool>(value.GetField(ThermostatFeature::kOccupancy));
+    obj["ScheduleConfiguration"] = static_cast<bool>(value.GetField(ThermostatFeature::kScheduleConfiguration));
+    obj["Setback"] = static_cast<bool>(value.GetField(ThermostatFeature::kSetback));
+    obj["AutoMode"] = static_cast<bool>(value.GetField(ThermostatFeature::kAutoMode));
     return obj;
 }
 
@@ -1018,10 +1018,10 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::FanContro
 {
     using namespace chip::app::Clusters::FanControl;
     nlohmann::json obj;
-    obj["Multi-Speed FIXME"] = static_cast<bool>(value.GetField(FanControlFeature::kMultiSpeed));
-    obj["Auto FIXME"] = static_cast<bool>(value.GetField(FanControlFeature::kAuto));
-    obj["Rocking FIXME"] = static_cast<bool>(value.GetField(FanControlFeature::kRocking));
-    obj["Wind FIXME"] = static_cast<bool>(value.GetField(FanControlFeature::kWind));
+    obj["Multi-Speed"] = static_cast<bool>(value.GetField(FanControlFeature::kMultiSpeed));
+    obj["Auto"] = static_cast<bool>(value.GetField(FanControlFeature::kAuto));
+    obj["Rocking"] = static_cast<bool>(value.GetField(FanControlFeature::kRocking));
+    obj["Wind"] = static_cast<bool>(value.GetField(FanControlFeature::kWind));
     return obj;
 }
 template <>
@@ -1029,9 +1029,9 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::FanContro
 {
     using namespace chip::app::Clusters::FanControl;
     nlohmann::json obj;
-    obj["RockLeftRight FIXME"] = static_cast<bool>(value.GetField(RockSupportMask::kRockLeftRight));
-    obj["RockUpDown FIXME"] = static_cast<bool>(value.GetField(RockSupportMask::kRockUpDown));
-    obj["RockRound FIXME"] = static_cast<bool>(value.GetField(RockSupportMask::kRockRound));
+    obj["RockLeftRight"] = static_cast<bool>(value.GetField(RockSupportMask::kRockLeftRight));
+    obj["RockUpDown"] = static_cast<bool>(value.GetField(RockSupportMask::kRockUpDown));
+    obj["RockRound"] = static_cast<bool>(value.GetField(RockSupportMask::kRockRound));
     return obj;
 }
 template <>
@@ -1039,8 +1039,8 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::FanContro
 {
     using namespace chip::app::Clusters::FanControl;
     nlohmann::json obj;
-    obj["Sleep Wind FIXME"] = static_cast<bool>(value.GetField(WindSettingMask::kSleepWind));
-    obj["Natural Wind FIXME"] = static_cast<bool>(value.GetField(WindSettingMask::kNaturalWind));
+    obj["Sleep Wind"] = static_cast<bool>(value.GetField(WindSettingMask::kSleepWind));
+    obj["Natural Wind"] = static_cast<bool>(value.GetField(WindSettingMask::kNaturalWind));
     return obj;
 }
 template <>
@@ -1048,8 +1048,8 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::FanContro
 {
     using namespace chip::app::Clusters::FanControl;
     nlohmann::json obj;
-    obj["Sleep Wind FIXME"] = static_cast<bool>(value.GetField(WindSupportMask::kSleepWind));
-    obj["Natural Wind FIXME"] = static_cast<bool>(value.GetField(WindSupportMask::kNaturalWind));
+    obj["Sleep Wind"] = static_cast<bool>(value.GetField(WindSupportMask::kSleepWind));
+    obj["Natural Wind"] = static_cast<bool>(value.GetField(WindSupportMask::kNaturalWind));
     return obj;
 }
 
@@ -1059,17 +1059,17 @@ nlohmann::json inline to_json(const chip::app::Clusters::FanControl::FanModeSequ
     using namespace chip::app::Clusters::FanControl;
     switch (value) {
     case FanModeSequenceType::kOffLowMedHigh:
-        return "Off/Low/Med/High FIXME";
+        return "Off/Low/Med/High";
     case FanModeSequenceType::kOffLowHigh:
-        return "Off/Low/High FIXME";
+        return "Off/Low/High";
     case FanModeSequenceType::kOffLowMedHighAuto:
-        return "Off/Low/Med/High/Auto FIXME";
+        return "Off/Low/Med/High/Auto";
     case FanModeSequenceType::kOffLowHighAuto:
-        return "Off/Low/High/Auto FIXME";
+        return "Off/Low/High/Auto";
     case FanModeSequenceType::kOffOnAuto:
-        return "Off/On/Auto FIXME";
+        return "Off/On/Auto";
     case FanModeSequenceType::kOffOn:
-        return "Off/On FIXME";
+        return "Off/On";
     default:
         return "{}";
     }
@@ -1080,19 +1080,19 @@ nlohmann::json inline to_json(const chip::app::Clusters::FanControl::FanModeType
     using namespace chip::app::Clusters::FanControl;
     switch (value) {
     case FanModeType::kOff:
-        return "Off FIXME";
+        return "Off";
     case FanModeType::kLow:
-        return "Low FIXME";
+        return "Low";
     case FanModeType::kMedium:
-        return "Medium FIXME";
+        return "Medium";
     case FanModeType::kHigh:
-        return "High FIXME";
+        return "High";
     case FanModeType::kOn:
-        return "On FIXME";
+        return "On";
     case FanModeType::kAuto:
-        return "Auto FIXME";
+        return "Auto";
     case FanModeType::kSmart:
-        return "Smart FIXME";
+        return "Smart";
     default:
         return "{}";
     }
@@ -1118,11 +1118,11 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::ColorCont
 {
     using namespace chip::app::Clusters::ColorControl;
     nlohmann::json obj;
-    obj["HueAndSaturation FIXME"] = static_cast<bool>(value.GetField(ColorControlFeature::kHueAndSaturation));
-    obj["EnhancedHue FIXME"] = static_cast<bool>(value.GetField(ColorControlFeature::kEnhancedHue));
-    obj["ColorLoop FIXME"] = static_cast<bool>(value.GetField(ColorControlFeature::kColorLoop));
-    obj["XY FIXME"] = static_cast<bool>(value.GetField(ColorControlFeature::kXy));
-    obj["ColorTemperature FIXME"] = static_cast<bool>(value.GetField(ColorControlFeature::kColorTemperature));
+    obj["HueAndSaturation"] = static_cast<bool>(value.GetField(ColorControlFeature::kHueAndSaturation));
+    obj["EnhancedHue"] = static_cast<bool>(value.GetField(ColorControlFeature::kEnhancedHue));
+    obj["ColorLoop"] = static_cast<bool>(value.GetField(ColorControlFeature::kColorLoop));
+    obj["XY"] = static_cast<bool>(value.GetField(ColorControlFeature::kXy));
+    obj["ColorTemperature"] = static_cast<bool>(value.GetField(ColorControlFeature::kColorTemperature));
     return obj;
 }
 template <>
@@ -1231,11 +1231,11 @@ nlohmann::json inline to_json(const chip::app::Clusters::ColorControl::Saturatio
     using namespace chip::app::Clusters::ColorControl;
     switch (value) {
     case SaturationMoveMode::kStop:
-        return "Stop FIXME";
+        return "Stop";
     case SaturationMoveMode::kUp:
-        return "Up FIXME";
+        return "Up";
     case SaturationMoveMode::kDown:
-        return "Down FIXME";
+        return "Down";
     default:
         return "{}";
     }
@@ -1246,9 +1246,9 @@ nlohmann::json inline to_json(const chip::app::Clusters::ColorControl::Saturatio
     using namespace chip::app::Clusters::ColorControl;
     switch (value) {
     case SaturationStepMode::kUp:
-        return "Up FIXME";
+        return "Up";
     case SaturationStepMode::kDown:
-        return "Down FIXME";
+        return "Down";
     default:
         return "{}";
     }
@@ -1277,7 +1277,7 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::PressureM
 {
     using namespace chip::app::Clusters::PressureMeasurement;
     nlohmann::json obj;
-    obj["Extended FIXME"] = static_cast<bool>(value.GetField(PressureFeature::kExtended));
+    obj["Extended"] = static_cast<bool>(value.GetField(PressureFeature::kExtended));
     return obj;
 }
 
@@ -1292,7 +1292,7 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::Occupancy
 {
     using namespace chip::app::Clusters::OccupancySensing;
     nlohmann::json obj;
-    obj["Occupied FIXME"] = static_cast<bool>(value.GetField(OccupancyBitmap::kOccupied));
+    obj["SensedOccupancy"] = static_cast<bool>(value.GetField(OccupancyBitmap::kOccupied));
     return obj;
 }
 template <>
@@ -1312,13 +1312,13 @@ nlohmann::json inline to_json(const chip::app::Clusters::OccupancySensing::Occup
     using namespace chip::app::Clusters::OccupancySensing;
     switch (value) {
     case OccupancySensorTypeEnum::kPir:
-        return "PIR FIXME";
+        return "PIR";
     case OccupancySensorTypeEnum::kUltrasonic:
-        return "Ultrasonic FIXME";
+        return "Ultrasonic";
     case OccupancySensorTypeEnum::kPIRAndUltrasonic:
-        return "PIRAndUltrasonic FIXME";
+        return "PIRAndUltrasonic";
     case OccupancySensorTypeEnum::kPhysicalContact:
-        return "PhysicalContact FIXME";
+        return "PhysicalContact";
     default:
         return "{}";
     }

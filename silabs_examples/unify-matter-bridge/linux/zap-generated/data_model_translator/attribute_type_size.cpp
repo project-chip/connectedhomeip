@@ -348,16 +348,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_ENUM8_ATTRIBUTE_TYPES, ZCL_ENUM8_ATTRIBUTE_TYPES_SIZE };
         }
         case Identify::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case Identify::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case Identify::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case Identify::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case Identify::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
@@ -375,16 +375,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_BITMAP8_ATTRIBUTE_TYPES, ZCL_BITMAP8_ATTRIBUTE_TYPES_SIZE };
         }
         case Groups::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case Groups::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case Groups::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case Groups::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case Groups::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
@@ -417,16 +417,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_NODE_ID_ATTRIBUTE_TYPES, ZCL_NODE_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case Scenes::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case Scenes::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case Scenes::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case Scenes::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case Scenes::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
@@ -456,16 +456,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_ON_OFF_START_UP_ON_OFF_ATTRIBUTE_TYPES, ZCL_ON_OFF_START_UP_ON_OFF_ATTRIBUTE_TYPES_SIZE };
         }
         case OnOff::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case OnOff::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case OnOff::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case OnOff::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case OnOff::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
@@ -522,16 +522,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_INT8U_ATTRIBUTE_TYPES, ZCL_INT8U_ATTRIBUTE_TYPES_SIZE };
         }
         case LevelControl::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case LevelControl::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case LevelControl::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case LevelControl::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case LevelControl::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
@@ -655,16 +655,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_INT16U_ATTRIBUTE_TYPES, ZCL_INT16U_ATTRIBUTE_TYPES_SIZE };
         }
         case DoorLock::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case DoorLock::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case DoorLock::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case DoorLock::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case DoorLock::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
@@ -709,16 +709,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_INT8U_ATTRIBUTE_TYPES, ZCL_INT8U_ATTRIBUTE_TYPES_SIZE };
         }
         case BarrierControl::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case BarrierControl::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case BarrierControl::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case BarrierControl::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case BarrierControl::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
@@ -880,16 +880,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_ENUM8_ATTRIBUTE_TYPES, ZCL_ENUM8_ATTRIBUTE_TYPES_SIZE };
         }
         case Thermostat::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case Thermostat::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case Thermostat::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case Thermostat::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case Thermostat::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
@@ -937,16 +937,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_BITMAP8_ATTRIBUTE_TYPES, ZCL_BITMAP8_ATTRIBUTE_TYPES_SIZE };
         }
         case FanControl::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case FanControl::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case FanControl::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case FanControl::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case FanControl::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
@@ -970,16 +970,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_ENUM8_ATTRIBUTE_TYPES, ZCL_ENUM8_ATTRIBUTE_TYPES_SIZE };
         }
         case ThermostatUserInterfaceConfiguration::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case ThermostatUserInterfaceConfiguration::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case ThermostatUserInterfaceConfiguration::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case ThermostatUserInterfaceConfiguration::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case ThermostatUserInterfaceConfiguration::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
@@ -1150,16 +1150,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_INT16U_ATTRIBUTE_TYPES, ZCL_INT16U_ATTRIBUTE_TYPES_SIZE };
         }
         case ColorControl::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case ColorControl::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case ColorControl::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case ColorControl::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case ColorControl::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
@@ -1189,16 +1189,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_ENUM8_ATTRIBUTE_TYPES, ZCL_ENUM8_ATTRIBUTE_TYPES_SIZE };
         }
         case IlluminanceMeasurement::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case IlluminanceMeasurement::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case IlluminanceMeasurement::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case IlluminanceMeasurement::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case IlluminanceMeasurement::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
@@ -1225,16 +1225,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_INT16U_ATTRIBUTE_TYPES, ZCL_INT16U_ATTRIBUTE_TYPES_SIZE };
         }
         case TemperatureMeasurement::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case TemperatureMeasurement::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case TemperatureMeasurement::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case TemperatureMeasurement::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case TemperatureMeasurement::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
@@ -1276,16 +1276,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_INT8S_ATTRIBUTE_TYPES, ZCL_INT8S_ATTRIBUTE_TYPES_SIZE };
         }
         case PressureMeasurement::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case PressureMeasurement::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case PressureMeasurement::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case PressureMeasurement::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case PressureMeasurement::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
@@ -1312,16 +1312,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_INT16U_ATTRIBUTE_TYPES, ZCL_INT16U_ATTRIBUTE_TYPES_SIZE };
         }
         case FlowMeasurement::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case FlowMeasurement::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case FlowMeasurement::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case FlowMeasurement::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case FlowMeasurement::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
@@ -1348,16 +1348,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_INT16U_ATTRIBUTE_TYPES, ZCL_INT16U_ATTRIBUTE_TYPES_SIZE };
         }
         case RelativeHumidityMeasurement::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case RelativeHumidityMeasurement::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case RelativeHumidityMeasurement::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case RelativeHumidityMeasurement::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case RelativeHumidityMeasurement::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
@@ -1408,16 +1408,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_INT8U_ATTRIBUTE_TYPES, ZCL_INT8U_ATTRIBUTE_TYPES_SIZE };
         }
         case OccupancySensing::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case OccupancySensing::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case OccupancySensing::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case OccupancySensing::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case OccupancySensing::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
@@ -1816,16 +1816,16 @@ attr_type_size get_attribute_type_size(uint16_t cluster_id, uint16_t attribute_i
             return { ZCL_INT16U_ATTRIBUTE_TYPES, ZCL_INT16U_ATTRIBUTE_TYPES_SIZE };
         }
         case ElectricalMeasurement::Attributes::GeneratedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case ElectricalMeasurement::Attributes::AcceptedCommandList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_COMMAND_ID_ATTRIBUTE_TYPES, ZCL_COMMAND_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case ElectricalMeasurement::Attributes::EventList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_EVENT_ID_ATTRIBUTE_TYPES, ZCL_EVENT_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case ElectricalMeasurement::Attributes::AttributeList::Id: {
-            return { ZCL_ARRAY_ATTRIBUTE_TYPES, ZCL_ARRAY_ATTRIBUTE_TYPES_SIZE };
+            return { ZCL_ATTRIB_ID_ATTRIBUTE_TYPES, ZCL_ATTRIB_ID_ATTRIBUTE_TYPES_SIZE };
         }
         case ElectricalMeasurement::Attributes::FeatureMap::Id: {
             return { ZCL_BITMAP32_ATTRIBUTE_TYPES, ZCL_BITMAP32_ATTRIBUTE_TYPES_SIZE };
