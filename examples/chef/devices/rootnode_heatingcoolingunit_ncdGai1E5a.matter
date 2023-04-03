@@ -1451,9 +1451,6 @@ endpoint 0 {
 
   server cluster Groups {
     ram      attribute nameSupport;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
@@ -1463,9 +1460,6 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
@@ -1515,6 +1509,7 @@ endpoint 0 {
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
     ram      attribute updateStateProgress default = 0;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -1639,7 +1634,7 @@ endpoint 1 {
   }
 
   server cluster Groups {
-    ram      attribute nameSupport;
+    ram      attribute nameSupport default = 0;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
@@ -1649,6 +1644,10 @@ endpoint 1 {
 
   server cluster OnOff {
     ram      attribute onOff default = 0;
+    ram      attribute globalSceneControl default = 1;
+    ram      attribute onTime default = 0;
+    ram      attribute offWaitTime default = 0;
+    ram      attribute startUpOnOff default = 0;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
@@ -1658,9 +1657,19 @@ endpoint 1 {
 
   server cluster LevelControl {
     ram      attribute currentLevel default = 0;
+    ram      attribute remainingTime default = 0x0000;
     ram      attribute minLevel default = 0;
     ram      attribute maxLevel default = 0xFE;
+    ram      attribute currentFrequency default = 0x0000;
+    ram      attribute minFrequency default = 0x0000;
+    ram      attribute maxFrequency default = 0x0000;
+    ram      attribute options default = 1;
+    ram      attribute onOffTransitionTime default = 0x0000;
     ram      attribute onLevel default = 0xFE;
+    ram      attribute onTransitionTime default = 0x0000;
+    ram      attribute offTransitionTime default = 0x0000;
+    ram      attribute defaultMoveRate default = 0x0000;
+    ram      attribute startUpCurrentLevel default = 3;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
@@ -1669,15 +1678,15 @@ endpoint 1 {
   }
 
   server cluster Descriptor {
-    callback attribute deviceTypeList;
-    callback attribute serverList;
-    callback attribute clientList;
-    callback attribute partsList;
+    callback attribute deviceTypeList default = 0;
+    callback attribute serverList default = 0;
+    callback attribute clientList default = 0;
+    callback attribute partsList default = 0;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster FanControl {
@@ -1688,6 +1697,10 @@ endpoint 1 {
     ram      attribute speedMax default = 10;
     ram      attribute speedSetting default = 0x00;
     ram      attribute speedCurrent default = 0x00;
+    ram      attribute rockSupport default = 0x00;
+    ram      attribute rockSetting default = 0x00;
+    ram      attribute windSupport default = 0x00;
+    ram      attribute windSetting default = 0x00;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;

@@ -2394,6 +2394,7 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
+    callback attribute attributeList;
     ram      attribute featureMap default = 4;
     ram      attribute clusterRevision default = 1;
   }
@@ -2577,6 +2578,7 @@ endpoint 0 {
     ram      attribute measuredValue;
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue;
+    ram      attribute tolerance;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
@@ -2612,7 +2614,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 0x0003;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -2628,22 +2630,25 @@ endpoint 1 {
 
   server cluster MediaPlayback {
     ram      attribute currentState default = 0x00;
-    ram      attribute startTime default = 0xFF;
-    ram      attribute duration;
+    ram      attribute startTime default = 0x00;
+    ram      attribute duration default = 0;
     callback attribute sampledPosition;
-    ram      attribute playbackSpeed;
+    ram      attribute playbackSpeed default = 0;
     ram      attribute seekRangeEnd;
     ram      attribute seekRangeStart;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0003;
+    ram      attribute featureMap default = 0x003;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster MediaInput {
     callback attribute inputList;
     ram      attribute currentInput default = 0x00;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
     ram      attribute clusterRevision default = 1;
   }
@@ -2657,13 +2662,16 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 0x0007;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster ContentLauncher {
     callback attribute acceptHeader;
     ram      attribute supportedStreamingProtocols;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0x0003;
     ram      attribute clusterRevision default = 1;
   }
@@ -2684,7 +2692,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 0x0001;
     ram      attribute clusterRevision default = 1;
   }
 }
@@ -2739,8 +2747,8 @@ endpoint 3 {
 
   server cluster Channel {
     callback attribute channelList;
-    callback attribute lineup;
-    callback attribute currentChannel;
+    ram      attribute lineup default = 0x0;
+    ram      attribute currentChannel default = 0x0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2784,13 +2792,16 @@ endpoint 3 {
   server cluster ContentLauncher {
     callback attribute acceptHeader;
     ram      attribute supportedStreamingProtocols;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0x0003;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster ApplicationLauncher {
     callback attribute catalogList;
-    callback attribute currentApp default = 0x00;
+    ram      attribute currentApp default = 0x0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2815,6 +2826,7 @@ endpoint 3 {
   }
 
   server cluster AccountLogin {
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }

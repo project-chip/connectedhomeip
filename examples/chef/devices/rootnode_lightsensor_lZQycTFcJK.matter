@@ -1192,9 +1192,6 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
@@ -1244,6 +1241,7 @@ endpoint 0 {
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
     ram      attribute updateStateProgress default = 0;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -1368,21 +1366,23 @@ endpoint 1 {
   }
 
   server cluster Descriptor {
-    callback attribute deviceTypeList;
-    callback attribute serverList;
-    callback attribute clientList;
-    callback attribute partsList;
+    callback attribute deviceTypeList default = 0;
+    callback attribute serverList default = 0;
+    callback attribute clientList default = 0;
+    callback attribute partsList default = 0;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster IlluminanceMeasurement {
     ram      attribute measuredValue default = 0xC351;
     ram      attribute minMeasuredValue default = 1;
     ram      attribute maxMeasuredValue default = 0xfffe;
+    ram      attribute tolerance;
+    ram      attribute lightSensorType default = 0xFF;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;

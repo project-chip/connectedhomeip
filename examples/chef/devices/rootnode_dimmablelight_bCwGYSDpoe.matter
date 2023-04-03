@@ -1286,24 +1286,18 @@ endpoint 0 {
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Groups {
-    ram      attribute nameSupport default = 0;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
+    ram      attribute nameSupport;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
   server cluster Descriptor {
-    callback attribute deviceTypeList default = 0;
-    callback attribute serverList default = 0;
-    callback attribute clientList default = 0;
-    callback attribute partsList default = 0;
-    callback attribute generatedCommandList default = 0;
-    callback attribute acceptedCommandList default = 0;
-    callback attribute attributeList default = 0;
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster AccessControl {
@@ -1351,6 +1345,7 @@ endpoint 0 {
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
     ram      attribute updateStateProgress default = 0;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -1501,8 +1496,15 @@ endpoint 1 {
     ram      attribute remainingTime default = 0x0000;
     ram      attribute minLevel default = 0x01;
     ram      attribute maxLevel default = 0xFE;
+    ram      attribute currentFrequency default = 0x0000;
+    ram      attribute minFrequency default = 0x0000;
+    ram      attribute maxFrequency default = 0x0000;
     ram      attribute options default = 0x03;
+    ram      attribute onOffTransitionTime default = 0x0000;
     ram      attribute onLevel default = 0xFE;
+    ram      attribute onTransitionTime;
+    ram      attribute offTransitionTime;
+    ram      attribute defaultMoveRate;
     ram      attribute startUpCurrentLevel default = 0x00;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;

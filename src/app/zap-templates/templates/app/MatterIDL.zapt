@@ -136,7 +136,7 @@ endpoint {{endpointId}} {
     emits event {{name}};
       {{/if}}
     {{/user_cluster_events}} 
-    {{#enabled_attributes_for_cluster_and_side name 'server'}}
+    {{#user_cluster_attributes}}
         {{~#if (is_str_equal storageOption "NVM")}}
     persist  {{!align~}}
         {{~else if (is_str_equal storageOption "External")}}
@@ -149,7 +149,7 @@ endpoint {{endpointId}} {
           {{!need space}} default = {{#if (isString type)}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
         {{~/if~}}
         ;
-    {{/enabled_attributes_for_cluster_and_side}}
+    {{/user_cluster_attributes}}
   }
       {{/if}}
     {{/if}}

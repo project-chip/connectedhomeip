@@ -1838,7 +1838,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster Actions {
@@ -1885,9 +1885,6 @@ endpoint 2 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
@@ -1904,6 +1901,7 @@ endpoint 2 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue default = 0x954D;
     callback attribute maxMeasuredValue default = 0x7FFF;
+    ram      attribute tolerance default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

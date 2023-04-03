@@ -1638,6 +1638,7 @@ endpoint 0 {
     emits event AccessControlEntryChanged;
     emits event AccessControlExtensionChanged;
     callback attribute acl;
+    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry default = 4;
     callback attribute targetsPerAccessControlEntry default = 3;
     callback attribute accessControlEntriesPerFabric default = 4;
@@ -1829,6 +1830,9 @@ endpoint 0 {
     callback attribute rxErrSecCount default = 0x0000;
     callback attribute rxErrFcsCount default = 0x0000;
     callback attribute rxErrOtherCount default = 0x0000;
+    callback attribute activeTimestamp default = 0x0000000000000000;
+    callback attribute pendingTimestamp default = 0x0000000000000000;
+    callback attribute delay default = 0x0000;
     callback attribute securityPolicy;
     callback attribute channelPage0Mask default = "0x0000";
     callback attribute operationalDatasetComponents;
@@ -1948,7 +1952,11 @@ endpoint 1 {
     ram      attribute minFrequency default = 0x0000;
     ram      attribute maxFrequency default = 0x0000;
     ram      attribute options default = 0x00;
+    ram      attribute onOffTransitionTime default = 0x0000;
     ram      attribute onLevel default = 0xFF;
+    ram      attribute onTransitionTime;
+    ram      attribute offTransitionTime;
+    ram      attribute defaultMoveRate default = 50;
     persist  attribute startUpCurrentLevel default = 255;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -1997,6 +2005,8 @@ endpoint 1 {
     ram      attribute remainingTime default = 0x0000;
     ram      attribute currentX default = 0x616B;
     ram      attribute currentY default = 0x607D;
+    ram      attribute driftCompensation;
+    ram      attribute compensationText;
     ram      attribute colorTemperatureMireds default = 0x00FA;
     ram      attribute colorMode default = 0x01;
     ram      attribute options default = 0x00;
@@ -2019,6 +2029,17 @@ endpoint 1 {
     ram      attribute primary6X;
     ram      attribute primary6Y;
     ram      attribute primary6Intensity;
+    ram      attribute whitePointX;
+    ram      attribute whitePointY;
+    ram      attribute colorPointRX;
+    ram      attribute colorPointRY;
+    ram      attribute colorPointRIntensity;
+    ram      attribute colorPointGX;
+    ram      attribute colorPointGY;
+    ram      attribute colorPointGIntensity;
+    ram      attribute colorPointBX;
+    ram      attribute colorPointBY;
+    ram      attribute colorPointBIntensity;
     ram      attribute enhancedCurrentHue default = 0x0000;
     ram      attribute enhancedColorMode default = 0x01;
     ram      attribute colorLoopActive default = 0x00;
