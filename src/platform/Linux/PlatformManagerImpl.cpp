@@ -193,8 +193,30 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     mGLibMainLoop       = g_main_loop_new(nullptr, FALSE);
     mGLibMainLoopThread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop);
 
-    // Wait for the GLib main loop to start.
-    ReturnErrorOnFailure(GLibMatterContextInvokeSync<void>([](void *) { return CHIP_NO_ERROR; }, nullptr));
+    {
+        // Wait for the GLib main loop to start. It is required that the context used
+        // by the main loop is acquired before any other GLib functions are called. Otherwise,
+        // the GLibMatterContextInvokeSync() might run functions on the wrong thread.
+
+        std::unique_lock<std::mutex> lock(mGLibMainLoopCallbackIndirectionMutex);
+        GLibMatterContextInvokeData invokeData{};
+
+        auto * idleSource = g_idle_source_new();
+        g_source_set_callback(
+            idleSource,
+            [](void * userData_) {
+                auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
+                std::unique_lock<std::mutex> lock_(PlatformMgrImpl().mGLibMainLoopCallbackIndirectionMutex);
+                data->mDone = true;
+                data->mDoneCond.notify_one();
+                return G_SOURCE_REMOVE;
+            },
+            &invokeData, nullptr);
+        g_source_attach(idleSource, g_main_loop_get_context(mGLibMainLoop));
+        g_source_unref(idleSource);
+
+        invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
+    }
 
 #endif
 
