@@ -21,9 +21,6 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
-#include <zephyr/logging/log.h>
-#include <zephyr/zephyr.h>
-
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
@@ -39,7 +36,9 @@ AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init(void)
 {
+#if APP_USE_EXAMPLE_START_BUTTON
     SetExampleButtonCallbacks(StartActionEventHandler);
+#endif
     InitCommonParts();
 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED

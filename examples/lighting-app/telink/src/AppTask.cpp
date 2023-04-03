@@ -23,9 +23,6 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
-#include <zephyr/logging/log.h>
-#include <zephyr/zephyr.h>
-
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
@@ -76,7 +73,9 @@ CHIP_ERROR AppTask::Init(void)
 #endif
     sAppTask.mPwmRgbBlueLed.SetCallbacks(ActionInitiated, ActionCompleted, nullptr);
 
+#if APP_USE_EXAMPLE_START_BUTTON
     SetExampleButtonCallbacks(LightingActionEventHandler);
+#endif
     InitCommonParts();
 
     err = ConnectivityMgr().SetBLEDeviceName("TelinkLight");

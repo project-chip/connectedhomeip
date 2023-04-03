@@ -21,9 +21,6 @@
 
 #include "ButtonManager.h"
 
-#include <zephyr/logging/log.h>
-#include <zephyr/zephyr.h>
-
 #include "ThreadUtil.h"
 
 #include <DeviceInfoProviderImpl.h>

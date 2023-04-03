@@ -35,6 +35,7 @@ struct AppEvent
         kEventType_IdentifyStart,
         kEventType_IdentifyStop,
         kEventType_Lighting,
+        kEventType_Thermostat,
         kEventType_Install,
         kEventType_Contact,
         kEventType_Start,
