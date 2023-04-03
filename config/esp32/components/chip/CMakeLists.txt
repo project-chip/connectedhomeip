@@ -174,6 +174,9 @@ endif()
 
 if (CONFIG_CHIP_ENABLE_EXTERNAL_PLATFORM)
     chip_gn_arg_append("chip_device_platform"   "\"external\"")
+    if (CONFIG_ENABLE_CHIP_SHELL)
+        chip_gn_arg_append("chip_shell_platform"    "\"esp32\"")
+    endif()
     chip_gn_arg_append("chip_platform_target"   "\"//${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}\"")
 endif()
 

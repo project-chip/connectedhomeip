@@ -88,6 +88,16 @@ def websocket_runner_options(f):
     return f
 
 
+def chip_repl_runner_options(f):
+    f = click.option('--repl_storage_path', type=str, default='/tmp/repl-storage.json',
+                     help='Path to persistent storage configuration file.')(f)
+    f = click.option('--commission_on_network_dut', type=bool, default=False,
+                     help='Prior to running test should we try to commission DUT on network.')(f)
+    f = click.option('--runner', type=str, default=None, show_default=True,
+                     help='The runner to run the test with.')(f)
+    return f
+
+
 @dataclass
 class ParserGroup:
     builder_config: TestParserBuilderConfig
@@ -202,6 +212,10 @@ CONTEXT_SETTINGS = dict(
             'server_name': 'chip-app2',
             'server_arguments': '--interactive',
         },
+        'chip-repl': {
+            'adapter': 'matter_yamltest_repl_adapter.adapter',
+            'runner': 'matter_yamltest_repl_adapter.runner',
+        },
     },
     max_content_width=120,
 )
@@ -278,6 +292,21 @@ def websocket(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop
         server_address, server_port, server_path, server_arguments, websocket_runner_hooks)
 
     runner = WebSocketRunner(websocket_runner_config)
+    return runner.run(parser_group.builder_config, runner_config)
+
+
+@runner_base.command()
+@test_runner_options
+@chip_repl_runner_options
+@pass_parser_group
+def chip_repl(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop_on_warning: bool, stop_at_number: int, show_adapter_logs: bool, show_adapter_logs_on_error: bool, runner: str, repl_storage_path: str, commission_on_network_dut: bool):
+    """Run the test suite using chip-repl."""
+    adapter = __import__(adapter, fromlist=[None]).Adapter(parser_group.builder_config.parser_config.definitions)
+    runner_options = TestRunnerOptions(stop_on_error, stop_on_warning, stop_at_number)
+    runner_hooks = TestRunnerLogger(show_adapter_logs, show_adapter_logs_on_error)
+    runner_config = TestRunnerConfig(adapter, parser_group.pseudo_clusters, runner_options, runner_hooks)
+
+    runner = __import__(runner, fromlist=[None]).Runner(repl_storage_path, commission_on_network_dut)
     return runner.run(parser_group.builder_config, runner_config)
 
 

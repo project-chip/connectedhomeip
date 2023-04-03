@@ -30,9 +30,6 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
-// Set the following to 1 in order to run individual test case manually.
-#define MANUAL_INDIVIDUAL_TEST 0
-
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kCASESetupTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
@@ -94,24 +91,44 @@ static MTRBaseDevice * GetConnectedDevice(void)
 @interface MTRBackwardsCompatTests : XCTestCase
 @end
 
+static BOOL sStackInitRan = NO;
+static BOOL sNeedsStackShutdown = YES;
+
 @implementation MTRBackwardsCompatTests
+
++ (void)tearDown
+{
+    // Global teardown, runs once
+    if (sNeedsStackShutdown) {
+        // We don't need to worry about ResetCommissionee.  If we get here,
+        // we're running only one of our test methods (using
+        // -only-testing:MatterTests/MTROTAProviderTests/testMethodName), since
+        // we did not run test999_TearDown.
+        [self shutdownStack];
+    }
+}
 
 - (void)setUp
 {
+    // Per-test setup, runs before each test.
     [super setUp];
     [self setContinueAfterFailure:NO];
+
+    if (sStackInitRan == NO) {
+        [self initStack];
+    }
 }
 
 - (void)tearDown
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self shutdownStack];
-#endif
+    // Per-test teardown, runs after each test.
     [super tearDown];
 }
 
 - (void)initStack
 {
+    sStackInitRan = YES;
+
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
 
     __auto_type * factory = [MTRControllerFactory sharedInstance];
@@ -166,8 +183,10 @@ static MTRBaseDevice * GetConnectedDevice(void)
     [self waitForExpectationsWithTimeout:kCASESetupTimeoutInSeconds handler:nil];
 }
 
-- (void)shutdownStack
++ (void)shutdownStack
 {
+    sNeedsStackShutdown = NO;
+
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
@@ -177,12 +196,12 @@ static MTRBaseDevice * GetConnectedDevice(void)
     [[MTRControllerFactory sharedInstance] shutdown];
 }
 
-#if !MANUAL_INDIVIDUAL_TEST
 - (void)test000_SetUp
 {
-    [self initStack];
+    // Nothing to do here; our setUp method handled this already.  This test
+    // just exists to make the setup not look like it's happening inside other
+    // tests.
 }
-#endif
 
 #define CHECK_RETURN_TYPE(sig, type)                                                                                               \
     do {                                                                                                                           \
@@ -1177,12 +1196,10 @@ static MTRBaseDevice * GetConnectedDevice(void)
     CHECK_RETURN_TYPE(sig, NSData *);
 }
 
-#if !MANUAL_INDIVIDUAL_TEST
 - (void)test999_TearDown
 {
     ResetCommissionee(GetConnectedDevice(), dispatch_get_main_queue(), self, kTimeoutInSeconds);
-    [self shutdownStack];
+    [[self class] shutdownStack];
 }
-#endif
 
 @end

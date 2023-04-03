@@ -130,16 +130,13 @@ uint8_t sUartTxQueueBuffer[UART_MAX_QUEUE_SIZE * sizeof(UartTxStruct_t)];
 static StaticQueue_t sUartTxQueueStruct;
 static QueueHandle_t sUartTxQueue;
 
-static EventGroupHandle_t sUartEventGroup;
-static StaticEventGroup_t sUartEventGroupStruct;
-
 // Rx buffer for the receive Fifo
 static uint8_t sRxFifoBuffer[MAX_BUFFER_SIZE];
 static Fifo_t sReceiveFifo;
 
 static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, uint8_t * data, UARTDRV_Count_t transferCount);
-// static void UART_tx_callback(struct UARTDRV_HandleData * handle, Ecode_t transferStatus, uint8_t * data,
-//                              UARTDRV_Count_t transferCount);
+static void UART_tx_callback(struct UARTDRV_HandleData * handle, Ecode_t transferStatus, uint8_t * data,
+                             UARTDRV_Count_t transferCount);
 static void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes);
 
 static bool InitFifo(Fifo_t * fifo, uint8_t * pDataBuffer, uint16_t bufferSize)
@@ -266,17 +263,10 @@ void uartConsoleInit(void)
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
     UARTDRV_Receive(vcom_handle, sRxDmaBuffer2, MAX_DMA_BUFFER_SIZE, UART_rx_callback);
 
-    uint32_t struct_size = sizeof(UartTxStruct_t);
-
-    sUartTxQueue = xQueueCreateStatic(UART_MAX_QUEUE_SIZE, struct_size, sUartTxQueueBuffer, &sUartTxQueueStruct);
-
-    sUartEventGroup = xEventGroupCreateStatic(&sUartEventGroupStruct);
-
-    // Start App task.
+    sUartTxQueue    = xQueueCreateStatic(UART_MAX_QUEUE_SIZE, sizeof(UartTxStruct_t), sUartTxQueueBuffer, &sUartTxQueueStruct);
     sUartTaskHandle = xTaskCreateStatic(uartMainLoop, UART_TASK_NAME, UART_TASK_SIZE, nullptr, 30, uartStack, &uartTaskStruct);
 
     assert(sUartTaskHandle);
-    assert(sUartEventGroup);
     assert(sUartTxQueue);
 
     // Enable USART0/EUSART0 interrupt to wake OT task when data arrives
@@ -322,10 +312,7 @@ void UART_tx_callback(struct UARTDRV_HandleData * handle, Ecode_t transferStatus
 {
     BaseType_t xHigherPriorityTaskWoken;
 
-    if (xEventGroupSetBitsFromISR(sUartEventGroup, UART_TX_COMPLETE_BIT, &xHigherPriorityTaskWoken) == pdPASS)
-    {
-        portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-    }
+    vTaskNotifyGiveFromISR(sUartTaskHandle, &xHigherPriorityTaskWoken) portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 /*
@@ -485,9 +472,8 @@ void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
     pre_uart_transfer();
 #endif /* EFR32MG24 && WF200_WIFI */
 
-    // TODO FIXME Swap to iostream driver since UARTDRV is deprecated.
-    // TODO Do no use blocking transmit (hotfix).
-    UARTDRV_TransmitB(vcom_handle, (uint8_t *) buffer, nbOfBytes);
+    UARTDRV_Transmit(vcom_handle, (uint8_t *) buffer, nbOfBytes, UART_tx_callback);
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
 #if (defined(EFR32MG24) && defined(WF200_WIFI))
     post_uart_transfer();

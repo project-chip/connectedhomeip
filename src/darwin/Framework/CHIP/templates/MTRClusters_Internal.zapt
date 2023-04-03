@@ -8,7 +8,7 @@
 
 #include <zap-generated/CHIPClusters.h>
 
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 
 {{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
 @interface MTRCluster{{asUpperCamelCase name preserveAcronyms=true}} ()
@@ -17,4 +17,4 @@
 @end
 {{/unless}}
 
-{{/chip_client_clusters}}
+{{/all_user_clusters}}

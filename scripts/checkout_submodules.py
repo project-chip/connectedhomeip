@@ -73,7 +73,7 @@ def module_matches_platforms(module: Module, platforms: set) -> bool:
 
 
 def module_initialized(module: Module) -> bool:
-    return bool(os.listdir(module.path))
+    return bool(os.listdir(os.path.join(CHIP_ROOT, module.path)))
 
 
 def make_chip_root_safe_directory() -> None:

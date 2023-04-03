@@ -17,21 +17,22 @@
 
 {{> clusters_header}}
 
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 {{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
 {{> cluster_header}}
 
-{{#chip_cluster_commands}}
-{{#unless (wasRemoved (asUpperCamelCase clusterName preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
+{{#zcl_commands}}
+{{#if (is_str_equal source 'client')}}
+{{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
 /*
  * Command {{asUpperCamelCase name}}
  */
-class {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}: public ClusterCommand
+class {{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ClusterCommand
 {
 public:
-    {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ClusterCommand("{{cleanse_label_as_kebab_case name}}"){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
+    {{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ClusterCommand("{{cleanse_label_as_kebab_case name}}"){{#zcl_command_arguments}}{{#if_chip_complex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if_chip_complex}}{{/zcl_command_arguments}}
     {
-        {{#chip_cluster_command_arguments}}
+        {{#zcl_command_arguments}}
         {{#if_chip_complex}}
         AddArgument("{{asUpperCamelCase label}}", &mComplex_{{asUpperCamelCase label}});
         {{else if (isString type)}}
@@ -39,7 +40,7 @@ public:
         {{else}}
         AddArgument("{{asUpperCamelCase label}}", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, &mRequest.{{asLowerCamelCase label}});
         {{/if_chip_complex}}
-        {{/chip_cluster_command_arguments}}
+        {{/zcl_command_arguments}}
         ClusterCommand::AddArguments();
     }
 
@@ -48,19 +49,19 @@ public:
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) command ({{asHex code 8}}) on endpoint %u", endpointId);
 
         dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.command", DISPATCH_QUEUE_SERIAL);
-        __auto_type * cluster = [[MTRBaseCluster{{asUpperCamelCase clusterName preserveAcronyms=true}} alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
-        __auto_type * params = [[MTR{{asUpperCamelCase clusterName preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params alloc] init];
+        __auto_type * cluster = [[MTRBaseCluster{{asUpperCamelCase parent.name preserveAcronyms=true}} alloc] initWithDevice:device endpointID:@(endpointId) queue:callbackQueue];
+        __auto_type * params = [[MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}Params alloc] init];
         params.timedInvokeTimeoutMs = mTimedInteractionTimeoutMs.HasValue() ? [NSNumber numberWithUnsignedShort:mTimedInteractionTimeoutMs.Value()] : nil;
-        {{#chip_cluster_command_arguments}}
-        {{>decodable_value target=(concat "params." (asStructPropertyName label)) source=(concat "mRequest." (asLowerCamelCase label)) cluster=parent.clusterName type=type depth=0}}
-        {{/chip_cluster_command_arguments}}
+        {{#zcl_command_arguments}}
+        {{>decodable_value target=(concat "params." (asStructPropertyName label)) source=(concat "mRequest." (asLowerCamelCase label)) cluster=parent.parent.name type=type depth=0}}
+        {{/zcl_command_arguments}}
         uint16_t repeatCount = mRepeatCount.ValueOr(1);
         uint16_t __block responsesNeeded = repeatCount;
         while (repeatCount--)
         {
             [cluster {{asLowerCamelCase name}}WithParams:params completion:
             {{#if hasSpecificResponse}}
-                ^(MTR{{asUpperCamelCase clusterName preserveAcronyms=true}}Cluster{{asUpperCamelCase responseName}}Params * _Nullable values, NSError * _Nullable error) {
+                ^(MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase responseName}}Params * _Nullable values, NSError * _Nullable error) {
                     NSLog(@"Values: %@", values);
             {{else}}
                 ^(NSError * _Nullable error) {
@@ -79,18 +80,19 @@ public:
     }
 
 private:
-    {{#if (hasArguments)}}
-    chip::app::Clusters::{{asUpperCamelCase clusterName}}::Commands::{{asUpperCamelCase name}}::Type mRequest;
+    {{#if hasArguments}}
+    chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type mRequest;
     {{/if}}
-    {{#chip_cluster_command_arguments}}
+    {{#zcl_command_arguments}}
     {{#if_chip_complex}}
     TypedComplexArgument<{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}> mComplex_{{asUpperCamelCase label}};
     {{/if_chip_complex}}
-    {{/chip_cluster_command_arguments}}
+    {{/zcl_command_arguments}}
 };
 
 {{/unless}}
-{{/chip_cluster_commands}}
+{{/if}}
+{{/zcl_commands}}
 
 {{#zcl_attributes_server removeKeys='isOptional'}}
 {{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))}}
@@ -248,12 +250,12 @@ public:
 {{/unless}}
 {{/zcl_attributes_server}}
 {{/unless}}
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 
 /*----------------------------------------------------------------------------*\
 | Register all Clusters commands                                               |
 \*----------------------------------------------------------------------------*/
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 {{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
 void registerCluster{{asUpperCamelCase name}}(Commands & commands)
 {
@@ -263,11 +265,13 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<ClusterCommand>(Id), //
-        {{#chip_cluster_commands}}
-        {{#unless (wasRemoved (asUpperCamelCase clusterName preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
-        make_unique<{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}>(), //
+        {{#zcl_commands}}
+        {{#if (is_str_equal source 'client')}}
+        {{#unless (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
+        make_unique<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{/unless}}
-        {{/chip_cluster_commands}}
+        {{/if}}
+        {{/zcl_commands}}
         {{#zcl_attributes_server removeKeys='isOptional'}}
         {{#first}}
          make_unique<ReadAttribute>(Id), //
@@ -303,7 +307,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
     commands.Register(clusterName, clusterCommands);
 }
 {{/unless}}
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 
 void registerClusterAny(Commands & commands)
 {
@@ -325,9 +329,9 @@ void registerClusterAny(Commands & commands)
 void registerClusters(Commands & commands)
 {
     registerClusterAny(commands);
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
     {{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
     registerCluster{{asUpperCamelCase name}}(commands);
     {{/unless}}
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 }

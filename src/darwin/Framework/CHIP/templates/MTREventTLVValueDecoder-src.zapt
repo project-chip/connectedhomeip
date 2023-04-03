@@ -21,7 +21,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
 {
     switch (aPath.mClusterId)
     {
-    {{#chip_client_clusters includeAll=true}}
+    {{#all_user_clusters side='client'}}
     {{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
     case Clusters::{{asUpperCamelCase name}}::Id: {
         using namespace Clusters::{{asUpperCamelCase name}};
@@ -63,7 +63,7 @@ id MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVReader & aRead
         break;
     }
     {{/unless}}
-    {{/chip_client_clusters}}
+    {{/all_user_clusters}}
     default: {
       *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
       break;
