@@ -160,6 +160,11 @@ public:
         return CreateBoxedObject(boxedTypeClsName, constructorSignature, chip::to_underlying(value), outObj);
     }
 
+    /**
+     * Fix to avoid NewStringUTF crash
+    */
+    jstring CharToJniString(const char * value);
+
 private:
     JniReferences() {}
 

@@ -388,4 +388,22 @@ CHIP_ERROR JniReferences::GetObjectField(jobject objectToRead, const char * name
     return err;
 }
 
+jstring JniReferences::CharToJniString(const char * value)
+{
+    JNIEnv * env   = GetEnvForCurrentThread();
+    jobject jbyteBuffer = env->NewDirectByteBuffer((void *)value, static_cast<jlong>(strlen(value)));
+
+    jclass charSetClass = env->FindClass("java/nio/charset/Charset");
+    jmethodID charsetForNameMethod = env->GetStaticMethodID(charSetClass, "forName", "(Ljava/lang/String;)Ljava/nio/charset/Charset;");
+    jobject charsetObject = env->CallStaticObjectMethod(charSetClass, charsetForNameMethod, env->NewStringUTF("UTF-8"));
+
+    jmethodID charSetDecodeMethod = env->GetMethodID(charSetClass, "decode", "(Ljava/nio/ByteBuffer;)Ljava/nio/CharBuffer;");
+    jobject decodeObject = env->CallObjectMethod(charsetObject, charSetDecodeMethod, jbyteBuffer);
+    env->DeleteLocalRef(jbyteBuffer);
+
+    jclass charBufferClass = env->FindClass("java/nio/CharBuffer");
+    jmethodID charBufferToString = env->GetMethodID(charBufferClass, "toString", "()Ljava/lang/String;");
+    return static_cast<jstring>(env->CallObjectMethod(decodeObject, charBufferToString));
+}
+
 } // namespace chip
