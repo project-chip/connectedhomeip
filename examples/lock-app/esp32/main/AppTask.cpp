@@ -86,9 +86,8 @@ CHIP_ERROR AppTask::Init()
                                   TimerEventHandler // timer callback handler
     );
 
-    PlatformMgr().LockChipStack();
+    chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = BoltLockMgr().InitLockState();
-    PlatformMgr().UnlockChipStack();
 
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
