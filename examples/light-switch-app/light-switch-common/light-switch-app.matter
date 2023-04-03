@@ -2256,13 +2256,13 @@ endpoint 1 {
   binding cluster ColorControl;
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0000;
+    ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster Groups {
@@ -2293,13 +2293,13 @@ endpoint 2 {
   device type genericswitch = 15, version 1;
 
   server cluster Identify {
-    ram      attribute identifyTime default = 0x0000;
+    ram      attribute identifyTime default = 0x0;
     ram      attribute identifyType default = 0x0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
+    ram      attribute clusterRevision default = 2;
   }
 
   server cluster Descriptor {

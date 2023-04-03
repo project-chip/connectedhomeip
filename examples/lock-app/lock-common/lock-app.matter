@@ -2205,14 +2205,14 @@ endpoint 0 {
   server cluster PowerSource {
     emits event WiredFaultChange;
     ram      attribute status default = 1;
-    ram      attribute order default = 0;
-    ram      attribute description default = "USB";
+    ram      attribute order default = 1;
+    ram      attribute description default = "Battery";
     ram      attribute wiredAssessedCurrent;
     ram      attribute batChargeLevel;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
     ram      attribute batReplacementDescription;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap default = 0x0A;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -2445,14 +2445,14 @@ endpoint 1 {
 
   server cluster PowerSource {
     ram      attribute status default = 1;
-    ram      attribute order default = 0;
-    ram      attribute description default = "USB";
+    ram      attribute order default = 1;
+    ram      attribute description default = "Battery";
     ram      attribute wiredAssessedCurrent;
     ram      attribute batChargeLevel;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
     ram      attribute batReplacementDescription;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap default = 0x0A;
     ram      attribute clusterRevision default = 1;
   }
 

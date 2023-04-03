@@ -2179,12 +2179,12 @@ endpoint 1 {
     persist  attribute installedClosedLimitLift default = 0xFFFF;
     persist  attribute installedOpenLimitTilt default = 0x0000;
     persist  attribute installedClosedLimitTilt default = 0xFFFF;
-    persist  attribute mode default = 0x0;
+    persist  attribute mode default = 0x00;
     ram      attribute safetyStatus default = 0x0000;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x001F;
+    ram      attribute featureMap default = 0x0017;
     ram      attribute clusterRevision default = 5;
   }
 }
@@ -2256,12 +2256,12 @@ endpoint 2 {
     persist  attribute installedClosedLimitLift default = 0xFFFF;
     persist  attribute installedOpenLimitTilt default = 0x0000;
     persist  attribute installedClosedLimitTilt default = 0xFFFF;
-    persist  attribute mode default = 0x0;
+    persist  attribute mode default = 0x00;
     ram      attribute safetyStatus default = 0x0000;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x001F;
+    ram      attribute featureMap default = 0x0017;
     ram      attribute clusterRevision default = 5;
   }
 }

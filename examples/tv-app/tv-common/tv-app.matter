@@ -2612,7 +2612,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0003;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -2628,16 +2628,16 @@ endpoint 1 {
 
   server cluster MediaPlayback {
     ram      attribute currentState default = 0x00;
-    ram      attribute startTime default = 0x00;
-    ram      attribute duration default = 0;
+    ram      attribute startTime default = 0xFF;
+    ram      attribute duration;
     callback attribute sampledPosition;
-    ram      attribute playbackSpeed default = 0;
+    ram      attribute playbackSpeed;
     ram      attribute seekRangeEnd;
     ram      attribute seekRangeStart;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x003;
+    ram      attribute featureMap default = 0x0003;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -2657,7 +2657,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0007;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -2684,7 +2684,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0001;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 }
@@ -2744,7 +2744,7 @@ endpoint 3 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0003;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -2760,16 +2760,16 @@ endpoint 3 {
 
   server cluster MediaPlayback {
     ram      attribute currentState default = 0x00;
-    ram      attribute startTime default = 0x00;
-    ram      attribute duration default = 0;
+    ram      attribute startTime default = 0xFF;
+    ram      attribute duration;
     callback attribute sampledPosition;
-    ram      attribute playbackSpeed default = 0;
+    ram      attribute playbackSpeed;
     ram      attribute seekRangeEnd;
     ram      attribute seekRangeStart;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x003;
+    ram      attribute featureMap default = 0x0003;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -2777,7 +2777,7 @@ endpoint 3 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0007;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -2794,7 +2794,7 @@ endpoint 3 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0001;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
