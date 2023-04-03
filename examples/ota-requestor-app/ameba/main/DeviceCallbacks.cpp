@@ -33,6 +33,7 @@
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
 #include <lib/dnssd/Advertiser.h>
+#include <platform/Ameba/AmebaUtils.h>
 #include <route_hook/ameba_route_hook.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -103,6 +104,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
 
     case DeviceEventType::kCommissioningComplete:
         ChipLogProgress(DeviceLayer, "Commissioning Complete");
+        chip::DeviceLayer::Internal::AmebaUtils::SetCurrentProvisionedNetwork();
         break;
     }
 }
