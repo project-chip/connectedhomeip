@@ -175,7 +175,9 @@ class TestRunner(TestRunnerBase):
                 if config.pseudo_clusters.supports(request):
                     responses, logs = await config.pseudo_clusters.execute(request)
                 else:
-                    responses, logs = config.adapter.decode(await self.execute(config.adapter.encode(request)))
+                    encoded_request = config.adapter.encode(request)
+                    encoded_response = await self.execute(encoded_request)
+                    responses, logs = config.adapter.decode(encoded_response)
                 duration = round((time.time() - start) * 1000, 2)
                 test_duration += duration
 

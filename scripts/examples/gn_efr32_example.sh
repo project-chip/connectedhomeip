@@ -268,8 +268,16 @@ else
         } &>/dev/null
     fi
 
-    if [ "$USE_SLC" == true ] && [ "$GN_PATH_PROVIDED" == false ]; then
-        GN_PATH=./.environment/cipd/packages/pigweed/gn
+    if [ "$USE_SLC" == true ]; then
+        PYTHON_PATH="/usr/bin/python3"
+        if [ "$GN_PATH_PROVIDED" == false ]; then
+            GN_PATH=./.environment/cipd/packages/pigweed/gn
+        fi
+    elif [ "$USE_SLC" == false ]; then
+        # Activation needs to be after SLC generation which is done in gn gen.
+        # Zap generation requires activation and is done in the build phase
+        source "$CHIP_ROOT/scripts/activate.sh"
+        PYTHON_PATH=$VIRTUAL_ENV"/bin/python3"
     fi
 
     BUILD_DIR=$OUTDIR/$SILABS_BOARD
@@ -292,15 +300,17 @@ else
         fi
 
         if [ -z "$optArgs" ]; then
-            "$GN_PATH" gen --check --script-executable="/usr/bin/python3" --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\"" "$BUILD_DIR"
+            "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\"" "$BUILD_DIR"
         else
-            "$GN_PATH" gen --check --script-executable="/usr/bin/python3" --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
+            "$GN_PATH" gen --check --script-executable="$PYTHON_PATH" --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
         fi
     fi
 
-    # Activation needs to be after SLC generation which is done in gn gen.
-    # Zap generation requires activation and is done in the build phase
-    source "$CHIP_ROOT/scripts/activate.sh"
+    if [ "$USE_SLC" == true ]; then
+        # Activation needs to be after SLC generation which is done in gn gen.
+        # Zap generation requires activation and is done in the build phase
+        source "$CHIP_ROOT/scripts/activate.sh"
+    fi
 
     ninja -v -C "$BUILD_DIR"/
     #print stats

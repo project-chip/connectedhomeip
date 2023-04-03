@@ -23,7 +23,7 @@
 # Usage:
 #  restyle-diff.sh [ref]
 #
-# if unspecified, ref defaults to "master"
+# if unspecified, ref defaults to upstream/master (or master)
 #
 
 here=${0%/*}
@@ -31,6 +31,7 @@ here=${0%/*}
 set -e
 
 CHIP_ROOT=$(cd "$here/../.." && pwd)
+cd "$CHIP_ROOT"
 
 restyle-paths() {
     if hash restyle-path 2>/dev/null; then
@@ -41,7 +42,11 @@ restyle-paths() {
     fi
 }
 
-cd "$CHIP_ROOT"
-declare -a paths="($(git diff --ignore-submodules --name-only "${1:-master}"))"
+ref="$1"
+if [[ -z "$ref" ]]; then
+    ref="master"
+    git remote | grep -qxF upstream && ref="upstream/master"
+fi
 
+declare -a paths="($(git diff --ignore-submodules --name-only --merge-base "$ref"))"
 restyle-paths "${paths[@]}"

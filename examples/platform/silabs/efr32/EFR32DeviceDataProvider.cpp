@@ -224,13 +224,13 @@ CHIP_ERROR EFR32DeviceDataProvider::GetHardwareVersionString(char * buf, size_t 
     size_t hardwareVersionStringLen = 0; // without counting null-terminator
     CHIP_ERROR err =
         SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_HardwareVersionString, buf, bufSize, hardwareVersionStringLen);
-#if defined(CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION_STRING)
+#if defined(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        memcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION_STRING, sizeof(bufSize));
+        memcpy(buf, CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING, bufSize);
         err = CHIP_NO_ERROR;
     }
-#endif // CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION_STRING
+#endif // CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING
     return err;
 }
 

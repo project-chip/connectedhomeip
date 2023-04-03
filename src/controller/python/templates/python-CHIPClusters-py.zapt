@@ -13,22 +13,32 @@ class ChipClusters:
     SUCCESS_DELEGATE = ctypes.CFUNCTYPE(None)
     FAILURE_DELEGATE = ctypes.CFUNCTYPE(None, ctypes.c_uint8)
 
-{{#chip_client_clusters}}
+{{#all_user_clusters side='client'}}
     _{{asDelimitedMacro name}}_CLUSTER_INFO = {
         "clusterName": "{{asUpperCamelCase name}}",
         "clusterId": {{asHex code 8}},
         "commands": {
-{{#chip_cluster_commands}}
-            {{asHex code 8}}: {
-                "commandId": {{asHex code 8}},
-                "commandName": "{{asUpperCamelCase name}}",
+{{#all_user_cluster_generated_commands}}
+  {{#if_compare clusterId ../id operator='=='}}
+  {{#if (is_str_equal commandSource 'client')}}
+            {{asHex commandCode 8}}: {
+                "commandId": {{asHex commandCode 8}},
+                "commandName": "{{asUpperCamelCase commandName}}",
                 "args": {
-{{#chip_cluster_command_arguments_with_structs_expanded}}
-                    "{{asLowerCamelCase label}}": "{{#if (isCharString type)}}str{{else}}{{asPythonType chipType}}{{/if}}",
-{{/chip_cluster_command_arguments_with_structs_expanded}}
+{{#zcl_command_arguments}}
+     {{#if_is_struct type}}
+        {{#zcl_struct_items_by_struct_name type}}
+                    "{{asLowerCamelCase label}}": "{{#if (isCharString type)}}str{{else}}{{as_underlying_python_zcl_type type ../../id}}{{/if}}",
+        {{/zcl_struct_items_by_struct_name}}
+    {{else}}
+                    "{{asLowerCamelCase label}}": "{{#if (isCharString type)}}str{{else}}{{as_underlying_python_zcl_type type ../id}}{{/if}}",
+    {{/if_is_struct}}
+{{/zcl_command_arguments}}
                 },
             },
-{{/chip_cluster_commands}}
+  {{/if}}
+  {{/if_compare}}
+{{/all_user_cluster_generated_commands}}
         },
         "attributes": {
 {{#zcl_attributes_server removeKeys='isOptional'}}
@@ -46,18 +56,18 @@ class ChipClusters:
 {{/zcl_attributes_server}}
         },
     }
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 
     _CLUSTER_ID_DICT = {
-{{#chip_client_clusters}}
+{{#all_user_clusters side='client'}}
         {{asHex code 8}}: _{{asDelimitedMacro name}}_CLUSTER_INFO,
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
     }
 
     _CLUSTER_NAME_DICT = {
-{{#chip_client_clusters}}
+{{#all_user_clusters side='client'}}
         "{{asUpperCamelCase name}}": _{{asDelimitedMacro name}}_CLUSTER_INFO,
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
     }
 
     def __init__(self, chipstack):
