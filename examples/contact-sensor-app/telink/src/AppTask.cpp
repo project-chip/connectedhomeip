@@ -19,10 +19,6 @@
 #include "AppTask.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/server/OnboardingCodesUtil.h>
-#include <app/server/Server.h>
-#include <app/util/af-enums.h>
-#include <app/util/attribute-storage.h>
 
 #include <zephyr/logging/log.h>
 #include <zephyr/zephyr.h>
@@ -42,7 +38,6 @@ CHIP_ERROR AppTask::Init(void)
     SetExampleButtonCallbacks(ContactActionEventHandler);
     InitCommonParts();
 
-    // Initialize LEDs
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
     sContactSensorLED.Init(CONTACT_STATE_LED);
     sContactSensorLED.Set(ContactSensorMgr().IsContactClosed());

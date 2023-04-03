@@ -91,9 +91,16 @@ CHIP_ERROR AppTask::Init(void)
 
 void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
-    PWMDevice::Action_t action;
-    int32_t actor = AppEvent::kEventType_Button;
+    PWMDevice::Action_t action = PWMDevice::INVALID_ACTION;
+    int32_t actor              = 0;
 
+    if (aEvent->Type == AppEvent::kEventType_Lighting)
+    {
+        action = static_cast<PWMDevice::Action_t>(aEvent->LightingEvent.Action);
+        actor  = aEvent->LightingEvent.Actor;
+    }
+    else if (aEvent->Type == AppEvent::kEventType_Button)
+    {
 #if USE_RGB_PWM
         if (sAppTask.mPwmRgbRedLed.IsTurnedOn() || sAppTask.mPwmRgbGreenLed.IsTurnedOn() || sAppTask.mPwmRgbBlueLed.IsTurnedOn())
         {
@@ -106,17 +113,46 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 #else
         action = sAppTask.mPwmRgbBlueLed.IsTurnedOn() ? PWMDevice::OFF_ACTION : PWMDevice::ON_ACTION;
 #endif
+        actor = AppEvent::kEventType_Button;
+    }
 
-    if (
+    if (action != PWMDevice::INVALID_ACTION &&
+        (
 #if USE_RGB_PWM
             !sAppTask.mPwmRgbRedLed.InitiateAction(action, actor, NULL) ||
             !sAppTask.mPwmRgbGreenLed.InitiateAction(action, actor, NULL) ||
 #endif
-            !sAppTask.mPwmRgbBlueLed.InitiateAction(action, actor, NULL))
+            !sAppTask.mPwmRgbBlueLed.InitiateAction(action, actor, NULL)))
     {
         LOG_INF("Action is in progress or active");
     }
 }
+
+#ifdef CONFIG_CHIP_PW_RPC
+void AppTask::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
+{
+    if (!btnPressed)
+    {
+        return;
+    }
+
+    switch (btnId)
+    {
+    case kButtonId_LightingAction:
+        ExampleActionButtonEventHandler();
+        break;
+    case kButtonId_FactoryReset:
+        FactoryResetButtonEventHandler();
+        break;
+    case kButtonId_StartThread:
+        StartThreadButtonEventHandler();
+        break;
+    case kButtonId_StartBleAdv:
+        StartBleAdvButtonEventHandler();
+        break;
+    }
+}
+#endif
 
 void AppTask::ActionInitiated(PWMDevice::Action_t aAction, int32_t aActor)
 {
