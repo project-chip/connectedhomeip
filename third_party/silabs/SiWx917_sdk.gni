@@ -113,7 +113,6 @@ template("siwx917_sdk") {
       defines += [ "ENABLE_CHIP_SHELL" ]
     }
 
-    if (!use_rs911x_sockets) {
       import("${chip_root}/src/platform/silabs/SiWx917/args.gni")
       defines += [ "LWIP_NETIF_API=1" ]
       if (lwip_ipv4) {
@@ -138,7 +137,6 @@ template("siwx917_sdk") {
       } else {
         defines += [ "LWIP_IPV6=0" ]
       }
-    }
 
     defines += board_defines
 
