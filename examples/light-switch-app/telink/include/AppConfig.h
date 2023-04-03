@@ -20,8 +20,9 @@
 
 // ---- Light Switch Example App Config ----
 
+#define APP_USE_EXAMPLE_START_BUTTON    1
+#define APP_USE_THREAD_START_BUTTON     1
 #define APP_SET_DEVICE_INFO_PROVIDER    1
-#define APP_USE_ADVANCED_BUTTON_FUNC    1
 #define APP_USE_IDENTIFY_PWM            1 // APP_USE_IDENTIFY_PWM must be defined before including "AppConfigCommon.h"
 
 #include "AppConfigCommon.h"

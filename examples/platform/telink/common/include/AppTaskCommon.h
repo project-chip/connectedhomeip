@@ -56,12 +56,13 @@ class AppTaskCommon
 {
 public:
     CHIP_ERROR StartApp();
+    void PostEvent(AppEvent * event);
+
     static void IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect);
 
 protected:
     CHIP_ERROR InitCommonParts(void);
 
-    void PostEvent(AppEvent * event);
     void DispatchEvent(AppEvent * event);
     void GetEvent(AppEvent * aEvent);
 
@@ -75,10 +76,12 @@ protected:
     static void StartBleAdvButtonEventHandler(void);
     static void StartBleAdvHandler(AppEvent * aEvent);
 
-#if APP_USE_ADVANCED_BUTTON_FUNC
+#if APP_USE_THREAD_START_BUTTON
     static void StartThreadButtonEventHandler(void);
     static void StartThreadHandler(AppEvent * aEvent);
+#endif
 
+#if APP_USE_EXAMPLE_START_BUTTON
     static void ExampleActionButtonEventHandler(void);
 
     void SetExampleButtonCallbacks(EventHandler aAction_CB);

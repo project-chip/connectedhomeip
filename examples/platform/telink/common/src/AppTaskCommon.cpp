@@ -65,8 +65,10 @@ LEDWidget sStatusLED;
 
 Button sFactoryResetButton;
 Button sBleAdvStartButton;
-#if APP_USE_ADVANCED_BUTTON_FUNC
+#if APP_USE_EXAMPLE_START_BUTTON
 Button sExampleActionButton;
+#endif
+#if APP_USE_THREAD_START_BUTTON
 Button sThreadStartButton;
 #endif
 
@@ -239,8 +241,10 @@ void AppTaskCommon::InitButtons(void)
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
     sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_1, FactoryResetButtonEventHandler);
     sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, StartBleAdvButtonEventHandler);
-    #if APP_USE_ADVANCED_BUTTON_FUNC
+    #if APP_USE_THREAD_START_BUTTON
     sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, StartThreadButtonEventHandler);
+    #endif
+    #if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler) {
         sExampleActionButton.Configure(BUTTON_PORT, BUTTON_PIN_2, ExampleActionButtonEventHandler);
     }
@@ -248,8 +252,10 @@ void AppTaskCommon::InitButtons(void)
 #else
     sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
     sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, StartBleAdvButtonEventHandler);
-    #if APP_USE_ADVANCED_BUTTON_FUNC
+    #if APP_USE_THREAD_START_BUTTON
     sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
+    #endif
+    #if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler) {
         sExampleActionButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, ExampleActionButtonEventHandler);
     }
@@ -258,8 +264,10 @@ void AppTaskCommon::InitButtons(void)
 
     ButtonManagerInst().AddButton(sFactoryResetButton);
     ButtonManagerInst().AddButton(sBleAdvStartButton);
-#if APP_USE_ADVANCED_BUTTON_FUNC
+#if APP_USE_THREAD_START_BUTTON
     ButtonManagerInst().AddButton(sThreadStartButton);
+#endif
+#if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler) {
         ButtonManagerInst().AddButton(sExampleActionButton);
     }
@@ -455,7 +463,7 @@ void AppTaskCommon::FactoryResetTimerEventHandler(AppEvent * aEvent)
     LOG_INF("Factory Reset Trigger Counter is cleared");
 }
 
-#if APP_USE_ADVANCED_BUTTON_FUNC
+#if APP_USE_THREAD_START_BUTTON
 void AppTaskCommon::StartThreadButtonEventHandler(void)
 {
     AppEvent event;
@@ -481,7 +489,9 @@ void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
         LOG_INF("Device already commissioned");
     }
 }
+#endif
 
+#if APP_USE_EXAMPLE_START_BUTTON
 void AppTaskCommon::ExampleActionButtonEventHandler(void)
 {
     AppEvent event;
