@@ -136,8 +136,7 @@ endpoint {{endpointId}} {
     emits event {{name}};
       {{/if}}
     {{/user_cluster_events}} 
-    {{#user_cluster_attributes}}
-      {{#if included}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
         {{~#if (is_str_equal storageOption "NVM")}}
     persist  {{!align~}}
         {{~else if (is_str_equal storageOption "External")}}
@@ -146,12 +145,17 @@ endpoint {{endpointId}} {
     ram      {{!align~}}
         {{~/if~}}
         attribute {{asLowerCamelCase name}}
-        {{~#if_is_non_zero_default defaultValue~}}
+        {{~#if isNullable~}} 
+          {{~#if defaultValue~}} 
+            {{!need space}} default = {{#if (isString type)}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
+          {{~/if~}}
+        {{~else~}}
+          {{~#if_is_non_zero_default defaultValue~}}
            {{!need space}} default = {{#if (isString type)}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
-        {{~/if_is_non_zero_default~}}
+          {{~/if_is_non_zero_default~}}
+        {{~/if~}}
         ;
-      {{/if}}
-    {{/user_cluster_attributes}}
+    {{/enabled_attributes_for_cluster_and_side}}
   }
       {{/if}}
     {{/if}}
