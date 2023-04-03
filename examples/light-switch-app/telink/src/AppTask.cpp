@@ -20,7 +20,35 @@
 
 #include "AppConfig.h"
 #include "AppEvent.h"
+#include "ButtonManager.h"
 #include "binding-handler.h"
+
+#include "ThreadUtil.h"
+
+#include <DeviceInfoProviderImpl.h>
+#include <app/clusters/identify-server/identify-server.h>
+#include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <lib/support/ErrorStr.h>
+#include <system/SystemClock.h>
+
+#if CONFIG_CHIP_OTA_REQUESTOR
+#include "OTAUtil.h"
+#endif
+
+#include <zephyr/logging/log.h>
+#include <zephyr/zephyr.h>
+
+#include <algorithm>
+
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
+
+using namespace ::chip;
+using namespace ::chip::app;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
 
 namespace {
 constexpr int kFactoryResetCalcTimeout          = 3000;

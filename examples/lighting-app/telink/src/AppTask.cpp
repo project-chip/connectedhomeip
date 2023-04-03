@@ -673,29 +673,29 @@ void AppTask::FactoryResetTimerEventHandler(AppEvent * aEvent)
     LOG_INF("Factory Reset Trigger Counter is cleared");
 }
 
-void AppTask::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
-{
-    if (!btnPressed)
-    {
-        return;
-    }
+// void AppTask::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
+// {
+//     if (!btnPressed)
+//     {
+//         return;
+//     }
 
-    switch (btnId)
-    {
-    case kButtonId_LightingAction:
-        LightingActionButtonEventHandler();
-        break;
-    case kButtonId_FactoryReset:
-        FactoryResetButtonEventHandler();
-        break;
-    case kButtonId_StartThread:
-        StartThreadButtonEventHandler();
-        break;
-    case kButtonId_StartBleAdv:
-        StartBleAdvButtonEventHandler();
-        break;
-    }
-}
+//     switch (btnId)
+//     {
+//     case kButtonId_LightingAction:
+//         LightingActionButtonEventHandler();
+//         break;
+//     case kButtonId_FactoryReset:
+//         FactoryResetButtonEventHandler();
+//         break;
+//     case kButtonId_StartThread:
+//         StartThreadButtonEventHandler();
+//         break;
+//     case kButtonId_StartBleAdv:
+//         StartBleAdvButtonEventHandler();
+//         break;
+//     }
+// }
 
 void AppTask::InitButtons(void)
 {

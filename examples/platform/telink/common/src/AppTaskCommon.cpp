@@ -16,29 +16,84 @@
  *    limitations under the License.
  */
 
+#include "AppTaskCommon.h"
 #include "AppTask.h"
 
 #include "ButtonManager.h"
 
+#include <zephyr/logging/log.h>
+#include <zephyr/zephyr.h>
+
 #include "ThreadUtil.h"
 
-#include <DeviceInfoProviderImpl.h>
-#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <app/util/attribute-storage.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <lib/support/ErrorStr.h>
-#include <system/SystemClock.h>
 
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include "OTAUtil.h"
 #endif
 
-#include <zephyr/logging/log.h>
-#include <zephyr/zephyr.h>
+namespace {
+constexpr int kFactoryResetCalcTimeout          = 3000;
+constexpr int kFactoryResetTriggerCntr          = 3;
+constexpr int kAppEventQueueSize                = 10;
+constexpr uint8_t kButtonPushEvent              = 1;
+constexpr uint8_t kButtonReleaseEvent           = 0;
+constexpr uint8_t kDefaultMinLevel              = 0;
+constexpr uint8_t kDefaultMaxLevel              = 254;
 
-#include <algorithm>
+#if APP_USE_IDENTIFY_PWM
+constexpr uint32_t kIdentifyBlinkRateMs         = 200;
+constexpr uint32_t kIdentifyOkayOnRateMs        = 50;
+constexpr uint32_t kIdentifyOkayOffRateMs       = 950;
+constexpr uint32_t kIdentifyFinishOnRateMs      = 950;
+constexpr uint32_t kIdentifyFinishOffRateMs     = 50;
+constexpr uint32_t kIdentifyChannelChangeRateMs = 1000;
+constexpr uint32_t kIdentifyBreatheRateMs       = 1000;
+
+const struct pwm_dt_spec sPwmIdentifySpecGreenLed = LIGHTING_PWM_SPEC_IDENTIFY_GREEN;
+#endif
+
+K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
+
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+LEDWidget sStatusLED;
+#endif
+
+Button sFactoryResetButton;
+Button sBleAdvStartButton;
+#if APP_USE_ADVANCED_BUTTON_FUNC
+Button sExampleActionButton;
+Button sThreadStartButton;
+#endif
+
+k_timer sFactoryResetTimer;
+uint8_t sFactoryResetCntr = 0;
+
+bool sIsThreadProvisioned = false;
+bool sIsThreadEnabled     = false;
+bool sIsThreadAttached    = false;
+bool sHaveBLEConnections  = false;
+}
+
+using namespace ::chip;
+using namespace ::chip::app;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
+
+class AppFabricTableDelegate : public FabricTable::Delegate
+{
+    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+    {
+        if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
+        {
+            chip::Server::GetInstance().ScheduleFactoryReset();
+        }
+    }
+};
 
 #if CONFIG_CHIP_LIB_SHELL
 #include <sys.h>
@@ -58,106 +113,170 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_telink, SHELL_CMD(reboot, NULL, "Reboot board
 SHELL_CMD_REGISTER(telink, &sub_telink, "Telink commands", NULL);
 #endif // CONFIG_CHIP_LIB_SHELL
 
-LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
+LOG_MODULE_DECLARE(appCommon, CONFIG_CHIP_APP_LOG_LEVEL);
 
-using namespace ::chip;
-using namespace ::chip::app;
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
+CHIP_ERROR AppTaskCommon::InitCommonParts(void)
+{
+    CHIP_ERROR err;
+    LOG_INF("SW Version: %u, %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
-namespace {
-constexpr int kFactoryResetCalcTimeout          = 3000;
-constexpr int kFactoryResetTriggerCntr          = 3;
-constexpr int kAppEventQueueSize                = 10;
-constexpr uint8_t kButtonPushEvent              = 1;
-constexpr uint8_t kButtonReleaseEvent           = 0;
-
-#if APP_USE_IDENTIFY_PWM
-constexpr EndpointId kLightEndpointId           = 1;
-constexpr uint8_t kDefaultMinLevel              = 0;
-constexpr uint8_t kDefaultMaxLevel              = 254;
-constexpr uint32_t kIdentifyBlinkRateMs         = 200;
-constexpr uint32_t kIdentifyOkayOnRateMs        = 50;
-constexpr uint32_t kIdentifyOkayOffRateMs       = 950;
-constexpr uint32_t kIdentifyFinishOnRateMs      = 950;
-constexpr uint32_t kIdentifyFinishOffRateMs     = 50;
-constexpr uint32_t kIdentifyChannelChangeRateMs = 1000;
-constexpr uint32_t kIdentifyBreatheRateMs       = 1000;
-const struct pwm_dt_spec sPwmIdentifySpecGreenLed = LIGHTING_PWM_SPEC_IDENTIFY_GREEN;
-#endif
-
-K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
-k_timer sFactoryResetTimer;
-uint8_t sFactoryResetCntr = 0;
-
+    // Initialize status LED
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-LEDWidget sStatusLED;
+    LEDWidget::InitGpio(LEDS_PORT);
+    LEDWidget::SetStateUpdateCallback(LEDStateUpdateHandler);
+    sStatusLED.Init(SYSTEM_STATE_LED);
+
+    UpdateStatusLED();
+#endif
+
+    InitButtons();
+
+    // Initialize function button timer
+    k_timer_init(&sFactoryResetTimer, &AppTask::FactoryResetTimerTimeoutCallback, nullptr);
+    k_timer_user_data_set(&sFactoryResetTimer, this);
+
 #if APP_USE_IDENTIFY_PWM
-LEDWidget sIdentifyLED;
-#endif
-#endif
-
-Button sFactoryResetButton;
-Button sBleAdvStartButton;
-
-bool sIsThreadProvisioned = false;
-bool sIsThreadEnabled     = false;
-bool sIsThreadAttached    = false;
-bool sHaveBLEConnections  = false;
-
-#if APP_USE_IDENTIFY_PWM
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
-
-void OnIdentifyTriggerEffect(Identify * identify)
-{
-    AppTask::IdentifyEffectHandler(identify->mCurrentEffectIdentifier);
-}
-
-Identify sIdentify = {
-    kLightEndpointId,
-    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStop"); },
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
-    OnIdentifyTriggerEffect,
-};
-#endif
-} // namespace
-
-AppTask AppTask::sAppTask;
-
-class AppFabricTableDelegate : public FabricTable::Delegate
-{
-    void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
-    {
-        if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
-        {
-            chip::Server::GetInstance().ScheduleFactoryReset();
-        }
-    }
-};
-
-
-CHIP_ERROR AppTask::AppTaskCommon::StartApp()
-{
-    CHIP_ERROR err = AppTask::Init();
-
+    // Initialize PWM Identify led
+    err = GetAppTask().mPwmIdentifyLed.Init(&sPwmIdentifySpecGreenLed, kDefaultMinLevel, kDefaultMaxLevel, kDefaultMaxLevel);
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("AppTask Init fail");
+        LOG_ERR("Green IDENTIFY PWM Device Init fail");
         return err;
     }
 
-    AppEvent event = {};
+    GetAppTask().mPwmIdentifyLed.SetCallbacks(nullptr, nullptr, ActionIdentifyStateUpdateHandler);
+#endif
 
-    while (true)
+    // Initialize CHIP server
+#if CONFIG_CHIP_FACTORY_DATA
+    ReturnErrorOnFailure(mFactoryDataProvider.Init());
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+    SetCommissionableDataProvider(&mFactoryDataProvider);
+    // Read EnableKey from the factory data.
+    MutableByteSpan enableKey(sTestEventTriggerEnableKey);
+    err = mFactoryDataProvider.GetEnableKey(enableKey);
+    if (err != CHIP_NO_ERROR)
     {
-        k_msgq_get(&sAppEventQueue, &event, K_FOREVER);
-        DispatchEvent(&event);
+        LOG_ERR("mFactoryDataProvider.GetEnableKey() failed. Could not delegate a test event trigger");
+        memset(sTestEventTriggerEnableKey, 0, sizeof(sTestEventTriggerEnableKey));
+    }
+#else
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
+
+#if CONFIG_CHIP_OTA_REQUESTOR
+    InitBasicOTARequestor();
+#endif
+
+    // Init ZCL Data Model and start server
+    static CommonCaseDeviceServerInitParams initParams;
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+
+    ConfigurationMgr().LogDeviceConfig();
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+
+    // Add CHIP event handler and start CHIP thread.
+    // Note that all the initialization code should happen prior to this point to avoid data races
+    // between the main and the CHIP threads.
+    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
+
+    err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(new AppFabricTableDelegate);
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("AppFabricTableDelegate fail");
+        return err;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void AppTaskCommon::InitButtons(void)
+{
+#if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
+    sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_1, FactoryResetButtonEventHandler);
+    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, StartBleAdvButtonEventHandler);
+    #if APP_USE_ADVANCED_BUTTON_FUNC
+    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, StartThreadButtonEventHandler);
+    if (ExampleActionEventHandler) {
+        sExampleActionButton.Configure(BUTTON_PORT, BUTTON_PIN_2, ExampleActionButtonEventHandler);
+    }
+    #endif
+#else
+    sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
+    sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, StartBleAdvButtonEventHandler);
+    #if APP_USE_ADVANCED_BUTTON_FUNC
+    sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
+    if (ExampleActionEventHandler) {
+        sExampleActionButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, ExampleActionButtonEventHandler);
+    }
+    #endif
+#endif
+
+    ButtonManagerInst().AddButton(sFactoryResetButton);
+    ButtonManagerInst().AddButton(sBleAdvStartButton);
+#if APP_USE_ADVANCED_BUTTON_FUNC
+    ButtonManagerInst().AddButton(sThreadStartButton);
+    if (ExampleActionEventHandler) {
+        ButtonManagerInst().AddButton(sExampleActionButton);
+    }
+#endif
+}
+
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+void AppTaskCommon::UpdateLedStateEventHandler(AppEvent * aEvent)
+{
+    if (aEvent->Type == AppEvent::kEventType_UpdateLedState)
+    {
+        aEvent->UpdateLedStateEvent.LedWidget->UpdateState();
     }
 }
 
+void AppTaskCommon::LEDStateUpdateHandler(LEDWidget * ledWidget)
+{
+    AppEvent event;
+    event.Type                          = AppEvent::kEventType_UpdateLedState;
+    event.Handler                       = UpdateLedStateEventHandler;
+    event.UpdateLedStateEvent.LedWidget = ledWidget;
+    GetAppTask().PostEvent(&event);
+}
+
+void AppTaskCommon::UpdateStatusLED()
+{
+    if (sIsThreadProvisioned && sIsThreadEnabled)
+    {
+        if (sIsThreadAttached)
+        {
+            sStatusLED.Blink(950, 50);
+        }
+        else
+        {
+            sStatusLED.Blink(100, 100);
+        }
+    }
+    else
+    {
+        sStatusLED.Blink(50, 950);
+    }
+}
+#endif
+
 #if APP_USE_IDENTIFY_PWM
-void AppTask::IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect)
+void AppTaskCommon::ActionIdentifyStateUpdateHandler(k_timer * timer)
+{
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_UpdateLedState;
+    event.Handler = UpdateIdentifyStateEventHandler;
+    GetAppTask().PostEvent(&event);
+}
+
+void AppTaskCommon::UpdateIdentifyStateEventHandler(AppEvent * aEvent)
+{
+    GetAppTask().mPwmIdentifyLed.UpdateAction();
+}
+
+void AppTaskCommon::IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect)
 {
     AppEvent event;
     event.Type = AppEvent::kEventType_IdentifyStart;
@@ -167,36 +286,36 @@ void AppTask::IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect)
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
         ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK");
         event.Handler = [](AppEvent *) {
-            sAppTask.mPwmIdentifyLed.InitiateBlinkAction(kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
+            GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyBlinkRateMs, kIdentifyBlinkRateMs);
         };
         break;
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
         ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE");
         event.Handler = [](AppEvent *) {
-            sAppTask.mPwmIdentifyLed.InitiateBreatheAction(PWMDevice::kBreatheType_Both, kIdentifyBreatheRateMs);
+            GetAppTask().mPwmIdentifyLed.InitiateBreatheAction(PWMDevice::kBreatheType_Both, kIdentifyBreatheRateMs);
         };
         break;
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
         ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY");
         event.Handler = [](AppEvent *) {
-            sAppTask.mPwmIdentifyLed.InitiateBlinkAction(kIdentifyOkayOnRateMs, kIdentifyOkayOffRateMs);
+            GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyOkayOnRateMs, kIdentifyOkayOffRateMs);
         };
         break;
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE:
         ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE");
         event.Handler = [](AppEvent *) {
-            sAppTask.mPwmIdentifyLed.InitiateBlinkAction(kIdentifyChannelChangeRateMs, kIdentifyChannelChangeRateMs);
+            GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyChannelChangeRateMs, kIdentifyChannelChangeRateMs);
         };
         break;
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
         ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT");
         event.Handler = [](AppEvent *) {
-            sAppTask.mPwmIdentifyLed.InitiateBlinkAction(kIdentifyFinishOnRateMs, kIdentifyFinishOffRateMs);
+            GetAppTask().mPwmIdentifyLed.InitiateBlinkAction(kIdentifyFinishOnRateMs, kIdentifyFinishOffRateMs);
         };
         break;
     case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
         ChipLogProgress(Zcl, "EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT");
-        event.Handler = [](AppEvent *) { sAppTask.mPwmIdentifyLed.StopAction(); };
+        event.Handler = [](AppEvent *) { GetAppTask().mPwmIdentifyLed.StopAction(); };
         event.Type    = AppEvent::kEventType_IdentifyStop;
         break;
     default:
@@ -204,50 +323,21 @@ void AppTask::IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect)
         return;
     }
 
-    sAppTask.PostEvent(&event);
+    GetAppTask().PostEvent(&event);
 }
 #endif
 
-void AppTask::FactoryResetButtonEventHandler(void)
-{
-    AppEvent event;
-
-    event.Type               = AppEvent::kEventType_Button;
-    event.ButtonEvent.Action = kButtonPushEvent;
-    event.Handler            = FactoryResetHandler;
-    sAppTask.PostEvent(&event);
-}
-
-void AppTask::FactoryResetHandler(AppEvent * aEvent)
-{
-    if (sFactoryResetCntr == 0)
-    {
-        k_timer_start(&sFactoryResetTimer, K_MSEC(kFactoryResetCalcTimeout), K_NO_WAIT);
-    }
-
-    sFactoryResetCntr++;
-    LOG_INF("Factory Reset Trigger Counter: %d/%d", sFactoryResetCntr, kFactoryResetTriggerCntr);
-
-    if (sFactoryResetCntr == kFactoryResetTriggerCntr)
-    {
-        k_timer_stop(&sFactoryResetTimer);
-        sFactoryResetCntr = 0;
-
-        chip::Server::GetInstance().ScheduleFactoryReset();
-    }
-}
-
-void AppTask::StartBleAdvButtonEventHandler(void)
+void AppTaskCommon::StartBleAdvButtonEventHandler(void)
 {
     AppEvent event;
 
     event.Type               = AppEvent::kEventType_Button;
     event.ButtonEvent.Action = kButtonPushEvent;
     event.Handler            = StartBleAdvHandler;
-    sAppTask.PostEvent(&event);
+    GetAppTask().PostEvent(&event);
 }
 
-void AppTask::StartBleAdvHandler(AppEvent * aEvent)
+void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
 {
     LOG_INF("StartBleAdvHandler");
 
@@ -270,45 +360,107 @@ void AppTask::StartBleAdvHandler(AppEvent * aEvent)
     }
 }
 
-#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
-void AppTask::UpdateLedStateEventHandler(AppEvent * aEvent)
+void AppTaskCommon::FactoryResetButtonEventHandler(void)
 {
-    if (aEvent->Type == AppEvent::kEventType_UpdateLedState)
+    AppEvent event;
+
+    event.Type               = AppEvent::kEventType_Button;
+    event.ButtonEvent.Action = kButtonPushEvent;
+    event.Handler            = FactoryResetHandler;
+    GetAppTask().PostEvent(&event);
+}
+
+void AppTaskCommon::FactoryResetHandler(AppEvent * aEvent)
+{
+    if (sFactoryResetCntr == 0)
     {
-        aEvent->UpdateLedStateEvent.LedWidget->UpdateState();
+        k_timer_start(&sFactoryResetTimer, K_MSEC(kFactoryResetCalcTimeout), K_NO_WAIT);
+    }
+
+    sFactoryResetCntr++;
+    LOG_INF("Factory Reset Trigger Counter: %d/%d", sFactoryResetCntr, kFactoryResetTriggerCntr);
+
+    if (sFactoryResetCntr == kFactoryResetTriggerCntr)
+    {
+        k_timer_stop(&sFactoryResetTimer);
+        sFactoryResetCntr = 0;
+
+        chip::Server::GetInstance().ScheduleFactoryReset();
     }
 }
 
-void AppTask::LEDStateUpdateHandler(LEDWidget * ledWidget)
+void AppTaskCommon::FactoryResetTimerTimeoutCallback(k_timer * timer)
 {
+    if (!timer)
+    {
+        return;
+    }
+
     AppEvent event;
-    event.Type                          = AppEvent::kEventType_UpdateLedState;
-    event.Handler                       = UpdateLedStateEventHandler;
-    event.UpdateLedStateEvent.LedWidget = ledWidget;
-    sAppTask.PostEvent(&event);
+    event.Type    = AppEvent::kEventType_Timer;
+    event.Handler = FactoryResetTimerEventHandler;
+    GetAppTask().PostEvent(&event);
 }
 
-void AppTask::UpdateStatusLED(void)
+void AppTaskCommon::FactoryResetTimerEventHandler(AppEvent * aEvent)
 {
-    if (sIsThreadProvisioned && sIsThreadEnabled)
+    if (aEvent->Type != AppEvent::kEventType_Timer)
     {
-        if (sIsThreadAttached)
-        {
-            sStatusLED.Blink(950, 50);
-        }
-        else
-        {
-            sStatusLED.Blink(100, 100);
-        }
+        return;
+    }
+
+    sFactoryResetCntr = 0;
+    LOG_INF("Factory Reset Trigger Counter is cleared");
+}
+
+#if APP_USE_ADVANCED_BUTTON_FUNC
+void AppTaskCommon::StartThreadButtonEventHandler(void)
+{
+    AppEvent event;
+
+    event.Type               = AppEvent::kEventType_Button;
+    event.ButtonEvent.Action = kButtonPushEvent;
+    event.Handler            = StartThreadHandler;
+    GetAppTask().PostEvent(&event);
+}
+
+void AppTaskCommon::StartThreadHandler(AppEvent * aEvent)
+{
+    LOG_INF("StartThreadHandler");
+    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    {
+        // Switch context from BLE to Thread
+        Internal::BLEManagerImpl sInstance;
+        sInstance.SwitchToIeee802154();
+        StartDefaultThreadNetwork();
     }
     else
     {
-        sStatusLED.Blink(50, 950);
+        LOG_INF("Device already commissioned");
     }
+}
+
+void AppTaskCommon::ExampleActionButtonEventHandler(void)
+{
+    AppEvent event;
+
+    if (!GetAppTask().ExampleActionEventHandler) {
+        return;
+    }
+
+    event.Type               = AppEvent::kEventType_Button;
+    event.ButtonEvent.Action = kButtonPushEvent;
+    event.Handler            = GetAppTask().ExampleActionEventHandler;
+    GetAppTask().PostEvent(&event);
+}
+
+void AppTaskCommon::SetExampleButtonCallbacks(EventHandler aAction_CB)
+{
+    ExampleActionEventHandler = aAction_CB;
 }
 #endif
 
-void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
+void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
 {
     switch (event->Type)
     {
@@ -339,21 +491,7 @@ void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */
     }
 }
 
-#if APP_USE_IDENTIFY_PWM
-void AppTask::ActionIdentifyStateUpdateHandler(k_timer * timer)
-{
-    AppEvent event;
-    event.Type    = AppEvent::kEventType_UpdateLedState;
-    event.Handler = UpdateIdentifyStateEventHandler;
-    sAppTask.PostEvent(&event);
-}
-
-void AppTask::UpdateIdentifyStateEventHandler(AppEvent * aEvent)
-{
-    sAppTask.mPwmIdentifyLed.UpdateAction();
-}
-#endif
-void AppTask::PostEvent(AppEvent * aEvent)
+void AppTaskCommon::PostEvent(AppEvent * aEvent)
 {
     if (!aEvent)
         return;
@@ -363,7 +501,7 @@ void AppTask::PostEvent(AppEvent * aEvent)
     }
 }
 
-void AppTask::DispatchEvent(AppEvent * aEvent)
+void AppTaskCommon::DispatchEvent(AppEvent * aEvent)
 {
     if (!aEvent)
         return;
@@ -377,26 +515,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-void AppTask::FactoryResetTimerTimeoutCallback(k_timer * timer)
+void AppTaskCommon::GetEvent(AppEvent * aEvent)
 {
-    if (!timer)
-    {
-        return;
-    }
-
-    AppEvent event;
-    event.Type    = AppEvent::kEventType_Timer;
-    event.Handler = FactoryResetTimerEventHandler;
-    sAppTask.PostEvent(&event);
-}
-
-void AppTask::FactoryResetTimerEventHandler(AppEvent * aEvent)
-{
-    if (aEvent->Type != AppEvent::kEventType_Timer)
-    {
-        return;
-    }
-
-    sFactoryResetCntr = 0;
-    LOG_INF("Factory Reset Trigger Counter is cleared");
+    k_msgq_get(&sAppEventQueue, aEvent, K_FOREVER);
 }

@@ -19,7 +19,7 @@
 #pragma once
 
 #include "AppConfig.h"
-#include "AppEvent.h"
+#include "AppEventCommon.h"
 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
 #include "LEDWidget.h"
@@ -39,47 +39,48 @@
 
 #include <cstdint>
 
-struct k_timer;
-
 class AppTaskCommon
 {
 public:
-    CHIP_ERROR StartApp();
+    CHIP_ERROR InitCommonParts(void);
 
     void PostEvent(AppEvent * event);
-
-private:
-
     void DispatchEvent(AppEvent * event);
+    void GetEvent(AppEvent * aEvent);
+
+    void InitButtons(void);
+
+    static void FactoryResetTimerTimeoutCallback(k_timer * timer);
+    static void FactoryResetTimerEventHandler(AppEvent * aEvent);
+    static void FactoryResetButtonEventHandler(void);
+    static void FactoryResetHandler(AppEvent * aEvent);
+
+    static void StartBleAdvButtonEventHandler(void);
+    static void StartBleAdvHandler(AppEvent * aEvent);
+
+#if APP_USE_ADVANCED_BUTTON_FUNC
+    static void StartThreadButtonEventHandler(void);
+    static void StartThreadHandler(AppEvent * aEvent);
+
+    static void ExampleActionButtonEventHandler(void);
+
+    void SetExampleButtonCallbacks(EventHandler aAction_CB);
+    EventHandler ExampleActionEventHandler;
+#endif
+
+    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
+#if APP_USE_IDENTIFY_PWM
+    PWMDevice mPwmIdentifyLed;
+
+    static void ActionIdentifyStateUpdateHandler(k_timer * timer);
+    static void UpdateIdentifyStateEventHandler(AppEvent * aEvent);
+    static void IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect); 
+#endif
 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
     static void UpdateLedStateEventHandler(AppEvent * aEvent);
     static void LEDStateUpdateHandler(LEDWidget * ledWidget);
-    static void UpdateStatusLED();
-#endif
-    static void FactoryResetButtonEventHandler(void);
-    static void StartBleAdvButtonEventHandler(void);
-
-    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-
-    static void FactoryResetTimerTimeoutCallback(k_timer * timer);
-
-    static void FactoryResetTimerEventHandler(AppEvent * aEvent);
-    static void FactoryResetHandler(AppEvent * aEvent);
-    static void StartBleAdvHandler(AppEvent * aEvent);
-#if APP_USE_IDENTIFY_PWM
-    static void UpdateIdentifyStateEventHandler(AppEvent * aEvent);
-#endif
-
-    static void InitButtons(void);
-
-    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-
-#if APP_USE_IDENTIFY_PWM
-    PWMDevice mPwmIdentifyLed;
-#endif
-
-#if CONFIG_CHIP_FACTORY_DATA
-    chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::ExternalFlashFactoryData> mFactoryDataProvider;
+    static void UpdateStatusLED(void);
 #endif
 };

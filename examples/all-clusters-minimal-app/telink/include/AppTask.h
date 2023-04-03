@@ -20,12 +20,18 @@
 
 #include "AppTaskCommon.h"
 
-class AppTask : public AppTaskCommon
+class AppTask : private AppTaskCommon
 {
+public:
+    CHIP_ERROR StartApp();
+
 private:
     friend AppTask & GetAppTask(void);
+    friend class AppTaskCommon;
 
     CHIP_ERROR Init();
+
+    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
     static AppTask sAppTask;
 };
