@@ -47,9 +47,9 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 namespace {
-constexpr uint8_t kDefaultMinLevel = 0;
-constexpr uint8_t kDefaultMaxLevel = 254;
-constexpr EndpointId kEndpointId   = 1;
+constexpr EndpointId kExampleEndpointId = 1;
+constexpr uint8_t kDefaultMinLevel      = 0;
+constexpr uint8_t kDefaultMaxLevel      = 254;
 } // namespace
 
 class AppTaskCommon

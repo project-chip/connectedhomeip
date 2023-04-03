@@ -22,13 +22,6 @@
 #include "ColorFormat.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/identify-server/identify-server.h>
-#include <app/server/OnboardingCodesUtil.h>
-#include <app/server/Server.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <lib/support/ErrorStr.h>
-#include <system/SystemClock.h>
 
 #include <zephyr/logging/log.h>
 #include <zephyr/zephyr.h>
@@ -53,15 +46,12 @@ AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init(void)
 {
-    SetExampleButtonCallbacks(LightingActionEventHandler);
-    InitCommonParts();
-
     // Init lighting manager
     uint8_t minLightLevel = kDefaultMinLevel;
-    Clusters::LevelControl::Attributes::MinLevel::Get(kEndpointId, &minLightLevel);
+    Clusters::LevelControl::Attributes::MinLevel::Get(kExampleEndpointId, &minLightLevel);
 
     uint8_t maxLightLevel = kDefaultMaxLevel;
-    Clusters::LevelControl::Attributes::MaxLevel::Get(kEndpointId, &maxLightLevel);
+    Clusters::LevelControl::Attributes::MaxLevel::Get(kExampleEndpointId, &maxLightLevel);
 
     CHIP_ERROR err = sAppTask.mPwmRgbBlueLed.Init(&sPwmRgbSpecBlueLed, minLightLevel, maxLightLevel, maxLightLevel);
     if (err != CHIP_NO_ERROR)
@@ -86,6 +76,9 @@ CHIP_ERROR AppTask::Init(void)
 #endif
     sAppTask.mPwmRgbBlueLed.SetCallbacks(ActionInitiated, ActionCompleted, nullptr);
 
+    SetExampleButtonCallbacks(LightingActionEventHandler);
+    InitCommonParts();
+
     err = ConnectivityMgr().SetBLEDeviceName("TelinkLight");
     if (err != CHIP_NO_ERROR)
     {
@@ -98,16 +91,9 @@ CHIP_ERROR AppTask::Init(void)
 
 void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 {
-    PWMDevice::Action_t action = PWMDevice::INVALID_ACTION;
-    int32_t actor              = 0;
+    PWMDevice::Action_t action;
+    int32_t actor = AppEvent::kEventType_Button;
 
-    if (aEvent->Type == AppEvent::kEventType_Lighting)
-    {
-        action = static_cast<PWMDevice::Action_t>(aEvent->LightingEvent.Action);
-        actor  = aEvent->LightingEvent.Actor;
-    }
-    else if (aEvent->Type == AppEvent::kEventType_Button)
-    {
 #if USE_RGB_PWM
         if (sAppTask.mPwmRgbRedLed.IsTurnedOn() || sAppTask.mPwmRgbGreenLed.IsTurnedOn() || sAppTask.mPwmRgbBlueLed.IsTurnedOn())
         {
@@ -120,16 +106,13 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
 #else
         action = sAppTask.mPwmRgbBlueLed.IsTurnedOn() ? PWMDevice::OFF_ACTION : PWMDevice::ON_ACTION;
 #endif
-        actor = AppEvent::kEventType_Button;
-    }
 
-    if (action != PWMDevice::INVALID_ACTION &&
-        (
+    if (
 #if USE_RGB_PWM
             !sAppTask.mPwmRgbRedLed.InitiateAction(action, actor, NULL) ||
             !sAppTask.mPwmRgbGreenLed.InitiateAction(action, actor, NULL) ||
 #endif
-            !sAppTask.mPwmRgbBlueLed.InitiateAction(action, actor, NULL)))
+            !sAppTask.mPwmRgbBlueLed.InitiateAction(action, actor, NULL))
     {
         LOG_INF("Action is in progress or active");
     }
@@ -181,7 +164,7 @@ void AppTask::UpdateClusterState(void)
     bool isTurnedOn  = sAppTask.mPwmRgbBlueLed.IsTurnedOn();
 #endif
     // write the new on/off value
-    EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(kEndpointId, isTurnedOn);
+    EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(kExampleEndpointId, isTurnedOn);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -202,7 +185,7 @@ void AppTask::UpdateClusterState(void)
 #else
     uint8_t setLevel = sAppTask.mPwmRgbBlueLed.GetLevel();
 #endif
-    status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kEndpointId, setLevel);
+    status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kExampleEndpointId, setLevel);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         LOG_ERR("Update CurrentLevel fail: %x", status);

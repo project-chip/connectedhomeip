@@ -89,7 +89,7 @@ void OnIdentifyTriggerEffect(Identify * identify)
 }
 
 Identify sIdentify = {
-    kEndpointId,
+    kExampleEndpointId,
     [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStart"); },
     [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStop"); },
     EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
