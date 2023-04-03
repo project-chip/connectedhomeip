@@ -1528,7 +1528,7 @@ bool ColorControlServer::colorLoopCommand(app::CommandHandler * commandObj, cons
 
     deactiveColorLoop = updateFlags.Has(ColorLoopUpdateFlags::kUpdateAction) && (action == ColorLoopAction::kDeactivate);
 
-    if (updateFlags.Has(ColorLoopUpdateFlags::kUpdateAction))
+    if (updateFlags.Has(ColorLoopUpdateFlags::kUpdateDirection))
     {
         Attributes::ColorLoopDirection::Set(endpoint, to_underlying(direction));
 
