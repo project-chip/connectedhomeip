@@ -1,1 +1,1 @@
-0.6.54 Version bump reason: [Ameba] Store wifi ssid and password into dct
+0.7.0 Version bump reason: [Android] Use NDK r23c and OpenSSL 1.1.1t
