@@ -37,6 +37,7 @@ struct AppEvent
         kEventType_Lighting,
         kEventType_Install,
         kEventType_Contact,
+        kEventType_Start,
     };
 
     uint16_t Type;
@@ -60,6 +61,11 @@ struct AppEvent
         {
             uint8_t Action;
         } ContactEvent;
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+        } StartEvent;
         struct
         {
             LEDWidget * LedWidget;

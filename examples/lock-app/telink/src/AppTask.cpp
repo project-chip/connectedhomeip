@@ -79,19 +79,27 @@ void AppTask::LockStateChanged(BoltLockManager::State state, BoltLockManager::Op
     {
     case BoltLockManager::State::kLockingInitiated:
         LOG_INF("Lock action initiated");
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         sLockLED.Blink(50, 50);
+#endif
         break;
     case BoltLockManager::State::kLockingCompleted:
         LOG_INF("Lock action completed");
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         sLockLED.Set(true);
+#endif
         break;
     case BoltLockManager::State::kUnlockingInitiated:
         LOG_INF("Unlock action initiated");
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         sLockLED.Blink(50, 50);
+#endif
         break;
     case BoltLockManager::State::kUnlockingCompleted:
         LOG_INF("Unlock action completed");
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
         sLockLED.Set(false);
+#endif
         break;
     }
 

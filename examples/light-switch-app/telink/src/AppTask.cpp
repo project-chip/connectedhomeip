@@ -19,8 +19,6 @@
 #include "AppTask.h"
 #include "binding-handler.h"
 
-#include <app/server/Server.h>
-
 #include <zephyr/logging/log.h>
 #include <zephyr/zephyr.h>
 

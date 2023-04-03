@@ -22,7 +22,7 @@
 
 #include <cstdint>
 
-#include "AppEvent.h"
+#include "AppEventCommon.h"
 
 struct k_timer;
 
