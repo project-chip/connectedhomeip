@@ -108,7 +108,6 @@ static uint16_t lastCount; // Nb of bytes already processed from the active dmaB
 #endif
 #define UART_TASK_SIZE 256
 #define UART_TASK_NAME "UART"
-#define UART_TX_COMPLETE_BIT (1 << 0)
 
 #ifdef CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE
 #define UART_TX_MAX_BUF_LEN (CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE + 2) // \r\n
@@ -351,6 +350,12 @@ int16_t uartConsoleWrite(const char * Buf, uint16_t BufLength)
     {
         return UART_CONSOLE_ERR;
     }
+
+#ifdef PW_RPC_ENABLED
+    // Pigweed Logger is already thread safe.
+    UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) Buf, BufLength);
+    return BufLength;
+#endif
 
     UartTxStruct_t workBuffer;
     memcpy(workBuffer.data, Buf, BufLength);
