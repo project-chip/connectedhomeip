@@ -118,12 +118,13 @@ class CodeGenerator:
         """
         if not loader:
             if not fs_loader_searchpath:
-                fs_loader_searchpath=os.path.dirname(__file__)
-            loader=jinja2.FileSystemLoader(searchpath=fs_loader_searchpath)
+                fs_loader_searchpath = os.path.dirname(__file__)
+            loader = jinja2.FileSystemLoader(searchpath=fs_loader_searchpath)
 
         self.storage = storage
         self.idl = idl
-        self.jinja_env = jinja2.Environment(loader=loader, keep_trailing_newline=True)
+        self.jinja_env = jinja2.Environment(
+            loader=loader, keep_trailing_newline=True)
         self.dry_run = False
 
         RegisterCommonFilters(self.jinja_env.filters)
