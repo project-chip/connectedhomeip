@@ -145,14 +145,8 @@ endpoint {{endpointId}} {
     ram      {{!align~}}
         {{~/if~}}
         attribute {{asLowerCamelCase name}}
-        {{~#if isNullable~}} 
-          {{~#if defaultValue~}} 
-            {{!need space}} default = {{#if (isString type)}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
-          {{~/if~}}
-        {{~else~}}
-          {{~#if_is_non_zero_default defaultValue~}}
-           {{!need space}} default = {{#if (isString type)}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
-          {{~/if_is_non_zero_default~}}
+        {{~#if defaultValue~}} 
+          {{!need space}} default = {{#if (isString type)}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
         {{~/if~}}
         ;
     {{/enabled_attributes_for_cluster_and_side}}
