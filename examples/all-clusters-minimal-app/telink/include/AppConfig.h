@@ -20,6 +20,7 @@
 
 // ---- All Clusters Minimal Application example config ----
 
+#define APP_SET_DEVICE_INFO_PROVIDER    0
 #define APP_USE_ADVANCED_BUTTON_FUNC    0
 #define APP_USE_IDENTIFY_PWM            0 // APP_USE_IDENTIFY_PWM must be defined before including "AppConfigCommon.h"
 

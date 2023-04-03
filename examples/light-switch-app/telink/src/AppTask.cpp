@@ -19,16 +19,7 @@
 #include "AppTask.h"
 #include "binding-handler.h"
 
-#include <DeviceInfoProviderImpl.h>
-#include <app/clusters/identify-server/identify-server.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <lib/support/ErrorStr.h>
-#include <system/SystemClock.h>
-
-#include <app/util/attribute-storage.h>
 
 #include <zephyr/logging/log.h>
 #include <zephyr/zephyr.h>
@@ -36,13 +27,7 @@
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
-using namespace ::chip::app;
-using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
-
-namespace {
-chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
-} // namespace
 
 AppTask AppTask::sAppTask;
 
@@ -50,9 +35,6 @@ CHIP_ERROR AppTask::Init(void)
 {
     SetExampleButtonCallbacks(SwitchActionEventHandler);
     InitCommonParts();
-
-    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     // Configure Bindings
     CHIP_ERROR err = InitBindingHandler();

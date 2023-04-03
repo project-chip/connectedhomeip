@@ -37,7 +37,20 @@
 #include <platform/telink/FactoryDataProvider.h>
 #endif
 
+#include <credentials/examples/DeviceAttestationCredsExample.h>
+
 #include <cstdint>
+
+using namespace ::chip;
+using namespace ::chip::app;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
+
+namespace {
+constexpr uint8_t kDefaultMinLevel = 0;
+constexpr uint8_t kDefaultMaxLevel = 254;
+constexpr EndpointId kEndpointId   = 1;
+} // namespace
 
 class AppTaskCommon
 {

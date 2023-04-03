@@ -26,9 +26,6 @@
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
-using namespace ::chip;
-using namespace ::chip::DeviceLayer;
-
 namespace {
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 } // namespace
