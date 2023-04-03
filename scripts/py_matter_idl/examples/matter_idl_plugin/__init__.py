@@ -14,7 +14,6 @@
 
 import os
 
-import jinja2
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.matter_idl_types import Cluster, ClusterSide, Command, Field, Idl
 
