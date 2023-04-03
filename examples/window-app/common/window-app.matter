@@ -1856,7 +1856,6 @@ endpoint 0 {
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
     ram      attribute updateStateProgress default = 0;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -1883,7 +1882,6 @@ endpoint 0 {
   }
 
   server cluster UnitLocalization {
-    persist  attribute temperatureUnit;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2025,9 +2023,6 @@ endpoint 0 {
     callback attribute channelPage0Mask default = "0x0000";
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0x000F;
     ram      attribute clusterRevision default = 1;
   }
@@ -2144,7 +2139,6 @@ endpoint 1 {
     ram      attribute currentGroup default = 0x0000;
     ram      attribute sceneValid default = 0x00;
     ram      attribute nameSupport;
-    ram      attribute lastConfiguredBy;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -2222,7 +2216,6 @@ endpoint 2 {
     ram      attribute currentGroup default = 0x0000;
     ram      attribute sceneValid default = 0x00;
     ram      attribute nameSupport;
-    ram      attribute lastConfiguredBy;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

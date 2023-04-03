@@ -137,6 +137,7 @@ endpoint {{endpointId}} {
       {{/if}}
     {{/user_cluster_events}} 
     {{#user_cluster_attributes}}
+       {{#if included}}
         {{~#if (is_str_equal storageOption "NVM")}}
     persist  {{!align~}}
         {{~else if (is_str_equal storageOption "External")}}
@@ -149,6 +150,7 @@ endpoint {{endpointId}} {
           {{!need space}} default = {{#if (isString type)}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
         {{~/if~}}
         ;
+      {{/if}}
     {{/user_cluster_attributes}}
   }
       {{/if}}

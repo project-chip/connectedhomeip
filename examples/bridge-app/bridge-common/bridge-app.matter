@@ -1902,7 +1902,6 @@ endpoint 2 {
     callback attribute measuredValue;
     callback attribute minMeasuredValue default = 0x954D;
     callback attribute maxMeasuredValue default = 0x7FFF;
-    ram      attribute tolerance default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

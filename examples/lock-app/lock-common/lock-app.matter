@@ -2177,7 +2177,6 @@ endpoint 0 {
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
     ram      attribute updateStateProgress default = 0;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -2395,7 +2394,6 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric default = 1;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -2445,7 +2443,6 @@ endpoint 1 {
     ram      attribute status default = 1;
     ram      attribute order default = 1;
     ram      attribute description default = "Battery";
-    ram      attribute wiredAssessedCurrent;
     ram      attribute batChargeLevel;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
@@ -2464,9 +2461,6 @@ endpoint 1 {
     ram      attribute lockType;
     ram      attribute actuatorEnabled;
     ram      attribute doorState;
-    ram      attribute doorOpenEvents;
-    ram      attribute doorClosedEvents;
-    ram      attribute openPeriod;
     ram      attribute numberOfTotalUsersSupported default = 10;
     ram      attribute numberOfPINUsersSupported default = 10;
     ram      attribute numberOfRFIDUsersSupported default = 10;
@@ -2480,25 +2474,15 @@ endpoint 1 {
     ram      attribute credentialRulesSupport default = 1;
     ram      attribute numberOfCredentialsSupportedPerUser default = 5;
     ram      attribute language default = "en";
-    ram      attribute LEDSettings default = 0;
     ram      attribute autoRelockTime default = 60;
     ram      attribute soundVolume default = 0x00;
     ram      attribute operatingMode default = 0x00;
     ram      attribute supportedOperatingModes default = 0xFFF6;
-    ram      attribute defaultConfigurationRegister default = 0;
-    ram      attribute enableLocalProgramming default = 1;
     ram      attribute enableOneTouchLocking default = 0x00;
-    ram      attribute enableInsideStatusLED default = 0;
     ram      attribute enablePrivacyModeButton default = 0x00;
-    ram      attribute localProgrammingFeatures default = 0;
     ram      attribute wrongCodeEntryLimit default = 3;
     ram      attribute userCodeTemporaryDisableTime default = 10;
-    ram      attribute sendPINOverTheAir default = 0;
     ram      attribute requirePINforRemoteOperation default = 0;
-    ram      attribute expiringUserTimeout;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0xDB3;
     ram      attribute clusterRevision default = 6;
   }

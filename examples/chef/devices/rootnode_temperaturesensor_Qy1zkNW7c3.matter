@@ -1236,7 +1236,6 @@ endpoint 0 {
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
     ram      attribute updateStateProgress default = 0;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -1376,7 +1375,6 @@ endpoint 1 {
     ram      attribute measuredValue default = 2350;
     ram      attribute minMeasuredValue default = -27315;
     ram      attribute maxMeasuredValue default = 32767;
-    ram      attribute tolerance default = 0;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;

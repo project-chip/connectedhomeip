@@ -3243,7 +3243,6 @@ endpoint 0 {
   server cluster AccessControl {
     emits event AccessControlEntryChanged;
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
@@ -3259,9 +3258,6 @@ endpoint 0 {
     callback attribute actionList;
     callback attribute endpointLists;
     callback attribute setupURL;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
@@ -3366,7 +3362,6 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
-    callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
   }
@@ -3534,8 +3529,6 @@ endpoint 0 {
     ram      attribute absMinHeatSetpointLimit default = 0x02BC;
     ram      attribute absMinCoolSetpointLimit default = 0x0640;
     ram      attribute absMaxCoolSetpointLimit default = 0x0C80;
-    ram      attribute PICoolingDemand;
-    ram      attribute PIHeatingDemand;
     ram      attribute occupiedCoolingSetpoint default = 0x0A28;
     ram      attribute occupiedHeatingSetpoint default = 0x07D0;
     ram      attribute minHeatSetpointLimit default = 0x02BC;
@@ -3548,7 +3541,6 @@ endpoint 0 {
     ram      attribute startOfWeek default = 0;
     ram      attribute numberOfWeeklyTransitions default = 7;
     ram      attribute numberOfDailyTransitions default = 4;
-    ram      attribute temperatureSetpointHold default = 0x00;
     ram      attribute featureMap default = 0x000b;
     ram      attribute clusterRevision default = 5;
   }
@@ -3696,7 +3688,6 @@ endpoint 1 {
     ram      attribute currentGroup default = 0x0000;
     ram      attribute sceneValid default = 0x00;
     ram      attribute nameSupport;
-    ram      attribute lastConfiguredBy;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -3722,17 +3713,8 @@ endpoint 1 {
   server cluster LevelControl {
     ram      attribute currentLevel default = 0x00;
     ram      attribute remainingTime default = 0x0000;
-    ram      attribute minLevel default = 0x00;
-    ram      attribute maxLevel default = 0xFE;
-    ram      attribute currentFrequency default = 0x0000;
-    ram      attribute minFrequency default = 0x0000;
-    ram      attribute maxFrequency default = 0x0000;
     ram      attribute options default = 0x00;
-    ram      attribute onOffTransitionTime default = 0x0000;
     ram      attribute onLevel;
-    ram      attribute onTransitionTime;
-    ram      attribute offTransitionTime;
-    ram      attribute defaultMoveRate;
     ram      attribute startUpCurrentLevel;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -3805,11 +3787,8 @@ endpoint 1 {
   }
 
   server cluster ColorControl {
-    ram      attribute currentHue default = 0x00;
-    ram      attribute currentSaturation default = 0x00;
     ram      attribute currentX default = 0x616B;
     ram      attribute currentY default = 0x607D;
-    ram      attribute colorTemperatureMireds default = 0x00FA;
     ram      attribute options default = 0x00;
     ram      attribute coupleColorTempToLevelMinMireds;
     ram      attribute startUpColorTemperatureMireds;
@@ -3830,9 +3809,6 @@ endpoint 1 {
     ram      attribute physicalContactOccupiedToUnoccupiedDelay default = 0x00;
     ram      attribute physicalContactUnoccupiedToOccupiedDelay default = 0x00;
     ram      attribute physicalContactUnoccupiedToOccupiedThreshold default = 1;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 3;
   }

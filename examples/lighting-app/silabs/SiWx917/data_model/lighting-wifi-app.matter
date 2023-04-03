@@ -1625,7 +1625,6 @@ endpoint 0 {
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
     ram      attribute updateStateProgress default = 0;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -1795,9 +1794,6 @@ endpoint 1 {
     ram      attribute offTransitionTime;
     ram      attribute defaultMoveRate default = 50;
     persist  attribute startUpCurrentLevel default = 255;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 5;
   }
@@ -1817,41 +1813,10 @@ endpoint 1 {
     ram      attribute remainingTime default = 0x0000;
     ram      attribute currentX default = 0x616B;
     ram      attribute currentY default = 0x607D;
-    ram      attribute driftCompensation;
-    ram      attribute compensationText;
     ram      attribute colorTemperatureMireds default = 0x00FA;
     ram      attribute colorMode default = 0x01;
     ram      attribute options default = 0x00;
     ram      attribute numberOfPrimaries;
-    ram      attribute primary1X;
-    ram      attribute primary1Y;
-    ram      attribute primary1Intensity;
-    ram      attribute primary2X;
-    ram      attribute primary2Y;
-    ram      attribute primary2Intensity;
-    ram      attribute primary3X;
-    ram      attribute primary3Y;
-    ram      attribute primary3Intensity;
-    ram      attribute primary4X;
-    ram      attribute primary4Y;
-    ram      attribute primary4Intensity;
-    ram      attribute primary5X;
-    ram      attribute primary5Y;
-    ram      attribute primary5Intensity;
-    ram      attribute primary6X;
-    ram      attribute primary6Y;
-    ram      attribute primary6Intensity;
-    ram      attribute whitePointX;
-    ram      attribute whitePointY;
-    ram      attribute colorPointRX;
-    ram      attribute colorPointRY;
-    ram      attribute colorPointRIntensity;
-    ram      attribute colorPointGX;
-    ram      attribute colorPointGY;
-    ram      attribute colorPointGIntensity;
-    ram      attribute colorPointBX;
-    ram      attribute colorPointBY;
-    ram      attribute colorPointBIntensity;
     ram      attribute enhancedCurrentHue default = 0x0000;
     ram      attribute enhancedColorMode default = 0x01;
     ram      attribute colorLoopActive default = 0x00;
@@ -1864,9 +1829,6 @@ endpoint 1 {
     ram      attribute colorTempPhysicalMaxMireds default = 0xFEFF;
     ram      attribute coupleColorTempToLevelMinMireds;
     ram      attribute startUpColorTemperatureMireds;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0x1F;
     ram      attribute clusterRevision default = 5;
   }

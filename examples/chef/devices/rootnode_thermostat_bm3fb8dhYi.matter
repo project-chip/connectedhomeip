@@ -1398,7 +1398,6 @@ endpoint 0 {
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
     ram      attribute updateStateProgress default = 0;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -1435,9 +1434,6 @@ endpoint 0 {
     ram      attribute lastNetworkingStatus;
     ram      attribute lastNetworkID;
     ram      attribute lastConnectErrorValue;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 0x0001;
   }
@@ -1577,21 +1573,6 @@ endpoint 1 {
     ram      attribute startOfWeek default = 0;
     ram      attribute numberOfWeeklyTransitions default = 0;
     ram      attribute numberOfDailyTransitions default = 0;
-    ram      attribute temperatureSetpointHold default = 0x00;
-    ram      attribute temperatureSetpointHoldDuration default = 0xFFFF;
-    ram      attribute thermostatProgrammingOperationMode default = 0x0000;
-    ram      attribute thermostatRunningState;
-    ram      attribute setpointChangeSource;
-    ram      attribute setpointChangeAmount default = 0x8000;
-    ram      attribute setpointChangeSourceTimestamp;
-    ram      attribute ACType default = 0x00;
-    ram      attribute ACCapacity default = 0x0000;
-    ram      attribute ACRefrigerantType default = 0x00;
-    ram      attribute ACCompressorType default = 0x00;
-    ram      attribute ACErrorCode default = 0x00000000;
-    ram      attribute ACLouverPosition default = 0x00;
-    ram      attribute ACCoilTemperature default = 0x8000;
-    ram      attribute ACCapacityformat default = 0x00;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
@@ -1602,7 +1583,6 @@ endpoint 1 {
   server cluster ThermostatUserInterfaceConfiguration {
     ram      attribute temperatureDisplayMode default = 0x00;
     ram      attribute keypadLockout default = 0x00;
-    ram      attribute scheduleProgrammingVisibility;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;

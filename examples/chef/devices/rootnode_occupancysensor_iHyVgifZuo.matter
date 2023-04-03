@@ -1253,7 +1253,6 @@ endpoint 0 {
     ram      attribute updatePossible default = 1;
     ram      attribute updateState default = 0;
     ram      attribute updateStateProgress default = 0;
-    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -1393,15 +1392,6 @@ endpoint 1 {
     ram      attribute occupancy default = 0;
     ram      attribute occupancySensorType default = 0;
     ram      attribute occupancySensorTypeBitmap default = 0x1;
-    ram      attribute PIROccupiedToUnoccupiedDelay default = 0x0000;
-    ram      attribute PIRUnoccupiedToOccupiedDelay default = 0x0000;
-    ram      attribute PIRUnoccupiedToOccupiedThreshold default = 0x01;
-    ram      attribute ultrasonicOccupiedToUnoccupiedDelay default = 0x0000;
-    ram      attribute ultrasonicUnoccupiedToOccupiedDelay default = 0x0000;
-    ram      attribute ultrasonicUnoccupiedToOccupiedThreshold default = 0x01;
-    ram      attribute physicalContactOccupiedToUnoccupiedDelay default = 0x0000;
-    ram      attribute physicalContactUnoccupiedToOccupiedDelay default = 0x0000;
-    ram      attribute physicalContactUnoccupiedToOccupiedThreshold default = 0x01;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
