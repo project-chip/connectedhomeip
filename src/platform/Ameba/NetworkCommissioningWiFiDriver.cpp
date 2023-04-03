@@ -18,6 +18,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <platform/Ameba/AmebaUtils.h>
+#include <platform/Ameba/ConnectivityManagerImpl.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -145,6 +146,7 @@ CHIP_ERROR AmebaWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLe
         }
     }
 
+    ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManager::kWiFiStationState_Connecting);
     return chip::DeviceLayer::Internal::AmebaUtils::WiFiConnect(ssid, key);
 }
 

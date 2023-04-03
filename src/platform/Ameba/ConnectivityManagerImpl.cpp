@@ -148,12 +148,12 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     if (event->Type == DeviceEventType::kRtkWiFiStationConnectedEvent)
     {
         ChipLogProgress(DeviceLayer, "WiFiStationConnected");
-        // normally we only advance connecting state to connecting_succeeded
-        // however, NetworkCommissioning::ConnectWiFiNetwork can't invoke ChangeWiFiStationState (private)
-        // hence we allow not_connected state to advance to connecting_succeeded state
         if ((mWiFiStationState == kWiFiStationState_Connecting) || (mWiFiStationState == kWiFiStationState_NotConnected))
         {
             ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
+        }
+        if (mWiFiStationState == kWiFiStationState_Connecting)
+        {
             DHCPProcess();
         }
         DriveStationState();

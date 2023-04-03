@@ -114,6 +114,7 @@ private:
     bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
+    void ChangeWiFiStationState(WiFiStationState newState);
 
     // ===== Private members reserved for use by this class only.
 
@@ -130,7 +131,6 @@ private:
     void DriveStationState(void);
     void OnStationConnected(void);
     void OnStationDisconnected(void);
-    void ChangeWiFiStationState(WiFiStationState newState);
     static void DriveStationState(::chip::System::Layer * aLayer, void * aAppState);
 
     void DriveAPState(void);
