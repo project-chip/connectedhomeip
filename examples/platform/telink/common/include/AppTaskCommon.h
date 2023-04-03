@@ -42,6 +42,10 @@
 class AppTaskCommon
 {
 public:
+    CHIP_ERROR StartApp();
+    static void IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect);
+
+protected:
     CHIP_ERROR InitCommonParts(void);
 
     void PostEvent(AppEvent * event);
@@ -75,12 +79,15 @@ public:
 
     static void ActionIdentifyStateUpdateHandler(k_timer * timer);
     static void UpdateIdentifyStateEventHandler(AppEvent * aEvent);
-    static void IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect); 
 #endif
 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
     static void UpdateLedStateEventHandler(AppEvent * aEvent);
     static void LEDStateUpdateHandler(LEDWidget * ledWidget);
     static void UpdateStatusLED(void);
+#endif
+
+#if CONFIG_CHIP_FACTORY_DATA
+    chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::ExternalFlashFactoryData> mFactoryDataProvider;
 #endif
 };

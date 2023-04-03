@@ -24,35 +24,16 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/zephyr.h>
 
-
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-AppTask AppTask::sAppTask;
-
-
+namespace {
 constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
+} // namespace
 
-CHIP_ERROR AppTask::StartApp()
-{
-    CHIP_ERROR err = Init();
-
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("AppTask Init fail");
-        return err;
-    }
-
-    AppEvent event = {};
-
-    while (true)
-    {
-        GetEvent(&event);
-        DispatchEvent(&event);
-    }
-}
+AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init()
 { 

@@ -30,11 +30,19 @@
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
+#include <app/clusters/identify-server/identify-server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include "OTAUtil.h"
 #endif
+
+LOG_MODULE_DECLARE(appCommon, CONFIG_CHIP_APP_LOG_LEVEL);
+
+using namespace ::chip;
+using namespace ::chip::app;
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
 
 namespace {
 constexpr int kFactoryResetCalcTimeout          = 3000;
@@ -46,6 +54,7 @@ constexpr uint8_t kDefaultMinLevel              = 0;
 constexpr uint8_t kDefaultMaxLevel              = 254;
 
 #if APP_USE_IDENTIFY_PWM
+constexpr EndpointId kEndpointId                = 1;
 constexpr uint32_t kIdentifyBlinkRateMs         = 200;
 constexpr uint32_t kIdentifyOkayOnRateMs        = 50;
 constexpr uint32_t kIdentifyOkayOffRateMs       = 950;
@@ -77,12 +86,28 @@ bool sIsThreadProvisioned = false;
 bool sIsThreadEnabled     = false;
 bool sIsThreadAttached    = false;
 bool sHaveBLEConnections  = false;
+
+#if APP_USE_IDENTIFY_PWM
+void OnIdentifyTriggerEffect(Identify * identify)
+{
+    AppTaskCommon::IdentifyEffectHandler(identify->mCurrentEffectIdentifier);
 }
 
-using namespace ::chip;
-using namespace ::chip::app;
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
+Identify sIdentify = {
+    kEndpointId,
+    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStart"); },
+    [](Identify *) { ChipLogProgress(Zcl, "OnIdentifyStop"); },
+    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+    OnIdentifyTriggerEffect,
+};
+#endif
+
+#if CONFIG_CHIP_FACTORY_DATA
+// NOTE! This key is for test/certification only and should not be available in production devices!
+uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+#endif
+} // namespace
 
 class AppFabricTableDelegate : public FabricTable::Delegate
 {
@@ -113,7 +138,24 @@ SHELL_STATIC_SUBCMD_SET_CREATE(sub_telink, SHELL_CMD(reboot, NULL, "Reboot board
 SHELL_CMD_REGISTER(telink, &sub_telink, "Telink commands", NULL);
 #endif // CONFIG_CHIP_LIB_SHELL
 
-LOG_MODULE_DECLARE(appCommon, CONFIG_CHIP_APP_LOG_LEVEL);
+CHIP_ERROR AppTaskCommon::StartApp(void)
+{
+    CHIP_ERROR err = GetAppTask().Init();
+
+    if (err != CHIP_NO_ERROR)
+    {
+        LOG_ERR("AppTask Init fail");
+        return err;
+    }
+
+    AppEvent event = {};
+
+    while (true)
+    {
+        GetEvent(&event);
+        DispatchEvent(&event);
+    }
+}
 
 CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 {

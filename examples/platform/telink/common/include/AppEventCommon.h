@@ -34,6 +34,8 @@ struct AppEvent
         kEventType_UpdateLedState,
         kEventType_IdentifyStart,
         kEventType_IdentifyStop,
+        kEventType_Lighting,
+        kEventType_Install,
     };
 
     uint16_t Type;
@@ -48,6 +50,11 @@ struct AppEvent
         {
             void * Context;
         } TimerEvent;
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+        } LightingEvent;
         struct
         {
             LEDWidget * LedWidget;
