@@ -1708,7 +1708,7 @@ endpoint 0 {
     callback attribute defaultOTAProviders;
     ram      attribute updatePossible default = 1;
     ram      attribute updateState;
-    ram      attribute updateStateProgress;
+    ram      attribute updateStateProgress default = 0;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -1790,16 +1790,16 @@ endpoint 0 {
     callback attribute bssid;
     callback attribute securityType;
     callback attribute wiFiVersion;
-    callback attribute channelNumber;
-    callback attribute rssi;
-    callback attribute beaconLostCount;
-    callback attribute beaconRxCount;
-    callback attribute packetMulticastRxCount;
-    callback attribute packetMulticastTxCount;
-    callback attribute packetUnicastRxCount;
-    callback attribute packetUnicastTxCount;
-    callback attribute currentMaxRate;
-    callback attribute overrunCount;
+    callback attribute channelNumber default = 0x0000;
+    callback attribute rssi default = 0x00;
+    callback attribute beaconLostCount default = 0x00000000;
+    callback attribute beaconRxCount default = 0x00000000;
+    callback attribute packetMulticastRxCount default = 0x00000000;
+    callback attribute packetMulticastTxCount default = 0x00000000;
+    callback attribute packetUnicastRxCount default = 0x00000000;
+    callback attribute packetUnicastTxCount default = 0x00000000;
+    callback attribute currentMaxRate default = 0x0000000000000000;
+    callback attribute overrunCount default = 0x0000000000000000;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
   }
@@ -1814,7 +1814,7 @@ endpoint 0 {
   server cluster AdministratorCommissioning {
     callback attribute windowStatus;
     callback attribute adminFabricIndex default = 1;
-    callback attribute adminVendorId;
+    callback attribute adminVendorId default = 0;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }

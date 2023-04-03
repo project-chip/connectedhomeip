@@ -1245,6 +1245,9 @@ endpoint 0 {
 
   server cluster Groups {
     ram      attribute nameSupport;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
@@ -1254,6 +1257,9 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap;
     callback attribute clusterRevision default = 1;
   }
@@ -1302,7 +1308,7 @@ endpoint 0 {
     callback attribute defaultOTAProviders;
     ram      attribute updatePossible default = 1;
     ram      attribute updateState;
-    ram      attribute updateStateProgress;
+    ram      attribute updateStateProgress default = 0;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -1380,7 +1386,7 @@ endpoint 0 {
   server cluster AdministratorCommissioning {
     callback attribute windowStatus;
     callback attribute adminFabricIndex default = 1;
-    callback attribute adminVendorId;
+    callback attribute adminVendorId default = 0;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 0x0001;
   }
@@ -1443,26 +1449,26 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster WindowCovering {
     ram      attribute type default = 8;
     ram      attribute physicalClosedLimitLift;
     ram      attribute physicalClosedLimitTilt;
-    ram      attribute currentPositionLift;
-    ram      attribute currentPositionTilt;
+    ram      attribute currentPositionLift default = 0;
+    ram      attribute currentPositionTilt default = 0;
     ram      attribute numberOfActuationsLift;
     ram      attribute numberOfActuationsTilt;
     ram      attribute configStatus default = 0x19;
-    ram      attribute currentPositionLiftPercentage;
-    ram      attribute currentPositionTiltPercentage;
+    ram      attribute currentPositionLiftPercentage default = 0;
+    ram      attribute currentPositionTiltPercentage default = 0;
     ram      attribute operationalStatus;
-    ram      attribute targetPositionLiftPercent100ths;
-    ram      attribute targetPositionTiltPercent100ths;
+    ram      attribute targetPositionLiftPercent100ths default = 0;
+    ram      attribute targetPositionTiltPercent100ths default = 0;
     ram      attribute endProductType default = 8;
-    ram      attribute currentPositionLiftPercent100ths;
-    ram      attribute currentPositionTiltPercent100ths;
+    ram      attribute currentPositionLiftPercent100ths default = 0;
+    ram      attribute currentPositionTiltPercent100ths default = 0;
     ram      attribute installedOpenLimitLift;
     ram      attribute installedClosedLimitLift default = 65534;
     ram      attribute installedOpenLimitTilt;

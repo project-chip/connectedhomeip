@@ -3227,6 +3227,10 @@ endpoint 0 {
     ram      attribute onTime;
     ram      attribute offWaitTime;
     ram      attribute startUpOnOff default = 0xFF;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0x0001;
     ram      attribute clusterRevision default = 4;
   }
@@ -3236,6 +3240,10 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap;
     callback attribute clusterRevision default = 1;
   }
@@ -3397,29 +3405,29 @@ endpoint 0 {
     callback attribute bssid;
     callback attribute securityType;
     callback attribute wiFiVersion;
-    callback attribute channelNumber;
-    callback attribute rssi;
-    callback attribute beaconLostCount;
-    callback attribute beaconRxCount;
-    callback attribute packetMulticastRxCount;
-    callback attribute packetMulticastTxCount;
-    callback attribute packetUnicastRxCount;
-    callback attribute packetUnicastTxCount;
-    callback attribute currentMaxRate;
-    callback attribute overrunCount;
+    callback attribute channelNumber default = 0x0000;
+    callback attribute rssi default = 0x00;
+    callback attribute beaconLostCount default = 0x00000000;
+    callback attribute beaconRxCount default = 0x00000000;
+    callback attribute packetMulticastRxCount default = 0x00000000;
+    callback attribute packetMulticastTxCount default = 0x00000000;
+    callback attribute packetUnicastRxCount default = 0x00000000;
+    callback attribute packetUnicastTxCount default = 0x00000000;
+    callback attribute currentMaxRate default = 0x0000000000000000;
+    callback attribute overrunCount default = 0x0000000000000000;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster EthernetNetworkDiagnostics {
     callback attribute PHYRate;
-    callback attribute fullDuplex;
+    callback attribute fullDuplex default = 0x00;
     callback attribute packetRxCount;
     callback attribute packetTxCount;
     callback attribute txErrCount;
     callback attribute collisionCount;
     callback attribute overrunCount;
-    callback attribute carrierDetect;
+    callback attribute carrierDetect default = 0x00;
     callback attribute timeSinceReset;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
@@ -3439,7 +3447,7 @@ endpoint 0 {
   server cluster AdministratorCommissioning {
     callback attribute windowStatus;
     callback attribute adminFabricIndex default = 1;
-    callback attribute adminVendorId;
+    callback attribute adminVendorId default = 0;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -3515,9 +3523,9 @@ endpoint 0 {
     ram      attribute effectiveControlMode;
     ram      attribute capacity;
     ram      attribute speed;
-    ram      attribute lifetimeRunningHours;
+    ram      attribute lifetimeRunningHours default = 0x000000;
     ram      attribute power;
-    ram      attribute lifetimeEnergyConsumed;
+    ram      attribute lifetimeEnergyConsumed default = 0x00000000;
     ram      attribute operationMode;
     ram      attribute controlMode;
     ram      attribute featureMap;
@@ -3557,7 +3565,7 @@ endpoint 0 {
   }
 
   server cluster IlluminanceMeasurement {
-    ram      attribute measuredValue;
+    ram      attribute measuredValue default = 0x0000;
     ram      attribute minMeasuredValue default = 0x01;
     ram      attribute maxMeasuredValue default = 0xFFFE;
     ram      attribute tolerance;
@@ -3576,13 +3584,13 @@ endpoint 0 {
   }
 
   server cluster PressureMeasurement {
-    ram      attribute measuredValue;
+    ram      attribute measuredValue default = 0x0000;
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue;
     ram      attribute tolerance;
-    ram      attribute scaledValue;
-    ram      attribute minScaledValue;
-    ram      attribute maxScaledValue;
+    ram      attribute scaledValue default = 0x0000;
+    ram      attribute minScaledValue default = 0x0000;
+    ram      attribute maxScaledValue default = 0x0000;
     ram      attribute scaledTolerance;
     ram      attribute scale;
     ram      attribute featureMap;
@@ -3600,7 +3608,7 @@ endpoint 0 {
 
   server cluster RelativeHumidityMeasurement {
     ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
+    ram      attribute minMeasuredValue default = 0;
     ram      attribute maxMeasuredValue default = 0x2710;
     ram      attribute tolerance;
     callback attribute generatedCommandList;
@@ -3698,20 +3706,20 @@ endpoint 1 {
 
   server cluster OnOff {
     ram      attribute onOff;
-    ram      attribute globalSceneControl default = 1;
+    ram      attribute globalSceneControl default = 0x01;
     ram      attribute onTime;
     ram      attribute offWaitTime;
-    ram      attribute startUpOnOff;
+    ram      attribute startUpOnOff default = 0xFF;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0x0001;
     ram      attribute clusterRevision default = 4;
   }
 
   server cluster LevelControl {
-    ram      attribute currentLevel;
+    ram      attribute currentLevel default = 0x00;
     ram      attribute remainingTime;
     ram      attribute options;
     ram      attribute onLevel;
@@ -3734,7 +3742,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster BasicInformation {

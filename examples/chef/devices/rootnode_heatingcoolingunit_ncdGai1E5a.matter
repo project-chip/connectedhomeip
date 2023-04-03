@@ -1451,6 +1451,9 @@ endpoint 0 {
 
   server cluster Groups {
     ram      attribute nameSupport;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 3;
   }
@@ -1460,8 +1463,11 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap;
-    callback attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 1;
   }
 
   server cluster AccessControl {
@@ -1508,7 +1514,7 @@ endpoint 0 {
     callback attribute defaultOTAProviders;
     ram      attribute updatePossible default = 1;
     ram      attribute updateState;
-    ram      attribute updateStateProgress;
+    ram      attribute updateStateProgress default = 0;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -1586,7 +1592,7 @@ endpoint 0 {
   server cluster AdministratorCommissioning {
     callback attribute windowStatus;
     callback attribute adminFabricIndex default = 1;
-    callback attribute adminVendorId;
+    callback attribute adminVendorId default = 0;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 0x0001;
   }
@@ -1651,7 +1657,7 @@ endpoint 1 {
   }
 
   server cluster LevelControl {
-    ram      attribute currentLevel;
+    ram      attribute currentLevel default = 0;
     ram      attribute minLevel;
     ram      attribute maxLevel default = 0xFE;
     ram      attribute onLevel default = 0xFE;
@@ -1677,10 +1683,10 @@ endpoint 1 {
   server cluster FanControl {
     ram      attribute fanMode;
     ram      attribute fanModeSequence default = 0x02;
-    ram      attribute percentSetting;
+    ram      attribute percentSetting default = 0x00;
     ram      attribute percentCurrent;
     ram      attribute speedMax default = 10;
-    ram      attribute speedSetting;
+    ram      attribute speedSetting default = 0x00;
     ram      attribute speedCurrent;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;

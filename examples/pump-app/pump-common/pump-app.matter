@@ -1435,9 +1435,9 @@ endpoint 0 {
   server cluster ThreadNetworkDiagnostics {
     callback attribute channel;
     callback attribute routingRole;
-    callback attribute networkName;
-    callback attribute panId;
-    callback attribute extendedPanId;
+    callback attribute networkName default = "0";
+    callback attribute panId default = 0x0000;
+    callback attribute extendedPanId default = 0x0000000000000000;
     callback attribute meshLocalPrefix;
     callback attribute neighborTable;
     callback attribute routeTable;
@@ -1447,7 +1447,7 @@ endpoint 0 {
     callback attribute stableDataVersion;
     callback attribute leaderRouterId;
     callback attribute securityPolicy;
-    callback attribute channelPage0Mask;
+    callback attribute channelPage0Mask default = "0x0000";
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     callback attribute generatedCommandList;
@@ -1460,7 +1460,7 @@ endpoint 0 {
   server cluster AdministratorCommissioning {
     callback attribute windowStatus;
     callback attribute adminFabricIndex default = 1;
-    callback attribute adminVendorId;
+    callback attribute adminVendorId default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -1518,7 +1518,7 @@ endpoint 1 {
   }
 
   server cluster LevelControl {
-    ram      attribute currentLevel;
+    ram      attribute currentLevel default = 0x00;
     ram      attribute minLevel;
     ram      attribute maxLevel default = 0xC8;
     ram      attribute options;
@@ -1570,9 +1570,9 @@ endpoint 1 {
     ram      attribute effectiveControlMode;
     ram      attribute capacity;
     ram      attribute speed;
-    ram      attribute lifetimeRunningHours;
+    ram      attribute lifetimeRunningHours default = 0x000000;
     ram      attribute power;
-    ram      attribute lifetimeEnergyConsumed;
+    ram      attribute lifetimeEnergyConsumed default = 0x00000000;
     ram      attribute operationMode;
     ram      attribute controlMode;
     callback attribute generatedCommandList;
@@ -1595,13 +1595,13 @@ endpoint 1 {
   }
 
   server cluster PressureMeasurement {
-    ram      attribute measuredValue;
+    ram      attribute measuredValue default = 0x0000;
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue;
     ram      attribute tolerance;
-    ram      attribute scaledValue;
-    ram      attribute minScaledValue;
-    ram      attribute maxScaledValue;
+    ram      attribute scaledValue default = 0x0000;
+    ram      attribute minScaledValue default = 0;
+    ram      attribute maxScaledValue default = 0;
     ram      attribute scaledTolerance;
     ram      attribute scale;
     callback attribute generatedCommandList;
@@ -1612,7 +1612,7 @@ endpoint 1 {
   }
 
   server cluster FlowMeasurement {
-    ram      attribute measuredValue;
+    ram      attribute measuredValue default = 0x0000;
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue;
     ram      attribute tolerance;

@@ -1252,6 +1252,9 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
     ram      attribute featureMap;
     callback attribute clusterRevision default = 1;
   }
@@ -1300,7 +1303,7 @@ endpoint 0 {
     callback attribute defaultOTAProviders;
     ram      attribute updatePossible default = 1;
     ram      attribute updateState;
-    ram      attribute updateStateProgress;
+    ram      attribute updateStateProgress default = 0;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -1378,7 +1381,7 @@ endpoint 0 {
   server cluster AdministratorCommissioning {
     callback attribute windowStatus;
     callback attribute adminFabricIndex default = 1;
-    callback attribute adminVendorId;
+    callback attribute adminVendorId default = 0;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 0x0001;
   }
@@ -1433,7 +1436,7 @@ endpoint 1 {
   }
 
   server cluster LevelControl {
-    ram      attribute currentLevel;
+    ram      attribute currentLevel default = 0x00;
     ram      attribute minLevel;
     ram      attribute maxLevel default = 0xFE;
     ram      attribute options;
@@ -1454,7 +1457,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
   }
 }
 
