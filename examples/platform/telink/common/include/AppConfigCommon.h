@@ -18,19 +18,17 @@
 
 #pragma once
 
-#include "AppTaskCommon.h"
+// Buttons config
+#define BUTTON_PORT DEVICE_DT_GET(DT_NODELABEL(gpioc))
 
-class AppTask : public AppTaskCommon
-{
-private:
-    friend AppTask & GetAppTask(void);
+#define BUTTON_PIN_1 2
+#define BUTTON_PIN_3 3
+#define BUTTON_PIN_4 1
+#define BUTTON_PIN_2 0
 
-    CHIP_ERROR Init();
-
-    static AppTask sAppTask;
-};
-
-inline AppTask & GetAppTask(void)
-{
-    return AppTask::sAppTask;
-}
+// LEDs config
+#define LEDS_PORT DEVICE_DT_GET(DT_NODELABEL(gpiob))
+#define SYSTEM_STATE_LED 7
+#if APP_USE_IDENTIFY_PWM
+#define LIGHTING_PWM_SPEC_IDENTIFY_GREEN PWM_DT_SPEC_GET(DT_ALIAS(pwm_led3))
+#endif

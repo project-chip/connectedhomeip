@@ -1,0 +1,85 @@
+/*
+ *
+ *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
+
+#include "AppConfig.h"
+#include "AppEvent.h"
+
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+#include "LEDWidget.h"
+#endif
+
+#if APP_USE_IDENTIFY_PWM
+#include "PWMDevice.h"
+#endif
+
+#include <zephyr/drivers/gpio.h>
+
+#include <platform/CHIPDeviceLayer.h>
+
+#if CONFIG_CHIP_FACTORY_DATA
+#include <platform/telink/FactoryDataProvider.h>
+#endif
+
+#include <cstdint>
+
+struct k_timer;
+
+class AppTaskCommon
+{
+public:
+    CHIP_ERROR StartApp();
+
+    void PostEvent(AppEvent * event);
+
+private:
+
+    void DispatchEvent(AppEvent * event);
+
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+    static void UpdateLedStateEventHandler(AppEvent * aEvent);
+    static void LEDStateUpdateHandler(LEDWidget * ledWidget);
+    static void UpdateStatusLED();
+#endif
+    static void FactoryResetButtonEventHandler(void);
+    static void StartBleAdvButtonEventHandler(void);
+
+    static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
+    static void FactoryResetTimerTimeoutCallback(k_timer * timer);
+
+    static void FactoryResetTimerEventHandler(AppEvent * aEvent);
+    static void FactoryResetHandler(AppEvent * aEvent);
+    static void StartBleAdvHandler(AppEvent * aEvent);
+#if APP_USE_IDENTIFY_PWM
+    static void UpdateIdentifyStateEventHandler(AppEvent * aEvent);
+#endif
+
+    static void InitButtons(void);
+
+    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
+#if APP_USE_IDENTIFY_PWM
+    PWMDevice mPwmIdentifyLed;
+#endif
+
+#if CONFIG_CHIP_FACTORY_DATA
+    chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::ExternalFlashFactoryData> mFactoryDataProvider;
+#endif
+};

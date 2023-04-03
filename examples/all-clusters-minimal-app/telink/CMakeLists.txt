@@ -61,6 +61,8 @@ target_include_directories(app PRIVATE
                            ${ALL_CLUSTERS_COMMON_DIR}/include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/all-clusters-minimal-app
+                           ${TELINK_COMMON}/common/include
+                           ${TELINK_COMMON}/common/src
                            ${TELINK_COMMON}/util/include)
 
 add_definitions(

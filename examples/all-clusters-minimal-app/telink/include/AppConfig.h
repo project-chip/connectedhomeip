@@ -18,16 +18,8 @@
 
 #pragma once
 
-// ---- All Clusters Application example config ----
+// ---- All Clusters Minimal Application example config ----
 
-// Buttons config
-#define BUTTON_PORT DEVICE_DT_GET(DT_NODELABEL(gpioc))
+#define APP_USE_IDENTIFY_PWM    0 // APP_USE_IDENTIFY_PWM must be defined before including "AppConfigCommon.h"
 
-#define BUTTON_PIN_1 2
-#define BUTTON_PIN_3 3
-#define BUTTON_PIN_4 1
-#define BUTTON_PIN_2 0
-
-// LEDs config
-#define LEDS_PORT DEVICE_DT_GET(DT_NODELABEL(gpiob))
-#define SYSTEM_STATE_LED 7
+#include "AppConfigCommon.h"
