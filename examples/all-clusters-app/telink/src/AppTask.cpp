@@ -20,31 +20,16 @@
 
 #include "binding-handler.h"
 
-#include <app/server/OnboardingCodesUtil.h>
-#include <app/server/Server.h>
-#include <app/util/attribute-storage.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-
 #include <zephyr/logging/log.h>
 #include <zephyr/zephyr.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
-
-namespace {
-constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
-} // namespace
 
 AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init(void)
 {
     InitCommonParts();
-
-    // We only have network commissioning on endpoint 0.
-    // Set up a valid Network Commissioning cluster on endpoint 0 is done in
-    // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp
-    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 
     // Configure Bindings
     CHIP_ERROR err = InitBindingHandlers();

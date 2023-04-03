@@ -57,6 +57,10 @@ constexpr uint32_t kIdentifyBreatheRateMs       = 1000;
 const struct pwm_dt_spec sPwmIdentifySpecGreenLed = LIGHTING_PWM_SPEC_IDENTIFY_GREEN;
 #endif
 
+#if APP_SET_NETWORK_COMM_ENDPOINT_SEC
+constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
+#endif
+
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), kAppEventQueueSize, alignof(AppEvent));
 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
@@ -204,27 +208,34 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
 
-#if CONFIG_CHIP_OTA_REQUESTOR
-    InitBasicOTARequestor();
-#endif
-
     // Init ZCL Data Model and start server
     static CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
 
+#if APP_SET_DEVICE_INFO_PROVIDER
+    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+#endif
+
+#if CONFIG_CHIP_OTA_REQUESTOR
+    InitBasicOTARequestor();
+#endif
+
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+
+#if APP_SET_NETWORK_COMM_ENDPOINT_SEC
+    // We only have network commissioning on endpoint 0.
+    // Set up a valid Network Commissioning cluster on endpoint 0 is done in
+    // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp
+    emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
+#endif
 
     // Add CHIP event handler and start CHIP thread.
     // Note that all the initialization code should happen prior to this point to avoid data races
     // between the main and the CHIP threads.
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
-
-#if APP_SET_DEVICE_INFO_PROVIDER
-    gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-#endif
 
     err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(new AppFabricTableDelegate);
     if (err != CHIP_NO_ERROR)
