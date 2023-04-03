@@ -162,7 +162,7 @@ public:
 
     /**
      * Fix to avoid NewStringUTF crash
-    */
+     */
     jstring CharToJniString(const char * value);
 
 private:
