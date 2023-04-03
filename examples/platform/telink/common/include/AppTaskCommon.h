@@ -52,6 +52,8 @@ namespace {
 constexpr EndpointId kExampleEndpointId = 1;
 constexpr uint8_t kDefaultMinLevel      = 0;
 constexpr uint8_t kDefaultMaxLevel      = 254;
+constexpr uint8_t kButtonPushEvent      = 1;
+constexpr uint8_t kButtonReleaseEvent   = 0;
 } // namespace
 
 class AppTaskCommon

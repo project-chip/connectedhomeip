@@ -39,8 +39,6 @@ namespace {
 constexpr int kFactoryResetCalcTimeout          = 3000;
 constexpr int kFactoryResetTriggerCntr          = 3;
 constexpr int kAppEventQueueSize                = 10;
-constexpr uint8_t kButtonPushEvent              = 1;
-constexpr uint8_t kButtonReleaseEvent           = 0;
 
 #if APP_USE_IDENTIFY_PWM
 constexpr uint32_t kIdentifyBlinkRateMs         = 200;
