@@ -104,6 +104,16 @@ void AppTask::ActionCompleted(PumpManager::Action_t action, int32_t actor)
     }
 }
 
+void AppTask::PostStartActionRequest(int32_t actor, PumpManager::Action_t action)
+{
+    AppEvent event;
+    event.Type              = AppEvent::kEventType_Start;
+    event.StartEvent.Actor  = actor;
+    event.StartEvent.Action = action;
+    event.Handler           = StartActionEventHandler;
+    sAppTask.PostEvent(&event);
+}
+
 void AppTask::StartActionEventHandler(AppEvent * aEvent)
 {
     PumpManager::Action_t action = PumpManager::INVALID_ACTION;
