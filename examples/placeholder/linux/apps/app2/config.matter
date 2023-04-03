@@ -3192,8 +3192,8 @@ endpoint 0 {
 
   server cluster OnOff {
     ram      attribute onOff default = 0x00;
-    ram      attribute globalSceneControl default = 1;
-    ram      attribute onTime default = 0;
+    ram      attribute globalSceneControl default = 0x01;
+    ram      attribute onTime default = 0x0000;
     ram      attribute offWaitTime default = 0x0000;
     ram      attribute startUpOnOff default = 0xFF;
     callback attribute generatedCommandList;
@@ -3692,8 +3692,8 @@ endpoint 1 {
 
   server cluster OnOff {
     ram      attribute onOff default = 0x00;
-    ram      attribute globalSceneControl default = 1;
-    ram      attribute onTime default = 0;
+    ram      attribute globalSceneControl default = 0x01;
+    ram      attribute onTime default = 0x0000;
     ram      attribute offWaitTime default = 0x0000;
     ram      attribute startUpOnOff default = 0xFF;
     callback attribute generatedCommandList;

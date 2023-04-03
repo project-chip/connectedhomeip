@@ -4543,8 +4543,8 @@ endpoint 0 {
 
   server cluster PowerSource {
     ram      attribute status default = 0;
-    ram      attribute order default = 2;
-    ram      attribute description default = "B2";
+    ram      attribute order default = 1;
+    ram      attribute description default = "B3";
     ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
@@ -4811,12 +4811,12 @@ endpoint 1 {
   }
 
   server cluster OnOff {
-    persist  attribute onOff default = 0x00;
-    ram      attribute globalSceneControl default = 0x01;
-    ram      attribute onTime default = 0x0000;
-    ram      attribute offWaitTime default = 0x0000;
-    persist  attribute startUpOnOff default = 0xFF;
-    ram      attribute featureMap default = 0x0001;
+    ram      attribute onOff default = 0x00;
+    ram      attribute globalSceneControl default = 1;
+    ram      attribute onTime default = 0;
+    ram      attribute offWaitTime default = 0;
+    ram      attribute startUpOnOff;
+    ram      attribute featureMap default = 0x0000;
     ram      attribute clusterRevision default = 4;
   }
 
@@ -4880,8 +4880,8 @@ endpoint 1 {
   server cluster PowerSource {
     emits event BatFaultChange;
     ram      attribute status default = 0;
-    ram      attribute order default = 2;
-    ram      attribute description default = "B2";
+    ram      attribute order default = 1;
+    ram      attribute description default = "B3";
     ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
@@ -5414,12 +5414,12 @@ endpoint 2 {
   }
 
   server cluster OnOff {
-    persist  attribute onOff default = 0x00;
-    ram      attribute globalSceneControl default = 0x01;
-    ram      attribute onTime default = 0x0000;
-    ram      attribute offWaitTime default = 0x0000;
-    persist  attribute startUpOnOff default = 0xFF;
-    ram      attribute featureMap default = 0x0001;
+    ram      attribute onOff default = 0x00;
+    ram      attribute globalSceneControl default = 1;
+    ram      attribute onTime default = 0;
+    ram      attribute offWaitTime default = 0;
+    ram      attribute startUpOnOff;
+    ram      attribute featureMap default = 0x0000;
     ram      attribute clusterRevision default = 4;
   }
 
@@ -5434,8 +5434,8 @@ endpoint 2 {
 
   server cluster PowerSource {
     ram      attribute status default = 0;
-    ram      attribute order default = 2;
-    ram      attribute description default = "B2";
+    ram      attribute order default = 1;
+    ram      attribute description default = "B3";
     ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;

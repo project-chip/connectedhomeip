@@ -3799,8 +3799,8 @@ endpoint 0 {
 
   server cluster PowerSource {
     ram      attribute status default = 0;
-    ram      attribute order default = 3;
-    ram      attribute description default = "B1";
+    ram      attribute order default = 2;
+    ram      attribute description default = "B2";
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -3970,8 +3970,8 @@ endpoint 1 {
   }
 
   server cluster OnOff {
-    ram      attribute onOff default = 0x00;
-    ram      attribute featureMap default = 0x0000;
+    persist  attribute onOff default = 0x00;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
   }
 
@@ -4007,8 +4007,8 @@ endpoint 1 {
 
   server cluster PowerSource {
     ram      attribute status default = 0;
-    ram      attribute order default = 3;
-    ram      attribute description default = "B1";
+    ram      attribute order default = 2;
+    ram      attribute description default = "B2";
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
@@ -4355,8 +4355,8 @@ endpoint 2 {
   }
 
   server cluster OnOff {
-    ram      attribute onOff default = 0x00;
-    ram      attribute featureMap default = 0x0000;
+    persist  attribute onOff default = 0x00;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
   }
 
@@ -4371,8 +4371,8 @@ endpoint 2 {
 
   server cluster PowerSource {
     ram      attribute status default = 0;
-    ram      attribute order default = 3;
-    ram      attribute description default = "B1";
+    ram      attribute order default = 2;
+    ram      attribute description default = "B2";
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }

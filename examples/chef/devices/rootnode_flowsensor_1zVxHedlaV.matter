@@ -1187,7 +1187,7 @@ endpoint 0 {
     callback attribute deviceTypeList;
     callback attribute serverList;
     callback attribute clientList;
-    callback attribute partsList default = 0;
+    callback attribute partsList;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
@@ -1367,7 +1367,7 @@ endpoint 1 {
     callback attribute deviceTypeList;
     callback attribute serverList;
     callback attribute clientList;
-    callback attribute partsList default = 0;
+    callback attribute partsList;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;

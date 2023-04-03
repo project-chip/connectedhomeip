@@ -1420,7 +1420,7 @@ endpoint 0 {
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Groups {
-    ram      attribute nameSupport default = 0;
+    ram      attribute nameSupport;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
@@ -1699,7 +1699,7 @@ endpoint 1 {
   }
 
   server cluster Groups {
-    ram      attribute nameSupport default = 0;
+    ram      attribute nameSupport;
     callback attribute generatedCommandList default = 0;
     callback attribute acceptedCommandList default = 0;
     callback attribute attributeList default = 0;
