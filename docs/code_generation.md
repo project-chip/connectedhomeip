@@ -263,7 +263,7 @@ scripts/idl_lint.py ${MATTER_FILE_PATH}
 #### Running pre-generation
 
 If you have zap files outside the CHIP repository (i.e. not in `src` or
-`examples`) you should provide the root of your external root(s) to the script:
+`examples`) you should provide the root of your application source.
 
 ```bash
 scripts/codepregen.py --external-root ${PATH_TO_SOURCE_ROOT} ${OUTPUT_DIRECTORY:-./zzz_pregenerated/}
@@ -274,7 +274,7 @@ zap/matter files as the code pre-generation will generate files based on the
 path inside the root:
 
 -   if files are `$PATH_TO_SOURCE_ROOT/some/path/foo.zap` this will generate
-    files into `$OUTPUT_DIRECTORY/some/path/foo/`
+    files into `$OUTPUT_DIRECTORY/some/path/foo/...`
 
 ### Using pre-generated code
 
