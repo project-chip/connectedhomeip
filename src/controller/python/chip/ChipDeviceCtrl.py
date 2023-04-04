@@ -295,7 +295,7 @@ class ChipDeviceControllerBase():
             self.devCtrl, self.cbHandleOpenWindowCompleteFunct)
 
         self.cbHandleDeviceUnpairCompleteFunct = _DeviceUnpairingCompleteFunct(HandleUnpairDeviceComplete)
-        
+
         self.state = DCState.IDLE
         self._isActive = True
         # Validate FabricID/NodeID followed from NOC Chain
