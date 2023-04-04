@@ -25,7 +25,6 @@
 #define WFX_RSI_TASK_SZ (1024 + 1024 + 1024)                 /* Stack for the WFX/RSI task		*/
 #define WFX_RSI_BUF_SZ (1024 * 15)                           /* May need tweak 			*/
 #define WFX_RSI_CONFIG_MAX_JOIN 5                            /* Max join retries			*/
-#define WFX_RSI_NUM_TIMERS 2                                 /* Number of RSI timers to alloc	*/
 
 /*
  * Various events fielded by the wfx_rsi task
@@ -75,7 +74,6 @@ struct wfx_rsi
     uint16_t join_retries;
     uint8_t ip4_addr[4]; /* Not sure if this is enough */
 };
-#define RSI_SCAN_RESP_SZ 54
 
 extern struct wfx_rsi wfx_rsi;
 #ifdef __cplusplus
@@ -91,7 +89,7 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap);
 int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_rsi_reset_count();
 int32_t wfx_rsi_disconnect();
-#define WFX_RSI_LOG(...) efr32Log(__VA_ARGS__);
+#define SILABS_LOG(...) efr32Log(__VA_ARGS__);
 
 #ifdef __cplusplus
 }

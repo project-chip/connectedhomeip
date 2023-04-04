@@ -189,28 +189,12 @@ typedef struct wfx_wifi_scan_ext
     uint32_t overrun_count;
 } wfx_wifi_scan_ext_t;
 
-#ifdef RS911X_WIFI
-/*
- * This Sh%t is here to support WFXUtils - and the Matter stuff that uses it
- * We took it from the SDK (for WF200)
- */
-typedef enum
-{
-    SL_WFX_NOT_INIT                = 0,
-    SL_WFX_STARTED                 = 1,
-    SL_WFX_STA_INTERFACE_CONNECTED = 2,
-    SL_WFX_AP_INTERFACE_UP         = 3,
-    SL_WFX_SLEEPING                = 4,
-    SL_WFX_POWER_SAVE_ACTIVE       = 5,
-} sl_wfx_state_t;
-
 typedef enum
 {
     SL_WFX_STA_INTERFACE    = 0, ///< Interface 0, linked to the station
     SL_WFX_SOFTAP_INTERFACE = 1, ///< Interface 1, linked to the softap
 } sl_wfx_interface_t;
 
-#endif /* RS911X_WIFI */
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -218,11 +202,9 @@ extern "C" {
 void sl_wfx_host_gpio_init(void);
 sl_status_t wfx_wifi_start(void);
 void wfx_enable_sta_mode(void);
-sl_wfx_state_t wfx_get_wifi_state(void);
 void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr);
 void wfx_set_wifi_provision(wfx_wifi_provision_t * wifiConfig);
 bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig);
-bool wfx_is_sta_provisioned(void);
 bool wfx_is_sta_mode_enabled(void);
 int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap);
 int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
@@ -263,12 +245,10 @@ void wfx_ip_changed_notify(int got_ip);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 void wfx_ipv6_notify(int got_ip);
 
-#ifdef RS911X_WIFI
 /* RSI for LWIP */
 void * wfx_rsi_alloc_pkt(void);
 void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off);
 int32_t wfx_rsi_send_data(void * p, uint16_t len);
-#endif /* RS911X_WIFI */
 
 void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin);
 
