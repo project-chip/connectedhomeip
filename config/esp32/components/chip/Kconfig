@@ -498,6 +498,13 @@ menu "CHIP Device Layer"
     menu "CHIP Thread Options"
         visible if OPENTHREAD_ENABLED
 
+        config ENABLE_MATTER_OVER_THREAD
+            bool "Enable Matter-over-Thread Support"
+            default y
+            depends on OPENTHREAD_ENABLED
+            help
+                Enables support for sending and receiving CHIP messages over a Thread Connection.
+
         config THREAD_TASK_STACK_SIZE
             int "Thread task stack size"
             default 5120
