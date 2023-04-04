@@ -395,7 +395,7 @@ class ChipDeviceControllerBase():
             # Error 50 is a timeout
             return False
         return self._ChipStack.commissioningEventRes.is_success
-    
+
     def UnpairDevice(self, nodeid: int):
         self.CheckIsActive()
 
@@ -403,7 +403,7 @@ class ChipDeviceControllerBase():
             lambda: self._dmLib.pychip_DeviceController_UnpairDevice(
                 self.devCtrl, nodeid, self.cbHandleDeviceUnpairCompleteFunct)
         ).raise_on_error()
-    
+
     def CloseBLEConnection(self):
         self.CheckIsActive()
 
