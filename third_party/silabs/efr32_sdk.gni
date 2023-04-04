@@ -273,7 +273,7 @@ template("efr32_sdk") {
         ]
       }
 
-      if (use_wf200 || !use_rs911x_sockets) {
+      if (use_wf200 || use_rs9116) {
         import("${chip_root}/src/platform/silabs/efr32/wifi_args.gni")
 
         defines += [ "LWIP_NETIF_API=1" ]
