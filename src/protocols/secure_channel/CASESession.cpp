@@ -158,10 +158,10 @@ public:
 
     // Create a work helper using the specified session, work callback, after work callback, and data (template arg).
     // Lifetime is managed by sharing between the caller (typically the session) and the helper itself (while work is scheduled).
-    static std::shared_ptr<WorkHelper> Create(CASESession & session, WorkCallback workCallback, AfterWorkCallback afterWorkCallback)
+    static Platform::SharedPtr<WorkHelper> Create(CASESession & session, WorkCallback workCallback,
+                                                  AfterWorkCallback afterWorkCallback)
     {
-        std::shared_ptr<WorkHelper> ptr(Platform::New<WorkHelper>(session, workCallback, afterWorkCallback),
-                                        Platform::Delete<WorkHelper>);
+        auto ptr = Platform::MakeShared<WorkHelper>(session, workCallback, afterWorkCallback);
         if (ptr)
         {
             ptr->mWeakPtr = ptr; // used by `ScheduleWork`
@@ -219,10 +219,10 @@ private:
 
 private:
     // Lifetime management: `ScheduleWork` sets `mStrongPtr` from `mWeakPtr`.
-    std::weak_ptr<WorkHelper> mWeakPtr;
+    Platform::WeakPtr<WorkHelper> mWeakPtr;
 
     // Lifetime management: `ScheduleWork` sets `mStrongPtr` from `mWeakPtr`.
-    std::shared_ptr<WorkHelper> mStrongPtr;
+    Platform::SharedPtr<WorkHelper> mStrongPtr;
 
     // Associated session, cleared by `CancelWork`.
     std::atomic<CASESession *> mSession;

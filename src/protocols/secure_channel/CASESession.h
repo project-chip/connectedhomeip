@@ -25,8 +25,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificateValidityPolicy.h>
 #include <credentials/FabricTable.h>
@@ -35,6 +33,7 @@
 #include <lib/core/ScopedNodeId.h>
 #include <lib/core/TLV.h>
 #include <lib/support/Base64.h>
+#include <lib/support/CHIPMem.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
@@ -310,7 +309,7 @@ private:
 
     template <class DATA>
     class WorkHelper;
-    std::shared_ptr<WorkHelper<SendSigma3Data>> mSendSigma3Helper;
+    Platform::SharedPtr<WorkHelper<SendSigma3Data>> mSendSigma3Helper;
 
     State mState;
 

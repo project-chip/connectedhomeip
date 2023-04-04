@@ -193,6 +193,9 @@ inline SharedPtr<T> MakeShared(Args &&... args)
     return SharedPtr<T>(New<T>(std::forward<Args>(args)...), Deleter<T>());
 }
 
+template <typename T>
+using WeakPtr = std::weak_ptr<T>;
+
 // See MemoryDebugCheckPointer().
 extern bool MemoryInternalCheckPointer(const void * p, size_t min_size);
 
