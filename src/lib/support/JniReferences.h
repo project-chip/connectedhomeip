@@ -161,7 +161,8 @@ public:
     }
 
     /**
-     * Fix to avoid NewStringUTF crash
+     * Use instead of 'NewStringUTF' function
+     * Creates a java string type based on char array.
      */
     jstring CharToJniString(const char * value);
 
