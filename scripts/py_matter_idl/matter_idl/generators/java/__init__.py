@@ -612,9 +612,9 @@ class JavaJNIGenerator(__JavaCodeGenerator):
             )
 
         cluster_targets = [
-            GenerateTarget(template="java/ChipClustersRead.jinja",
+            GenerateTarget(template="ChipClustersRead.jinja",
                            output_name="jni/{cluster_name}Client-ReadImpl.cpp"),
-            GenerateTarget(template="java/ChipClustersCpp.jinja",
+            GenerateTarget(template="ChipClustersCpp.jinja",
                            output_name="jni/{cluster_name}Client-InvokeSubscribeImpl.cpp"),
         ]
 
