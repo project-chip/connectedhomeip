@@ -153,7 +153,7 @@ extern "C" void efr32UartProcess(void)
 #if !defined(PW_RPC_ENABLED) && !defined(ENABLE_CHIP_SHELL)
     uint8_t tempBuf[128] = { 0 };
     // will read the data available up to 128bytes
-    uint16_t count = uartConsoleRead((char *) tempBuf, 128);
+    int16_t count = uartConsoleRead((char *) tempBuf, 128);
     if (count > 0)
     {
         // ot process Received data for CLI cmds

@@ -277,7 +277,7 @@ CHIP_ERROR Decode(const ConcreteDataAttributePath & aPath, AttributeValueDecoder
 
     case ConcreteDataAttributePath::ListOperation::ReplaceAll:
         x.clear();
-        // fallthrough
+        FALLTHROUGH;
     default:
         x.emplace_back();
         return aDecoder.Decode(x.back());

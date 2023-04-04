@@ -199,8 +199,10 @@ public class ClusterInfoMapping {
       callback.onFailure(e);
     }
   }
-  {{#chip_client_clusters}}
-  {{#chip_cluster_responses}}
+  {{#all_user_clusters side='client'}}
+    {{#all_user_cluster_generated_commands}}
+      {{#if_compare clusterId ../id operator='=='}}
+        {{#if (is_str_equal commandSource 'server')}}
       public static class Delegated{{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase name}}Callback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}Callback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
@@ -209,9 +211,9 @@ public class ClusterInfoMapping {
         }
 
         @Override
-        public void onSuccess({{#chip_cluster_response_arguments}}{{#not_first}}, {{/not_first}}{{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asSymbol label}}{{/chip_cluster_response_arguments}}) {
+        public void onSuccess({{#zcl_command_arguments}}{{#not_first}}, {{/not_first}}{{asJavaType type chipType parent.parent.name includeAnnotations=true clusterId=parent.parent.id}} {{asSymbol label}}{{/zcl_command_arguments}}) {
            Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-           {{#chip_cluster_response_arguments}}
+           {{#zcl_command_arguments}}
              {{#if isArray}}
                // {{asSymbol label}}: {{asUnderlyingZclType type}}
                // Conversion from this type to Java is not properly implemented yet
@@ -220,11 +222,11 @@ public class ClusterInfoMapping {
                // {{asSymbol label}}: Struct {{type}}
                // Conversion from this type to Java is not properly implemented yet
              {{else}}
-               CommandResponseInfo {{asSymbol label}}ResponseValue = new CommandResponseInfo("{{asSymbol label}}", "{{asJavaType type null parent.parent.name}}");
+               CommandResponseInfo {{asSymbol label}}ResponseValue = new CommandResponseInfo("{{asSymbol label}}", "{{asJavaType type null parent.parent.name clusterId=parent.parent.id}}");
                responseValues.put({{asSymbol label}}ResponseValue, {{asSymbol label}});
              {{/if_is_struct}}
              {{/if}}
-           {{/chip_cluster_response_arguments}}
+           {{/zcl_command_arguments}}
            callback.onSuccess(responseValues);
         }
 
@@ -234,7 +236,9 @@ public class ClusterInfoMapping {
         }
       }
 
-  {{/chip_cluster_responses}}
+        {{/if}}
+    {{/if_compare}}
+  {{/all_user_cluster_generated_commands}}
       {{#zcl_attributes_server removeKeys='isOptional'}}
       {{#if_unsupported_attribute_callback type isArray ../id}}
       {{else}}
@@ -275,7 +279,7 @@ public class ClusterInfoMapping {
       {{/if_unsupported_attribute_callback}}
       {{/zcl_attributes_server}}
 
-  {{/chip_client_clusters}}
+  {{/all_user_clusters}}
 
  public Map<String, ClusterInfo> getClusterMap() {
     Map<String, ClusterInfo> clusterMap = initializeClusterMap();
@@ -290,37 +294,39 @@ public class ClusterInfoMapping {
 
  public Map<String, ClusterInfo> initializeClusterMap() {
     Map<String, ClusterInfo> clusterMap = new HashMap<>();
-    {{#chip_client_clusters}}
+    {{#all_user_clusters side='client'}}
       ClusterInfo {{asLowerCamelCase name}}ClusterInfo = new ClusterInfo(
         (ptr, endpointId) -> new ChipClusters.{{asUpperCamelCase name}}Cluster(ptr, endpointId), new HashMap<>());
       clusterMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase name}}ClusterInfo);
-    {{/chip_client_clusters}}
+    {{/all_user_clusters}}
     return clusterMap;
  }
 
  public void combineCommand(Map<String, ClusterInfo> destination, Map<String, Map<String, InteractionInfo>> source) {
-    {{#chip_client_clusters}}
+    {{#all_user_clusters side='client'}}
       destination.get("{{asLowerCamelCase name}}").combineCommands(source.get("{{asLowerCamelCase name}}"));
-    {{/chip_client_clusters}}
+    {{/all_user_clusters}}
  }
 
  @SuppressWarnings("unchecked")
  public Map<String, Map<String, InteractionInfo>> getCommandMap() {
      Map<String, Map<String, InteractionInfo>> commandMap = new HashMap<>();
-     {{#chip_client_clusters}}
+     {{#all_user_clusters side='client'}}
      Map<String, InteractionInfo> {{asLowerCamelCase name}}ClusterInteractionInfoMap = new LinkedHashMap<>();
-     {{#chip_cluster_commands}}
+      {{#all_user_cluster_generated_commands}}
+        {{#if_compare clusterId ../id operator='=='}}
+          {{#if (is_str_equal commandSource 'client')}}
      Map<String, CommandParameterInfo> {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
      {{! TODO: fill out parameter types }}
-     {{#if (zcl_command_arguments_count this.id)}}
-     {{#chip_cluster_command_arguments}}
+     {{#if hasArguments}}
+     {{#zcl_command_arguments}}
      {{#if_is_struct type}}
      {{else}}
-       CommandParameterInfo {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameterInfo = new CommandParameterInfo("{{asLowerCamelCase label}}", {{asJavaType type null parent.parent.name removeGenericType=true}}.class, {{asJavaType type null parent.parent.name underlyingType=true}}.class);
+       CommandParameterInfo {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameterInfo = new CommandParameterInfo("{{asLowerCamelCase label}}", {{asJavaType type null parent.parent.name removeGenericType=true clusterId=parent.parent.id}}.class, {{asJavaType type null parent.parent.name underlyingType=true clusterId=parent.parent.id}}.class);
        {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}CommandParams.put("{{asLowerCamelCase label}}",{{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameterInfo);
      {{#not_last}} {{/not_last}}
      {{/if_is_struct}}
-     {{/chip_cluster_command_arguments}}
+     {{/zcl_command_arguments}}
      {{else}}
      {{/if}}
      {{#if hasSpecificResponse}}
@@ -328,10 +334,10 @@ public class ClusterInfoMapping {
          (cluster, callback, commandArguments) -> {
            ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster)
            .{{asLowerCamelCase name}}((ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase responseName}}Callback) callback
-           {{#chip_cluster_command_arguments}}
-           , ({{asJavaType type chipType parent.parent.name}})
+           {{#zcl_command_arguments}}
+           , ({{asJavaType type chipType parent.parent.name clusterId=parent.parent.id}})
            commandArguments.get("{{asLowerCamelCase label}}")
-           {{/chip_cluster_command_arguments}}
+           {{/zcl_command_arguments}}
             {{! TODO: Allow timeout to be passed from client for this and timed write. }}
            {{#if mustUseTimedInvoke}}, 10000{{/if}}
            );
@@ -344,10 +350,10 @@ public class ClusterInfoMapping {
          (cluster, callback, commandArguments) -> {
            ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster)
            .{{asLowerCamelCase name}}((DefaultClusterCallback) callback
-           {{#chip_cluster_command_arguments}}
-           , ({{asJavaType type chipType parent.parent.name}})
+           {{#zcl_command_arguments}}
+           , ({{asJavaType type chipType parent.parent.name clusterId=parent.parent.id}})
            commandArguments.get("{{asLowerCamelCase label}}")
-           {{/chip_cluster_command_arguments}}
+           {{/zcl_command_arguments}}
            {{! TODO: Allow timeout to be passed from client for this and timed write. }}
            {{#if mustUseTimedInvoke}}, 10000{{/if}}
            );
@@ -357,9 +363,11 @@ public class ClusterInfoMapping {
        );
      {{/if}}
        {{asLowerCamelCase ../name}}ClusterInteractionInfoMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase ../name}}{{asLowerCamelCase name}}InteractionInfo);
-     {{/chip_cluster_commands}}
+          {{/if}}
+        {{/if_compare}}
+      {{/all_user_cluster_generated_commands}}
      commandMap.put("{{asLowerCamelCase name}}", {{asLowerCamelCase name}}ClusterInteractionInfoMap);
-     {{/chip_client_clusters}}
+     {{/all_user_clusters}}
      return commandMap;
   }
 

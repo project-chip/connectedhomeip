@@ -11,7 +11,7 @@ import java.util.Optional;
 {{! TODO: Use AutoValue for inner classes. }}
 public class ChipStructs {
 {{#if (chip_has_client_clusters)}}
-{{#chip_client_clusters}}
+{{#all_user_clusters side='client'}}
 {{#zcl_structs}}
 {{#if itemCnt}}
 public static class {{asUpperCamelCase parent.name}}Cluster{{asUnderlyingType name}} {
@@ -52,6 +52,6 @@ public {{asJavaType type null parent.parent.name includeAnnotations=true}} {{asL
 {{/if}}
 
 {{/zcl_structs}}
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 {{/if}}
 }

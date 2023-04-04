@@ -13,12 +13,12 @@
 #include <lib/support/Span.h>
 
 // List specific responses
-{{#chip_client_clusters}}
+{{#all_user_clusters side='client'}}
 {{#zcl_attributes_server removeKeys='isOptional'}}
 {{#if isArray}}
 typedef void (*{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback)(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} data);
 {{/if}}
 {{/zcl_attributes_server}}
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 
 {{/if}}

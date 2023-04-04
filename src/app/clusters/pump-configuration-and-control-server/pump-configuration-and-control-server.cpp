@@ -228,7 +228,7 @@ static void setEffectiveModes(EndpointId endpoint)
     }
 }
 
-bool HasFeature(EndpointId endpoint, PumpFeature feature)
+bool HasFeature(EndpointId endpoint, PumpConfigurationAndControlFeature feature)
 {
     bool hasFeature;
     uint32_t featureMap;
@@ -267,37 +267,37 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
         switch (controlMode)
         {
         case ControlModeEnum::kConstantFlow:
-            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantFlow))
+            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kConstantFlow))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case ControlModeEnum::kConstantPressure:
-            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantPressure))
+            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kConstantPressure))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case ControlModeEnum::kConstantSpeed:
-            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantSpeed))
+            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kConstantSpeed))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case ControlModeEnum::kConstantTemperature:
-            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantTemperature))
+            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kConstantTemperature))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case ControlModeEnum::kProportionalPressure:
-            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kCompensatedPressure))
+            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kCompensatedPressure))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case ControlModeEnum::kAutomatic:
-            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kAutomatic))
+            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kAutomatic))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
@@ -318,19 +318,19 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
         switch (operationMode)
         {
         case OperationModeEnum::kMinimum:
-            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantSpeed))
+            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kConstantSpeed))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case OperationModeEnum::kMaximum:
-            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kConstantSpeed))
+            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kConstantSpeed))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
             break;
         case OperationModeEnum::kLocal:
-            if (!HasFeature(attributePath.mEndpointId, PumpFeature::kLocalOperation))
+            if (!HasFeature(attributePath.mEndpointId, PumpConfigurationAndControlFeature::kLocalOperation))
             {
                 status = Protocols::InteractionModel::Status::ConstraintError;
             }
