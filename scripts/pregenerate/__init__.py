@@ -66,8 +66,22 @@ class GlobMatcher:
     def matches(self, s: str):
         return fnmatch.fnmatch(s, self.pattern)
 
+def _GeneratorsForRoot(root: str):
+    """Define all generators for the given source root."""
 
-def FindPregenerationTargets(sdk_root: str, filter: TargetFilter, runner):
+    return [
+        # Jinja-based codegen
+        CodegenBridgePregenerator(root),
+        CodegenJavaJNIPregenerator(root),
+        CodegenJavaClassPregenerator(root),
+        CodegenCppAppPregenerator(root),
+
+        # ZAP codegen
+        ZapApplicationPregenerator(root),
+    ]
+
+
+def FindPregenerationTargets(sdk_root: str, external_roots: Optional[List[str]], filter: TargetFilter, runner):
     """Finds all relevand pre-generation targets in the given
        SDK root.
 
@@ -75,16 +89,10 @@ def FindPregenerationTargets(sdk_root: str, filter: TargetFilter, runner):
        on what rules to pregenerate and how.
     """
 
-    generators = [
-        # Jinja-based codegen
-        CodegenBridgePregenerator(sdk_root),
-        CodegenJavaJNIPregenerator(sdk_root),
-        CodegenJavaClassPregenerator(sdk_root),
-        CodegenCppAppPregenerator(sdk_root),
-
-        # ZAP codegen
-        ZapApplicationPregenerator(sdk_root),
-    ]
+    generators = _GeneratorsForRoot(sdk_root)
+    if extenral_roots:
+        for root in external_roots:
+            generators.extend(_GeneratorsForRoot(root))
 
     path_matchers = [GlobMatcher(pattern) for pattern in filter.path_glob]
 
