@@ -15,6 +15,7 @@
 
 import enum
 import logging
+import os
 from typing import List, Set, Union
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
@@ -405,7 +406,7 @@ class __JavaCodeGenerator(CodeGenerator):
         Inintialization is specific for java generation and will add
         filters as required by the java .jinja templates to function.
         """
-        super().__init__(storage, idl)
+        super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
 
         self.jinja_env.filters['attributesWithCallback'] = attributesWithSupportedCallback
         self.jinja_env.filters['callbackName'] = CallbackName
@@ -434,7 +435,7 @@ class JavaJNIGenerator(__JavaCodeGenerator):
         """
 
         self.internal_render_one_output(
-            template_path="java/CHIPCallbackTypes.jinja",
+            template_path="CHIPCallbackTypes.jinja",
             output_file_name="jni/CHIPCallbackTypes.h",
             vars={
                 'idl': self.idl,
@@ -449,7 +450,7 @@ class JavaJNIGenerator(__JavaCodeGenerator):
                 continue
 
             self.internal_render_one_output(
-                template_path="java/ChipClustersRead.jinja",
+                template_path="ChipClustersRead.jinja",
                 output_file_name="jni/%sClient-ReadImpl.cpp" % cluster.name,
                 vars={
                     'cluster': cluster,
@@ -458,7 +459,7 @@ class JavaJNIGenerator(__JavaCodeGenerator):
             )
 
             self.internal_render_one_output(
-                template_path="java/ChipClustersCpp.jinja",
+                template_path="ChipClustersCpp.jinja",
                 output_file_name="jni/%sClient-InvokeSubscribeImpl.cpp" % cluster.name,
                 vars={
                     'cluster': cluster,
@@ -482,7 +483,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
             c for c in self.idl.clusters if c.side == ClusterSide.CLIENT]
 
         self.internal_render_one_output(
-            template_path="java/ClusterReadMapping.jinja",
+            template_path="ClusterReadMapping.jinja",
             output_file_name="java/chip/devicecontroller/ClusterReadMapping.java",
             vars={
                 'idl': self.idl,
@@ -491,7 +492,7 @@ class JavaClassGenerator(__JavaCodeGenerator):
         )
 
         self.internal_render_one_output(
-            template_path="java/ClusterWriteMapping.jinja",
+            template_path="ClusterWriteMapping.jinja",
             output_file_name="java/chip/devicecontroller/ClusterWriteMapping.java",
             vars={
                 'idl': self.idl,
