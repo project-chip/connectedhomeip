@@ -294,9 +294,10 @@ class ChipDeviceControllerBase():
         self._dmLib.pychip_ScriptDevicePairingDelegate_SetOpenWindowCompleteCallback(
             self.devCtrl, self.cbHandleOpenWindowCompleteFunct)
 
+        self.cbHandleDeviceUnpairCompleteFunct = _DeviceUnpairingCompleteFunct(HandleUnpairDeviceComplete)
+        
         self.state = DCState.IDLE
         self._isActive = True
-        self.cbHandleDeviceUnpairCompleteFunct = _DeviceUnpairingCompleteFunct(HandleUnpairDeviceComplete)
         # Validate FabricID/NodeID followed from NOC Chain
         self._fabricId = self.GetFabricIdInternal()
         self._nodeId = self.GetNodeIdInternal()
