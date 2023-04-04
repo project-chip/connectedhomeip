@@ -242,7 +242,7 @@ scripts/codepregen.py --input-glob "*all-clusters*" --input-glob "*controller*" 
 #### Ensure you have a `.matter` file
 
 Code generation generally will use both `.zap` or `.matter` files. If you only
-have a `.zap` file, you can create the corresponding matter via:
+have a `.zap` file, you can create the corresponding `.matter` file via:
 
 ```bash
 scripts/tools/zap/generate.py ${ZAP_FILE_PATH}
