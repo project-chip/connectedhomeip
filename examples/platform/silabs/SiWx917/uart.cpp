@@ -82,7 +82,9 @@ void uartConsoleInit(void)
 
     status = UARTdrv->Initialize(ARM_USART_SignalEvent);
     // Setting the GPIO 30 of the radio board (TX)
+    // Setting the GPIO 29 of the radio board (RX)
     RSI_EGPIO_HostPadsGpioModeEnable(30);
+    RSI_EGPIO_HostPadsGpioModeEnable(29);
 
     // Initialized board UART
     DEBUGINIT();

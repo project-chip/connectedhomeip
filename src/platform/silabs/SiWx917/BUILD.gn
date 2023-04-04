@@ -30,14 +30,6 @@ if (chip_crypto == "platform") {
 config("siwx917-platform-wifi-config") {
   include_dirs = [ "wifi" ]
   defines = []
-
-  if (use_rs911x_sockets) {
-    include_dirs += [ "wifi/rsi-sockets" ]
-    defines += [
-      "RS911X_SOCKETS",
-      "RSI_IPV6_ENABLE",
-    ]
-  }
 }
 static_library("SiWx917") {
   sources = [

@@ -26,9 +26,6 @@
 // system dependencies
 #import <XCTest/XCTest.h>
 
-// Set the following to 1 in order to run individual test case manually.
-#define MANUAL_INDIVIDUAL_TEST 0
-
 static const uint16_t kPairingTimeoutInSeconds = 10;
 static const uint16_t kTimeoutInSeconds = 3;
 static uint64_t sDeviceId = 0x12344321;
@@ -148,24 +145,44 @@ static void DoPairingTest(XCTestCase * testcase, id<MTRDeviceAttestationDelegate
 @interface MTRPairingTests : XCTestCase
 @end
 
+static BOOL sStackInitRan = NO;
+static BOOL sNeedsStackShutdown = YES;
+
 @implementation MTRPairingTests
+
++ (void)tearDown
+{
+    // Global teardown, runs once
+    if (sNeedsStackShutdown) {
+        // We don't need to worry about ResetCommissionee.  If we get here,
+        // we're running only one of our test methods (using
+        // -only-testing:MatterTests/MTROTAProviderTests/testMethodName), since
+        // we did not run test999_TearDown.
+        [self shutdownStack];
+    }
+}
 
 - (void)setUp
 {
+    // Per-test setup, runs before each test.
     [super setUp];
     [self setContinueAfterFailure:NO];
+
+    if (sStackInitRan == NO) {
+        [self initStack];
+    }
 }
 
 - (void)tearDown
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self shutdownStack];
-#endif
+    // Per-test teardown, runs after each test.
     [super tearDown];
 }
 
 - (void)initStack
 {
+    sStackInitRan = YES;
+
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
@@ -192,8 +209,10 @@ static void DoPairingTest(XCTestCase * testcase, id<MTRDeviceAttestationDelegate
     sController = controller;
 }
 
-- (void)shutdownStack
++ (void)shutdownStack
 {
+    sNeedsStackShutdown = NO;
+
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
 
@@ -203,12 +222,12 @@ static void DoPairingTest(XCTestCase * testcase, id<MTRDeviceAttestationDelegate
     [[MTRDeviceControllerFactory sharedInstance] stopControllerFactory];
 }
 
-#if !MANUAL_INDIVIDUAL_TEST
 - (void)test000_SetUp
 {
-    [self initStack];
+    // Nothing to do here; our setUp method handled this already.  This test
+    // just exists to make the setup not look like it's happening inside other
+    // tests.
 }
-#endif
 
 - (void)test001_PairWithoutAttestationDelegate
 {
@@ -248,11 +267,9 @@ static void DoPairingTest(XCTestCase * testcase, id<MTRDeviceAttestationDelegate
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
 }
 
-#if !MANUAL_INDIVIDUAL_TEST
 - (void)test999_TearDown
 {
-    [self shutdownStack];
+    [[self class] shutdownStack];
 }
-#endif
 
 @end

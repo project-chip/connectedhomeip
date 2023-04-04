@@ -65,6 +65,13 @@
 
 #define LWIP_SOCKET 0
 
+#ifdef DIC_ENABLE
+#define LWIP_DNS 1
+#define DNS_RAND_TXID() ((u32_t) rand())
+#else
+#define LWIP_DNS 0
+#endif /* DIC_ENABLE */
+
 #define LWIP_FREERTOS_USE_STATIC_TCPIP_TASK 1
 
 #define LWIP_RAW 1

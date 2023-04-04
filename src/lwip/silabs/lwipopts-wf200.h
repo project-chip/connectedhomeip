@@ -66,15 +66,19 @@
 #define LWIP_SOCKET 0
 
 #ifdef DIC_ENABLE
+#define LWIP_DNS 1
+#define DNS_RAND_TXID() ((u32_t) rand())
 #define MEM_SIZE 5632
+#define MEMP_NUM_UDP_PCB (6)
+#else
+#define LWIP_DNS 0
+#define MEMP_NUM_UDP_PCB (5)
 #endif // DIC_ENABLE
 
 #define LWIP_FREERTOS_USE_STATIC_TCPIP_TASK 1
 
 #define LWIP_RAW 1
 #define MEMP_NUM_RAW_PCB (4)
-
-#define MEMP_NUM_UDP_PCB (5)
 
 #define LWIP_HAVE_LOOPIF (0)
 

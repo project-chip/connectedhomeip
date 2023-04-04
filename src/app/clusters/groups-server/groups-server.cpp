@@ -129,7 +129,7 @@ void emberAfGroupsClusterServerInitCallback(EndpointId endpointId)
         ChipLogDetail(Zcl, "ERR: writing NameSupport %x", status);
     }
 
-    status = Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(GroupClusterFeature::kGroupNames));
+    status = Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(GroupsFeature::kGroupNames));
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogDetail(Zcl, "ERR: writing group feature map %x", status);

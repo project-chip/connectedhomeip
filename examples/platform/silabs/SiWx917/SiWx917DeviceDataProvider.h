@@ -39,8 +39,10 @@ public:
 
     static SIWx917DeviceDataProvider & GetDeviceDataProvider();
     CHIP_ERROR GetSetupPayload(MutableCharSpan & payloadBuf);
+#ifdef SIWX917_USE_COMISSIONABLE_DATA
     void setupPayload(uint8_t * outBuf);
     CHIP_ERROR FlashFactoryData();
+#endif /* SIWX917_USE_COMISSIONABLE_DATA */
     // ===== Members functions that implement the CommissionableDataProvider
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
     CHIP_ERROR SetSetupDiscriminator(uint16_t setupDiscriminator) override { return CHIP_ERROR_NOT_IMPLEMENTED; }

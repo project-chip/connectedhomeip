@@ -1127,7 +1127,7 @@ server cluster PumpConfigurationAndControl = 512 {
     kLocal = 3;
   }
 
-  bitmap PumpFeature : BITMAP32 {
+  bitmap PumpConfigurationAndControlFeature : BITMAP32 {
     kConstantPressure = 0x1;
     kCompensatedPressure = 0x2;
     kConstantFlow = 0x4;
@@ -1245,7 +1245,7 @@ server cluster TemperatureMeasurement = 1026 {
 }
 
 server cluster PressureMeasurement = 1027 {
-  bitmap PressureFeature : BITMAP32 {
+  bitmap PressureMeasurementFeature : BITMAP32 {
     kExtended = 0x1;
   }
 

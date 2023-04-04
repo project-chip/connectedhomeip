@@ -845,17 +845,7 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR                   CHIP_CORE_ERROR(0x33)
 
 // AVAILABLE: 0x34
-
-/**
- *  @def CHIP_END_OF_INPUT
- *
- *  @brief
- *    An input ended.
- *
- */
-#define CHIP_ERROR_END_OF_INPUT                                CHIP_CORE_ERROR(0x35)
-#define CHIP_END_OF_INPUT CHIP_ERROR_END_OF_INPUT
-
+// AVAILABLE: 0x35
 // AVAILABLE: 0x36
 // AVAILABLE: 0x37
 

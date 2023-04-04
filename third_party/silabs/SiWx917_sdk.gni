@@ -113,31 +113,29 @@ template("siwx917_sdk") {
       defines += [ "ENABLE_CHIP_SHELL" ]
     }
 
-    if (!use_rs911x_sockets) {
-      import("${chip_root}/src/platform/silabs/SiWx917/args.gni")
-      defines += [ "LWIP_NETIF_API=1" ]
-      if (lwip_ipv4) {
-        defines += [
-          "LWIP_IPV4=1",
+    import("${chip_root}/src/platform/silabs/SiWx917/args.gni")
+    defines += [ "LWIP_NETIF_API=1" ]
+    if (lwip_ipv4) {
+      defines += [
+        "LWIP_IPV4=1",
 
-          # adds following options to provide
-          # them to .cpp source files
-          # flags ported from lwipopts file
-          # TODO: move lwipopts to one location
-          "LWIP_ARP=1",
-          "LWIP_ICMP=1",
-          "LWIP_IGMP=1",
-          "LWIP_DHCP=1",
-          "LWIP_DNS=0",
-        ]
-      } else {
-        defines += [ "LWIP_IPV4=0" ]
-      }
-      if (lwip_ipv6) {
-        defines += [ "LWIP_IPV6=1" ]
-      } else {
-        defines += [ "LWIP_IPV6=0" ]
-      }
+        # adds following options to provide
+        # them to .cpp source files
+        # flags ported from lwipopts file
+        # TODO: move lwipopts to one location
+        "LWIP_ARP=1",
+        "LWIP_ICMP=1",
+        "LWIP_IGMP=1",
+        "LWIP_DHCP=1",
+        "LWIP_DNS=0",
+      ]
+    } else {
+      defines += [ "LWIP_IPV4=0" ]
+    }
+    if (lwip_ipv6) {
+      defines += [ "LWIP_IPV6=1" ]
+    } else {
+      defines += [ "LWIP_IPV6=0" ]
     }
 
     defines += board_defines
