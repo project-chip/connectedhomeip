@@ -12,29 +12,31 @@ using chip::Protocols::InteractionModel::Status;
 using ModeOptionStructType = Structs::ModeOptionStruct::Type;
 using SemanticTag          = Structs::SemanticTagStruct::Type;
 template <typename T>
-using List                                                                                = app::DataModel::List<T>;
+using List = app::DataModel::List<T>;
 
-StaticSupportedModesManager::ModeLabel* StaticSupportedModesManager::modeLabelList = nullptr;
-StaticSupportedModesManager::ModeOptionStructType* StaticSupportedModesManager::modeOptionStruct = nullptr;
-StaticSupportedModesManager::SemanticTag* StaticSupportedModesManager::semanticTags = nullptr;
+StaticSupportedModesManager::ModeLabel * StaticSupportedModesManager::modeLabelList               = nullptr;
+StaticSupportedModesManager::ModeOptionStructType * StaticSupportedModesManager::modeOptionStruct = nullptr;
+StaticSupportedModesManager::SemanticTag * StaticSupportedModesManager::semanticTags              = nullptr;
 
 const StaticSupportedModesManager StaticSupportedModesManager::instance = StaticSupportedModesManager();
 
-ModeOptionStructType *StaticSupportedModesManager::endpointArray[FIXED_ENDPOINT_COUNT][2];
+ModeOptionStructType * StaticSupportedModesManager::endpointArray[FIXED_ENDPOINT_COUNT][2];
 
 void StaticSupportedModesManager::InitEndpointArray()
 {
-	for(int i=0; i<FIXED_ENDPOINT_COUNT; i++) {
-		endpointArray[i][0] = nullptr;
-		endpointArray[i][1] = nullptr;
-	}
+    for (int i = 0; i < FIXED_ENDPOINT_COUNT; i++)
+    {
+        endpointArray[i][0] = nullptr;
+        endpointArray[i][1] = nullptr;
+    }
 }
 
 SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeOptionsProvider(EndpointId endpointId) const
 {
-	if(endpointArray[endpointId][0] != nullptr && endpointArray[endpointId][1] != nullptr) {
-		return ModeOptionsProvider(endpointArray[endpointId][0], endpointArray[endpointId][1]);
-	}
+    if (endpointArray[endpointId][0] != nullptr && endpointArray[endpointId][1] != nullptr)
+    {
+        return ModeOptionsProvider(endpointArray[endpointId][0], endpointArray[endpointId][1]);
+    }
 
     char keyBuf[ESP32Config::kMaxConfigKeyNameLength];
     uint32_t supportedModeCount = 0;
@@ -45,7 +47,7 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
     VerifyOrReturnValue(ESP32Config::ReadConfigValue(countKey, supportedModeCount) == CHIP_NO_ERROR,
                         ModeOptionsProvider(nullptr, nullptr));
 
-	modeLabelList = new ModeLabel[supportedModeCount];
+    modeLabelList    = new ModeLabel[supportedModeCount];
     modeOptionStruct = new ModeOptionStructType[supportedModeCount];
 
     for (int index = 0; index < supportedModeCount; index++)
@@ -61,8 +63,9 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
                                 CHIP_NO_ERROR,
                             ModeOptionsProvider(nullptr, nullptr));
         ESP32Config::Key labelKey(ESP32Config::kConfigNamespace_ChipFactory, keyBuf);
-        VerifyOrReturnValue(ESP32Config::ReadConfigValueStr(labelKey, modeLabelList[index].supportedModeLabel, sizeof(modeLabelList[index].supportedModeLabel), outLen) ==
-                                CHIP_NO_ERROR,
+        VerifyOrReturnValue(ESP32Config::ReadConfigValueStr(labelKey, modeLabelList[index].supportedModeLabel,
+                                                            sizeof(modeLabelList[index].supportedModeLabel),
+                                                            outLen) == CHIP_NO_ERROR,
                             ModeOptionsProvider(nullptr, nullptr));
 
         memset(keyBuf, 0, sizeof(char) * ESP32Config::kMaxConfigKeyNameLength);
@@ -116,8 +119,8 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
 
         modeOptionStruct[index] = option;
     }
-	endpointArray[endpointId][0] = modeOptionStruct;
-	endpointArray[endpointId][1] = (modeOptionStruct + supportedModeCount);
+    endpointArray[endpointId][0] = modeOptionStruct;
+    endpointArray[endpointId][1] = (modeOptionStruct + supportedModeCount);
 
     return ModeOptionsProvider(modeOptionStruct, modeOptionStruct + supportedModeCount);
 }
@@ -153,21 +156,24 @@ const ModeSelect::SupportedModesManager * ModeSelect::getSupportedModesManager()
 
 void StaticSupportedModesManager::FreeSupportedModes()
 {
-	for(int i=0; i<FIXED_ENDPOINT_COUNT; i++) {
-		if(endpointArray[i][0] != nullptr) {
-    		auto * begin = static_cast<ModeOptionStructType *>(endpointArray[i][0]);
-    		auto * end   = static_cast<ModeOptionStructType *>(endpointArray[i][1]);
-			for(auto *it = begin; it != end; ++it) {
-        		auto & modeOption = *it;
-				delete[] modeOption.label.data();
-				delete[] modeOption.semanticTags.data();
-			}
-			delete[] begin;
-		}
-		endpointArray[i][0] = nullptr;
-		endpointArray[i][1] = nullptr;
-	}
-	delete[] modeLabelList;
-	delete[] modeOptionStruct;
-	delete[] semanticTags;
+    for (int i = 0; i < FIXED_ENDPOINT_COUNT; i++)
+    {
+        if (endpointArray[i][0] != nullptr)
+        {
+            auto * begin = static_cast<ModeOptionStructType *>(endpointArray[i][0]);
+            auto * end   = static_cast<ModeOptionStructType *>(endpointArray[i][1]);
+            for (auto * it = begin; it != end; ++it)
+            {
+                auto & modeOption = *it;
+                delete[] modeOption.label.data();
+                delete[] modeOption.semanticTags.data();
+            }
+            delete[] begin;
+        }
+        endpointArray[i][0] = nullptr;
+        endpointArray[i][1] = nullptr;
+    }
+    delete[] modeLabelList;
+    delete[] modeOptionStruct;
+    delete[] semanticTags;
 }

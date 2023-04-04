@@ -30,22 +30,22 @@ class StaticSupportedModesManager : public chip::app::Clusters::ModeSelect::Supp
 {
 private:
     using ModeOptionStructType = Structs::ModeOptionStruct::Type;
-	using SemanticTag          = Structs::SemanticTagStruct::Type;
+    using SemanticTag          = Structs::SemanticTagStruct::Type;
 
-	struct ModeLabel {
-		char supportedModeLabel[64];
-	};
+    struct ModeLabel
+    {
+        char supportedModeLabel[64];
+    };
 
-	static ModeLabel *modeLabelList;
+    static ModeLabel * modeLabelList;
     static ModeOptionStructType * modeOptionStruct;
     static SemanticTag * semanticTags;
-	// TODO : We need to decide wheather the endpointArray shoule be static or dynamic.
-	static ModeOptionStructType *endpointArray[FIXED_ENDPOINT_COUNT][2];
+    // TODO : We need to decide wheather the endpointArray shoule be static or dynamic.
+    static ModeOptionStructType * endpointArray[FIXED_ENDPOINT_COUNT][2];
 
-	void InitEndpointArray();
+    void InitEndpointArray();
 
-	void FreeSupportedModes();
-
+    void FreeSupportedModes();
 
 public:
     static const StaticSupportedModesManager instance;
@@ -55,13 +55,9 @@ public:
     Protocols::InteractionModel::Status getModeOptionByMode(EndpointId endpointId, uint8_t mode,
                                                             const ModeOptionStructType ** dataPtr) const override;
 
-    StaticSupportedModesManager() {
-		InitEndpointArray();
-	}
+    StaticSupportedModesManager() { InitEndpointArray(); }
 
-    ~StaticSupportedModesManager(){
-		FreeSupportedModes();
-	}
+    ~StaticSupportedModesManager() { FreeSupportedModes(); }
 
     static inline const StaticSupportedModesManager & getStaticSupportedModesManagerInstance() { return instance; }
 };
