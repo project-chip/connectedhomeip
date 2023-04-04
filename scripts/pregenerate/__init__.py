@@ -58,6 +58,7 @@ def _FindAllIdls(sdk_root: str, external_roots: Optional[List[str]]) -> Iterator
     # next external roots
     if external_roots:
         for root in external_roots:
+            root = os.path.normpath(root)
             for idl in _IdlsInDirectory(root, len(root) + 1):
                 yield idl
 
