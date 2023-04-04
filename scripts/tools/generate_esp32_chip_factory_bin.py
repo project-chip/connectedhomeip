@@ -21,7 +21,6 @@ import base64
 import enum
 import logging
 import os
-import re
 import sys
 from types import SimpleNamespace
 
@@ -228,7 +227,7 @@ def get_fixed_label_dict(fixed_labels):
     return fl_dict
 
 # get_supported_modes_dict() converts the list of strings to per endpoint dictionaries.
-# example input  : ['0/label1/1"1\0x8000, 2\0x8000",  1/label2/1/"1\0x8000, 2\0x8000"']
+# example input  : ['0/label1/1/"1\0x8000, 2\0x8000",  1/label2/1/"1\0x8000, 2\0x8000"']
 # example outout : {'1': [{'Label': 'label1', 'Mode': 0, 'Semantic_Tag': [{'value': 1, 'mfgCode': 32768}, {'value': 2, 'mfgCode': 32768}]}, {'Label': 'label2', 'Mode': 1, 'Semantic_Tag': [{'value': 1, 'mfgCode': 32768}, {'value': 2, 'mfgCode': 32768}]}]}
 
 
@@ -549,7 +548,7 @@ def main():
     parser.add_argument('--fixed-labels', nargs='+',
                         help='List of fixed labels, eg: "0/orientation/up" "1/orientation/down" "2/orientation/down"')
     parser.add_argument('--supported-modes', type=str, nargs='+', required=False,
-                        help='List of supported modes, eg: mode1/label1/ep/"tagValue1\mfgCode, tagValue2\mfgCode"  mode2/label2/ep/"tagValue1\mfgCode, tagValue2\mfgCode"  mode3/label3/ep/"tagValue1\mfgCode, tagValue2\mfgCode"')
+                        help='List of supported modes, eg: mode1/label1/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode2/label2/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"  mode3/label3/ep/"tagValue1\\mfgCode, tagValue2\\mfgCode"')
 
     parser.add_argument('-s', '--size', type=any_base_int, default=0x6000,
                         help='The size of the partition.bin, default: 0x6000')
