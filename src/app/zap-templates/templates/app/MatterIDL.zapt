@@ -5,10 +5,9 @@
 {{>idl_structure_definition extraIndent=0}}
 
 {{/chip_shared_structs}}
-{{!TODO: consider #chip_clusters as iteration point as well.
-{{!      Unsure about the differences}}
-{{#all_user_clusters}}
-  {{~side}} cluster {{asUpperCamelCase name}} = {{code}} {
+{{#all_user_clusters~}}
+/** {{description}} */
+{{side}} cluster {{asUpperCamelCase name}} = {{code}} {
   {{#zcl_enums}}
   enum {{asUpperCamelCase name}} : ENUM{{multiply size 8}} {
     {{#zcl_enum_items}}
