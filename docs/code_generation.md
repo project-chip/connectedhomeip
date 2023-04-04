@@ -254,7 +254,7 @@ generate a `.matter`.
 `.matter` files are designed to be human readable. It is recommended to take a look
 at the generated file and see if it contains what is expected and also lint it.
 If anything seems wrong, the `.zap` file should be fixed
-(` .matter`` represents the content of `.zap`). To lint use:
+(` .matter` represents the content of `.zap`). To lint use:
 
 ```bash
 scripts/idl_lint.py ${MATTER_FILE_PATH}
