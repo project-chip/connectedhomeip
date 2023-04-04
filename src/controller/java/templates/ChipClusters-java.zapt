@@ -102,7 +102,7 @@ public class ChipClusters {
     }
   }
 
-  {{#chip_client_clusters}}
+  {{#all_user_clusters side='client'}}
   public static class {{asUpperCamelCase name}}Cluster extends BaseChipCluster {
     public static final long CLUSTER_ID = {{code}}L;
 
@@ -112,34 +112,46 @@ public class ChipClusters {
 
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
-  {{#chip_cluster_commands}}
+  {{#all_user_cluster_generated_commands}}
+    {{#if_compare clusterId ../id operator='=='}}
+      {{#if (is_str_equal commandSource 'client')}}
 
     {{#unless mustUseTimedInvoke}}
     public void {{asLowerCamelCase name}}({{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback
-      {{#chip_cluster_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}) {
-      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#chip_cluster_command_arguments}}, {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}, null);
+      {{#zcl_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true clusterId=parent.parent.id}} {{asLowerCamelCase label}}{{/zcl_command_arguments}}) {
+      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#zcl_command_arguments}}, {{asLowerCamelCase label}}{{/zcl_command_arguments}}, null);
     }
     {{/unless}}
 
     public void {{asLowerCamelCase name}}({{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback
-      {{#chip_cluster_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}
+      {{#zcl_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true clusterId=parent.parent.id}} {{asLowerCamelCase label}}{{/zcl_command_arguments}}
       , int timedInvokeTimeoutMs) {
-      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#chip_cluster_command_arguments}}, {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}, timedInvokeTimeoutMs);
+      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#zcl_command_arguments}}, {{asLowerCamelCase label}}{{/zcl_command_arguments}}, timedInvokeTimeoutMs);
     }
-  {{/chip_cluster_commands}}
-  {{#chip_cluster_commands}}
+      {{/if}}
+    {{/if_compare}}
+  {{/all_user_cluster_generated_commands}}
+  {{#all_user_cluster_generated_commands}}
+    {{#if_compare clusterId ../id operator='=='}}
+      {{#if (is_str_equal commandSource 'client')}}
     private native void {{asLowerCamelCase name}}(long chipClusterPtr, {{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} Callback
-      {{#chip_cluster_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}
+      {{#zcl_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true clusterId=parent.parent.id}} {{asLowerCamelCase label}}{{/zcl_command_arguments}}
       , @Nullable Integer timedInvokeTimeoutMs);
-  {{/chip_cluster_commands}}
-  {{#chip_cluster_responses}}
+      {{/if}}
+    {{/if_compare}}
+  {{/all_user_cluster_generated_commands}}
+    {{#all_user_cluster_generated_commands}}
+      {{#if_compare clusterId ../id operator='=='}}
+        {{#if (is_str_equal commandSource 'server')}}
     public interface {{asUpperCamelCase name}}Callback {
-      void onSuccess({{#chip_cluster_response_arguments}}{{#not_first}}, {{/not_first}}{{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/chip_cluster_response_arguments}});
+      void onSuccess({{#zcl_command_arguments}}{{#not_first}}, {{/not_first}}{{asJavaType type chipType parent.parent.name includeAnnotations=true clusterId=parent.parent.id}} {{asLowerCamelCase label}}{{/zcl_command_arguments}});
       
       void onError(Exception error);
     }
 
-  {{/chip_cluster_responses}}
+        {{/if}}
+    {{/if_compare}}
+  {{/all_user_cluster_generated_commands}}
 
   {{#zcl_attributes_server removeKeys='isOptional'}}
   {{#if_unsupported_attribute_callback type isArray ../id}}
@@ -233,6 +245,6 @@ public class ChipClusters {
   {{#not_last}}
 
   {{/not_last}}
-  {{/chip_client_clusters}}
+  {{/all_user_clusters}}
 }
 {{/if}}

@@ -9,11 +9,11 @@ public final class ChipIdLookup {
    * ID is found, returns an empty string.
    */
   public static String clusterIdToName(long clusterId) {
-    {{#chip_client_clusters}}
+    {{#all_user_clusters side='client'}}
     if (clusterId == {{code}}L) {
       return "{{asUpperCamelCase name}}";
     }
-    {{/chip_client_clusters}}
+    {{/all_user_clusters}}
     return "";
   }
 
@@ -22,7 +22,7 @@ public final class ChipIdLookup {
    * If no matching IDs are found, returns an empty string.
    */
   public static String attributeIdToName(long clusterId, long attributeId) {
-    {{#chip_client_clusters}}
+    {{#all_user_clusters side='client'}}
     if (clusterId == {{code}}L) {
       {{#zcl_attributes_server}}
       if (attributeId == {{code}}L) {
@@ -31,7 +31,7 @@ public final class ChipIdLookup {
       {{/zcl_attributes_server}}
       return "";
     }
-    {{/chip_client_clusters}}
+    {{/all_user_clusters}}
     return "";
   }
 
@@ -40,7 +40,7 @@ public final class ChipIdLookup {
    * If no matching IDs are found, returns an empty string.
    */
   public static String eventIdToName(long clusterId, long eventId) {
-    {{#chip_client_clusters}}
+    {{#all_user_clusters side='client'}}
     if (clusterId == {{code}}L) {
       {{#chip_server_cluster_events}}
       if (eventId == {{code}}L) {
@@ -49,7 +49,7 @@ public final class ChipIdLookup {
       {{/chip_server_cluster_events}}
       return "";
     }
-    {{/chip_client_clusters}}
+    {{/all_user_clusters}}
     return "";
   }
 }

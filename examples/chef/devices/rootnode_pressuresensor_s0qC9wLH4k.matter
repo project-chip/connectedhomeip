@@ -46,7 +46,7 @@ server cluster Identify = 3 {
 }
 
 client cluster Groups = 4 {
-  bitmap GroupClusterFeature : BITMAP32 {
+  bitmap GroupsFeature : BITMAP32 {
     kGroupNames = 0x1;
   }
 
@@ -110,7 +110,7 @@ client cluster Groups = 4 {
 }
 
 server cluster Groups = 4 {
-  bitmap GroupClusterFeature : BITMAP32 {
+  bitmap GroupsFeature : BITMAP32 {
     kGroupNames = 0x1;
   }
 
@@ -1171,7 +1171,7 @@ server cluster UserLabel = 65 {
 }
 
 server cluster PressureMeasurement = 1027 {
-  bitmap PressureFeature : BITMAP32 {
+  bitmap PressureMeasurementFeature : BITMAP32 {
     kExtended = 0x1;
   }
 

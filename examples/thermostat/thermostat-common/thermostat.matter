@@ -97,7 +97,7 @@ server cluster Identify = 3 {
 }
 
 server cluster Groups = 4 {
-  bitmap GroupClusterFeature : BITMAP32 {
+  bitmap GroupsFeature : BITMAP32 {
     kGroupNames = 0x1;
   }
 
@@ -161,12 +161,12 @@ server cluster Groups = 4 {
 }
 
 server cluster Scenes = 5 {
-  bitmap SceneFeatures : BITMAP32 {
-    kSceneNames = 0x1;
-  }
-
   bitmap ScenesCopyMode : BITMAP8 {
     kCopyAllScenes = 0x1;
+  }
+
+  bitmap ScenesFeature : BITMAP32 {
+    kSceneNames = 0x1;
   }
 
   struct ExtensionFieldSet {
