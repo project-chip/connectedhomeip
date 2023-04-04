@@ -593,11 +593,10 @@ class JavaJNIGenerator(__JavaCodeGenerator):
         Renders .CPP files required for JNI support.
         """
 
-<<<<<<< HEAD
         large_targets = [
-            GenerateTarget(template="java/CHIPCallbackTypes.jinja",
+            GenerateTarget(template="CHIPCallbackTypes.jinja",
                            output_name="jni/CHIPCallbackTypes.h"),
-            GenerateTarget(template="java/CHIPReadCallbacks_h.jinja",
+            GenerateTarget(template="CHIPReadCallbacks_h.jinja",
                            output_name="jni/CHIPReadCallbacks.h")
         ]
 
