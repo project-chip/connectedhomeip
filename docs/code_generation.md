@@ -251,7 +251,7 @@ scripts/tools/zap/generate.py ${ZAP_FILE_PATH}
 The above will use the template `src/app/zap-templates/matter-idl.json` to
 generate a `.matter`.
 
-Matter files are designed to be human readable. It is recommended to take a look
+`.matter` files are designed to be human readable. It is recommended to take a look
 at the generated file and see if it contains what is expected and also lint it.
 If anything seems wrong, the `.zap` file should be fixed
 (` .matter`` represents the content of `.zap`). To lint use:
