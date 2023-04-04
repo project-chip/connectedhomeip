@@ -716,6 +716,9 @@ private:
         timeout = MTRClampedNumber(timeout, @(1), @(UINT16_MAX));
     }
     expectedValueInterval = MTRClampedNumber(expectedValueInterval, @(1), @(UINT32_MAX));
+    MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID
+                                                                           clusterID:clusterID
+                                                                         attributeID:attributeID];
     MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.queue];
     MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
         MTR_LOG_INFO("%@ dequeueWorkItem %@", logPrefix, self->_asyncCallbackWorkQueue);
@@ -730,6 +733,9 @@ private:
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   MTR_LOG_INFO("%@ completion error %@ endWork", logPrefix, error);
                                   [workItem endWork];
+                                  if (error) {
+                                      [self removeExpectedValuesForAttributePath:attributePath];
+                                  }
                               }];
     };
     workItem.readyHandler = readyHandler;
@@ -737,9 +743,6 @@ private:
     [_asyncCallbackWorkQueue enqueueWorkItem:workItem];
 
     // Commit change into expected value cache
-    MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID
-                                                                           clusterID:clusterID
-                                                                         attributeID:attributeID];
     NSDictionary * newExpectedValueDictionary = @{ MTRAttributePathKey : attributePath, MTRDataKey : value };
 
     [self setExpectedValues:@[ newExpectedValueDictionary ] expectedValueInterval:expectedValueInterval];
@@ -995,6 +998,45 @@ private:
     return attributesToReport;
 }
 
+- (void)_setExpectedValue:(NSDictionary<NSString *, id> *)expectedAttributeValue
+             attributePath:(MTRAttributePath *)attributePath
+            expirationTime:(NSDate *)expirationTime
+         shouldReportValue:(BOOL *)shouldReportValue
+    attributeValueToReport:(NSDictionary<NSString *, id> **)attributeValueToReport
+{
+    *shouldReportValue = NO;
+
+    MTRPair<NSDate *, NSDictionary *> * previousExpectedValue = _expectedValueCache[attributePath];
+    if (previousExpectedValue) {
+        if (expectedAttributeValue
+            && ![self _attributeDataValue:expectedAttributeValue isEqualToDataValue:previousExpectedValue.second]) {
+            // Case where new expected value overrides previous expected value - report new expected value
+            *shouldReportValue = YES;
+            *attributeValueToReport = expectedAttributeValue;
+        } else if (!expectedAttributeValue
+            && ![self _attributeDataValue:previousExpectedValue.second isEqualToDataValue:_readCache[attributePath]]) {
+            // Case of removing expected value that is different than read cache - report read cache value
+            *shouldReportValue = YES;
+            *attributeValueToReport = _readCache[attributePath];
+        }
+    } else {
+        if (expectedAttributeValue
+            && ![self _attributeDataValue:expectedAttributeValue isEqualToDataValue:_readCache[attributePath]]) {
+            // Case where new expected value is different than read cache - report new expected value
+            *shouldReportValue = YES;
+            *attributeValueToReport = expectedAttributeValue;
+        }
+
+        // No need to report if new and previous expected value are both nil
+    }
+
+    if (expectedAttributeValue) {
+        _expectedValueCache[attributePath] = [MTRPair pairWithFirst:expirationTime second:expectedAttributeValue];
+    } else {
+        _expectedValueCache[attributePath] = nil;
+    }
+}
+
 // assume lock is held
 - (NSArray *)_getAttributesToReportWithNewExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedAttributeValues
                                           expirationTime:(NSDate *)expirationTime
@@ -1007,25 +1049,16 @@ private:
         MTRAttributePath * attributePath = attributeReponseValue[MTRAttributePathKey];
         NSDictionary * attributeDataValue = attributeReponseValue[MTRDataKey];
 
-        // check if value is different than cache, and report if needed
-        BOOL shouldReportAttribute = NO;
+        BOOL shouldReportValue = NO;
+        NSDictionary<NSString *, id> * attributeValueToReport;
+        [self _setExpectedValue:attributeDataValue
+                     attributePath:attributePath
+                    expirationTime:expirationTime
+                 shouldReportValue:&shouldReportValue
+            attributeValueToReport:&attributeValueToReport];
 
-        // first check write cache and purge / update
-        MTRPair<NSDate *, NSDictionary *> * previousExpectedValue = _expectedValueCache[attributePath];
-        if (previousExpectedValue) {
-            if (![self _attributeDataValue:attributeDataValue isEqualToDataValue:previousExpectedValue.second]) {
-                shouldReportAttribute = YES;
-            }
-        } else {
-            // if new expected value then compare with read cache and report if needed
-            if (![self _attributeDataValue:attributeDataValue isEqualToDataValue:_readCache[attributePath]]) {
-                shouldReportAttribute = YES;
-            }
-        }
-        _expectedValueCache[attributePath] = [MTRPair pairWithFirst:expirationTime second:attributeDataValue];
-
-        if (shouldReportAttribute) {
-            [attributesToReport addObject:attributeReponseValue];
+        if (shouldReportValue) {
+            [attributesToReport addObject:@{ MTRAttributePathKey : attributePath, MTRDataKey : attributeValueToReport }];
             [attributePathsToReport addObject:attributePath];
         }
     }
@@ -1050,6 +1083,29 @@ private:
     [self _reportAttributes:attributesToReport];
 
     [self _checkExpiredExpectedValues];
+    os_unfair_lock_unlock(&self->_lock);
+}
+
+- (void)removeExpectedValuesForAttributePath:(MTRAttributePath *)attributePath
+{
+    os_unfair_lock_lock(&self->_lock);
+    BOOL shouldReportValue;
+    NSDictionary<NSString *, id> * attributeValueToReport;
+    [self _setExpectedValue:nil
+                 attributePath:attributePath
+                expirationTime:nil
+             shouldReportValue:&shouldReportValue
+        attributeValueToReport:&attributeValueToReport];
+
+    MTR_LOG_INFO("%@ remove expected values for path %@ should report %@", self, attributePath, shouldReportValue ? @"YES" : @"NO");
+
+    if (shouldReportValue) {
+        if (attributeValueToReport) {
+            [self _reportAttributes:@[ @{ MTRAttributePathKey : attributePath, MTRDataKey : attributeValueToReport } ]];
+        } else {
+            [self _reportAttributes:@[ @{ MTRAttributePathKey : attributePath } ]];
+        }
+    }
     os_unfair_lock_unlock(&self->_lock);
 }
 
