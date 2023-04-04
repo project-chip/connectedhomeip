@@ -66,6 +66,7 @@ class GlobMatcher:
     def matches(self, s: str):
         return fnmatch.fnmatch(s, self.pattern)
 
+
 def _GeneratorsForRoot(root: str):
     """Define all generators for the given source root."""
 
