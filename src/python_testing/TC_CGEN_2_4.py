@@ -32,7 +32,7 @@ class TC_CGEN_2_4(MatterBaseTest):
     def OpenCommissioningWindow(self) -> int:
         try:
             pin, code = self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=self.matter_test_config.discriminator, option=1)
+                nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=self.matter_test_config.discriminator[0], option=1)
             time.sleep(5)
             return pin, code
 
