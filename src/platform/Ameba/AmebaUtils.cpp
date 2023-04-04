@@ -154,6 +154,7 @@ CHIP_ERROR AmebaUtils::WiFiConnectProvisionedNetwork(void)
 CHIP_ERROR AmebaUtils::WiFiConnect(const char * ssid, const char * password)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    ChipLogProgress(DeviceLayer, "Connecting to AP : [%s]", (char *) ssid);
     int ameba_err  = matter_wifi_connect((char *) ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) password, strlen(ssid),
                                         strlen(password), 0, nullptr);
     err            = (ameba_err == RTW_SUCCESS) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;

@@ -84,6 +84,9 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
+public:
+    void ChangeWiFiStationState(WiFiStationState newState);
+
 private:
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
@@ -114,7 +117,6 @@ private:
     bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
-    void ChangeWiFiStationState(WiFiStationState newState);
 
     // ===== Private members reserved for use by this class only.
 

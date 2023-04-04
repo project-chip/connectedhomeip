@@ -148,13 +148,13 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     if (event->Type == DeviceEventType::kRtkWiFiStationConnectedEvent)
     {
         ChipLogProgress(DeviceLayer, "WiFiStationConnected");
-        if ((mWiFiStationState == kWiFiStationState_Connecting) || (mWiFiStationState == kWiFiStationState_NotConnected))
-        {
-            ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
-        }
         if (mWiFiStationState == kWiFiStationState_Connecting)
         {
             DHCPProcess();
+        }
+        if ((mWiFiStationState == kWiFiStationState_Connecting) || (mWiFiStationState == kWiFiStationState_NotConnected))
+        {
+            ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
         }
         DriveStationState();
     }

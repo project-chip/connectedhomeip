@@ -147,7 +147,9 @@ CHIP_ERROR AmebaWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLe
     }
 
     ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManager::kWiFiStationState_Connecting);
-    return chip::DeviceLayer::Internal::AmebaUtils::WiFiConnect(ssid, key);
+
+    err = chip::DeviceLayer::Internal::AmebaUtils::WiFiConnect(ssid, key);
+    return err;
 }
 
 void AmebaWiFiDriver::OnConnectWiFiNetwork()
