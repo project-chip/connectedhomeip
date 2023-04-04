@@ -133,7 +133,8 @@ PyChipError pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommission
                                               uint32_t setupPINCode, chip::NodeId nodeid);
 PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceCommissioner * devCtrl, const char * onboardingPayload,
                                                     chip::NodeId nodeid);
-PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId remoteDeviceId, DeviceUnpairingCompleteFunct callback);
+PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId remoteDeviceId,
+                                                 DeviceUnpairingCompleteFunct callback);
 PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size);
 PyChipError pychip_DeviceController_SetWiFiCredentials(const char * ssid, const char * credentials);
 PyChipError pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
@@ -390,11 +391,11 @@ PyChipError pychip_DeviceController_ConnectWithCode(chip::Controller::DeviceComm
 }
 
 namespace {
-    struct UnpairDeviceCallback
+struct UnpairDeviceCallback
 {
     UnpairDeviceCallback(DeviceUnpairingCompleteFunct callback, chip::Controller::CurrentFabricRemover * remover) :
-         mOnCurrentFabricRemove(OnCurrentFabricRemoveFn, this) , mCallback(callback), mRemover(remover)
-     {}
+        mOnCurrentFabricRemove(OnCurrentFabricRemoveFn, this), mCallback(callback), mRemover(remover)
+    {}
 
     static void OnCurrentFabricRemoveFn(void * context, chip::NodeId nodeId, CHIP_ERROR error)
     {
@@ -410,7 +411,8 @@ namespace {
 };
 } // anonymous namespace
 
-PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid, DeviceUnpairingCompleteFunct callback)
+PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid,
+                                                 DeviceUnpairingCompleteFunct callback)
 {
     // Create a new CurrentFabricRemover instance
     auto * fabricRemover = new chip::Controller::CurrentFabricRemover(devCtrl);
@@ -422,7 +424,6 @@ PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommiss
 
     return ToPyChipError(err);
 }
-
 
 PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::DeviceCommissioner * devCtrl, uint64_t nodeId,
                                                         uint32_t setupPasscode, const uint8_t filterType, const char * filterParam)
