@@ -436,8 +436,8 @@ void PersistenceManager::OnFabricRemoved(const FabricTable & fabricTable, Fabric
                 }
             }
 
-            // memset cachedVideoPlayers[indexToDelete] to zeroes
-            memset(&cachedVideoPlayers[indexToDelete], 0, sizeof(cachedVideoPlayers[indexToDelete]));
+            // Reset cachedVideoPlayers[indexToDelete]
+            cachedVideoPlayers[indexToDelete].Reset();
         }
     }
 
