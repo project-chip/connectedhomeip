@@ -148,10 +148,13 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     if (event->Type == DeviceEventType::kRtkWiFiStationConnectedEvent)
     {
         ChipLogProgress(DeviceLayer, "WiFiStationConnected");
+        // Only do DHCP when connecting to wifi via matter provisioning
+        // External wifi provisioning will do DHCP on their own
         if (mWiFiStationState == kWiFiStationState_Connecting)
         {
             DHCPProcess();
         }
+        // Allow external wifi provisioning methods by allowing NotConnected states to advance to Connecting_succeed
         if ((mWiFiStationState == kWiFiStationState_Connecting) || (mWiFiStationState == kWiFiStationState_NotConnected))
         {
             ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
