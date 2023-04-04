@@ -107,7 +107,7 @@ tests:
       command: "readAttribute"
       attribute: "ColorLoopTime"
       response:
-          value: 30
+          value: 5
 
     - label: "Read ColorLoopStartEnhancedHue attribute from DUT."
       command: "readAttribute"

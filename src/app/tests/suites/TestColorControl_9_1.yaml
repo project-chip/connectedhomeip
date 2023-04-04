@@ -133,7 +133,7 @@ tests:
               - name: "Direction"
                 value: 0
               - name: "Time"
-                value: 1
+                value: 5
               - name: "StartHue"
                 value: 0
               - name: "OptionsMask"
