@@ -207,13 +207,16 @@ class BarcodeFragment : Fragment() {
             lateinit var payload: SetupPayload
             try {
                 payload = SetupPayloadParser().parseQrCode(barcode.displayValue)
+                FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
+                    ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
             } catch (ex: UnrecognizedQrCodeException) {
                 Log.e(TAG, "Unrecognized QR Code", ex)
                 Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
                 return@post
+            } catch(ex: IllegalStateException) {
+                Log.e(TAG, "Handle IllegalStateException ", ex)
+                return@post
             }
-            FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
-                ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
         }
     }
 
