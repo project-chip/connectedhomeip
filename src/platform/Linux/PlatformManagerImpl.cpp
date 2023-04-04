@@ -266,8 +266,8 @@ void PlatformManagerImpl::_Shutdown()
 
 #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
     g_main_loop_quit(mGLibMainLoop);
-    g_main_loop_unref(mGLibMainLoop);
     g_thread_join(mGLibMainLoopThread);
+    g_main_loop_unref(mGLibMainLoop);
 #endif
 }
 
