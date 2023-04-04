@@ -71,7 +71,7 @@ uint32_t gOverrunCount = 0;
  * @return
  *    None
  ******************************************************************************/
-static void low_level_init(struct netif * netif)
+static void low_level_init(struct netif *netif)
 {
     /* set netif MAC hardware address length */
     netif->hwaddr_len = ETH_HWADDR_LEN;
@@ -108,7 +108,7 @@ static void low_level_init(struct netif * netif)
  * @return
  *     None
  ************************************************************************************/
-static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
+static void low_level_input(struct netif *netif, uint8_t *b, uint16_t len)
 {
     struct pbuf *p, *q;
     uint32_t bufferoffset;
@@ -123,8 +123,8 @@ static void low_level_input(struct netif * netif, uint8_t * b, uint16_t len)
     }
 
     /* Drop packets originated from the same interface and is not destined for the said interface */
-    const uint8_t * src_mac = b + netif->hwaddr_len;
-    const uint8_t * dst_mac = b;
+    const uint8_t *src_mac = b + netif->hwaddr_len;
+    const uint8_t *dst_mac = b;
 
     if (!(ip6_addr_ispreferred(netif_ip6_addr_state(netif, 0))) && (memcmp(netif->hwaddr, src_mac, netif->hwaddr_len) == 0) &&
         (memcmp(netif->hwaddr, dst_mac, netif->hwaddr_len) != 0))
@@ -190,10 +190,10 @@ static SemaphoreHandle_t ethout_sem;
  * @return
  *    ERR_OK if successful
  ******************************************************************************/
-static err_t low_level_output(struct netif * netif, struct pbuf * p)
+static err_t low_level_output(struct netif *netif, struct pbuf *p)
 {
-    void * rsipkt;
-    struct pbuf * q;
+    void *rsipkt;
+    struct pbuf *q;
     uint16_t framelength;
 
     if (xSemaphoreTake(ethout_sem, portMAX_DELAY) != pdTRUE)
@@ -268,9 +268,9 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
  * @return
  *    None
  ******************************************************************************/
-void wfx_host_received_sta_frame_cb(uint8_t * buf, int len)
+void wfx_host_received_sta_frame_cb(uint8_t *buf, int len)
 {
-    struct netif * ifp;
+    struct netif *ifp;
 
     /* get the network interface for STATION interface,
      * and forward the received frame buffer to LWIP
@@ -291,7 +291,7 @@ void wfx_host_received_sta_frame_cb(uint8_t * buf, int len)
  * @return
  *    ERR_OK if successful
  ******************************************************************************/
-err_t sta_ethernetif_init(struct netif * netif)
+err_t sta_ethernetif_init(struct netif *netif)
 {
     LWIP_ASSERT("netif != NULL", (netif != NULL));
 

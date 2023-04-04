@@ -53,7 +53,7 @@ const uint8_t ShortUUID_CHIPoBLEService[] = { 0xF6, 0xFF };
  */
 void rsi_ble_app_init_events()
 {
-    WFX_RSI_LOG("%s: starting", __func__);
+    SILABS_LOG("%s: starting", __func__);
     event_msg.ble_app_event_map  = 0;
     event_msg.ble_app_event_mask = 0xFFFFFFFF;
     event_msg.ble_app_event_mask = event_msg.ble_app_event_mask; // To suppress warning while compiling
@@ -71,7 +71,7 @@ void rsi_ble_app_init_events()
  */
 void rsi_ble_app_clear_event(uint32_t event_num)
 {
-    WFX_RSI_LOG("%s: starting", __func__);
+    SILABS_LOG("%s: starting", __func__);
     event_msg.event_num = event_num;
     event_msg.ble_app_event_map &= ~BIT(event_num);
     return;
@@ -86,9 +86,9 @@ void rsi_ble_app_clear_event(uint32_t event_num)
  * @section description
  * This callback function is invoked when  mtu exhange event is received
  */
-void rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu)
+void rsi_ble_on_mtu_event(rsi_ble_event_mtu_t *rsi_ble_mtu)
 {
-    WFX_RSI_LOG("%s: starting", __func__);
+    SILABS_LOG("%s: starting", __func__);
     memcpy(&event_msg.rsi_ble_mtu, rsi_ble_mtu, sizeof(rsi_ble_event_mtu_t));
     rsi_ble_app_set_event(RSI_BLE_MTU_EVENT);
 }
@@ -103,9 +103,9 @@ void rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu)
  * @section description
  * This callback function is invoked when write/notify/indication events are received
  */
-void rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t * rsi_ble_write)
+void rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t *rsi_ble_write)
 {
-    WFX_RSI_LOG("%s: starting", __func__);
+    SILABS_LOG("%s: starting", __func__);
     event_msg.event_id = event_id;
     memcpy(&event_msg.rsi_ble_write, rsi_ble_write, sizeof(rsi_ble_event_write_t));
     rsi_ble_app_set_event(RSI_BLE_GATT_WRITE_EVENT);
@@ -120,9 +120,9 @@ void rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t * rsi_
  * @section description
  * This callback function indicates the status of the connection
  */
-void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * resp_enh_conn)
+void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t *resp_enh_conn)
 {
-    WFX_RSI_LOG("%s: starting", __func__);
+    SILABS_LOG("%s: starting", __func__);
     event_msg.connectionHandle = 1;
     event_msg.bondingHandle    = 255;
     memcpy(event_msg.resp_enh_conn.dev_addr, resp_enh_conn->dev_addr, RSI_DEV_ADDR_LEN);
@@ -139,9 +139,9 @@ void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * 
  * @section description
  * This callback function indicates disconnected device information and status
  */
-void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, uint16_t reason)
+void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t *resp_disconnect, uint16_t reason)
 {
-    WFX_RSI_LOG("%s: starting", __func__);
+    SILABS_LOG("%s: starting", __func__);
     event_msg.reason = reason;
     rsi_ble_app_set_event(RSI_BLE_DISCONN_EVENT);
 }
@@ -155,9 +155,9 @@ void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, u
  * @return     none
  * @section description
  */
-void rsi_ble_on_event_indication_confirmation(uint16_t resp_status, rsi_ble_set_att_resp_t * rsi_ble_event_set_att_rsp)
+void rsi_ble_on_event_indication_confirmation(uint16_t resp_status, rsi_ble_set_att_resp_t *rsi_ble_event_set_att_rsp)
 {
-    WFX_RSI_LOG("%s: starting", __func__);
+    SILABS_LOG("%s: starting", __func__);
     event_msg.resp_status = resp_status;
     memcpy(&event_msg.rsi_ble_event_set_att_rsp, rsi_ble_event_set_att_rsp, sizeof(rsi_ble_set_att_resp_t));
     rsi_ble_app_set_event(RSI_BLE_GATT_INDICATION_CONFIRMATION);
@@ -200,7 +200,7 @@ int32_t rsi_ble_app_get_event(void)
  */
 void rsi_ble_app_set_event(uint32_t event_num)
 {
-    WFX_RSI_LOG("%s: starting", __func__);
+    SILABS_LOG("%s: starting", __func__);
     event_msg.ble_app_event_map |= BIT(event_num);
     rsi_semaphore_post(&sl_ble_event_sem);
     return;
@@ -219,7 +219,7 @@ void rsi_ble_app_set_event(uint32_t event_num)
  * @section description
  * This function is used to store all attribute records
  */
-void rsi_gatt_add_attribute_to_list(rsi_ble_t * p_val, uint16_t handle, uint16_t data_len, uint8_t * data, uuid_t uuid,
+void rsi_gatt_add_attribute_to_list(rsi_ble_t *p_val, uint16_t handle, uint16_t data_len, uint8_t *data, uuid_t uuid,
                                     uint8_t char_prop)
 {
     if ((p_val->DATA_ix + data_len) >= BLE_ATT_REC_SIZE)
@@ -254,7 +254,7 @@ void rsi_gatt_add_attribute_to_list(rsi_ble_t * p_val, uint16_t handle, uint16_t
  * @section description
  * This function is used at application to add characteristic attribute
  */
-void rsi_ble_add_char_serv_att(void * serv_handler, uint16_t handle, uint8_t val_prop, uint16_t att_val_handle, uuid_t att_val_uuid)
+void rsi_ble_add_char_serv_att(void  *serv_handler, uint16_t handle, uint8_t val_prop, uint16_t att_val_handle, uuid_t att_val_uuid)
 {
     rsi_ble_req_add_att_t new_att = { 0 };
 
@@ -302,7 +302,7 @@ void rsi_ble_add_char_serv_att(void * serv_handler, uint16_t handle, uint8_t val
  * This function is used at application to create new service.
  */
 
-void rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_type_uuid, uint8_t val_prop, uint8_t * data,
+void rsi_ble_add_char_val_att(void *serv_handler, uint16_t handle, uuid_t att_type_uuid, uint8_t val_prop, uint8_t *data,
                               uint8_t data_len, uint8_t auth_read)
 {
     rsi_ble_req_add_att_t new_att = { 0 };

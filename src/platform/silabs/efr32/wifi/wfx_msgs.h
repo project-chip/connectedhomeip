@@ -59,8 +59,7 @@ typedef struct __attribute__((__packed__)) sl_wfx_generic_message_s
  */
 typedef struct __attribute__((__packed__)) sl_wfx_startup_ind_body_s
 {
-    uint32_t
-        status; ///< Initialization status. A value of zero indicates the boot is completed successfully  (see enum sl_wfx_status_t)
+    uint32_t status; ///< Initialization status. A value of zero indicates the boot is completed successfully  (see enum sl_wfx_status_t)
     uint16_t hardware_id; ///<=RO misc_read_reg7 register value
 #if 0                     /* Not used in RS911x for now - use stuff here for the port */
   uint8_t  opn[SL_WFX_OPN_SIZE];                           ///<=OTP part_OPN

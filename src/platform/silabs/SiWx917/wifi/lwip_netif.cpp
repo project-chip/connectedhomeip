@@ -47,7 +47,7 @@ static struct netif ap_netif;
  * @param[in]  ap_if:
  * @return None
  *****************************************************************************/
-static void netif_config(struct netif * sta_if, struct netif * ap_if)
+static void netif_config(struct netif *sta_if, struct netif *ap_if)
 {
     if (sta_if != NULL)
     {
@@ -134,7 +134,7 @@ void wfx_lwip_start(void)
  * @param[in] interface:
  * @return None
  *****************************************************************************/
-struct netif * wfx_get_netif(sl_wfx_interface_t interface)
+struct netif* wfx_get_netif(sl_wfx_interface_t interface)
 {
     if (interface == SL_WFX_STA_INTERFACE)
     {

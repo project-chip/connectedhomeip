@@ -83,13 +83,13 @@ void dhcpclient_set_link_state(int link_up)
  * Don't need a task here. We get polled every 250ms
  * @return  None
  ************************************************************************************/
-uint8_t dhcpclient_poll(void * arg)
+uint8_t dhcpclient_poll(void *arg)
 {
-    struct netif * netif = (struct netif *) arg;
+    struct netif *netif = (struct netif *) arg;
     ip_addr_t ipaddr;
     ip_addr_t netmask;
     ip_addr_t gw;
-    struct dhcp * dhcp;
+    struct dhcp *dhcp;
 
     switch (dhcp_state)
     {

@@ -30,7 +30,7 @@ extern "C" {
  * @param netif the lwip network interface structure
  * @returns ERR_OK if successful
  ******************************************************************************/
-err_t sta_ethernetif_init(struct netif * netif);
+err_t sta_ethernetif_init(struct netif *netif);
 
 /***************************************************************************
  * @fn err_t ap_ethernetif_init(struct netif *netif
@@ -40,9 +40,9 @@ err_t sta_ethernetif_init(struct netif * netif);
  * @param netif the lwip network interface structure
  * @returns ERR_OK if successful
  ******************************************************************************/
-err_t ap_ethernetif_init(struct netif * netif);
+err_t ap_ethernetif_init(struct netif *netif);
 
-void wfx_host_received_sta_frame_cb(uint8_t * buf, int len);
+void wfx_host_received_sta_frame_cb(uint8_t *buf, int len);
 
 #ifdef __cplusplus
 }
