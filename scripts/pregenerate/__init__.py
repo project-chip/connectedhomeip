@@ -30,9 +30,11 @@ def _IdlsInDirectory(top_directory_name: str, truncate_length: int):
           for file in files:
                if file.endswith('.zap'):
                     yield InputIdlFile(file_type=IdlFileType.ZAP,
+                                       full_path=os.path.join(root, file),
                                        relative_path=os.path.join(root[truncate_length:], file))
                if file.endswith('.matter'):
                     yield InputIdlFile(file_type=IdlFileType.MATTER,
+                                       full_path=os.path.join(root, file),
                                        relative_path=os.path.join(root[truncate_length:], file))
 
 
