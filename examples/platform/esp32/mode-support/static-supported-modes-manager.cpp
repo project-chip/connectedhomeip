@@ -27,7 +27,7 @@ void StaticSupportedModesManager::InitEndpointArray()
 	for(int i=0; i<FIXED_ENDPOINT_COUNT; i++) {
 		endpointArray[i][0] = nullptr;
 		endpointArray[i][1] = nullptr;
-	} 
+	}
 }
 
 SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeOptionsProvider(EndpointId endpointId) const
@@ -166,9 +166,8 @@ void StaticSupportedModesManager::FreeSupportedModes()
 		}
 		endpointArray[i][0] = nullptr;
 		endpointArray[i][1] = nullptr;
-	} 
+	}
 	delete[] modeLabelList;
 	delete[] modeOptionStruct;
-	delete[] semanticTags; 
+	delete[] semanticTags;
 }
-
