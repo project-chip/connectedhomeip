@@ -91,7 +91,7 @@ def FindPregenerationTargets(sdk_root: str, external_roots: Optional[List[str]],
     """
 
     generators = _GeneratorsForRoot(sdk_root)
-    if extenral_roots:
+    if external_roots:
         for root in external_roots:
             generators.extend(_GeneratorsForRoot(root))
 
