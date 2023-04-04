@@ -199,7 +199,6 @@ typedef enum
 extern "C" {
 #endif
 
-void sl_wfx_host_gpio_init(void);
 sl_status_t wfx_wifi_start(void);
 void wfx_enable_sta_mode(void);
 void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr);
