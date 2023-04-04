@@ -143,8 +143,8 @@ jobs:
                   # all-clusters-app and from other requestors.
                   #
                   # And a different port from the test harness too; the test harness uses port 5541.
-                  ../../../out/debug/chip-ota-requestor-app --interface-id -1 --secured-device-port 5542 --discriminator 1111 --KVS /tmp/chip-ota-requestor-kvs1 > >(tee /tmp/darwin/framework-tests/ota-requestor-app-1.log) 2> >(tee /tmp/darwin/framework-tests/ota-requestor-app-err-1.log >&2) &
-                  ../../../out/debug/chip-ota-requestor-app --interface-id -1 --secured-device-port 5543 --discriminator 1112 --KVS /tmp/chip-ota-requestor-kvs2 > >(tee /tmp/darwin/framework-tests/ota-requestor-app-2.log) 2> >(tee /tmp/darwin/framework-tests/ota-requestor-app-err-2.log >&2) &
+                  ../../../out/debug/chip-ota-requestor-app --interface-id -1 --secured-device-port 5542 --discriminator 1111 --KVS /tmp/chip-ota-requestor-kvs1 --otaDownloadPath /tmp/chip-ota-requestor-downloaded-image1 --autoApplyImage > >(tee /tmp/darwin/framework-tests/ota-requestor-app-1.log) 2> >(tee /tmp/darwin/framework-tests/ota-requestor-app-err-1.log >&2) &
+                  ../../../out/debug/chip-ota-requestor-app --interface-id -1 --secured-device-port 5543 --discriminator 1112 --KVS /tmp/chip-ota-requestor-kvs2 --otaDownloadPath /tmp/chip-ota-requestor-downloaded-image2 --autoApplyImage > >(tee /tmp/darwin/framework-tests/ota-requestor-app-2.log) 2> >(tee /tmp/darwin/framework-tests/ota-requestor-app-err-2.log >&2) &
                   xcodebuild test -target "Matter" -scheme "Matter Framework Tests" -sdk macosx OTHER_CFLAGS='${inherited} -Werror -Wconversion -Wno-incomplete-umbrella -Wno-unguarded-availability-new' > >(tee /tmp/darwin/framework-tests/darwin-tests.log) 2> >(tee /tmp/darwin/framework-tests/darwin-tests-err.log >&2)
               working-directory: src/darwin/Framework
             - name: Uploading log files
