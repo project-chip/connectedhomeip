@@ -51,23 +51,31 @@ constexpr char ThreadStackManagerImpl::kPropertyDeviceRole[];
 
 ThreadStackManagerImpl::ThreadStackManagerImpl() : mAttached(false) {}
 
-CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
+CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextInitThreadStack(ThreadStackManagerImpl * self)
 {
     // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
     // all D-Bus signals will be delivered to the GLib global default main context.
     VerifyOrDie(g_main_context_get_thread_default() != nullptr);
 
     std::unique_ptr<GError, GErrorDeleter> err;
-    mProxy.reset(openthread_io_openthread_border_router_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE,
-                                                                               kDBusOpenThreadService, kDBusOpenThreadObjectPath,
-                                                                               nullptr, &MakeUniquePointerReceiver(err).Get()));
-    if (!mProxy)
-    {
-        ChipLogError(DeviceLayer, "openthread: failed to create openthread dbus proxy %s", err ? err->message : "unknown error");
-        return CHIP_ERROR_INTERNAL;
-    }
+    self->mProxy.reset(openthread_io_openthread_border_router_proxy_new_for_bus_sync(
+        G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kDBusOpenThreadService, kDBusOpenThreadObjectPath, nullptr,
+        &MakeUniquePointerReceiver(err).Get()));
+    VerifyOrReturnError(
+        self->mProxy != nullptr, CHIP_ERROR_INTERNAL,
+        ChipLogError(DeviceLayer, "openthread: failed to create openthread dbus proxy %s", err ? err->message : "unknown error"));
 
-    g_signal_connect(mProxy.get(), "g-properties-changed", G_CALLBACK(OnDbusPropertiesChanged), this);
+    g_signal_connect(self->mProxy.get(), "g-properties-changed", G_CALLBACK(OnDbusPropertiesChanged), self);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
+{
+    CHIP_ERROR err;
+
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(GLibMatterContextInitThreadStack, this);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "openthread: failed to init dbus proxy"));
 
     // If get property is called inside dbus thread (we are going to make it so), XXX_get_XXX can be used instead of XXX_dup_XXX
     // which is a little bit faster and the returned object doesn't need to be freed. Same for all following get properties.
