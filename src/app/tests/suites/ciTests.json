@@ -34,7 +34,9 @@
         "Test_TC_CC_7_2",
         "Test_TC_CC_7_3",
         "Test_TC_CC_7_4",
-        "Test_TC_CC_8_1"
+        "Test_TC_CC_8_1",
+        "TestColorControl_9_1",
+        "TestColorControl_9_2"
     ],
     "DeviceManagement": [
         "Test_TC_OPCREDS_1_2",
