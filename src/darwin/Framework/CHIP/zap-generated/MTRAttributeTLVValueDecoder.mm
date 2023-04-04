@@ -16931,6 +16931,183 @@ id MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader &
             value = [NSNumber numberWithBool:cppValue];
             return value;
         }
+        case Attributes::NullablesAndOptionalsStruct::Id: {
+            using TypeInfo = Attributes::NullablesAndOptionalsStruct::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            MTRUnitTestingClusterNullablesAndOptionalsStruct * _Nonnull value;
+            value = [MTRUnitTestingClusterNullablesAndOptionalsStruct new];
+            if (cppValue.nullableInt.IsNull()) {
+                value.nullableInt = nil;
+            } else {
+                value.nullableInt = [NSNumber numberWithUnsignedShort:cppValue.nullableInt.Value()];
+            }
+            if (cppValue.optionalInt.HasValue()) {
+                value.optionalInt = [NSNumber numberWithUnsignedShort:cppValue.optionalInt.Value()];
+            } else {
+                value.optionalInt = nil;
+            }
+            if (cppValue.nullableOptionalInt.HasValue()) {
+                if (cppValue.nullableOptionalInt.Value().IsNull()) {
+                    value.nullableOptionalInt = nil;
+                } else {
+                    value.nullableOptionalInt = [NSNumber numberWithUnsignedShort:cppValue.nullableOptionalInt.Value().Value()];
+                }
+            } else {
+                value.nullableOptionalInt = nil;
+            }
+            if (cppValue.nullableString.IsNull()) {
+                value.nullableString = nil;
+            } else {
+                value.nullableString = [[NSString alloc] initWithBytes:cppValue.nullableString.Value().data()
+                                                                length:cppValue.nullableString.Value().size()
+                                                              encoding:NSUTF8StringEncoding];
+            }
+            if (cppValue.optionalString.HasValue()) {
+                value.optionalString = [[NSString alloc] initWithBytes:cppValue.optionalString.Value().data()
+                                                                length:cppValue.optionalString.Value().size()
+                                                              encoding:NSUTF8StringEncoding];
+            } else {
+                value.optionalString = nil;
+            }
+            if (cppValue.nullableOptionalString.HasValue()) {
+                if (cppValue.nullableOptionalString.Value().IsNull()) {
+                    value.nullableOptionalString = nil;
+                } else {
+                    value.nullableOptionalString =
+                        [[NSString alloc] initWithBytes:cppValue.nullableOptionalString.Value().Value().data()
+                                                 length:cppValue.nullableOptionalString.Value().Value().size()
+                                               encoding:NSUTF8StringEncoding];
+                }
+            } else {
+                value.nullableOptionalString = nil;
+            }
+            if (cppValue.nullableStruct.IsNull()) {
+                value.nullableStruct = nil;
+            } else {
+                value.nullableStruct = [MTRUnitTestingClusterSimpleStruct new];
+                value.nullableStruct.a = [NSNumber numberWithUnsignedChar:cppValue.nullableStruct.Value().a];
+                value.nullableStruct.b = [NSNumber numberWithBool:cppValue.nullableStruct.Value().b];
+                value.nullableStruct.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.nullableStruct.Value().c)];
+                value.nullableStruct.d = [NSData dataWithBytes:cppValue.nullableStruct.Value().d.data()
+                                                        length:cppValue.nullableStruct.Value().d.size()];
+                value.nullableStruct.e = [[NSString alloc] initWithBytes:cppValue.nullableStruct.Value().e.data()
+                                                                  length:cppValue.nullableStruct.Value().e.size()
+                                                                encoding:NSUTF8StringEncoding];
+                value.nullableStruct.f = [NSNumber numberWithUnsignedChar:cppValue.nullableStruct.Value().f.Raw()];
+                value.nullableStruct.g = [NSNumber numberWithFloat:cppValue.nullableStruct.Value().g];
+                value.nullableStruct.h = [NSNumber numberWithDouble:cppValue.nullableStruct.Value().h];
+            }
+            if (cppValue.optionalStruct.HasValue()) {
+                value.optionalStruct = [MTRUnitTestingClusterSimpleStruct new];
+                value.optionalStruct.a = [NSNumber numberWithUnsignedChar:cppValue.optionalStruct.Value().a];
+                value.optionalStruct.b = [NSNumber numberWithBool:cppValue.optionalStruct.Value().b];
+                value.optionalStruct.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.optionalStruct.Value().c)];
+                value.optionalStruct.d = [NSData dataWithBytes:cppValue.optionalStruct.Value().d.data()
+                                                        length:cppValue.optionalStruct.Value().d.size()];
+                value.optionalStruct.e = [[NSString alloc] initWithBytes:cppValue.optionalStruct.Value().e.data()
+                                                                  length:cppValue.optionalStruct.Value().e.size()
+                                                                encoding:NSUTF8StringEncoding];
+                value.optionalStruct.f = [NSNumber numberWithUnsignedChar:cppValue.optionalStruct.Value().f.Raw()];
+                value.optionalStruct.g = [NSNumber numberWithFloat:cppValue.optionalStruct.Value().g];
+                value.optionalStruct.h = [NSNumber numberWithDouble:cppValue.optionalStruct.Value().h];
+            } else {
+                value.optionalStruct = nil;
+            }
+            if (cppValue.nullableOptionalStruct.HasValue()) {
+                if (cppValue.nullableOptionalStruct.Value().IsNull()) {
+                    value.nullableOptionalStruct = nil;
+                } else {
+                    value.nullableOptionalStruct = [MTRUnitTestingClusterSimpleStruct new];
+                    value.nullableOptionalStruct.a =
+                        [NSNumber numberWithUnsignedChar:cppValue.nullableOptionalStruct.Value().Value().a];
+                    value.nullableOptionalStruct.b = [NSNumber numberWithBool:cppValue.nullableOptionalStruct.Value().Value().b];
+                    value.nullableOptionalStruct.c =
+                        [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.nullableOptionalStruct.Value().Value().c)];
+                    value.nullableOptionalStruct.d =
+                        [NSData dataWithBytes:cppValue.nullableOptionalStruct.Value().Value().d.data()
+                                       length:cppValue.nullableOptionalStruct.Value().Value().d.size()];
+                    value.nullableOptionalStruct.e =
+                        [[NSString alloc] initWithBytes:cppValue.nullableOptionalStruct.Value().Value().e.data()
+                                                 length:cppValue.nullableOptionalStruct.Value().Value().e.size()
+                                               encoding:NSUTF8StringEncoding];
+                    value.nullableOptionalStruct.f =
+                        [NSNumber numberWithUnsignedChar:cppValue.nullableOptionalStruct.Value().Value().f.Raw()];
+                    value.nullableOptionalStruct.g = [NSNumber numberWithFloat:cppValue.nullableOptionalStruct.Value().Value().g];
+                    value.nullableOptionalStruct.h = [NSNumber numberWithDouble:cppValue.nullableOptionalStruct.Value().Value().h];
+                }
+            } else {
+                value.nullableOptionalStruct = nil;
+            }
+            if (cppValue.nullableList.IsNull()) {
+                value.nullableList = nil;
+            } else {
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = cppValue.nullableList.Value().begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        NSNumber * newElement_2;
+                        newElement_2 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2)];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    value.nullableList = array_2;
+                }
+            }
+            if (cppValue.optionalList.HasValue()) {
+                { // Scope for our temporary variables
+                    auto * array_2 = [NSMutableArray new];
+                    auto iter_2 = cppValue.optionalList.Value().begin();
+                    while (iter_2.Next()) {
+                        auto & entry_2 = iter_2.GetValue();
+                        NSNumber * newElement_2;
+                        newElement_2 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2)];
+                        [array_2 addObject:newElement_2];
+                    }
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                    value.optionalList = array_2;
+                }
+            } else {
+                value.optionalList = nil;
+            }
+            if (cppValue.nullableOptionalList.HasValue()) {
+                if (cppValue.nullableOptionalList.Value().IsNull()) {
+                    value.nullableOptionalList = nil;
+                } else {
+                    { // Scope for our temporary variables
+                        auto * array_3 = [NSMutableArray new];
+                        auto iter_3 = cppValue.nullableOptionalList.Value().Value().begin();
+                        while (iter_3.Next()) {
+                            auto & entry_3 = iter_3.GetValue();
+                            NSNumber * newElement_3;
+                            newElement_3 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3)];
+                            [array_3 addObject:newElement_3];
+                        }
+                        CHIP_ERROR err = iter_3.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        value.nullableOptionalList = array_3;
+                    }
+                }
+            } else {
+                value.nullableOptionalList = nil;
+            }
+            return value;
+        }
         case Attributes::Unsupported::Id: {
             using TypeInfo = Attributes::Unsupported::TypeInfo;
             TypeInfo::DecodableType cppValue;

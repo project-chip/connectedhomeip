@@ -20369,6 +20369,22 @@
               "reportableChange": 0
             },
             {
+              "name": "nullables_and_optionals_struct",
+              "code": 51,
+              "mfgCode": null,
+              "side": "server",
+              "type": "NullablesAndOptionalsStruct",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "unsupported",
               "code": 255,
               "mfgCode": null,

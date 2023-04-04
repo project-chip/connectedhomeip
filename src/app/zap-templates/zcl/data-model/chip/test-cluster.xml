@@ -197,6 +197,8 @@ limitations under the License.
                type="BOOLEAN" writable="true" optional="false">general_error_boolean</attribute>
     <attribute side="server" code="0x0032" define="CLUSTER_ERROR_BOOLEAN"
                type="BOOLEAN" writable="true" optional="false">cluster_error_boolean</attribute>
+    <attribute side="server" code="0x0033" define="STRUCTS_WITH_OPTIONALS" type="NullablesAndOptionalsStruct"
+               writable="true" optional="false">nullables_and_optionals_struct</attribute>
 
     <attribute side="server" code="0x4000" define="NULLABLE_BOOLEAN" type="BOOLEAN" writable="true" default="false" isNullable="true" optional="false">nullable_boolean</attribute>
     <attribute side="server" code="0x4001" define="NULLABLE_BITMAP8" type="Bitmap8MaskMap" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap8</attribute>

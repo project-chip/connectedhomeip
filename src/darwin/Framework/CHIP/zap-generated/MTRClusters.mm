@@ -31096,6 +31096,35 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
                             timedWriteTimeout:timedWriteTimeout];
 }
 
+- (NSDictionary<NSString *, id> *)readAttributeNullablesAndOptionalsStructWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(_endpoint)
+                                          clusterID:@(MTRClusterIDTypeUnitTestingID)
+                                        attributeID:@(MTRAttributeIDTypeClusterUnitTestingAttributeNullablesAndOptionalsStructID)
+                                             params:params];
+}
+
+- (void)writeAttributeNullablesAndOptionalsStructWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+{
+    [self writeAttributeNullablesAndOptionalsStructWithValue:dataValueDictionary
+                                       expectedValueInterval:expectedValueIntervalMs
+                                                      params:nil];
+}
+- (void)writeAttributeNullablesAndOptionalsStructWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary
+                                     expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+                                                    params:(MTRWriteParams * _Nullable)params
+{
+    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+
+    [self.device writeAttributeWithEndpointID:@(_endpoint)
+                                    clusterID:@(MTRClusterIDTypeUnitTestingID)
+                                  attributeID:@(MTRAttributeIDTypeClusterUnitTestingAttributeNullablesAndOptionalsStructID)
+                                        value:dataValueDictionary
+                        expectedValueInterval:expectedValueIntervalMs
+                            timedWriteTimeout:timedWriteTimeout];
+}
+
 - (NSDictionary<NSString *, id> *)readAttributeUnsupportedWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(_endpoint)

@@ -5122,6 +5122,10 @@ namespace ClusterErrorBoolean {
 static constexpr AttributeId Id = 0x00000032;
 } // namespace ClusterErrorBoolean
 
+namespace NullablesAndOptionalsStruct {
+static constexpr AttributeId Id = 0x00000033;
+} // namespace NullablesAndOptionalsStruct
+
 namespace Unsupported {
 static constexpr AttributeId Id = 0x000000FF;
 } // namespace Unsupported

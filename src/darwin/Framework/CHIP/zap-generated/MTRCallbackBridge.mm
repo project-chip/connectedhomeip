@@ -11045,6 +11045,192 @@ void MTRUnitTestingListFabricScopedListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
+void MTRUnitTestingNullablesAndOptionalsStructStructAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType & value)
+{
+    MTRUnitTestingClusterNullablesAndOptionalsStruct * _Nonnull objCValue;
+    objCValue = [MTRUnitTestingClusterNullablesAndOptionalsStruct new];
+    if (value.nullableInt.IsNull()) {
+        objCValue.nullableInt = nil;
+    } else {
+        objCValue.nullableInt = [NSNumber numberWithUnsignedShort:value.nullableInt.Value()];
+    }
+    if (value.optionalInt.HasValue()) {
+        objCValue.optionalInt = [NSNumber numberWithUnsignedShort:value.optionalInt.Value()];
+    } else {
+        objCValue.optionalInt = nil;
+    }
+    if (value.nullableOptionalInt.HasValue()) {
+        if (value.nullableOptionalInt.Value().IsNull()) {
+            objCValue.nullableOptionalInt = nil;
+        } else {
+            objCValue.nullableOptionalInt = [NSNumber numberWithUnsignedShort:value.nullableOptionalInt.Value().Value()];
+        }
+    } else {
+        objCValue.nullableOptionalInt = nil;
+    }
+    if (value.nullableString.IsNull()) {
+        objCValue.nullableString = nil;
+    } else {
+        objCValue.nullableString = [[NSString alloc] initWithBytes:value.nullableString.Value().data()
+                                                            length:value.nullableString.Value().size()
+                                                          encoding:NSUTF8StringEncoding];
+    }
+    if (value.optionalString.HasValue()) {
+        objCValue.optionalString = [[NSString alloc] initWithBytes:value.optionalString.Value().data()
+                                                            length:value.optionalString.Value().size()
+                                                          encoding:NSUTF8StringEncoding];
+    } else {
+        objCValue.optionalString = nil;
+    }
+    if (value.nullableOptionalString.HasValue()) {
+        if (value.nullableOptionalString.Value().IsNull()) {
+            objCValue.nullableOptionalString = nil;
+        } else {
+            objCValue.nullableOptionalString = [[NSString alloc] initWithBytes:value.nullableOptionalString.Value().Value().data()
+                                                                        length:value.nullableOptionalString.Value().Value().size()
+                                                                      encoding:NSUTF8StringEncoding];
+        }
+    } else {
+        objCValue.nullableOptionalString = nil;
+    }
+    if (value.nullableStruct.IsNull()) {
+        objCValue.nullableStruct = nil;
+    } else {
+        objCValue.nullableStruct = [MTRUnitTestingClusterSimpleStruct new];
+        objCValue.nullableStruct.a = [NSNumber numberWithUnsignedChar:value.nullableStruct.Value().a];
+        objCValue.nullableStruct.b = [NSNumber numberWithBool:value.nullableStruct.Value().b];
+        objCValue.nullableStruct.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.nullableStruct.Value().c)];
+        objCValue.nullableStruct.d = [NSData dataWithBytes:value.nullableStruct.Value().d.data()
+                                                    length:value.nullableStruct.Value().d.size()];
+        objCValue.nullableStruct.e = [[NSString alloc] initWithBytes:value.nullableStruct.Value().e.data()
+                                                              length:value.nullableStruct.Value().e.size()
+                                                            encoding:NSUTF8StringEncoding];
+        objCValue.nullableStruct.f = [NSNumber numberWithUnsignedChar:value.nullableStruct.Value().f.Raw()];
+        objCValue.nullableStruct.g = [NSNumber numberWithFloat:value.nullableStruct.Value().g];
+        objCValue.nullableStruct.h = [NSNumber numberWithDouble:value.nullableStruct.Value().h];
+    }
+    if (value.optionalStruct.HasValue()) {
+        objCValue.optionalStruct = [MTRUnitTestingClusterSimpleStruct new];
+        objCValue.optionalStruct.a = [NSNumber numberWithUnsignedChar:value.optionalStruct.Value().a];
+        objCValue.optionalStruct.b = [NSNumber numberWithBool:value.optionalStruct.Value().b];
+        objCValue.optionalStruct.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.optionalStruct.Value().c)];
+        objCValue.optionalStruct.d = [NSData dataWithBytes:value.optionalStruct.Value().d.data()
+                                                    length:value.optionalStruct.Value().d.size()];
+        objCValue.optionalStruct.e = [[NSString alloc] initWithBytes:value.optionalStruct.Value().e.data()
+                                                              length:value.optionalStruct.Value().e.size()
+                                                            encoding:NSUTF8StringEncoding];
+        objCValue.optionalStruct.f = [NSNumber numberWithUnsignedChar:value.optionalStruct.Value().f.Raw()];
+        objCValue.optionalStruct.g = [NSNumber numberWithFloat:value.optionalStruct.Value().g];
+        objCValue.optionalStruct.h = [NSNumber numberWithDouble:value.optionalStruct.Value().h];
+    } else {
+        objCValue.optionalStruct = nil;
+    }
+    if (value.nullableOptionalStruct.HasValue()) {
+        if (value.nullableOptionalStruct.Value().IsNull()) {
+            objCValue.nullableOptionalStruct = nil;
+        } else {
+            objCValue.nullableOptionalStruct = [MTRUnitTestingClusterSimpleStruct new];
+            objCValue.nullableOptionalStruct.a = [NSNumber numberWithUnsignedChar:value.nullableOptionalStruct.Value().Value().a];
+            objCValue.nullableOptionalStruct.b = [NSNumber numberWithBool:value.nullableOptionalStruct.Value().Value().b];
+            objCValue.nullableOptionalStruct.c =
+                [NSNumber numberWithUnsignedChar:chip::to_underlying(value.nullableOptionalStruct.Value().Value().c)];
+            objCValue.nullableOptionalStruct.d = [NSData dataWithBytes:value.nullableOptionalStruct.Value().Value().d.data()
+                                                                length:value.nullableOptionalStruct.Value().Value().d.size()];
+            objCValue.nullableOptionalStruct.e =
+                [[NSString alloc] initWithBytes:value.nullableOptionalStruct.Value().Value().e.data()
+                                         length:value.nullableOptionalStruct.Value().Value().e.size()
+                                       encoding:NSUTF8StringEncoding];
+            objCValue.nullableOptionalStruct.f =
+                [NSNumber numberWithUnsignedChar:value.nullableOptionalStruct.Value().Value().f.Raw()];
+            objCValue.nullableOptionalStruct.g = [NSNumber numberWithFloat:value.nullableOptionalStruct.Value().Value().g];
+            objCValue.nullableOptionalStruct.h = [NSNumber numberWithDouble:value.nullableOptionalStruct.Value().Value().h];
+        }
+    } else {
+        objCValue.nullableOptionalStruct = nil;
+    }
+    if (value.nullableList.IsNull()) {
+        objCValue.nullableList = nil;
+    } else {
+        { // Scope for our temporary variables
+            auto * array_2 = [NSMutableArray new];
+            auto iter_2 = value.nullableList.Value().begin();
+            while (iter_2.Next()) {
+                auto & entry_2 = iter_2.GetValue();
+                NSNumber * newElement_2;
+                newElement_2 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2)];
+                [array_2 addObject:newElement_2];
+            }
+            CHIP_ERROR err = iter_2.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, err);
+                return;
+            }
+            objCValue.nullableList = array_2;
+        }
+    }
+    if (value.optionalList.HasValue()) {
+        { // Scope for our temporary variables
+            auto * array_2 = [NSMutableArray new];
+            auto iter_2 = value.optionalList.Value().begin();
+            while (iter_2.Next()) {
+                auto & entry_2 = iter_2.GetValue();
+                NSNumber * newElement_2;
+                newElement_2 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2)];
+                [array_2 addObject:newElement_2];
+            }
+            CHIP_ERROR err = iter_2.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, err);
+                return;
+            }
+            objCValue.optionalList = array_2;
+        }
+    } else {
+        objCValue.optionalList = nil;
+    }
+    if (value.nullableOptionalList.HasValue()) {
+        if (value.nullableOptionalList.Value().IsNull()) {
+            objCValue.nullableOptionalList = nil;
+        } else {
+            { // Scope for our temporary variables
+                auto * array_3 = [NSMutableArray new];
+                auto iter_3 = value.nullableOptionalList.Value().Value().begin();
+                while (iter_3.Next()) {
+                    auto & entry_3 = iter_3.GetValue();
+                    NSNumber * newElement_3;
+                    newElement_3 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3)];
+                    [array_3 addObject:newElement_3];
+                }
+                CHIP_ERROR err = iter_3.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    OnFailureFn(context, err);
+                    return;
+                }
+                objCValue.nullableOptionalList = array_3;
+            }
+        }
+    } else {
+        objCValue.nullableOptionalList = nil;
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRUnitTestingNullablesAndOptionalsStructStructAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
 void MTRUnitTestingNullableBitmap8AttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> & value)
 {
