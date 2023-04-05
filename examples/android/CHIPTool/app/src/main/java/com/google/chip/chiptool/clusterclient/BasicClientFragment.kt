@@ -42,7 +42,6 @@ class BasicClientFragment : Fragment() {
 
     addressUpdateFragment =
       childFragmentManager.findFragmentById(R.id.addressUpdateFragment) as AddressUpdateFragment
-
     binding.writeNodeLabelBtn.setOnClickListener { scope.launch {
       sendWriteNodeLabelAttribute()
       binding.nodeLabelEd.onEditorAction(EditorInfo.IME_ACTION_DONE)
@@ -182,7 +181,7 @@ class BasicClientFragment : Fragment() {
   }
 
   private suspend fun sendReadVendorIDAttribute() {
-    getBasicClusterForDevice().readVendorIDAttribute(object : ChipClusters.BasicInformationCluster.VendorIDAttributeCallback {
+    getBasicClusterForDevice().readVendorIDAttribute(object : ChipClusters.IntegerAttributeCallback {
       override fun onSuccess(value: Int) {
         Log.i(TAG,"[Read Success] VendorID: $value")
         showMessage("[Read Success] VendorID: $value")
@@ -480,8 +479,13 @@ class BasicClientFragment : Fragment() {
 
   private suspend fun getBasicClusterForDevice(): BasicInformationCluster {
     return BasicInformationCluster(
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId), ENDPOINT
+      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId), addressUpdateFragment.endpointId
     )
+  }
+
+  override fun onResume() {
+    super.onResume()
+    addressUpdateFragment.endpointId = ENDPOINT
   }
 
   companion object {

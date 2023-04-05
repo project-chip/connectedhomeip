@@ -342,7 +342,6 @@ int main(int argc, char ** args)
             gMdnsServer.Shutdown();
 
             DeviceLayer::PlatformMgr().StopEventLoopTask();
-            DeviceLayer::PlatformMgr().Shutdown();
         },
         nullptr);
     if (err != CHIP_NO_ERROR)
@@ -351,6 +350,9 @@ int main(int argc, char ** args)
     }
 
     DeviceLayer::PlatformMgr().RunEventLoop();
+
+    DeviceLayer::PlatformMgr().Shutdown();
+    Platform::MemoryShutdown();
 
     printf("Done...\n");
     return 0;

@@ -4126,7 +4126,10 @@
               - DoorLockFeature
           WindowCovering:
               - ConfigStatus
-              - Feature
+              # WindowCoveringFeature was originally just named Feature, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              - WindowCoveringFeature
               - Mode
               - OperationalStatus
               - SafetyStatus
@@ -4349,7 +4352,10 @@
                   - TiltPositionAware
                   - LiftEncoderControlled
                   - TiltEncoderControlled
-              Feature:
+              # WindowCoveringFeature was originally just named Feature, but we
+              # generate the same API for both of those names, so the name can
+              # just change here.
+              WindowCoveringFeature:
                   - Lift
                   - Tilt
                   - PositionAwareLift
@@ -6192,13 +6198,6 @@
                   - Dual
               CredentialRuleEnum:
                   - Double
-      bitmaps:
-          Scenes:
-              # All the other feature map bitmaps have names ending in
-              # "Feature", so let's not ship this one until it aligns
-              # with the others.
-              # See https://github.com/project-chip/connectedhomeip/issues/24681
-              - SceneFeatures
   renames:
       clusters:
           UnitTesting: TestCluster
@@ -7004,3 +7003,48 @@
 
 - release: "TBD"
   versions: "future"
+  introduced:
+      bitmaps:
+          Groups:
+              - GroupsFeature
+          PressureMeasurement:
+              - PressureMeasurementFeature
+          PumpConfigurationAndControl:
+              - PumpConfigurationAndControlFeature
+          Scenes:
+              - ScenesFeature
+      bitmap values:
+          Groups:
+              GroupsFeature:
+                  - GroupNames
+          PressureMeasurement:
+              PressureMeasurementFeature:
+                  - Extended
+          PumpConfigurationAndControl:
+              PumpConfigurationAndControlFeature:
+                  - ConstantPressure
+                  - CompensatedPressure
+                  - ConstantFlow
+                  - ConstantSpeed
+                  - ConstantTemperature
+                  - Automatic
+                  - LocalOperation
+          Scenes:
+              ScenesFeature:
+                  - SceneNames
+  deprecated:
+      bitmaps:
+          Groups:
+              - GroupClusterFeature
+          PressureMeasurement:
+              - PressureFeature
+          PumpConfigurationAndControl:
+              - PumpFeature
+  renames:
+      bitmaps:
+          Groups:
+              GroupsFeature: GroupClusterFeature
+          PressureMeasurement:
+              PressureMeasurementFeature: PressureFeature
+          PumpConfigurationAndControl:
+              PumpConfigurationAndControlFeature: PumpFeature

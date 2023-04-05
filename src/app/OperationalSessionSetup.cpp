@@ -53,6 +53,14 @@ void OperationalSessionSetup::MoveToState(State aTargetState)
         ChipLogDetail(Discovery, "OperationalSessionSetup[%u:" ChipLogFormatX64 "]: State change %d --> %d",
                       mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()), to_underlying(mState),
                       to_underlying(aTargetState));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+        if (mState == State::WaitingForRetry)
+        {
+            CancelSessionSetupReattempt();
+        }
+#endif
+
         mState = aTargetState;
 
         if (aTargetState != State::Connecting)
@@ -64,7 +72,9 @@ void OperationalSessionSetup::MoveToState(State aTargetState)
 
 bool OperationalSessionSetup::AttachToExistingSecureSession()
 {
-    VerifyOrReturnError(mState == State::NeedsAddress || mState == State::ResolvingAddress || mState == State::HasAddress, false);
+    VerifyOrReturnError(mState == State::NeedsAddress || mState == State::ResolvingAddress || mState == State::HasAddress ||
+                            mState == State::WaitingForRetry,
+                        false);
 
     auto sessionHandle =
         mInitParams.sessionManager->FindSecureSessionForNode(mPeerId, MakeOptional(Transport::SecureSession::Type::kCASE));
@@ -119,6 +129,7 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
         break;
 
     case State::ResolvingAddress:
+    case State::WaitingForRetry:
         isConnected = AttachToExistingSecureSession();
         break;
 
@@ -320,19 +331,26 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
         // Make a copy of the ReliableMessageProtocolConfig, since our
-        // mCaseClient is about to go away.
+        // mCaseClient is about to go away once we change state.
         ReliableMessageProtocolConfig remoteMprConfig = mCASEClient->GetRemoteMRPIntervals();
 #endif
 
+        // Move to the ResolvingAddress state, in case we have more results,
+        // since we expect to receive results in that state.
+        MoveToState(State::ResolvingAddress);
         if (CHIP_NO_ERROR == Resolver::Instance().TryNextResult(mAddressLookupHandle))
         {
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-            // Our retry is going to be immediate, once the event loop spins.
+            // Our retry has already been kicked off.
             NotifyRetryHandlers(error, remoteMprConfig, System::Clock::kZero);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
-            MoveToState(State::ResolvingAddress);
             return;
         }
+
+        // Moving back to the Connecting state would be a bit of a lie, since we
+        // don't have an mCASEClient.  Just go back to NeedsAddress, since
+        // that's really where we are now.
+        MoveToState(State::NeedsAddress);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
         if (mRemainingAttempts > 0)
@@ -341,6 +359,7 @@ void OperationalSessionSetup::OnSessionEstablishmentError(CHIP_ERROR error)
             CHIP_ERROR err = ScheduleSessionSetupReattempt(reattemptDelay);
             if (err == CHIP_NO_ERROR)
             {
+                MoveToState(State::WaitingForRetry);
                 NotifyRetryHandlers(error, remoteMprConfig, reattemptDelay);
                 return;
             }
@@ -406,6 +425,10 @@ OperationalSessionSetup::~OperationalSessionSetup()
         // Make sure we don't leak it.
         mClientPool->Release(mCASEClient);
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    CancelSessionSetupReattempt();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 }
 
 CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
@@ -553,27 +576,32 @@ CHIP_ERROR OperationalSessionSetup::ScheduleSessionSetupReattempt(System::Clock:
     return err;
 }
 
+void OperationalSessionSetup::CancelSessionSetupReattempt()
+{
+    // If we can't get a system layer, there is no way for us to cancel things
+    // at this point, but hopefully that's because everything is torn down
+    // anyway and hence the timer will not fire.
+    auto * sessionManager = mInitParams.exchangeMgr->GetSessionManager();
+    VerifyOrReturn(sessionManager != nullptr);
+
+    auto * systemLayer = sessionManager->SystemLayer();
+    VerifyOrReturn(systemLayer != nullptr);
+
+    systemLayer->CancelTimer(TrySetupAgain, this);
+}
+
 void OperationalSessionSetup::TrySetupAgain(System::Layer * systemLayer, void * state)
 {
     auto * self = static_cast<OperationalSessionSetup *>(state);
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    if (self->mState != State::NeedsAddress)
+    self->MoveToState(State::ResolvingAddress);
+    CHIP_ERROR err = self->LookupPeerAddress();
+    if (err == CHIP_NO_ERROR)
     {
-        err = CHIP_ERROR_INCORRECT_STATE;
-    }
-    else
-    {
-        self->MoveToState(State::ResolvingAddress);
-        err = self->LookupPeerAddress();
-        if (err == CHIP_NO_ERROR)
-        {
-            return;
-        }
+        return;
     }
 
-    // Give up; we're either in a bad state or could not start a lookup.
+    // Give up; we could not start a lookup.
     self->DequeueConnectionCallbacks(err);
     // Do not touch `self` instance anymore; it has been destroyed in DequeueConnectionCallbacks.
 }

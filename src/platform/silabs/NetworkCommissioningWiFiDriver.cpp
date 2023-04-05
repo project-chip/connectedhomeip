@@ -43,11 +43,11 @@ CHIP_ERROR SlWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     mpScanCallback        = nullptr;
     mpConnectCallback     = nullptr;
 
-#ifdef CHIP_ONNETWORK_PAIRING
-    memcpy(&mSavedNetwork.ssid[0], CHIP_WIFI_SSID, sizeof(CHIP_WIFI_SSID));
-    memcpy(&mSavedNetwork.credentials[0], CHIP_WIFI_PSK, sizeof(CHIP_WIFI_PSK));
-    credentialsLen               = sizeof(CHIP_WIFI_PSK);
-    ssidLen                      = sizeof(CHIP_WIFI_SSID);
+#ifdef SL_ONNETWORK_PAIRING
+    memcpy(&mSavedNetwork.ssid[0], SL_WIFI_SSID, sizeof(SL_WIFI_SSID));
+    memcpy(&mSavedNetwork.credentials[0], SL_WIFI_PSK, sizeof(SL_WIFI_PSK));
+    credentialsLen               = sizeof(SL_WIFI_PSK);
+    ssidLen                      = sizeof(SL_WIFI_SSID);
     mSavedNetwork.credentialsLen = credentialsLen;
     mSavedNetwork.ssidLen        = ssidLen;
     mStagingNetwork              = mSavedNetwork;

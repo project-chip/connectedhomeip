@@ -24,6 +24,7 @@
 
 #import "MTRErrorTestUtils.h"
 #import "MTRTestKeys.h"
+#import "MTRTestResetCommissioneeHelper.h"
 #import "MTRTestStorage.h"
 
 #import <app/util/af-enums.h>
@@ -32,9 +33,6 @@
 
 // system dependencies
 #import <XCTest/XCTest.h>
-
-// Set the following to 1 in order to run individual test case manually.
-#define MANUAL_INDIVIDUAL_TEST 0
 
 static uint16_t kTestVendorId = 0xFFF1u;
 
@@ -444,24 +442,45 @@ static MTRBaseDevice * GetConnectedDevice(void)
 
 @end
 
+static BOOL sStackInitRan = NO;
+static BOOL sNeedsStackShutdown = YES;
+
 @implementation MTRXPCListenerSampleTests
+
++ (void)tearDown
+{
+    // Global teardown, runs once
+    if (sNeedsStackShutdown) {
+        // We don't need to worry about ResetCommissionee.  If we get here,
+        // we're running only one of our test methods (using
+        // -only-testing:MatterTests/MTROTAProviderTests/testMethodName), since
+        // we did not run test999_TearDown.
+        [self shutdownStack];
+    }
+}
 
 - (void)setUp
 {
+    // Per-test setup, runs before each test.
     [super setUp];
     [self setContinueAfterFailure:NO];
+
+    if (sStackInitRan == NO) {
+        [self initStack];
+        [self waitForCommissionee];
+    }
 }
 
 - (void)tearDown
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self shutdownStack];
-#endif
+    // Per-test teardown, runs after each test.
     [super tearDown];
 }
 
 - (void)initStack
 {
+    sStackInitRan = YES;
+
     XCTestExpectation * expectation = [self expectationWithDescription:@"Pairing Complete"];
 
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
@@ -507,8 +526,10 @@ static MTRBaseDevice * GetConnectedDevice(void)
     [mSampleListener start];
 }
 
-- (void)shutdownStack
++ (void)shutdownStack
 {
+    sNeedsStackShutdown = NO;
+
     [mSampleListener stop];
     mSampleListener = nil;
 
@@ -538,20 +559,15 @@ static MTRBaseDevice * GetConnectedDevice(void)
     mDeviceController = remoteController;
 }
 
-#if !MANUAL_INDIVIDUAL_TEST
 - (void)test000_SetUp
 {
-    [self initStack];
-    [self waitForCommissionee];
+    // Nothing to do here; our setUp method handled this already.  This test
+    // just exists to make the setup not look like it's happening inside other
+    // tests.
 }
-#endif
 
 - (void)test001_ReadAttribute
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"read DeviceDescriptor DeviceType attribute for all endpoints"];
 
@@ -589,10 +605,6 @@ static MTRBaseDevice * GetConnectedDevice(void)
 
 - (void)test002_WriteAttribute
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"write LevelControl Brightness attribute"];
 
     MTRBaseDevice * device = GetConnectedDevice();
@@ -632,10 +644,6 @@ static MTRBaseDevice * GetConnectedDevice(void)
 
 - (void)test003_InvokeCommand
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"invoke MoveToLevelWithOnOff command"];
 
     MTRBaseDevice * device = GetConnectedDevice();
@@ -682,10 +690,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test004_Subscribe
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
 
     MTRBaseDevice * device = GetConnectedDevice();
@@ -772,10 +776,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test005_ReadAttributeFailure
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"read failed"];
 
     MTRBaseDevice * device = GetConnectedDevice();
@@ -817,10 +817,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test006_WriteAttributeFailure
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"write failed"];
 
     MTRBaseDevice * device = GetConnectedDevice();
@@ -847,53 +843,46 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-#if 0 // Re-enable test if the crash bug in CHIP stack is fixed to handle bad command Id
 - (void)test007_InvokeCommandFailure
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
-    XCTestExpectation * expectation = [self expectationWithDescription:@"invoke MoveToLevelWithOnOff command"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"invoke command with invalid command id"];
 
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
-    NSDictionary *fields = [NSDictionary dictionaryWithObjectsAndKeys:
-                                         @"Structure", @"type",
-                                         [NSArray arrayWithObjects:
-                                          [NSDictionary dictionaryWithObjectsAndKeys:
-                                           [NSNumber numberWithUnsignedInteger:0], @"tag",
-                                           [NSDictionary dictionaryWithObjectsAndKeys:
-                                            @"UnsignedInteger", @"type",
-                                            [NSNumber numberWithUnsignedInteger:0], @"value", nil], @"value", nil],
-                                          [NSDictionary dictionaryWithObjectsAndKeys:
-                                           [NSNumber numberWithUnsignedInteger:1], @"tag",
-                                           [NSDictionary dictionaryWithObjectsAndKeys:
-                                            @"UnsignedInteger", @"type",
-                                            [NSNumber numberWithUnsignedInteger:10], @"value", nil], @"value", nil],
-                                          nil], @"value", nil];
-    [device invokeCommandWithEndpointID:@1 clusterID:@8 commandID:@40000 commandFields:fields queue:queue
-            timedInvokeTimeout:nil
-           completion:^(id _Nullable values, NSError * _Nullable error) {
-               NSLog(@"invoke command: MoveToLevelWithOnOff values: %@, error: %@", values, error);
+    NSDictionary * fields = [NSDictionary
+        dictionaryWithObjectsAndKeys:@"Structure", @"type",
+        [NSArray arrayWithObjects:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:0], @"contextTag",
+                                                [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type",
+                                                              [NSNumber numberWithUnsignedInteger:0], @"value", nil],
+                                                @"data", nil],
+                 [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedInteger:1], @"contextTag",
+                               [NSDictionary dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type",
+                                             [NSNumber numberWithUnsignedInteger:10], @"value", nil],
+                               @"data", nil],
+                 nil],
+        @"value", nil];
+    [device
+        invokeCommandWithEndpointID:@1
+                          clusterID:@8
+                          commandID:@40000
+                      commandFields:fields
+                 timedInvokeTimeout:nil
+                              queue:queue
+                         completion:^(id _Nullable values, NSError * _Nullable error) {
+                             NSLog(@"invoke command: MoveToLevelWithOnOff values: %@, error: %@", values, error);
 
-               XCTAssertNil(values);
-               XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+                             XCTAssertNil(values);
+                             XCTAssertEqual([MTRErrorTestUtils errorToZCLErrorCode:error], EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
 
-        [expectation fulfill];
-    }];
+                             [expectation fulfill];
+                         }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-#endif
 
 - (void)test008_SubscribeFailure
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe OnOff attribute"];
 
     // Set up expectation for report
@@ -936,10 +925,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test009_ReadAttributeWithParams
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"read DeviceDescriptor DeviceType attribute for all endpoints"];
 
@@ -979,10 +964,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test010_SubscribeWithNoParams
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -1156,10 +1137,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test011_SubscribeWithParams
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -1341,10 +1318,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test012_SubscribeKeepingPreviousSubscription
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -1517,10 +1490,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test013_TimedWriteAttribute
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     MTRBaseDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -1657,10 +1626,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test014_TimedInvokeCommand
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"invoke MoveToLevelWithOnOff command"];
 
     MTRBaseDevice * device = GetConnectedDevice();
@@ -1706,10 +1671,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
 - (void)test900_SubscribeClusterStateCache
 {
-#if MANUAL_INDIVIDUAL_TEST
-    [self initStack];
-    [self waitForCommissionee];
-#endif
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe attributes by cache"];
 
     MTRBaseDevice * device = GetConnectedDevice();
@@ -1828,64 +1789,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
 }
 
-#if !MANUAL_INDIVIDUAL_TEST
 - (void)test999_TearDown
 {
-    // Put the device back in the state we found it: open commissioning window, no fabrics commissioned.
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    __auto_type device = [MTRBaseDevice deviceWithNodeID:@(kDeviceId) controller:sController];
-
-    // Get our current fabric index, for later deletion.
-    XCTestExpectation * readFabricIndexExpectation = [self expectationWithDescription:@"Fabric index read"];
-
-    __block NSNumber * fabricIndex;
-    __auto_type * opCredsCluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:device endpointID:@(0) queue:queue];
-    [opCredsCluster
-        readAttributeCurrentFabricIndexWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable readError) {
-            XCTAssertNil(readError);
-            XCTAssertNotNil(value);
-            fabricIndex = value;
-            [readFabricIndexExpectation fulfill];
-        }];
-
-    [self waitForExpectations:@[ readFabricIndexExpectation ] timeout:kTimeoutInSeconds];
-
-    // Open a commissioning window.
-    XCTestExpectation * openCommissioningWindowExpectation = [self expectationWithDescription:@"Commissioning window opened"];
-
-    __auto_type * adminCommissioningCluster = [[MTRBaseClusterAdministratorCommissioning alloc] initWithDevice:device
-                                                                                                    endpointID:@(0)
-                                                                                                         queue:queue];
-    __auto_type * openWindowParams = [[MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams alloc] init];
-    openWindowParams.commissioningTimeout = @(900);
-    openWindowParams.timedInvokeTimeoutMs = @(50000);
-    [adminCommissioningCluster openBasicCommissioningWindowWithParams:openWindowParams
-                                                    completionHandler:^(NSError * _Nullable error) {
-                                                        XCTAssertNil(error);
-                                                        [openCommissioningWindowExpectation fulfill];
-                                                    }];
-
-    [self waitForExpectations:@[ openCommissioningWindowExpectation ] timeout:kTimeoutInSeconds];
-
-    // Remove our fabric from the device.
-    XCTestExpectation * removeFabricExpectation = [self expectationWithDescription:@"Fabric removed"];
-
-    __auto_type * removeParams = [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];
-    removeParams.fabricIndex = fabricIndex;
-
-    [opCredsCluster removeFabricWithParams:removeParams
-                         completionHandler:^(
-                             MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable removeError) {
-                             XCTAssertNil(removeError);
-                             XCTAssertNotNil(data);
-                             XCTAssertEqualObjects(data.statusCode, @(0));
-                             [removeFabricExpectation fulfill];
-                         }];
-
-    [self waitForExpectations:@[ removeFabricExpectation ] timeout:kTimeoutInSeconds];
-
-    [self shutdownStack];
+    ResetCommissionee(
+        [MTRBaseDevice deviceWithNodeID:@(kDeviceId) controller:sController], dispatch_get_main_queue(), self, kTimeoutInSeconds);
+    [[self class] shutdownStack];
 }
-#endif
 
 @end

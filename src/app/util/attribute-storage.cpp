@@ -298,14 +298,6 @@ bool emberAfEndpointIndexIsEnabled(uint16_t index)
     return (emAfEndpoints[index].bitmask & EMBER_AF_ENDPOINT_ENABLED);
 }
 
-// some data types (like strings) are sent OTA in human readable order
-// (how they are read) instead of little endian as the data types are.
-bool emberAfIsThisDataTypeAStringType(EmberAfAttributeType dataType)
-{
-    return (dataType == ZCL_OCTET_STRING_ATTRIBUTE_TYPE || dataType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE ||
-            dataType == ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE || dataType == ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
-}
-
 bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType)
 {
     return (attributeType == ZCL_OCTET_STRING_ATTRIBUTE_TYPE || attributeType == ZCL_CHAR_STRING_ATTRIBUTE_TYPE);

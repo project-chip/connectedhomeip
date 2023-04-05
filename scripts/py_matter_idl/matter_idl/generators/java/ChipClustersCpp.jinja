@@ -84,9 +84,9 @@
     {% endif -%}
 {% endmacro -%}
 
-#include <controller/java/zap-generated/CHIPCallbackTypes.h>
+#include <jni/CHIPCallbackTypes.h>
+#include <jni/CHIPReadCallbacks.h>
 #include <controller/java/zap-generated/CHIPInvokeCallbacks.h>
-#include <controller/java/zap-generated/CHIPReadCallbacks.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <zap-generated/CHIPClientCallbacks.h>
@@ -185,7 +185,7 @@ JNI_METHOD(void, {{cluster.name}}Cluster, subscribe{{attr.definition.name | capi
 {
     chip::DeviceLayer::StackLock lock;
 
-    {%- set callbackName = attr | callbackName(cluster, typeLookup) -%}
+    {%- set callbackName = attr | callbackName(typeLookup) -%}
 
     std::unique_ptr<{{callbackName}}, void (*)({{callbackName}} *)> onSuccess(Platform::New<{{callbackName}}>(callback, true), chip::Platform::Delete<{{callbackName}}>);
     VerifyOrReturn(onSuccess.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));

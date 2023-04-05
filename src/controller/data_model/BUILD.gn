@@ -39,9 +39,11 @@ if (current_os == "android" || build_java_matter_controller) {
 
   chip_codegen("java-jni-generate") {
     input = "controller-clusters.matter"
-    generator = "java"
+    generator = "java-jni"
 
     outputs = [
+      "jni/CHIPCallbackTypes.h",
+      "jni/CHIPReadCallbacks.h",
       "jni/IdentifyClient-ReadImpl.cpp",
       "jni/IdentifyClient-InvokeSubscribeImpl.cpp",
       "jni/GroupsClient-ReadImpl.cpp",
@@ -187,6 +189,7 @@ if (current_os == "android" || build_java_matter_controller) {
   source_set("java-jni-sources") {
     public_configs = [
       ":java-build-config",
+      ":java-jni-generate_config",
       "${chip_root}/src:includes",
     ]
 

@@ -109,10 +109,24 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
  *********************************************************************/
 int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
 {
-    /* TODO : Place holder until we have similar functionality
-     *        available for SiWx917
-     */
-    int32_t status = 0;
+    int32_t status;
+    uint8_t buff[RSI_RESPONSE_MAX_SIZE] = { 0 };
+    status                              = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
+    if (status != RSI_SUCCESS)
+    {
+        WFX_RSI_LOG("\r\n Failed, Error Code : 0x%lX\r\n", status);
+    }
+    else
+    {
+        rsi_wlan_ext_stats_t * test   = (rsi_wlan_ext_stats_t *) buff;
+        extra_info->beacon_lost_count = test->beacon_lost_count - temp_reset->beacon_lost_count;
+        extra_info->beacon_rx_count   = test->beacon_rx_count - temp_reset->beacon_rx_count;
+        extra_info->mcast_rx_count    = test->mcast_rx_count - temp_reset->mcast_rx_count;
+        extra_info->mcast_tx_count    = test->mcast_tx_count - temp_reset->mcast_tx_count;
+        extra_info->ucast_rx_count    = test->ucast_rx_count - temp_reset->ucast_rx_count;
+        extra_info->ucast_tx_count    = test->ucast_tx_count - temp_reset->ucast_tx_count;
+        extra_info->overrun_count     = test->overrun_count - temp_reset->overrun_count;
+    }
     return status;
 }
 
@@ -126,10 +140,24 @@ int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
  *********************************************************************/
 int32_t wfx_rsi_reset_count()
 {
-    /* TODO : Place holder until we have similar functionality
-     *        available for SiWx917
-     */
-    int32_t status = 0;
+    int32_t status;
+    uint8_t buff[RSI_RESPONSE_MAX_SIZE] = { 0 };
+    status                              = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
+    if (status != RSI_SUCCESS)
+    {
+        WFX_RSI_LOG("\r\n Failed, Error Code : 0x%lX\r\n", status);
+    }
+    else
+    {
+        rsi_wlan_ext_stats_t * test   = (rsi_wlan_ext_stats_t *) buff;
+        temp_reset->beacon_lost_count = test->beacon_lost_count;
+        temp_reset->beacon_rx_count   = test->beacon_rx_count;
+        temp_reset->mcast_rx_count    = test->mcast_rx_count;
+        temp_reset->mcast_tx_count    = test->mcast_tx_count;
+        temp_reset->ucast_rx_count    = test->ucast_rx_count;
+        temp_reset->ucast_tx_count    = test->ucast_tx_count;
+        temp_reset->overrun_count     = test->overrun_count;
+    }
     return status;
 }
 
@@ -177,11 +205,7 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
          * Join was complete - Do the DHCP
          */
         WFX_RSI_LOG("%s: join completed.", __func__);
-#ifdef RS911X_SOCKETS
-        xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_DO_DHCP);
-#else
         xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_CONN);
-#endif
         wfx_rsi.join_retries = 0;
         retryInterval        = WLAN_MIN_RETRY_TIMER_MS;
         if (is_wifi_disconnection_event)
@@ -207,34 +231,7 @@ static void wfx_rsi_join_fail_cb(uint16_t status, uint8_t * buf, uint32_t len)
     is_wifi_disconnection_event = true;
     xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
 }
-#ifdef RS911X_SOCKETS
 
-/******************************************************************
- * @fn  wfx_rsi_ipchange_cb(uint16_t status, uint8_t *buf, uint32_t len)
- * @brief
- *       DHCP should end up here
- * @param[in] status:
- * @param[in] buf:
- * @param[in] len:
- * @return
- *        None
- *********************************************************************/
-static void wfx_rsi_ipchange_cb(uint16_t status, uint8_t * buf, uint32_t len)
-{
-    WFX_RSI_LOG("%s: status: %02x", __func__, status);
-    if (status != RSI_SUCCESS)
-    {
-        /* Restart DHCP? */
-        xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_DO_DHCP);
-    }
-    else
-    {
-        wfx_rsi.dev_state |= WFX_RSI_ST_STA_DHCP_DONE;
-        xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_DHCP_DONE);
-    }
-}
-
-#else
 /*************************************************************************************
  * @fn  wfx_rsi_wlan_pkt_cb(uint16_t status, uint8_t *buf, uint32_t len)
  * @brief
@@ -254,7 +251,6 @@ static void wfx_rsi_wlan_pkt_cb(uint16_t status, uint8_t * buf, uint32_t len)
     }
     wfx_host_received_sta_frame_cb(buf, len);
 }
-#endif /* !Socket support */
 
 /*************************************************************************************
  * @fn  static int32_t wfx_rsi_init(void)
@@ -329,15 +325,11 @@ static int32_t wfx_rsi_init(void)
         WFX_RSI_LOG("%s: RSI callback register join failed with status: %02x", __func__, status);
         return status;
     }
-#ifdef RS911X_SOCKETS
-    (void) rsi_wlan_register_callbacks(RSI_IP_CHANGE_NOTIFY_CB, wfx_rsi_ipchange_cb);
-#else
     if ((status = rsi_wlan_register_callbacks(RSI_WLAN_DATA_RECEIVE_NOTIFY_CB, wfx_rsi_wlan_pkt_cb)) != RSI_SUCCESS)
     {
         WFX_RSI_LOG("%s: RSI callback register data-notify failed with status: %02x", __func__, status);
         return status;
     }
-#endif
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
     rsi_semaphore_post(&sl_rs_ble_init_sem);
     WFX_RSI_LOG("%s: RSI: OK", __func__);
@@ -510,10 +502,8 @@ void wfx_rsi_task(void * arg)
 {
     EventBits_t flags;
     int32_t status = 0;
-#ifndef RS911X_SOCKETS
     TickType_t last_dhcp_poll, now;
     struct netif * sta_netif;
-#endif
     (void) arg;
     uint32_t rsi_status = wfx_rsi_init();
     if (rsi_status != RSI_SUCCESS)
@@ -521,11 +511,9 @@ void wfx_rsi_task(void * arg)
         WFX_RSI_LOG("%s: error: wfx_rsi_init with status: %02x", __func__, rsi_status);
         return;
     }
-#ifndef RS911X_SOCKETS
     wfx_lwip_start();
     last_dhcp_poll = xTaskGetTickCount();
     sta_netif      = wfx_get_netif(SL_WFX_STA_INTERFACE);
-#endif
     wfx_started_notify();
 
     WFX_RSI_LOG("%s: starting event wait", __func__);
@@ -538,9 +526,6 @@ void wfx_rsi_task(void * arg)
          */
         flags = xEventGroupWaitBits(wfx_rsi.events,
                                     WFX_EVT_STA_CONN | WFX_EVT_STA_DISCONN | WFX_EVT_STA_START_JOIN
-#ifdef RS911X_SOCKETS
-                                        | WFX_EVT_STA_DO_DHCP | WFX_EVT_STA_DHCP_DONE
-#endif /* RS911X_SOCKETS */
 #ifdef SL_WFX_CONFIG_SOFTAP
                                         | WFX_EVT_AP_START | WFX_EVT_AP_STOP
 #endif /* SL_WFX_CONFIG_SOFTAP */
@@ -556,20 +541,6 @@ void wfx_rsi_task(void * arg)
         {
             WFX_RSI_LOG("%s: wait event encountered: %x", __func__, flags);
         }
-#ifdef RS911X_SOCKETS
-        if (flags & WFX_EVT_STA_DO_DHCP)
-        {
-            /*
-             * Do DHCP -
-             */
-            if ((status = rsi_config_ipaddress(RSI_IP_VERSION_4, RSI_DHCP | RSI_DHCP_UNICAST_OFFER, NULL, NULL, NULL,
-                                               &wfx_rsi.ip4_addr[0], IP_CONF_RSP_BUFF_LENGTH_4, STATION)) != RSI_SUCCESS)
-            {
-                /* We should try this again.. (perhaps sleep) */
-                /* TODO - Figure out what to do here */
-            }
-        }
-#else /* !RS911X_SOCKET - using LWIP */
         /*
          * Let's handle DHCP polling here
          */
@@ -611,7 +582,6 @@ void wfx_rsi_task(void * arg)
                 last_dhcp_poll = now;
             }
         }
-#endif /* RS911X_SOCKETS */
         if (flags & WFX_EVT_STA_START_JOIN)
         {
             // saving the AP related info
@@ -626,14 +596,12 @@ void wfx_rsi_task(void * arg)
              */
             WFX_RSI_LOG("%s: starting LwIP STA", __func__);
             wfx_rsi.dev_state |= WFX_RSI_ST_STA_CONNECTED;
-#ifndef RS911X_SOCKETS
             hasNotifiedWifiConnectivity = false;
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
             hasNotifiedIPV4 = false;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_IPV4
             hasNotifiedIPV6 = false;
             wfx_lwip_set_sta_link_up();
-#endif /* !RS911X_SOCKETS */
             /* We need to get AP Mac - TODO */
             // Uncomment once the hook into MATTER is moved to IP connectivity instead
             // of AP connectivity. wfx_connected_notify(0, &wfx_rsi.ap_mac); // This
@@ -645,7 +613,6 @@ void wfx_rsi_task(void * arg)
                 ~(WFX_RSI_ST_STA_READY | WFX_RSI_ST_STA_CONNECTING | WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE);
             WFX_RSI_LOG("%s: disconnect notify", __func__);
             /* TODO: Implement disconnect notify */
-#ifndef RS911X_SOCKETS
             wfx_lwip_set_sta_link_down(); // Internally dhcpclient_poll(netif) ->
                                           // wfx_ip_changed_notify(0) for IPV4
 #if (CHIP_DEVICE_CONFIG_ENABLE_IPV4)
@@ -655,7 +622,6 @@ void wfx_rsi_task(void * arg)
             wfx_ipv6_notify(GET_IPV6_FAIL);
             hasNotifiedIPV6             = false;
             hasNotifiedWifiConnectivity = false;
-#endif /* !RS911X_SOCKETS */
         }
 #ifdef SL_WFX_CONFIG_SCAN
         if (flags & WFX_EVT_SCAN)

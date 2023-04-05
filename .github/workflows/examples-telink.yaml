@@ -50,7 +50,7 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform telink
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform telink
 
             - name: Set up environment for size reports
               if: ${{ !env.ACT }}
@@ -132,7 +132,7 @@ jobs:
 
             - name: Build example Telink Lighting App with Factory Data
               run: |
-                  ./scripts/checkout_submodules.py --shallow --platform linux
+                  ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
                   ./scripts/build/gn_gen.sh
                   ./scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE chip-cert chip-tool spake2p"
                   ./scripts/run_in_build_env.sh \

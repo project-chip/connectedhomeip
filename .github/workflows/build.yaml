@@ -60,7 +60,7 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform linux
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -177,7 +177,7 @@ jobs:
             #   with:
             #      languages: "cpp"
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform linux
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -342,7 +342,7 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform linux
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
 
             - name: Bootstrap cache
               uses: actions/cache@v3
@@ -398,7 +398,7 @@ jobs:
             #  with:
             #     languages: "cpp"
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform darwin
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform darwin
             - name: Try to ensure the directory for diagnostic log collection exists
               run: |
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
@@ -501,7 +501,7 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform linux
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
 
             - name: Bootstrap cache
               uses: actions/cache@v3

@@ -54,7 +54,7 @@ jobs:
             # Bootstrap and checkout for internal scripts (like idl_lint)
             # to run
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform linux
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
             - name: Bootstrap cache
               uses: actions/cache@v3
               timeout-minutes: 10

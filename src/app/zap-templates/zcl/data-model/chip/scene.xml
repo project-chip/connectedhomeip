@@ -230,7 +230,7 @@ limitations under the License.
     </command>
   </cluster>
 
-  <bitmap name="SceneFeatures" type="BITMAP32">
+  <bitmap name="ScenesFeature" type="BITMAP32">
     <cluster code="0x0005" />
     <field name="SceneNames" mask="0x01" />
   </bitmap>

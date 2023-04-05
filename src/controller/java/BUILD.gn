@@ -29,6 +29,10 @@ shared_library("jni") {
     output_extension = "dylib"
   }
 
+  # Temporary while we have circular dependencies between codegen.py and zap
+  # generated files
+  check_includes = false
+
   sources = [
     "AndroidCallbacks-JNI.cpp",
     "AndroidCallbacks.cpp",
@@ -58,7 +62,6 @@ shared_library("jni") {
     "zap-generated/CHIPInvokeCallbacks.cpp",
     "zap-generated/CHIPInvokeCallbacks.h",
     "zap-generated/CHIPReadCallbacks.cpp",
-    "zap-generated/CHIPReadCallbacks.h",
   ]
 
   deps = [
@@ -212,6 +215,8 @@ android_library("java") {
   data_deps = [ ":jni" ]
 
   sources = [
+    "generated/java/chip/devicecontroller/ClusterReadMapping.java",
+    "generated/java/chip/devicecontroller/ClusterWriteMapping.java",
     "src/chip/clusterinfo/ClusterCommandCallback.java",
     "src/chip/clusterinfo/ClusterInfo.java",
     "src/chip/clusterinfo/CommandParameterInfo.java",
@@ -261,8 +266,6 @@ android_library("java") {
     "zap-generated/chip/devicecontroller/ChipIdLookup.java",
     "zap-generated/chip/devicecontroller/ChipStructs.java",
     "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
-    "zap-generated/chip/devicecontroller/ClusterReadMapping.java",
-    "zap-generated/chip/devicecontroller/ClusterWriteMapping.java",
   ]
 
   if (build_java_matter_controller) {
@@ -282,7 +285,7 @@ android_library("java") {
   ]
 
   # TODO: add classpath support (we likely need to add something like
-  #  ..../platforms/android-21/android.jar to access BLE items)
+  #  ..../platforms/android-26/android.jar to access BLE items)
 }
 
 if (chip_link_tests) {
@@ -314,7 +317,7 @@ if (chip_link_tests) {
     javac_flags = [ "-Xlint:deprecation" ]
 
     # TODO: add classpath support (we likely need to add something like
-    #  ..../platforms/android-21/android.jar to access BLE items)
+    #  ..../platforms/android-26/android.jar to access BLE items)
   }
 
   android_library("tests") {
@@ -349,12 +352,12 @@ if (chip_link_tests) {
     javac_flags = [ "-Xlint:deprecation" ]
 
     # TODO: add classpath support (we likely need to add something like
-    #  ..../platforms/android-21/android.jar to access BLE items)
+    #  ..../platforms/android-26/android.jar to access BLE items)
   }
 }
 
 if (!build_java_matter_controller) {
   java_prebuilt("android") {
-    jar_path = "${android_sdk_root}/platforms/android-21/android.jar"
+    jar_path = "${android_sdk_root}/platforms/android-26/android.jar"
   }
 }

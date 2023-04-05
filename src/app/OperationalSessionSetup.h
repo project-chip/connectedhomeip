@@ -253,6 +253,8 @@ private:
         HasAddress,       // Have an address, CASE handshake not started yet.
         Connecting,       // CASE handshake in progress.
         SecureConnected,  // CASE session established.
+        WaitingForRetry,  // No address known, but a retry is pending.  Added at
+                          // end to make logs easier to understand.
     };
 
     CASEClientInitParams mInitParams;
@@ -334,6 +336,12 @@ private:
      * it will be before the reattempt happens.
      */
     CHIP_ERROR ScheduleSessionSetupReattempt(System::Clock::Seconds16 & timerDelay);
+
+    /**
+     * Cancel a scheduled setup reattempt, if we can (i.e. if we still have
+     * access to the SystemLayer).
+     */
+    void CancelSessionSetupReattempt();
 
     /**
      * Helper for our backoff retry timer.

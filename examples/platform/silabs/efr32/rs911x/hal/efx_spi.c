@@ -57,22 +57,21 @@
 #endif
 
 StaticSemaphore_t xEfxSpiIntfSemaBuffer;
-static SemaphoreHandle_t spi_sem;
+static SemaphoreHandle_t spiTransferLock;
+static TaskHandle_t spiInitiatorTaskHandle = NULL;
 
 #if defined(EFR32MG12)
 #include "sl_spidrv_exp_config.h"
 extern SPIDRV_Handle_t sl_spidrv_exp_handle;
-#endif
-
-#if defined(EFR32MG24)
+#define SPI_HANDLE sl_spidrv_exp_handle
+#elif defined(EFR32MG24)
 #include "sl_spidrv_eusart_exp_config.h"
 extern SPIDRV_Handle_t sl_spidrv_eusart_exp_handle;
+#define SPI_HANDLE sl_spidrv_eusart_exp_handle
+#else
+#error "Unknown platform"
 #endif
 
-static unsigned int tx_dma_channel;
-static unsigned int rx_dma_channel;
-
-static uint32_t dummy_data; /* Used for DMA - when results don't matter */
 extern void rsi_gpio_irq_cb(uint8_t irqnum);
 //#define RS911X_USE_LDMA
 
@@ -137,20 +136,8 @@ void sl_wfx_host_reset_chip(void)
  ****************************************************************/
 void rsi_hal_board_init(void)
 {
-    spi_sem = xSemaphoreCreateBinaryStatic(&xEfxSpiIntfSemaBuffer);
-    xSemaphoreGive(spi_sem);
-
-    /* Assign DMA channel from Handle*/
-#if defined(EFR32MG12)
-    /* MG12 + rs9116 combination uses USART driver */
-    tx_dma_channel = sl_spidrv_exp_handle->txDMACh;
-    rx_dma_channel = sl_spidrv_exp_handle->rxDMACh;
-
-#elif defined(EFR32MG24)
-    /* MG24 + rs9116 combination uses EUSART driver */
-    tx_dma_channel = sl_spidrv_eusart_exp_handle->txDMACh;
-    rx_dma_channel = sl_spidrv_eusart_exp_handle->rxDMACh;
-#endif
+    spiTransferLock = xSemaphoreCreateBinaryStatic(&xEfxSpiIntfSemaBuffer);
+    xSemaphoreGive(spiTransferLock);
 
     /* GPIO INIT of MG12 & MG24 : Reset, Wakeup, Interrupt */
     WFX_RSI_LOG("RSI_HAL: init GPIO");
@@ -163,115 +150,24 @@ void rsi_hal_board_init(void)
 }
 
 /*****************************************************************************
- *@fn static bool dma_complete_cb(unsigned int channel, unsigned int sequenceNo, void *userParam)
- *
  *@brief
- *    DMA transfer completion callback. Called by the DMA interrupt handler.
- *    This is being set in the tx/rx of the DMA
- *
- * @param[in] channel:
- * @param[in] sequenceNO: sequence number
- * @param[in] userParam :user parameter
+ *    Spi dma transfer is complete Callback
+ *    Notify the task that initiated the SPI transfer that it is completed.
+ *    The callback needs is a SPIDRV_Callback_t function pointer type
+ * @param[in] pxHandle: spidrv instance handle
+ * @param[in] transferStatus: Error code linked to the completed spi transfer. As master, the return code is irrelevant
+ * @param[in] lCount: number of bytes transferred.
  *
  * @return
  *    None
  ******************************************************************************/
-static bool dma_complete_cb(unsigned int channel, unsigned int sequenceNo, void * userParam)
+static void spi_dmaTransfertComplete(SPIDRV_HandleData_t * pxHandle, Ecode_t transferStatus, int itemsTransferred)
 {
+    configASSERT(spiInitiatorTaskHandle != NULL);
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    // uint8_t *buf = (void *)userParam;
-
-    (void) channel;
-    (void) sequenceNo;
-    (void) userParam;
-
-    // WFX_RSI_LOG ("SPI: DMA done [%x,%x,%x,%x]", buf [0], buf [1], buf [2], buf [3]);
-    xSemaphoreGiveFromISR(spi_sem, &xHigherPriorityTaskWoken);
+    vTaskNotifyGiveFromISR(spiInitiatorTaskHandle, &xHigherPriorityTaskWoken);
+    spiInitiatorTaskHandle = NULL;
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
-    sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
-#endif
-
-    return true;
-}
-
-/*************************************************************
- * @fn   static void receiveDMA(uint8_t *rx_buf, uint16_t xlen)
- * @brief
- *       RX buf was specified
- *       TX buf was not specified by caller - so we
- *       transmit dummy data (typically 0)
- * @param[in] rx_buf:
- * @param[in] xlen:
- * @return
- *        None
- *******************************************************************/
-static void receiveDMA(uint8_t * rx_buf, uint16_t xlen)
-{
-    /*
-     * The caller wants to receive data -
-     * The xmit can be dummy data (no src increment for tx)
-     */
-    dummy_data = 0;
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
-    sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
-#endif
-
-    // Start receive DMA
-    DMADRV_PeripheralMemory(rx_dma_channel, MY_USART_RX_SIGNAL, (void *) rx_buf, (void *) &(MY_USART->RXDATA), true, xlen,
-                            dmadrvDataSize1, dma_complete_cb, NULL);
-
-    // Start transmit DMA.
-    DMADRV_MemoryPeripheral(tx_dma_channel, MY_USART_TX_SIGNAL, (void *) &(MY_USART->TXDATA), (void *) &(dummy_data), false, xlen,
-                            dmadrvDataSize1, NULL, NULL);
-}
-
-/*****************************************************************************
- *@fn static void transmitDMA(void *rx_buf, void *tx_buf, uint8_t xlen)
- *@brief
- *    we have a tx_buf. There are some instances where
- *    a rx_buf is not specifed. If one is specified then
- *    the caller wants results (auto increment src)
- * @param[in] rx_buf:
- * @param[in] tx_buf:
- * @param[in] xlen:
- * @return
- *     None
- ******************************************************************************/
-static void transmitDMA(uint8_t * rx_buf, uint8_t * tx_buf, uint16_t xlen)
-{
-    void * buf;
-    bool srcinc;
-    /*
-     * we have a tx_buf. There are some instances where
-     * a rx_buf is not specifed. If one is specified then
-     * the caller wants results (auto increment src)
-     * TODO - the caller specified 8/32 bit - we should use this
-     * instead of dmadrvDataSize1 always
-     */
-    if (rx_buf == NULL)
-    {
-        buf    = &dummy_data;
-        srcinc = false;
-    }
-    else
-    {
-        buf                   = rx_buf;
-        srcinc                = true;
-        /* DEBUG */ rx_buf[0] = 0xAA;
-        rx_buf[1]             = 0x55;
-    }
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
-    sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
-#endif
-
-    // Start receive DMA
-    DMADRV_PeripheralMemory(rx_dma_channel, MY_USART_RX_SIGNAL, buf, (void *) &(MY_USART->RXDATA), srcinc, xlen, dmadrvDataSize1,
-                            dma_complete_cb, buf);
-    // Start transmit DMA.
-    DMADRV_MemoryPeripheral(tx_dma_channel, MY_USART_TX_SIGNAL, (void *) &(MY_USART->TXDATA), (void *) tx_buf, true, xlen,
-                            dmadrvDataSize1, NULL, NULL);
 }
 
 /*********************************************************************
@@ -287,57 +183,60 @@ static void transmitDMA(uint8_t * rx_buf, uint8_t * tx_buf, uint16_t xlen)
  **************************************************************************/
 int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint8_t mode)
 {
-    // WFX_RSI_LOG ("SPI: Xfer: tx=%x,rx=%x,len=%d",(uint32_t)tx_buf, (uint32_t)rx_buf, xlen);
-    if (xlen > MIN_XLEN)
+    if (xlen <= MIN_XLEN || (tx_buf == NULL && rx_buf == NULL)) // at least one buffer needs to be provided
     {
-        MY_USART->CMD = USART_CMD_CLEARRX | USART_CMD_CLEARTX;
-        if (xSemaphoreTake(spi_sem, portMAX_DELAY) != pdTRUE)
-        {
-            return RSI_FALSE;
-        }
-        if (tx_buf == NULL)
-        {
-            receiveDMA(rx_buf, xlen);
-        }
-        else
-        {
-            transmitDMA(rx_buf, tx_buf, xlen);
-        }
-
-        /*
-         * receiveDMA() and transmitDMA() are asynchronous
-         * Our application design assumes that this function is synchronous
-         * To make it synchronous, we wait to re-acquire the semaphore before exiting this function
-         * dma_complete_cb() gives back the semaphore when the SPI transfer is done
-         */
-        if (xSemaphoreTake(spi_sem, pdMS_TO_TICKS(RSI_SEM_BLOCK_MIN_TIMER_VALUE_MS)) == pdTRUE)
-        {
-            // Transfer complete
-            // Give back the semaphore before exiting, so that it may be re-acquired
-            // in this function, just before the next transfer
-            xSemaphoreGive(spi_sem);
-        }
-        // Temporary patch
-        // Sometimes the xSemaphoreTake() above is getting stuck indefinitely
-        // As a workaround, if the transfer is not done within RSI_SEM_BLOCK_MIN_TIMER_VALUE_MS
-        // stop and start it again
-        // No need to re-acquire the semaphore since this is the function that acquired it
-        // TODO: Remove this after a permanent solution is found to the problem of the transfer getting stuck
-        else
-        {
-            uint32_t ldma_flags = 0;
-            uint32_t rem_len    = 0;
-            rem_len             = LDMA_TransferRemainingCount(RSI_LDMA_TRANSFER_CHANNEL_NUM);
-            LDMA_StopTransfer(RSI_LDMA_TRANSFER_CHANNEL_NUM);
-            ldma_flags = LDMA_IntGet();
-            LDMA_IntClear(ldma_flags);
-            receiveDMA(rx_buf, rem_len);
-            if (xSemaphoreTake(spi_sem, portMAX_DELAY) == pdTRUE)
-            {
-                xSemaphoreGive(spi_sem);
-            }
-        }
+        return RSI_ERROR_INVALID_PARAM;
     }
 
-    return RSI_ERROR_NONE;
+    (void) mode; // currently not used;
+    rsi_error_t rsiError = RSI_ERROR_NONE;
+
+    if (xSemaphoreTake(spiTransferLock, portMAX_DELAY) != pdTRUE)
+    {
+        return RSI_ERROR_SPI_BUSY;
+    }
+
+    configASSERT(spiInitiatorTaskHandle == NULL); // No other task should currently be waiting for the dma completion
+    spiInitiatorTaskHandle = xTaskGetCurrentTaskHandle();
+
+    Ecode_t spiError;
+    if (tx_buf == NULL) // Rx operation only
+    {
+        spiError = SPIDRV_MReceive(SPI_HANDLE, rx_buf, xlen, spi_dmaTransfertComplete);
+    }
+    else if (rx_buf == NULL) // Tx operation only
+    {
+        spiError = SPIDRV_MTransmit(SPI_HANDLE, tx_buf, xlen, spi_dmaTransfertComplete);
+    }
+    else // Tx and Rx operation
+    {
+        spiError = SPIDRV_MTransfer(SPI_HANDLE, tx_buf, rx_buf, xlen, spi_dmaTransfertComplete);
+    }
+
+    if (spiError == ECODE_EMDRV_SPIDRV_OK)
+    {
+        // rsi implementation expect a synchronous operation
+        // wait for the notification that the dma completed in a block state.
+        // it does not consume any CPU time.
+        if (ulTaskNotifyTake(pdTRUE, RSI_SEM_BLOCK_MIN_TIMER_VALUE_MS) != pdPASS)
+        {
+            int itemsTransferred = 0;
+            int itemsRemaining   = 0;
+            SPIDRV_GetTransferStatus(SPI_HANDLE, &itemsTransferred, &itemsRemaining);
+            WFX_RSI_LOG("SPI transfert timed out %d/%d (rx%x rx%x)", itemsTransferred, itemsRemaining, (uint32_t) tx_buf,
+                        (uint32_t) rx_buf);
+
+            SPIDRV_AbortTransfer(SPI_HANDLE);
+            rsiError = RSI_ERROR_SPI_TIMEOUT;
+        }
+    }
+    else
+    {
+        WFX_RSI_LOG("SPI transfert failed with err:%x (tx%x rx%x)", spiError, (uint32_t) tx_buf, (uint32_t) rx_buf);
+        rsiError               = RSI_ERROR_SPI_FAIL;
+        spiInitiatorTaskHandle = NULL; // SPI operation failed. No notification to received.
+    }
+
+    xSemaphoreGive(spiTransferLock);
+    return rsiError;
 }

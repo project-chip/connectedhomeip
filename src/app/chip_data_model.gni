@@ -41,6 +41,12 @@ _zap_cluster_list_script = get_path_info("zap_cluster_list.py", "abspath")
 template("chip_data_model") {
   _data_model_name = target_name
 
+  declare_args() {
+    # Allow building ota-requestor-app with a non-spec-compliant floor
+    # (i.e. smaller than 2 minutes) for action delays.
+    non_spec_compliant_ota_action_delay_floor = -1
+  }
+
   if (defined(invoker.idl)) {
     _idl = invoker.idl
   } else {
@@ -157,6 +163,12 @@ template("chip_data_model") {
       "${_app_root}/clusters/identify-server/identify-server.h",
       "${_app_root}/clusters/level-control/level-control.h",
       "${_app_root}/clusters/on-off-server/on-off-server.h",
+      "${_app_root}/clusters/scenes/ExtensionFieldSets.h",
+      "${_app_root}/clusters/scenes/ExtensionFieldSetsImpl.cpp",
+      "${_app_root}/clusters/scenes/ExtensionFieldSetsImpl.h",
+      "${_app_root}/clusters/scenes/SceneTable.h",
+      "${_app_root}/clusters/scenes/SceneTableImpl.cpp",
+      "${_app_root}/clusters/scenes/SceneTableImpl.h",
       "${_app_root}/clusters/scenes/scenes-tokens.h",
       "${_app_root}/clusters/scenes/scenes.h",
       "${_app_root}/util/ClientMonitoringRegistrationTable.cpp",
@@ -278,6 +290,10 @@ template("chip_data_model") {
     }
 
     cflags += [ "-Wconversion" ]
+
+    if (non_spec_compliant_ota_action_delay_floor >= 0) {
+      cflags += [ "-DNON_SPEC_COMPLIANT_OTA_ACTION_DELAY_FLOOR=${non_spec_compliant_ota_action_delay_floor}" ]
+    }
 
     if (!defined(public_configs)) {
       public_configs = []

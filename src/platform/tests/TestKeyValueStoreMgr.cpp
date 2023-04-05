@@ -260,6 +260,7 @@ static void TestKeyValueStoreMgr_NonExistentDelete(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 }
 
+#if !defined(__ZEPHYR__) && !defined(__MBED__)
 static void TestKeyValueStoreMgr_MultiRead(nlTestSuite * inSuite, void * inContext)
 {
     constexpr const char * kTestKey  = "multi_key";
@@ -283,6 +284,7 @@ static void TestKeyValueStoreMgr_MultiRead(nlTestSuite * inSuite, void * inConte
     err = KeyValueStoreMgr().Delete(kTestKey);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
+#endif
 
 #ifdef __ZEPHYR__
 static void TestKeyValueStoreMgr_DoFactoryReset(nlTestSuite * inSuite, void * inContext)
