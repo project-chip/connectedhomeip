@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <stdint.h>
 #include "rsi_board.h"
+#include <stdint.h>
 
 class LEDWidget
 {
