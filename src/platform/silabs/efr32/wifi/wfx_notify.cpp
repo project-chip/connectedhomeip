@@ -86,7 +86,7 @@ void wfx_started_notify()
  * @param[in] ap: access point
  * @return None
  *************************************************************************************/
-void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t *ap)
+void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t * ap)
 {
     sl_wfx_connect_ind_t evt;
 

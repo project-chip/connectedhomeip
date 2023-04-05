@@ -36,7 +36,7 @@ uint32_t NVIC_GetIRQEnable(IRQn_Type IRQn)
     return ((NVIC->ICER[((uint32_t)(IRQn) >> 5)] & (1 << ((uint32_t)(IRQn) &0x1F))) ? 1 : 0);
 }
 
-void rsi_assertion(uint16_t assertion_val, const char *string)
+void rsi_assertion(uint16_t assertion_val, const char * string)
 {
     uint16_t i;
     if (assertion_val == 0)
@@ -174,7 +174,7 @@ int rsi_submit_rx_pkt(void)
  * This is a common function to read response for all the command and data from Wi-Fi module.
  */
 
-rsi_pkt_t *rsi_frame_read(void)
+rsi_pkt_t * rsi_frame_read(void)
 {
 #ifdef ROM_WIRELESS
     return ROMAPI_WL->rsi_frame_read(global_cb_p);
@@ -198,7 +198,7 @@ rsi_pkt_t *rsi_frame_read(void)
  * This is a common function used to process a command to the Wi-Fi module.
  */
 
-int16_t rsi_frame_write(rsi_frame_desc_t *uFrameDscFrame, uint8_t *payloadparam, uint16_t size_param)
+int16_t rsi_frame_write(rsi_frame_desc_t * uFrameDscFrame, uint8_t * payloadparam, uint16_t size_param)
 {
 #ifdef ROM_WIRELESS
     return ROMAPI_WL->rsi_frame_write(global_cb_p, uFrameDscFrame, payloadparam, size_param);
@@ -286,7 +286,7 @@ void rsi_config_m4_dma_desc_on_reset(void)
  *               0 = Success
  *              -2 = Reg read failure
  */
-int16_t rsi_device_interrupt_status(uint8_t *int_status)
+int16_t rsi_device_interrupt_status(uint8_t * int_status)
 {
 
     //! Check for TA active .If it is not active Buffer full status is not valid,

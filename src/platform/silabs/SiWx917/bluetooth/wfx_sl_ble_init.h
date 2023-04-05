@@ -57,7 +57,7 @@ typedef struct sl_wfx_msg_s
     rsi_ble_event_mtu_t rsi_ble_mtu;
     rsi_ble_event_write_t rsi_ble_write;
     rsi_ble_event_enhance_conn_status_t resp_enh_conn;
-    rsi_ble_event_disconnect_t *resp_disconnect;
+    rsi_ble_event_disconnect_t * resp_disconnect;
     rsi_ble_set_att_resp_t rsi_ble_event_set_att_rsp;
     uint32_t ble_app_event_map;
     uint32_t ble_app_event_mask;
@@ -101,17 +101,17 @@ typedef struct sl_wfx_msg_s
 #define RSI_BLE_CHARACTERISTIC_TX_GATT_SERVER_CLIENT_HANDLE_LOCATION (5)
 
 // ALL Ble functions
-void rsi_ble_on_connect_event(rsi_ble_event_conn_status_t *resp_conn);
-void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t *resp_disconnect, uint16_t reason);
-void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t *resp_enh_conn);
-void rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t *rsi_ble_write);
-void rsi_ble_on_mtu_event(rsi_ble_event_mtu_t *rsi_ble_mtu);
-void rsi_ble_on_event_indication_confirmation(uint16_t resp_status, rsi_ble_set_att_resp_t *rsi_ble_event_set_att_rsp);
-void rsi_gatt_add_attribute_to_list(rsi_ble_t *p_val, uint16_t handle, uint16_t data_len, uint8_t *data, uuid_t uuid,
+void rsi_ble_on_connect_event(rsi_ble_event_conn_status_t * resp_conn);
+void rsi_ble_on_disconnect_event(rsi_ble_event_disconnect_t * resp_disconnect, uint16_t reason);
+void rsi_ble_on_enhance_conn_status_event(rsi_ble_event_enhance_conn_status_t * resp_enh_conn);
+void rsi_ble_on_gatt_write_event(uint16_t event_id, rsi_ble_event_write_t * rsi_ble_write);
+void rsi_ble_on_mtu_event(rsi_ble_event_mtu_t * rsi_ble_mtu);
+void rsi_ble_on_event_indication_confirmation(uint16_t resp_status, rsi_ble_set_att_resp_t * rsi_ble_event_set_att_rsp);
+void rsi_gatt_add_attribute_to_list(rsi_ble_t * p_val, uint16_t handle, uint16_t data_len, uint8_t * data, uuid_t uuid,
                                     uint8_t char_prop);
-void rsi_ble_add_char_serv_att(void *serv_handler, uint16_t handle, uint8_t val_prop, uint16_t att_val_handle,
+void rsi_ble_add_char_serv_att(void * serv_handler, uint16_t handle, uint8_t val_prop, uint16_t att_val_handle,
                                uuid_t att_val_uuid);
-void rsi_ble_add_char_val_att(void *serv_handler, uint16_t handle, uuid_t att_type_uuid, uint8_t val_prop, uint8_t *data,
+void rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_type_uuid, uint8_t val_prop, uint8_t * data,
                               uint8_t data_len, uint8_t auth_read);
 uint32_t rsi_ble_add_matter_service(void);
 void rsi_ble_app_set_event(uint32_t event_num);

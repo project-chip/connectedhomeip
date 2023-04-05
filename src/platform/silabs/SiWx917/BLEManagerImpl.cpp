@@ -251,11 +251,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
-    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",                           // Just a text name, not used by the RTOS kernel
+    sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",                              // Just a text name, not used by the RTOS kernel
                                        pdMS_TO_TICKS(BLE_DEFAULT_TIMER_PERIOD_MS), // == default timer period
-                                       false,                                   // no timer reload (==one-shot)
-                                       (void *) this,                           // init timer id = ble obj context
-                                       BleAdvTimeoutHandler                     // timer callback handler
+                                       false,                                      // no timer reload (==one-shot)
+                                       (void *) this,                              // init timer id = ble obj context
+                                       BleAdvTimeoutHandler                        // timer callback handler
     );
 
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
@@ -315,7 +315,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BLEManagerImpl::_GetDeviceName(char *buf, size_t bufSize)
+CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 {
     if (strlen(mDeviceName) >= bufSize)
     {
@@ -325,7 +325,7 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char *buf, size_t bufSize)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char *deviceName)
+CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 {
     ChipLogProgress(DeviceLayer, "_SetDeviceName Started");
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported)
@@ -354,7 +354,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char *deviceName)
     return CHIP_NO_ERROR;
 }
 
-void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent *event)
+void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
     switch (event->Type)
     {
@@ -399,13 +399,13 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent *event)
     }
 }
 
-bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID *svcId, const ChipBleUUID *charId)
+bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::SubscribeCharacteristic() not supported");
     return false;
 }
 
-bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID *svcId, const ChipBleUUID *charId)
+bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::UnsubscribeCharacteristic() not supported");
     return false;
@@ -431,7 +431,7 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
     return (conState != NULL) ? conState->mtu : 0;
 }
 
-bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID *svcId, const ChipBleUUID *charId,
+bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                     PacketBufferHandle data)
 {
     int32_t status = 0;
@@ -447,14 +447,14 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     return true;
 }
 
-bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID *svcId, const ChipBleUUID *charId,
+bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                       PacketBufferHandle pBuf)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendWriteRequest() not supported");
     return false;
 }
 
-bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID *svcId, const ChipBleUUID *charId,
+bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                      PacketBufferHandle pBuf)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendReadRequest() not supported");
@@ -462,7 +462,7 @@ bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleU
 }
 
 bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                      const ChipBleUUID *svcId, const ChipBleUUID *charId)
+                                      const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendReadResponse() not supported");
     return false;
@@ -754,7 +754,8 @@ void BLEManagerImpl::HandleWriteEvent(rsi_ble_event_write_t evt)
     ChipLogProgress(DeviceLayer, "Char Write Req, packet type %d", evt.pkt_type);
     // uint8_t attribute = (uint8_t) event_msg.rsi_ble_measurement_hndl;
 
-    ChipLogProgress(DeviceLayer, "event_msg.rsi_ble_gatt_server_client_config_hndl = %d", event_msg.rsi_ble_gatt_server_client_config_hndl);
+    ChipLogProgress(DeviceLayer, "event_msg.rsi_ble_gatt_server_client_config_hndl = %d",
+                    event_msg.rsi_ble_gatt_server_client_config_hndl);
 
     if (evt.handle[0] == (uint8_t) event_msg.rsi_ble_gatt_server_client_config_hndl) // TODO:: compare the handle exactly
     {
@@ -768,7 +769,7 @@ void BLEManagerImpl::HandleWriteEvent(rsi_ble_event_write_t evt)
 }
 
 // TODO:: Need to implement this
-void BLEManagerImpl::HandleTXCharCCCDWrite(rsi_ble_event_write_t *evt)
+void BLEManagerImpl::HandleTXCharCCCDWrite(rsi_ble_event_write_t * evt)
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     bool isIndicationEnabled = false;
@@ -800,7 +801,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(rsi_ble_event_write_t *evt)
     }
 }
 
-void BLEManagerImpl::HandleRXCharWrite(rsi_ble_event_write_t *evt)
+void BLEManagerImpl::HandleRXCharWrite(rsi_ble_event_write_t * evt)
 {
     uint8_t conId  = 1;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -860,7 +861,7 @@ bool BLEManagerImpl::RemoveConnection(uint8_t connectionHandle)
 
 void BLEManagerImpl::AddConnection(uint8_t connectionHandle, uint8_t bondingHandle)
 {
-    CHIPoBLEConState *bleConnState = GetConnectionState(connectionHandle, true);
+    CHIPoBLEConState * bleConnState = GetConnectionState(connectionHandle, true);
 
     if (bleConnState != NULL)
     {

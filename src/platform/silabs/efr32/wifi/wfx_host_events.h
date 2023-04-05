@@ -308,13 +308,13 @@ void sl_wfx_host_gpio_init(void);
 sl_status_t wfx_wifi_start(void);
 void wfx_enable_sta_mode(void);
 sl_wfx_state_t wfx_get_wifi_state(void);
-void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t *addr);
-void wfx_set_wifi_provision(wfx_wifi_provision_t *wifiConfig);
-bool wfx_get_wifi_provision(wfx_wifi_provision_t *wifiConfig);
+void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr);
+void wfx_set_wifi_provision(wfx_wifi_provision_t * wifiConfig);
+bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig);
 bool wfx_is_sta_provisioned(void);
 bool wfx_is_sta_mode_enabled(void);
-int32_t wfx_get_ap_info(wfx_wifi_scan_result_t *ap);
-int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t *extra_info);
+int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap);
+int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info);
 int32_t wfx_reset_counts();
 
 void wfx_clear_wifi_provision(void);
@@ -327,21 +327,21 @@ bool wfx_have_ipv4_addr(sl_wfx_interface_t);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
 bool wfx_have_ipv6_addr(sl_wfx_interface_t);
 wifi_mode_t wfx_get_wifi_mode(void);
-bool wfx_start_scan(char *ssid, void (*scan_cb)(wfx_wifi_scan_result_t *)); /* true returned if successfuly started */
+bool wfx_start_scan(char * ssid, void (*scan_cb)(wfx_wifi_scan_result_t *)); /* true returned if successfuly started */
 void wfx_cancel_scan(void);
 
 /*
  * Call backs into the Matter Platform code
  */
 void wfx_started_notify(void);
-void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t *ap);
+void wfx_connected_notify(int32_t status, sl_wfx_mac_address_t * ap);
 void wfx_disconnected_notify(int32_t status);
 /* Implemented for LWIP */
-void wfx_host_received_sta_frame_cb(uint8_t *buf, int len);
+void wfx_host_received_sta_frame_cb(uint8_t * buf, int len);
 void wfx_lwip_set_sta_link_up(void);
 void wfx_lwip_set_sta_link_down(void);
 void wfx_lwip_start(void);
-struct netif* wfx_get_netif(sl_wfx_interface_t interface);
+struct netif * wfx_get_netif(sl_wfx_interface_t interface);
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
 void wfx_dhcp_got_ipv4(uint32_t);
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
@@ -353,16 +353,16 @@ void wfx_ipv6_notify(int got_ip);
 
 #ifdef RS911X_WIFI
 /* RSI for LWIP */
-void* wfx_rsi_alloc_pkt(void);
-void wfx_rsi_pkt_add_data(void *p, uint8_t *buf, uint16_t len, uint16_t off);
-int32_t wfx_rsi_send_data(void *p, uint16_t len);
+void * wfx_rsi_alloc_pkt(void);
+void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off);
+int32_t wfx_rsi_send_data(void * p, uint16_t len);
 #endif /* RS911X_WIFI */
 
 #ifdef WF200_WIFI
 void wfx_bus_start(void);
 sl_status_t get_all_counters(void);
 void sl_wfx_host_gpio_init(void);
-sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t *event_payload);
+sl_status_t sl_wfx_host_process_event(sl_wfx_generic_message_t * event_payload);
 #endif
 
 void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin);

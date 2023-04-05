@@ -37,7 +37,7 @@ extern "C" {
  * @param link_up link status
  ******************************************************************************/
 void dhcpclient_set_link_state(int link_up);
-uint8_t dhcpclient_poll(void *arg);
+uint8_t dhcpclient_poll(void * arg);
 #ifdef __cplusplus
 }
 #endif

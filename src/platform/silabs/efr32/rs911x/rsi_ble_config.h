@@ -257,7 +257,7 @@ typedef struct rsi_ble_att_list_s
     uint16_t value_len;
     uint16_t max_value_len;
     uint8_t char_val_prop;
-    void *value;
+    void * value;
 } rsi_ble_att_list_t;
 typedef struct rsi_ble_s
 {
