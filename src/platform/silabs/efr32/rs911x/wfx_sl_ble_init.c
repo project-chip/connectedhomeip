@@ -219,7 +219,7 @@ void rsi_ble_app_set_event(uint32_t event_num)
  * @section description
  * This function is used to store all attribute records
  */
-void rsi_gatt_add_attribute_to_list(rsi_ble_t *p_val, uint16_t handle, uint16_t data_len, uint8_t * data, uuid_t uuid,
+void rsi_gatt_add_attribute_to_list(rsi_ble_t * p_val, uint16_t handle, uint16_t data_len, uint8_t * data, uuid_t uuid,
                                     uint8_t char_prop)
 {
     if ((p_val->DATA_ix + data_len) >= BLE_ATT_REC_SIZE)
