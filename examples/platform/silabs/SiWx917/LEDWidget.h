@@ -21,7 +21,7 @@
 
 #include <stdint.h>
 
-extern "C" void RSI_Board_LED_Set(int, bool);
+extern "C" void RSI_Board_LED_Set(int, int);
 extern "C" void RSI_Board_LED_Toggle(int);
 extern "C" bool RSI_Board_LED_GetState(int);
 
