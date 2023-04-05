@@ -420,7 +420,7 @@ PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommiss
     auto * callbacks = new UnpairDeviceCallback(callback, fabricRemover);
 
     // Pass the callback and nodeid to the RemoveCurrentFabric function
-    CHIP_ERROR err = fabricRemover->RemoveCurrentFabric(nodeid, &callbacks->mOnCurrentFabricRemove); 
+    CHIP_ERROR err = fabricRemover->RemoveCurrentFabric(nodeid, &callbacks->mOnCurrentFabricRemove);
     if (err != CHIP_NO_ERROR)
     {
         delete fabricRemover;
