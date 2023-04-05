@@ -107,6 +107,7 @@ template("siwx917_sdk") {
       "TINYCRYPT_PRIMITIVES",
       "OPTIMIZE_TINYCRYPT_ASM",
       "__error_t_defined",
+      "RSI_SAMPLE_HAL",
     ]
 
     if (chip_build_libshell) {

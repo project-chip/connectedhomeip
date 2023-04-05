@@ -70,7 +70,7 @@ extern rsi_semaphore_handle_t sl_rs_ble_init_sem;
  * This file implements the interface to the RSI SAPIs
  */
 static uint8_t wfx_rsi_drv_buf[WFX_RSI_BUF_SZ];
-static wfx_wifi_scan_ext_t * temp_reset;
+static wfx_wifi_scan_ext_t *temp_reset;
 
 /******************************************************************
  * @fn   int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t *ap)
@@ -80,7 +80,7 @@ static wfx_wifi_scan_ext_t * temp_reset;
  * @return
  *        status
  *********************************************************************/
-int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
+int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t *ap)
 {
     int32_t status;
     uint8_t rssi;
@@ -90,7 +90,7 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
     status = rsi_wlan_get(RSI_RSSI, &rssi, sizeof(rssi));
     if (status == RSI_SUCCESS)
     {
-        ap->rssi = (-1) * rssi;
+        ap->rssi = (-1) *rssi;
     }
     return status;
 }
@@ -103,18 +103,18 @@ int32_t wfx_rsi_get_ap_info(wfx_wifi_scan_result_t * ap)
  * @return
  *        status
  *********************************************************************/
-int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
+int32_t wfx_rsi_get_ap_ext(wfx_wifi_scan_ext_t *extra_info)
 {
     int32_t status;
     uint8_t buff[RSI_RESPONSE_MAX_SIZE] = { 0 };
     status                              = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
     if (status != RSI_SUCCESS)
     {
-        SILABS_LOG("\r\n Failed, Error Code : 0x%lX\r\n", status);
+        SILABS_LOG("Failed, Error Code : 0x%lX", status);
     }
     else
     {
-        rsi_wlan_ext_stats_t * test   = (rsi_wlan_ext_stats_t *) buff;
+        rsi_wlan_ext_stats_t *test   = (rsi_wlan_ext_stats_t *)buff;
         extra_info->beacon_lost_count = test->beacon_lost_count - temp_reset->beacon_lost_count;
         extra_info->beacon_rx_count   = test->beacon_rx_count - temp_reset->beacon_rx_count;
         extra_info->mcast_rx_count    = test->mcast_rx_count - temp_reset->mcast_rx_count;
@@ -141,11 +141,11 @@ int32_t wfx_rsi_reset_count()
     status                              = rsi_wlan_get(RSI_WLAN_EXT_STATS, buff, sizeof(buff));
     if (status != RSI_SUCCESS)
     {
-        SILABS_LOG("\r\n Failed, Error Code : 0x%lX\r\n", status);
+        SILABS_LOG("Failed, Error Code : 0x%lX", status);
     }
     else
     {
-        rsi_wlan_ext_stats_t * test   = (rsi_wlan_ext_stats_t *) buff;
+        rsi_wlan_ext_stats_t *test   = (rsi_wlan_ext_stats_t *)buff;
         temp_reset->beacon_lost_count = test->beacon_lost_count;
         temp_reset->beacon_rx_count   = test->beacon_rx_count;
         temp_reset->mcast_rx_count    = test->mcast_rx_count;
@@ -181,7 +181,7 @@ int32_t wfx_rsi_disconnect()
  * @return
  *        None
  *********************************************************************/
-static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t len)
+static void wfx_rsi_join_cb(uint16_t status, const uint8_t *buf, const uint16_t len)
 {
     SILABS_LOG("%s: status: %02x", __func__, status);
     wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
@@ -219,7 +219,7 @@ static void wfx_rsi_join_cb(uint16_t status, const uint8_t * buf, const uint16_t
  * @return
  *        None
  *********************************************************************/
-static void wfx_rsi_join_fail_cb(uint16_t status, uint8_t * buf, uint32_t len)
+static void wfx_rsi_join_fail_cb(uint16_t status, uint8_t *buf, uint32_t len)
 {
     SILABS_LOG("%s: error: failed status: %02x", __func__, status);
     wfx_rsi.join_retries += 1;
@@ -238,7 +238,7 @@ static void wfx_rsi_join_fail_cb(uint16_t status, uint8_t * buf, uint32_t len)
  * @return
  *        None
  *****************************************************************************************/
-static void wfx_rsi_wlan_pkt_cb(uint16_t status, uint8_t * buf, uint32_t len)
+static void wfx_rsi_wlan_pkt_cb(uint16_t status, uint8_t *buf, uint32_t len)
 {
     if (status != RSI_SUCCESS)
     {
@@ -488,12 +488,12 @@ static void wfx_rsi_do_join(void)
  *       None
  **********************************************************************************/
 /* ARGSUSED */
-void wfx_rsi_task(void * arg)
+void wfx_rsi_task(void *arg)
 {
     EventBits_t flags;
     int32_t status = 0;
     TickType_t last_dhcp_poll, now;
-    struct netif * sta_netif;
+    struct netif *sta_netif;
     (void) arg;
     uint32_t rsi_status = wfx_rsi_init();
     if (rsi_status != RSI_SUCCESS)
@@ -621,13 +621,13 @@ void wfx_rsi_task(void * arg)
                 SILABS_LOG("%s: start SSID scan", __func__);
                 int x;
                 wfx_wifi_scan_result_t ap;
-                rsi_scan_info_t * scan;
+                rsi_scan_info_t *scan;
                 int32_t status;
                 uint8_t bgscan_results[BG_SCAN_RES_SIZE] = { 0 };
                 status = rsi_wlan_bgscan_profile(1, (rsi_rsp_scan_t *) bgscan_results, BG_SCAN_RES_SIZE);
 
                 SILABS_LOG("%s: status: %02x size = %d", __func__, status, BG_SCAN_RES_SIZE);
-                rsi_rsp_scan_t * rsp = (rsi_rsp_scan_t *) bgscan_results;
+                rsi_rsp_scan_t *rsp = (rsi_rsp_scan_t *) bgscan_results;
                 if (status)
                 {
                     /*
@@ -647,7 +647,7 @@ void wfx_rsi_task(void * arg)
                             {
                                 SILABS_LOG("Inside ap details");
                                 ap.security = scan->security_mode;
-                                ap.rssi     = (-1) * scan->rssi_val;
+                                ap.rssi     = (-1) *scan->rssi_val;
                                 memcpy(&ap.bssid[0], &scan->bssid[0], BSSID_MAX_STR_LEN);
                                 (*wfx_rsi.scan_cb)(&ap);
                             }
@@ -656,7 +656,7 @@ void wfx_rsi_task(void * arg)
                         {
                             SILABS_LOG("Inside else");
                             ap.security = scan->security_mode;
-                            ap.rssi     = (-1) * scan->rssi_val;
+                            ap.rssi     = (-1) *scan->rssi_val;
                             memcpy(&ap.bssid[0], &scan->bssid[0], BSSID_MAX_STR_LEN);
                             (*wfx_rsi.scan_cb)(&ap);
                         }
@@ -729,7 +729,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
  **********************************************************************************************/
 void * wfx_rsi_alloc_pkt()
 {
-    rsi_pkt_t * pkt;
+    rsi_pkt_t *pkt;
 
     // Allocate packet to send data
     if ((pkt = rsi_pkt_alloc(&rsi_driver_cb->wlan_cb->wlan_tx_pool)) == NULL)
@@ -737,7 +737,7 @@ void * wfx_rsi_alloc_pkt()
         return (void *) 0;
     }
 
-    return (void *) pkt;
+    return (void *)pkt;
 }
 
 /********************************************************************************************
@@ -751,11 +751,11 @@ void * wfx_rsi_alloc_pkt()
  * @return
  *        None
  **********************************************************************************************/
-void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off)
+void wfx_rsi_pkt_add_data(void *p, uint8_t *buf, uint16_t len, uint16_t off)
 {
-    rsi_pkt_t * pkt;
+    rsi_pkt_t *pkt;
 
-    pkt = (rsi_pkt_t *) p;
+    pkt = (rsi_pkt_t *)p;
     memcpy(((char *) pkt->data) + off, buf, len);
 }
 
@@ -768,11 +768,11 @@ void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off)
  * @return
  *        None
  **********************************************************************************************/
-int32_t wfx_rsi_send_data(void * p, uint16_t len)
+int32_t wfx_rsi_send_data(void *p, uint16_t len)
 {
     int32_t status;
-    register uint8_t * host_desc;
-    rsi_pkt_t * pkt;
+    register uint8_t *host_desc;
+    rsi_pkt_t *pkt;
 
     pkt       = (rsi_pkt_t *) p;
     host_desc = pkt->desc;

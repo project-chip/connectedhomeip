@@ -231,7 +231,6 @@ source_set("siwx917-common") {
     ".",
     "SiWx917/",
     "${wifi_sdk_dir}",
-    "${wifi_sdk_dir}/hal",
   ]
 
   sources = [

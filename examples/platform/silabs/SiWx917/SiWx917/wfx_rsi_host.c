@@ -99,7 +99,7 @@ bool wfx_is_sta_mode_enabled(void)
 }
 
 /*********************************************************************
- * @fn  void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr)
+ * @fn  void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t *addr)
  * @brief
  *      get the wifi mac address
  * @param[in]  Interface:
@@ -107,9 +107,9 @@ bool wfx_is_sta_mode_enabled(void)
  * @return
  *       None
  ***********************************************************************/
-void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * addr)
+void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t *addr)
 {
-    sl_wfx_mac_address_t * mac;
+    sl_wfx_mac_address_t *mac;
 
 #ifdef SL_WFX_CONFIG_SOFTAP
     mac = (interface == SL_WFX_SOFTAP_INTERFACE) ? &wfx_rsi.softap_mac : &wfx_rsi.sta_mac;
@@ -129,7 +129,7 @@ void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * 
  * @return
  *       None
  ***********************************************************************/
-void wfx_set_wifi_provision(wfx_wifi_provision_t * cfg)
+void wfx_set_wifi_provision(wfx_wifi_provision_t *cfg)
 {
     SILABS_LOG("%s: SSID: %s", __func__, &wfx_rsi.sec.ssid[0]);
 
@@ -145,7 +145,7 @@ void wfx_set_wifi_provision(wfx_wifi_provision_t * cfg)
  * @return  return false if successful,
  *        true otherwise
  ***********************************************************************/
-bool wfx_get_wifi_provision(wfx_wifi_provision_t * wifiConfig)
+bool wfx_get_wifi_provision(wfx_wifi_provision_t *wifiConfig)
 {
     if (wifiConfig != NULL)
     {
@@ -328,7 +328,7 @@ bool wfx_hw_ready(void)
  * @return
  *      access point information
  ***********************************************************************/
-int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
+int32_t wfx_get_ap_info(wfx_wifi_scan_result_t *ap)
 {
     return wfx_rsi_get_ap_info(ap);
 }
@@ -341,7 +341,7 @@ int32_t wfx_get_ap_info(wfx_wifi_scan_result_t * ap)
  * @return
  *      access point extra information
  ***********************************************************************/
-int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t * extra_info)
+int32_t wfx_get_ap_ext(wfx_wifi_scan_ext_t *extra_info)
 {
     return wfx_rsi_get_ap_ext(extra_info);
 }
@@ -368,7 +368,7 @@ int32_t wfx_reset_counts()
  * @return returns ture if successful,
  *          false otherwise
  *******************************************************************************/
-bool wfx_start_scan(char * ssid, void (*callback)(wfx_wifi_scan_result_t *))
+bool wfx_start_scan(char *ssid, void (*callback)(wfx_wifi_scan_result_t *))
 {
     int sz;
 
