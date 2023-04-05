@@ -20,10 +20,7 @@
 #pragma once
 
 #include <stdint.h>
-
-extern "C" void RSI_Board_LED_Set(int, int);
-extern "C" void RSI_Board_LED_Toggle(int);
-extern "C" bool RSI_Board_LED_GetState(int);
+#include "rsi_board.h"
 
 class LEDWidget
 {
