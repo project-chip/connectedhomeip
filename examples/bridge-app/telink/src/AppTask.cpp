@@ -184,6 +184,7 @@ static DeviceTempSensor TempSensor1("TempSensor 1", "Office", minMeasuredValue, 
 #define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
 #define ZCL_ON_OFF_CLUSTER_REVISION (4u)
 #define ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION (4u)
+#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP (0u)
 #define ZCL_TEMPERATURE_SENSOR_FEATURE_MAP (0u)
 
 /* BRIDGED DEVICE ENDPOINT: contains the following clusters:
@@ -357,6 +358,14 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
         MutableByteSpan zclNameSpan(buffer, maxReadLength);
         MakeZclCharString(zclNameSpan, dev->GetName());
     }
+    else if ((attributeId == FeatureMap::Id) && (maxReadLength == 4))
+    {
+        *buffer = (uint32_t) ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP;
+    }
+    else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 4))
+    {
+        *buffer = (uint16_t) ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION;
+    }
     else
     {
         return EMBER_ZCL_STATUS_FAILURE;
@@ -372,6 +381,10 @@ EmberAfStatus HandleReadOnOffAttribute(Device * dev, chip::AttributeId attribute
     if ((attributeId == Clusters::OnOff::Attributes::OnOff::Id) && (maxReadLength == 1))
     {
         *buffer = dev->IsOn() ? 1 : 0;
+    }
+    else if ((attributeId == Clusters::OnOff::Attributes::ClusterRevision::Id) && (maxReadLength == 4))
+    {
+        *buffer = (uint16_t) ZCL_ON_OFF_CLUSTER_REVISION;
     }
     else
     {
@@ -703,14 +716,12 @@ EmberAfStatus HandleReadTempMeasurementAttribute(DeviceTempSensor * dev, chip::A
     }
     else if ((attributeId == FeatureMap::Id) && (maxReadLength == 4))
     {
-        uint32_t featureMap;
-        FeatureMap::Get(dev->GetEndpointId(), &featureMap);
+        uint32_t featureMap = ZCL_TEMPERATURE_SENSOR_FEATURE_MAP;
         memcpy(buffer, &featureMap, sizeof(featureMap));
     }
-    else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 2))
+    else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 4))
     {
-        uint16_t clusterRevision;
-        ClusterRevision::Get(dev->GetEndpointId(), &clusterRevision);
+        uint16_t clusterRevision = ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION;
         memcpy(buffer, &clusterRevision, sizeof(clusterRevision));
     }
     else
