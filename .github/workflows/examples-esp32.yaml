@@ -87,6 +87,12 @@ jobs:
                         build \
                         --copy-artifacts-to out/artifacts \
                      "
+            - name: Prepare bloat report
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                     esp32 m5stack all-clusters-app \
+                     out/esp32-m5stack-all-clusters/chip-all-clusters-app.elf \
+                     /tmp/bloat_reports/
             - name: Prepare code pregen and ensure compile time pregen not possible
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/codepregen.py ./zzz_pregenerated"
@@ -117,12 +123,6 @@ jobs:
               run: |
                   rm -rf ./zzz_pregenerated
                   mv scripts/codegen.py.renamed scripts/codegen.py
-            - name: Prepare bloat report
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                     esp32 m5stack all-clusters-app \
-                     out/esp32-m5stack-all-clusters/chip-all-clusters-app.elf \
-                     /tmp/bloat_reports/
             - name: Build example All Clusters App C3
               timeout-minutes: 15
               run: scripts/examples/esp_example.sh all-clusters-app sdkconfig_c3devkit.defaults
