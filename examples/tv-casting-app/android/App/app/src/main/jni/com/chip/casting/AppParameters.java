@@ -18,6 +18,7 @@
 package com.chip.casting;
 
 import android.util.Log;
+import chip.platform.ConfigurationManager;
 import java.math.BigInteger;
 import java.util.Arrays;
 
@@ -28,6 +29,7 @@ public class AppParameters {
   private static final int TEST_DISCRIMINATOR = 0xF00;
   private DACProvider TEST_DAC_PROVIDER = new DACProviderStub();
 
+  private ConfigurationManager configurationManager;
   private byte[] rotatingDeviceIdUniqueId;
   private DACProvider dacProvider = TEST_DAC_PROVIDER;
   private String spake2pVerifierBase64;
@@ -35,6 +37,14 @@ public class AppParameters {
   private int spake2pIterationCount;
   private int setupPasscode = TEST_SETUP_PASSCODE;
   private int discriminator = TEST_DISCRIMINATOR;
+
+  public ConfigurationManager getConfigurationManager() {
+    return configurationManager;
+  }
+
+  public void setConfigurationManager(ConfigurationManager configurationManager) {
+    this.configurationManager = configurationManager;
+  }
 
   public void setRotatingDeviceIdUniqueId(byte[] rotatingDeviceIdUniqueId) {
     Log.d(
