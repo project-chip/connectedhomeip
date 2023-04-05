@@ -33,7 +33,7 @@
 #include "OTAUtil.h"
 #endif
 
-LOG_MODULE_DECLARE(appCommon, CONFIG_CHIP_APP_LOG_LEVEL);
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
 constexpr int kFactoryResetCalcTimeout          = 3000;
