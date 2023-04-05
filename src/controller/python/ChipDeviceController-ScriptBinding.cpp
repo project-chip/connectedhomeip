@@ -420,9 +420,13 @@ PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommiss
     auto * callbacks = new UnpairDeviceCallback(callback, fabricRemover);
 
     // Pass the callback and nodeid to the RemoveCurrentFabric function
-    fabricRemover->RemoveCurrentFabric(nodeid, &callbacks->mOnCurrentFabricRemove);
-
-    return ToPyChipError(CHIP_NO_ERROR);
+    CHIP_ERROR err = fabricRemover->RemoveCurrentFabric(nodeid, &callbacks->mOnCurrentFabricRemove); 
+    if (err != CHIP_NO_ERROR)
+    {
+        delete fabricRemover;
+    }
+    // Else will clean up when the callback is called.
+    return ToPyChipError(err);
 }
 
 PyChipError pychip_DeviceController_OnNetworkCommission(chip::Controller::DeviceCommissioner * devCtrl, uint64_t nodeId,
