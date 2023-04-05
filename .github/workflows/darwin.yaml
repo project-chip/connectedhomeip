@@ -42,7 +42,7 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform darwin
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform darwin
             - name: Setup Environment
               run: brew install python@3.9
 
