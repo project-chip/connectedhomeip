@@ -196,7 +196,7 @@
 
  @param responseHandler Called when purgeCache completes
  */
-- (void)purgeCache:(dispatch_queue_t _Nonnull)clientQueue responseHandler:(void (^)(MatterError * _Nonnull))responseHandler;
+- (void)purgeCache:(dispatch_queue_t _Nonnull)clientQueue responseHandler:(void (^_Nonnull)(MatterError * _Nonnull))responseHandler;
 
 /*!
  @brief Start the Matter server and reconnect to a previously connected Video Player (if any). This API is async

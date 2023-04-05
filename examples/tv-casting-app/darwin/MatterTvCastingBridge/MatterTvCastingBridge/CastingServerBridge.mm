@@ -240,57 +240,47 @@
            clientQueue:(dispatch_queue_t _Nonnull)clientQueue
     setDacHolderStatus:(void (^_Nonnull)(MatterError * _Nonnull))setDacHolderStatus
 {
-    [self
-        dispatchOnMatterSDKQueue:@"setDacHolder(...)"
-                           block:^{
-                               NSData * certificationDeclarationNsData = deviceAttestationCredentials.getCertificationDeclaration;
-                               chip::MutableByteSpan certificationDeclaration = chip::MutableByteSpan(
-                                   const_cast<uint8_t *>(static_cast<const uint8_t *>(certificationDeclarationNsData.bytes)),
-                                   certificationDeclarationNsData.length);
+    dispatch_sync(_chipWorkQueue, ^{
+        NSData * certificationDeclarationNsData = deviceAttestationCredentials.getCertificationDeclaration;
+        chip::MutableByteSpan certificationDeclaration
+            = chip::MutableByteSpan(const_cast<uint8_t *>(static_cast<const uint8_t *>(certificationDeclarationNsData.bytes)),
+                certificationDeclarationNsData.length);
 
-                               NSData * firmwareInformationNsData = deviceAttestationCredentials.getFirmwareInformation;
-                               chip::MutableByteSpan firmwareInformation = chip::MutableByteSpan(
-                                   const_cast<uint8_t *>(static_cast<const uint8_t *>(firmwareInformationNsData.bytes)),
-                                   firmwareInformationNsData.length);
+        NSData * firmwareInformationNsData = deviceAttestationCredentials.getFirmwareInformation;
+        chip::MutableByteSpan firmwareInformation = chip::MutableByteSpan(
+            const_cast<uint8_t *>(static_cast<const uint8_t *>(firmwareInformationNsData.bytes)), firmwareInformationNsData.length);
 
-                               NSData * deviceAttestationCertNsData = deviceAttestationCredentials.getDeviceAttestationCert;
-                               chip::MutableByteSpan deviceAttestationCert = chip::MutableByteSpan(
-                                   const_cast<uint8_t *>(static_cast<const uint8_t *>(deviceAttestationCertNsData.bytes)),
-                                   deviceAttestationCertNsData.length);
+        NSData * deviceAttestationCertNsData = deviceAttestationCredentials.getDeviceAttestationCert;
+        chip::MutableByteSpan deviceAttestationCert
+            = chip::MutableByteSpan(const_cast<uint8_t *>(static_cast<const uint8_t *>(deviceAttestationCertNsData.bytes)),
+                deviceAttestationCertNsData.length);
 
-                               NSData * productAttestationIntermediateCertNsData
-                                   = deviceAttestationCredentials.getProductAttestationIntermediateCert;
-                               chip::MutableByteSpan productAttestationIntermediateCert = chip::MutableByteSpan(
-                                   const_cast<uint8_t *>(
-                                       static_cast<const uint8_t *>(productAttestationIntermediateCertNsData.bytes)),
-                                   productAttestationIntermediateCertNsData.length);
+        NSData * productAttestationIntermediateCertNsData = deviceAttestationCredentials.getProductAttestationIntermediateCert;
+        chip::MutableByteSpan productAttestationIntermediateCert = chip::MutableByteSpan(
+            const_cast<uint8_t *>(static_cast<const uint8_t *>(productAttestationIntermediateCertNsData.bytes)),
+            productAttestationIntermediateCertNsData.length);
 
-                               NSData * deviceAttestationCertPrivateKeyNsData
-                                   = deviceAttestationCredentials.getDeviceAttestationCertPrivateKey;
-                               chip::MutableByteSpan deviceAttestationCertPrivateKey = chip::MutableByteSpan(
-                                   const_cast<uint8_t *>(static_cast<const uint8_t *>(deviceAttestationCertPrivateKeyNsData.bytes)),
-                                   deviceAttestationCertPrivateKeyNsData.length);
+        NSData * deviceAttestationCertPrivateKeyNsData = deviceAttestationCredentials.getDeviceAttestationCertPrivateKey;
+        chip::MutableByteSpan deviceAttestationCertPrivateKey = chip::MutableByteSpan(
+            const_cast<uint8_t *>(static_cast<const uint8_t *>(deviceAttestationCertPrivateKeyNsData.bytes)),
+            deviceAttestationCertPrivateKeyNsData.length);
 
-                               NSData * deviceAttestationCertPublicKeyKeyNsData
-                                   = deviceAttestationCredentials.getDeviceAttestationCertPublicKey;
-                               chip::MutableByteSpan deviceAttestationCertPublicKeyKey = chip::MutableByteSpan(
-                                   const_cast<uint8_t *>(
-                                       static_cast<const uint8_t *>(deviceAttestationCertPublicKeyKeyNsData.bytes)),
-                                   deviceAttestationCertPublicKeyKeyNsData.length);
+        NSData * deviceAttestationCertPublicKeyKeyNsData = deviceAttestationCredentials.getDeviceAttestationCertPublicKey;
+        chip::MutableByteSpan deviceAttestationCertPublicKeyKey = chip::MutableByteSpan(
+            const_cast<uint8_t *>(static_cast<const uint8_t *>(deviceAttestationCertPublicKeyKeyNsData.bytes)),
+            deviceAttestationCertPublicKeyKeyNsData.length);
 
-                               self->_deviceAttestationCredentialsProvider
-                                   = new DeviceAttestationCredentialsProviderImpl(&certificationDeclaration, &firmwareInformation,
-                                       &deviceAttestationCert, &productAttestationIntermediateCert,
-                                       &deviceAttestationCertPrivateKey, &deviceAttestationCertPublicKeyKey);
+        self->_deviceAttestationCredentialsProvider
+            = new DeviceAttestationCredentialsProviderImpl(&certificationDeclaration, &firmwareInformation, &deviceAttestationCert,
+                &productAttestationIntermediateCert, &deviceAttestationCertPrivateKey, &deviceAttestationCertPublicKeyKey);
 
-                               SetDeviceAttestationCredentialsProvider(self->_deviceAttestationCredentialsProvider);
+        SetDeviceAttestationCredentialsProvider(self->_deviceAttestationCredentialsProvider);
 
-                               dispatch_async(clientQueue, ^{
-                                   setDacHolderStatus(
-                                       [[MatterError alloc] initWithCode:CHIP_NO_ERROR.AsInteger()
-                                                                 message:[NSString stringWithUTF8String:CHIP_NO_ERROR.AsString()]]);
-                               });
-                           }];
+        dispatch_async(clientQueue, ^{
+            setDacHolderStatus([[MatterError alloc] initWithCode:CHIP_NO_ERROR.AsInteger()
+                                                         message:[NSString stringWithUTF8String:CHIP_NO_ERROR.AsString()]]);
+        });
+    });
 }
 
 - (void)discoverCommissioners:(dispatch_queue_t _Nonnull)clientQueue
