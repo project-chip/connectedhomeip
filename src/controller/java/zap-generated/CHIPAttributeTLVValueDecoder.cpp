@@ -1372,7 +1372,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::Description::Id: {
@@ -1384,7 +1384,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::InactiveText::Id: {
@@ -1396,7 +1396,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::OutOfService::Id: {
@@ -2540,8 +2540,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                newElement_0_actionIDCtorSignature.c_str(),
                                                                                entry_0.actionID, newElement_0_actionID);
                 jobject newElement_0_name;
-                newElement_0_name = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(entry_0.name.data(), entry_0.name.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str(),
+                                                                   newElement_0_name);
                 jobject newElement_0_type;
                 std::string newElement_0_typeClassName     = "java/lang/Integer";
                 std::string newElement_0_typeCtorSignature = "(I)V";
@@ -2615,8 +2615,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                newElement_0_endpointListIDCtorSignature.c_str(),
                                                                                entry_0.endpointListID, newElement_0_endpointListID);
                 jobject newElement_0_name;
-                newElement_0_name = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(entry_0.name.data(), entry_0.name.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str(),
+                                                                   newElement_0_name);
                 jobject newElement_0_type;
                 std::string newElement_0_typeClassName     = "java/lang/Integer";
                 std::string newElement_0_typeCtorSignature = "(I)V";
@@ -2671,7 +2671,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -2834,7 +2834,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::VendorID::Id: {
@@ -2861,7 +2861,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::ProductID::Id: {
@@ -2888,7 +2888,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::Location::Id: {
@@ -2900,7 +2900,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::HardwareVersion::Id: {
@@ -2927,7 +2927,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::SoftwareVersion::Id: {
@@ -2954,7 +2954,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::ManufacturingDate::Id: {
@@ -2966,7 +2966,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::PartNumber::Id: {
@@ -2978,7 +2978,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::ProductURL::Id: {
@@ -2990,7 +2990,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::ProductLabel::Id: {
@@ -3002,7 +3002,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::SerialNumber::Id: {
@@ -3014,7 +3014,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::LocalConfigDisabled::Id: {
@@ -3056,7 +3056,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::CapabilityMinima::Id: {
@@ -3629,7 +3629,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::SupportedLocales::Id: {
@@ -3648,8 +3648,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                newElement_0 =
-                    chip::JniReferences::GetInstance().CharToJniString(std::string(entry_0.data(), entry_0.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(std::string(entry_0.data(), entry_0.size()).c_str(),
+                                                                   newElement_0);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -4330,7 +4330,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::WiredAssessedInputVoltage::Id: {
@@ -4642,7 +4642,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::BatCommonDesignation::Id: {
@@ -4669,7 +4669,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::BatIECDesignation::Id: {
@@ -4681,7 +4681,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::BatApprovedChemistry::Id: {
@@ -5667,8 +5667,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
                 jobject newElement_0_name;
-                newElement_0_name = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(entry_0.name.data(), entry_0.name.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str(),
+                                                                   newElement_0_name);
                 jobject newElement_0_isOperational;
                 std::string newElement_0_isOperationalClassName     = "java/lang/Boolean";
                 std::string newElement_0_isOperationalCtorSignature = "(Z)V";
@@ -6084,8 +6084,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 else
                 {
                     jobject newElement_0_nameInsideOptional;
-                    newElement_0_nameInsideOptional = chip::JniReferences::GetInstance().CharToJniString(
-                        std::string(entry_0.name.Value().data(), entry_0.name.Value().size()).c_str());
+                    chip::JniReferences::GetInstance().CharToStringUTF(
+                        std::string(entry_0.name.Value().data(), entry_0.name.Value().size()).c_str(),
+                        newElement_0_nameInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(newElement_0_nameInsideOptional, newElement_0_name);
                 }
                 jobject newElement_0_stackFreeCurrent;
@@ -6404,8 +6405,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             else
             {
-                value = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(cppValue.Value().data(), cppValue.Value().size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(
+                    std::string(cppValue.Value().data(), cppValue.Value().size()).c_str(), value);
             }
             return value;
         }
@@ -8611,7 +8612,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::VendorID::Id: {
@@ -8638,7 +8639,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::NodeLabel::Id: {
@@ -8650,7 +8651,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::HardwareVersion::Id: {
@@ -8677,7 +8678,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::SoftwareVersion::Id: {
@@ -8704,7 +8705,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::ManufacturingDate::Id: {
@@ -8716,7 +8717,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::PartNumber::Id: {
@@ -8728,7 +8729,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::ProductURL::Id: {
@@ -8740,7 +8741,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::ProductLabel::Id: {
@@ -8752,7 +8753,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::SerialNumber::Id: {
@@ -8764,7 +8765,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::Reachable::Id: {
@@ -8791,7 +8792,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -9408,8 +9409,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                                newElement_0_nodeIDCtorSignature.c_str(),
                                                                                entry_0.nodeID, newElement_0_nodeID);
                 jobject newElement_0_label;
-                newElement_0_label = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(entry_0.label.data(), entry_0.label.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(std::string(entry_0.label.data(), entry_0.label.size()).c_str(),
+                                                                   newElement_0_label);
                 jobject newElement_0_fabricIndex;
                 std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
                 std::string newElement_0_fabricIndexCtorSignature = "(I)V";
@@ -9749,8 +9750,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 else
                 {
                     jobject newElement_0_groupNameInsideOptional;
-                    newElement_0_groupNameInsideOptional = chip::JniReferences::GetInstance().CharToJniString(
-                        std::string(entry_0.groupName.Value().data(), entry_0.groupName.Value().size()).c_str());
+                    chip::JniReferences::GetInstance().CharToStringUTF(
+                        std::string(entry_0.groupName.Value().data(), entry_0.groupName.Value().size()).c_str(),
+                        newElement_0_groupNameInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(newElement_0_groupNameInsideOptional, newElement_0_groupName);
                 }
                 jobject newElement_0_fabricIndex;
@@ -9967,11 +9969,11 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
                 jobject newElement_0_label;
-                newElement_0_label = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(entry_0.label.data(), entry_0.label.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(std::string(entry_0.label.data(), entry_0.label.size()).c_str(),
+                                                                   newElement_0_label);
                 jobject newElement_0_value;
-                newElement_0_value = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(entry_0.value.data(), entry_0.value.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(std::string(entry_0.value.data(), entry_0.value.size()).c_str(),
+                                                                   newElement_0_value);
 
                 jclass labelStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -10148,11 +10150,11 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
                 jobject newElement_0_label;
-                newElement_0_label = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(entry_0.label.data(), entry_0.label.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(std::string(entry_0.label.data(), entry_0.label.size()).c_str(),
+                                                                   newElement_0_label);
                 jobject newElement_0_value;
-                newElement_0_value = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(entry_0.value.data(), entry_0.value.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(std::string(entry_0.value.data(), entry_0.value.size()).c_str(),
+                                                                   newElement_0_value);
 
                 jclass labelStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -10472,7 +10474,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::StandardNamespace::Id: {
@@ -10514,8 +10516,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
                 jobject newElement_0_label;
-                newElement_0_label = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(entry_0.label.data(), entry_0.label.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(std::string(entry_0.label.data(), entry_0.label.size()).c_str(),
+                                                                   newElement_0_label);
                 jobject newElement_0_mode;
                 std::string newElement_0_modeClassName     = "java/lang/Integer";
                 std::string newElement_0_modeCtorSignature = "(I)V";
@@ -11089,7 +11091,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::LEDSettings::Id: {
@@ -14426,7 +14428,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::ColorTemperatureMireds::Id: {
@@ -15460,7 +15462,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::LampManufacturer::Id: {
@@ -15472,7 +15474,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::LampRatedHours::Id: {
@@ -17220,7 +17222,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -17395,8 +17397,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 else
                 {
                     jobject newElement_0_nameInsideOptional;
-                    newElement_0_nameInsideOptional = chip::JniReferences::GetInstance().CharToJniString(
-                        std::string(entry_0.name.Value().data(), entry_0.name.Value().size()).c_str());
+                    chip::JniReferences::GetInstance().CharToStringUTF(
+                        std::string(entry_0.name.Value().data(), entry_0.name.Value().size()).c_str(),
+                        newElement_0_nameInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(newElement_0_nameInsideOptional, newElement_0_name);
                 }
                 jobject newElement_0_callSign;
@@ -17407,8 +17410,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 else
                 {
                     jobject newElement_0_callSignInsideOptional;
-                    newElement_0_callSignInsideOptional = chip::JniReferences::GetInstance().CharToJniString(
-                        std::string(entry_0.callSign.Value().data(), entry_0.callSign.Value().size()).c_str());
+                    chip::JniReferences::GetInstance().CharToStringUTF(
+                        std::string(entry_0.callSign.Value().data(), entry_0.callSign.Value().size()).c_str(),
+                        newElement_0_callSignInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(newElement_0_callSignInsideOptional, newElement_0_callSign);
                 }
                 jobject newElement_0_affiliateCallSign;
@@ -17419,8 +17423,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 else
                 {
                     jobject newElement_0_affiliateCallSignInsideOptional;
-                    newElement_0_affiliateCallSignInsideOptional = chip::JniReferences::GetInstance().CharToJniString(
-                        std::string(entry_0.affiliateCallSign.Value().data(), entry_0.affiliateCallSign.Value().size()).c_str());
+                    chip::JniReferences::GetInstance().CharToStringUTF(
+                        std::string(entry_0.affiliateCallSign.Value().data(), entry_0.affiliateCallSign.Value().size()).c_str(),
+                        newElement_0_affiliateCallSignInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(newElement_0_affiliateCallSignInsideOptional,
                                                                       newElement_0_affiliateCallSign);
                 }
@@ -17465,8 +17470,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             else
             {
                 jobject value_operatorName;
-                value_operatorName = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(cppValue.Value().operatorName.data(), cppValue.Value().operatorName.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(
+                    std::string(cppValue.Value().operatorName.data(), cppValue.Value().operatorName.size()).c_str(),
+                    value_operatorName);
                 jobject value_lineupName;
                 if (!cppValue.Value().lineupName.HasValue())
                 {
@@ -17475,9 +17481,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 else
                 {
                     jobject value_lineupNameInsideOptional;
-                    value_lineupNameInsideOptional = chip::JniReferences::GetInstance().CharToJniString(
-                        std::string(cppValue.Value().lineupName.Value().data(), cppValue.Value().lineupName.Value().size())
-                            .c_str());
+                    chip::JniReferences::GetInstance().CharToStringUTF(
+                        std::string(cppValue.Value().lineupName.Value().data(), cppValue.Value().lineupName.Value().size()).c_str(),
+                        value_lineupNameInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(value_lineupNameInsideOptional, value_lineupName);
                 }
                 jobject value_postalCode;
@@ -17488,9 +17494,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 else
                 {
                     jobject value_postalCodeInsideOptional;
-                    value_postalCodeInsideOptional = chip::JniReferences::GetInstance().CharToJniString(
-                        std::string(cppValue.Value().postalCode.Value().data(), cppValue.Value().postalCode.Value().size())
-                            .c_str());
+                    chip::JniReferences::GetInstance().CharToStringUTF(
+                        std::string(cppValue.Value().postalCode.Value().data(), cppValue.Value().postalCode.Value().size()).c_str(),
+                        value_postalCodeInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(value_postalCodeInsideOptional, value_postalCode);
                 }
                 jobject value_lineupInfoType;
@@ -17557,8 +17563,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 else
                 {
                     jobject value_nameInsideOptional;
-                    value_nameInsideOptional = chip::JniReferences::GetInstance().CharToJniString(
-                        std::string(cppValue.Value().name.Value().data(), cppValue.Value().name.Value().size()).c_str());
+                    chip::JniReferences::GetInstance().CharToStringUTF(
+                        std::string(cppValue.Value().name.Value().data(), cppValue.Value().name.Value().size()).c_str(),
+                        value_nameInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(value_nameInsideOptional, value_name);
                 }
                 jobject value_callSign;
@@ -17569,8 +17576,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 else
                 {
                     jobject value_callSignInsideOptional;
-                    value_callSignInsideOptional = chip::JniReferences::GetInstance().CharToJniString(
-                        std::string(cppValue.Value().callSign.Value().data(), cppValue.Value().callSign.Value().size()).c_str());
+                    chip::JniReferences::GetInstance().CharToStringUTF(
+                        std::string(cppValue.Value().callSign.Value().data(), cppValue.Value().callSign.Value().size()).c_str(),
+                        value_callSignInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(value_callSignInsideOptional, value_callSign);
                 }
                 jobject value_affiliateCallSign;
@@ -17581,10 +17589,11 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 else
                 {
                     jobject value_affiliateCallSignInsideOptional;
-                    value_affiliateCallSignInsideOptional = chip::JniReferences::GetInstance().CharToJniString(
+                    chip::JniReferences::GetInstance().CharToStringUTF(
                         std::string(cppValue.Value().affiliateCallSign.Value().data(),
                                     cppValue.Value().affiliateCallSign.Value().size())
-                            .c_str());
+                            .c_str(),
+                        value_affiliateCallSignInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(value_affiliateCallSignInsideOptional,
                                                                       value_affiliateCallSign);
                 }
@@ -17770,8 +17779,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                               newElement_0_identifierCtorSignature.c_str(),
                                                                               entry_0.identifier, newElement_0_identifier);
                 jobject newElement_0_name;
-                newElement_0_name = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(entry_0.name.data(), entry_0.name.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str(),
+                                                                   newElement_0_name);
 
                 jclass targetInfoStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -18286,11 +18295,11 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     newElement_0_inputTypeClassName.c_str(), newElement_0_inputTypeCtorSignature.c_str(),
                     static_cast<uint8_t>(entry_0.inputType), newElement_0_inputType);
                 jobject newElement_0_name;
-                newElement_0_name = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(entry_0.name.data(), entry_0.name.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str(),
+                                                                   newElement_0_name);
                 jobject newElement_0_description;
-                newElement_0_description = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(entry_0.description.data(), entry_0.description.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(
+                    std::string(entry_0.description.data(), entry_0.description.size()).c_str(), newElement_0_description);
 
                 jclass inputInfoStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -18754,8 +18763,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             {
                 auto & entry_0 = iter_value_0.GetValue();
                 jobject newElement_0;
-                newElement_0 =
-                    chip::JniReferences::GetInstance().CharToJniString(std::string(entry_0.data(), entry_0.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(std::string(entry_0.data(), entry_0.size()).c_str(),
+                                                                   newElement_0);
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
             return value;
@@ -18940,8 +18949,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     newElement_0_outputTypeClassName.c_str(), newElement_0_outputTypeCtorSignature.c_str(),
                     static_cast<uint8_t>(entry_0.outputType), newElement_0_outputType);
                 jobject newElement_0_name;
-                newElement_0_name = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(entry_0.name.data(), entry_0.name.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str(),
+                                                                   newElement_0_name);
 
                 jclass outputInfoStructStructClass_1;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -19163,10 +19172,10 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     value_application_catalogVendorIDClassName.c_str(), value_application_catalogVendorIDCtorSignature.c_str(),
                     cppValue.Value().application.catalogVendorID, value_application_catalogVendorID);
                 jobject value_application_applicationID;
-                value_application_applicationID = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(cppValue.Value().application.applicationID.data(),
-                                cppValue.Value().application.applicationID.size())
-                        .c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.Value().application.applicationID.data(),
+                                                                               cppValue.Value().application.applicationID.size())
+                                                                       .c_str(),
+                                                                   value_application_applicationID);
 
                 jclass applicationStructStructClass_2;
                 err = chip::JniReferences::GetInstance().GetClassRef(
@@ -19371,7 +19380,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::VendorID::Id: {
@@ -19398,7 +19407,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::ProductID::Id: {
@@ -19432,8 +19441,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                            value_catalogVendorIDCtorSignature.c_str(),
                                                                            cppValue.catalogVendorID, value_catalogVendorID);
             jobject value_applicationID;
-            value_applicationID = chip::JniReferences::GetInstance().CharToJniString(
-                std::string(cppValue.applicationID.data(), cppValue.applicationID.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(
+                std::string(cppValue.applicationID.data(), cppValue.applicationID.size()).c_str(), value_applicationID);
 
             jclass applicationStructStructClass_0;
             err = chip::JniReferences::GetInstance().GetClassRef(
@@ -19479,7 +19488,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::AllowedVendorList::Id: {
@@ -22585,7 +22594,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::LongCharString::Id: {
@@ -22597,7 +22606,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            value = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.data(), cppValue.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.data(), cppValue.size()).c_str(), value);
             return value;
         }
         case Attributes::EpochUs::Id: {
@@ -22722,8 +22731,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
                 else
                 {
-                    newElement_0_nullableString = chip::JniReferences::GetInstance().CharToJniString(
-                        std::string(entry_0.nullableString.Value().data(), entry_0.nullableString.Value().size()).c_str());
+                    chip::JniReferences::GetInstance().CharToStringUTF(
+                        std::string(entry_0.nullableString.Value().data(), entry_0.nullableString.Value().size()).c_str(),
+                        newElement_0_nullableString);
                 }
                 jobject newElement_0_optionalString;
                 if (!entry_0.optionalString.HasValue())
@@ -22733,8 +22743,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 else
                 {
                     jobject newElement_0_optionalStringInsideOptional;
-                    newElement_0_optionalStringInsideOptional = chip::JniReferences::GetInstance().CharToJniString(
-                        std::string(entry_0.optionalString.Value().data(), entry_0.optionalString.Value().size()).c_str());
+                    chip::JniReferences::GetInstance().CharToStringUTF(
+                        std::string(entry_0.optionalString.Value().data(), entry_0.optionalString.Value().size()).c_str(),
+                        newElement_0_optionalStringInsideOptional);
                     chip::JniReferences::GetInstance().CreateOptional(newElement_0_optionalStringInsideOptional,
                                                                       newElement_0_optionalString);
                 }
@@ -22752,10 +22763,11 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     }
                     else
                     {
-                        newElement_0_nullableOptionalStringInsideOptional = chip::JniReferences::GetInstance().CharToJniString(
+                        chip::JniReferences::GetInstance().CharToStringUTF(
                             std::string(entry_0.nullableOptionalString.Value().Value().data(),
                                         entry_0.nullableOptionalString.Value().Value().size())
-                                .c_str());
+                                .c_str(),
+                            newElement_0_nullableOptionalStringInsideOptional);
                     }
                     chip::JniReferences::GetInstance().CreateOptional(newElement_0_nullableOptionalStringInsideOptional,
                                                                       newElement_0_nullableOptionalString);
@@ -22793,8 +22805,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                             reinterpret_cast<const jbyte *>(entry_0.nullableStruct.Value().d.data()));
                     newElement_0_nullableStruct_d = newElement_0_nullableStruct_dByteArray;
                     jobject newElement_0_nullableStruct_e;
-                    newElement_0_nullableStruct_e = chip::JniReferences::GetInstance().CharToJniString(
-                        std::string(entry_0.nullableStruct.Value().e.data(), entry_0.nullableStruct.Value().e.size()).c_str());
+                    chip::JniReferences::GetInstance().CharToStringUTF(
+                        std::string(entry_0.nullableStruct.Value().e.data(), entry_0.nullableStruct.Value().e.size()).c_str(),
+                        newElement_0_nullableStruct_e);
                     jobject newElement_0_nullableStruct_f;
                     std::string newElement_0_nullableStruct_fClassName     = "java/lang/Integer";
                     std::string newElement_0_nullableStruct_fCtorSignature = "(I)V";
@@ -22875,8 +22888,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                             reinterpret_cast<const jbyte *>(entry_0.optionalStruct.Value().d.data()));
                     newElement_0_optionalStructInsideOptional_d = newElement_0_optionalStructInsideOptional_dByteArray;
                     jobject newElement_0_optionalStructInsideOptional_e;
-                    newElement_0_optionalStructInsideOptional_e = chip::JniReferences::GetInstance().CharToJniString(
-                        std::string(entry_0.optionalStruct.Value().e.data(), entry_0.optionalStruct.Value().e.size()).c_str());
+                    chip::JniReferences::GetInstance().CharToStringUTF(
+                        std::string(entry_0.optionalStruct.Value().e.data(), entry_0.optionalStruct.Value().e.size()).c_str(),
+                        newElement_0_optionalStructInsideOptional_e);
                     jobject newElement_0_optionalStructInsideOptional_f;
                     std::string newElement_0_optionalStructInsideOptional_fClassName     = "java/lang/Integer";
                     std::string newElement_0_optionalStructInsideOptional_fCtorSignature = "(I)V";
@@ -22972,10 +22986,11 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         newElement_0_nullableOptionalStructInsideOptional_d =
                             newElement_0_nullableOptionalStructInsideOptional_dByteArray;
                         jobject newElement_0_nullableOptionalStructInsideOptional_e;
-                        newElement_0_nullableOptionalStructInsideOptional_e = chip::JniReferences::GetInstance().CharToJniString(
+                        chip::JniReferences::GetInstance().CharToStringUTF(
                             std::string(entry_0.nullableOptionalStruct.Value().Value().e.data(),
                                         entry_0.nullableOptionalStruct.Value().Value().e.size())
-                                .c_str());
+                                .c_str(),
+                            newElement_0_nullableOptionalStructInsideOptional_e);
                         jobject newElement_0_nullableOptionalStructInsideOptional_f;
                         std::string newElement_0_nullableOptionalStructInsideOptional_fClassName     = "java/lang/Integer";
                         std::string newElement_0_nullableOptionalStructInsideOptional_fCtorSignature = "(I)V";
@@ -23188,7 +23203,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                     reinterpret_cast<const jbyte *>(cppValue.d.data()));
             value_d = value_dByteArray;
             jobject value_e;
-            value_e = chip::JniReferences::GetInstance().CharToJniString(std::string(cppValue.e.data(), cppValue.e.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.e.data(), cppValue.e.size()).c_str(), value_e);
             jobject value_f;
             std::string value_fClassName     = "java/lang/Integer";
             std::string value_fCtorSignature = "(I)V";
@@ -23391,8 +23406,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         newElement_0_nullableOptionalFabricSensitiveInt8u);
                 }
                 jobject newElement_0_fabricSensitiveCharString;
-                newElement_0_fabricSensitiveCharString = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(entry_0.fabricSensitiveCharString.data(), entry_0.fabricSensitiveCharString.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(
+                    std::string(entry_0.fabricSensitiveCharString.data(), entry_0.fabricSensitiveCharString.size()).c_str(),
+                    newElement_0_fabricSensitiveCharString);
                 jobject newElement_0_fabricSensitiveStruct;
                 jobject newElement_0_fabricSensitiveStruct_a;
                 std::string newElement_0_fabricSensitiveStruct_aClassName     = "java/lang/Integer";
@@ -23423,8 +23439,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                         reinterpret_cast<const jbyte *>(entry_0.fabricSensitiveStruct.d.data()));
                 newElement_0_fabricSensitiveStruct_d = newElement_0_fabricSensitiveStruct_dByteArray;
                 jobject newElement_0_fabricSensitiveStruct_e;
-                newElement_0_fabricSensitiveStruct_e = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(entry_0.fabricSensitiveStruct.e.data(), entry_0.fabricSensitiveStruct.e.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(
+                    std::string(entry_0.fabricSensitiveStruct.e.data(), entry_0.fabricSensitiveStruct.e.size()).c_str(),
+                    newElement_0_fabricSensitiveStruct_e);
                 jobject newElement_0_fabricSensitiveStruct_f;
                 std::string newElement_0_fabricSensitiveStruct_fClassName     = "java/lang/Integer";
                 std::string newElement_0_fabricSensitiveStruct_fCtorSignature = "(I)V";
@@ -24166,8 +24183,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             else
             {
-                value = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(cppValue.Value().data(), cppValue.Value().size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(
+                    std::string(cppValue.Value().data(), cppValue.Value().size()).c_str(), value);
             }
             return value;
         }
@@ -24229,8 +24246,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                         reinterpret_cast<const jbyte *>(cppValue.Value().d.data()));
                 value_d = value_dByteArray;
                 jobject value_e;
-                value_e = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(cppValue.Value().e.data(), cppValue.Value().e.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(
+                    std::string(cppValue.Value().e.data(), cppValue.Value().e.size()).c_str(), value_e);
                 jobject value_f;
                 std::string value_fClassName     = "java/lang/Integer";
                 std::string value_fCtorSignature = "(I)V";

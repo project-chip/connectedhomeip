@@ -388,7 +388,7 @@ CHIP_ERROR JniReferences::GetObjectField(jobject objectToRead, const char * name
     return err;
 }
 
-jstring JniReferences::CharToJniString(const char * value)
+CHIP_ERROR JniReferences::CharToStringUTF(const char * value, jobject &outStr)
 {
     JNIEnv * env        = GetEnvForCurrentThread();
     jobject jbyteBuffer = env->NewDirectByteBuffer((void *) value, static_cast<jlong>(strlen(value)));
@@ -398,13 +398,21 @@ jstring JniReferences::CharToJniString(const char * value)
         env->GetStaticMethodID(charSetClass, "forName", "(Ljava/lang/String;)Ljava/nio/charset/Charset;");
     jobject charsetObject = env->CallStaticObjectMethod(charSetClass, charsetForNameMethod, env->NewStringUTF("UTF-8"));
 
-    jmethodID charSetDecodeMethod = env->GetMethodID(charSetClass, "decode", "(Ljava/nio/ByteBuffer;)Ljava/nio/CharBuffer;");
-    jobject decodeObject          = env->CallObjectMethod(charsetObject, charSetDecodeMethod, jbyteBuffer);
+    jclass charSetDocoderClass = env->FindClass("java/nio/charset/CharsetDecoder");
+    jmethodID newDocoderMethod = env->GetMethodID(charSetClass, "newDecoder", "()Ljava/nio/charset/CharsetDecoder;");
+    jobject decoderObject = env->CallObjectMethod(charsetObject, newDocoderMethod);
+
+    jmethodID charSetDecodeMethod = env->GetMethodID(charSetDocoderClass, "decode", "(Ljava/nio/ByteBuffer;)Ljava/nio/CharBuffer;");
+    jobject decodeObject          = env->CallObjectMethod(decoderObject, charSetDecodeMethod, jbyteBuffer);
     env->DeleteLocalRef(jbyteBuffer);
+
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
     jclass charBufferClass       = env->FindClass("java/nio/CharBuffer");
     jmethodID charBufferToString = env->GetMethodID(charBufferClass, "toString", "()Ljava/lang/String;");
-    return static_cast<jstring>(env->CallObjectMethod(decodeObject, charBufferToString));
+    outStr = static_cast<jstring>(env->CallObjectMethod(decodeObject, charBufferToString));
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

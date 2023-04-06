@@ -162,9 +162,12 @@ public:
 
     /**
      * Use instead of 'NewStringUTF' function
+     * If the value is not decoded with "UTF-8", the error will be returned.
+     * (The NewStringUTF function crashes when the value can not decoded as "UTF-8".)
+     *
      * Creates a java string type based on char array.
      */
-    jstring CharToJniString(const char * value);
+    CHIP_ERROR CharToStringUTF(const char * value, jobject &outString);
 
 private:
     JniReferences() {}

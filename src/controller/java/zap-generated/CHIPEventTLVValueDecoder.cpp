@@ -1420,8 +1420,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             else
             {
                 jobject value_nameInsideOptional;
-                value_nameInsideOptional = chip::JniReferences::GetInstance().CharToJniString(
-                    std::string(cppValue.name.Value().data(), cppValue.name.Value().size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(
+                    std::string(cppValue.name.Value().data(), cppValue.name.Value().size()).c_str(), value_nameInsideOptional);
                 chip::JniReferences::GetInstance().CreateOptional(value_nameInsideOptional, value_name);
             }
 
@@ -3498,8 +3498,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                     reinterpret_cast<const jbyte *>(cppValue.arg4.d.data()));
             value_arg4_d = value_arg4_dByteArray;
             jobject value_arg4_e;
-            value_arg4_e = chip::JniReferences::GetInstance().CharToJniString(
-                std::string(cppValue.arg4.e.data(), cppValue.arg4.e.size()).c_str());
+            chip::JniReferences::GetInstance().CharToStringUTF(std::string(cppValue.arg4.e.data(), cppValue.arg4.e.size()).c_str(),
+                                                               value_arg4_e);
             jobject value_arg4_f;
             std::string value_arg4_fClassName     = "java/lang/Integer";
             std::string value_arg4_fCtorSignature = "(I)V";
@@ -3567,8 +3567,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                         reinterpret_cast<const jbyte *>(entry_0.d.data()));
                 newElement_0_d = newElement_0_dByteArray;
                 jobject newElement_0_e;
-                newElement_0_e =
-                    chip::JniReferences::GetInstance().CharToJniString(std::string(entry_0.e.data(), entry_0.e.size()).c_str());
+                chip::JniReferences::GetInstance().CharToStringUTF(std::string(entry_0.e.data(), entry_0.e.size()).c_str(),
+                                                                   newElement_0_e);
                 jobject newElement_0_f;
                 std::string newElement_0_fClassName     = "java/lang/Integer";
                 std::string newElement_0_fCtorSignature = "(I)V";
