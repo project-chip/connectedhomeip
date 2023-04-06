@@ -262,7 +262,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kSceneCount)));
         ReturnErrorOnFailure(reader.Get(scene_count));
 
-        // In the event of an OTA, is max_scenes_per_fabric was reduced, this will return an error signaling the load function that
+        // In the event of an OTA, if max_scenes_per_fabric was reduced, this will return an error signaling the load function that
         // the fabric in memory has too many scenes and needs to be trimmed down.
         VerifyOrReturnError(scene_count <= max_scenes_per_fabric, CHIP_ERROR_BUFFER_TOO_SMALL);
         ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::ContextTag(TagScene::kStorageIDArray)));
