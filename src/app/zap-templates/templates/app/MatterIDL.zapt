@@ -53,9 +53,9 @@
   {{/zcl_events}}
   {{#if (is_client side)}}
     {{#zcl_attributes_server}}
-      {{#unless (is_number_greater_than code 65520)}}
+      {{#if clusterRef}}
   {{! ensure indent }}{{>idl_attribute_definition}}
-      {{/unless}}
+      {{/if}}
     {{/zcl_attributes_server}}
 
   {{~else}}
