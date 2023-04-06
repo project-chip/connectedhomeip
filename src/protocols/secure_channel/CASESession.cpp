@@ -244,7 +244,7 @@ public:
 struct CASESession::SendSigma3Data
 {
     FabricTable * fabricTable;
-    FabricIndex fabricIndex;
+    std::atomic<FabricIndex> fabricIndex;
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Signed;
     size_t msg_r3_signed_len;
@@ -308,6 +308,7 @@ void CASESession::Clear()
     // Cancel any outstanding work.
     if (mSendSigma3Helper)
     {
+        mSendSigma3Helper->mData.fabricIndex = kUndefinedFabricIndex;
         mSendSigma3Helper->CancelWork();
         mSendSigma3Helper.reset();
     }

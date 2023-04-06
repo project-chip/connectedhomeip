@@ -22,6 +22,7 @@
 #pragma once
 
 #include <algorithm>
+#include <mutex>
 
 #include <app/util/basic-types.h>
 #include <credentials/CHIPCert.h>
@@ -1146,6 +1147,8 @@ private:
     uint8_t mFabricCount = 0;
 
     BitFlags<StateFlags> mStateFlags;
+
+    mutable std::mutex mMutex;
 };
 
 } // namespace chip
