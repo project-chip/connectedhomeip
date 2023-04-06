@@ -388,7 +388,7 @@ CHIP_ERROR JniReferences::GetObjectField(jobject objectToRead, const char * name
     return err;
 }
 
-CHIP_ERROR JniReferences::CharToStringUTF(const char * value, jobject &outStr)
+CHIP_ERROR JniReferences::CharToStringUTF(const char * value, jobject & outStr)
 {
     JNIEnv * env        = GetEnvForCurrentThread();
     jobject jbyteBuffer = env->NewDirectByteBuffer((void *) value, static_cast<jlong>(strlen(value)));
@@ -400,7 +400,7 @@ CHIP_ERROR JniReferences::CharToStringUTF(const char * value, jobject &outStr)
 
     jclass charSetDocoderClass = env->FindClass("java/nio/charset/CharsetDecoder");
     jmethodID newDocoderMethod = env->GetMethodID(charSetClass, "newDecoder", "()Ljava/nio/charset/CharsetDecoder;");
-    jobject decoderObject = env->CallObjectMethod(charsetObject, newDocoderMethod);
+    jobject decoderObject      = env->CallObjectMethod(charsetObject, newDocoderMethod);
 
     jmethodID charSetDecodeMethod = env->GetMethodID(charSetDocoderClass, "decode", "(Ljava/nio/ByteBuffer;)Ljava/nio/CharBuffer;");
     jobject decodeObject          = env->CallObjectMethod(decoderObject, charSetDecodeMethod, jbyteBuffer);
@@ -410,7 +410,7 @@ CHIP_ERROR JniReferences::CharToStringUTF(const char * value, jobject &outStr)
 
     jclass charBufferClass       = env->FindClass("java/nio/CharBuffer");
     jmethodID charBufferToString = env->GetMethodID(charBufferClass, "toString", "()Ljava/lang/String;");
-    outStr = static_cast<jstring>(env->CallObjectMethod(decodeObject, charBufferToString));
+    outStr                       = static_cast<jstring>(env->CallObjectMethod(decodeObject, charBufferToString));
 
     return CHIP_NO_ERROR;
 }

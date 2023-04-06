@@ -167,7 +167,7 @@ public:
      *
      * Creates a java string type based on char array.
      */
-    CHIP_ERROR CharToStringUTF(const char * value, jobject &outString);
+    CHIP_ERROR CharToStringUTF(const char * value, jobject & outString);
 
 private:
     JniReferences() {}
