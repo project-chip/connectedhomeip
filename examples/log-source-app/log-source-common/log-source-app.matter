@@ -61,11 +61,11 @@ server cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
-  attribute access(read: administer, write: administer) AccessControlExtensionStruct extension[] = 1;
-  readonly attribute int16u subjectsPerAccessControlEntry = 2;
-  readonly attribute int16u targetsPerAccessControlEntry = 3;
-  readonly attribute int16u accessControlEntriesPerFabric = 4;
+  attribute access(read: administer, write: administer) optional AccessControlEntryStruct acl[] = 0;
+  attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
+  readonly attribute optional int16u subjectsPerAccessControlEntry = 2;
+  readonly attribute optional int16u targetsPerAccessControlEntry = 3;
+  readonly attribute optional int16u accessControlEntriesPerFabric = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -95,9 +95,9 @@ server cluster GeneralCommissioning = 48 {
     int16u maxCumulativeFailsafeSeconds = 1;
   }
 
-  attribute access(write: administer) int64u breadcrumb = 0;
-  readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
-  readonly attribute boolean supportsConcurrentConnection = 4;
+  attribute access(write: administer) optional int64u breadcrumb = 0;
+  readonly attribute optional BasicCommissioningInfo basicCommissioningInfo = 1;
+  readonly attribute optional boolean supportsConcurrentConnection = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -283,12 +283,12 @@ client cluster DiagnosticLogs = 50 {
     kBdx = 1;
   }
 
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
+  readonly attribute optional command_id generatedCommandList[] = 65528;
+  readonly attribute optional command_id acceptedCommandList[] = 65529;
+  readonly attribute optional event_id eventList[] = 65530;
+  readonly attribute optional attrib_id attributeList[] = 65531;
+  readonly attribute optional bitmap32 featureMap = 65532;
+  readonly attribute optional int16u clusterRevision = 65533;
 
   request struct RetrieveLogsRequestRequest {
     IntentEnum intent = 0;
@@ -380,10 +380,10 @@ server cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute FabricDescriptorStruct fabrics[] = 1;
-  readonly attribute int8u supportedFabrics = 2;
-  readonly attribute int8u commissionedFabrics = 3;
-  readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
+  readonly attribute optional FabricDescriptorStruct fabrics[] = 1;
+  readonly attribute optional int8u supportedFabrics = 2;
+  readonly attribute optional int8u commissionedFabrics = 3;
+  readonly attribute optional OCTET_STRING trustedRootCertificates[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
