@@ -28,7 +28,6 @@ import chip.platform.ChipMdnsCallbackImpl;
 import chip.platform.DiagnosticDataProviderImpl;
 import chip.platform.NsdManagerServiceBrowser;
 import chip.platform.NsdManagerServiceResolver;
-import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
 import java.util.Arrays;
 import java.util.List;
@@ -62,7 +61,7 @@ public class TvCastingApp {
         new AndroidChipPlatform(
             new AndroidBleManager(),
             new PreferencesKeyValueStoreManager(applicationContext),
-            new PreferencesConfigurationManager(applicationContext),
+            appParameters.getConfigurationManager(),
             nsdManagerServiceResolver,
             new NsdManagerServiceBrowser(applicationContext),
             new ChipMdnsCallbackImpl(),

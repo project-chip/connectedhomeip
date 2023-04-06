@@ -11,6 +11,7 @@ struct ApplicationStruct {
     char_string applicationID = 1;
 }
 
+/** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 client cluster Identify = 3 {
   enum IdentifyEffectIdentifier : ENUM8 {
     kBlink = 0;
@@ -52,10 +53,13 @@ client cluster Identify = 3 {
     IdentifyEffectVariant effectVariant = 1;
   }
 
+  /** Command description for Identify */
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
+  /** Command description for TriggerEffect */
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
+/** Attributes and commands for group configuration and manipulation. */
 client cluster Groups = 4 {
   bitmap GroupsFeature : BITMAP32 {
     kGroupNames = 0x1;
@@ -112,14 +116,21 @@ client cluster Groups = 4 {
     CHAR_STRING groupName = 1;
   }
 
+  /** Command description for AddGroup */
   fabric command access(invoke: manage) AddGroup(AddGroupRequest): AddGroupResponse = 0;
+  /** Command description for ViewGroup */
   fabric command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
+  /** Command description for GetGroupMembership */
   fabric command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
+  /** Command description for RemoveGroup */
   fabric command access(invoke: manage) RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
+  /** Command description for RemoveAllGroups */
   fabric command access(invoke: manage) RemoveAllGroups(): DefaultSuccess = 4;
+  /** Command description for AddGroupIfIdentifying */
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
+/** Attributes and commands for scene configuration and manipulation. */
 client cluster Scenes = 5 {
   bitmap ScenesCopyMode : BITMAP8 {
     kCopyAllScenes = 0x1;
@@ -270,18 +281,29 @@ client cluster Scenes = 5 {
     INT8U sceneIdentifierFrom = 2;
   }
 
+  /** Add a scene to the scene table. Extension field sets are supported, and are inputed as '{"ClusterID": VALUE, "AttributeValueList":[{"AttributeId": VALUE, "AttributeValue": VALUE}]}' */
   fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
+  /** Retrieves the requested scene entry from its Scene table. */
   fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
+  /** Removes the requested scene entry, corresponding to the value of the GroupID field, from its Scene Table */
   fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
+  /** Remove all scenes, corresponding to the value of the GroupID field, from its Scene Table */
   fabric command access(invoke: manage) RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
+  /** Adds the scene entry into its Scene Table along with all extension field sets corresponding to the current state of other clusters on the same endpoint */
   fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
+  /** Set the attributes and corresponding state for each other cluster implemented on the endpoint accordingly to the resquested scene entry in the Scene Table */
   fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
+  /** Get an unused scene identifier when no commissioning tool is in the network, or for a commissioning tool to get the used scene identifiers within a certain group */
   fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
+  /** Allows a scene to be added using a finer scene transition time than the AddScene command. */
   fabric command EnhancedAddScene(EnhancedAddSceneRequest): EnhancedAddSceneResponse = 64;
+  /** Allows a scene to be retrieved using a finer scene transition time than the ViewScene command */
   fabric command EnhancedViewScene(EnhancedViewSceneRequest): EnhancedViewSceneResponse = 65;
+  /** Allows a client to efficiently copy scenes from one group/scene identifier pair to another group/scene identifier pair. */
   fabric command CopyScene(CopySceneRequest): CopySceneResponse = 66;
 }
 
+/** Attributes and commands for switching devices between 'On' and 'Off' states. */
 client cluster OnOff = 6 {
   enum OnOffDelayedAllOffEffectVariant : ENUM8 {
     kFadeToOffIn0p8Seconds = 0;
@@ -335,14 +357,21 @@ client cluster OnOff = 6 {
     int16u offWaitTime = 2;
   }
 
+  /** On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0. */
   command Off(): DefaultSuccess = 0;
+  /** On receipt of this command, a device SHALL enter its ‘On’ state. This state is device dependent, but it is recommended that it is used for power on or similar functions. On receipt of the On command, if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. */
   command On(): DefaultSuccess = 1;
+  /** On receipt of this command, if a device is in its ‘Off’ state it SHALL enter its ‘On’ state. Otherwise, if it is in its ‘On’ state it SHALL enter its ‘Off’ state. On receipt of the Toggle command, if the value of the OnOff attribute is equal to FALSE and if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. If the value of the OnOff attribute is equal to TRUE, the OnTime attribute SHALL be set to 0. */
   command Toggle(): DefaultSuccess = 2;
+  /** The OffWithEffect command allows devices to be turned off using enhanced ways of fading. */
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
+  /** The OnWithRecallGlobalScene command allows the recall of the settings when the device was turned off. */
   command OnWithRecallGlobalScene(): DefaultSuccess = 65;
+  /** The OnWithTimedOff command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently switched off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 
+/** Attributes and commands for configuring On/Off switching devices. */
 client cluster OnOffSwitchConfiguration = 7 {
   readonly attribute enum8 switchType = 0;
   attribute enum8 switchActions = 16;
@@ -354,6 +383,7 @@ client cluster OnOffSwitchConfiguration = 7 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
 client cluster LevelControl = 8 {
   enum MoveMode : ENUM8 {
     kUp = 0;
@@ -455,17 +485,28 @@ client cluster LevelControl = 8 {
     INT16U frequency = 0;
   }
 
+  /** Command description for MoveToLevel */
   command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
+  /** Command description for Move */
   command Move(MoveRequest): DefaultSuccess = 1;
+  /** Command description for Step */
   command Step(StepRequest): DefaultSuccess = 2;
+  /** Command description for Stop */
   command Stop(StopRequest): DefaultSuccess = 3;
+  /** Command description for MoveToLevelWithOnOff */
   command MoveToLevelWithOnOff(MoveToLevelWithOnOffRequest): DefaultSuccess = 4;
+  /** Command description for MoveWithOnOff */
   command MoveWithOnOff(MoveWithOnOffRequest): DefaultSuccess = 5;
+  /** Command description for StepWithOnOff */
   command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
+  /** Command description for StopWithOnOff */
   command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
+  /** Change the currrent frequency to the provided one, or a close
+        approximation if the exact provided one is not possible. */
   command MoveToClosestFrequency(MoveToClosestFrequencyRequest): DefaultSuccess = 8;
 }
 
+/** An interface for reading the value of a binary measurement and accessing various characteristics of that measurement. */
 client cluster BinaryInputBasic = 15 {
   attribute char_string<16> activeText = 4;
   attribute char_string<16> description = 28;
@@ -484,6 +525,7 @@ client cluster BinaryInputBasic = 15 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 client cluster Descriptor = 29 {
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
@@ -502,6 +544,7 @@ client cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 client cluster Binding = 30 {
   fabric_scoped struct TargetStruct {
     optional node_id node = 1;
@@ -520,6 +563,10 @@ client cluster Binding = 30 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** The Access Control Cluster exposes a data model view of a
+      Node's Access Control List (ACL), which codifies the rules used to manage
+      and enforce Access Control for the Node's endpoints and their associated
+      cluster instances. */
 client cluster AccessControl = 31 {
   enum AccessControlEntryAuthModeEnum : ENUM8 {
     kPase = 1;
@@ -589,6 +636,7 @@ client cluster AccessControl = 31 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information. */
 client cluster Actions = 37 {
   enum ActionErrorEnum : ENUM8 {
     kUnknown = 0;
@@ -737,20 +785,35 @@ client cluster Actions = 37 {
     INT32U duration = 2;
   }
 
+  /** This command triggers an action (state change) on the involved endpoints. */
   command InstantAction(InstantActionRequest): DefaultSuccess = 0;
+  /** This command triggers an action (state change) on the involved endpoints, with a specified time to transition from the current state to the new state. */
   command InstantActionWithTransition(InstantActionWithTransitionRequest): DefaultSuccess = 1;
+  /** This command triggers the commencement of an action on the involved endpoints. */
   command StartAction(StartActionRequest): DefaultSuccess = 2;
+  /** This command triggers the commencement of an action (with a duration) on the involved endpoints. */
   command StartActionWithDuration(StartActionWithDurationRequest): DefaultSuccess = 3;
+  /** This command stops the ongoing action on the involved endpoints. */
   command StopAction(StopActionRequest): DefaultSuccess = 4;
+  /** This command pauses an ongoing action. */
   command PauseAction(PauseActionRequest): DefaultSuccess = 5;
+  /** This command pauses an ongoing action with a duration. */
   command PauseActionWithDuration(PauseActionWithDurationRequest): DefaultSuccess = 6;
+  /** This command resumes a previously paused action. */
   command ResumeAction(ResumeActionRequest): DefaultSuccess = 7;
+  /** This command enables a certain action or automation. */
   command EnableAction(EnableActionRequest): DefaultSuccess = 8;
+  /** This command enables a certain action or automation with a duration. */
   command EnableActionWithDuration(EnableActionWithDurationRequest): DefaultSuccess = 9;
+  /** This command disables a certain action or automation. */
   command DisableAction(DisableActionRequest): DefaultSuccess = 10;
+  /** This command disables a certain action or automation with a duration. */
   command DisableActionWithDuration(DisableActionWithDurationRequest): DefaultSuccess = 11;
 }
 
+/** This cluster provides attributes and events for determining basic information about Nodes, which supports both
+      Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
+      which apply to the whole Node. Also allows setting user device information such as location. */
 client cluster BasicInformation = 40 {
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
@@ -802,6 +865,7 @@ client cluster BasicInformation = 40 {
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
+/** Provides an interface for providing OTA software updates */
 client cluster OtaSoftwareUpdateProvider = 41 {
   enum OTAApplyUpdateAction : ENUM8 {
     kProceed = 0;
@@ -867,11 +931,15 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     INT32U softwareVersion = 1;
   }
 
+  /** Determine availability of a new Software Image */
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
+  /** Determine next action to take for a downloaded Software Image */
   command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
+  /** Notify OTA Provider that an update was applied */
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
 
+/** Provides an interface for downloading and applying OTA software updates */
 client cluster OtaSoftwareUpdateRequestor = 42 {
   enum OTAAnnouncementReason : ENUM8 {
     kSimpleAnnouncement = 0;
@@ -943,9 +1011,14 @@ client cluster OtaSoftwareUpdateRequestor = 42 {
     endpoint_no endpoint = 4;
   }
 
+  /** Announce the presence of an OTA Provider */
   command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing common languages, units of measurements, and numerical formatting
+      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
+      they can be configured to use a user’s preferred language, units, etc */
 client cluster LocalizationConfiguration = 43 {
   attribute char_string<35> activeLocale = 0;
   readonly attribute CHAR_STRING supportedLocales[] = 1;
@@ -957,6 +1030,10 @@ client cluster LocalizationConfiguration = 43 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
+      or audibly convey time information need a mechanism by which they can be configured to use a
+      user’s preferred format. */
 client cluster TimeFormatLocalization = 44 {
   enum CalendarTypeEnum : ENUM8 {
     kBuddhist = 0;
@@ -989,6 +1066,10 @@ client cluster TimeFormatLocalization = 44 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing preferences for the units in which values are conveyed in communication to a
+      user. As such, Nodes that visually or audibly convey measurable values to the user need a
+      mechanism by which they can be configured to use a user’s preferred unit. */
 client cluster UnitLocalization = 45 {
   enum TempUnitEnum : ENUM8 {
     kFahrenheit = 0;
@@ -1009,6 +1090,7 @@ client cluster UnitLocalization = 45 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster is used to describe the configuration and capabilities of a Device's power system. */
 client cluster PowerSourceConfiguration = 46 {
   readonly attribute INT8U sources[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1019,6 +1101,7 @@ client cluster PowerSourceConfiguration = 46 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 client cluster PowerSource = 47 {
   enum BatApprovedChemistryEnum : ENUM16 {
     kUnspecified = 0;
@@ -1274,6 +1357,7 @@ client cluster PowerSource = 47 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster is used to manage global aspects of the Commissioning flow. */
 client cluster GeneralCommissioning = 48 {
   enum CommissioningError : ENUM8 {
     kOk = 0;
@@ -1332,11 +1416,15 @@ client cluster GeneralCommissioning = 48 {
     CHAR_STRING debugText = 1;
   }
 
+  /** Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock */
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
+  /** Set the regulatory configuration to be used during commissioning */
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
+  /** Signals the Server that the Client has successfully completed all steps of Commissioning/Recofiguration needed during fail-safe period. */
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
 }
 
+/** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 client cluster NetworkCommissioning = 49 {
   enum NetworkCommissioningStatus : ENUM8 {
     kSuccess = 0;
@@ -1467,14 +1555,21 @@ client cluster NetworkCommissioning = 49 {
     optional INT64U breadcrumb = 2;
   }
 
+  /** Detemine the set of networks the device sees as available. */
   command access(invoke: administer) ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
+  /** Add or update the credentials for a given Wi-Fi network. */
   command access(invoke: administer) AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
+  /** Add or update the credentials for a given Thread network. */
   command access(invoke: administer) AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
+  /** Remove the definition of a given network (including its credentials). */
   command access(invoke: administer) RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
+  /** Connect to the specified network, using previously-defined credentials. */
   command access(invoke: administer) ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
+  /** Modify the order in which networks will be presented in the Networks attribute. */
   command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
 }
 
+/** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
 client cluster DiagnosticLogs = 50 {
   enum IntentEnum : ENUM8 {
     kEndUserSupport = 0;
@@ -1515,9 +1610,11 @@ client cluster DiagnosticLogs = 50 {
     optional systime_us timeSinceBoot = 3;
   }
 
+  /** Retrieving diagnostic logs from a Node */
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
 }
 
+/** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 client cluster GeneralDiagnostics = 51 {
   enum BootReasonEnum : ENUM8 {
     kUnspecified = 0;
@@ -1619,9 +1716,11 @@ client cluster GeneralDiagnostics = 51 {
     INT64U eventTrigger = 1;
   }
 
+  /** Provide a means for certification tests to trigger some test-plan-specific events */
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
 }
 
+/** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 client cluster SoftwareDiagnostics = 52 {
   bitmap SoftwareDiagnosticsFeature : BITMAP32 {
     kWaterMarks = 0x1;
@@ -1652,9 +1751,11 @@ client cluster SoftwareDiagnostics = 52 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+  /** Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute. */
   command ResetWatermarks(): DefaultSuccess = 0;
 }
 
+/** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 client cluster ThreadNetworkDiagnostics = 53 {
   enum ConnectionStatusEnum : ENUM8 {
     kConnected = 0;
@@ -1814,9 +1915,11 @@ client cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+  /** Reception of this command SHALL reset the OverrunCount attributes to 0 */
   command ResetCounts(): DefaultSuccess = 0;
 }
 
+/** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 client cluster WiFiNetworkDiagnostics = 54 {
   enum AssociationFailureCauseEnum : ENUM8 {
     kUnknown = 0;
@@ -1886,9 +1989,11 @@ client cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+  /** Reception of this command SHALL reset the Breacon and Packet related count attributes to 0 */
   command ResetCounts(): DefaultSuccess = 0;
 }
 
+/** The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 client cluster EthernetNetworkDiagnostics = 55 {
   enum PHYRateEnum : ENUM8 {
     kRate10M = 0;
@@ -1924,9 +2029,14 @@ client cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+  /** Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0 */
   command ResetCounts(): DefaultSuccess = 0;
 }
 
+/** This Cluster serves two purposes towards a Node communicating with a Bridge: indicate that the functionality on
+          the Endpoint where it is placed (and its Parts) is bridged from a non-CHIP technology; and provide a centralized
+          collection of attributes that the Node MAY collect to aid in conveying information regarding the Bridged Device to a user,
+          such as the vendor name, the model name, or user-assigned name. */
 client cluster BridgedDeviceBasicInformation = 57 {
   critical event StartUp = 0 {
     INT32U softwareVersion = 0;
@@ -1965,6 +2075,9 @@ client cluster BridgedDeviceBasicInformation = 57 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
+Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
+Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
 client cluster Switch = 59 {
   bitmap SwitchFeature : BITMAP32 {
     kLatchingSwitch = 0x1;
@@ -2015,6 +2128,7 @@ client cluster Switch = 59 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Commands to trigger a Node to allow a new Administrator to commission it. */
 client cluster AdministratorCommissioning = 60 {
   enum CommissioningWindowStatusEnum : ENUM8 {
     kWindowNotOpen = 0;
@@ -2050,11 +2164,15 @@ client cluster AdministratorCommissioning = 60 {
     INT16U commissioningTimeout = 0;
   }
 
+  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method. */
   timed command access(invoke: administer) OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  /** This command is used by a current Administrator to instruct a Node to go into commissioning mode using basic commissioning method, if the node supports it. */
   timed command access(invoke: administer) OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  /** This command is used by a current Administrator to instruct a Node to revoke any active Open Commissioning Window or Open Basic Commissioning Window command. */
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
+/** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 client cluster OperationalCredentials = 62 {
   enum CertificateChainTypeEnum : ENUM8 {
     kDACCertificate = 1;
@@ -2160,16 +2278,25 @@ client cluster OperationalCredentials = 62 {
     OCTET_STRING rootCACertificate = 0;
   }
 
+  /** Sender is requesting attestation information from the receiver. */
   command access(invoke: administer) AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  /** Sender is requesting a device attestation certificate from the receiver. */
   command access(invoke: administer) CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
+  /** Sender is requesting a certificate signing request (CSR) from the receiver. */
   command access(invoke: administer) CSRRequest(CSRRequestRequest): CSRResponse = 4;
+  /** Sender is requesting to add the new node operational certificates. */
   command access(invoke: administer) AddNOC(AddNOCRequest): NOCResponse = 6;
+  /** Sender is requesting to update the node operational certificates. */
   fabric command access(invoke: administer) UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
+  /** This command SHALL be used by an Administrative Node to set the user-visible Label field for a given Fabric, as reflected by entries in the Fabrics attribute. */
   fabric command access(invoke: administer) UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  /** This command is used by Administrative Nodes to remove a given fabric index and delete all associated fabric-scoped data. */
   command access(invoke: administer) RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
+  /** This command SHALL add a Trusted Root CA Certificate, provided as its CHIP Certificate representation. */
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
 }
 
+/** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 client cluster GroupKeyManagement = 63 {
   enum GroupKeySecurityPolicyEnum : ENUM8 {
     kTrustFirst = 0;
@@ -2235,12 +2362,18 @@ client cluster GroupKeyManagement = 63 {
     INT16U groupKeySetIDs[] = 0;
   }
 
+  /** Write a new set of keys for the given key set id. */
   fabric command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
+  /** Read the keys for a given key set id. */
   fabric command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
+  /** Revoke a Root Key from a Group */
   fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
+  /** Return the list of Group Key Sets associated with the accessing fabric */
   fabric command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
 }
 
+/** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
+labels. */
 client cluster FixedLabel = 64 {
   struct LabelStruct {
     char_string<16> label = 0;
@@ -2256,6 +2389,7 @@ client cluster FixedLabel = 64 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
 client cluster UserLabel = 65 {
   struct LabelStruct {
     char_string<16> label = 0;
@@ -2271,6 +2405,7 @@ client cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface to a boolean state called StateValue. */
 client cluster BooleanState = 69 {
   info event StateChange = 0 {
     boolean stateValue = 0;
@@ -2285,6 +2420,7 @@ client cluster BooleanState = 69 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for selecting a mode from a list of supported options. */
 client cluster ModeSelect = 80 {
   bitmap ModeSelectFeature : BITMAP32 {
     kDeponoff = 0x1;
@@ -2318,9 +2454,11 @@ client cluster ModeSelect = 80 {
     INT8U newMode = 0;
   }
 
+  /** On receipt of this command, if the NewMode field matches the Mode field in an entry of the SupportedModes list, the server SHALL set the CurrentMode attribute to the NewMode value, otherwise, the server SHALL respond with an INVALID_COMMAND status response. */
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
+/** An interface to a generic way to secure a door */
 client cluster DoorLock = 257 {
   enum AlarmCodeEnum : ENUM8 {
     kLockJammed = 0;
@@ -2892,26 +3030,45 @@ client cluster DoorLock = 257 {
     nullable CredentialStruct credential = 0;
   }
 
+  /** This command causes the lock device to lock the door. */
   timed command LockDoor(LockDoorRequest): DefaultSuccess = 0;
+  /** This command causes the lock device to unlock the door. */
   timed command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
+  /** This command causes the lock device to unlock the door with a timeout parameter. */
   timed command UnlockWithTimeout(UnlockWithTimeoutRequest): DefaultSuccess = 3;
+  /** Set a weekly repeating schedule for a specified user. */
   command access(invoke: administer) SetWeekDaySchedule(SetWeekDayScheduleRequest): DefaultSuccess = 11;
+  /** Retrieve the specific weekly schedule for the specific user. */
   command access(invoke: administer) GetWeekDaySchedule(GetWeekDayScheduleRequest): GetWeekDayScheduleResponse = 12;
+  /** Clear the specific weekly schedule or all weekly schedules for the specific user. */
   command access(invoke: administer) ClearWeekDaySchedule(ClearWeekDayScheduleRequest): DefaultSuccess = 13;
+  /** Set a time-specific schedule ID for a specified user. */
   command access(invoke: administer) SetYearDaySchedule(SetYearDayScheduleRequest): DefaultSuccess = 14;
+  /** Returns the year day schedule data for the specified schedule and user indexes. */
   command access(invoke: administer) GetYearDaySchedule(GetYearDayScheduleRequest): GetYearDayScheduleResponse = 15;
+  /** Clears the specific year day schedule or all year day schedules for the specific user. */
   command access(invoke: administer) ClearYearDaySchedule(ClearYearDayScheduleRequest): DefaultSuccess = 16;
+  /** Set the holiday Schedule by specifying local start time and local end time with respect to any Lock Operating Mode. */
   command access(invoke: administer) SetHolidaySchedule(SetHolidayScheduleRequest): DefaultSuccess = 17;
+  /** Get the holiday schedule for the specified index. */
   command access(invoke: administer) GetHolidaySchedule(GetHolidayScheduleRequest): GetHolidayScheduleResponse = 18;
+  /** Clears the holiday schedule or all holiday schedules. */
   command access(invoke: administer) ClearHolidaySchedule(ClearHolidayScheduleRequest): DefaultSuccess = 19;
+  /** Set User into the lock. */
   timed command access(invoke: administer) SetUser(SetUserRequest): DefaultSuccess = 26;
+  /** Retrieve User. */
   command access(invoke: administer) GetUser(GetUserRequest): GetUserResponse = 27;
+  /** Clears a User or all Users. */
   timed command access(invoke: administer) ClearUser(ClearUserRequest): DefaultSuccess = 29;
+  /** Set a credential (e.g. PIN, RFID, Fingerprint, etc.) into the lock for a new user, existing user, or ProgrammingUser. */
   timed command access(invoke: administer) SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
+  /** Retrieve the status of a particular credential (e.g. PIN, RFID, Fingerprint, etc.) by index. */
   command access(invoke: administer) GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
+  /** Clear one, one type, or all credentials except ProgrammingPIN credential. */
   timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
 }
 
+/** Provides an interface for controlling and adjusting automatic window coverings. */
 client cluster WindowCovering = 258 {
   enum EndProductType : ENUM8 {
     kRollerShade = 0;
@@ -3046,15 +3203,23 @@ client cluster WindowCovering = 258 {
     Percent100ths tiltPercent100thsValue = 0;
   }
 
+  /** Moves window covering to InstalledOpenLimitLift and InstalledOpenLimitTilt */
   command UpOrOpen(): DefaultSuccess = 0;
+  /** Moves window covering to InstalledClosedLimitLift and InstalledCloseLimitTilt */
   command DownOrClose(): DefaultSuccess = 1;
+  /** Stop any adjusting of window covering */
   command StopMotion(): DefaultSuccess = 2;
+  /** Go to lift value specified */
   command GoToLiftValue(GoToLiftValueRequest): DefaultSuccess = 4;
+  /** Go to lift percentage specified */
   command GoToLiftPercentage(GoToLiftPercentageRequest): DefaultSuccess = 5;
+  /** Go to tilt value specified */
   command GoToTiltValue(GoToTiltValueRequest): DefaultSuccess = 7;
+  /** Go to tilt percentage specified */
   command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
 }
 
+/** This cluster provides control of a barrier (garage door). */
 client cluster BarrierControl = 259 {
   readonly attribute enum8 barrierMovingState = 1;
   readonly attribute bitmap16 barrierSafetyStatus = 2;
@@ -3077,10 +3242,13 @@ client cluster BarrierControl = 259 {
     INT8U percentOpen = 0;
   }
 
+  /** Command to instruct a barrier to go to a percent open state. */
   command BarrierControlGoToPercent(BarrierControlGoToPercentRequest): DefaultSuccess = 0;
+  /** Command that instructs the barrier to stop moving. */
   command BarrierControlStop(): DefaultSuccess = 1;
 }
 
+/** An interface for configuring and controlling pumps. */
 client cluster PumpConfigurationAndControl = 512 {
   enum ControlModeEnum : ENUM8 {
     kConstantSpeed = 0;
@@ -3202,6 +3370,7 @@ client cluster PumpConfigurationAndControl = 512 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** An interface for configuring and controlling the functionality of a thermostat. */
 client cluster Thermostat = 513 {
   enum SetpointAdjustMode : ENUM8 {
     kHeat = 0;
@@ -3347,12 +3516,17 @@ client cluster Thermostat = 513 {
     ModeForSequence modeToReturn = 1;
   }
 
+  /** Command description for SetpointRaiseLower */
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
+  /** Command description for SetWeeklySchedule */
   command access(invoke: manage) SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
+  /** Command description for GetWeeklySchedule */
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
+  /** The Clear Weekly Schedule command is used to clear the weekly schedule. */
   command access(invoke: manage) ClearWeeklySchedule(): DefaultSuccess = 3;
 }
 
+/** An interface for controlling a fan in a heating/cooling system. */
 client cluster FanControl = 514 {
   enum FanModeSequenceType : ENUM8 {
     kOffLowMedHigh = 0;
@@ -3415,6 +3589,7 @@ client cluster FanControl = 514 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** An interface for configuring the user interface of a thermostat (which may be remote from the thermostat). */
 client cluster ThermostatUserInterfaceConfiguration = 516 {
   attribute enum8 temperatureDisplayMode = 0;
   attribute access(write: manage) enum8 keypadLockout = 1;
@@ -3427,6 +3602,7 @@ client cluster ThermostatUserInterfaceConfiguration = 516 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for controlling the color properties of a color-capable light. */
 client cluster ColorControl = 768 {
   enum ColorLoopAction : ENUM8 {
     kDeactivate = 0;
@@ -3704,27 +3880,47 @@ client cluster ColorControl = 768 {
     BITMAP8 optionsOverride = 6;
   }
 
+  /** Move to specified hue. */
   command MoveToHue(MoveToHueRequest): DefaultSuccess = 0;
+  /** Move hue up or down at specified rate. */
   command MoveHue(MoveHueRequest): DefaultSuccess = 1;
+  /** Step hue up or down by specified size at specified rate. */
   command StepHue(StepHueRequest): DefaultSuccess = 2;
+  /** Move to specified saturation. */
   command MoveToSaturation(MoveToSaturationRequest): DefaultSuccess = 3;
+  /** Move saturation up or down at specified rate. */
   command MoveSaturation(MoveSaturationRequest): DefaultSuccess = 4;
+  /** Step saturation up or down by specified size at specified rate. */
   command StepSaturation(StepSaturationRequest): DefaultSuccess = 5;
+  /** Move to hue and saturation. */
   command MoveToHueAndSaturation(MoveToHueAndSaturationRequest): DefaultSuccess = 6;
+  /** Move to specified color. */
   command MoveToColor(MoveToColorRequest): DefaultSuccess = 7;
+  /** Moves the color. */
   command MoveColor(MoveColorRequest): DefaultSuccess = 8;
+  /** Steps the lighting to a specific color. */
   command StepColor(StepColorRequest): DefaultSuccess = 9;
+  /** Move to a specific color temperature. */
   command MoveToColorTemperature(MoveToColorTemperatureRequest): DefaultSuccess = 10;
+  /** Command description for EnhancedMoveToHue */
   command EnhancedMoveToHue(EnhancedMoveToHueRequest): DefaultSuccess = 64;
+  /** Command description for EnhancedMoveHue */
   command EnhancedMoveHue(EnhancedMoveHueRequest): DefaultSuccess = 65;
+  /** Command description for EnhancedStepHue */
   command EnhancedStepHue(EnhancedStepHueRequest): DefaultSuccess = 66;
+  /** Command description for EnhancedMoveToHueAndSaturation */
   command EnhancedMoveToHueAndSaturation(EnhancedMoveToHueAndSaturationRequest): DefaultSuccess = 67;
+  /** Command description for ColorLoopSet */
   command ColorLoopSet(ColorLoopSetRequest): DefaultSuccess = 68;
+  /** Command description for StopMoveStep */
   command StopMoveStep(StopMoveStepRequest): DefaultSuccess = 71;
+  /** Command description for MoveColorTemperature */
   command MoveColorTemperature(MoveColorTemperatureRequest): DefaultSuccess = 75;
+  /** Command description for StepColorTemperature */
   command StepColorTemperature(StepColorTemperatureRequest): DefaultSuccess = 76;
 }
 
+/** Attributes and commands for configuring a lighting ballast. */
 client cluster BallastConfiguration = 769 {
   readonly attribute int8u physicalMinLevel = 0;
   readonly attribute int8u physicalMaxLevel = 1;
@@ -3748,6 +3944,7 @@ client cluster BallastConfiguration = 769 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
 client cluster IlluminanceMeasurement = 1024 {
   enum LightSensorType : ENUM8 {
     kPhotodiode = 0;
@@ -3767,6 +3964,7 @@ client cluster IlluminanceMeasurement = 1024 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
 client cluster TemperatureMeasurement = 1026 {
   readonly attribute nullable int16s measuredValue = 0;
   readonly attribute nullable int16s minMeasuredValue = 1;
@@ -3780,6 +3978,7 @@ client cluster TemperatureMeasurement = 1026 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements. */
 client cluster PressureMeasurement = 1027 {
   bitmap PressureMeasurementFeature : BITMAP32 {
     kExtended = 0x1;
@@ -3802,6 +4001,7 @@ client cluster PressureMeasurement = 1027 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
 client cluster FlowMeasurement = 1028 {
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
@@ -3815,6 +4015,7 @@ client cluster FlowMeasurement = 1028 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements. */
 client cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
@@ -3828,6 +4029,7 @@ client cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 client cluster OccupancySensing = 1030 {
   enum OccupancySensorTypeEnum : ENUM8 {
     kPir = 0;
@@ -3866,6 +4068,7 @@ client cluster OccupancySensing = 1030 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 client cluster WakeOnLan = 1283 {
   readonly attribute char_string<32> MACAddress = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -3876,6 +4079,7 @@ client cluster WakeOnLan = 1283 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface for controlling the current Channel on a device. */
 client cluster Channel = 1284 {
   enum ChannelStatusEnum : ENUM8 {
     kSuccess = 0;
@@ -3935,11 +4139,15 @@ client cluster Channel = 1284 {
     INT16U count = 0;
   }
 
+  /** Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. */
   command ChangeChannel(ChangeChannelRequest): ChangeChannelResponse = 0;
+  /** Change the channel on the media plaeyer to the channel with the given Number in the ChannelList attribute. */
   command ChangeChannelByNumber(ChangeChannelByNumberRequest): DefaultSuccess = 2;
+  /** This command provides channel up and channel down functionality, but allows channel index jumps of size Count. When the value of the increase or decrease is larger than the number of channels remaining in the given direction, then the behavior SHALL be to return to the beginning (or end) of the channel list and continue. For example, if the current channel is at index 0 and count value of -1 is given, then the current channel should change to the last channel. */
   command SkipChannel(SkipChannelRequest): DefaultSuccess = 3;
 }
 
+/** This cluster provides an interface for UX navigation within a set of targets on a device or endpoint. */
 client cluster TargetNavigator = 1285 {
   enum TargetNavigatorStatusEnum : ENUM8 {
     kSuccess = 0;
@@ -3971,9 +4179,11 @@ client cluster TargetNavigator = 1285 {
     optional CHAR_STRING data = 1;
   }
 
+  /** Upon receipt, this SHALL navigation the UX to the target identified. */
   command NavigateTarget(NavigateTargetRequest): NavigateTargetResponse = 0;
 }
 
+/** This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker. */
 client cluster MediaPlayback = 1286 {
   enum MediaPlaybackStatusEnum : ENUM8 {
     kSuccess = 0;
@@ -4032,19 +4242,31 @@ client cluster MediaPlayback = 1286 {
     INT64U position = 0;
   }
 
+  /** Upon receipt, this SHALL play media. */
   command Play(): PlaybackResponse = 0;
+  /** Upon receipt, this SHALL pause media. */
   command Pause(): PlaybackResponse = 1;
+  /** Upon receipt, this SHALL stop media. User experience is context-specific. This will often navigate the user back to the location where media was originally launched. */
   command Stop(): PlaybackResponse = 2;
+  /** Upon receipt, this SHALL Start Over with the current media playback item. */
   command StartOver(): PlaybackResponse = 3;
+  /** Upon receipt, this SHALL cause the handler to be invoked for "Previous". User experience is context-specific. This will often Go back to the previous media playback item. */
   command Previous(): PlaybackResponse = 4;
+  /** Upon receipt, this SHALL cause the handler to be invoked for "Next". User experience is context-specific. This will often Go forward to the next media playback item. */
   command Next(): PlaybackResponse = 5;
+  /** Upon receipt, this SHALL Rewind through media. Different Rewind speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc). */
   command Rewind(): PlaybackResponse = 6;
+  /** Upon receipt, this SHALL Advance through media. Different FF speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc). */
   command FastForward(): PlaybackResponse = 7;
+  /** Upon receipt, this SHALL Skip forward in the media by the given number of seconds, using the data as follows: */
   command SkipForward(SkipForwardRequest): PlaybackResponse = 8;
+  /** Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows: */
   command SkipBackward(SkipBackwardRequest): PlaybackResponse = 9;
+  /** Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows: */
   command Seek(SeekRequest): PlaybackResponse = 11;
 }
 
+/** This cluster provides an interface for controlling the Input Selector on a media device such as a TV. */
 client cluster MediaInput = 1287 {
   enum InputTypeEnum : ENUM8 {
     kInternal = 0;
@@ -4090,12 +4312,17 @@ client cluster MediaInput = 1287 {
     CHAR_STRING name = 1;
   }
 
+  /** Upon receipt, this SHALL change the input on the media device to the input at a specific index in the Input List. */
   command SelectInput(SelectInputRequest): DefaultSuccess = 0;
+  /** Upon receipt, this SHALL display the active status of the input list on screen. */
   command ShowInputStatus(): DefaultSuccess = 1;
+  /** Upon receipt, this SHALL hide the input list from the screen. */
   command HideInputStatus(): DefaultSuccess = 2;
+  /** Upon receipt, this SHALL rename the input at a specific index in the Input List. Updates to the input name SHALL appear in the TV settings menus. */
   command RenameInput(RenameInputRequest): DefaultSuccess = 3;
 }
 
+/** This cluster provides an interface for managing low power mode on a device. */
 client cluster LowPower = 1288 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -4104,9 +4331,11 @@ client cluster LowPower = 1288 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+  /** This command shall put the device into low power mode. */
   command Sleep(): DefaultSuccess = 0;
 }
 
+/** This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT. */
 client cluster KeypadInput = 1289 {
   enum CecKeyCode : ENUM8 {
     kSelect = 0;
@@ -4224,9 +4453,11 @@ client cluster KeypadInput = 1289 {
     KeypadInputStatusEnum status = 0;
   }
 
+  /** Upon receipt, this SHALL process a keycode as input to the media device. */
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
 }
 
+/** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 client cluster ContentLauncher = 1290 {
   enum ContentLaunchStatusEnum : ENUM8 {
     kSuccess = 0;
@@ -4328,10 +4559,13 @@ client cluster ContentLauncher = 1290 {
     optional CHAR_STRING data = 1;
   }
 
+  /** Upon receipt, this SHALL launch the specified content with optional search criteria. */
   command LaunchContent(LaunchContentRequest): LauncherResponse = 0;
+  /** Upon receipt, this SHALL launch content from the specified URL. */
   command LaunchURL(LaunchURLRequest): LauncherResponse = 1;
 }
 
+/** This cluster provides an interface for controlling the Output on a media device such as a TV. */
 client cluster AudioOutput = 1291 {
   enum OutputTypeEnum : ENUM8 {
     kHdmi = 0;
@@ -4370,10 +4604,13 @@ client cluster AudioOutput = 1291 {
     CHAR_STRING name = 1;
   }
 
+  /** Upon receipt, this SHALL change the output on the media device to the output at a specific index in the Output List. */
   command SelectOutput(SelectOutputRequest): DefaultSuccess = 0;
+  /** Upon receipt, this SHALL rename the output at a specific index in the Output List. Updates to the output name SHALL appear in the TV settings menus. */
   command RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
 }
 
+/** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 client cluster ApplicationLauncher = 1292 {
   enum ApplicationLauncherStatusEnum : ENUM8 {
     kSuccess = 0;
@@ -4422,11 +4659,15 @@ client cluster ApplicationLauncher = 1292 {
     optional OCTET_STRING data = 1;
   }
 
+  /** Upon receipt, this SHALL launch the specified app with optional data. The TV Device SHALL launch and bring to foreground the identified application in the command if the application is not already launched and in foreground. The TV Device SHALL update state attribute on the Application Basic cluster of the Endpoint corresponding to the launched application. This command returns a Launch Response. */
   command LaunchApp(LaunchAppRequest): LauncherResponse = 0;
+  /** Upon receipt on a Video Player endpoint this SHALL stop the specified application if it is running. */
   command StopApp(StopAppRequest): LauncherResponse = 1;
+  /** Upon receipt on a Video Player endpoint this SHALL hide the specified application if it is running and visible. */
   command HideApp(HideAppRequest): LauncherResponse = 2;
 }
 
+/** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
 client cluster ApplicationBasic = 1293 {
   enum ApplicationStatusEnum : ENUM8 {
     kStopped = 0;
@@ -4456,6 +4697,7 @@ client cluster ApplicationBasic = 1293 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client. */
 client cluster AccountLogin = 1294 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -4477,11 +4719,15 @@ client cluster AccountLogin = 1294 {
     CHAR_STRING setupPIN = 1;
   }
 
+  /** Upon receipt, the Content App checks if the account associated with the client Temp Account Identifier Rotating ID is the same acount that is active on the given Content App. If the accounts are the same, then the Content App includes the Setup PIN in the GetSetupPIN Response. */
   timed command GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;
+  /** Upon receipt, the Content App checks if the account associated with the client’s Temp Account Identifier (Rotating ID) has a current active Setup PIN with the given value. If the Setup PIN is valid for the user account associated with the Temp Account Identifier, then the Content App MAY make that user account active. */
   timed command Login(LoginRequest): DefaultSuccess = 2;
+  /** The purpose of this command is to instruct the Content App to clear the current user account. This command SHOULD be used by clients of a Content App to indicate the end of a user session. */
   timed command Logout(): DefaultSuccess = 3;
 }
 
+/** Attributes related to the electrical properties of a device. This cluster is used by power outlets and other devices that need to provide instantaneous data as opposed to metrology data which should be retrieved from the metering cluster.. */
 client cluster ElectricalMeasurement = 2820 {
   readonly attribute bitmap32 measurementType = 0;
   readonly attribute int16s dcVoltage = 256;
@@ -4640,10 +4886,13 @@ client cluster ElectricalMeasurement = 2820 {
     ENUM8 numberOfIntervals = 2;
   }
 
+  /** A function which retrieves the power profiling information from the electrical measurement server. */
   command GetProfileInfoCommand(): DefaultSuccess = 0;
+  /** A function which retrieves an electricity measurement profile from the electricity measurement server for a specific attribute Id requested. */
   command GetMeasurementProfileCommand(GetMeasurementProfileCommandRequest): DefaultSuccess = 1;
 }
 
+/** Client Monitoring allows for ensuring that listed clients meet the required monitoring conditions on the server. */
 client cluster ClientMonitoring = 4166 {
   fabric_scoped struct MonitoringRegistration {
     node_id clientNodeId = 1;
@@ -4672,11 +4921,15 @@ client cluster ClientMonitoring = 4166 {
     INT64U ICid = 1;
   }
 
+  /** Register a client to the end device */
   command access(invoke: manage) RegisterClientMonitoring(RegisterClientMonitoringRequest): DefaultSuccess = 0;
+  /** Unregister a client from an end device */
   command access(invoke: manage) UnregisterClientMonitoring(UnregisterClientMonitoringRequest): DefaultSuccess = 1;
+  /** Request the end device to stay in Active Mode for an additional ActiveModeThreshold */
   command access(invoke: manage) StayAwakeRequest(): DefaultSuccess = 2;
 }
 
+/** The Test Cluster is meant to validate the generated code */
 client cluster UnitTesting = 4294048773 {
   enum SimpleEnum : ENUM8 {
     kUnspecified = 0;
@@ -5055,27 +5308,70 @@ client cluster UnitTesting = 4294048773 {
     INT8U arg1 = 0;
   }
 
+  /** Simple command without any parameters and without a specific response */
   command Test(): DefaultSuccess = 0;
+  /** Simple command without any parameters and without a specific response not handled by the server */
   command TestNotHandled(): DefaultSuccess = 1;
+  /** Simple command without any parameters and with a specific response */
   command TestSpecific(): TestSpecificResponse = 2;
+  /** Simple command that should not be added to the server. */
   command TestUnknownCommand(): DefaultSuccess = 3;
+  /** Command that takes two arguments and returns their sum. */
   command TestAddArguments(TestAddArgumentsRequest): TestAddArgumentsResponse = 4;
+  /** Command that takes an argument which is bool */
   command TestSimpleArgumentRequest(TestSimpleArgumentRequestRequest): TestSimpleArgumentResponse = 5;
+  /** Command that takes various arguments that are arrays, including an array of structs which have a list member. */
   command TestStructArrayArgumentRequest(TestStructArrayArgumentRequestRequest): TestStructArrayArgumentResponse = 6;
+  /** Command that takes an argument which is struct.  The response echoes the
+        'b' field of the single arg. */
   command TestStructArgumentRequest(TestStructArgumentRequestRequest): BooleanResponse = 7;
+  /** Command that takes an argument which is nested struct.  The response
+        echoes the 'b' field of ar1.c. */
   command TestNestedStructArgumentRequest(TestNestedStructArgumentRequestRequest): BooleanResponse = 8;
+  /** Command that takes an argument which is a list of structs.  The response
+        returns false if there is some struct in the list whose 'b' field is
+        false, and true otherwise (including if the list is empty). */
   command TestListStructArgumentRequest(TestListStructArgumentRequestRequest): BooleanResponse = 9;
+  /** Command that takes an argument which is a list of INT8U.  The response
+        returns false if the list contains a 0 in it, true otherwise (including
+        if the list is empty). */
   command TestListInt8UArgumentRequest(TestListInt8UArgumentRequestRequest): BooleanResponse = 10;
+  /** Command that takes an argument which is a Nested Struct List.  The
+        response returns false if there is some struct in arg1 (either directly
+        in arg1.c or in the arg1.d list) whose 'b' field is false, and true
+        otherwise. */
   command TestNestedStructListArgumentRequest(TestNestedStructListArgumentRequestRequest): BooleanResponse = 11;
+  /** Command that takes an argument which is a list of Nested Struct List.
+        The response returns false if there is some struct in arg1 (either
+        directly in as the 'c' field of an entry 'd' list of an entry) whose 'b'
+        field is false, and true otherwise (including if the list is empty). */
   command TestListNestedStructListArgumentRequest(TestListNestedStructListArgumentRequestRequest): BooleanResponse = 12;
+  /** Command that takes an argument which is a list of INT8U and expects a
+        response that reverses the list. */
   command TestListInt8UReverseRequest(TestListInt8UReverseRequestRequest): TestListInt8UReverseResponse = 13;
+  /** Command that sends a vendor id and an enum.  The server is expected to
+        echo them back. */
   command TestEnumsRequest(TestEnumsRequestRequest): TestEnumsResponse = 14;
+  /** Command that takes an argument which is nullable and optional.  The
+        response returns a boolean indicating whether the argument was present,
+        if that's true a boolean indicating whether the argument was null, and
+        if that' false the argument it received. */
   command TestNullableOptionalRequest(TestNullableOptionalRequestRequest): TestNullableOptionalResponse = 15;
+  /** Command that takes various arguments which can be nullable and/or optional.  The
+        response returns information about which things were received and what
+        their state was. */
   command TestComplexNullableOptionalRequest(TestComplexNullableOptionalRequestRequest): TestComplexNullableOptionalResponse = 16;
+  /** Command that takes an argument which is a struct.  The response echoes
+        the struct back. */
   command SimpleStructEchoRequest(SimpleStructEchoRequestRequest): SimpleStructResponse = 17;
+  /** Command that just responds with a success status if the timed invoke
+        conditions are met. */
   timed command TimedInvokeRequest(): DefaultSuccess = 18;
+  /** Command that takes an optional argument which is bool. It responds with a success value if the optional is set to any value. */
   command TestSimpleOptionalArgumentRequest(TestSimpleOptionalArgumentRequestRequest): DefaultSuccess = 19;
+  /** Command that takes identical arguments to the fields of the TestEvent and logs the TestEvent to the buffer.  Command returns an event ID as the response. */
   command TestEmitTestEventRequest(TestEmitTestEventRequestRequest): TestEmitTestEventResponse = 20;
+  /** Command that takes identical arguments to the fields of the TestFabricScopedEvent and logs the TestFabricScopedEvent to the buffer.  Command returns an event ID as the response. */
   command TestEmitTestFabricScopedEventRequest(TestEmitTestFabricScopedEventRequestRequest): TestEmitTestFabricScopedEventResponse = 21;
 }
 

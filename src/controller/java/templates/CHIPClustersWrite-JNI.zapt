@@ -1,8 +1,8 @@
 {{> header}}
 {{#if (chip_has_client_clusters)}}
 #include <jni/CHIPCallbackTypes.h>
+#include <jni/CHIPReadCallbacks.h>
 #include "CHIPInvokeCallbacks.h"
-#include "CHIPReadCallbacks.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <zap-generated/CHIPClusters.h>

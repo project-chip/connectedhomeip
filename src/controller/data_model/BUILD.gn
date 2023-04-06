@@ -43,6 +43,7 @@ if (current_os == "android" || build_java_matter_controller) {
 
     outputs = [
       "jni/CHIPCallbackTypes.h",
+      "jni/CHIPReadCallbacks.h",
       "jni/IdentifyClient-ReadImpl.cpp",
       "jni/IdentifyClient-InvokeSubscribeImpl.cpp",
       "jni/GroupsClient-ReadImpl.cpp",
