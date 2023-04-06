@@ -27,6 +27,7 @@ declare_args() {
   chip_enable_chipoble = true
   chip_bt_nimble_enabled = false
   chip_bt_bluedroid_enabled = false
+  chip_use_secure_cert_dac_provider = false
 }
 
 defines = [
@@ -64,7 +65,10 @@ static_library("ESP32") {
     "${chip_root}/src/setup_payload",
   ]
 
-  public = [ "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h" ]
+  public = [
+    "${chip_root}/src/credentials/CHIPCert.h",
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+  ]
 
   public_deps = [
     "${chip_root}/src/crypto",
@@ -146,6 +150,13 @@ static_library("ESP32") {
     sources += [
       "ESP32DeviceInfoProvider.cpp",
       "ESP32DeviceInfoProvider.h",
+    ]
+  }
+
+  if (chip_use_secure_cert_dac_provider) {
+    sources += [
+      "ESP32SecureCertDACProvider.cpp",
+      "ESP32SecureCertDACProvider.h",
     ]
   }
 
