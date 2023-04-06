@@ -335,6 +335,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
             commissionerParams.controllerNOC = noc;
         }
         commissionerParams.controllerVendorId = static_cast<chip::VendorId>([startupParams.vendorID unsignedShortValue]);
+        commissionerParams.enableServerInteractions = startupParams.advertiseOperational;
         commissionerParams.deviceAttestationVerifier = _factory.deviceAttestationVerifier;
 
         auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
