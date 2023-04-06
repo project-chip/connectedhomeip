@@ -402,9 +402,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OnOffCluster) cluster)
                   .readGlobalSceneControlAttribute(
-                      (ChipClusters.OnOffCluster.GlobalSceneControlAttributeCallback) callback);
+                      (ChipClusters.BooleanAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedOnOffClusterGlobalSceneControlAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
             readOnOffGlobalSceneControlCommandParams);
     readOnOffInteractionInfo.put(
         "readGlobalSceneControlAttribute", readOnOffGlobalSceneControlAttributeInteractionInfo);
@@ -414,10 +414,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OnOffCluster) cluster)
-                  .readOnTimeAttribute(
-                      (ChipClusters.OnOffCluster.OnTimeAttributeCallback) callback);
+                  .readOnTimeAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedOnOffClusterOnTimeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readOnOffOnTimeCommandParams);
     readOnOffInteractionInfo.put("readOnTimeAttribute", readOnOffOnTimeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readOnOffOffWaitTimeCommandParams =
@@ -426,10 +425,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OnOffCluster) cluster)
-                  .readOffWaitTimeAttribute(
-                      (ChipClusters.OnOffCluster.OffWaitTimeAttributeCallback) callback);
+                  .readOffWaitTimeAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedOnOffClusterOffWaitTimeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readOnOffOffWaitTimeCommandParams);
     readOnOffInteractionInfo.put(
         "readOffWaitTimeAttribute", readOnOffOffWaitTimeAttributeInteractionInfo);
@@ -669,11 +667,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
-                  .readRemainingTimeAttribute(
-                      (ChipClusters.LevelControlCluster.RemainingTimeAttributeCallback) callback);
+                  .readRemainingTimeAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedLevelControlClusterRemainingTimeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readLevelControlRemainingTimeCommandParams);
     readLevelControlInteractionInfo.put(
         "readRemainingTimeAttribute", readLevelControlRemainingTimeAttributeInteractionInfo);
@@ -683,10 +679,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
-                  .readMinLevelAttribute(
-                      (ChipClusters.LevelControlCluster.MinLevelAttributeCallback) callback);
+                  .readMinLevelAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedLevelControlClusterMinLevelAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readLevelControlMinLevelCommandParams);
     readLevelControlInteractionInfo.put(
         "readMinLevelAttribute", readLevelControlMinLevelAttributeInteractionInfo);
@@ -696,10 +691,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
-                  .readMaxLevelAttribute(
-                      (ChipClusters.LevelControlCluster.MaxLevelAttributeCallback) callback);
+                  .readMaxLevelAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedLevelControlClusterMaxLevelAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readLevelControlMaxLevelCommandParams);
     readLevelControlInteractionInfo.put(
         "readMaxLevelAttribute", readLevelControlMaxLevelAttributeInteractionInfo);
@@ -709,13 +703,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
-                  .readCurrentFrequencyAttribute(
-                      (ChipClusters.LevelControlCluster.CurrentFrequencyAttributeCallback)
-                          callback);
+                  .readCurrentFrequencyAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedLevelControlClusterCurrentFrequencyAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readLevelControlCurrentFrequencyCommandParams);
     readLevelControlInteractionInfo.put(
         "readCurrentFrequencyAttribute", readLevelControlCurrentFrequencyAttributeInteractionInfo);
@@ -725,11 +715,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
-                  .readMinFrequencyAttribute(
-                      (ChipClusters.LevelControlCluster.MinFrequencyAttributeCallback) callback);
+                  .readMinFrequencyAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedLevelControlClusterMinFrequencyAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readLevelControlMinFrequencyCommandParams);
     readLevelControlInteractionInfo.put(
         "readMinFrequencyAttribute", readLevelControlMinFrequencyAttributeInteractionInfo);
@@ -739,11 +727,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
-                  .readMaxFrequencyAttribute(
-                      (ChipClusters.LevelControlCluster.MaxFrequencyAttributeCallback) callback);
+                  .readMaxFrequencyAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedLevelControlClusterMaxFrequencyAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readLevelControlMaxFrequencyCommandParams);
     readLevelControlInteractionInfo.put(
         "readMaxFrequencyAttribute", readLevelControlMaxFrequencyAttributeInteractionInfo);
@@ -766,12 +752,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
                   .readOnOffTransitionTimeAttribute(
-                      (ChipClusters.LevelControlCluster.OnOffTransitionTimeAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedLevelControlClusterOnOffTransitionTimeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readLevelControlOnOffTransitionTimeCommandParams);
     readLevelControlInteractionInfo.put(
         "readOnOffTransitionTimeAttribute",
@@ -947,12 +930,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BinaryInputBasicCluster) cluster)
-                  .readActiveTextAttribute(
-                      (ChipClusters.BinaryInputBasicCluster.ActiveTextAttributeCallback) callback);
+                  .readActiveTextAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBinaryInputBasicClusterActiveTextAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBinaryInputBasicActiveTextCommandParams);
     readBinaryInputBasicInteractionInfo.put(
         "readActiveTextAttribute", readBinaryInputBasicActiveTextAttributeInteractionInfo);
@@ -962,12 +942,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BinaryInputBasicCluster) cluster)
-                  .readDescriptionAttribute(
-                      (ChipClusters.BinaryInputBasicCluster.DescriptionAttributeCallback) callback);
+                  .readDescriptionAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBinaryInputBasicClusterDescriptionAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBinaryInputBasicDescriptionCommandParams);
     readBinaryInputBasicInteractionInfo.put(
         "readDescriptionAttribute", readBinaryInputBasicDescriptionAttributeInteractionInfo);
@@ -977,13 +954,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BinaryInputBasicCluster) cluster)
-                  .readInactiveTextAttribute(
-                      (ChipClusters.BinaryInputBasicCluster.InactiveTextAttributeCallback)
-                          callback);
+                  .readInactiveTextAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBinaryInputBasicClusterInactiveTextAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBinaryInputBasicInactiveTextCommandParams);
     readBinaryInputBasicInteractionInfo.put(
         "readInactiveTextAttribute", readBinaryInputBasicInactiveTextAttributeInteractionInfo);
@@ -1005,11 +978,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BinaryInputBasicCluster) cluster)
-                  .readPolarityAttribute(
-                      (ChipClusters.BinaryInputBasicCluster.PolarityAttributeCallback) callback);
+                  .readPolarityAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedBinaryInputBasicClusterPolarityAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readBinaryInputBasicPolarityCommandParams);
     readBinaryInputBasicInteractionInfo.put(
         "readPolarityAttribute", readBinaryInputBasicPolarityAttributeInteractionInfo);
@@ -1031,12 +1002,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BinaryInputBasicCluster) cluster)
-                  .readReliabilityAttribute(
-                      (ChipClusters.BinaryInputBasicCluster.ReliabilityAttributeCallback) callback);
+                  .readReliabilityAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBinaryInputBasicClusterReliabilityAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readBinaryInputBasicReliabilityCommandParams);
     readBinaryInputBasicInteractionInfo.put(
         "readReliabilityAttribute", readBinaryInputBasicReliabilityAttributeInteractionInfo);
@@ -1058,13 +1026,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BinaryInputBasicCluster) cluster)
-                  .readApplicationTypeAttribute(
-                      (ChipClusters.BinaryInputBasicCluster.ApplicationTypeAttributeCallback)
-                          callback);
+                  .readApplicationTypeAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBinaryInputBasicClusterApplicationTypeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readBinaryInputBasicApplicationTypeCommandParams);
     readBinaryInputBasicInteractionInfo.put(
         "readApplicationTypeAttribute",
@@ -1583,10 +1547,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ActionsCluster) cluster)
-                  .readSetupURLAttribute(
-                      (ChipClusters.ActionsCluster.SetupURLAttributeCallback) callback);
+                  .readSetupURLAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedActionsClusterSetupURLAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readActionsSetupURLCommandParams);
     readActionsInteractionInfo.put(
         "readSetupURLAttribute", readActionsSetupURLAttributeInteractionInfo);
@@ -1819,12 +1782,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BasicInformationCluster) cluster)
                   .readManufacturingDateAttribute(
-                      (ChipClusters.BasicInformationCluster.ManufacturingDateAttributeCallback)
-                          callback);
+                      (ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBasicInformationClusterManufacturingDateAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBasicInformationManufacturingDateCommandParams);
     readBasicInformationInteractionInfo.put(
         "readManufacturingDateAttribute",
@@ -1835,12 +1795,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BasicInformationCluster) cluster)
-                  .readPartNumberAttribute(
-                      (ChipClusters.BasicInformationCluster.PartNumberAttributeCallback) callback);
+                  .readPartNumberAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBasicInformationClusterPartNumberAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBasicInformationPartNumberCommandParams);
     readBasicInformationInteractionInfo.put(
         "readPartNumberAttribute", readBasicInformationPartNumberAttributeInteractionInfo);
@@ -1850,12 +1807,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BasicInformationCluster) cluster)
-                  .readProductURLAttribute(
-                      (ChipClusters.BasicInformationCluster.ProductURLAttributeCallback) callback);
+                  .readProductURLAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBasicInformationClusterProductURLAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBasicInformationProductURLCommandParams);
     readBasicInformationInteractionInfo.put(
         "readProductURLAttribute", readBasicInformationProductURLAttributeInteractionInfo);
@@ -1865,13 +1819,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BasicInformationCluster) cluster)
-                  .readProductLabelAttribute(
-                      (ChipClusters.BasicInformationCluster.ProductLabelAttributeCallback)
-                          callback);
+                  .readProductLabelAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBasicInformationClusterProductLabelAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBasicInformationProductLabelCommandParams);
     readBasicInformationInteractionInfo.put(
         "readProductLabelAttribute", readBasicInformationProductLabelAttributeInteractionInfo);
@@ -1881,13 +1831,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BasicInformationCluster) cluster)
-                  .readSerialNumberAttribute(
-                      (ChipClusters.BasicInformationCluster.SerialNumberAttributeCallback)
-                          callback);
+                  .readSerialNumberAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBasicInformationClusterSerialNumberAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBasicInformationSerialNumberCommandParams);
     readBasicInformationInteractionInfo.put(
         "readSerialNumberAttribute", readBasicInformationSerialNumberAttributeInteractionInfo);
@@ -1898,12 +1844,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BasicInformationCluster) cluster)
                   .readLocalConfigDisabledAttribute(
-                      (ChipClusters.BasicInformationCluster.LocalConfigDisabledAttributeCallback)
-                          callback);
+                      (ChipClusters.BooleanAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBasicInformationClusterLocalConfigDisabledAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
             readBasicInformationLocalConfigDisabledCommandParams);
     readBasicInformationInteractionInfo.put(
         "readLocalConfigDisabledAttribute",
@@ -1914,11 +1857,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BasicInformationCluster) cluster)
-                  .readReachableAttribute(
-                      (ChipClusters.BasicInformationCluster.ReachableAttributeCallback) callback);
+                  .readReachableAttribute((ChipClusters.BooleanAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedBasicInformationClusterReachableAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
             readBasicInformationReachableCommandParams);
     readBasicInformationInteractionInfo.put(
         "readReachableAttribute", readBasicInformationReachableAttributeInteractionInfo);
@@ -1928,11 +1869,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BasicInformationCluster) cluster)
-                  .readUniqueIDAttribute(
-                      (ChipClusters.BasicInformationCluster.UniqueIDAttributeCallback) callback);
+                  .readUniqueIDAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedBasicInformationClusterUniqueIDAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBasicInformationUniqueIDCommandParams);
     readBasicInformationInteractionInfo.put(
         "readUniqueIDAttribute", readBasicInformationUniqueIDAttributeInteractionInfo);
@@ -2441,13 +2380,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TimeFormatLocalizationCluster) cluster)
                   .readActiveCalendarTypeAttribute(
-                      (ChipClusters.TimeFormatLocalizationCluster
-                              .ActiveCalendarTypeAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedTimeFormatLocalizationClusterActiveCalendarTypeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readTimeFormatLocalizationActiveCalendarTypeCommandParams);
     readTimeFormatLocalizationInteractionInfo.put(
         "readActiveCalendarTypeAttribute",
@@ -2573,13 +2508,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.UnitLocalizationCluster) cluster)
-                  .readTemperatureUnitAttribute(
-                      (ChipClusters.UnitLocalizationCluster.TemperatureUnitAttributeCallback)
-                          callback);
+                  .readTemperatureUnitAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedUnitLocalizationClusterTemperatureUnitAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readUnitLocalizationTemperatureUnitCommandParams);
     readUnitLocalizationInteractionInfo.put(
         "readTemperatureUnitAttribute",
@@ -2865,12 +2796,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readWiredCurrentTypeAttribute(
-                      (ChipClusters.PowerSourceCluster.WiredCurrentTypeAttributeCallback) callback);
+                  .readWiredCurrentTypeAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedPowerSourceClusterWiredCurrentTypeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPowerSourceWiredCurrentTypeCommandParams);
     readPowerSourceInteractionInfo.put(
         "readWiredCurrentTypeAttribute", readPowerSourceWiredCurrentTypeAttributeInteractionInfo);
@@ -2897,13 +2825,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readWiredNominalVoltageAttribute(
-                      (ChipClusters.PowerSourceCluster.WiredNominalVoltageAttributeCallback)
-                          callback);
+                  .readWiredNominalVoltageAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedPowerSourceClusterWiredNominalVoltageAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readPowerSourceWiredNominalVoltageCommandParams);
     readPowerSourceInteractionInfo.put(
         "readWiredNominalVoltageAttribute",
@@ -2914,13 +2838,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readWiredMaximumCurrentAttribute(
-                      (ChipClusters.PowerSourceCluster.WiredMaximumCurrentAttributeCallback)
-                          callback);
+                  .readWiredMaximumCurrentAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedPowerSourceClusterWiredMaximumCurrentAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readPowerSourceWiredMaximumCurrentCommandParams);
     readPowerSourceInteractionInfo.put(
         "readWiredMaximumCurrentAttribute",
@@ -2931,10 +2851,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readWiredPresentAttribute(
-                      (ChipClusters.PowerSourceCluster.WiredPresentAttributeCallback) callback);
+                  .readWiredPresentAttribute((ChipClusters.BooleanAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedPowerSourceClusterWiredPresentAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
             readPowerSourceWiredPresentCommandParams);
     readPowerSourceInteractionInfo.put(
         "readWiredPresentAttribute", readPowerSourceWiredPresentAttributeInteractionInfo);
@@ -3005,11 +2924,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatChargeLevelAttribute(
-                      (ChipClusters.PowerSourceCluster.BatChargeLevelAttributeCallback) callback);
+                  .readBatChargeLevelAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedPowerSourceClusterBatChargeLevelAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPowerSourceBatChargeLevelCommandParams);
     readPowerSourceInteractionInfo.put(
         "readBatChargeLevelAttribute", readPowerSourceBatChargeLevelAttributeInteractionInfo);
@@ -3020,12 +2937,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
                   .readBatReplacementNeededAttribute(
-                      (ChipClusters.PowerSourceCluster.BatReplacementNeededAttributeCallback)
-                          callback);
+                      (ChipClusters.BooleanAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedPowerSourceClusterBatReplacementNeededAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
             readPowerSourceBatReplacementNeededCommandParams);
     readPowerSourceInteractionInfo.put(
         "readBatReplacementNeededAttribute",
@@ -3036,13 +2950,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatReplaceabilityAttribute(
-                      (ChipClusters.PowerSourceCluster.BatReplaceabilityAttributeCallback)
-                          callback);
+                  .readBatReplaceabilityAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedPowerSourceClusterBatReplaceabilityAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPowerSourceBatReplaceabilityCommandParams);
     readPowerSourceInteractionInfo.put(
         "readBatReplaceabilityAttribute", readPowerSourceBatReplaceabilityAttributeInteractionInfo);
@@ -3052,10 +2962,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatPresentAttribute(
-                      (ChipClusters.PowerSourceCluster.BatPresentAttributeCallback) callback);
+                  .readBatPresentAttribute((ChipClusters.BooleanAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedPowerSourceClusterBatPresentAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
             readPowerSourceBatPresentCommandParams);
     readPowerSourceInteractionInfo.put(
         "readBatPresentAttribute", readPowerSourceBatPresentAttributeInteractionInfo);
@@ -3081,12 +2990,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
                   .readBatReplacementDescriptionAttribute(
-                      (ChipClusters.PowerSourceCluster.BatReplacementDescriptionAttributeCallback)
-                          callback);
+                      (ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedPowerSourceClusterBatReplacementDescriptionAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readPowerSourceBatReplacementDescriptionCommandParams);
     readPowerSourceInteractionInfo.put(
         "readBatReplacementDescriptionAttribute",
@@ -3098,12 +3004,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
                   .readBatCommonDesignationAttribute(
-                      (ChipClusters.PowerSourceCluster.BatCommonDesignationAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedPowerSourceClusterBatCommonDesignationAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPowerSourceBatCommonDesignationCommandParams);
     readPowerSourceInteractionInfo.put(
         "readBatCommonDesignationAttribute",
@@ -3115,12 +3018,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
                   .readBatANSIDesignationAttribute(
-                      (ChipClusters.PowerSourceCluster.BatANSIDesignationAttributeCallback)
-                          callback);
+                      (ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedPowerSourceClusterBatANSIDesignationAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readPowerSourceBatANSIDesignationCommandParams);
     readPowerSourceInteractionInfo.put(
         "readBatANSIDesignationAttribute",
@@ -3132,12 +3032,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
                   .readBatIECDesignationAttribute(
-                      (ChipClusters.PowerSourceCluster.BatIECDesignationAttributeCallback)
-                          callback);
+                      (ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedPowerSourceClusterBatIECDesignationAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readPowerSourceBatIECDesignationCommandParams);
     readPowerSourceInteractionInfo.put(
         "readBatIECDesignationAttribute", readPowerSourceBatIECDesignationAttributeInteractionInfo);
@@ -3148,12 +3045,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
                   .readBatApprovedChemistryAttribute(
-                      (ChipClusters.PowerSourceCluster.BatApprovedChemistryAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedPowerSourceClusterBatApprovedChemistryAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPowerSourceBatApprovedChemistryCommandParams);
     readPowerSourceInteractionInfo.put(
         "readBatApprovedChemistryAttribute",
@@ -3164,10 +3058,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatCapacityAttribute(
-                      (ChipClusters.PowerSourceCluster.BatCapacityAttributeCallback) callback);
+                  .readBatCapacityAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedPowerSourceClusterBatCapacityAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readPowerSourceBatCapacityCommandParams);
     readPowerSourceInteractionInfo.put(
         "readBatCapacityAttribute", readPowerSourceBatCapacityAttributeInteractionInfo);
@@ -3177,10 +3070,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatQuantityAttribute(
-                      (ChipClusters.PowerSourceCluster.BatQuantityAttributeCallback) callback);
+                  .readBatQuantityAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedPowerSourceClusterBatQuantityAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPowerSourceBatQuantityCommandParams);
     readPowerSourceInteractionInfo.put(
         "readBatQuantityAttribute", readPowerSourceBatQuantityAttributeInteractionInfo);
@@ -3190,11 +3082,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
-                  .readBatChargeStateAttribute(
-                      (ChipClusters.PowerSourceCluster.BatChargeStateAttributeCallback) callback);
+                  .readBatChargeStateAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedPowerSourceClusterBatChargeStateAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPowerSourceBatChargeStateCommandParams);
     readPowerSourceInteractionInfo.put(
         "readBatChargeStateAttribute", readPowerSourceBatChargeStateAttributeInteractionInfo);
@@ -3222,12 +3112,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PowerSourceCluster) cluster)
                   .readBatFunctionalWhileChargingAttribute(
-                      (ChipClusters.PowerSourceCluster.BatFunctionalWhileChargingAttributeCallback)
-                          callback);
+                      (ChipClusters.BooleanAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedPowerSourceClusterBatFunctionalWhileChargingAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
             readPowerSourceBatFunctionalWhileChargingCommandParams);
     readPowerSourceInteractionInfo.put(
         "readBatFunctionalWhileChargingAttribute",
@@ -3538,12 +3425,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.NetworkCommissioningCluster) cluster)
                   .readScanMaxTimeSecondsAttribute(
-                      (ChipClusters.NetworkCommissioningCluster.ScanMaxTimeSecondsAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedNetworkCommissioningClusterScanMaxTimeSecondsAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readNetworkCommissioningScanMaxTimeSecondsCommandParams);
     readNetworkCommissioningInteractionInfo.put(
         "readScanMaxTimeSecondsAttribute",
@@ -3555,13 +3439,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.NetworkCommissioningCluster) cluster)
                   .readConnectMaxTimeSecondsAttribute(
-                      (ChipClusters.NetworkCommissioningCluster
-                              .ConnectMaxTimeSecondsAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedNetworkCommissioningClusterConnectMaxTimeSecondsAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readNetworkCommissioningConnectMaxTimeSecondsCommandParams);
     readNetworkCommissioningInteractionInfo.put(
         "readConnectMaxTimeSecondsAttribute",
@@ -3851,11 +3731,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.GeneralDiagnosticsCluster) cluster)
-                  .readUpTimeAttribute(
-                      (ChipClusters.GeneralDiagnosticsCluster.UpTimeAttributeCallback) callback);
+                  .readUpTimeAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedGeneralDiagnosticsClusterUpTimeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readGeneralDiagnosticsUpTimeCommandParams);
     readGeneralDiagnosticsInteractionInfo.put(
         "readUpTimeAttribute", readGeneralDiagnosticsUpTimeAttributeInteractionInfo);
@@ -3866,13 +3744,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.GeneralDiagnosticsCluster) cluster)
                   .readTotalOperationalHoursAttribute(
-                      (ChipClusters.GeneralDiagnosticsCluster
-                              .TotalOperationalHoursAttributeCallback)
-                          callback);
+                      (ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedGeneralDiagnosticsClusterTotalOperationalHoursAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readGeneralDiagnosticsTotalOperationalHoursCommandParams);
     readGeneralDiagnosticsInteractionInfo.put(
         "readTotalOperationalHoursAttribute",
@@ -3883,13 +3757,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.GeneralDiagnosticsCluster) cluster)
-                  .readBootReasonAttribute(
-                      (ChipClusters.GeneralDiagnosticsCluster.BootReasonAttributeCallback)
-                          callback);
+                  .readBootReasonAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedGeneralDiagnosticsClusterBootReasonAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readGeneralDiagnosticsBootReasonCommandParams);
     readGeneralDiagnosticsInteractionInfo.put(
         "readBootReasonAttribute", readGeneralDiagnosticsBootReasonAttributeInteractionInfo);
@@ -4072,13 +3942,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.SoftwareDiagnosticsCluster) cluster)
-                  .readCurrentHeapFreeAttribute(
-                      (ChipClusters.SoftwareDiagnosticsCluster.CurrentHeapFreeAttributeCallback)
-                          callback);
+                  .readCurrentHeapFreeAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedSoftwareDiagnosticsClusterCurrentHeapFreeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readSoftwareDiagnosticsCurrentHeapFreeCommandParams);
     readSoftwareDiagnosticsInteractionInfo.put(
         "readCurrentHeapFreeAttribute",
@@ -4089,13 +3955,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.SoftwareDiagnosticsCluster) cluster)
-                  .readCurrentHeapUsedAttribute(
-                      (ChipClusters.SoftwareDiagnosticsCluster.CurrentHeapUsedAttributeCallback)
-                          callback);
+                  .readCurrentHeapUsedAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedSoftwareDiagnosticsClusterCurrentHeapUsedAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readSoftwareDiagnosticsCurrentHeapUsedCommandParams);
     readSoftwareDiagnosticsInteractionInfo.put(
         "readCurrentHeapUsedAttribute",
@@ -4107,13 +3969,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.SoftwareDiagnosticsCluster) cluster)
                   .readCurrentHeapHighWatermarkAttribute(
-                      (ChipClusters.SoftwareDiagnosticsCluster
-                              .CurrentHeapHighWatermarkAttributeCallback)
-                          callback);
+                      (ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedSoftwareDiagnosticsClusterCurrentHeapHighWatermarkAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readSoftwareDiagnosticsCurrentHeapHighWatermarkCommandParams);
     readSoftwareDiagnosticsInteractionInfo.put(
         "readCurrentHeapHighWatermarkAttribute",
@@ -4320,13 +4178,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readOverrunCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.OverrunCountAttributeCallback)
-                          callback);
+                  .readOverrunCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterOverrunCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsOverrunCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readOverrunCountAttribute",
@@ -4455,14 +4309,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readDetachedRoleCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .DetachedRoleCountAttributeCallback)
-                          callback);
+                  .readDetachedRoleCountAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterDetachedRoleCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThreadNetworkDiagnosticsDetachedRoleCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readDetachedRoleCountAttribute",
@@ -4473,13 +4322,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readChildRoleCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.ChildRoleCountAttributeCallback)
-                          callback);
+                  .readChildRoleCountAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterChildRoleCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThreadNetworkDiagnosticsChildRoleCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readChildRoleCountAttribute",
@@ -4490,14 +4335,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readRouterRoleCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .RouterRoleCountAttributeCallback)
-                          callback);
+                  .readRouterRoleCountAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRouterRoleCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThreadNetworkDiagnosticsRouterRoleCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRouterRoleCountAttribute",
@@ -4508,14 +4348,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readLeaderRoleCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .LeaderRoleCountAttributeCallback)
-                          callback);
+                  .readLeaderRoleCountAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterLeaderRoleCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThreadNetworkDiagnosticsLeaderRoleCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readLeaderRoleCountAttribute",
@@ -4527,13 +4362,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
                   .readAttachAttemptCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .AttachAttemptCountAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterAttachAttemptCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThreadNetworkDiagnosticsAttachAttemptCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readAttachAttemptCountAttribute",
@@ -4546,13 +4377,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
                   .readPartitionIdChangeCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .PartitionIdChangeCountAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterPartitionIdChangeCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThreadNetworkDiagnosticsPartitionIdChangeCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readPartitionIdChangeCountAttribute",
@@ -4566,13 +4393,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
                       .readBetterPartitionAttachAttemptCountAttribute(
-                          (ChipClusters.ThreadNetworkDiagnosticsCluster
-                                  .BetterPartitionAttachAttemptCountAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedThreadNetworkDiagnosticsClusterBetterPartitionAttachAttemptCountAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readThreadNetworkDiagnosticsBetterPartitionAttachAttemptCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readBetterPartitionAttachAttemptCountAttribute",
@@ -4583,14 +4406,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readParentChangeCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .ParentChangeCountAttributeCallback)
-                          callback);
+                  .readParentChangeCountAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterParentChangeCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThreadNetworkDiagnosticsParentChangeCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readParentChangeCountAttribute",
@@ -4601,13 +4419,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readTxTotalCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.TxTotalCountAttributeCallback)
-                          callback);
+                  .readTxTotalCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterTxTotalCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsTxTotalCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readTxTotalCountAttribute",
@@ -4618,13 +4432,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readTxUnicastCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.TxUnicastCountAttributeCallback)
-                          callback);
+                  .readTxUnicastCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterTxUnicastCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsTxUnicastCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readTxUnicastCountAttribute",
@@ -4635,14 +4445,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readTxBroadcastCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .TxBroadcastCountAttributeCallback)
-                          callback);
+                  .readTxBroadcastCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterTxBroadcastCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsTxBroadcastCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readTxBroadcastCountAttribute",
@@ -4653,14 +4458,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readTxAckRequestedCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .TxAckRequestedCountAttributeCallback)
-                          callback);
+                  .readTxAckRequestedCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterTxAckRequestedCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsTxAckRequestedCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readTxAckRequestedCountAttribute",
@@ -4671,13 +4471,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readTxAckedCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.TxAckedCountAttributeCallback)
-                          callback);
+                  .readTxAckedCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterTxAckedCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsTxAckedCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readTxAckedCountAttribute",
@@ -4690,13 +4486,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
                   .readTxNoAckRequestedCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .TxNoAckRequestedCountAttributeCallback)
-                          callback);
+                      (ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterTxNoAckRequestedCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsTxNoAckRequestedCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readTxNoAckRequestedCountAttribute",
@@ -4707,13 +4499,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readTxDataCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.TxDataCountAttributeCallback)
-                          callback);
+                  .readTxDataCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterTxDataCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsTxDataCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readTxDataCountAttribute",
@@ -4724,14 +4512,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readTxDataPollCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .TxDataPollCountAttributeCallback)
-                          callback);
+                  .readTxDataPollCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterTxDataPollCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsTxDataPollCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readTxDataPollCountAttribute",
@@ -4742,13 +4525,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readTxBeaconCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.TxBeaconCountAttributeCallback)
-                          callback);
+                  .readTxBeaconCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterTxBeaconCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsTxBeaconCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readTxBeaconCountAttribute",
@@ -4760,14 +4539,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readTxBeaconRequestCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .TxBeaconRequestCountAttributeCallback)
-                          callback);
+                  .readTxBeaconRequestCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterTxBeaconRequestCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsTxBeaconRequestCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readTxBeaconRequestCountAttribute",
@@ -4778,13 +4552,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readTxOtherCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.TxOtherCountAttributeCallback)
-                          callback);
+                  .readTxOtherCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterTxOtherCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsTxOtherCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readTxOtherCountAttribute",
@@ -4795,13 +4565,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readTxRetryCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.TxRetryCountAttributeCallback)
-                          callback);
+                  .readTxRetryCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterTxRetryCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsTxRetryCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readTxRetryCountAttribute",
@@ -4815,13 +4581,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
                       .readTxDirectMaxRetryExpiryCountAttribute(
-                          (ChipClusters.ThreadNetworkDiagnosticsCluster
-                                  .TxDirectMaxRetryExpiryCountAttributeCallback)
-                              callback);
+                          (ChipClusters.LongAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedThreadNetworkDiagnosticsClusterTxDirectMaxRetryExpiryCountAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
                 readThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readTxDirectMaxRetryExpiryCountAttribute",
@@ -4835,13 +4597,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
                       .readTxIndirectMaxRetryExpiryCountAttribute(
-                          (ChipClusters.ThreadNetworkDiagnosticsCluster
-                                  .TxIndirectMaxRetryExpiryCountAttributeCallback)
-                              callback);
+                          (ChipClusters.LongAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedThreadNetworkDiagnosticsClusterTxIndirectMaxRetryExpiryCountAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
                 readThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readTxIndirectMaxRetryExpiryCountAttribute",
@@ -4852,13 +4610,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readTxErrCcaCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.TxErrCcaCountAttributeCallback)
-                          callback);
+                  .readTxErrCcaCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterTxErrCcaCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsTxErrCcaCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readTxErrCcaCountAttribute",
@@ -4869,14 +4623,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readTxErrAbortCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .TxErrAbortCountAttributeCallback)
-                          callback);
+                  .readTxErrAbortCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterTxErrAbortCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsTxErrAbortCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readTxErrAbortCountAttribute",
@@ -4889,13 +4638,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
                   .readTxErrBusyChannelCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .TxErrBusyChannelCountAttributeCallback)
-                          callback);
+                      (ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterTxErrBusyChannelCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsTxErrBusyChannelCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readTxErrBusyChannelCountAttribute",
@@ -4906,13 +4651,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readRxTotalCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.RxTotalCountAttributeCallback)
-                          callback);
+                  .readRxTotalCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRxTotalCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsRxTotalCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRxTotalCountAttribute",
@@ -4923,13 +4664,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readRxUnicastCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.RxUnicastCountAttributeCallback)
-                          callback);
+                  .readRxUnicastCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRxUnicastCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsRxUnicastCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRxUnicastCountAttribute",
@@ -4940,14 +4677,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readRxBroadcastCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .RxBroadcastCountAttributeCallback)
-                          callback);
+                  .readRxBroadcastCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRxBroadcastCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsRxBroadcastCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRxBroadcastCountAttribute",
@@ -4958,13 +4690,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readRxDataCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.RxDataCountAttributeCallback)
-                          callback);
+                  .readRxDataCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRxDataCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsRxDataCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRxDataCountAttribute",
@@ -4975,14 +4703,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readRxDataPollCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .RxDataPollCountAttributeCallback)
-                          callback);
+                  .readRxDataPollCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRxDataPollCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsRxDataPollCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRxDataPollCountAttribute",
@@ -4993,13 +4716,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readRxBeaconCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.RxBeaconCountAttributeCallback)
-                          callback);
+                  .readRxBeaconCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRxBeaconCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsRxBeaconCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRxBeaconCountAttribute",
@@ -5011,14 +4730,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readRxBeaconRequestCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .RxBeaconRequestCountAttributeCallback)
-                          callback);
+                  .readRxBeaconRequestCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRxBeaconRequestCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsRxBeaconRequestCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRxBeaconRequestCountAttribute",
@@ -5029,13 +4743,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readRxOtherCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.RxOtherCountAttributeCallback)
-                          callback);
+                  .readRxOtherCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRxOtherCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsRxOtherCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRxOtherCountAttribute",
@@ -5048,13 +4758,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
                   .readRxAddressFilteredCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .RxAddressFilteredCountAttributeCallback)
-                          callback);
+                      (ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRxAddressFilteredCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsRxAddressFilteredCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRxAddressFilteredCountAttribute",
@@ -5067,13 +4773,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
                   .readRxDestAddrFilteredCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .RxDestAddrFilteredCountAttributeCallback)
-                          callback);
+                      (ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRxDestAddrFilteredCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsRxDestAddrFilteredCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRxDestAddrFilteredCountAttribute",
@@ -5084,14 +4786,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readRxDuplicatedCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .RxDuplicatedCountAttributeCallback)
-                          callback);
+                  .readRxDuplicatedCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRxDuplicatedCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsRxDuplicatedCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRxDuplicatedCountAttribute",
@@ -5102,14 +4799,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readRxErrNoFrameCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .RxErrNoFrameCountAttributeCallback)
-                          callback);
+                  .readRxErrNoFrameCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRxErrNoFrameCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsRxErrNoFrameCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRxErrNoFrameCountAttribute",
@@ -5122,13 +4814,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
                   .readRxErrUnknownNeighborCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .RxErrUnknownNeighborCountAttributeCallback)
-                          callback);
+                      (ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRxErrUnknownNeighborCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsRxErrUnknownNeighborCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRxErrUnknownNeighborCountAttribute",
@@ -5141,13 +4829,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
                   .readRxErrInvalidSrcAddrCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .RxErrInvalidSrcAddrCountAttributeCallback)
-                          callback);
+                      (ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRxErrInvalidSrcAddrCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsRxErrInvalidSrcAddrCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRxErrInvalidSrcAddrCountAttribute",
@@ -5158,13 +4842,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readRxErrSecCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.RxErrSecCountAttributeCallback)
-                          callback);
+                  .readRxErrSecCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRxErrSecCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsRxErrSecCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRxErrSecCountAttribute",
@@ -5175,13 +4855,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readRxErrFcsCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster.RxErrFcsCountAttributeCallback)
-                          callback);
+                  .readRxErrFcsCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRxErrFcsCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsRxErrFcsCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRxErrFcsCountAttribute",
@@ -5192,14 +4868,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
-                  .readRxErrOtherCountAttribute(
-                      (ChipClusters.ThreadNetworkDiagnosticsCluster
-                              .RxErrOtherCountAttributeCallback)
-                          callback);
+                  .readRxErrOtherCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThreadNetworkDiagnosticsClusterRxErrOtherCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThreadNetworkDiagnosticsRxErrOtherCountCommandParams);
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readRxErrOtherCountAttribute",
@@ -5748,14 +5419,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.EthernetNetworkDiagnosticsCluster) cluster)
-                  .readPacketRxCountAttribute(
-                      (ChipClusters.EthernetNetworkDiagnosticsCluster
-                              .PacketRxCountAttributeCallback)
-                          callback);
+                  .readPacketRxCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedEthernetNetworkDiagnosticsClusterPacketRxCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readEthernetNetworkDiagnosticsPacketRxCountCommandParams);
     readEthernetNetworkDiagnosticsInteractionInfo.put(
         "readPacketRxCountAttribute",
@@ -5766,14 +5432,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.EthernetNetworkDiagnosticsCluster) cluster)
-                  .readPacketTxCountAttribute(
-                      (ChipClusters.EthernetNetworkDiagnosticsCluster
-                              .PacketTxCountAttributeCallback)
-                          callback);
+                  .readPacketTxCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedEthernetNetworkDiagnosticsClusterPacketTxCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readEthernetNetworkDiagnosticsPacketTxCountCommandParams);
     readEthernetNetworkDiagnosticsInteractionInfo.put(
         "readPacketTxCountAttribute",
@@ -5784,13 +5445,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.EthernetNetworkDiagnosticsCluster) cluster)
-                  .readTxErrCountAttribute(
-                      (ChipClusters.EthernetNetworkDiagnosticsCluster.TxErrCountAttributeCallback)
-                          callback);
+                  .readTxErrCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedEthernetNetworkDiagnosticsClusterTxErrCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readEthernetNetworkDiagnosticsTxErrCountCommandParams);
     readEthernetNetworkDiagnosticsInteractionInfo.put(
         "readTxErrCountAttribute",
@@ -5801,14 +5458,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.EthernetNetworkDiagnosticsCluster) cluster)
-                  .readCollisionCountAttribute(
-                      (ChipClusters.EthernetNetworkDiagnosticsCluster
-                              .CollisionCountAttributeCallback)
-                          callback);
+                  .readCollisionCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedEthernetNetworkDiagnosticsClusterCollisionCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readEthernetNetworkDiagnosticsCollisionCountCommandParams);
     readEthernetNetworkDiagnosticsInteractionInfo.put(
         "readCollisionCountAttribute",
@@ -5819,13 +5471,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.EthernetNetworkDiagnosticsCluster) cluster)
-                  .readOverrunCountAttribute(
-                      (ChipClusters.EthernetNetworkDiagnosticsCluster.OverrunCountAttributeCallback)
-                          callback);
+                  .readOverrunCountAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedEthernetNetworkDiagnosticsClusterOverrunCountAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readEthernetNetworkDiagnosticsOverrunCountCommandParams);
     readEthernetNetworkDiagnosticsInteractionInfo.put(
         "readOverrunCountAttribute",
@@ -5854,14 +5502,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.EthernetNetworkDiagnosticsCluster) cluster)
-                  .readTimeSinceResetAttribute(
-                      (ChipClusters.EthernetNetworkDiagnosticsCluster
-                              .TimeSinceResetAttributeCallback)
-                          callback);
+                  .readTimeSinceResetAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedEthernetNetworkDiagnosticsClusterTimeSinceResetAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readEthernetNetworkDiagnosticsTimeSinceResetCommandParams);
     readEthernetNetworkDiagnosticsInteractionInfo.put(
         "readTimeSinceResetAttribute",
@@ -5974,14 +5617,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
-                  .readVendorNameAttribute(
-                      (ChipClusters.BridgedDeviceBasicInformationCluster
-                              .VendorNameAttributeCallback)
-                          callback);
+                  .readVendorNameAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicInformationClusterVendorNameAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBridgedDeviceBasicInformationVendorNameCommandParams);
     readBridgedDeviceBasicInformationInteractionInfo.put(
         "readVendorNameAttribute",
@@ -5992,13 +5630,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
-                  .readVendorIDAttribute(
-                      (ChipClusters.BridgedDeviceBasicInformationCluster.VendorIDAttributeCallback)
-                          callback);
+                  .readVendorIDAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicInformationClusterVendorIDAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readBridgedDeviceBasicInformationVendorIDCommandParams);
     readBridgedDeviceBasicInformationInteractionInfo.put(
         "readVendorIDAttribute", readBridgedDeviceBasicInformationVendorIDAttributeInteractionInfo);
@@ -6008,14 +5642,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
-                  .readProductNameAttribute(
-                      (ChipClusters.BridgedDeviceBasicInformationCluster
-                              .ProductNameAttributeCallback)
-                          callback);
+                  .readProductNameAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicInformationClusterProductNameAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBridgedDeviceBasicInformationProductNameCommandParams);
     readBridgedDeviceBasicInformationInteractionInfo.put(
         "readProductNameAttribute",
@@ -6026,13 +5655,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
-                  .readNodeLabelAttribute(
-                      (ChipClusters.BridgedDeviceBasicInformationCluster.NodeLabelAttributeCallback)
-                          callback);
+                  .readNodeLabelAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicInformationClusterNodeLabelAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBridgedDeviceBasicInformationNodeLabelCommandParams);
     readBridgedDeviceBasicInformationInteractionInfo.put(
         "readNodeLabelAttribute",
@@ -6044,14 +5669,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
-                  .readHardwareVersionAttribute(
-                      (ChipClusters.BridgedDeviceBasicInformationCluster
-                              .HardwareVersionAttributeCallback)
-                          callback);
+                  .readHardwareVersionAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicInformationClusterHardwareVersionAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readBridgedDeviceBasicInformationHardwareVersionCommandParams);
     readBridgedDeviceBasicInformationInteractionInfo.put(
         "readHardwareVersionAttribute",
@@ -6064,13 +5684,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readHardwareVersionStringAttribute(
-                      (ChipClusters.BridgedDeviceBasicInformationCluster
-                              .HardwareVersionStringAttributeCallback)
-                          callback);
+                      (ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicInformationClusterHardwareVersionStringAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBridgedDeviceBasicInformationHardwareVersionStringCommandParams);
     readBridgedDeviceBasicInformationInteractionInfo.put(
         "readHardwareVersionStringAttribute",
@@ -6082,14 +5698,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
-                  .readSoftwareVersionAttribute(
-                      (ChipClusters.BridgedDeviceBasicInformationCluster
-                              .SoftwareVersionAttributeCallback)
-                          callback);
+                  .readSoftwareVersionAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicInformationClusterSoftwareVersionAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readBridgedDeviceBasicInformationSoftwareVersionCommandParams);
     readBridgedDeviceBasicInformationInteractionInfo.put(
         "readSoftwareVersionAttribute",
@@ -6102,13 +5713,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readSoftwareVersionStringAttribute(
-                      (ChipClusters.BridgedDeviceBasicInformationCluster
-                              .SoftwareVersionStringAttributeCallback)
-                          callback);
+                      (ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicInformationClusterSoftwareVersionStringAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBridgedDeviceBasicInformationSoftwareVersionStringCommandParams);
     readBridgedDeviceBasicInformationInteractionInfo.put(
         "readSoftwareVersionStringAttribute",
@@ -6121,13 +5728,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
                   .readManufacturingDateAttribute(
-                      (ChipClusters.BridgedDeviceBasicInformationCluster
-                              .ManufacturingDateAttributeCallback)
-                          callback);
+                      (ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicInformationClusterManufacturingDateAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBridgedDeviceBasicInformationManufacturingDateCommandParams);
     readBridgedDeviceBasicInformationInteractionInfo.put(
         "readManufacturingDateAttribute",
@@ -6138,14 +5741,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
-                  .readPartNumberAttribute(
-                      (ChipClusters.BridgedDeviceBasicInformationCluster
-                              .PartNumberAttributeCallback)
-                          callback);
+                  .readPartNumberAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicInformationClusterPartNumberAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBridgedDeviceBasicInformationPartNumberCommandParams);
     readBridgedDeviceBasicInformationInteractionInfo.put(
         "readPartNumberAttribute",
@@ -6156,14 +5754,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
-                  .readProductURLAttribute(
-                      (ChipClusters.BridgedDeviceBasicInformationCluster
-                              .ProductURLAttributeCallback)
-                          callback);
+                  .readProductURLAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicInformationClusterProductURLAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBridgedDeviceBasicInformationProductURLCommandParams);
     readBridgedDeviceBasicInformationInteractionInfo.put(
         "readProductURLAttribute",
@@ -6174,14 +5767,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
-                  .readProductLabelAttribute(
-                      (ChipClusters.BridgedDeviceBasicInformationCluster
-                              .ProductLabelAttributeCallback)
-                          callback);
+                  .readProductLabelAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicInformationClusterProductLabelAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBridgedDeviceBasicInformationProductLabelCommandParams);
     readBridgedDeviceBasicInformationInteractionInfo.put(
         "readProductLabelAttribute",
@@ -6192,14 +5780,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
-                  .readSerialNumberAttribute(
-                      (ChipClusters.BridgedDeviceBasicInformationCluster
-                              .SerialNumberAttributeCallback)
-                          callback);
+                  .readSerialNumberAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicInformationClusterSerialNumberAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBridgedDeviceBasicInformationSerialNumberCommandParams);
     readBridgedDeviceBasicInformationInteractionInfo.put(
         "readSerialNumberAttribute",
@@ -6223,13 +5806,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicInformationCluster) cluster)
-                  .readUniqueIDAttribute(
-                      (ChipClusters.BridgedDeviceBasicInformationCluster.UniqueIDAttributeCallback)
-                          callback);
+                  .readUniqueIDAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBridgedDeviceBasicInformationClusterUniqueIDAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBridgedDeviceBasicInformationUniqueIDCommandParams);
     readBridgedDeviceBasicInformationInteractionInfo.put(
         "readUniqueIDAttribute", readBridgedDeviceBasicInformationUniqueIDAttributeInteractionInfo);
@@ -6366,10 +5945,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.SwitchCluster) cluster)
-                  .readMultiPressMaxAttribute(
-                      (ChipClusters.SwitchCluster.MultiPressMaxAttributeCallback) callback);
+                  .readMultiPressMaxAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedSwitchClusterMultiPressMaxAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readSwitchMultiPressMaxCommandParams);
     readSwitchInteractionInfo.put(
         "readMultiPressMaxAttribute", readSwitchMultiPressMaxAttributeInteractionInfo);
@@ -7463,10 +7041,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
-                  .readDoorOpenEventsAttribute(
-                      (ChipClusters.DoorLockCluster.DoorOpenEventsAttributeCallback) callback);
+                  .readDoorOpenEventsAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedDoorLockClusterDoorOpenEventsAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readDoorLockDoorOpenEventsCommandParams);
     readDoorLockInteractionInfo.put(
         "readDoorOpenEventsAttribute", readDoorLockDoorOpenEventsAttributeInteractionInfo);
@@ -7476,11 +7053,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
-                  .readDoorClosedEventsAttribute(
-                      (ChipClusters.DoorLockCluster.DoorClosedEventsAttributeCallback) callback);
+                  .readDoorClosedEventsAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedDoorLockClusterDoorClosedEventsAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readDoorLockDoorClosedEventsCommandParams);
     readDoorLockInteractionInfo.put(
         "readDoorClosedEventsAttribute", readDoorLockDoorClosedEventsAttributeInteractionInfo);
@@ -7490,10 +7065,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
-                  .readOpenPeriodAttribute(
-                      (ChipClusters.DoorLockCluster.OpenPeriodAttributeCallback) callback);
+                  .readOpenPeriodAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedDoorLockClusterOpenPeriodAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockOpenPeriodCommandParams);
     readDoorLockInteractionInfo.put(
         "readOpenPeriodAttribute", readDoorLockOpenPeriodAttributeInteractionInfo);
@@ -7504,12 +7078,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readNumberOfTotalUsersSupportedAttribute(
-                      (ChipClusters.DoorLockCluster.NumberOfTotalUsersSupportedAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterNumberOfTotalUsersSupportedAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockNumberOfTotalUsersSupportedCommandParams);
     readDoorLockInteractionInfo.put(
         "readNumberOfTotalUsersSupportedAttribute",
@@ -7521,12 +7092,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readNumberOfPINUsersSupportedAttribute(
-                      (ChipClusters.DoorLockCluster.NumberOfPINUsersSupportedAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterNumberOfPINUsersSupportedAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockNumberOfPINUsersSupportedCommandParams);
     readDoorLockInteractionInfo.put(
         "readNumberOfPINUsersSupportedAttribute",
@@ -7538,12 +7106,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readNumberOfRFIDUsersSupportedAttribute(
-                      (ChipClusters.DoorLockCluster.NumberOfRFIDUsersSupportedAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterNumberOfRFIDUsersSupportedAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockNumberOfRFIDUsersSupportedCommandParams);
     readDoorLockInteractionInfo.put(
         "readNumberOfRFIDUsersSupportedAttribute",
@@ -7556,13 +7121,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readNumberOfWeekDaySchedulesSupportedPerUserAttribute(
-                      (ChipClusters.DoorLockCluster
-                              .NumberOfWeekDaySchedulesSupportedPerUserAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterNumberOfWeekDaySchedulesSupportedPerUserAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockNumberOfWeekDaySchedulesSupportedPerUserCommandParams);
     readDoorLockInteractionInfo.put(
         "readNumberOfWeekDaySchedulesSupportedPerUserAttribute",
@@ -7575,13 +7136,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readNumberOfYearDaySchedulesSupportedPerUserAttribute(
-                      (ChipClusters.DoorLockCluster
-                              .NumberOfYearDaySchedulesSupportedPerUserAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterNumberOfYearDaySchedulesSupportedPerUserAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockNumberOfYearDaySchedulesSupportedPerUserCommandParams);
     readDoorLockInteractionInfo.put(
         "readNumberOfYearDaySchedulesSupportedPerUserAttribute",
@@ -7593,13 +7150,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readNumberOfHolidaySchedulesSupportedAttribute(
-                      (ChipClusters.DoorLockCluster
-                              .NumberOfHolidaySchedulesSupportedAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterNumberOfHolidaySchedulesSupportedAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockNumberOfHolidaySchedulesSupportedCommandParams);
     readDoorLockInteractionInfo.put(
         "readNumberOfHolidaySchedulesSupportedAttribute",
@@ -7610,11 +7163,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
-                  .readMaxPINCodeLengthAttribute(
-                      (ChipClusters.DoorLockCluster.MaxPINCodeLengthAttributeCallback) callback);
+                  .readMaxPINCodeLengthAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedDoorLockClusterMaxPINCodeLengthAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockMaxPINCodeLengthCommandParams);
     readDoorLockInteractionInfo.put(
         "readMaxPINCodeLengthAttribute", readDoorLockMaxPINCodeLengthAttributeInteractionInfo);
@@ -7624,11 +7175,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
-                  .readMinPINCodeLengthAttribute(
-                      (ChipClusters.DoorLockCluster.MinPINCodeLengthAttributeCallback) callback);
+                  .readMinPINCodeLengthAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedDoorLockClusterMinPINCodeLengthAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockMinPINCodeLengthCommandParams);
     readDoorLockInteractionInfo.put(
         "readMinPINCodeLengthAttribute", readDoorLockMinPINCodeLengthAttributeInteractionInfo);
@@ -7638,11 +7187,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
-                  .readMaxRFIDCodeLengthAttribute(
-                      (ChipClusters.DoorLockCluster.MaxRFIDCodeLengthAttributeCallback) callback);
+                  .readMaxRFIDCodeLengthAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedDoorLockClusterMaxRFIDCodeLengthAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockMaxRFIDCodeLengthCommandParams);
     readDoorLockInteractionInfo.put(
         "readMaxRFIDCodeLengthAttribute", readDoorLockMaxRFIDCodeLengthAttributeInteractionInfo);
@@ -7652,11 +7199,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
-                  .readMinRFIDCodeLengthAttribute(
-                      (ChipClusters.DoorLockCluster.MinRFIDCodeLengthAttributeCallback) callback);
+                  .readMinRFIDCodeLengthAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedDoorLockClusterMinRFIDCodeLengthAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockMinRFIDCodeLengthCommandParams);
     readDoorLockInteractionInfo.put(
         "readMinRFIDCodeLengthAttribute", readDoorLockMinRFIDCodeLengthAttributeInteractionInfo);
@@ -7667,12 +7212,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readCredentialRulesSupportAttribute(
-                      (ChipClusters.DoorLockCluster.CredentialRulesSupportAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterCredentialRulesSupportAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockCredentialRulesSupportCommandParams);
     readDoorLockInteractionInfo.put(
         "readCredentialRulesSupportAttribute",
@@ -7684,13 +7226,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readNumberOfCredentialsSupportedPerUserAttribute(
-                      (ChipClusters.DoorLockCluster
-                              .NumberOfCredentialsSupportedPerUserAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterNumberOfCredentialsSupportedPerUserAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockNumberOfCredentialsSupportedPerUserCommandParams);
     readDoorLockInteractionInfo.put(
         "readNumberOfCredentialsSupportedPerUserAttribute",
@@ -7701,10 +7239,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
-                  .readLanguageAttribute(
-                      (ChipClusters.DoorLockCluster.LanguageAttributeCallback) callback);
+                  .readLanguageAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedDoorLockClusterLanguageAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readDoorLockLanguageCommandParams);
     readDoorLockInteractionInfo.put(
         "readLanguageAttribute", readDoorLockLanguageAttributeInteractionInfo);
@@ -7714,10 +7251,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
-                  .readLEDSettingsAttribute(
-                      (ChipClusters.DoorLockCluster.LEDSettingsAttributeCallback) callback);
+                  .readLEDSettingsAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedDoorLockClusterLEDSettingsAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockLEDSettingsCommandParams);
     readDoorLockInteractionInfo.put(
         "readLEDSettingsAttribute", readDoorLockLEDSettingsAttributeInteractionInfo);
@@ -7739,10 +7275,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
-                  .readSoundVolumeAttribute(
-                      (ChipClusters.DoorLockCluster.SoundVolumeAttributeCallback) callback);
+                  .readSoundVolumeAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedDoorLockClusterSoundVolumeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockSoundVolumeCommandParams);
     readDoorLockInteractionInfo.put(
         "readSoundVolumeAttribute", readDoorLockSoundVolumeAttributeInteractionInfo);
@@ -7779,12 +7314,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readDefaultConfigurationRegisterAttribute(
-                      (ChipClusters.DoorLockCluster.DefaultConfigurationRegisterAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterDefaultConfigurationRegisterAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockDefaultConfigurationRegisterCommandParams);
     readDoorLockInteractionInfo.put(
         "readDefaultConfigurationRegisterAttribute",
@@ -7796,12 +7328,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readEnableLocalProgrammingAttribute(
-                      (ChipClusters.DoorLockCluster.EnableLocalProgrammingAttributeCallback)
-                          callback);
+                      (ChipClusters.BooleanAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterEnableLocalProgrammingAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
             readDoorLockEnableLocalProgrammingCommandParams);
     readDoorLockInteractionInfo.put(
         "readEnableLocalProgrammingAttribute",
@@ -7813,12 +7342,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readEnableOneTouchLockingAttribute(
-                      (ChipClusters.DoorLockCluster.EnableOneTouchLockingAttributeCallback)
-                          callback);
+                      (ChipClusters.BooleanAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterEnableOneTouchLockingAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
             readDoorLockEnableOneTouchLockingCommandParams);
     readDoorLockInteractionInfo.put(
         "readEnableOneTouchLockingAttribute",
@@ -7830,12 +7356,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readEnableInsideStatusLEDAttribute(
-                      (ChipClusters.DoorLockCluster.EnableInsideStatusLEDAttributeCallback)
-                          callback);
+                      (ChipClusters.BooleanAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterEnableInsideStatusLEDAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
             readDoorLockEnableInsideStatusLEDCommandParams);
     readDoorLockInteractionInfo.put(
         "readEnableInsideStatusLEDAttribute",
@@ -7847,12 +7370,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readEnablePrivacyModeButtonAttribute(
-                      (ChipClusters.DoorLockCluster.EnablePrivacyModeButtonAttributeCallback)
-                          callback);
+                      (ChipClusters.BooleanAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterEnablePrivacyModeButtonAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
             readDoorLockEnablePrivacyModeButtonCommandParams);
     readDoorLockInteractionInfo.put(
         "readEnablePrivacyModeButtonAttribute",
@@ -7864,12 +7384,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readLocalProgrammingFeaturesAttribute(
-                      (ChipClusters.DoorLockCluster.LocalProgrammingFeaturesAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterLocalProgrammingFeaturesAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockLocalProgrammingFeaturesCommandParams);
     readDoorLockInteractionInfo.put(
         "readLocalProgrammingFeaturesAttribute",
@@ -7881,11 +7398,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readWrongCodeEntryLimitAttribute(
-                      (ChipClusters.DoorLockCluster.WrongCodeEntryLimitAttributeCallback) callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterWrongCodeEntryLimitAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockWrongCodeEntryLimitCommandParams);
     readDoorLockInteractionInfo.put(
         "readWrongCodeEntryLimitAttribute",
@@ -7897,12 +7412,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readUserCodeTemporaryDisableTimeAttribute(
-                      (ChipClusters.DoorLockCluster.UserCodeTemporaryDisableTimeAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterUserCodeTemporaryDisableTimeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockUserCodeTemporaryDisableTimeCommandParams);
     readDoorLockInteractionInfo.put(
         "readUserCodeTemporaryDisableTimeAttribute",
@@ -7913,11 +7425,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
-                  .readSendPINOverTheAirAttribute(
-                      (ChipClusters.DoorLockCluster.SendPINOverTheAirAttributeCallback) callback);
+                  .readSendPINOverTheAirAttribute((ChipClusters.BooleanAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedDoorLockClusterSendPINOverTheAirAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
             readDoorLockSendPINOverTheAirCommandParams);
     readDoorLockInteractionInfo.put(
         "readSendPINOverTheAirAttribute", readDoorLockSendPINOverTheAirAttributeInteractionInfo);
@@ -7928,12 +7438,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readRequirePINforRemoteOperationAttribute(
-                      (ChipClusters.DoorLockCluster.RequirePINforRemoteOperationAttributeCallback)
-                          callback);
+                      (ChipClusters.BooleanAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterRequirePINforRemoteOperationAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
             readDoorLockRequirePINforRemoteOperationCommandParams);
     readDoorLockInteractionInfo.put(
         "readRequirePINforRemoteOperationAttribute",
@@ -7945,11 +7452,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.DoorLockCluster) cluster)
                   .readExpiringUserTimeoutAttribute(
-                      (ChipClusters.DoorLockCluster.ExpiringUserTimeoutAttributeCallback) callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedDoorLockClusterExpiringUserTimeoutAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readDoorLockExpiringUserTimeoutCommandParams);
     readDoorLockInteractionInfo.put(
         "readExpiringUserTimeoutAttribute",
@@ -8058,12 +7563,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .readPhysicalClosedLimitLiftAttribute(
-                      (ChipClusters.WindowCoveringCluster.PhysicalClosedLimitLiftAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedWindowCoveringClusterPhysicalClosedLimitLiftAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWindowCoveringPhysicalClosedLimitLiftCommandParams);
     readWindowCoveringInteractionInfo.put(
         "readPhysicalClosedLimitLiftAttribute",
@@ -8075,12 +7577,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .readPhysicalClosedLimitTiltAttribute(
-                      (ChipClusters.WindowCoveringCluster.PhysicalClosedLimitTiltAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedWindowCoveringClusterPhysicalClosedLimitTiltAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWindowCoveringPhysicalClosedLimitTiltCommandParams);
     readWindowCoveringInteractionInfo.put(
         "readPhysicalClosedLimitTiltAttribute",
@@ -8126,12 +7625,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .readNumberOfActuationsLiftAttribute(
-                      (ChipClusters.WindowCoveringCluster.NumberOfActuationsLiftAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedWindowCoveringClusterNumberOfActuationsLiftAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWindowCoveringNumberOfActuationsLiftCommandParams);
     readWindowCoveringInteractionInfo.put(
         "readNumberOfActuationsLiftAttribute",
@@ -8143,12 +7639,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .readNumberOfActuationsTiltAttribute(
-                      (ChipClusters.WindowCoveringCluster.NumberOfActuationsTiltAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedWindowCoveringClusterNumberOfActuationsTiltAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWindowCoveringNumberOfActuationsTiltCommandParams);
     readWindowCoveringInteractionInfo.put(
         "readNumberOfActuationsTiltAttribute",
@@ -8309,12 +7802,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .readInstalledOpenLimitLiftAttribute(
-                      (ChipClusters.WindowCoveringCluster.InstalledOpenLimitLiftAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedWindowCoveringClusterInstalledOpenLimitLiftAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWindowCoveringInstalledOpenLimitLiftCommandParams);
     readWindowCoveringInteractionInfo.put(
         "readInstalledOpenLimitLiftAttribute",
@@ -8326,12 +7816,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .readInstalledClosedLimitLiftAttribute(
-                      (ChipClusters.WindowCoveringCluster.InstalledClosedLimitLiftAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedWindowCoveringClusterInstalledClosedLimitLiftAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWindowCoveringInstalledClosedLimitLiftCommandParams);
     readWindowCoveringInteractionInfo.put(
         "readInstalledClosedLimitLiftAttribute",
@@ -8343,12 +7830,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .readInstalledOpenLimitTiltAttribute(
-                      (ChipClusters.WindowCoveringCluster.InstalledOpenLimitTiltAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedWindowCoveringClusterInstalledOpenLimitTiltAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWindowCoveringInstalledOpenLimitTiltCommandParams);
     readWindowCoveringInteractionInfo.put(
         "readInstalledOpenLimitTiltAttribute",
@@ -8360,12 +7844,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .readInstalledClosedLimitTiltAttribute(
-                      (ChipClusters.WindowCoveringCluster.InstalledClosedLimitTiltAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedWindowCoveringClusterInstalledClosedLimitTiltAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWindowCoveringInstalledClosedLimitTiltCommandParams);
     readWindowCoveringInteractionInfo.put(
         "readInstalledClosedLimitTiltAttribute",
@@ -8388,12 +7869,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WindowCoveringCluster) cluster)
-                  .readSafetyStatusAttribute(
-                      (ChipClusters.WindowCoveringCluster.SafetyStatusAttributeCallback) callback);
+                  .readSafetyStatusAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedWindowCoveringClusterSafetyStatusAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWindowCoveringSafetyStatusCommandParams);
     readWindowCoveringInteractionInfo.put(
         "readSafetyStatusAttribute", readWindowCoveringSafetyStatusAttributeInteractionInfo);
@@ -8533,13 +8011,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BarrierControlCluster) cluster)
-                  .readBarrierOpenEventsAttribute(
-                      (ChipClusters.BarrierControlCluster.BarrierOpenEventsAttributeCallback)
-                          callback);
+                  .readBarrierOpenEventsAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBarrierControlClusterBarrierOpenEventsAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readBarrierControlBarrierOpenEventsCommandParams);
     readBarrierControlInteractionInfo.put(
         "readBarrierOpenEventsAttribute",
@@ -8551,12 +8025,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BarrierControlCluster) cluster)
                   .readBarrierCloseEventsAttribute(
-                      (ChipClusters.BarrierControlCluster.BarrierCloseEventsAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBarrierControlClusterBarrierCloseEventsAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readBarrierControlBarrierCloseEventsCommandParams);
     readBarrierControlInteractionInfo.put(
         "readBarrierCloseEventsAttribute",
@@ -8568,12 +8039,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BarrierControlCluster) cluster)
                   .readBarrierCommandOpenEventsAttribute(
-                      (ChipClusters.BarrierControlCluster.BarrierCommandOpenEventsAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBarrierControlClusterBarrierCommandOpenEventsAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readBarrierControlBarrierCommandOpenEventsCommandParams);
     readBarrierControlInteractionInfo.put(
         "readBarrierCommandOpenEventsAttribute",
@@ -8585,13 +8053,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BarrierControlCluster) cluster)
                   .readBarrierCommandCloseEventsAttribute(
-                      (ChipClusters.BarrierControlCluster
-                              .BarrierCommandCloseEventsAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBarrierControlClusterBarrierCommandCloseEventsAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readBarrierControlBarrierCommandCloseEventsCommandParams);
     readBarrierControlInteractionInfo.put(
         "readBarrierCommandCloseEventsAttribute",
@@ -8602,13 +8066,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BarrierControlCluster) cluster)
-                  .readBarrierOpenPeriodAttribute(
-                      (ChipClusters.BarrierControlCluster.BarrierOpenPeriodAttributeCallback)
-                          callback);
+                  .readBarrierOpenPeriodAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBarrierControlClusterBarrierOpenPeriodAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readBarrierControlBarrierOpenPeriodCommandParams);
     readBarrierControlInteractionInfo.put(
         "readBarrierOpenPeriodAttribute",
@@ -8620,12 +8080,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BarrierControlCluster) cluster)
                   .readBarrierClosePeriodAttribute(
-                      (ChipClusters.BarrierControlCluster.BarrierClosePeriodAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBarrierControlClusterBarrierClosePeriodAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readBarrierControlBarrierClosePeriodCommandParams);
     readBarrierControlInteractionInfo.put(
         "readBarrierClosePeriodAttribute",
@@ -8966,13 +8423,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readPumpStatusAttribute(
-                      (ChipClusters.PumpConfigurationAndControlCluster.PumpStatusAttributeCallback)
-                          callback);
+                  .readPumpStatusAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedPumpConfigurationAndControlClusterPumpStatusAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlPumpStatusCommandParams);
     readPumpConfigurationAndControlInteractionInfo.put(
         "readPumpStatusAttribute",
@@ -9112,13 +8565,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readControlModeAttribute(
-                      (ChipClusters.PumpConfigurationAndControlCluster.ControlModeAttributeCallback)
-                          callback);
+                  .readControlModeAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedPumpConfigurationAndControlClusterControlModeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPumpConfigurationAndControlControlModeCommandParams);
     readPumpConfigurationAndControlInteractionInfo.put(
         "readControlModeAttribute",
@@ -9262,10 +8711,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
-                  .readOccupancyAttribute(
-                      (ChipClusters.ThermostatCluster.OccupancyAttributeCallback) callback);
+                  .readOccupancyAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedThermostatClusterOccupancyAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatOccupancyCommandParams);
     readThermostatInteractionInfo.put(
         "readOccupancyAttribute", readThermostatOccupancyAttributeInteractionInfo);
@@ -9276,12 +8724,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readAbsMinHeatSetpointLimitAttribute(
-                      (ChipClusters.ThermostatCluster.AbsMinHeatSetpointLimitAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterAbsMinHeatSetpointLimitAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatAbsMinHeatSetpointLimitCommandParams);
     readThermostatInteractionInfo.put(
         "readAbsMinHeatSetpointLimitAttribute",
@@ -9293,12 +8738,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readAbsMaxHeatSetpointLimitAttribute(
-                      (ChipClusters.ThermostatCluster.AbsMaxHeatSetpointLimitAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterAbsMaxHeatSetpointLimitAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatAbsMaxHeatSetpointLimitCommandParams);
     readThermostatInteractionInfo.put(
         "readAbsMaxHeatSetpointLimitAttribute",
@@ -9310,12 +8752,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readAbsMinCoolSetpointLimitAttribute(
-                      (ChipClusters.ThermostatCluster.AbsMinCoolSetpointLimitAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterAbsMinCoolSetpointLimitAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatAbsMinCoolSetpointLimitCommandParams);
     readThermostatInteractionInfo.put(
         "readAbsMinCoolSetpointLimitAttribute",
@@ -9327,12 +8766,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readAbsMaxCoolSetpointLimitAttribute(
-                      (ChipClusters.ThermostatCluster.AbsMaxCoolSetpointLimitAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterAbsMaxCoolSetpointLimitAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatAbsMaxCoolSetpointLimitCommandParams);
     readThermostatInteractionInfo.put(
         "readAbsMaxCoolSetpointLimitAttribute",
@@ -9343,11 +8779,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
-                  .readPICoolingDemandAttribute(
-                      (ChipClusters.ThermostatCluster.PICoolingDemandAttributeCallback) callback);
+                  .readPICoolingDemandAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedThermostatClusterPICoolingDemandAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatPICoolingDemandCommandParams);
     readThermostatInteractionInfo.put(
         "readPICoolingDemandAttribute", readThermostatPICoolingDemandAttributeInteractionInfo);
@@ -9357,11 +8791,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
-                  .readPIHeatingDemandAttribute(
-                      (ChipClusters.ThermostatCluster.PIHeatingDemandAttributeCallback) callback);
+                  .readPIHeatingDemandAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedThermostatClusterPIHeatingDemandAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatPIHeatingDemandCommandParams);
     readThermostatInteractionInfo.put(
         "readPIHeatingDemandAttribute", readThermostatPIHeatingDemandAttributeInteractionInfo);
@@ -9372,12 +8804,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readHVACSystemTypeConfigurationAttribute(
-                      (ChipClusters.ThermostatCluster.HVACSystemTypeConfigurationAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterHVACSystemTypeConfigurationAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatHVACSystemTypeConfigurationCommandParams);
     readThermostatInteractionInfo.put(
         "readHVACSystemTypeConfigurationAttribute",
@@ -9389,12 +8818,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readLocalTemperatureCalibrationAttribute(
-                      (ChipClusters.ThermostatCluster.LocalTemperatureCalibrationAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterLocalTemperatureCalibrationAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatLocalTemperatureCalibrationCommandParams);
     readThermostatInteractionInfo.put(
         "readLocalTemperatureCalibrationAttribute",
@@ -9406,12 +8832,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readOccupiedCoolingSetpointAttribute(
-                      (ChipClusters.ThermostatCluster.OccupiedCoolingSetpointAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterOccupiedCoolingSetpointAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatOccupiedCoolingSetpointCommandParams);
     readThermostatInteractionInfo.put(
         "readOccupiedCoolingSetpointAttribute",
@@ -9423,12 +8846,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readOccupiedHeatingSetpointAttribute(
-                      (ChipClusters.ThermostatCluster.OccupiedHeatingSetpointAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterOccupiedHeatingSetpointAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatOccupiedHeatingSetpointCommandParams);
     readThermostatInteractionInfo.put(
         "readOccupiedHeatingSetpointAttribute",
@@ -9440,12 +8860,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readUnoccupiedCoolingSetpointAttribute(
-                      (ChipClusters.ThermostatCluster.UnoccupiedCoolingSetpointAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterUnoccupiedCoolingSetpointAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatUnoccupiedCoolingSetpointCommandParams);
     readThermostatInteractionInfo.put(
         "readUnoccupiedCoolingSetpointAttribute",
@@ -9457,12 +8874,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readUnoccupiedHeatingSetpointAttribute(
-                      (ChipClusters.ThermostatCluster.UnoccupiedHeatingSetpointAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterUnoccupiedHeatingSetpointAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatUnoccupiedHeatingSetpointCommandParams);
     readThermostatInteractionInfo.put(
         "readUnoccupiedHeatingSetpointAttribute",
@@ -9474,12 +8888,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readMinHeatSetpointLimitAttribute(
-                      (ChipClusters.ThermostatCluster.MinHeatSetpointLimitAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterMinHeatSetpointLimitAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatMinHeatSetpointLimitCommandParams);
     readThermostatInteractionInfo.put(
         "readMinHeatSetpointLimitAttribute",
@@ -9491,12 +8902,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readMaxHeatSetpointLimitAttribute(
-                      (ChipClusters.ThermostatCluster.MaxHeatSetpointLimitAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterMaxHeatSetpointLimitAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatMaxHeatSetpointLimitCommandParams);
     readThermostatInteractionInfo.put(
         "readMaxHeatSetpointLimitAttribute",
@@ -9508,12 +8916,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readMinCoolSetpointLimitAttribute(
-                      (ChipClusters.ThermostatCluster.MinCoolSetpointLimitAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterMinCoolSetpointLimitAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatMinCoolSetpointLimitCommandParams);
     readThermostatInteractionInfo.put(
         "readMinCoolSetpointLimitAttribute",
@@ -9525,12 +8930,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readMaxCoolSetpointLimitAttribute(
-                      (ChipClusters.ThermostatCluster.MaxCoolSetpointLimitAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterMaxCoolSetpointLimitAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatMaxCoolSetpointLimitCommandParams);
     readThermostatInteractionInfo.put(
         "readMaxCoolSetpointLimitAttribute",
@@ -9542,12 +8944,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readMinSetpointDeadBandAttribute(
-                      (ChipClusters.ThermostatCluster.MinSetpointDeadBandAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterMinSetpointDeadBandAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatMinSetpointDeadBandCommandParams);
     readThermostatInteractionInfo.put(
         "readMinSetpointDeadBandAttribute",
@@ -9558,10 +8957,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
-                  .readRemoteSensingAttribute(
-                      (ChipClusters.ThermostatCluster.RemoteSensingAttributeCallback) callback);
+                  .readRemoteSensingAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedThermostatClusterRemoteSensingAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatRemoteSensingCommandParams);
     readThermostatInteractionInfo.put(
         "readRemoteSensingAttribute", readThermostatRemoteSensingAttributeInteractionInfo);
@@ -9598,12 +8996,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readThermostatRunningModeAttribute(
-                      (ChipClusters.ThermostatCluster.ThermostatRunningModeAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterThermostatRunningModeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatThermostatRunningModeCommandParams);
     readThermostatInteractionInfo.put(
         "readThermostatRunningModeAttribute",
@@ -9614,10 +9009,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
-                  .readStartOfWeekAttribute(
-                      (ChipClusters.ThermostatCluster.StartOfWeekAttributeCallback) callback);
+                  .readStartOfWeekAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedThermostatClusterStartOfWeekAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatStartOfWeekCommandParams);
     readThermostatInteractionInfo.put(
         "readStartOfWeekAttribute", readThermostatStartOfWeekAttributeInteractionInfo);
@@ -9628,12 +9022,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readNumberOfWeeklyTransitionsAttribute(
-                      (ChipClusters.ThermostatCluster.NumberOfWeeklyTransitionsAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterNumberOfWeeklyTransitionsAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatNumberOfWeeklyTransitionsCommandParams);
     readThermostatInteractionInfo.put(
         "readNumberOfWeeklyTransitionsAttribute",
@@ -9645,12 +9036,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readNumberOfDailyTransitionsAttribute(
-                      (ChipClusters.ThermostatCluster.NumberOfDailyTransitionsAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterNumberOfDailyTransitionsAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatNumberOfDailyTransitionsCommandParams);
     readThermostatInteractionInfo.put(
         "readNumberOfDailyTransitionsAttribute",
@@ -9662,12 +9050,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readTemperatureSetpointHoldAttribute(
-                      (ChipClusters.ThermostatCluster.TemperatureSetpointHoldAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterTemperatureSetpointHoldAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatTemperatureSetpointHoldCommandParams);
     readThermostatInteractionInfo.put(
         "readTemperatureSetpointHoldAttribute",
@@ -9698,13 +9083,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readThermostatProgrammingOperationModeAttribute(
-                      (ChipClusters.ThermostatCluster
-                              .ThermostatProgrammingOperationModeAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterThermostatProgrammingOperationModeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatThermostatProgrammingOperationModeCommandParams);
     readThermostatInteractionInfo.put(
         "readThermostatProgrammingOperationModeAttribute",
@@ -9716,12 +9097,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readThermostatRunningStateAttribute(
-                      (ChipClusters.ThermostatCluster.ThermostatRunningStateAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterThermostatRunningStateAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatThermostatRunningStateCommandParams);
     readThermostatInteractionInfo.put(
         "readThermostatRunningStateAttribute",
@@ -9733,12 +9111,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readSetpointChangeSourceAttribute(
-                      (ChipClusters.ThermostatCluster.SetpointChangeSourceAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterSetpointChangeSourceAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatSetpointChangeSourceCommandParams);
     readThermostatInteractionInfo.put(
         "readSetpointChangeSourceAttribute",
@@ -9767,13 +9142,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readSetpointChangeSourceTimestampAttribute(
-                      (ChipClusters.ThermostatCluster
-                              .SetpointChangeSourceTimestampAttributeCallback)
-                          callback);
+                      (ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterSetpointChangeSourceTimestampAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThermostatSetpointChangeSourceTimestampCommandParams);
     readThermostatInteractionInfo.put(
         "readSetpointChangeSourceTimestampAttribute",
@@ -9882,12 +9253,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .readEmergencyHeatDeltaAttribute(
-                      (ChipClusters.ThermostatCluster.EmergencyHeatDeltaAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterEmergencyHeatDeltaAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatEmergencyHeatDeltaCommandParams);
     readThermostatInteractionInfo.put(
         "readEmergencyHeatDeltaAttribute",
@@ -9898,10 +9266,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
-                  .readACTypeAttribute(
-                      (ChipClusters.ThermostatCluster.ACTypeAttributeCallback) callback);
+                  .readACTypeAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedThermostatClusterACTypeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatACTypeCommandParams);
     readThermostatInteractionInfo.put(
         "readACTypeAttribute", readThermostatACTypeAttributeInteractionInfo);
@@ -9911,10 +9278,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
-                  .readACCapacityAttribute(
-                      (ChipClusters.ThermostatCluster.ACCapacityAttributeCallback) callback);
+                  .readACCapacityAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedThermostatClusterACCapacityAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatACCapacityCommandParams);
     readThermostatInteractionInfo.put(
         "readACCapacityAttribute", readThermostatACCapacityAttributeInteractionInfo);
@@ -9924,12 +9290,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
-                  .readACRefrigerantTypeAttribute(
-                      (ChipClusters.ThermostatCluster.ACRefrigerantTypeAttributeCallback) callback);
+                  .readACRefrigerantTypeAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterACRefrigerantTypeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatACRefrigerantTypeCommandParams);
     readThermostatInteractionInfo.put(
         "readACRefrigerantTypeAttribute", readThermostatACRefrigerantTypeAttributeInteractionInfo);
@@ -9939,12 +9302,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
-                  .readACCompressorTypeAttribute(
-                      (ChipClusters.ThermostatCluster.ACCompressorTypeAttributeCallback) callback);
+                  .readACCompressorTypeAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterACCompressorTypeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatACCompressorTypeCommandParams);
     readThermostatInteractionInfo.put(
         "readACCompressorTypeAttribute", readThermostatACCompressorTypeAttributeInteractionInfo);
@@ -9954,10 +9314,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
-                  .readACErrorCodeAttribute(
-                      (ChipClusters.ThermostatCluster.ACErrorCodeAttributeCallback) callback);
+                  .readACErrorCodeAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedThermostatClusterACErrorCodeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readThermostatACErrorCodeCommandParams);
     readThermostatInteractionInfo.put(
         "readACErrorCodeAttribute", readThermostatACErrorCodeAttributeInteractionInfo);
@@ -9967,12 +9326,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
-                  .readACLouverPositionAttribute(
-                      (ChipClusters.ThermostatCluster.ACLouverPositionAttributeCallback) callback);
+                  .readACLouverPositionAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterACLouverPositionAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatACLouverPositionCommandParams);
     readThermostatInteractionInfo.put(
         "readACLouverPositionAttribute", readThermostatACLouverPositionAttributeInteractionInfo);
@@ -9997,12 +9353,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
-                  .readACCapacityformatAttribute(
-                      (ChipClusters.ThermostatCluster.ACCapacityformatAttributeCallback) callback);
+                  .readACCapacityformatAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedThermostatClusterACCapacityformatAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readThermostatACCapacityformatCommandParams);
     readThermostatInteractionInfo.put(
         "readACCapacityformatAttribute", readThermostatACCapacityformatAttributeInteractionInfo);
@@ -10148,10 +9501,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.FanControlCluster) cluster)
-                  .readSpeedMaxAttribute(
-                      (ChipClusters.FanControlCluster.SpeedMaxAttributeCallback) callback);
+                  .readSpeedMaxAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedFanControlClusterSpeedMaxAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readFanControlSpeedMaxCommandParams);
     readFanControlInteractionInfo.put(
         "readSpeedMaxAttribute", readFanControlSpeedMaxAttributeInteractionInfo);
@@ -10174,10 +9526,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.FanControlCluster) cluster)
-                  .readSpeedCurrentAttribute(
-                      (ChipClusters.FanControlCluster.SpeedCurrentAttributeCallback) callback);
+                  .readSpeedCurrentAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedFanControlClusterSpeedCurrentAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readFanControlSpeedCurrentCommandParams);
     readFanControlInteractionInfo.put(
         "readSpeedCurrentAttribute", readFanControlSpeedCurrentAttributeInteractionInfo);
@@ -10187,10 +9538,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.FanControlCluster) cluster)
-                  .readRockSupportAttribute(
-                      (ChipClusters.FanControlCluster.RockSupportAttributeCallback) callback);
+                  .readRockSupportAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedFanControlClusterRockSupportAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readFanControlRockSupportCommandParams);
     readFanControlInteractionInfo.put(
         "readRockSupportAttribute", readFanControlRockSupportAttributeInteractionInfo);
@@ -10200,10 +9550,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.FanControlCluster) cluster)
-                  .readRockSettingAttribute(
-                      (ChipClusters.FanControlCluster.RockSettingAttributeCallback) callback);
+                  .readRockSettingAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedFanControlClusterRockSettingAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readFanControlRockSettingCommandParams);
     readFanControlInteractionInfo.put(
         "readRockSettingAttribute", readFanControlRockSettingAttributeInteractionInfo);
@@ -10213,10 +9562,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.FanControlCluster) cluster)
-                  .readWindSupportAttribute(
-                      (ChipClusters.FanControlCluster.WindSupportAttributeCallback) callback);
+                  .readWindSupportAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedFanControlClusterWindSupportAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readFanControlWindSupportCommandParams);
     readFanControlInteractionInfo.put(
         "readWindSupportAttribute", readFanControlWindSupportAttributeInteractionInfo);
@@ -10226,10 +9574,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.FanControlCluster) cluster)
-                  .readWindSettingAttribute(
-                      (ChipClusters.FanControlCluster.WindSettingAttributeCallback) callback);
+                  .readWindSettingAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedFanControlClusterWindSettingAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readFanControlWindSettingCommandParams);
     readFanControlInteractionInfo.put(
         "readWindSettingAttribute", readFanControlWindSettingAttributeInteractionInfo);
@@ -10359,13 +9706,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ThermostatUserInterfaceConfigurationCluster) cluster)
                       .readScheduleProgrammingVisibilityAttribute(
-                          (ChipClusters.ThermostatUserInterfaceConfigurationCluster
-                                  .ScheduleProgrammingVisibilityAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedThermostatUserInterfaceConfigurationClusterScheduleProgrammingVisibilityAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityCommandParams);
     readThermostatUserInterfaceConfigurationInteractionInfo.put(
         "readScheduleProgrammingVisibilityAttribute",
@@ -10488,10 +9831,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readCurrentHueAttribute(
-                      (ChipClusters.ColorControlCluster.CurrentHueAttributeCallback) callback);
+                  .readCurrentHueAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedColorControlClusterCurrentHueAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlCurrentHueCommandParams);
     readColorControlInteractionInfo.put(
         "readCurrentHueAttribute", readColorControlCurrentHueAttributeInteractionInfo);
@@ -10501,13 +9843,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readCurrentSaturationAttribute(
-                      (ChipClusters.ColorControlCluster.CurrentSaturationAttributeCallback)
-                          callback);
+                  .readCurrentSaturationAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedColorControlClusterCurrentSaturationAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlCurrentSaturationCommandParams);
     readColorControlInteractionInfo.put(
         "readCurrentSaturationAttribute",
@@ -10518,11 +9856,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readRemainingTimeAttribute(
-                      (ChipClusters.ColorControlCluster.RemainingTimeAttributeCallback) callback);
+                  .readRemainingTimeAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedColorControlClusterRemainingTimeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlRemainingTimeCommandParams);
     readColorControlInteractionInfo.put(
         "readRemainingTimeAttribute", readColorControlRemainingTimeAttributeInteractionInfo);
@@ -10532,10 +9868,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readCurrentXAttribute(
-                      (ChipClusters.ColorControlCluster.CurrentXAttributeCallback) callback);
+                  .readCurrentXAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedColorControlClusterCurrentXAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlCurrentXCommandParams);
     readColorControlInteractionInfo.put(
         "readCurrentXAttribute", readColorControlCurrentXAttributeInteractionInfo);
@@ -10545,10 +9880,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readCurrentYAttribute(
-                      (ChipClusters.ColorControlCluster.CurrentYAttributeCallback) callback);
+                  .readCurrentYAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedColorControlClusterCurrentYAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlCurrentYCommandParams);
     readColorControlInteractionInfo.put(
         "readCurrentYAttribute", readColorControlCurrentYAttributeInteractionInfo);
@@ -10558,13 +9892,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readDriftCompensationAttribute(
-                      (ChipClusters.ColorControlCluster.DriftCompensationAttributeCallback)
-                          callback);
+                  .readDriftCompensationAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedColorControlClusterDriftCompensationAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlDriftCompensationCommandParams);
     readColorControlInteractionInfo.put(
         "readDriftCompensationAttribute",
@@ -10576,12 +9906,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
                   .readCompensationTextAttribute(
-                      (ChipClusters.ColorControlCluster.CompensationTextAttributeCallback)
-                          callback);
+                      (ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedColorControlClusterCompensationTextAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readColorControlCompensationTextCommandParams);
     readColorControlInteractionInfo.put(
         "readCompensationTextAttribute", readColorControlCompensationTextAttributeInteractionInfo);
@@ -10592,12 +9919,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
                   .readColorTemperatureMiredsAttribute(
-                      (ChipClusters.ColorControlCluster.ColorTemperatureMiredsAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedColorControlClusterColorTemperatureMiredsAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlColorTemperatureMiredsCommandParams);
     readColorControlInteractionInfo.put(
         "readColorTemperatureMiredsAttribute",
@@ -10649,10 +9973,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary1XAttribute(
-                      (ChipClusters.ColorControlCluster.Primary1XAttributeCallback) callback);
+                  .readPrimary1XAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedColorControlClusterPrimary1XAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary1XCommandParams);
     readColorControlInteractionInfo.put(
         "readPrimary1XAttribute", readColorControlPrimary1XAttributeInteractionInfo);
@@ -10662,10 +9985,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary1YAttribute(
-                      (ChipClusters.ColorControlCluster.Primary1YAttributeCallback) callback);
+                  .readPrimary1YAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedColorControlClusterPrimary1YAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary1YCommandParams);
     readColorControlInteractionInfo.put(
         "readPrimary1YAttribute", readColorControlPrimary1YAttributeInteractionInfo);
@@ -10692,10 +10014,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary2XAttribute(
-                      (ChipClusters.ColorControlCluster.Primary2XAttributeCallback) callback);
+                  .readPrimary2XAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedColorControlClusterPrimary2XAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary2XCommandParams);
     readColorControlInteractionInfo.put(
         "readPrimary2XAttribute", readColorControlPrimary2XAttributeInteractionInfo);
@@ -10705,10 +10026,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary2YAttribute(
-                      (ChipClusters.ColorControlCluster.Primary2YAttributeCallback) callback);
+                  .readPrimary2YAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedColorControlClusterPrimary2YAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary2YCommandParams);
     readColorControlInteractionInfo.put(
         "readPrimary2YAttribute", readColorControlPrimary2YAttributeInteractionInfo);
@@ -10735,10 +10055,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary3XAttribute(
-                      (ChipClusters.ColorControlCluster.Primary3XAttributeCallback) callback);
+                  .readPrimary3XAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedColorControlClusterPrimary3XAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary3XCommandParams);
     readColorControlInteractionInfo.put(
         "readPrimary3XAttribute", readColorControlPrimary3XAttributeInteractionInfo);
@@ -10748,10 +10067,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary3YAttribute(
-                      (ChipClusters.ColorControlCluster.Primary3YAttributeCallback) callback);
+                  .readPrimary3YAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedColorControlClusterPrimary3YAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary3YCommandParams);
     readColorControlInteractionInfo.put(
         "readPrimary3YAttribute", readColorControlPrimary3YAttributeInteractionInfo);
@@ -10778,10 +10096,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary4XAttribute(
-                      (ChipClusters.ColorControlCluster.Primary4XAttributeCallback) callback);
+                  .readPrimary4XAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedColorControlClusterPrimary4XAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary4XCommandParams);
     readColorControlInteractionInfo.put(
         "readPrimary4XAttribute", readColorControlPrimary4XAttributeInteractionInfo);
@@ -10791,10 +10108,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary4YAttribute(
-                      (ChipClusters.ColorControlCluster.Primary4YAttributeCallback) callback);
+                  .readPrimary4YAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedColorControlClusterPrimary4YAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary4YCommandParams);
     readColorControlInteractionInfo.put(
         "readPrimary4YAttribute", readColorControlPrimary4YAttributeInteractionInfo);
@@ -10821,10 +10137,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary5XAttribute(
-                      (ChipClusters.ColorControlCluster.Primary5XAttributeCallback) callback);
+                  .readPrimary5XAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedColorControlClusterPrimary5XAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary5XCommandParams);
     readColorControlInteractionInfo.put(
         "readPrimary5XAttribute", readColorControlPrimary5XAttributeInteractionInfo);
@@ -10834,10 +10149,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary5YAttribute(
-                      (ChipClusters.ColorControlCluster.Primary5YAttributeCallback) callback);
+                  .readPrimary5YAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedColorControlClusterPrimary5YAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary5YCommandParams);
     readColorControlInteractionInfo.put(
         "readPrimary5YAttribute", readColorControlPrimary5YAttributeInteractionInfo);
@@ -10864,10 +10178,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary6XAttribute(
-                      (ChipClusters.ColorControlCluster.Primary6XAttributeCallback) callback);
+                  .readPrimary6XAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedColorControlClusterPrimary6XAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary6XCommandParams);
     readColorControlInteractionInfo.put(
         "readPrimary6XAttribute", readColorControlPrimary6XAttributeInteractionInfo);
@@ -10877,10 +10190,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readPrimary6YAttribute(
-                      (ChipClusters.ColorControlCluster.Primary6YAttributeCallback) callback);
+                  .readPrimary6YAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedColorControlClusterPrimary6YAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlPrimary6YCommandParams);
     readColorControlInteractionInfo.put(
         "readPrimary6YAttribute", readColorControlPrimary6YAttributeInteractionInfo);
@@ -10907,10 +10219,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readWhitePointXAttribute(
-                      (ChipClusters.ColorControlCluster.WhitePointXAttributeCallback) callback);
+                  .readWhitePointXAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedColorControlClusterWhitePointXAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlWhitePointXCommandParams);
     readColorControlInteractionInfo.put(
         "readWhitePointXAttribute", readColorControlWhitePointXAttributeInteractionInfo);
@@ -10920,10 +10231,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readWhitePointYAttribute(
-                      (ChipClusters.ColorControlCluster.WhitePointYAttributeCallback) callback);
+                  .readWhitePointYAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedColorControlClusterWhitePointYAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlWhitePointYCommandParams);
     readColorControlInteractionInfo.put(
         "readWhitePointYAttribute", readColorControlWhitePointYAttributeInteractionInfo);
@@ -10933,11 +10243,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readColorPointRXAttribute(
-                      (ChipClusters.ColorControlCluster.ColorPointRXAttributeCallback) callback);
+                  .readColorPointRXAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedColorControlClusterColorPointRXAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlColorPointRXCommandParams);
     readColorControlInteractionInfo.put(
         "readColorPointRXAttribute", readColorControlColorPointRXAttributeInteractionInfo);
@@ -10947,11 +10255,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readColorPointRYAttribute(
-                      (ChipClusters.ColorControlCluster.ColorPointRYAttributeCallback) callback);
+                  .readColorPointRYAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedColorControlClusterColorPointRYAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlColorPointRYCommandParams);
     readColorControlInteractionInfo.put(
         "readColorPointRYAttribute", readColorControlColorPointRYAttributeInteractionInfo);
@@ -10978,11 +10284,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readColorPointGXAttribute(
-                      (ChipClusters.ColorControlCluster.ColorPointGXAttributeCallback) callback);
+                  .readColorPointGXAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedColorControlClusterColorPointGXAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlColorPointGXCommandParams);
     readColorControlInteractionInfo.put(
         "readColorPointGXAttribute", readColorControlColorPointGXAttributeInteractionInfo);
@@ -10992,11 +10296,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readColorPointGYAttribute(
-                      (ChipClusters.ColorControlCluster.ColorPointGYAttributeCallback) callback);
+                  .readColorPointGYAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedColorControlClusterColorPointGYAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlColorPointGYCommandParams);
     readColorControlInteractionInfo.put(
         "readColorPointGYAttribute", readColorControlColorPointGYAttributeInteractionInfo);
@@ -11023,11 +10325,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readColorPointBXAttribute(
-                      (ChipClusters.ColorControlCluster.ColorPointBXAttributeCallback) callback);
+                  .readColorPointBXAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedColorControlClusterColorPointBXAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlColorPointBXCommandParams);
     readColorControlInteractionInfo.put(
         "readColorPointBXAttribute", readColorControlColorPointBXAttributeInteractionInfo);
@@ -11037,11 +10337,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readColorPointBYAttribute(
-                      (ChipClusters.ColorControlCluster.ColorPointBYAttributeCallback) callback);
+                  .readColorPointBYAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedColorControlClusterColorPointBYAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlColorPointBYCommandParams);
     readColorControlInteractionInfo.put(
         "readColorPointBYAttribute", readColorControlColorPointBYAttributeInteractionInfo);
@@ -11069,12 +10367,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
                   .readEnhancedCurrentHueAttribute(
-                      (ChipClusters.ColorControlCluster.EnhancedCurrentHueAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedColorControlClusterEnhancedCurrentHueAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlEnhancedCurrentHueCommandParams);
     readColorControlInteractionInfo.put(
         "readEnhancedCurrentHueAttribute",
@@ -11098,12 +10393,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readColorLoopActiveAttribute(
-                      (ChipClusters.ColorControlCluster.ColorLoopActiveAttributeCallback) callback);
+                  .readColorLoopActiveAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedColorControlClusterColorLoopActiveAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlColorLoopActiveCommandParams);
     readColorControlInteractionInfo.put(
         "readColorLoopActiveAttribute", readColorControlColorLoopActiveAttributeInteractionInfo);
@@ -11114,12 +10406,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
                   .readColorLoopDirectionAttribute(
-                      (ChipClusters.ColorControlCluster.ColorLoopDirectionAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedColorControlClusterColorLoopDirectionAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlColorLoopDirectionCommandParams);
     readColorControlInteractionInfo.put(
         "readColorLoopDirectionAttribute",
@@ -11130,11 +10419,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
-                  .readColorLoopTimeAttribute(
-                      (ChipClusters.ColorControlCluster.ColorLoopTimeAttributeCallback) callback);
+                  .readColorLoopTimeAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedColorControlClusterColorLoopTimeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlColorLoopTimeCommandParams);
     readColorControlInteractionInfo.put(
         "readColorLoopTimeAttribute", readColorControlColorLoopTimeAttributeInteractionInfo);
@@ -11145,12 +10432,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
                   .readColorLoopStartEnhancedHueAttribute(
-                      (ChipClusters.ColorControlCluster.ColorLoopStartEnhancedHueAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedColorControlClusterColorLoopStartEnhancedHueAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlColorLoopStartEnhancedHueCommandParams);
     readColorControlInteractionInfo.put(
         "readColorLoopStartEnhancedHueAttribute",
@@ -11162,12 +10446,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
                   .readColorLoopStoredEnhancedHueAttribute(
-                      (ChipClusters.ColorControlCluster.ColorLoopStoredEnhancedHueAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedColorControlClusterColorLoopStoredEnhancedHueAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlColorLoopStoredEnhancedHueCommandParams);
     readColorControlInteractionInfo.put(
         "readColorLoopStoredEnhancedHueAttribute",
@@ -11192,12 +10473,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
                   .readColorTempPhysicalMinMiredsAttribute(
-                      (ChipClusters.ColorControlCluster.ColorTempPhysicalMinMiredsAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedColorControlClusterColorTempPhysicalMinMiredsAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlColorTempPhysicalMinMiredsCommandParams);
     readColorControlInteractionInfo.put(
         "readColorTempPhysicalMinMiredsAttribute",
@@ -11209,12 +10487,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
                   .readColorTempPhysicalMaxMiredsAttribute(
-                      (ChipClusters.ColorControlCluster.ColorTempPhysicalMaxMiredsAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedColorControlClusterColorTempPhysicalMaxMiredsAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlColorTempPhysicalMaxMiredsCommandParams);
     readColorControlInteractionInfo.put(
         "readColorTempPhysicalMaxMiredsAttribute",
@@ -11226,13 +10501,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ColorControlCluster) cluster)
                   .readCoupleColorTempToLevelMinMiredsAttribute(
-                      (ChipClusters.ColorControlCluster
-                              .CoupleColorTempToLevelMinMiredsAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedColorControlClusterCoupleColorTempToLevelMinMiredsAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readColorControlCoupleColorTempToLevelMinMiredsCommandParams);
     readColorControlInteractionInfo.put(
         "readCoupleColorTempToLevelMinMiredsAttribute",
@@ -11374,13 +10645,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BallastConfigurationCluster) cluster)
-                  .readBallastStatusAttribute(
-                      (ChipClusters.BallastConfigurationCluster.BallastStatusAttributeCallback)
-                          callback);
+                  .readBallastStatusAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBallastConfigurationClusterBallastStatusAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readBallastConfigurationBallastStatusCommandParams);
     readBallastConfigurationInteractionInfo.put(
         "readBallastStatusAttribute",
@@ -11463,13 +10730,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BallastConfigurationCluster) cluster)
-                  .readLampTypeAttribute(
-                      (ChipClusters.BallastConfigurationCluster.LampTypeAttributeCallback)
-                          callback);
+                  .readLampTypeAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBallastConfigurationClusterLampTypeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBallastConfigurationLampTypeCommandParams);
     readBallastConfigurationInteractionInfo.put(
         "readLampTypeAttribute", readBallastConfigurationLampTypeAttributeInteractionInfo);
@@ -11480,12 +10743,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BallastConfigurationCluster) cluster)
                   .readLampManufacturerAttribute(
-                      (ChipClusters.BallastConfigurationCluster.LampManufacturerAttributeCallback)
-                          callback);
+                      (ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBallastConfigurationClusterLampManufacturerAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readBallastConfigurationLampManufacturerCommandParams);
     readBallastConfigurationInteractionInfo.put(
         "readLampManufacturerAttribute",
@@ -11530,13 +10790,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BallastConfigurationCluster) cluster)
-                  .readLampAlarmModeAttribute(
-                      (ChipClusters.BallastConfigurationCluster.LampAlarmModeAttributeCallback)
-                          callback);
+                  .readLampAlarmModeAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedBallastConfigurationClusterLampAlarmModeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readBallastConfigurationLampAlarmModeCommandParams);
     readBallastConfigurationInteractionInfo.put(
         "readLampAlarmModeAttribute",
@@ -11712,13 +10968,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.IlluminanceMeasurementCluster) cluster)
-                  .readToleranceAttribute(
-                      (ChipClusters.IlluminanceMeasurementCluster.ToleranceAttributeCallback)
-                          callback);
+                  .readToleranceAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedIlluminanceMeasurementClusterToleranceAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readIlluminanceMeasurementToleranceCommandParams);
     readIlluminanceMeasurementInteractionInfo.put(
         "readToleranceAttribute", readIlluminanceMeasurementToleranceAttributeInteractionInfo);
@@ -11892,13 +11144,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TemperatureMeasurementCluster) cluster)
-                  .readToleranceAttribute(
-                      (ChipClusters.TemperatureMeasurementCluster.ToleranceAttributeCallback)
-                          callback);
+                  .readToleranceAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedTemperatureMeasurementClusterToleranceAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readTemperatureMeasurementToleranceCommandParams);
     readTemperatureMeasurementInteractionInfo.put(
         "readToleranceAttribute", readTemperatureMeasurementToleranceAttributeInteractionInfo);
@@ -12054,13 +11302,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PressureMeasurementCluster) cluster)
-                  .readToleranceAttribute(
-                      (ChipClusters.PressureMeasurementCluster.ToleranceAttributeCallback)
-                          callback);
+                  .readToleranceAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedPressureMeasurementClusterToleranceAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPressureMeasurementToleranceCommandParams);
     readPressureMeasurementInteractionInfo.put(
         "readToleranceAttribute", readPressureMeasurementToleranceAttributeInteractionInfo);
@@ -12120,13 +11364,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PressureMeasurementCluster) cluster)
-                  .readScaledToleranceAttribute(
-                      (ChipClusters.PressureMeasurementCluster.ScaledToleranceAttributeCallback)
-                          callback);
+                  .readScaledToleranceAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedPressureMeasurementClusterScaledToleranceAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPressureMeasurementScaledToleranceCommandParams);
     readPressureMeasurementInteractionInfo.put(
         "readScaledToleranceAttribute",
@@ -12137,11 +11377,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PressureMeasurementCluster) cluster)
-                  .readScaleAttribute(
-                      (ChipClusters.PressureMeasurementCluster.ScaleAttributeCallback) callback);
+                  .readScaleAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedPressureMeasurementClusterScaleAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readPressureMeasurementScaleCommandParams);
     readPressureMeasurementInteractionInfo.put(
         "readScaleAttribute", readPressureMeasurementScaleAttributeInteractionInfo);
@@ -12295,11 +11533,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.FlowMeasurementCluster) cluster)
-                  .readToleranceAttribute(
-                      (ChipClusters.FlowMeasurementCluster.ToleranceAttributeCallback) callback);
+                  .readToleranceAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedFlowMeasurementClusterToleranceAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readFlowMeasurementToleranceCommandParams);
     readFlowMeasurementInteractionInfo.put(
         "readToleranceAttribute", readFlowMeasurementToleranceAttributeInteractionInfo);
@@ -12454,13 +11690,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.RelativeHumidityMeasurementCluster) cluster)
-                  .readToleranceAttribute(
-                      (ChipClusters.RelativeHumidityMeasurementCluster.ToleranceAttributeCallback)
-                          callback);
+                  .readToleranceAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedRelativeHumidityMeasurementClusterToleranceAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readRelativeHumidityMeasurementToleranceCommandParams);
     readRelativeHumidityMeasurementInteractionInfo.put(
         "readToleranceAttribute", readRelativeHumidityMeasurementToleranceAttributeInteractionInfo);
@@ -12613,13 +11845,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OccupancySensingCluster) cluster)
                   .readPIROccupiedToUnoccupiedDelayAttribute(
-                      (ChipClusters.OccupancySensingCluster
-                              .PIROccupiedToUnoccupiedDelayAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedOccupancySensingClusterPIROccupiedToUnoccupiedDelayAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readOccupancySensingPIROccupiedToUnoccupiedDelayCommandParams);
     readOccupancySensingInteractionInfo.put(
         "readPIROccupiedToUnoccupiedDelayAttribute",
@@ -12632,13 +11860,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OccupancySensingCluster) cluster)
                   .readPIRUnoccupiedToOccupiedDelayAttribute(
-                      (ChipClusters.OccupancySensingCluster
-                              .PIRUnoccupiedToOccupiedDelayAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedOccupancySensingClusterPIRUnoccupiedToOccupiedDelayAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readOccupancySensingPIRUnoccupiedToOccupiedDelayCommandParams);
     readOccupancySensingInteractionInfo.put(
         "readPIRUnoccupiedToOccupiedDelayAttribute",
@@ -12651,13 +11875,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OccupancySensingCluster) cluster)
                   .readPIRUnoccupiedToOccupiedThresholdAttribute(
-                      (ChipClusters.OccupancySensingCluster
-                              .PIRUnoccupiedToOccupiedThresholdAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedOccupancySensingClusterPIRUnoccupiedToOccupiedThresholdAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readOccupancySensingPIRUnoccupiedToOccupiedThresholdCommandParams);
     readOccupancySensingInteractionInfo.put(
         "readPIRUnoccupiedToOccupiedThresholdAttribute",
@@ -12671,13 +11891,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.OccupancySensingCluster) cluster)
                       .readUltrasonicOccupiedToUnoccupiedDelayAttribute(
-                          (ChipClusters.OccupancySensingCluster
-                                  .UltrasonicOccupiedToUnoccupiedDelayAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedOccupancySensingClusterUltrasonicOccupiedToUnoccupiedDelayAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readOccupancySensingUltrasonicOccupiedToUnoccupiedDelayCommandParams);
     readOccupancySensingInteractionInfo.put(
         "readUltrasonicOccupiedToUnoccupiedDelayAttribute",
@@ -12691,13 +11907,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.OccupancySensingCluster) cluster)
                       .readUltrasonicUnoccupiedToOccupiedDelayAttribute(
-                          (ChipClusters.OccupancySensingCluster
-                                  .UltrasonicUnoccupiedToOccupiedDelayAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedOccupancySensingClusterUltrasonicUnoccupiedToOccupiedDelayAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readOccupancySensingUltrasonicUnoccupiedToOccupiedDelayCommandParams);
     readOccupancySensingInteractionInfo.put(
         "readUltrasonicUnoccupiedToOccupiedDelayAttribute",
@@ -12711,13 +11923,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.OccupancySensingCluster) cluster)
                       .readUltrasonicUnoccupiedToOccupiedThresholdAttribute(
-                          (ChipClusters.OccupancySensingCluster
-                                  .UltrasonicUnoccupiedToOccupiedThresholdAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedOccupancySensingClusterUltrasonicUnoccupiedToOccupiedThresholdAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readOccupancySensingUltrasonicUnoccupiedToOccupiedThresholdCommandParams);
     readOccupancySensingInteractionInfo.put(
         "readUltrasonicUnoccupiedToOccupiedThresholdAttribute",
@@ -12731,13 +11939,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.OccupancySensingCluster) cluster)
                       .readPhysicalContactOccupiedToUnoccupiedDelayAttribute(
-                          (ChipClusters.OccupancySensingCluster
-                                  .PhysicalContactOccupiedToUnoccupiedDelayAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedOccupancySensingClusterPhysicalContactOccupiedToUnoccupiedDelayAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readOccupancySensingPhysicalContactOccupiedToUnoccupiedDelayCommandParams);
     readOccupancySensingInteractionInfo.put(
         "readPhysicalContactOccupiedToUnoccupiedDelayAttribute",
@@ -12751,13 +11955,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.OccupancySensingCluster) cluster)
                       .readPhysicalContactUnoccupiedToOccupiedDelayAttribute(
-                          (ChipClusters.OccupancySensingCluster
-                                  .PhysicalContactUnoccupiedToOccupiedDelayAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedOccupancySensingClusterPhysicalContactUnoccupiedToOccupiedDelayAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readOccupancySensingPhysicalContactUnoccupiedToOccupiedDelayCommandParams);
     readOccupancySensingInteractionInfo.put(
         "readPhysicalContactUnoccupiedToOccupiedDelayAttribute",
@@ -12771,13 +11971,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.OccupancySensingCluster) cluster)
                       .readPhysicalContactUnoccupiedToOccupiedThresholdAttribute(
-                          (ChipClusters.OccupancySensingCluster
-                                  .PhysicalContactUnoccupiedToOccupiedThresholdAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedOccupancySensingClusterPhysicalContactUnoccupiedToOccupiedThresholdAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readOccupancySensingPhysicalContactUnoccupiedToOccupiedThresholdCommandParams);
     readOccupancySensingInteractionInfo.put(
         "readPhysicalContactUnoccupiedToOccupiedThresholdAttribute",
@@ -12879,10 +12075,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WakeOnLanCluster) cluster)
-                  .readMACAddressAttribute(
-                      (ChipClusters.WakeOnLanCluster.MACAddressAttributeCallback) callback);
+                  .readMACAddressAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedWakeOnLanClusterMACAddressAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readWakeOnLanMACAddressCommandParams);
     readWakeOnLanInteractionInfo.put(
         "readMACAddressAttribute", readWakeOnLanMACAddressAttributeInteractionInfo);
@@ -13088,13 +12283,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TargetNavigatorCluster) cluster)
-                  .readCurrentTargetAttribute(
-                      (ChipClusters.TargetNavigatorCluster.CurrentTargetAttributeCallback)
-                          callback);
+                  .readCurrentTargetAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedTargetNavigatorClusterCurrentTargetAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readTargetNavigatorCurrentTargetCommandParams);
     readTargetNavigatorInteractionInfo.put(
         "readCurrentTargetAttribute", readTargetNavigatorCurrentTargetAttributeInteractionInfo);
@@ -13232,12 +12423,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.MediaPlaybackCluster) cluster)
-                  .readPlaybackSpeedAttribute(
-                      (ChipClusters.MediaPlaybackCluster.PlaybackSpeedAttributeCallback) callback);
+                  .readPlaybackSpeedAttribute((ChipClusters.FloatAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedMediaPlaybackClusterPlaybackSpeedAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedFloatAttributeCallback(),
             readMediaPlaybackPlaybackSpeedCommandParams);
     readMediaPlaybackInteractionInfo.put(
         "readPlaybackSpeedAttribute", readMediaPlaybackPlaybackSpeedAttributeInteractionInfo);
@@ -13663,13 +12851,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ContentLauncherCluster) cluster)
                   .readSupportedStreamingProtocolsAttribute(
-                      (ChipClusters.ContentLauncherCluster
-                              .SupportedStreamingProtocolsAttributeCallback)
-                          callback);
+                      (ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedContentLauncherClusterSupportedStreamingProtocolsAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readContentLauncherSupportedStreamingProtocolsCommandParams);
     readContentLauncherInteractionInfo.put(
         "readSupportedStreamingProtocolsAttribute",
@@ -13783,11 +12967,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.AudioOutputCluster) cluster)
-                  .readCurrentOutputAttribute(
-                      (ChipClusters.AudioOutputCluster.CurrentOutputAttributeCallback) callback);
+                  .readCurrentOutputAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedAudioOutputClusterCurrentOutputAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readAudioOutputCurrentOutputCommandParams);
     readAudioOutputInteractionInfo.put(
         "readCurrentOutputAttribute", readAudioOutputCurrentOutputAttributeInteractionInfo);
@@ -13994,12 +13176,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ApplicationBasicCluster) cluster)
-                  .readVendorNameAttribute(
-                      (ChipClusters.ApplicationBasicCluster.VendorNameAttributeCallback) callback);
+                  .readVendorNameAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedApplicationBasicClusterVendorNameAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readApplicationBasicVendorNameCommandParams);
     readApplicationBasicInteractionInfo.put(
         "readVendorNameAttribute", readApplicationBasicVendorNameAttributeInteractionInfo);
@@ -14009,11 +13188,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ApplicationBasicCluster) cluster)
-                  .readVendorIDAttribute(
-                      (ChipClusters.ApplicationBasicCluster.VendorIDAttributeCallback) callback);
+                  .readVendorIDAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedApplicationBasicClusterVendorIDAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readApplicationBasicVendorIDCommandParams);
     readApplicationBasicInteractionInfo.put(
         "readVendorIDAttribute", readApplicationBasicVendorIDAttributeInteractionInfo);
@@ -14037,11 +13214,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ApplicationBasicCluster) cluster)
-                  .readProductIDAttribute(
-                      (ChipClusters.ApplicationBasicCluster.ProductIDAttributeCallback) callback);
+                  .readProductIDAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedApplicationBasicClusterProductIDAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readApplicationBasicProductIDCommandParams);
     readApplicationBasicInteractionInfo.put(
         "readProductIDAttribute", readApplicationBasicProductIDAttributeInteractionInfo);
@@ -14272,13 +13447,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readMeasurementTypeAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.MeasurementTypeAttributeCallback)
-                          callback);
+                  .readMeasurementTypeAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterMeasurementTypeAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readElectricalMeasurementMeasurementTypeCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readMeasurementTypeAttribute",
@@ -14289,13 +13460,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readDcVoltageAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.DcVoltageAttributeCallback)
-                          callback);
+                  .readDcVoltageAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterDcVoltageAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementDcVoltageCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readDcVoltageAttribute", readElectricalMeasurementDcVoltageAttributeInteractionInfo);
@@ -14305,13 +13472,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readDcVoltageMinAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.DcVoltageMinAttributeCallback)
-                          callback);
+                  .readDcVoltageMinAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterDcVoltageMinAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementDcVoltageMinCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readDcVoltageMinAttribute", readElectricalMeasurementDcVoltageMinAttributeInteractionInfo);
@@ -14321,13 +13484,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readDcVoltageMaxAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.DcVoltageMaxAttributeCallback)
-                          callback);
+                  .readDcVoltageMaxAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterDcVoltageMaxAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementDcVoltageMaxCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readDcVoltageMaxAttribute", readElectricalMeasurementDcVoltageMaxAttributeInteractionInfo);
@@ -14337,13 +13496,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readDcCurrentAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.DcCurrentAttributeCallback)
-                          callback);
+                  .readDcCurrentAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterDcCurrentAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementDcCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readDcCurrentAttribute", readElectricalMeasurementDcCurrentAttributeInteractionInfo);
@@ -14353,13 +13508,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readDcCurrentMinAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.DcCurrentMinAttributeCallback)
-                          callback);
+                  .readDcCurrentMinAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterDcCurrentMinAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementDcCurrentMinCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readDcCurrentMinAttribute", readElectricalMeasurementDcCurrentMinAttributeInteractionInfo);
@@ -14369,13 +13520,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readDcCurrentMaxAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.DcCurrentMaxAttributeCallback)
-                          callback);
+                  .readDcCurrentMaxAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterDcCurrentMaxAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementDcCurrentMaxCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readDcCurrentMaxAttribute", readElectricalMeasurementDcCurrentMaxAttributeInteractionInfo);
@@ -14385,13 +13532,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readDcPowerAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.DcPowerAttributeCallback)
-                          callback);
+                  .readDcPowerAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterDcPowerAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementDcPowerCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readDcPowerAttribute", readElectricalMeasurementDcPowerAttributeInteractionInfo);
@@ -14401,13 +13544,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readDcPowerMinAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.DcPowerMinAttributeCallback)
-                          callback);
+                  .readDcPowerMinAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterDcPowerMinAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementDcPowerMinCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readDcPowerMinAttribute", readElectricalMeasurementDcPowerMinAttributeInteractionInfo);
@@ -14417,13 +13556,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readDcPowerMaxAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.DcPowerMaxAttributeCallback)
-                          callback);
+                  .readDcPowerMaxAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterDcPowerMaxAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementDcPowerMaxCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readDcPowerMaxAttribute", readElectricalMeasurementDcPowerMaxAttributeInteractionInfo);
@@ -14434,13 +13569,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readDcVoltageMultiplierAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .DcVoltageMultiplierAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterDcVoltageMultiplierAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementDcVoltageMultiplierCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readDcVoltageMultiplierAttribute",
@@ -14451,13 +13582,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readDcVoltageDivisorAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.DcVoltageDivisorAttributeCallback)
-                          callback);
+                  .readDcVoltageDivisorAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterDcVoltageDivisorAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementDcVoltageDivisorCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readDcVoltageDivisorAttribute",
@@ -14469,13 +13596,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readDcCurrentMultiplierAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .DcCurrentMultiplierAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterDcCurrentMultiplierAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementDcCurrentMultiplierCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readDcCurrentMultiplierAttribute",
@@ -14486,13 +13609,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readDcCurrentDivisorAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.DcCurrentDivisorAttributeCallback)
-                          callback);
+                  .readDcCurrentDivisorAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterDcCurrentDivisorAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementDcCurrentDivisorCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readDcCurrentDivisorAttribute",
@@ -14503,13 +13622,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readDcPowerMultiplierAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.DcPowerMultiplierAttributeCallback)
-                          callback);
+                  .readDcPowerMultiplierAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterDcPowerMultiplierAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementDcPowerMultiplierCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readDcPowerMultiplierAttribute",
@@ -14520,13 +13635,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readDcPowerDivisorAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.DcPowerDivisorAttributeCallback)
-                          callback);
+                  .readDcPowerDivisorAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterDcPowerDivisorAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementDcPowerDivisorCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readDcPowerDivisorAttribute",
@@ -14537,13 +13648,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readAcFrequencyAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.AcFrequencyAttributeCallback)
-                          callback);
+                  .readAcFrequencyAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAcFrequencyAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAcFrequencyCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAcFrequencyAttribute", readElectricalMeasurementAcFrequencyAttributeInteractionInfo);
@@ -14553,13 +13660,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readAcFrequencyMinAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.AcFrequencyMinAttributeCallback)
-                          callback);
+                  .readAcFrequencyMinAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAcFrequencyMinAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAcFrequencyMinCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAcFrequencyMinAttribute",
@@ -14570,13 +13673,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readAcFrequencyMaxAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.AcFrequencyMaxAttributeCallback)
-                          callback);
+                  .readAcFrequencyMaxAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAcFrequencyMaxAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAcFrequencyMaxCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAcFrequencyMaxAttribute",
@@ -14587,13 +13686,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readNeutralCurrentAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.NeutralCurrentAttributeCallback)
-                          callback);
+                  .readNeutralCurrentAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterNeutralCurrentAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementNeutralCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readNeutralCurrentAttribute",
@@ -14604,13 +13699,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readTotalActivePowerAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.TotalActivePowerAttributeCallback)
-                          callback);
+                  .readTotalActivePowerAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterTotalActivePowerAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readElectricalMeasurementTotalActivePowerCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readTotalActivePowerAttribute",
@@ -14621,14 +13712,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readTotalReactivePowerAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .TotalReactivePowerAttributeCallback)
-                          callback);
+                  .readTotalReactivePowerAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterTotalReactivePowerAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readElectricalMeasurementTotalReactivePowerCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readTotalReactivePowerAttribute",
@@ -14639,14 +13725,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readTotalApparentPowerAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .TotalApparentPowerAttributeCallback)
-                          callback);
+                  .readTotalApparentPowerAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterTotalApparentPowerAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readElectricalMeasurementTotalApparentPowerCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readTotalApparentPowerAttribute",
@@ -14659,13 +13740,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readMeasured1stHarmonicCurrentAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .Measured1stHarmonicCurrentAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterMeasured1stHarmonicCurrentAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementMeasured1stHarmonicCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readMeasured1stHarmonicCurrentAttribute",
@@ -14678,13 +13755,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readMeasured3rdHarmonicCurrentAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .Measured3rdHarmonicCurrentAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterMeasured3rdHarmonicCurrentAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementMeasured3rdHarmonicCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readMeasured3rdHarmonicCurrentAttribute",
@@ -14697,13 +13770,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readMeasured5thHarmonicCurrentAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .Measured5thHarmonicCurrentAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterMeasured5thHarmonicCurrentAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementMeasured5thHarmonicCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readMeasured5thHarmonicCurrentAttribute",
@@ -14716,13 +13785,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readMeasured7thHarmonicCurrentAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .Measured7thHarmonicCurrentAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterMeasured7thHarmonicCurrentAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementMeasured7thHarmonicCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readMeasured7thHarmonicCurrentAttribute",
@@ -14735,13 +13800,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readMeasured9thHarmonicCurrentAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .Measured9thHarmonicCurrentAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterMeasured9thHarmonicCurrentAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementMeasured9thHarmonicCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readMeasured9thHarmonicCurrentAttribute",
@@ -14754,13 +13815,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readMeasured11thHarmonicCurrentAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .Measured11thHarmonicCurrentAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterMeasured11thHarmonicCurrentAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementMeasured11thHarmonicCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readMeasured11thHarmonicCurrentAttribute",
@@ -14774,13 +13831,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readMeasuredPhase1stHarmonicCurrentAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .MeasuredPhase1stHarmonicCurrentAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterMeasuredPhase1stHarmonicCurrentAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementMeasuredPhase1stHarmonicCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readMeasuredPhase1stHarmonicCurrentAttribute",
@@ -14794,13 +13847,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readMeasuredPhase3rdHarmonicCurrentAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .MeasuredPhase3rdHarmonicCurrentAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterMeasuredPhase3rdHarmonicCurrentAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementMeasuredPhase3rdHarmonicCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readMeasuredPhase3rdHarmonicCurrentAttribute",
@@ -14814,13 +13863,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readMeasuredPhase5thHarmonicCurrentAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .MeasuredPhase5thHarmonicCurrentAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterMeasuredPhase5thHarmonicCurrentAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementMeasuredPhase5thHarmonicCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readMeasuredPhase5thHarmonicCurrentAttribute",
@@ -14834,13 +13879,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readMeasuredPhase7thHarmonicCurrentAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .MeasuredPhase7thHarmonicCurrentAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterMeasuredPhase7thHarmonicCurrentAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementMeasuredPhase7thHarmonicCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readMeasuredPhase7thHarmonicCurrentAttribute",
@@ -14854,13 +13895,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readMeasuredPhase9thHarmonicCurrentAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .MeasuredPhase9thHarmonicCurrentAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterMeasuredPhase9thHarmonicCurrentAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementMeasuredPhase9thHarmonicCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readMeasuredPhase9thHarmonicCurrentAttribute",
@@ -14874,13 +13911,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readMeasuredPhase11thHarmonicCurrentAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .MeasuredPhase11thHarmonicCurrentAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterMeasuredPhase11thHarmonicCurrentAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementMeasuredPhase11thHarmonicCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readMeasuredPhase11thHarmonicCurrentAttribute",
@@ -14892,13 +13925,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readAcFrequencyMultiplierAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .AcFrequencyMultiplierAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAcFrequencyMultiplierAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAcFrequencyMultiplierCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAcFrequencyMultiplierAttribute",
@@ -14910,13 +13939,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readAcFrequencyDivisorAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .AcFrequencyDivisorAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAcFrequencyDivisorAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAcFrequencyDivisorCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAcFrequencyDivisorAttribute",
@@ -14927,13 +13952,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readPowerMultiplierAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.PowerMultiplierAttributeCallback)
-                          callback);
+                  .readPowerMultiplierAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterPowerMultiplierAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readElectricalMeasurementPowerMultiplierCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readPowerMultiplierAttribute",
@@ -14944,13 +13965,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readPowerDivisorAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.PowerDivisorAttributeCallback)
-                          callback);
+                  .readPowerDivisorAttribute((ChipClusters.LongAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterPowerDivisorAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readElectricalMeasurementPowerDivisorCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readPowerDivisorAttribute", readElectricalMeasurementPowerDivisorAttributeInteractionInfo);
@@ -14962,13 +13979,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readHarmonicCurrentMultiplierAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .HarmonicCurrentMultiplierAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterHarmonicCurrentMultiplierAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementHarmonicCurrentMultiplierCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readHarmonicCurrentMultiplierAttribute",
@@ -14982,13 +13995,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readPhaseHarmonicCurrentMultiplierAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .PhaseHarmonicCurrentMultiplierAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterPhaseHarmonicCurrentMultiplierAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementPhaseHarmonicCurrentMultiplierCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readPhaseHarmonicCurrentMultiplierAttribute",
@@ -15000,13 +14009,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readInstantaneousVoltageAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .InstantaneousVoltageAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterInstantaneousVoltageAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementInstantaneousVoltageCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readInstantaneousVoltageAttribute",
@@ -15019,13 +14024,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readInstantaneousLineCurrentAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .InstantaneousLineCurrentAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterInstantaneousLineCurrentAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementInstantaneousLineCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readInstantaneousLineCurrentAttribute",
@@ -15038,13 +14039,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readInstantaneousActiveCurrentAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .InstantaneousActiveCurrentAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterInstantaneousActiveCurrentAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementInstantaneousActiveCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readInstantaneousActiveCurrentAttribute",
@@ -15057,13 +14054,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readInstantaneousReactiveCurrentAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .InstantaneousReactiveCurrentAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterInstantaneousReactiveCurrentAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementInstantaneousReactiveCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readInstantaneousReactiveCurrentAttribute",
@@ -15075,13 +14068,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readInstantaneousPowerAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .InstantaneousPowerAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterInstantaneousPowerAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementInstantaneousPowerCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readInstantaneousPowerAttribute",
@@ -15092,13 +14081,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readRmsVoltageAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.RmsVoltageAttributeCallback)
-                          callback);
+                  .readRmsVoltageAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsVoltageAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsVoltageCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsVoltageAttribute", readElectricalMeasurementRmsVoltageAttributeInteractionInfo);
@@ -15108,13 +14093,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readRmsVoltageMinAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.RmsVoltageMinAttributeCallback)
-                          callback);
+                  .readRmsVoltageMinAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsVoltageMinAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsVoltageMinCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsVoltageMinAttribute",
@@ -15125,13 +14106,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readRmsVoltageMaxAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.RmsVoltageMaxAttributeCallback)
-                          callback);
+                  .readRmsVoltageMaxAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsVoltageMaxAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsVoltageMaxCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsVoltageMaxAttribute",
@@ -15142,13 +14119,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readRmsCurrentAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.RmsCurrentAttributeCallback)
-                          callback);
+                  .readRmsCurrentAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsCurrentAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsCurrentCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsCurrentAttribute", readElectricalMeasurementRmsCurrentAttributeInteractionInfo);
@@ -15158,13 +14131,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readRmsCurrentMinAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.RmsCurrentMinAttributeCallback)
-                          callback);
+                  .readRmsCurrentMinAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsCurrentMinAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsCurrentMinCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsCurrentMinAttribute",
@@ -15175,13 +14144,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readRmsCurrentMaxAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.RmsCurrentMaxAttributeCallback)
-                          callback);
+                  .readRmsCurrentMaxAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsCurrentMaxAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsCurrentMaxCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsCurrentMaxAttribute",
@@ -15192,13 +14157,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readActivePowerAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.ActivePowerAttributeCallback)
-                          callback);
+                  .readActivePowerAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterActivePowerAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementActivePowerCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readActivePowerAttribute", readElectricalMeasurementActivePowerAttributeInteractionInfo);
@@ -15208,13 +14169,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readActivePowerMinAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.ActivePowerMinAttributeCallback)
-                          callback);
+                  .readActivePowerMinAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterActivePowerMinAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementActivePowerMinCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readActivePowerMinAttribute",
@@ -15225,13 +14182,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readActivePowerMaxAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.ActivePowerMaxAttributeCallback)
-                          callback);
+                  .readActivePowerMaxAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterActivePowerMaxAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementActivePowerMaxCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readActivePowerMaxAttribute",
@@ -15242,13 +14195,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readReactivePowerAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.ReactivePowerAttributeCallback)
-                          callback);
+                  .readReactivePowerAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterReactivePowerAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementReactivePowerCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readReactivePowerAttribute",
@@ -15259,13 +14208,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readApparentPowerAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.ApparentPowerAttributeCallback)
-                          callback);
+                  .readApparentPowerAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterApparentPowerAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementApparentPowerCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readApparentPowerAttribute",
@@ -15276,13 +14221,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readPowerFactorAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.PowerFactorAttributeCallback)
-                          callback);
+                  .readPowerFactorAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterPowerFactorAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementPowerFactorCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readPowerFactorAttribute", readElectricalMeasurementPowerFactorAttributeInteractionInfo);
@@ -15295,13 +14236,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readAverageRmsVoltageMeasurementPeriodAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .AverageRmsVoltageMeasurementPeriodAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterAverageRmsVoltageMeasurementPeriodAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementAverageRmsVoltageMeasurementPeriodCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAverageRmsVoltageMeasurementPeriodAttribute",
@@ -15314,13 +14251,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readAverageRmsUnderVoltageCounterAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .AverageRmsUnderVoltageCounterAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAverageRmsUnderVoltageCounterAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAverageRmsUnderVoltageCounterCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAverageRmsUnderVoltageCounterAttribute",
@@ -15333,13 +14266,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsExtremeOverVoltagePeriodAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsExtremeOverVoltagePeriodAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsExtremeOverVoltagePeriodAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsExtremeOverVoltagePeriodCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsExtremeOverVoltagePeriodAttribute",
@@ -15352,13 +14281,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsExtremeUnderVoltagePeriodAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsExtremeUnderVoltagePeriodAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsExtremeUnderVoltagePeriodAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsExtremeUnderVoltagePeriodCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsExtremeUnderVoltagePeriodAttribute",
@@ -15370,13 +14295,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsVoltageSagPeriodAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsVoltageSagPeriodAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsVoltageSagPeriodAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsVoltageSagPeriodCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsVoltageSagPeriodAttribute",
@@ -15388,13 +14309,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsVoltageSwellPeriodAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsVoltageSwellPeriodAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsVoltageSwellPeriodAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsVoltageSwellPeriodCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsVoltageSwellPeriodAttribute",
@@ -15406,13 +14323,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readAcVoltageMultiplierAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .AcVoltageMultiplierAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAcVoltageMultiplierAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAcVoltageMultiplierCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAcVoltageMultiplierAttribute",
@@ -15423,13 +14336,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readAcVoltageDivisorAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.AcVoltageDivisorAttributeCallback)
-                          callback);
+                  .readAcVoltageDivisorAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAcVoltageDivisorAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAcVoltageDivisorCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAcVoltageDivisorAttribute",
@@ -15441,13 +14350,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readAcCurrentMultiplierAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .AcCurrentMultiplierAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAcCurrentMultiplierAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAcCurrentMultiplierCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAcCurrentMultiplierAttribute",
@@ -15458,13 +14363,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readAcCurrentDivisorAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.AcCurrentDivisorAttributeCallback)
-                          callback);
+                  .readAcCurrentDivisorAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAcCurrentDivisorAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAcCurrentDivisorCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAcCurrentDivisorAttribute",
@@ -15475,13 +14376,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readAcPowerMultiplierAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.AcPowerMultiplierAttributeCallback)
-                          callback);
+                  .readAcPowerMultiplierAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAcPowerMultiplierAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAcPowerMultiplierCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAcPowerMultiplierAttribute",
@@ -15492,13 +14389,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readAcPowerDivisorAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.AcPowerDivisorAttributeCallback)
-                          callback);
+                  .readAcPowerDivisorAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAcPowerDivisorAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAcPowerDivisorCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAcPowerDivisorAttribute",
@@ -15510,13 +14403,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readOverloadAlarmsMaskAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .OverloadAlarmsMaskAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterOverloadAlarmsMaskAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementOverloadAlarmsMaskCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readOverloadAlarmsMaskAttribute",
@@ -15527,13 +14416,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readVoltageOverloadAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.VoltageOverloadAttributeCallback)
-                          callback);
+                  .readVoltageOverloadAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterVoltageOverloadAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementVoltageOverloadCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readVoltageOverloadAttribute",
@@ -15544,13 +14429,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readCurrentOverloadAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.CurrentOverloadAttributeCallback)
-                          callback);
+                  .readCurrentOverloadAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterCurrentOverloadAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementCurrentOverloadCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readCurrentOverloadAttribute",
@@ -15562,13 +14443,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readAcOverloadAlarmsMaskAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .AcOverloadAlarmsMaskAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAcOverloadAlarmsMaskAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAcOverloadAlarmsMaskCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAcOverloadAlarmsMaskAttribute",
@@ -15579,13 +14456,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readAcVoltageOverloadAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.AcVoltageOverloadAttributeCallback)
-                          callback);
+                  .readAcVoltageOverloadAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAcVoltageOverloadAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAcVoltageOverloadCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAcVoltageOverloadAttribute",
@@ -15596,13 +14469,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readAcCurrentOverloadAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.AcCurrentOverloadAttributeCallback)
-                          callback);
+                  .readAcCurrentOverloadAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAcCurrentOverloadAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAcCurrentOverloadCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAcCurrentOverloadAttribute",
@@ -15614,13 +14483,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readAcActivePowerOverloadAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .AcActivePowerOverloadAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAcActivePowerOverloadAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAcActivePowerOverloadCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAcActivePowerOverloadAttribute",
@@ -15633,13 +14498,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readAcReactivePowerOverloadAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .AcReactivePowerOverloadAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAcReactivePowerOverloadAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAcReactivePowerOverloadCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAcReactivePowerOverloadAttribute",
@@ -15651,13 +14512,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readAverageRmsOverVoltageAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .AverageRmsOverVoltageAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAverageRmsOverVoltageAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAverageRmsOverVoltageCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAverageRmsOverVoltageAttribute",
@@ -15669,13 +14526,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readAverageRmsUnderVoltageAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .AverageRmsUnderVoltageAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterAverageRmsUnderVoltageAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementAverageRmsUnderVoltageCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAverageRmsUnderVoltageAttribute",
@@ -15687,13 +14540,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsExtremeOverVoltageAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsExtremeOverVoltageAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsExtremeOverVoltageAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsExtremeOverVoltageCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsExtremeOverVoltageAttribute",
@@ -15705,13 +14554,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsExtremeUnderVoltageAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsExtremeUnderVoltageAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsExtremeUnderVoltageAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsExtremeUnderVoltageCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsExtremeUnderVoltageAttribute",
@@ -15722,13 +14567,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readRmsVoltageSagAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.RmsVoltageSagAttributeCallback)
-                          callback);
+                  .readRmsVoltageSagAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsVoltageSagAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsVoltageSagCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsVoltageSagAttribute",
@@ -15739,13 +14580,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readRmsVoltageSwellAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.RmsVoltageSwellAttributeCallback)
-                          callback);
+                  .readRmsVoltageSwellAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsVoltageSwellAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsVoltageSwellCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsVoltageSwellAttribute",
@@ -15756,13 +14593,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readLineCurrentPhaseBAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.LineCurrentPhaseBAttributeCallback)
-                          callback);
+                  .readLineCurrentPhaseBAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterLineCurrentPhaseBAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementLineCurrentPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readLineCurrentPhaseBAttribute",
@@ -15774,13 +14607,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readActiveCurrentPhaseBAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .ActiveCurrentPhaseBAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterActiveCurrentPhaseBAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementActiveCurrentPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readActiveCurrentPhaseBAttribute",
@@ -15792,13 +14621,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readReactiveCurrentPhaseBAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .ReactiveCurrentPhaseBAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterReactiveCurrentPhaseBAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementReactiveCurrentPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readReactiveCurrentPhaseBAttribute",
@@ -15809,13 +14634,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readRmsVoltagePhaseBAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.RmsVoltagePhaseBAttributeCallback)
-                          callback);
+                  .readRmsVoltagePhaseBAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsVoltagePhaseBAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsVoltagePhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsVoltagePhaseBAttribute",
@@ -15827,13 +14648,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsVoltageMinPhaseBAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsVoltageMinPhaseBAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsVoltageMinPhaseBAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsVoltageMinPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsVoltageMinPhaseBAttribute",
@@ -15845,13 +14662,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsVoltageMaxPhaseBAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsVoltageMaxPhaseBAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsVoltageMaxPhaseBAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsVoltageMaxPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsVoltageMaxPhaseBAttribute",
@@ -15862,13 +14675,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readRmsCurrentPhaseBAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.RmsCurrentPhaseBAttributeCallback)
-                          callback);
+                  .readRmsCurrentPhaseBAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsCurrentPhaseBAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsCurrentPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsCurrentPhaseBAttribute",
@@ -15880,13 +14689,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsCurrentMinPhaseBAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsCurrentMinPhaseBAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsCurrentMinPhaseBAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsCurrentMinPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsCurrentMinPhaseBAttribute",
@@ -15898,13 +14703,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsCurrentMaxPhaseBAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsCurrentMaxPhaseBAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsCurrentMaxPhaseBAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsCurrentMaxPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsCurrentMaxPhaseBAttribute",
@@ -15915,13 +14716,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readActivePowerPhaseBAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.ActivePowerPhaseBAttributeCallback)
-                          callback);
+                  .readActivePowerPhaseBAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterActivePowerPhaseBAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementActivePowerPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readActivePowerPhaseBAttribute",
@@ -15933,13 +14730,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readActivePowerMinPhaseBAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .ActivePowerMinPhaseBAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterActivePowerMinPhaseBAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementActivePowerMinPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readActivePowerMinPhaseBAttribute",
@@ -15951,13 +14744,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readActivePowerMaxPhaseBAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .ActivePowerMaxPhaseBAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterActivePowerMaxPhaseBAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementActivePowerMaxPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readActivePowerMaxPhaseBAttribute",
@@ -15969,13 +14758,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readReactivePowerPhaseBAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .ReactivePowerPhaseBAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterReactivePowerPhaseBAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementReactivePowerPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readReactivePowerPhaseBAttribute",
@@ -15987,13 +14772,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readApparentPowerPhaseBAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .ApparentPowerPhaseBAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterApparentPowerPhaseBAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementApparentPowerPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readApparentPowerPhaseBAttribute",
@@ -16004,13 +14785,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readPowerFactorPhaseBAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.PowerFactorPhaseBAttributeCallback)
-                          callback);
+                  .readPowerFactorPhaseBAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterPowerFactorPhaseBAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementPowerFactorPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readPowerFactorPhaseBAttribute",
@@ -16024,13 +14801,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readAverageRmsVoltageMeasurementPeriodPhaseBAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .AverageRmsVoltageMeasurementPeriodPhaseBAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterAverageRmsVoltageMeasurementPeriodPhaseBAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementAverageRmsVoltageMeasurementPeriodPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAverageRmsVoltageMeasurementPeriodPhaseBAttribute",
@@ -16044,13 +14817,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readAverageRmsOverVoltageCounterPhaseBAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .AverageRmsOverVoltageCounterPhaseBAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterAverageRmsOverVoltageCounterPhaseBAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementAverageRmsOverVoltageCounterPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAverageRmsOverVoltageCounterPhaseBAttribute",
@@ -16064,13 +14833,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readAverageRmsUnderVoltageCounterPhaseBAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .AverageRmsUnderVoltageCounterPhaseBAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterAverageRmsUnderVoltageCounterPhaseBAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementAverageRmsUnderVoltageCounterPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAverageRmsUnderVoltageCounterPhaseBAttribute",
@@ -16084,13 +14849,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readRmsExtremeOverVoltagePeriodPhaseBAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .RmsExtremeOverVoltagePeriodPhaseBAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterRmsExtremeOverVoltagePeriodPhaseBAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementRmsExtremeOverVoltagePeriodPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsExtremeOverVoltagePeriodPhaseBAttribute",
@@ -16104,13 +14865,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readRmsExtremeUnderVoltagePeriodPhaseBAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .RmsExtremeUnderVoltagePeriodPhaseBAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterRmsExtremeUnderVoltagePeriodPhaseBAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementRmsExtremeUnderVoltagePeriodPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsExtremeUnderVoltagePeriodPhaseBAttribute",
@@ -16123,13 +14880,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsVoltageSagPeriodPhaseBAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsVoltageSagPeriodPhaseBAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsVoltageSagPeriodPhaseBAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsVoltageSagPeriodPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsVoltageSagPeriodPhaseBAttribute",
@@ -16142,13 +14895,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsVoltageSwellPeriodPhaseBAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsVoltageSwellPeriodPhaseBAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsVoltageSwellPeriodPhaseBAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsVoltageSwellPeriodPhaseBCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsVoltageSwellPeriodPhaseBAttribute",
@@ -16159,13 +14908,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readLineCurrentPhaseCAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.LineCurrentPhaseCAttributeCallback)
-                          callback);
+                  .readLineCurrentPhaseCAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterLineCurrentPhaseCAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementLineCurrentPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readLineCurrentPhaseCAttribute",
@@ -16177,13 +14922,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readActiveCurrentPhaseCAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .ActiveCurrentPhaseCAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterActiveCurrentPhaseCAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementActiveCurrentPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readActiveCurrentPhaseCAttribute",
@@ -16195,13 +14936,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readReactiveCurrentPhaseCAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .ReactiveCurrentPhaseCAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterReactiveCurrentPhaseCAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementReactiveCurrentPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readReactiveCurrentPhaseCAttribute",
@@ -16212,13 +14949,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readRmsVoltagePhaseCAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.RmsVoltagePhaseCAttributeCallback)
-                          callback);
+                  .readRmsVoltagePhaseCAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsVoltagePhaseCAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsVoltagePhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsVoltagePhaseCAttribute",
@@ -16230,13 +14963,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsVoltageMinPhaseCAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsVoltageMinPhaseCAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsVoltageMinPhaseCAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsVoltageMinPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsVoltageMinPhaseCAttribute",
@@ -16248,13 +14977,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsVoltageMaxPhaseCAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsVoltageMaxPhaseCAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsVoltageMaxPhaseCAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsVoltageMaxPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsVoltageMaxPhaseCAttribute",
@@ -16265,13 +14990,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readRmsCurrentPhaseCAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.RmsCurrentPhaseCAttributeCallback)
-                          callback);
+                  .readRmsCurrentPhaseCAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsCurrentPhaseCAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsCurrentPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsCurrentPhaseCAttribute",
@@ -16283,13 +15004,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsCurrentMinPhaseCAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsCurrentMinPhaseCAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsCurrentMinPhaseCAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsCurrentMinPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsCurrentMinPhaseCAttribute",
@@ -16301,13 +15018,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsCurrentMaxPhaseCAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsCurrentMaxPhaseCAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsCurrentMaxPhaseCAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsCurrentMaxPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsCurrentMaxPhaseCAttribute",
@@ -16318,13 +15031,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readActivePowerPhaseCAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.ActivePowerPhaseCAttributeCallback)
-                          callback);
+                  .readActivePowerPhaseCAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterActivePowerPhaseCAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementActivePowerPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readActivePowerPhaseCAttribute",
@@ -16336,13 +15045,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readActivePowerMinPhaseCAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .ActivePowerMinPhaseCAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterActivePowerMinPhaseCAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementActivePowerMinPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readActivePowerMinPhaseCAttribute",
@@ -16354,13 +15059,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readActivePowerMaxPhaseCAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .ActivePowerMaxPhaseCAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterActivePowerMaxPhaseCAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementActivePowerMaxPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readActivePowerMaxPhaseCAttribute",
@@ -16372,13 +15073,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readReactivePowerPhaseCAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .ReactivePowerPhaseCAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterReactivePowerPhaseCAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementReactivePowerPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readReactivePowerPhaseCAttribute",
@@ -16390,13 +15087,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readApparentPowerPhaseCAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .ApparentPowerPhaseCAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterApparentPowerPhaseCAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementApparentPowerPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readApparentPowerPhaseCAttribute",
@@ -16407,13 +15100,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
-                  .readPowerFactorPhaseCAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster.PowerFactorPhaseCAttributeCallback)
-                          callback);
+                  .readPowerFactorPhaseCAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterPowerFactorPhaseCAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementPowerFactorPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readPowerFactorPhaseCAttribute",
@@ -16427,13 +15116,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readAverageRmsVoltageMeasurementPeriodPhaseCAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .AverageRmsVoltageMeasurementPeriodPhaseCAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterAverageRmsVoltageMeasurementPeriodPhaseCAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementAverageRmsVoltageMeasurementPeriodPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAverageRmsVoltageMeasurementPeriodPhaseCAttribute",
@@ -16447,13 +15132,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readAverageRmsOverVoltageCounterPhaseCAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .AverageRmsOverVoltageCounterPhaseCAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterAverageRmsOverVoltageCounterPhaseCAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementAverageRmsOverVoltageCounterPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAverageRmsOverVoltageCounterPhaseCAttribute",
@@ -16467,13 +15148,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readAverageRmsUnderVoltageCounterPhaseCAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .AverageRmsUnderVoltageCounterPhaseCAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterAverageRmsUnderVoltageCounterPhaseCAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementAverageRmsUnderVoltageCounterPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readAverageRmsUnderVoltageCounterPhaseCAttribute",
@@ -16487,13 +15164,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readRmsExtremeOverVoltagePeriodPhaseCAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .RmsExtremeOverVoltagePeriodPhaseCAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterRmsExtremeOverVoltagePeriodPhaseCAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementRmsExtremeOverVoltagePeriodPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsExtremeOverVoltagePeriodPhaseCAttribute",
@@ -16507,13 +15180,9 @@ public class ClusterReadMapping {
                 (cluster, callback, commandArguments) -> {
                   ((ChipClusters.ElectricalMeasurementCluster) cluster)
                       .readRmsExtremeUnderVoltagePeriodPhaseCAttribute(
-                          (ChipClusters.ElectricalMeasurementCluster
-                                  .RmsExtremeUnderVoltagePeriodPhaseCAttributeCallback)
-                              callback);
+                          (ChipClusters.IntegerAttributeCallback) callback);
                 },
-                () ->
-                    new ClusterInfoMapping
-                        .DelegatedElectricalMeasurementClusterRmsExtremeUnderVoltagePeriodPhaseCAttributeCallback(),
+                () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
                 readElectricalMeasurementRmsExtremeUnderVoltagePeriodPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsExtremeUnderVoltagePeriodPhaseCAttribute",
@@ -16526,13 +15195,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsVoltageSagPeriodPhaseCAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsVoltageSagPeriodPhaseCAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsVoltageSagPeriodPhaseCAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsVoltageSagPeriodPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsVoltageSagPeriodPhaseCAttribute",
@@ -16545,13 +15210,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ElectricalMeasurementCluster) cluster)
                   .readRmsVoltageSwellPeriodPhaseCAttribute(
-                      (ChipClusters.ElectricalMeasurementCluster
-                              .RmsVoltageSwellPeriodPhaseCAttributeCallback)
-                          callback);
+                      (ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping
-                    .DelegatedElectricalMeasurementClusterRmsVoltageSwellPeriodPhaseCAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readElectricalMeasurementRmsVoltageSwellPeriodPhaseCCommandParams);
     readElectricalMeasurementInteractionInfo.put(
         "readRmsVoltageSwellPeriodPhaseCAttribute",
@@ -17394,10 +16055,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.UnitTestingCluster) cluster)
-                  .readUnsupportedAttribute(
-                      (ChipClusters.UnitTestingCluster.UnsupportedAttributeCallback) callback);
+                  .readUnsupportedAttribute((ChipClusters.BooleanAttributeCallback) callback);
             },
-            () -> new ClusterInfoMapping.DelegatedUnitTestingClusterUnsupportedAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
             readUnitTestingUnsupportedCommandParams);
     readUnitTestingInteractionInfo.put(
         "readUnsupportedAttribute", readUnitTestingUnsupportedAttributeInteractionInfo);
@@ -17889,11 +16549,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.UnitTestingCluster) cluster)
-                  .readWriteOnlyInt8uAttribute(
-                      (ChipClusters.UnitTestingCluster.WriteOnlyInt8uAttributeCallback) callback);
+                  .readWriteOnlyInt8uAttribute((ChipClusters.IntegerAttributeCallback) callback);
             },
-            () ->
-                new ClusterInfoMapping.DelegatedUnitTestingClusterWriteOnlyInt8uAttributeCallback(),
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readUnitTestingWriteOnlyInt8uCommandParams);
     readUnitTestingInteractionInfo.put(
         "readWriteOnlyInt8uAttribute", readUnitTestingWriteOnlyInt8uAttributeInteractionInfo);
