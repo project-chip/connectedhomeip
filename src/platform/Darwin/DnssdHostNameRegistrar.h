@@ -36,7 +36,9 @@ namespace Dnssd {
 
     class HostNameRegistrar {
     public:
-        void Init(const char * hostname, Inet::IPAddressType addressType, uint32_t interfaceId);
+        ~HostNameRegistrar();
+
+        DNSServiceErrorType Init(const char * hostname, Inet::IPAddressType addressType, uint32_t interfaceId);
 
         CHIP_ERROR Register();
         void Unregister();
@@ -61,15 +63,24 @@ namespace Dnssd {
         CHIP_ERROR StartSharedConnection();
         void StopSharedConnection();
         CHIP_ERROR ResetSharedConnection();
-        DNSServiceRef mServiceRef;
 
         CHIP_ERROR StartMonitorInterfaces(OnInterfaceChanges interfaceChangesBlock);
         void StopMonitorInterfaces();
-        nw_path_monitor_t mInterfaceMonitor;
+
+        DNSServiceRef mServiceRef = nullptr;
+        nw_path_monitor_t mInterfaceMonitor = nullptr;
 
         std::string mHostname;
-        uint32_t mInterfaceId;
+        // Default to kDNSServiceInterfaceIndexLocalOnly so we don't mess around
+        // with un-registration if we never get Init() called.
+        uint32_t mInterfaceId = kDNSServiceInterfaceIndexLocalOnly;
         Inet::IPAddressType mAddressType;
+
+        // We use mLivenessTracker to indicate to blocks that close over us that
+        // we've been destroyed.  This is needed because we're not a refcounted
+        // object, so the blocks can't keep us alive; they just close over the
+        // raw pointer to "this".
+        std::shared_ptr<bool> mLivenessTracker;
     };
 
 } // namespace Dnssd

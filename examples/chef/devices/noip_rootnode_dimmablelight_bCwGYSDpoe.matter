@@ -1463,7 +1463,7 @@ endpoint 0 {
 
   server cluster Groups {
     ram      attribute nameSupport;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -1472,7 +1472,7 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
 
@@ -1482,7 +1482,7 @@ endpoint 0 {
     callback attribute acl;
     callback attribute extension;
     callback attribute attributeList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1497,19 +1497,19 @@ endpoint 0 {
     callback attribute productID;
     persist  attribute nodeLabel;
     callback attribute location default = "XX";
-    callback attribute hardwareVersion;
+    callback attribute hardwareVersion default = 0;
     callback attribute hardwareVersionString;
-    callback attribute softwareVersion;
+    callback attribute softwareVersion default = 0;
     callback attribute softwareVersionString;
     callback attribute manufacturingDate default = "20210614123456ZZ";
     callback attribute partNumber;
     callback attribute productURL;
     callback attribute productLabel;
     callback attribute serialNumber;
-    persist  attribute localConfigDisabled;
+    persist  attribute localConfigDisabled default = 0;
     ram      attribute reachable default = 1;
     callback attribute uniqueID;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1519,60 +1519,60 @@ endpoint 0 {
     emits event DownloadError;
     callback attribute defaultOTAProviders;
     ram      attribute updatePossible default = 1;
-    ram      attribute updateState;
-    ram      attribute updateStateProgress;
-    ram      attribute featureMap;
+    ram      attribute updateState default = 0;
+    ram      attribute updateStateProgress default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster LocalizationConfiguration {
     callback attribute supportedLocales;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster TimeFormatLocalization {
-    persist  attribute hourFormat;
-    persist  attribute activeCalendarType;
+    persist  attribute hourFormat default = 0;
+    persist  attribute activeCalendarType default = 0;
     callback attribute supportedCalendarTypes;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster GeneralCommissioning {
-    ram      attribute breadcrumb;
+    ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
-    callback attribute regulatoryConfig;
-    callback attribute locationCapability;
-    ram      attribute featureMap;
+    callback attribute regulatoryConfig default = 0;
+    callback attribute locationCapability default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 0x0001;
   }
 
   server cluster DiagnosticLogs {
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster GeneralDiagnostics {
     emits event BootReason;
     callback attribute networkInterfaces;
-    callback attribute rebootCount;
-    callback attribute upTime;
-    callback attribute totalOperationalHours;
+    callback attribute rebootCount default = 0x0000;
+    callback attribute upTime default = 0x0000000000000000;
+    callback attribute totalOperationalHours default = 0x00000000;
     callback attribute bootReason;
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
-    callback attribute testEventTriggersEnabled;
-    ram      attribute featureMap;
+    callback attribute testEventTriggersEnabled default = false;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 0x0001;
   }
 
   server cluster SoftwareDiagnostics {
     callback attribute threadMetrics;
-    callback attribute currentHeapFree;
-    callback attribute currentHeapUsed;
-    callback attribute currentHeapHighWatermark;
+    callback attribute currentHeapFree default = 0x0000000000000000;
+    callback attribute currentHeapUsed default = 0x0000000000000000;
+    callback attribute currentHeapHighWatermark default = 0x0000000000000000;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 0x0001;
   }
@@ -1580,11 +1580,11 @@ endpoint 0 {
   server cluster ThreadNetworkDiagnostics {
     callback attribute channel;
     callback attribute routingRole;
-    callback attribute networkName;
-    callback attribute panId;
-    callback attribute extendedPanId;
+    callback attribute networkName default = "0";
+    callback attribute panId default = 0x0000;
+    callback attribute extendedPanId default = 0x0000000000000000;
     callback attribute meshLocalPrefix;
-    callback attribute overrunCount;
+    callback attribute overrunCount default = 0x0000000000000000;
     callback attribute neighborTable;
     callback attribute routeTable;
     callback attribute partitionId;
@@ -1592,53 +1592,53 @@ endpoint 0 {
     callback attribute dataVersion;
     callback attribute stableDataVersion;
     callback attribute leaderRouterId;
-    callback attribute detachedRoleCount;
-    callback attribute childRoleCount;
-    callback attribute routerRoleCount;
-    callback attribute leaderRoleCount;
-    callback attribute attachAttemptCount;
-    callback attribute partitionIdChangeCount;
-    callback attribute betterPartitionAttachAttemptCount;
-    callback attribute parentChangeCount;
-    callback attribute txTotalCount;
-    callback attribute txUnicastCount;
-    callback attribute txBroadcastCount;
-    callback attribute txAckRequestedCount;
-    callback attribute txAckedCount;
-    callback attribute txNoAckRequestedCount;
-    callback attribute txDataCount;
-    callback attribute txDataPollCount;
-    callback attribute txBeaconCount;
-    callback attribute txBeaconRequestCount;
-    callback attribute txOtherCount;
-    callback attribute txRetryCount;
-    callback attribute txDirectMaxRetryExpiryCount;
-    callback attribute txIndirectMaxRetryExpiryCount;
-    callback attribute txErrCcaCount;
-    callback attribute txErrAbortCount;
-    callback attribute txErrBusyChannelCount;
-    callback attribute rxTotalCount;
-    callback attribute rxUnicastCount;
-    callback attribute rxBroadcastCount;
-    callback attribute rxDataCount;
-    callback attribute rxDataPollCount;
-    callback attribute rxBeaconCount;
-    callback attribute rxBeaconRequestCount;
-    callback attribute rxOtherCount;
-    callback attribute rxAddressFilteredCount;
-    callback attribute rxDestAddrFilteredCount;
-    callback attribute rxDuplicatedCount;
-    callback attribute rxErrNoFrameCount;
-    callback attribute rxErrUnknownNeighborCount;
-    callback attribute rxErrInvalidSrcAddrCount;
-    callback attribute rxErrSecCount;
-    callback attribute rxErrFcsCount;
-    callback attribute rxErrOtherCount;
-    callback attribute activeTimestamp;
-    callback attribute pendingTimestamp;
-    callback attribute delay;
+    callback attribute detachedRoleCount default = 0x0000;
+    callback attribute childRoleCount default = 0x0000;
+    callback attribute routerRoleCount default = 0x0000;
+    callback attribute leaderRoleCount default = 0x0000;
+    callback attribute attachAttemptCount default = 0x0000;
+    callback attribute partitionIdChangeCount default = 0x0000;
+    callback attribute betterPartitionAttachAttemptCount default = 0x0000;
+    callback attribute parentChangeCount default = 0x0000;
+    callback attribute txTotalCount default = 0x0000;
+    callback attribute txUnicastCount default = 0x0000;
+    callback attribute txBroadcastCount default = 0x0000;
+    callback attribute txAckRequestedCount default = 0x0000;
+    callback attribute txAckedCount default = 0x0000;
+    callback attribute txNoAckRequestedCount default = 0x0000;
+    callback attribute txDataCount default = 0x0000;
+    callback attribute txDataPollCount default = 0x0000;
+    callback attribute txBeaconCount default = 0x0000;
+    callback attribute txBeaconRequestCount default = 0x0000;
+    callback attribute txOtherCount default = 0x0000;
+    callback attribute txRetryCount default = 0x0000;
+    callback attribute txDirectMaxRetryExpiryCount default = 0x0000;
+    callback attribute txIndirectMaxRetryExpiryCount default = 0x0000;
+    callback attribute txErrCcaCount default = 0x0000;
+    callback attribute txErrAbortCount default = 0x0000;
+    callback attribute txErrBusyChannelCount default = 0x0000;
+    callback attribute rxTotalCount default = 0x0000;
+    callback attribute rxUnicastCount default = 0x0000;
+    callback attribute rxBroadcastCount default = 0x0000;
+    callback attribute rxDataCount default = 0x0000;
+    callback attribute rxDataPollCount default = 0x0000;
+    callback attribute rxBeaconCount default = 0x0000;
+    callback attribute rxBeaconRequestCount default = 0x0000;
+    callback attribute rxOtherCount default = 0x0000;
+    callback attribute rxAddressFilteredCount default = 0x0000;
+    callback attribute rxDestAddrFilteredCount default = 0x0000;
+    callback attribute rxDuplicatedCount default = 0x0000;
+    callback attribute rxErrNoFrameCount default = 0x0000;
+    callback attribute rxErrUnknownNeighborCount default = 0x0000;
+    callback attribute rxErrInvalidSrcAddrCount default = 0x0000;
+    callback attribute rxErrSecCount default = 0x0000;
+    callback attribute rxErrFcsCount default = 0x0000;
+    callback attribute rxErrOtherCount default = 0x0000;
+    callback attribute activeTimestamp default = 0x0000000000000000;
+    callback attribute pendingTimestamp default = 0x0000000000000000;
+    callback attribute delay default = 0x0000;
     callback attribute securityPolicy;
-    callback attribute channelPage0Mask;
+    callback attribute channelPage0Mask default = "0x0000";
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
@@ -1652,44 +1652,44 @@ endpoint 0 {
     callback attribute bssid;
     callback attribute securityType;
     callback attribute wiFiVersion;
-    callback attribute channelNumber;
-    callback attribute rssi;
-    callback attribute beaconLostCount;
-    callback attribute beaconRxCount;
-    callback attribute packetMulticastRxCount;
-    callback attribute packetMulticastTxCount;
-    callback attribute packetUnicastRxCount;
-    callback attribute packetUnicastTxCount;
-    callback attribute currentMaxRate;
-    callback attribute overrunCount;
+    callback attribute channelNumber default = 0x0000;
+    callback attribute rssi default = 0x00;
+    callback attribute beaconLostCount default = 0x00000000;
+    callback attribute beaconRxCount default = 0x00000000;
+    callback attribute packetMulticastRxCount default = 0x00000000;
+    callback attribute packetMulticastTxCount default = 0x00000000;
+    callback attribute packetUnicastRxCount default = 0x00000000;
+    callback attribute packetUnicastTxCount default = 0x00000000;
+    callback attribute currentMaxRate default = 0x0000000000000000;
+    callback attribute overrunCount default = 0x0000000000000000;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 0x0001;
   }
 
   server cluster EthernetNetworkDiagnostics {
     callback attribute PHYRate;
-    callback attribute fullDuplex;
-    callback attribute packetRxCount;
-    callback attribute packetTxCount;
-    callback attribute txErrCount;
-    callback attribute collisionCount;
-    callback attribute overrunCount;
-    callback attribute carrierDetect;
-    callback attribute timeSinceReset;
+    callback attribute fullDuplex default = 0x00;
+    callback attribute packetRxCount default = 0x0000000000000000;
+    callback attribute packetTxCount default = 0x0000000000000000;
+    callback attribute txErrCount default = 0x0000000000000000;
+    callback attribute collisionCount default = 0x0000000000000000;
+    callback attribute overrunCount default = 0x0000000000000000;
+    callback attribute carrierDetect default = 0x00;
+    callback attribute timeSinceReset default = 0x0000000000000000;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 0x0001;
   }
 
   server cluster Switch {
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster AdministratorCommissioning {
-    callback attribute windowStatus;
+    callback attribute windowStatus default = 0;
     callback attribute adminFabricIndex default = 1;
-    callback attribute adminVendorId;
-    ram      attribute featureMap;
+    callback attribute adminVendorId default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 0x0001;
   }
 
@@ -1700,7 +1700,7 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 0x0001;
   }
 
@@ -1709,13 +1709,13 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster FixedLabel {
     callback attribute labelList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 }
@@ -1725,61 +1725,61 @@ endpoint 1 {
   binding cluster OccupancySensing;
 
   server cluster Identify {
-    ram      attribute identifyTime;
-    ram      attribute identifyType;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap;
+    ram      attribute identifyTime default = 0x0;
+    ram      attribute identifyType default = 0x0;
+    callback attribute generatedCommandList default = 0;
+    callback attribute acceptedCommandList default = 0;
+    callback attribute attributeList default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
   }
 
   server cluster Groups {
-    ram      attribute nameSupport;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap;
+    ram      attribute nameSupport default = 0;
+    callback attribute generatedCommandList default = 0;
+    callback attribute acceptedCommandList default = 0;
+    callback attribute attributeList default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
   server cluster OnOff {
-    ram      attribute onOff;
+    ram      attribute onOff default = 0;
     ram      attribute globalSceneControl default = 1;
-    ram      attribute onTime;
-    ram      attribute offWaitTime;
-    ram      attribute startUpOnOff;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
+    ram      attribute onTime default = 0;
+    ram      attribute offWaitTime default = 0;
+    ram      attribute startUpOnOff default = 0;
+    callback attribute generatedCommandList default = 0;
+    callback attribute acceptedCommandList default = 0;
+    callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0x1;
     ram      attribute clusterRevision default = 4;
   }
 
   server cluster LevelControl {
     ram      attribute currentLevel default = 0x01;
-    ram      attribute remainingTime;
+    ram      attribute remainingTime default = 0x0000;
     ram      attribute minLevel default = 0x01;
     ram      attribute maxLevel default = 0xFE;
     ram      attribute options default = 0x03;
     ram      attribute onLevel default = 0xFE;
-    ram      attribute startUpCurrentLevel;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
+    ram      attribute startUpCurrentLevel default = 0x00;
+    callback attribute generatedCommandList default = 0;
+    callback attribute acceptedCommandList default = 0;
+    callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0x03;
     ram      attribute clusterRevision default = 5;
   }
 
   server cluster Descriptor {
-    callback attribute deviceTypeList;
-    callback attribute serverList;
-    callback attribute clientList;
-    callback attribute partsList;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap;
+    callback attribute deviceTypeList default = 0;
+    callback attribute serverList default = 0;
+    callback attribute clientList default = 0;
+    callback attribute partsList default = 0;
+    callback attribute generatedCommandList default = 0;
+    callback attribute acceptedCommandList default = 0;
+    callback attribute attributeList default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 }

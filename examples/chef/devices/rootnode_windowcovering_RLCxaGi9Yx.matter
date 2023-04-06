@@ -1283,7 +1283,7 @@ endpoint 0 {
 
   server cluster Groups {
     ram      attribute nameSupport;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -1292,7 +1292,7 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
 
@@ -1302,7 +1302,7 @@ endpoint 0 {
     callback attribute acl;
     callback attribute extension;
     callback attribute attributeList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1317,19 +1317,19 @@ endpoint 0 {
     callback attribute productID;
     persist  attribute nodeLabel;
     callback attribute location default = "XX";
-    callback attribute hardwareVersion;
+    callback attribute hardwareVersion default = 0;
     callback attribute hardwareVersionString;
-    callback attribute softwareVersion;
+    callback attribute softwareVersion default = 0;
     callback attribute softwareVersionString;
     callback attribute manufacturingDate default = "20210614123456ZZ";
     callback attribute partNumber;
     callback attribute productURL;
     callback attribute productLabel;
     callback attribute serialNumber;
-    persist  attribute localConfigDisabled;
+    persist  attribute localConfigDisabled default = 0;
     ram      attribute reachable default = 1;
     callback attribute uniqueID;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1339,32 +1339,32 @@ endpoint 0 {
     emits event DownloadError;
     callback attribute defaultOTAProviders;
     ram      attribute updatePossible default = 1;
-    ram      attribute updateState;
-    ram      attribute updateStateProgress;
-    ram      attribute featureMap;
+    ram      attribute updateState default = 0;
+    ram      attribute updateStateProgress default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster LocalizationConfiguration {
     callback attribute supportedLocales;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster TimeFormatLocalization {
-    persist  attribute hourFormat;
-    persist  attribute activeCalendarType;
+    persist  attribute hourFormat default = 0;
+    persist  attribute activeCalendarType default = 0;
     callback attribute supportedCalendarTypes;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster GeneralCommissioning {
-    ram      attribute breadcrumb;
+    ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
-    callback attribute regulatoryConfig;
-    callback attribute locationCapability;
-    ram      attribute featureMap;
+    callback attribute regulatoryConfig default = 0;
+    callback attribute locationCapability default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 0x0001;
   }
 
@@ -1382,44 +1382,44 @@ endpoint 0 {
   }
 
   server cluster DiagnosticLogs {
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster GeneralDiagnostics {
     emits event BootReason;
     callback attribute networkInterfaces;
-    callback attribute rebootCount;
-    callback attribute upTime;
-    callback attribute totalOperationalHours;
+    callback attribute rebootCount default = 0x0000;
+    callback attribute upTime default = 0x0000000000000000;
+    callback attribute totalOperationalHours default = 0x00000000;
     callback attribute bootReason;
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
     callback attribute activeNetworkFaults;
-    callback attribute testEventTriggersEnabled;
-    ram      attribute featureMap;
+    callback attribute testEventTriggersEnabled default = false;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 0x0001;
   }
 
   server cluster SoftwareDiagnostics {
     callback attribute threadMetrics;
-    callback attribute currentHeapFree;
-    callback attribute currentHeapUsed;
-    callback attribute currentHeapHighWatermark;
+    callback attribute currentHeapFree default = 0x0000000000000000;
+    callback attribute currentHeapUsed default = 0x0000000000000000;
+    callback attribute currentHeapHighWatermark default = 0x0000000000000000;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 0x0001;
   }
 
   server cluster Switch {
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster AdministratorCommissioning {
-    callback attribute windowStatus;
+    callback attribute windowStatus default = 0;
     callback attribute adminFabricIndex default = 1;
-    callback attribute adminVendorId;
-    ram      attribute featureMap;
+    callback attribute adminVendorId default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 0x0001;
   }
 
@@ -1430,7 +1430,7 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 0x0001;
   }
 
@@ -1439,13 +1439,13 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster FixedLabel {
     callback attribute labelList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 }
@@ -1454,62 +1454,62 @@ endpoint 1 {
   binding cluster Binding;
 
   server cluster Identify {
-    ram      attribute identifyTime;
-    ram      attribute identifyType;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap;
+    ram      attribute identifyTime default = 0x0;
+    ram      attribute identifyType default = 0x0;
+    callback attribute generatedCommandList default = 0;
+    callback attribute acceptedCommandList default = 0;
+    callback attribute attributeList default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
   }
 
   server cluster Groups {
-    ram      attribute nameSupport;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap;
+    ram      attribute nameSupport default = 0;
+    callback attribute generatedCommandList default = 0;
+    callback attribute acceptedCommandList default = 0;
+    callback attribute attributeList default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
   server cluster Descriptor {
-    callback attribute deviceTypeList;
-    callback attribute serverList;
-    callback attribute clientList;
-    callback attribute partsList;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap;
+    callback attribute deviceTypeList default = 0;
+    callback attribute serverList default = 0;
+    callback attribute clientList default = 0;
+    callback attribute partsList default = 0;
+    callback attribute generatedCommandList default = 0;
+    callback attribute acceptedCommandList default = 0;
+    callback attribute attributeList default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster WindowCovering {
     ram      attribute type default = 8;
-    ram      attribute physicalClosedLimitLift;
-    ram      attribute physicalClosedLimitTilt;
-    ram      attribute currentPositionLift;
-    ram      attribute currentPositionTilt;
-    ram      attribute numberOfActuationsLift;
-    ram      attribute numberOfActuationsTilt;
+    ram      attribute physicalClosedLimitLift default = 0x0000;
+    ram      attribute physicalClosedLimitTilt default = 0x0000;
+    ram      attribute currentPositionLift default = 0;
+    ram      attribute currentPositionTilt default = 0;
+    ram      attribute numberOfActuationsLift default = 0x0000;
+    ram      attribute numberOfActuationsTilt default = 0x0000;
     ram      attribute configStatus default = 0x19;
-    ram      attribute currentPositionLiftPercentage;
-    ram      attribute currentPositionTiltPercentage;
-    ram      attribute operationalStatus;
-    ram      attribute targetPositionLiftPercent100ths;
-    ram      attribute targetPositionTiltPercent100ths;
+    ram      attribute currentPositionLiftPercentage default = 0;
+    ram      attribute currentPositionTiltPercentage default = 0;
+    ram      attribute operationalStatus default = 0x00;
+    ram      attribute targetPositionLiftPercent100ths default = 0;
+    ram      attribute targetPositionTiltPercent100ths default = 0;
     ram      attribute endProductType default = 8;
-    ram      attribute currentPositionLiftPercent100ths;
-    ram      attribute currentPositionTiltPercent100ths;
-    ram      attribute installedOpenLimitLift;
+    ram      attribute currentPositionLiftPercent100ths default = 0;
+    ram      attribute currentPositionTiltPercent100ths default = 0;
+    ram      attribute installedOpenLimitLift default = 0;
     ram      attribute installedClosedLimitLift default = 65534;
-    ram      attribute installedOpenLimitTilt;
+    ram      attribute installedOpenLimitTilt default = 0;
     ram      attribute installedClosedLimitTilt default = 1800;
-    ram      attribute mode;
-    ram      attribute safetyStatus;
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
+    ram      attribute mode default = 0x00;
+    ram      attribute safetyStatus default = 0x0000;
+    callback attribute generatedCommandList default = 0;
+    callback attribute acceptedCommandList default = 0;
+    callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0x1f;
     ram      attribute clusterRevision default = 5;
   }

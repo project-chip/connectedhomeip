@@ -1,5 +1,5 @@
 steps:
-    - name: "connectedhomeip/chip-build-vscode:0.6.51"
+    - name: "connectedhomeip/chip-build-vscode:0.7.0"
       entrypoint: "bash"
       args:
           - "-c"
@@ -7,7 +7,7 @@ steps:
               git config --global --add safe.directory "*"
               git submodule update --init --recursive
       id: Submodules
-    - name: "connectedhomeip/chip-build-vscode:0.6.51"
+    - name: "connectedhomeip/chip-build-vscode:0.7.0"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -22,7 +22,7 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "connectedhomeip/chip-build-vscode:0.6.51"
+    - name: "connectedhomeip/chip-build-vscode:0.7.0"
       id: ESP32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -41,7 +41,7 @@ steps:
       volumes:
           - name: pwenv
             path: /pwenv
-    - name: "connectedhomeip/chip-build-vscode:0.6.51"
+    - name: "connectedhomeip/chip-build-vscode:0.7.0"
       id: NRFConnect
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -62,7 +62,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.6.51"
+    - name: "connectedhomeip/chip-build-vscode:0.7.0"
       id: EFR32
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -84,7 +84,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.6.51"
+    - name: "connectedhomeip/chip-build-vscode:0.7.0"
       id: Linux
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
@@ -144,7 +144,7 @@ steps:
           - name: pwenv
             path: /pwenv
 
-    - name: "connectedhomeip/chip-build-vscode:0.6.51"
+    - name: "connectedhomeip/chip-build-vscode:0.7.0"
       id: Android
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
