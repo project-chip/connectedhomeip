@@ -459,7 +459,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
             scene_map[scene.index].Clear();
             err = this->Save(storage);
 
-            // On failure to update the scene map, undoes the global count modification
+            // On failure to update the scene map, undo the global count modification
             if (CHIP_NO_ERROR != err)
             {
                 global_scene_count.count_value++;
