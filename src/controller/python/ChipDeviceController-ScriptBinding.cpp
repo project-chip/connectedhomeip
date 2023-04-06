@@ -424,6 +424,7 @@ PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommiss
     if (err != CHIP_NO_ERROR)
     {
         delete fabricRemover;
+        delete callbacks;
     }
     // Else will clean up when the callback is called.
     return ToPyChipError(err);
