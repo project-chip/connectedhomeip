@@ -336,6 +336,11 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         }
         commissionerParams.controllerVendorId = static_cast<chip::VendorId>([startupParams.vendorID unsignedShortValue]);
         commissionerParams.enableServerInteractions = startupParams.advertiseOperational;
+        // We don't want to remove things from the fabric table on controller
+        // shutdown, since our controller setup depends on being able to fetch
+        // fabric information for the relevant fabric indices on controller
+        // bring-up.
+        commissionerParams.removeFromFabricTableOnShutdown = false;
         commissionerParams.deviceAttestationVerifier = _factory.deviceAttestationVerifier;
 
         auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
