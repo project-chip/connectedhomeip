@@ -469,7 +469,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
 
             err = scene.Delete(storage);
 
-            // On failure to delete scene, undoes the change to the Fabric Scene Data and the global scene count
+            // On failure to delete scene, undo the change to the Fabric Scene Data and the global scene count
             if (CHIP_NO_ERROR != err)
             {
                 global_scene_count.count_value++;
