@@ -48,6 +48,8 @@ static_library("chip-tool-utils") {
   sources = [
     "${chip_root}/src/app/tests/suites/include/ConstraintsChecker.h",
     "${chip_root}/src/app/tests/suites/include/ValueChecker.h",
+    "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
+    "${chip_root}/src/controller/ExamplePersistentStorage.h",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/logging/DataModelLogger.cpp",
     "commands/clusters/ModelCommand.cpp",
@@ -68,17 +70,11 @@ static_library("chip-tool-utils") {
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
-    "commands/pairing/PairingCommand.cpp",
-
-    # TODO - enable CommissionedListCommand once DNS Cache is implemented
-    #    "commands/pairing/CommissionedListCommand.cpp",
-    #    "commands/pairing/CommissionedListCommand.h",
-    "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
-    "${chip_root}/src/controller/ExamplePersistentStorage.h",
     "commands/pairing/CloseSessionCommand.cpp",
     "commands/pairing/CloseSessionCommand.h",
     "commands/pairing/OpenCommissioningWindowCommand.cpp",
     "commands/pairing/OpenCommissioningWindowCommand.h",
+    "commands/pairing/PairingCommand.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",
     "commands/payload/SetupPayloadGenerateCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
