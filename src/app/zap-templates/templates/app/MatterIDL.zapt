@@ -40,7 +40,7 @@
   {{~#chip_access_elements entity="event"~}}
       {{~#first~}}access({{~/first~}}
       {{~#not_first~}}, {{/not_first~}}
-        {{operation}}: {{role}} 
+        {{operation}}: {{role}}
       {{~#last}}) {{/last~}}
   {{~/chip_access_elements~}}
   {{asUpperCamelCase name}} = {{code}} {

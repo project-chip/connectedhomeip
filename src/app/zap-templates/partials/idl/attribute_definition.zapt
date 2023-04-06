@@ -15,9 +15,9 @@
       {{operation}}: {{role}}
     {{~#last}}) {{/last~}}
   {{~/chip_access_elements~}}
-  {{#unless isOptional~}}
+  {{#if isOptional~}}
     optional {{!marker to place a space even with whitespace removal~}}
-  {{~/unless~}}
+  {{~/if~}}
   {{~#if isNullable~}}
     nullable {{!marker to place a space even with whitespace removal~}}
   {{~/if~}} {{type}}
