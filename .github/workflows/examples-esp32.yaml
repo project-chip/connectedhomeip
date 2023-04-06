@@ -87,10 +87,18 @@ jobs:
                         build \
                         --copy-artifacts-to out/artifacts \
                      "
+            - name: Prepare bloat report
+              run: |
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                     esp32 m5stack all-clusters-app \
+                     out/esp32-m5stack-all-clusters/chip-all-clusters-app.elf \
+                     /tmp/bloat_reports/
             - name: Prepare code pregen and ensure compile time pregen not possible
               run: |
                   ./scripts/run_in_build_env.sh "./scripts/codepregen.py ./zzz_pregenerated"
                   mv scripts/codegen.py scripts/codegen.py.renamed
+            - name: Clean output
+              run: rm -rf ./out
             - name: Build some M5Stack variations with pregen
               timeout-minutes: 60
               run: |
@@ -105,22 +113,16 @@ jobs:
                      "
             - name: Check no code generation in output
               run: |
-                  CNT=$(find -name "CHIPClusters.h" out | wc -l)
+                  CNT=$(find out -name "CHIPClusters.h" | wc -l)
                   if [ "${CNT}" != "0" ]; then
                      echo "ERROR: found unexpected generated files:"
-                     find -name "CHIPClusters.h" out
+                     find out -name "CHIPClusters.h"
                      exit 1
                   fi
             - name: Undo code pregeneration changes
               run: |
                   rm -rf ./zzz_pregenerated
                   mv scripts/codegen.py.renamed scripts/codegen.py
-            - name: Prepare bloat report
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                     esp32 m5stack all-clusters-app \
-                     out/esp32-m5stack-all-clusters/chip-all-clusters-app.elf \
-                     /tmp/bloat_reports/
             - name: Build example All Clusters App C3
               timeout-minutes: 15
               run: scripts/examples/esp_example.sh all-clusters-app sdkconfig_c3devkit.defaults
