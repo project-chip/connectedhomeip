@@ -300,6 +300,13 @@ public:
     virtual CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) = 0;
 
     /**
+     * Returns whether the advertiser has completed the initialization.
+     *
+     * Returns true if the advertiser is ready to advertise services.
+     */
+    virtual bool IsInitialized() = 0;
+
+    /**
      * Shuts down the advertiser.
      */
     virtual void Shutdown() = 0;

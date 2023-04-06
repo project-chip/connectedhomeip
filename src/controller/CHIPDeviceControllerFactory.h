@@ -174,7 +174,7 @@ public:
     // created to permit retention of the underlying system state.
     //
     // NB: The system state will still be freed in Shutdown() regardless of this call.
-    void RetainSystemState() { (void) mSystemState->Retain(); }
+    void RetainSystemState();
 
     //
     // To initiate shutdown of the stack upon termination of all resident controllers in the
@@ -183,7 +183,7 @@ public:
     //
     // This should only be invoked if a matching call to RetainSystemState() was called prior.
     //
-    void ReleaseSystemState() { mSystemState->Release(); }
+    void ReleaseSystemState();
 
     //
     // Retrieve a read-only pointer to the system state object that contains pointers to key stack
