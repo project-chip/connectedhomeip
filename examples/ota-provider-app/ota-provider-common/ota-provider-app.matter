@@ -13,10 +13,10 @@ server cluster Descriptor = 29 {
     int16u revision = 1;
   }
 
-  readonly attribute optional DeviceTypeStruct deviceTypeList[] = 0;
-  readonly attribute optional CLUSTER_ID serverList[] = 1;
-  readonly attribute optional CLUSTER_ID clientList[] = 2;
-  readonly attribute optional ENDPOINT_NO partsList[] = 3;
+  readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
+  readonly attribute CLUSTER_ID serverList[] = 1;
+  readonly attribute CLUSTER_ID clientList[] = 2;
+  readonly attribute ENDPOINT_NO partsList[] = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute optional event_id eventList[] = 65530;
@@ -86,11 +86,11 @@ client cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  attribute access(read: administer, write: administer) optional AccessControlEntryStruct acl[] = 0;
-  attribute access(read: administer, write: administer) AccessControlExtensionStruct extension[] = 1;
-  readonly attribute optional int16u subjectsPerAccessControlEntry = 2;
-  readonly attribute optional int16u targetsPerAccessControlEntry = 3;
-  readonly attribute optional int16u accessControlEntriesPerFabric = 4;
+  attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
+  attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
+  readonly attribute int16u subjectsPerAccessControlEntry = 2;
+  readonly attribute int16u targetsPerAccessControlEntry = 3;
+  readonly attribute int16u accessControlEntriesPerFabric = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute optional event_id eventList[] = 65530;
@@ -159,11 +159,11 @@ server cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  attribute access(read: administer, write: administer) optional AccessControlEntryStruct acl[] = 0;
-  attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
-  readonly attribute optional int16u subjectsPerAccessControlEntry = 2;
-  readonly attribute optional int16u targetsPerAccessControlEntry = 3;
-  readonly attribute optional int16u accessControlEntriesPerFabric = 4;
+  attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
+  attribute access(read: administer, write: administer) AccessControlExtensionStruct extension[] = 1;
+  readonly attribute int16u subjectsPerAccessControlEntry = 2;
+  readonly attribute int16u targetsPerAccessControlEntry = 3;
+  readonly attribute int16u accessControlEntriesPerFabric = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute optional event_id eventList[] = 65530;
@@ -197,26 +197,26 @@ server cluster BasicInformation = 40 {
     boolean reachableNewValue = 0;
   }
 
-  readonly attribute optional int16u dataModelRevision = 0;
-  readonly attribute optional char_string<32> vendorName = 1;
-  readonly attribute optional vendor_id vendorID = 2;
-  readonly attribute optional char_string<32> productName = 3;
-  readonly attribute optional int16u productID = 4;
-  attribute access(write: manage) optional char_string<32> nodeLabel = 5;
-  attribute access(write: administer) optional char_string<2> location = 6;
-  readonly attribute optional int16u hardwareVersion = 7;
-  readonly attribute optional char_string<64> hardwareVersionString = 8;
-  readonly attribute optional int32u softwareVersion = 9;
-  readonly attribute optional char_string<64> softwareVersionString = 10;
-  readonly attribute optional char_string<16> manufacturingDate = 11;
-  readonly attribute optional char_string<32> partNumber = 12;
-  readonly attribute optional long_char_string<256> productURL = 13;
-  readonly attribute optional char_string<64> productLabel = 14;
-  readonly attribute optional char_string<32> serialNumber = 15;
-  attribute access(write: manage) optional boolean localConfigDisabled = 16;
-  readonly attribute optional boolean reachable = 17;
-  readonly attribute optional char_string<32> uniqueID = 18;
-  readonly attribute optional CapabilityMinimaStruct capabilityMinima = 19;
+  readonly attribute int16u dataModelRevision = 0;
+  readonly attribute char_string<32> vendorName = 1;
+  readonly attribute vendor_id vendorID = 2;
+  readonly attribute char_string<32> productName = 3;
+  readonly attribute int16u productID = 4;
+  attribute access(write: manage) char_string<32> nodeLabel = 5;
+  attribute access(write: administer) char_string<2> location = 6;
+  readonly attribute int16u hardwareVersion = 7;
+  readonly attribute char_string<64> hardwareVersionString = 8;
+  readonly attribute int32u softwareVersion = 9;
+  readonly attribute char_string<64> softwareVersionString = 10;
+  readonly attribute char_string<16> manufacturingDate = 11;
+  readonly attribute char_string<32> partNumber = 12;
+  readonly attribute long_char_string<256> productURL = 13;
+  readonly attribute char_string<64> productLabel = 14;
+  readonly attribute char_string<32> serialNumber = 15;
+  attribute access(write: manage) boolean localConfigDisabled = 16;
+  readonly attribute boolean reachable = 17;
+  readonly attribute char_string<32> uniqueID = 18;
+  readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute optional event_id eventList[] = 65530;
@@ -303,8 +303,8 @@ server cluster OtaSoftwareUpdateProvider = 41 {
       standards. As such, Nodes that visually or audibly convey information need a mechanism by which
       they can be configured to use a user’s preferred language, units, etc */
 server cluster LocalizationConfiguration = 43 {
-  attribute optional char_string<35> activeLocale = 0;
-  readonly attribute optional CHAR_STRING supportedLocales[] = 1;
+  attribute char_string<35> activeLocale = 0;
+  readonly attribute CHAR_STRING supportedLocales[] = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute optional event_id eventList[] = 65530;
@@ -339,9 +339,9 @@ server cluster TimeFormatLocalization = 44 {
     k24hr = 1;
   }
 
-  attribute optional HourFormatEnum hourFormat = 0;
-  attribute optional CalendarTypeEnum activeCalendarType = 1;
-  readonly attribute optional CalendarTypeEnum supportedCalendarTypes[] = 2;
+  attribute HourFormatEnum hourFormat = 0;
+  attribute CalendarTypeEnum activeCalendarType = 1;
+  readonly attribute CalendarTypeEnum supportedCalendarTypes[] = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute optional event_id eventList[] = 65530;
@@ -372,11 +372,11 @@ server cluster GeneralCommissioning = 48 {
     int16u maxCumulativeFailsafeSeconds = 1;
   }
 
-  attribute access(write: administer) optional int64u breadcrumb = 0;
-  readonly attribute optional BasicCommissioningInfo basicCommissioningInfo = 1;
-  readonly attribute optional RegulatoryLocationType regulatoryConfig = 2;
-  readonly attribute optional RegulatoryLocationType locationCapability = 3;
-  readonly attribute optional boolean supportsConcurrentConnection = 4;
+  attribute access(write: administer) int64u breadcrumb = 0;
+  readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
+  readonly attribute RegulatoryLocationType regulatoryConfig = 2;
+  readonly attribute RegulatoryLocationType locationCapability = 3;
+  readonly attribute boolean supportsConcurrentConnection = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute optional event_id eventList[] = 65530;
@@ -481,14 +481,14 @@ server cluster NetworkCommissioning = 49 {
     int8u lqi = 7;
   }
 
-  readonly attribute access(read: administer) optional int8u maxNetworks = 0;
-  readonly attribute access(read: administer) optional NetworkInfo networks[] = 1;
-  readonly attribute optional int8u scanMaxTimeSeconds = 2;
-  readonly attribute optional int8u connectMaxTimeSeconds = 3;
-  attribute access(write: administer) optional boolean interfaceEnabled = 4;
-  readonly attribute access(read: administer) optional nullable NetworkCommissioningStatus lastNetworkingStatus = 5;
-  readonly attribute access(read: administer) optional nullable octet_string<32> lastNetworkID = 6;
-  readonly attribute access(read: administer) optional nullable int32s lastConnectErrorValue = 7;
+  readonly attribute access(read: administer) int8u maxNetworks = 0;
+  readonly attribute access(read: administer) NetworkInfo networks[] = 1;
+  readonly attribute int8u scanMaxTimeSeconds = 2;
+  readonly attribute int8u connectMaxTimeSeconds = 3;
+  attribute access(write: administer) boolean interfaceEnabled = 4;
+  readonly attribute access(read: administer) nullable NetworkCommissioningStatus lastNetworkingStatus = 5;
+  readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
+  readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute optional event_id eventList[] = 65530;
@@ -637,15 +637,15 @@ server cluster GeneralDiagnostics = 51 {
     BootReasonEnum bootReason = 0;
   }
 
-  readonly attribute optional NetworkInterface networkInterfaces[] = 0;
-  readonly attribute optional int16u rebootCount = 1;
-  readonly attribute optional int64u upTime = 2;
-  readonly attribute optional int32u totalOperationalHours = 3;
-  readonly attribute optional BootReasonEnum bootReason = 4;
-  readonly attribute optional HardwareFaultEnum activeHardwareFaults[] = 5;
-  readonly attribute optional RadioFaultEnum activeRadioFaults[] = 6;
-  readonly attribute optional NetworkFaultEnum activeNetworkFaults[] = 7;
-  readonly attribute optional boolean testEventTriggersEnabled = 8;
+  readonly attribute NetworkInterface networkInterfaces[] = 0;
+  readonly attribute int16u rebootCount = 1;
+  readonly attribute int64u upTime = 2;
+  readonly attribute int32u totalOperationalHours = 3;
+  readonly attribute BootReasonEnum bootReason = 4;
+  readonly attribute HardwareFaultEnum activeHardwareFaults[] = 5;
+  readonly attribute RadioFaultEnum activeRadioFaults[] = 6;
+  readonly attribute NetworkFaultEnum activeNetworkFaults[] = 7;
+  readonly attribute boolean testEventTriggersEnabled = 8;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute optional event_id eventList[] = 65530;
@@ -676,9 +676,9 @@ server cluster AdministratorCommissioning = 60 {
     kWindowNotOpen = 4;
   }
 
-  readonly attribute optional CommissioningWindowStatusEnum windowStatus = 0;
-  readonly attribute optional nullable fabric_idx adminFabricIndex = 1;
-  readonly attribute optional nullable int16u adminVendorId = 2;
+  readonly attribute CommissioningWindowStatusEnum windowStatus = 0;
+  readonly attribute nullable fabric_idx adminFabricIndex = 1;
+  readonly attribute nullable int16u adminVendorId = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute optional event_id eventList[] = 65530;
@@ -739,12 +739,12 @@ server cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute access(read: administer) optional NOCStruct NOCs[] = 0;
-  readonly attribute optional FabricDescriptorStruct fabrics[] = 1;
-  readonly attribute optional int8u supportedFabrics = 2;
-  readonly attribute optional int8u commissionedFabrics = 3;
-  readonly attribute optional OCTET_STRING trustedRootCertificates[] = 4;
-  readonly attribute optional int8u currentFabricIndex = 5;
+  readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
+  readonly attribute FabricDescriptorStruct fabrics[] = 1;
+  readonly attribute int8u supportedFabrics = 2;
+  readonly attribute int8u commissionedFabrics = 3;
+  readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
+  readonly attribute int8u currentFabricIndex = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute optional event_id eventList[] = 65530;
@@ -852,10 +852,10 @@ server cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime2 = 7;
   }
 
-  attribute access(write: manage) optional GroupKeyMapStruct groupKeyMap[] = 0;
-  readonly attribute optional GroupInfoMapStruct groupTable[] = 1;
-  readonly attribute optional int16u maxGroupsPerFabric = 2;
-  readonly attribute optional int16u maxGroupKeysPerFabric = 3;
+  attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
+  readonly attribute GroupInfoMapStruct groupTable[] = 1;
+  readonly attribute int16u maxGroupsPerFabric = 2;
+  readonly attribute int16u maxGroupKeysPerFabric = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute optional event_id eventList[] = 65530;
@@ -897,7 +897,7 @@ server cluster GroupKeyManagement = 63 {
 /** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
 labels. */
 server cluster FixedLabel = 64 {
-  readonly attribute optional LabelStruct labelList[] = 0;
+  readonly attribute LabelStruct labelList[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute optional event_id eventList[] = 65530;
@@ -909,7 +909,7 @@ server cluster FixedLabel = 64 {
 
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
 server cluster UserLabel = 65 {
-  attribute access(write: manage) optional LabelStruct labelList[] = 0;
+  attribute access(write: manage) LabelStruct labelList[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute optional event_id eventList[] = 65530;
