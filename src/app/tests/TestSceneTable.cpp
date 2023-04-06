@@ -1056,7 +1056,7 @@ void TestFabricScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric2, scene3));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric2, scene4));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetRemainingCapacity(kFabric2, fabric_capacity));
-    NL_TEST_ASSERT(aSuite, scenes::kMaxScenesPerFabric - 4 == fabric_capacity);
+    NL_TEST_ASSERT(aSuite, (scenes::kMaxScenesPerFabric - 4) == fabric_capacity);
 
     // Fabric 3 inserts, should only be 4 spaces left at this point since 12 got taken
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetRemainingCapacity(kFabric3, fabric_capacity));
@@ -1262,6 +1262,15 @@ void TestOTAChanges(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetGlobalSceneCount(scene_count));
     // Global count should not have been modified
     NL_TEST_ASSERT(aSuite, scenes::kMaxScenesGlobal == scene_count);
+
+    // Test failure to init a SceneTable with sizes above the defined max scenes per fabric or globaly
+    TestSceneTableImpl SceneTableTooManyPerFabric(scenes::kMaxScenesPerFabric + 1, scenes::kMaxScenesGlobal);
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_INTEGER_VALUE == SceneTableTooManyPerFabric.Init(&testStorage));
+    SceneTableTooManyPerFabric.Finish();
+
+    TestSceneTableImpl SceneTableTooManyGlobal(scenes::kMaxScenesPerFabric, scenes::kMaxScenesGlobal + 1);
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_INTEGER_VALUE == SceneTableTooManyGlobal.Init(&testStorage));
+    SceneTableTooManyGlobal.Finish();
 
     // Create a new table with a different limit of scenes per fabric
     TestSceneTableImpl ReducedSceneTable(scenes::kMaxScenesPerFabric - 1, scenes::kMaxScenesGlobal - 2);

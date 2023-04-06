@@ -83,6 +83,18 @@ struct GlobalSceneCount : public PersistentData<kPersistentBufferSceneCountBytes
         ReturnErrorOnFailure(reader.Get(count_value));
         return reader.ExitContainer(container);
     }
+
+    CHIP_ERROR Load(PersistentStorageDelegate * storage) override
+    {
+        CHIP_ERROR err = PersistentData::Load(storage);
+        VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
+        if (CHIP_ERROR_NOT_FOUND == err)
+        {
+            count_value = 0;
+        }
+
+        return CHIP_NO_ERROR;
+    }
 };
 
 // Worst case tested: Add Scene Command with EFS using the default SerializeAdd Method. This yielded a serialized scene of 212bytes
@@ -197,11 +209,9 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
 
     FabricSceneData(FabricIndex fabric = kUndefinedFabricIndex, uint8_t maxScenePerFabric = kMaxScenesPerFabric,
                     uint8_t maxScenesGlobal = kMaxScenesGlobal) :
-        fabric_index(fabric)
-    {
-        max_scenes_per_fabric = (maxScenePerFabric > kMaxScenesPerFabric) ? kMaxScenesPerFabric : maxScenePerFabric;
-        max_scenes_global     = (maxScenesGlobal > kMaxScenesGlobal) ? kMaxScenesGlobal : maxScenesGlobal;
-    }
+        fabric_index(fabric),
+        max_scenes_per_fabric(maxScenePerFabric), max_scenes_global(maxScenesGlobal)
+    {}
 
     CHIP_ERROR UpdateKey(StorageKeyName & key) override
     {
@@ -403,16 +413,17 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
             scene_map[scene.index] = scene.mStorageId;
 
             err = this->Save(storage);
-            if (err != CHIP_NO_ERROR)
+            if (CHIP_NO_ERROR != err)
             {
                 global_scene_count.count_value--;
                 ReturnErrorOnFailure(global_scene_count.Save(storage));
+                return err;
             }
 
             err = scene.Save(storage);
 
             // on failure to save the scene, undoes the changes to Fabric Scene Data
-            if (err != CHIP_NO_ERROR)
+            if (CHIP_NO_ERROR != err)
             {
                 global_scene_count.count_value--;
                 ReturnErrorOnFailure(global_scene_count.Save(storage));
@@ -420,6 +431,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
                 scene_count--;
                 scene_map[scene.index].Clear();
                 ReturnErrorOnFailure(this->Save(storage));
+                return err;
             }
         }
 
@@ -447,16 +459,18 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
             scene_map[scene.index].Clear();
             err = this->Save(storage);
 
-            if (err != CHIP_NO_ERROR)
+            // On failure to update the scene map, undoes the global count modification
+            if (CHIP_NO_ERROR != err)
             {
                 global_scene_count.count_value++;
                 ReturnErrorOnFailure(global_scene_count.Save(storage));
+                return err;
             }
 
             err = scene.Delete(storage);
 
-            // On failure to delete scene, undoes the change to the Fabric Scene Data
-            if (err != CHIP_NO_ERROR)
+            // On failure to delete scene, undoes the change to the Fabric Scene Data and the global scene count
+            if (CHIP_NO_ERROR != err)
             {
                 global_scene_count.count_value++;
                 ReturnErrorOnFailure(global_scene_count.Save(storage));
@@ -464,6 +478,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
                 scene_count++;
                 scene_map[scene.index] = scene.mStorageId;
                 ReturnErrorOnFailure(this->Save(storage));
+                return err;
             }
         }
         return err;
@@ -493,7 +508,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         reader.Init(buffer, size);
 
         err = Deserialize(reader);
-        // If PersistentData::Load returns "buffer too small", the table in flash memory holds to many scenes (Can happend if
+        // If Deserialize returns "buffer too small", the table in flash memory holds to many scenes (Can happend if
         // max_scenes_per_fabric was reduced during an OTA). The fabric will then proceed to remove all scenes above the limit from
         // the fabric
         if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
@@ -516,15 +531,9 @@ CHIP_ERROR DefaultSceneTableImpl::Init(PersistentStorageDelegate * storage)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    CHIP_ERROR err = global_count.Load(storage);
-    VerifyOrReturnError(CHIP_NO_ERROR == err || CHIP_ERROR_NOT_FOUND == err, err);
-
-    if (err == CHIP_ERROR_NOT_FOUND)
-    {
-        global_count.count_value = 0;
-        global_count.Save(storage);
-    }
-
+    // Verified the initialized parameter respect the maximum allowed values for scene capacity
+    VerifyOrReturnError(mMaxScenesPerFabric <= kMaxScenesPerFabric && mMaxScenesGlobal <= kMaxScenesGlobal,
+                        CHIP_ERROR_INVALID_INTEGER_VALUE);
     mStorage = storage;
     return CHIP_NO_ERROR;
 }
@@ -537,6 +546,8 @@ void DefaultSceneTableImpl::Finish()
 
 CHIP_ERROR DefaultSceneTableImpl::GetGlobalSceneCount(uint8_t & scene_count)
 {
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
+
     GlobalSceneCount global_count;
 
     ReturnErrorOnFailure(global_count.Load(mStorage));
@@ -546,6 +557,8 @@ CHIP_ERROR DefaultSceneTableImpl::GetGlobalSceneCount(uint8_t & scene_count)
 }
 CHIP_ERROR DefaultSceneTableImpl::SetGlobalSceneCount(const uint8_t & scene_count)
 {
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
+
     GlobalSceneCount global_count(scene_count);
     return global_count.Save(mStorage);
 }
@@ -563,7 +576,6 @@ CHIP_ERROR DefaultSceneTableImpl::GetRemainingCapacity(FabricIndex fabric_index,
         capacity = 0;
         return CHIP_NO_ERROR;
     }
-
     uint8_t remaining_capacity_global = static_cast<uint8_t>(mMaxScenesGlobal - global_scene_count);
     uint8_t remaining_capacity_fabric = mMaxScenesPerFabric;
 
@@ -598,6 +610,8 @@ CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(FabricIndex fabric_index, c
 
 CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry)
 {
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
+
     FabricSceneData fabric(fabric_index, mMaxScenesPerFabric, mMaxScenesGlobal);
     SceneTableData scene(fabric_index);
 
@@ -622,6 +636,8 @@ CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, S
 
 CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id)
 {
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
+
     FabricSceneData fabric(fabric_index, mMaxScenesPerFabric, mMaxScenesGlobal);
 
     ReturnErrorOnFailure(fabric.Load(mStorage));
@@ -636,6 +652,8 @@ CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntry(FabricIndex fabric_index
 /// @return CHIP_NO_ERROR if removal was successful, errors if failed to remove the scene or to update the fabric after removing it
 CHIP_ERROR DefaultSceneTableImpl::RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scene_idx)
 {
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     FabricSceneData fabric(fabric_index, mMaxScenesPerFabric, mMaxScenesGlobal);
     SceneTableData scene(fabric_index, scene_idx);
@@ -676,6 +694,8 @@ CHIP_ERROR DefaultSceneTableImpl::GetAllSceneIdsInGroup(FabricIndex fabric_index
 
 CHIP_ERROR DefaultSceneTableImpl::DeleteAllScenesInGroup(FabricIndex fabric_index, GroupId group_id)
 {
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
+
     FabricSceneData fabric(fabric_index, mMaxScenesPerFabric, mMaxScenesGlobal);
     SceneTableData scene(fabric_index);
 
@@ -788,6 +808,8 @@ CHIP_ERROR DefaultSceneTableImpl::SceneApplyEFS(const SceneTableEntry & scene)
 
 CHIP_ERROR DefaultSceneTableImpl::RemoveFabric(FabricIndex fabric_index)
 {
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
+
     FabricSceneData fabric(fabric_index);
     SceneIndex idx = 0;
     CHIP_ERROR err = fabric.Load(mStorage);
