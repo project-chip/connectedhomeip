@@ -453,10 +453,19 @@ config("libfuzzer_fuzzing") {
   ldflags = cflags
 }
 
+config("oss_fuzz") {
+  cflags = string_split(getenv("CFLAGS"))
+  ldflags = string_split(getenv("CXXFLAGS"))
+  ldflags += [ getenv("LIB_FUZZING_ENGINE") ]
+}
+
 config("fuzzing_default") {
   configs = []
   if (is_libfuzzer) {
     configs += [ ":libfuzzer_fuzzing" ]
+  }
+  if (oss_fuzz) {
+    configs += [ ":oss_fuzz" ]
   }
 }
 
