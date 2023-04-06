@@ -4,7 +4,6 @@ A [chip-shell](../README.md) project on the Texas Instruments CC13X2_26X2 family
 of Wireless MCUs.
 
 ## Building
-
 ### Preparation
 
 Some initial setup is necessary for preparing the build environment. This
@@ -17,9 +16,9 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
     ```
     $ cd ~
-    $ wget [recommended version][sysconfig_recommended]
-    $ chmod +x sysconfig-1.1*-setup.run
-    $ ./sysconfig-1.1*-setup.run
+    $ wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.15.0.2826/sysconfig-1.15.0_2826-setup.run
+    $ chmod +x sysconfig-1.15.0_2826-setup.run
+    $ ./sysconfig-1.15.0_2826-setup.run
     ```
 
 -   Run the bootstrap script to setup the build environment.
