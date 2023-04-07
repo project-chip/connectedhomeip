@@ -111,9 +111,9 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
     if (strongDelegate && mQueue && strongController) {
         if ([strongDelegate respondsToSelector:@selector(controller:readCommissioningInfo:)]) {
             dispatch_async(mQueue, ^{
-                NSDictionary<NSString *, id> * info = [NSDictionary
-                    dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:vendorId], MTRVendorIDKey,
-                    [NSNumber numberWithUnsignedShort:productId], MTRProductIDKey, nil];
+                NSDictionary<NSString *, id> * info =
+                    [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:vendorId], MTRVendorIDKey,
+                                  [NSNumber numberWithUnsignedShort:productId], MTRProductIDKey, nil];
                 [strongDelegate controller:strongController readCommissioningInfo:info];
             });
         }
