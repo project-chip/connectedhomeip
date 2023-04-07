@@ -43,6 +43,9 @@ declare_args() {
   # OTA periodic query timeout in seconds
   ota_periodic_query_timeout = 86400
 
+  # reboot delay in seconds to apply new OTA image  
+  ota_auto_reboot_delay = 5
+
   enable_heap_monitoring = false
 
   setupPinCode = 20202021
@@ -67,6 +70,7 @@ bl_iot_sdk("sdk") {
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE=${setupPinCode}",
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
     "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout}",
+    "OTA_AUTO_REBOOT_DELAY=${ota_auto_reboot_delay}",
     "CHIP_UART_BAUDRATE=${baudrate}",
     "SYS_AOS_LOOP_ENABLE",
   ]

@@ -30,4 +30,6 @@ public:
     OTAConfig(){};
 
     static void Init();
+    static constexpr uint32_t kInitOTARequestorDelaySec = 3;
+    static void InitOTARequestorHandler(chip::System::Layer * systemLayer, void * appState);
 };
