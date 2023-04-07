@@ -213,6 +213,9 @@ private:
  */
 @property (nonatomic) ReadClient * currentReadClient;
 
+// Set of attribute paths that are not reported by subscription
+@property (nonatomic) NSMutableSet * nonSubscriptionAttributePaths;
+
 @end
 
 @implementation MTRDevice
@@ -230,6 +233,7 @@ private:
         _expectedValueCache = [NSMutableDictionary dictionary];
         _asyncCallbackWorkQueue = [[MTRAsyncCallbackWorkQueue alloc] initWithContext:self queue:_queue];
         _state = MTRDeviceStateUnknown;
+        _nonSubscriptionAttributePaths = [NSMutableSet set];
         MTR_LOG_INFO("%@ init with hex nodeID 0x%016llX", self, _nodeID.unsignedLongLongValue);
     }
     return self;
@@ -442,12 +446,12 @@ private:
     }
 }
 
-- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)fromSubscription
 {
     os_unfair_lock_lock(&self->_lock);
 
     // _getAttributesToReportWithReportedValues will log attribute paths reported
-    [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport]];
+    [self _reportAttributes:[self _getAttributesToReportWithReportedValues:attributeReport fromSubscription:fromSubscription]];
 
     os_unfair_lock_unlock(&self->_lock);
 }
@@ -566,7 +570,7 @@ private:
                                           MTR_LOG_INFO("%@ got attribute report %@", self, value);
                                           dispatch_async(self.queue, ^{
                                               // OnAttributeData (after OnReportEnd)
-                                              [self _handleAttributeReport:value];
+                                              [self _handleAttributeReport:value fromSubscription:YES];
                                           });
                                       },
                                       ^(NSArray * value) {
@@ -660,45 +664,51 @@ private:
                                                   attributeID:(NSNumber *)attributeID
                                                        params:(MTRReadParams *)params
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"%@ read %@ %@ %@", self, endpointID, clusterID, attributeID];
-    // Create work item, set ready handler to perform task, then enqueue the work
-    MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.queue];
-    MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTR_LOG_INFO("%@ dequeueWorkItem %@", logPrefix, self->_asyncCallbackWorkQueue);
-        MTRBaseDevice * baseDevice = [self newBaseDevice];
-        [baseDevice
-            readAttributesWithEndpointID:endpointID
-                               clusterID:clusterID
-                             attributeID:attributeID
-                                  params:params
-                                   queue:self.queue
-                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                  if (values) {
-                                      // Since the format is the same data-value dictionary, this looks like an attribute
-                                      // report
-                                      MTR_LOG_INFO("%@ completion values %@", logPrefix, values);
-                                      [self _handleAttributeReport:values];
-                                  }
-
-                                  // TODO: better retry logic
-                                  if (error && (retryCount < 2)) {
-                                      MTR_LOG_INFO(
-                                          "%@ completion error %@ retryWork %lu", logPrefix, error, (unsigned long) retryCount);
-                                      [workItem retryWork];
-                                  } else {
-                                      MTR_LOG_INFO("%@ completion error %@ endWork", logPrefix, error);
-                                      [workItem endWork];
-                                  }
-                              }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTR_LOG_INFO("%@ enqueueWorkItem %@", logPrefix, _asyncCallbackWorkQueue);
-    [_asyncCallbackWorkQueue enqueueWorkItem:workItem];
-
-    // Return current known / expected value right away
     MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID
                                                                            clusterID:clusterID
                                                                          attributeID:attributeID];
+
+    NSString * logPrefix = [NSString stringWithFormat:@"%@ read %@ %@ %@", self, endpointID, clusterID, attributeID];
+    if ([self _shouldReadThroughAttributePath:attributePath]) {
+        // Create work item, set ready handler to perform task, then enqueue the work
+        MTRAsyncCallbackQueueWorkItem * workItem = [[MTRAsyncCallbackQueueWorkItem alloc] initWithQueue:self.queue];
+        MTRAsyncCallbackReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
+            MTR_LOG_INFO("%@ dequeueWorkItem %@", logPrefix, self->_asyncCallbackWorkQueue);
+            MTRBaseDevice * baseDevice = [self newBaseDevice];
+            [baseDevice readAttributesWithEndpointID:endpointID
+                                           clusterID:clusterID
+                                         attributeID:attributeID
+                                              params:params
+                                               queue:self.queue
+                                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values,
+                                              NSError * _Nullable error) {
+                                              if (values) {
+                                                  // Since the format is the same data-value dictionary, this looks like an
+                                                  // attribute report
+                                                  MTR_LOG_INFO("%@ completion values %@", logPrefix, values);
+                                                  [self _handleAttributeReport:values fromSubscription:NO];
+                                              }
+
+                                              // TODO: better retry logic
+                                              if (error && (retryCount < 2)) {
+                                                  MTR_LOG_INFO("%@ completion error %@ retryWork %lu", logPrefix, error,
+                                                      (unsigned long) retryCount);
+                                                  [workItem retryWork];
+                                              } else {
+                                                  MTR_LOG_INFO("%@ completion error %@ endWork", logPrefix, error);
+                                                  [self _noteReadInteractionResponseForAttributePath:attributePath];
+                                                  [workItem endWork];
+                                              }
+                                          }];
+        };
+        workItem.readyHandler = readyHandler;
+        MTR_LOG_INFO("%@ enqueueWorkItem %@", logPrefix, _asyncCallbackWorkQueue);
+        [_asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    } else {
+        MTR_LOG_INFO("%@ result in cache and no read-through needed", logPrefix);
+    }
+
+    // Return current known / expected value right away
     NSDictionary<NSString *, id> * attributeValueToReturn = [self _attributeValueDictionaryForAttributePath:attributePath];
 
     return attributeValueToReturn;
@@ -926,6 +936,7 @@ private:
 
 // assume lock is held
 - (NSArray *)_getAttributesToReportWithReportedValues:(NSArray<NSDictionary<NSString *, id> *> *)reportedAttributeValues
+                                     fromSubscription:(BOOL)fromSubscription
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -952,6 +963,10 @@ private:
             _expectedValueCache[attributePath] = nil;
             _readCache[attributePath] = nil;
         } else {
+            if (fromSubscription) {
+                [self _noteSubscriptionReportForAttributePath:attributePath];
+            }
+
             // if expected values exists, purge and update read cache
             MTRPair<NSDate *, NSDictionary *> * expectedValue = _expectedValueCache[attributePath];
             if (expectedValue) {
@@ -1042,6 +1057,53 @@ private:
 
     [self _checkExpiredExpectedValues];
     os_unfair_lock_unlock(&self->_lock);
+}
+
+// MTRDevice should only create read interaction in these cases:
+//   - There is no active subscription
+//   - There is no value in the read cache
+//   - The attribute being read is not reported through a subscription
+//     * Whenever a read interaction returns a result, if there is no read cache entry, then the path would be added to a set that
+//     means "not reported through subscription"
+//     * Any subscription report will clear the path in the set, if exists
+//     * When client calls read, check if the path is in the set, and read-through if true
+- (BOOL)_shouldReadThroughAttributePath:(MTRAttributePath *)attributePath
+{
+    os_unfair_lock_lock(&self->_lock);
+
+    if (_state != MTRDeviceStateReachable) {
+        os_unfair_lock_unlock(&self->_lock);
+        return YES;
+    }
+
+    if (!_readCache[attributePath]) {
+        os_unfair_lock_unlock(&self->_lock);
+        return YES;
+    }
+
+    if ([_nonSubscriptionAttributePaths containsObject:attributePath]) {
+        os_unfair_lock_unlock(&self->_lock);
+        return YES;
+    }
+
+    os_unfair_lock_unlock(&self->_lock);
+    return NO;
+}
+
+- (void)_noteReadInteractionResponseForAttributePath:(MTRAttributePath *)attributePath
+{
+    os_unfair_lock_lock(&self->_lock);
+    if (!_readCache[attributePath]) {
+        [_nonSubscriptionAttributePaths addObject:attributePath];
+    }
+    os_unfair_lock_unlock(&self->_lock);
+}
+
+// Assume lock already acquired - called from when attributes reports are processed
+- (void)_noteSubscriptionReportForAttributePath:(MTRAttributePath *)attributePath
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+    [_nonSubscriptionAttributePaths removeObject:attributePath];
 }
 
 - (MTRBaseDevice *)newBaseDevice

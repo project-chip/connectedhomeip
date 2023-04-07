@@ -1438,6 +1438,10 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Check that device resets start time on subscription drop
     XCTAssertNil(device.estimatedStartTime);
+
+    // Issue a read and expect no actual read from device - verified in logs during run
+    NSDictionary * knownExistingAttribute = [device readAttributeWithEndpointID:@0 clusterID:@3 attributeID:@0 params:nil];
+    XCTAssertNotNil(knownExistingAttribute);
 }
 
 - (void)test018_SubscriptionErrorWhenNotResubscribing
