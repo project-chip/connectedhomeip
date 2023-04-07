@@ -27,7 +27,6 @@
 #define SL_WFX_SCAN_COMPLETE_ID 4
 #define WFX_RSI_SSID_SIZE 64
 
-#ifndef RS911X_SOCKETS
 /* LwIP includes. */
 #include "lwip/apps/httpd.h"
 #include "lwip/ip_addr.h"
@@ -43,8 +42,6 @@
 #define SL_WFX_SCAN_START (1 << 5)
 #define SL_WFX_SCAN_COMPLETE (1 << 6)
 #define SL_WFX_RETRY_CONNECT (1 << 7)
-
-#endif /* RS911X_SOCKETS */
 
 #include "sl_status.h"
 

@@ -14,6 +14,7 @@
 # limitations under the License.
 
 import logging
+import os
 import re
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
@@ -137,7 +138,7 @@ class BridgeGenerator(CodeGenerator):
         Inintialization is specific for cpp generation and will add
         filters as required by the cpp .jinja templates to function.
         """
-        super().__init__(storage, idl)
+        super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
 
         self.jinja_env.filters['getType'] = get_attr_type
         self.jinja_env.filters['getRawSizeAndType'] = get_raw_size_and_type
@@ -163,7 +164,7 @@ class BridgeGenerator(CodeGenerator):
                 output_file_name = "bridge/%s.h" % cluster.name
 
             self.internal_render_one_output(
-                template_path="bridge/BridgeClustersCpp.jinja",
+                template_path="BridgeClustersCpp.jinja",
                 output_file_name=output_file_name,
                 vars={
                     'cluster': cluster,
@@ -172,7 +173,7 @@ class BridgeGenerator(CodeGenerator):
             )
 
         self.internal_render_one_output(
-            template_path="bridge/BridgeClustersCommon.jinja",
+            template_path="BridgeClustersCommon.jinja",
             output_file_name="bridge/BridgeClustersImpl.h",
             vars={
                 'clusters': self.idl.clusters,
@@ -181,7 +182,7 @@ class BridgeGenerator(CodeGenerator):
         )
 
         self.internal_render_one_output(
-            template_path="bridge/BridgeClustersGlobalStructs.jinja",
+            template_path="BridgeClustersGlobalStructs.jinja",
             output_file_name="bridge/BridgeGlobalStructs.h",
             vars={
                 'idl': self.idl,

@@ -146,7 +146,8 @@ chef_$PLATFORM:
               attempt_limit: 3
               attempt_delay: 2000
         - name: Checkout submodules
-          run: scripts/checkout_submodules.py --shallow --platform $PLATFORM
+          run: |
+              scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform $PLATFORM
         - name: Bootstrap
           timeout-minutes: 25
           run: scripts/build/gn_bootstrap.sh

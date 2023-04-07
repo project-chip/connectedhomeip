@@ -20,5 +20,5 @@ declare_args() {
   android_ndk_root = ""
 
   # Version of the Android SDK.
-  android_sdk_version = 21
+  android_sdk_version = 26
 }

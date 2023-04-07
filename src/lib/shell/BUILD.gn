@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/lib/shell/shell_device.gni")
 import("${chip_root}/src/platform/device.gni")
 
 source_set("shell_core") {
@@ -43,7 +44,8 @@ static_library("shell") {
     sources += [ "streamer_stdio.cpp" ]
   }
 
-  if (chip_device_platform == "esp32") {
+  if (chip_device_platform == "esp32" ||
+      (chip_device_platform == "external" && chip_shell_platform == "esp32")) {
     sources += [
       "MainLoopESP32.cpp",
       "streamer_esp32.cpp",

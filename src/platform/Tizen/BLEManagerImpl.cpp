@@ -93,10 +93,9 @@ const char * desc_uuid_short = "2902";
 const char * chip_ble_service_uuid_short = "FFF6";
 
 /* Tizen Default Scan Timeout */
-static constexpr unsigned kNewConnectionScanTimeoutMs = 10000;
-
+static constexpr System::Clock::Timeout kNewConnectionScanTimeout = System::Clock::Seconds16(10);
 /* Tizen Default Connect Timeout */
-constexpr System::Clock::Timeout kConnectTimeoutMs = System::Clock::Seconds16(10);
+static constexpr System::Clock::Timeout kConnectTimeout = System::Clock::Seconds16(10);
 
 static void __AdapterStateChangedCb(int result, bt_adapter_state_e adapterState, void * userData)
 {
@@ -105,16 +104,15 @@ static void __AdapterStateChangedCb(int result, bt_adapter_state_e adapterState,
 
 void BLEManagerImpl::GattConnectionStateChangedCb(int result, bool connected, const char * remoteAddress, void * userData)
 {
-    ChipLogProgress(DeviceLayer, "Gatt Connection State Changed [%u]: %s", result, connected ? "Connected" : "Disconnected");
     switch (result)
     {
     case BT_ERROR_NONE:
     case BT_ERROR_ALREADY_DONE:
+        ChipLogProgress(DeviceLayer, "GATT %s", connected ? "connected" : "disconnected");
         sInstance.HandleConnectionEvent(connected, remoteAddress);
         break;
     default:
-        ChipLogError(DeviceLayer, "%s: %s", connected ? "Connection req failed" : "Disconnection req failed",
-                     get_error_message(result));
+        ChipLogError(DeviceLayer, "GATT %s failed: %s", connected ? "connection" : "disconnection", get_error_message(result));
         if (connected)
             sInstance.NotifyHandleConnectFailed(CHIP_ERROR_INTERNAL);
     }
@@ -406,9 +404,9 @@ void BLEManagerImpl::NotifyBLEDisconnection(BLE_CONNECTION_OBJECT conId, CHIP_ER
 
 void BLEManagerImpl::NotifyHandleConnectFailed(CHIP_ERROR error)
 {
+    ChipLogProgress(DeviceLayer, "Connection failed: %" CHIP_ERROR_FORMAT, error.Format());
     if (sInstance.mIsCentral)
     {
-        ChipLogProgress(DeviceLayer, "Connection Failed: Post Platform event");
         ChipDeviceEvent event;
         event.Type                                    = DeviceEventType::kPlatformTizenBLECentralConnectFailed;
         event.Platform.BLECentralConnectFailed.mError = error;
@@ -513,7 +511,7 @@ void BLEManagerImpl::OnChipDeviceScanned(void * device, const Ble::ChipBLEDevice
 
     /* Set CHIP Connecting state */
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
-    DeviceLayer::SystemLayer().StartTimer(kConnectTimeoutMs, HandleConnectionTimeout, nullptr);
+    DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectionTimeout, nullptr);
     mDeviceScanner->StopChipScan();
 
     /* Initiate Connect */
@@ -1405,20 +1403,15 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
     }
 
     /* Send StartChipScan Request to Scanner Class */
-    err = mDeviceScanner->StartChipScan(kNewConnectionScanTimeoutMs, ScanFilterType::kServiceData, data);
+    err = mDeviceScanner->StartChipScan(kNewConnectionScanTimeout, ScanFilterType::kServiceData, data);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start a BLE scan"));
 
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to start a BLE Scan: %s", ErrorStr(err));
-        goto exit;
-    }
-
-    ChipLogError(DeviceLayer, "BLE Scan Initiation Successful");
+    ChipLogProgress(DeviceLayer, "BLE scan initiation successful");
     mBLEScanConfig.mBleScanState = scanType;
     return;
 
 exit:
-    ChipLogError(DeviceLayer, "Scan Initiation Failed!");
+    ChipLogError(DeviceLayer, "BLE scan initiation failed: %" CHIP_ERROR_FORMAT, err.Format());
     mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
     BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
 }

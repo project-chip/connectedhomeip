@@ -2,7 +2,7 @@
     "meta": {
         "sdkRoot": "../..",
         "description": "Matter SDK",
-        "requiredFeatureLevel": 77
+        "requiredFeatureLevel": 95
     },
     "zcl": {
         "main": "src/app/zap-templates/zcl/zcl.json",

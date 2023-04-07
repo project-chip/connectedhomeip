@@ -51,7 +51,7 @@ siwx917_sdk("sdk") {
 }
 
 silabs_executable("window_app") {
-  output_name = "chip-efr32-window-example.out"
+  output_name = "chip-siwx917-window-example.out"
   output_dir = root_out_dir
   include_dirs = [
     "include",

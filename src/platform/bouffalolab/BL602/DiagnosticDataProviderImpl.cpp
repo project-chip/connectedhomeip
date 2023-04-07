@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Provides an implementation of the DiagnosticDataProvider object
- *          for k32w0 platform.
+ *          for Bouffalolab BL602 platform.
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -36,31 +36,13 @@ extern "C" {
 #include <bl_efuse.h>
 #include <bl_sys.h>
 #include <wifi_mgmr_ext.h>
+#include <wifi_mgmr_portable.h>
 }
 
 extern uint8_t _heap_size;
 
 namespace chip {
 namespace DeviceLayer {
-
-uint8_t MapAuthModeToSecurityType(int authmode)
-{
-    switch (authmode)
-    {
-    case WIFI_EVENT_BEACON_IND_AUTH_OPEN:
-        return 1;
-    case WIFI_EVENT_BEACON_IND_AUTH_WEP:
-        return 2;
-    case WIFI_EVENT_BEACON_IND_AUTH_WPA_PSK:
-        return 3;
-    case WIFI_EVENT_BEACON_IND_AUTH_WPA2_PSK:
-        return 4;
-    case WIFI_EVENT_BEACON_IND_AUTH_WPA3_SAE:
-        return 5;
-    default:
-        return 0;
-    }
-}
 
 DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 {
@@ -248,37 +230,60 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
-    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
-    securityType = SecurityTypeEnum::kUnspecified;
-    // int authmode;
+    if (ConnectivityMgrImpl()._IsWiFiStationConnected())
+    {
+        if (wifi_mgmr_security_type_is_open())
+        {
+            securityType = app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum::kNone;
+        }
+        else if (wifi_mgmr_security_type_is_wpa())
+        {
+            securityType = app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum::kWpa;
+        }
+        else if (wifi_mgmr_security_type_is_wpa2())
+        {
+            securityType = app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum::kWpa2;
+        }
+        else if (wifi_mgmr_security_type_is_wpa3())
+        {
+            securityType = app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum::kWpa3;
+        }
+        else
+        {
+            securityType = app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum::kWep;
+        }
 
-    // authmode     = mgmr_get_security_type();
-    // securityType = MapAuthModeToSecurityType(authmode);
-    return CHIP_NO_ERROR;
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_READ_FAILED;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wifiVersion)
 {
-    // TODO: Keeping existing behavior, but this looks broken.
-    // https://github.com/project-chip/connectedhomeip/issues/25546
-    wifiVersion = app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum::kA;
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
 {
-    channelNumber = 0;
+    if (ConnectivityMgrImpl()._IsWiFiStationConnected())
+    {
+        channelNumber = wifiMgmr.channel;
+        return CHIP_NO_ERROR;
+    }
 
-    // channelNumber = mgmr_get_current_channel_num();
-
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_READ_FAILED;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
-    // rssi = mgmr_get_rssi();
+    if (ConnectivityMgrImpl()._IsWiFiStationConnected())
+    {
+        rssi = wifiMgmr.wlan_sta.sta.rssi;
+        return CHIP_NO_ERROR;
+    }
 
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_READ_FAILED;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
@@ -353,13 +358,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & pa
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCount)
 {
-    overrunCount = 0;
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
 {
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)

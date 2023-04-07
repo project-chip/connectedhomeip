@@ -54,6 +54,8 @@ NS_ASSUME_NONNULL_BEGIN
 // Key store we're using with our fabric table, for sanity checks.
 @property (nonatomic, assign, readonly) chip::Crypto::OperationalKeystore * keystore;
 
+@property (nonatomic, assign, readonly) BOOL advertiseOperational;
+
 /**
  * Helper method that checks that our keypairs match our certificates.
  * Specifically:
@@ -73,6 +75,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initForNewFabric:(chip::FabricTable *)fabricTable
                         keystore:(chip::Crypto::OperationalKeystore *)keystore
+            advertiseOperational:(BOOL)advertiseOperational
                           params:(MTRDeviceControllerStartupParams *)params;
 
 /**
@@ -81,6 +84,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initForExistingFabric:(chip::FabricTable *)fabricTable
                           fabricIndex:(chip::FabricIndex)fabricIndex
                              keystore:(chip::Crypto::OperationalKeystore *)keystore
+                 advertiseOperational:(BOOL)advertiseOperational
                                params:(MTRDeviceControllerStartupParams *)params;
 
 /**

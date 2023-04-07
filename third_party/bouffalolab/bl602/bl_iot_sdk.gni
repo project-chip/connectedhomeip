@@ -677,6 +677,10 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/wifi_hosal/include",
       "${bl_iot_sdk_root}/components/network/wifi_manager",
       "${bl_iot_sdk_root}/components/network/wifi_manager/bl60x_wifi_driver/include",
+      "${bl_iot_sdk_root}/components/security",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/include",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/src",
+      "${bl_iot_sdk_root}/components/security/wpa_supplicant/port/include",
     ]
 
     cflags_c = [ "-Wno-sign-compare" ]

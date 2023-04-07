@@ -35,6 +35,9 @@ declare_args() {
   # Argument to force enable WPA3 security on rs91x
   rs91x_wpa3_only = false
 
+  # use commissionable data for SiWx917
+  siwx917_commissionable_data = false
+
   #default WiFi SSID
   chip_default_wifi_ssid = ""
 
@@ -145,6 +148,10 @@ source_set("siwx917-attestation-credentials") {
 }
 
 source_set("siwx917-factory-data-provider") {
+  if (siwx917_commissionable_data) {
+    defines = [ "SIWX917_USE_COMISSIONABLE_DATA=1" ]
+  }
+
   sources = [
     "SiWx917DeviceDataProvider.cpp",
     "SiWx917DeviceDataProvider.h",

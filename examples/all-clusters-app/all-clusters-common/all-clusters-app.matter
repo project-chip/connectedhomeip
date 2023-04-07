@@ -6,6 +6,7 @@ struct LabelStruct {
     char_string<16> value = 1;
 }
 
+/** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 server cluster Identify = 3 {
   enum IdentifyEffectIdentifier : ENUM8 {
     kBlink = 0;
@@ -51,8 +52,9 @@ server cluster Identify = 3 {
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
+/** Attributes and commands for group configuration and manipulation. */
 server cluster Groups = 4 {
-  bitmap GroupClusterFeature : BITMAP32 {
+  bitmap GroupsFeature : BITMAP32 {
     kGroupNames = 0x1;
   }
 
@@ -115,13 +117,14 @@ server cluster Groups = 4 {
   fabric command access(invoke: manage) AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
 }
 
+/** Attributes and commands for scene configuration and manipulation. */
 server cluster Scenes = 5 {
-  bitmap SceneFeatures : BITMAP32 {
-    kSceneNames = 0x1;
-  }
-
   bitmap ScenesCopyMode : BITMAP8 {
     kCopyAllScenes = 0x1;
+  }
+
+  bitmap ScenesFeature : BITMAP32 {
+    kSceneNames = 0x1;
   }
 
   struct ExtensionFieldSet {
@@ -231,6 +234,7 @@ server cluster Scenes = 5 {
   fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
 }
 
+/** Attributes and commands for switching devices between 'On' and 'Off' states. */
 client cluster OnOff = 6 {
   enum OnOffDelayedAllOffEffectVariant : ENUM8 {
     kFadeToOffIn0p8Seconds = 0;
@@ -273,11 +277,32 @@ client cluster OnOff = 6 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
+  request struct OffWithEffectRequest {
+    OnOffEffectIdentifier effectIdentifier = 0;
+    int8u effectVariant = 1;
+  }
+
+  request struct OnWithTimedOffRequest {
+    OnOffControl onOffControl = 0;
+    int16u onTime = 1;
+    int16u offWaitTime = 2;
+  }
+
+  /** On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0. */
   command Off(): DefaultSuccess = 0;
+  /** On receipt of this command, a device SHALL enter its ‘On’ state. This state is device dependent, but it is recommended that it is used for power on or similar functions. On receipt of the On command, if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. */
   command On(): DefaultSuccess = 1;
+  /** On receipt of this command, if a device is in its ‘Off’ state it SHALL enter its ‘On’ state. Otherwise, if it is in its ‘On’ state it SHALL enter its ‘Off’ state. On receipt of the Toggle command, if the value of the OnOff attribute is equal to FALSE and if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. If the value of the OnOff attribute is equal to TRUE, the OnTime attribute SHALL be set to 0. */
   command Toggle(): DefaultSuccess = 2;
+  /** The OffWithEffect command allows devices to be turned off using enhanced ways of fading. */
+  command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
+  /** The OnWithRecallGlobalScene command allows the recall of the settings when the device was turned off. */
+  command OnWithRecallGlobalScene(): DefaultSuccess = 65;
+  /** The OnWithTimedOff command allows devices to be turned on for a specific duration with a guarded off duration so that SHOULD the device be subsequently switched off, further OnWithTimedOff commands, received during this time, are prevented from turning the devices back on. */
+  command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 
+/** Attributes and commands for switching devices between 'On' and 'Off' states. */
 server cluster OnOff = 6 {
   enum OnOffDelayedAllOffEffectVariant : ENUM8 {
     kFadeToOffIn0p8Seconds = 0;
@@ -339,6 +364,7 @@ server cluster OnOff = 6 {
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 
+/** Attributes and commands for configuring On/Off switching devices. */
 server cluster OnOffSwitchConfiguration = 7 {
   readonly attribute enum8 switchType = 0;
   attribute enum8 switchActions = 16;
@@ -350,6 +376,7 @@ server cluster OnOffSwitchConfiguration = 7 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for controlling devices that can be set to a level between fully 'On' and fully 'Off.' */
 server cluster LevelControl = 8 {
   enum MoveMode : ENUM8 {
     kUp = 0;
@@ -457,6 +484,7 @@ server cluster LevelControl = 8 {
   command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
 }
 
+/** An interface for reading the value of a binary measurement and accessing various characteristics of that measurement. */
 server cluster BinaryInputBasic = 15 {
   attribute boolean outOfService = 81;
   attribute boolean presentValue = 85;
@@ -469,6 +497,7 @@ server cluster BinaryInputBasic = 15 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
   struct DeviceTypeStruct {
     devtype_id deviceType = 0;
@@ -487,6 +516,7 @@ server cluster Descriptor = 29 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table. */
 server cluster Binding = 30 {
   fabric_scoped struct TargetStruct {
     optional node_id node = 1;
@@ -505,6 +535,10 @@ server cluster Binding = 30 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** The Access Control Cluster exposes a data model view of a
+      Node's Access Control List (ACL), which codifies the rules used to manage
+      and enforce Access Control for the Node's endpoints and their associated
+      cluster instances. */
 server cluster AccessControl = 31 {
   enum AccessControlEntryAuthModeEnum : ENUM8 {
     kPase = 1;
@@ -574,6 +608,7 @@ server cluster AccessControl = 31 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides a standardized way for a Node (typically a Bridge, but could be any Node) to expose action information. */
 server cluster Actions = 37 {
   enum ActionErrorEnum : ENUM8 {
     kUnknown = 0;
@@ -658,6 +693,9 @@ server cluster Actions = 37 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides attributes and events for determining basic information about Nodes, which supports both
+      Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
+      which apply to the whole Node. Also allows setting user device information such as location. */
 server cluster BasicInformation = 40 {
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
@@ -707,6 +745,7 @@ server cluster BasicInformation = 40 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Provides an interface for providing OTA software updates */
 client cluster OtaSoftwareUpdateProvider = 41 {
   enum OTAApplyUpdateAction : ENUM8 {
     kProceed = 0;
@@ -746,14 +785,20 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     optional OCTET_STRING<512> metadataForProvider = 7;
   }
 
+  response struct QueryImageResponse = 1 {
+    OTAQueryStatus status = 0;
+    optional INT32U delayedActionTime = 1;
+    optional CHAR_STRING<256> imageURI = 2;
+    optional INT32U softwareVersion = 3;
+    optional CHAR_STRING<64> softwareVersionString = 4;
+    optional OCTET_STRING<32> updateToken = 5;
+    optional BOOLEAN userConsentNeeded = 6;
+    optional OCTET_STRING<512> metadataForRequestor = 7;
+  }
+
   request struct ApplyUpdateRequestRequest {
     OCTET_STRING<32> updateToken = 0;
     INT32U newVersion = 1;
-  }
-
-  request struct NotifyUpdateAppliedRequest {
-    OCTET_STRING<32> updateToken = 0;
-    INT32U softwareVersion = 1;
   }
 
   response struct ApplyUpdateResponse = 3 {
@@ -761,11 +806,20 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     INT32U delayedActionTime = 1;
   }
 
+  request struct NotifyUpdateAppliedRequest {
+    OCTET_STRING<32> updateToken = 0;
+    INT32U softwareVersion = 1;
+  }
+
+  /** Determine availability of a new Software Image */
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
+  /** Determine next action to take for a downloaded Software Image */
   command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
+  /** Notify OTA Provider that an update was applied */
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
 }
 
+/** Provides an interface for downloading and applying OTA software updates */
 server cluster OtaSoftwareUpdateRequestor = 42 {
   enum OTAAnnouncementReason : ENUM8 {
     kSimpleAnnouncement = 0;
@@ -840,6 +894,10 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   command AnnounceOTAProvider(AnnounceOTAProviderRequest): DefaultSuccess = 0;
 }
 
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing common languages, units of measurements, and numerical formatting
+      standards. As such, Nodes that visually or audibly convey information need a mechanism by which
+      they can be configured to use a user’s preferred language, units, etc */
 server cluster LocalizationConfiguration = 43 {
   attribute char_string<35> activeLocale = 0;
   readonly attribute CHAR_STRING supportedLocales[] = 1;
@@ -851,6 +909,10 @@ server cluster LocalizationConfiguration = 43 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing preferences for how dates and times are conveyed. As such, Nodes that visually
+      or audibly convey time information need a mechanism by which they can be configured to use a
+      user’s preferred format. */
 server cluster TimeFormatLocalization = 44 {
   enum CalendarTypeEnum : ENUM8 {
     kBuddhist = 0;
@@ -883,6 +945,10 @@ server cluster TimeFormatLocalization = 44 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Nodes should be expected to be deployed to any and all regions of the world. These global regions
+      may have differing preferences for the units in which values are conveyed in communication to a
+      user. As such, Nodes that visually or audibly convey measurable values to the user need a
+      mechanism by which they can be configured to use a user’s preferred unit. */
 server cluster UnitLocalization = 45 {
   enum TempUnitEnum : ENUM8 {
     kFahrenheit = 0;
@@ -903,6 +969,7 @@ server cluster UnitLocalization = 45 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster is used to describe the configuration and capabilities of a Device's power system. */
 server cluster PowerSourceConfiguration = 46 {
   readonly attribute INT8U sources[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -913,6 +980,7 @@ server cluster PowerSourceConfiguration = 46 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 server cluster PowerSource = 47 {
   enum BatApprovedChemistryEnum : ENUM16 {
     kUnspecified = 0;
@@ -1128,6 +1196,7 @@ server cluster PowerSource = 47 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
   enum CommissioningError : ENUM8 {
     kOk = 0;
@@ -1191,6 +1260,7 @@ server cluster GeneralCommissioning = 48 {
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
 }
 
+/** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 server cluster NetworkCommissioning = 49 {
   enum NetworkCommissioningStatus : ENUM8 {
     kSuccess = 0;
@@ -1329,6 +1399,7 @@ server cluster NetworkCommissioning = 49 {
   command access(invoke: administer) ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
 }
 
+/** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
 server cluster DiagnosticLogs = 50 {
   enum IntentEnum : ENUM8 {
     kEndUserSupport = 0;
@@ -1365,6 +1436,7 @@ server cluster DiagnosticLogs = 50 {
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
 }
 
+/** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster GeneralDiagnostics = 51 {
   enum BootReasonEnum : ENUM8 {
     kUnspecified = 0;
@@ -1469,6 +1541,7 @@ server cluster GeneralDiagnostics = 51 {
   command access(invoke: manage) TestEventTrigger(TestEventTriggerRequest): DefaultSuccess = 0;
 }
 
+/** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster SoftwareDiagnostics = 52 {
   bitmap SoftwareDiagnosticsFeature : BITMAP32 {
     kWaterMarks = 0x1;
@@ -1502,6 +1575,7 @@ server cluster SoftwareDiagnostics = 52 {
   command ResetWatermarks(): DefaultSuccess = 0;
 }
 
+/** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 server cluster ThreadNetworkDiagnostics = 53 {
   enum ConnectionStatusEnum : ENUM8 {
     kConnected = 0;
@@ -1664,6 +1738,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
+/** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster WiFiNetworkDiagnostics = 54 {
   enum AssociationFailureCauseEnum : ENUM8 {
     kUnknown = 0;
@@ -1736,6 +1811,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
+/** The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster EthernetNetworkDiagnostics = 55 {
   enum PHYRateEnum : ENUM8 {
     kRate10M = 0;
@@ -1774,6 +1850,9 @@ server cluster EthernetNetworkDiagnostics = 55 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
+/** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
+Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
+Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
 server cluster Switch = 59 {
   bitmap SwitchFeature : BITMAP32 {
     kLatchingSwitch = 0x1;
@@ -1824,6 +1903,7 @@ server cluster Switch = 59 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Commands to trigger a Node to allow a new Administrator to commission it. */
 server cluster AdministratorCommissioning = 60 {
   enum CommissioningWindowStatusEnum : ENUM8 {
     kWindowNotOpen = 0;
@@ -1864,6 +1944,7 @@ server cluster AdministratorCommissioning = 60 {
   timed command access(invoke: administer) RevokeCommissioning(): DefaultSuccess = 2;
 }
 
+/** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 server cluster OperationalCredentials = 62 {
   enum CertificateChainTypeEnum : ENUM8 {
     kDACCertificate = 1;
@@ -1979,6 +2060,7 @@ server cluster OperationalCredentials = 62 {
   command access(invoke: administer) AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
 }
 
+/** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 server cluster GroupKeyManagement = 63 {
   enum GroupKeySecurityPolicyEnum : ENUM8 {
     kTrustFirst = 0;
@@ -2050,6 +2132,8 @@ server cluster GroupKeyManagement = 63 {
   fabric command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
 }
 
+/** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
+labels. */
 server cluster FixedLabel = 64 {
   readonly attribute LabelStruct labelList[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2060,6 +2144,7 @@ server cluster FixedLabel = 64 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
 server cluster UserLabel = 65 {
   attribute access(write: manage) LabelStruct labelList[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -2070,6 +2155,7 @@ server cluster UserLabel = 65 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface to a boolean state called StateValue. */
 server cluster BooleanState = 69 {
   info event StateChange = 0 {
     boolean stateValue = 0;
@@ -2084,6 +2170,7 @@ server cluster BooleanState = 69 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for selecting a mode from a list of supported options. */
 server cluster ModeSelect = 80 {
   bitmap ModeSelectFeature : BITMAP32 {
     kDeponoff = 0x1;
@@ -2121,6 +2208,7 @@ server cluster ModeSelect = 80 {
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
+/** An interface to a generic way to secure a door */
 server cluster DoorLock = 257 {
   enum AlarmCodeEnum : ENUM8 {
     kLockJammed = 0;
@@ -2656,6 +2744,7 @@ server cluster DoorLock = 257 {
   timed command access(invoke: administer) ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
 }
 
+/** Provides an interface for controlling and adjusting automatic window coverings. */
 server cluster WindowCovering = 258 {
   enum EndProductType : ENUM8 {
     kRollerShade = 0;
@@ -2709,14 +2798,6 @@ server cluster WindowCovering = 258 {
     kTiltEncoderControlled = 0x40;
   }
 
-  bitmap Feature : BITMAP32 {
-    kLift = 0x1;
-    kTilt = 0x2;
-    kPositionAwareLift = 0x4;
-    kAbsolutePosition = 0x8;
-    kPositionAwareTilt = 0x10;
-  }
-
   bitmap Mode : BITMAP8 {
     kMotorDirectionReversed = 0x1;
     kCalibrationMode = 0x2;
@@ -2743,6 +2824,14 @@ server cluster WindowCovering = 258 {
     kHardwareFailure = 0x200;
     kManualOperation = 0x400;
     kProtection = 0x800;
+  }
+
+  bitmap WindowCoveringFeature : BITMAP32 {
+    kLift = 0x1;
+    kTilt = 0x2;
+    kPositionAwareLift = 0x4;
+    kAbsolutePosition = 0x8;
+    kPositionAwareTilt = 0x10;
   }
 
   readonly attribute Type type = 0;
@@ -2799,6 +2888,7 @@ server cluster WindowCovering = 258 {
   command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
 }
 
+/** This cluster provides control of a barrier (garage door). */
 server cluster BarrierControl = 259 {
   readonly attribute enum8 barrierMovingState = 1;
   readonly attribute bitmap16 barrierSafetyStatus = 2;
@@ -2819,6 +2909,7 @@ server cluster BarrierControl = 259 {
   command BarrierControlStop(): DefaultSuccess = 1;
 }
 
+/** An interface for configuring and controlling pumps. */
 server cluster PumpConfigurationAndControl = 512 {
   enum ControlModeEnum : ENUM8 {
     kConstantSpeed = 0;
@@ -2836,7 +2927,7 @@ server cluster PumpConfigurationAndControl = 512 {
     kLocal = 3;
   }
 
-  bitmap PumpFeature : BITMAP32 {
+  bitmap PumpConfigurationAndControlFeature : BITMAP32 {
     kConstantPressure = 0x1;
     kCompensatedPressure = 0x2;
     kConstantFlow = 0x4;
@@ -2940,6 +3031,7 @@ server cluster PumpConfigurationAndControl = 512 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** An interface for configuring and controlling the functionality of a thermostat. */
 server cluster Thermostat = 513 {
   enum SetpointAdjustMode : ENUM8 {
     kHeat = 0;
@@ -3034,6 +3126,7 @@ server cluster Thermostat = 513 {
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
 }
 
+/** An interface for controlling a fan in a heating/cooling system. */
 server cluster FanControl = 514 {
   enum FanModeSequenceType : ENUM8 {
     kOffLowMedHigh = 0;
@@ -3096,6 +3189,7 @@ server cluster FanControl = 514 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** An interface for configuring the user interface of a thermostat (which may be remote from the thermostat). */
 server cluster ThermostatUserInterfaceConfiguration = 516 {
   attribute enum8 temperatureDisplayMode = 0;
   attribute access(write: manage) enum8 keypadLockout = 1;
@@ -3108,6 +3202,7 @@ server cluster ThermostatUserInterfaceConfiguration = 516 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for controlling the color properties of a color-capable light. */
 server cluster ColorControl = 768 {
   enum ColorLoopAction : ENUM8 {
     kDeactivate = 0;
@@ -3406,6 +3501,7 @@ server cluster ColorControl = 768 {
   command StepColorTemperature(StepColorTemperatureRequest): DefaultSuccess = 76;
 }
 
+/** Attributes and commands for configuring a lighting ballast. */
 server cluster BallastConfiguration = 769 {
   readonly attribute int8u physicalMinLevel = 0;
   readonly attribute int8u physicalMaxLevel = 1;
@@ -3429,6 +3525,7 @@ server cluster BallastConfiguration = 769 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
 server cluster IlluminanceMeasurement = 1024 {
   enum LightSensorType : ENUM8 {
     kPhotodiode = 0;
@@ -3448,6 +3545,7 @@ server cluster IlluminanceMeasurement = 1024 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
 server cluster TemperatureMeasurement = 1026 {
   readonly attribute nullable int16s measuredValue = 0;
   readonly attribute nullable int16s minMeasuredValue = 1;
@@ -3461,8 +3559,9 @@ server cluster TemperatureMeasurement = 1026 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for configuring the measurement of pressure, and reporting pressure measurements. */
 server cluster PressureMeasurement = 1027 {
-  bitmap PressureFeature : BITMAP32 {
+  bitmap PressureMeasurementFeature : BITMAP32 {
     kExtended = 0x1;
   }
 
@@ -3477,6 +3576,7 @@ server cluster PressureMeasurement = 1027 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for configuring the measurement of flow, and reporting flow measurements. */
 server cluster FlowMeasurement = 1028 {
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
@@ -3490,6 +3590,7 @@ server cluster FlowMeasurement = 1028 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for configuring the measurement of relative humidity, and reporting relative humidity measurements. */
 server cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
@@ -3503,6 +3604,7 @@ server cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
 server cluster OccupancySensing = 1030 {
   enum OccupancySensorTypeEnum : ENUM8 {
     kPir = 0;
@@ -3532,6 +3634,7 @@ server cluster OccupancySensing = 1030 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 server cluster WakeOnLan = 1283 {
   readonly attribute char_string<32> MACAddress = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -3542,6 +3645,7 @@ server cluster WakeOnLan = 1283 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface for controlling the current Channel on a device. */
 server cluster Channel = 1284 {
   enum ChannelStatusEnum : ENUM8 {
     kSuccess = 0;
@@ -3575,6 +3679,7 @@ server cluster Channel = 1284 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface for UX navigation within a set of targets on a device or endpoint. */
 server cluster TargetNavigator = 1285 {
   enum TargetNavigatorStatusEnum : ENUM8 {
     kSuccess = 0;
@@ -3609,6 +3714,7 @@ server cluster TargetNavigator = 1285 {
   command NavigateTarget(NavigateTargetRequest): NavigateTargetResponse = 0;
 }
 
+/** This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker. */
 server cluster MediaPlayback = 1286 {
   enum MediaPlaybackStatusEnum : ENUM8 {
     kSuccess = 0;
@@ -3645,6 +3751,7 @@ server cluster MediaPlayback = 1286 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface for controlling the Input Selector on a media device such as a TV. */
 server cluster MediaInput = 1287 {
   enum InputTypeEnum : ENUM8 {
     kInternal = 0;
@@ -3696,6 +3803,7 @@ server cluster MediaInput = 1287 {
   command RenameInput(RenameInputRequest): DefaultSuccess = 3;
 }
 
+/** This cluster provides an interface for managing low power mode on a device. */
 server cluster LowPower = 1288 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -3707,6 +3815,7 @@ server cluster LowPower = 1288 {
   command Sleep(): DefaultSuccess = 0;
 }
 
+/** This cluster provides an interface for controlling a device like a TV using action commands such as UP, DOWN, and SELECT. */
 server cluster KeypadInput = 1289 {
   enum CecKeyCode : ENUM8 {
     kSelect = 0;
@@ -3827,6 +3936,7 @@ server cluster KeypadInput = 1289 {
   command SendKey(SendKeyRequest): SendKeyResponse = 0;
 }
 
+/** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 server cluster ContentLauncher = 1290 {
   enum ContentLaunchStatusEnum : ENUM8 {
     kSuccess = 0;
@@ -3912,6 +4022,7 @@ server cluster ContentLauncher = 1290 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface for controlling the Output on a media device such as a TV. */
 server cluster AudioOutput = 1291 {
   enum OutputTypeEnum : ENUM8 {
     kHdmi = 0;
@@ -3942,6 +4053,7 @@ server cluster AudioOutput = 1291 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
 server cluster ApplicationLauncher = 1292 {
   enum ApplicationLauncherStatusEnum : ENUM8 {
     kSuccess = 0;
@@ -3967,6 +4079,7 @@ server cluster ApplicationLauncher = 1292 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides information about an application running on a TV or media player device which is represented as an endpoint. */
 server cluster ApplicationBasic = 1293 {
   enum ApplicationStatusEnum : ENUM8 {
     kStopped = 0;
@@ -3990,6 +4103,7 @@ server cluster ApplicationBasic = 1293 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** This cluster provides commands that facilitate user account login on a Content App or a node. For example, a Content App running on a Video Player device, which is represented as an endpoint (see [TV Architecture]), can use this cluster to help make the user account on the Content App match the user account on the Client. */
 server cluster AccountLogin = 1294 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -3999,6 +4113,7 @@ server cluster AccountLogin = 1294 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Attributes related to the electrical properties of a device. This cluster is used by power outlets and other devices that need to provide instantaneous data as opposed to metrology data which should be retrieved from the metering cluster.. */
 server cluster ElectricalMeasurement = 2820 {
   readonly attribute bitmap32 measurementType = 0;
   readonly attribute int32s totalActivePower = 772;
@@ -4019,6 +4134,7 @@ server cluster ElectricalMeasurement = 2820 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
+/** Client Monitoring allows for ensuring that listed clients meet the required monitoring conditions on the server. */
 server cluster ClientMonitoring = 4166 {
   fabric_scoped struct MonitoringRegistration {
     node_id clientNodeId = 1;
@@ -4051,6 +4167,7 @@ server cluster ClientMonitoring = 4166 {
   command access(invoke: manage) UnregisterClientMonitoring(UnregisterClientMonitoringRequest): DefaultSuccess = 1;
 }
 
+/** The Test Cluster is meant to validate the generated code */
 server cluster UnitTesting = 4294048773 {
   enum SimpleEnum : ENUM8 {
     kUnspecified = 0;
@@ -4368,6 +4485,7 @@ server cluster UnitTesting = 4294048773 {
   command TestEmitTestFabricScopedEventRequest(TestEmitTestFabricScopedEventRequestRequest): TestEmitTestFabricScopedEventResponse = 21;
 }
 
+/** The Fault Injection Cluster provide a means for a test harness to configure faults(for example triggering a fault in the system). */
 server cluster FaultInjection = 4294048774 {
   enum FaultType : ENUM8 {
     kUnspecified = 0;
@@ -4407,15 +4525,15 @@ endpoint 0 {
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Identify {
-    ram      attribute identifyTime;
-    ram      attribute identifyType;
-    ram      attribute featureMap;
+    ram      attribute identifyTime default = 0x0000;
+    ram      attribute identifyType default = 0x0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
   }
 
   server cluster Groups {
     ram      attribute nameSupport;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
   }
 
@@ -4424,13 +4542,13 @@ endpoint 0 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -4442,7 +4560,7 @@ endpoint 0 {
     callback attribute subjectsPerAccessControlEntry default = 4;
     callback attribute targetsPerAccessControlEntry default = 3;
     callback attribute accessControlEntriesPerFabric default = 4;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
 
@@ -4457,20 +4575,20 @@ endpoint 0 {
     callback attribute productID;
     persist  attribute nodeLabel;
     callback attribute location default = "XX";
-    callback attribute hardwareVersion;
+    callback attribute hardwareVersion default = 0;
     callback attribute hardwareVersionString;
-    callback attribute softwareVersion;
+    callback attribute softwareVersion default = 0;
     callback attribute softwareVersionString;
     callback attribute manufacturingDate default = "20210614123456ZZ";
     callback attribute partNumber;
     callback attribute productURL;
     callback attribute productLabel;
     callback attribute serialNumber;
-    persist  attribute localConfigDisabled;
+    persist  attribute localConfigDisabled default = 0;
     ram      attribute reachable default = 1;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -4478,49 +4596,49 @@ endpoint 0 {
     emits event StateTransition;
     emits event VersionApplied;
     emits event DownloadError;
-    callback attribute defaultOTAProviders;
+    callback attribute defaultOTAProviders default = 0;
     ram      attribute updatePossible default = 1;
-    ram      attribute updateState;
-    ram      attribute updateStateProgress;
-    ram      attribute featureMap;
+    ram      attribute updateState default = 0;
+    ram      attribute updateStateProgress default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster LocalizationConfiguration {
     persist  attribute activeLocale default = "en-US";
     callback attribute supportedLocales;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster TimeFormatLocalization {
-    persist  attribute hourFormat;
-    persist  attribute activeCalendarType;
+    persist  attribute hourFormat default = 0;
+    persist  attribute activeCalendarType default = 0;
     callback attribute supportedCalendarTypes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster UnitLocalization {
-    persist  attribute temperatureUnit;
+    persist  attribute temperatureUnit default = 0;
     ram      attribute featureMap default = 0x1;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster PowerSourceConfiguration {
     callback attribute sources;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster PowerSource {
-    ram      attribute status;
+    ram      attribute status default = 0;
     ram      attribute order default = 3;
     ram      attribute description default = "B1";
-    ram      attribute batChargeLevel;
+    ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
     ram      attribute featureMap default = 2;
@@ -4528,12 +4646,12 @@ endpoint 0 {
   }
 
   server cluster GeneralCommissioning {
-    ram      attribute breadcrumb;
+    ram      attribute breadcrumb default = 0x0000000000000000;
     callback attribute basicCommissioningInfo;
-    callback attribute regulatoryConfig;
-    callback attribute locationCapability;
+    callback attribute regulatoryConfig default = 0;
+    callback attribute locationCapability default = 0;
     callback attribute supportsConcurrentConnection default = 1;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -4551,7 +4669,7 @@ endpoint 0 {
   }
 
   server cluster DiagnosticLogs {
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -4561,9 +4679,9 @@ endpoint 0 {
     emits event NetworkFaultChange;
     emits event BootReason;
     callback attribute networkInterfaces;
-    callback attribute rebootCount;
-    callback attribute upTime;
-    callback attribute totalOperationalHours;
+    callback attribute rebootCount default = 0x0000;
+    callback attribute upTime default = 0x0000000000000000;
+    callback attribute totalOperationalHours default = 0x00000000;
     callback attribute bootReason;
     callback attribute activeHardwareFaults;
     callback attribute activeRadioFaults;
@@ -4572,16 +4690,16 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster SoftwareDiagnostics {
     emits event SoftwareFault;
     callback attribute threadMetrics;
-    callback attribute currentHeapFree;
-    callback attribute currentHeapUsed;
-    callback attribute currentHeapHighWatermark;
+    callback attribute currentHeapFree default = 0x0000000000000000;
+    callback attribute currentHeapUsed default = 0x0000000000000000;
+    callback attribute currentHeapHighWatermark default = 0x0000000000000000;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
   }
@@ -4589,11 +4707,11 @@ endpoint 0 {
   server cluster ThreadNetworkDiagnostics {
     callback attribute channel;
     callback attribute routingRole;
-    callback attribute networkName;
-    callback attribute panId;
-    callback attribute extendedPanId;
+    callback attribute networkName default = "0";
+    callback attribute panId default = 0x0000;
+    callback attribute extendedPanId default = 0x0000000000000000;
     callback attribute meshLocalPrefix;
-    callback attribute overrunCount;
+    callback attribute overrunCount default = 0x0000000000000000;
     callback attribute neighborTable;
     callback attribute routeTable;
     callback attribute partitionId;
@@ -4601,53 +4719,53 @@ endpoint 0 {
     callback attribute dataVersion;
     callback attribute stableDataVersion;
     callback attribute leaderRouterId;
-    callback attribute detachedRoleCount;
-    callback attribute childRoleCount;
-    callback attribute routerRoleCount;
-    callback attribute leaderRoleCount;
-    callback attribute attachAttemptCount;
-    callback attribute partitionIdChangeCount;
-    callback attribute betterPartitionAttachAttemptCount;
-    callback attribute parentChangeCount;
-    callback attribute txTotalCount;
-    callback attribute txUnicastCount;
-    callback attribute txBroadcastCount;
-    callback attribute txAckRequestedCount;
-    callback attribute txAckedCount;
-    callback attribute txNoAckRequestedCount;
-    callback attribute txDataCount;
-    callback attribute txDataPollCount;
-    callback attribute txBeaconCount;
-    callback attribute txBeaconRequestCount;
-    callback attribute txOtherCount;
-    callback attribute txRetryCount;
-    callback attribute txDirectMaxRetryExpiryCount;
-    callback attribute txIndirectMaxRetryExpiryCount;
-    callback attribute txErrCcaCount;
-    callback attribute txErrAbortCount;
-    callback attribute txErrBusyChannelCount;
-    callback attribute rxTotalCount;
-    callback attribute rxUnicastCount;
-    callback attribute rxBroadcastCount;
-    callback attribute rxDataCount;
-    callback attribute rxDataPollCount;
-    callback attribute rxBeaconCount;
-    callback attribute rxBeaconRequestCount;
-    callback attribute rxOtherCount;
-    callback attribute rxAddressFilteredCount;
-    callback attribute rxDestAddrFilteredCount;
-    callback attribute rxDuplicatedCount;
-    callback attribute rxErrNoFrameCount;
-    callback attribute rxErrUnknownNeighborCount;
-    callback attribute rxErrInvalidSrcAddrCount;
-    callback attribute rxErrSecCount;
-    callback attribute rxErrFcsCount;
-    callback attribute rxErrOtherCount;
-    callback attribute activeTimestamp;
-    callback attribute pendingTimestamp;
-    callback attribute delay;
+    callback attribute detachedRoleCount default = 0x0000;
+    callback attribute childRoleCount default = 0x0000;
+    callback attribute routerRoleCount default = 0x0000;
+    callback attribute leaderRoleCount default = 0x0000;
+    callback attribute attachAttemptCount default = 0x0000;
+    callback attribute partitionIdChangeCount default = 0x0000;
+    callback attribute betterPartitionAttachAttemptCount default = 0x0000;
+    callback attribute parentChangeCount default = 0x0000;
+    callback attribute txTotalCount default = 0x0000;
+    callback attribute txUnicastCount default = 0x0000;
+    callback attribute txBroadcastCount default = 0x0000;
+    callback attribute txAckRequestedCount default = 0x0000;
+    callback attribute txAckedCount default = 0x0000;
+    callback attribute txNoAckRequestedCount default = 0x0000;
+    callback attribute txDataCount default = 0x0000;
+    callback attribute txDataPollCount default = 0x0000;
+    callback attribute txBeaconCount default = 0x0000;
+    callback attribute txBeaconRequestCount default = 0x0000;
+    callback attribute txOtherCount default = 0x0000;
+    callback attribute txRetryCount default = 0x0000;
+    callback attribute txDirectMaxRetryExpiryCount default = 0x0000;
+    callback attribute txIndirectMaxRetryExpiryCount default = 0x0000;
+    callback attribute txErrCcaCount default = 0x0000;
+    callback attribute txErrAbortCount default = 0x0000;
+    callback attribute txErrBusyChannelCount default = 0x0000;
+    callback attribute rxTotalCount default = 0x0000;
+    callback attribute rxUnicastCount default = 0x0000;
+    callback attribute rxBroadcastCount default = 0x0000;
+    callback attribute rxDataCount default = 0x0000;
+    callback attribute rxDataPollCount default = 0x0000;
+    callback attribute rxBeaconCount default = 0x0000;
+    callback attribute rxBeaconRequestCount default = 0x0000;
+    callback attribute rxOtherCount default = 0x0000;
+    callback attribute rxAddressFilteredCount default = 0x0000;
+    callback attribute rxDestAddrFilteredCount default = 0x0000;
+    callback attribute rxDuplicatedCount default = 0x0000;
+    callback attribute rxErrNoFrameCount default = 0x0000;
+    callback attribute rxErrUnknownNeighborCount default = 0x0000;
+    callback attribute rxErrInvalidSrcAddrCount default = 0x0000;
+    callback attribute rxErrSecCount default = 0x0000;
+    callback attribute rxErrFcsCount default = 0x0000;
+    callback attribute rxErrOtherCount default = 0x0000;
+    callback attribute activeTimestamp default = 0x0000000000000000;
+    callback attribute pendingTimestamp default = 0x0000000000000000;
+    callback attribute delay default = 0x0000;
     callback attribute securityPolicy;
-    callback attribute channelPage0Mask;
+    callback attribute channelPage0Mask default = "0x0000";
     callback attribute operationalDatasetComponents;
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
@@ -4661,39 +4779,39 @@ endpoint 0 {
     callback attribute bssid;
     callback attribute securityType;
     callback attribute wiFiVersion;
-    callback attribute channelNumber;
-    callback attribute rssi;
-    callback attribute beaconLostCount;
-    callback attribute beaconRxCount;
-    callback attribute packetMulticastRxCount;
-    callback attribute packetMulticastTxCount;
-    callback attribute packetUnicastRxCount;
-    callback attribute packetUnicastTxCount;
-    callback attribute currentMaxRate;
-    callback attribute overrunCount;
+    callback attribute channelNumber default = 0x0000;
+    callback attribute rssi default = 0x00;
+    callback attribute beaconLostCount default = 0x00000000;
+    callback attribute beaconRxCount default = 0x00000000;
+    callback attribute packetMulticastRxCount default = 0x00000000;
+    callback attribute packetMulticastTxCount default = 0x00000000;
+    callback attribute packetUnicastRxCount default = 0x00000000;
+    callback attribute packetUnicastTxCount default = 0x00000000;
+    callback attribute currentMaxRate default = 0x0000000000000000;
+    callback attribute overrunCount default = 0x0000000000000000;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster EthernetNetworkDiagnostics {
     callback attribute PHYRate;
-    callback attribute fullDuplex;
-    callback attribute packetRxCount;
-    callback attribute packetTxCount;
-    callback attribute txErrCount;
-    callback attribute collisionCount;
-    callback attribute overrunCount;
-    callback attribute carrierDetect;
-    callback attribute timeSinceReset;
+    callback attribute fullDuplex default = 0x00;
+    callback attribute packetRxCount default = 0x0000000000000000;
+    callback attribute packetTxCount default = 0x0000000000000000;
+    callback attribute txErrCount default = 0x0000000000000000;
+    callback attribute collisionCount default = 0x0000000000000000;
+    callback attribute overrunCount default = 0x0000000000000000;
+    callback attribute carrierDetect default = 0x00;
+    callback attribute timeSinceReset default = 0x0000000000000000;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster AdministratorCommissioning {
-    callback attribute windowStatus;
+    callback attribute windowStatus default = 0;
     callback attribute adminFabricIndex default = 1;
-    callback attribute adminVendorId;
-    ram      attribute featureMap;
+    callback attribute adminVendorId default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -4704,7 +4822,7 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -4713,27 +4831,27 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster FixedLabel {
     callback attribute labelList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster UserLabel {
     callback attribute labelList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster RelativeHumidityMeasurement {
     ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
+    ram      attribute minMeasuredValue default = 0;
     ram      attribute maxMeasuredValue default = 0x2710;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -4745,7 +4863,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -4753,7 +4871,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 }
@@ -4762,33 +4880,33 @@ endpoint 1 {
   binding cluster OnOff;
 
   server cluster Identify {
-    ram      attribute identifyTime;
-    ram      attribute identifyType;
-    ram      attribute featureMap;
+    ram      attribute identifyTime default = 0x0000;
+    ram      attribute identifyType default = 0x0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
   }
 
   server cluster Groups {
     ram      attribute nameSupport;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
   }
 
   server cluster Scenes {
-    ram      attribute sceneCount;
-    ram      attribute currentScene;
-    ram      attribute currentGroup;
-    ram      attribute sceneValid;
+    ram      attribute sceneCount default = 0x00;
+    ram      attribute currentScene default = 0x00;
+    ram      attribute currentGroup default = 0x0000;
+    ram      attribute sceneValid default = 0x00;
     ram      attribute nameSupport;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
   }
 
   server cluster OnOff {
-    persist  attribute onOff;
+    persist  attribute onOff default = 0x00;
     ram      attribute globalSceneControl default = 0x01;
-    ram      attribute onTime;
-    ram      attribute offWaitTime;
+    ram      attribute onTime default = 0x0000;
+    ram      attribute offWaitTime default = 0x0000;
     persist  attribute startUpOnOff default = 0xFF;
     ram      attribute featureMap default = 0x0001;
     ram      attribute clusterRevision default = 4;
@@ -4796,21 +4914,21 @@ endpoint 1 {
 
   server cluster OnOffSwitchConfiguration {
     ram      attribute switchType;
-    ram      attribute switchActions;
-    ram      attribute featureMap;
+    ram      attribute switchActions default = 0x00;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster LevelControl {
     persist  attribute currentLevel default = 0xFE;
-    ram      attribute remainingTime;
+    ram      attribute remainingTime default = 0x0000;
     ram      attribute minLevel default = 0x01;
     ram      attribute maxLevel default = 0xFE;
-    ram      attribute currentFrequency;
-    ram      attribute minFrequency;
-    ram      attribute maxFrequency;
-    ram      attribute options;
-    ram      attribute onOffTransitionTime;
+    ram      attribute currentFrequency default = 0x0000;
+    ram      attribute minFrequency default = 0x0000;
+    ram      attribute maxFrequency default = 0x0000;
+    ram      attribute options default = 0x00;
+    ram      attribute onOffTransitionTime default = 0x0000;
     ram      attribute onLevel default = 0xFF;
     ram      attribute onTransitionTime;
     ram      attribute offTransitionTime;
@@ -4821,10 +4939,10 @@ endpoint 1 {
   }
 
   server cluster BinaryInputBasic {
-    ram      attribute outOfService;
+    ram      attribute outOfService default = 0x00;
     ram      attribute presentValue;
-    ram      attribute statusFlags;
-    ram      attribute featureMap;
+    ram      attribute statusFlags default = 0x00;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -4833,13 +4951,13 @@ endpoint 1 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
 
   server cluster Binding {
     callback attribute binding;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -4847,16 +4965,16 @@ endpoint 1 {
     callback attribute actionList;
     callback attribute endpointLists;
     callback attribute setupURL;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
 
   server cluster PowerSource {
     emits event BatFaultChange;
-    ram      attribute status;
+    ram      attribute status default = 0;
     ram      attribute order default = 2;
     ram      attribute description default = "B2";
-    ram      attribute batChargeLevel;
+    ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
     ram      attribute featureMap default = 2;
@@ -4874,28 +4992,28 @@ endpoint 1 {
 
   server cluster FixedLabel {
     callback attribute labelList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster UserLabel {
     callback attribute labelList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster BooleanState {
-    ram      attribute stateValue;
-    ram      attribute featureMap;
+    ram      attribute stateValue default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster ModeSelect {
     ram      attribute description default = "Coffee";
-    ram      attribute standardNamespace;
-    callback attribute supportedModes;
-    persist  attribute currentMode;
-    persist  attribute startUpMode;
+    ram      attribute standardNamespace default = 0;
+    callback attribute supportedModes default = 0;
+    persist  attribute currentMode default = 0;
+    persist  attribute startUpMode default = 0;
     persist  attribute onMode default = 255;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -4922,7 +5040,7 @@ endpoint 1 {
     ram      attribute numberOfRFIDUsersSupported default = 10;
     ram      attribute numberOfWeekDaySchedulesSupportedPerUser default = 10;
     ram      attribute numberOfYearDaySchedulesSupportedPerUser default = 10;
-    ram      attribute numberOfHolidaySchedulesSupported;
+    ram      attribute numberOfHolidaySchedulesSupported default = 0;
     ram      attribute maxPINCodeLength default = 6;
     ram      attribute minPINCodeLength default = 6;
     ram      attribute maxRFIDCodeLength default = 20;
@@ -4931,16 +5049,16 @@ endpoint 1 {
     ram      attribute numberOfCredentialsSupportedPerUser default = 5;
     ram      attribute language default = "en";
     ram      attribute autoRelockTime default = 60;
-    ram      attribute soundVolume;
-    ram      attribute operatingMode;
+    ram      attribute soundVolume default = 0x00;
+    ram      attribute operatingMode default = 0x00;
     ram      attribute supportedOperatingModes default = 0xFFF6;
-    ram      attribute defaultConfigurationRegister;
-    ram      attribute enableOneTouchLocking;
-    ram      attribute enableInsideStatusLED;
-    ram      attribute enablePrivacyModeButton;
+    ram      attribute defaultConfigurationRegister default = 0;
+    ram      attribute enableOneTouchLocking default = 0x00;
+    ram      attribute enableInsideStatusLED default = 0;
+    ram      attribute enablePrivacyModeButton default = 0x00;
     ram      attribute wrongCodeEntryLimit default = 3;
     ram      attribute userCodeTemporaryDisableTime default = 10;
-    ram      attribute requirePINforRemoteOperation;
+    ram      attribute requirePINforRemoteOperation default = 0;
     ram      attribute featureMap default = 0xD13;
     ram      attribute clusterRevision default = 6;
   }
@@ -4951,23 +5069,23 @@ endpoint 1 {
     ram      attribute physicalClosedLimitTilt default = 0xFFFF;
     persist  attribute currentPositionLift default = 0x7FFF;
     persist  attribute currentPositionTilt default = 0x7FFF;
-    persist  attribute numberOfActuationsLift;
-    persist  attribute numberOfActuationsTilt;
+    persist  attribute numberOfActuationsLift default = 0x0000;
+    persist  attribute numberOfActuationsTilt default = 0x0000;
     persist  attribute configStatus default = 0x03;
     persist  attribute currentPositionLiftPercentage default = 50;
     persist  attribute currentPositionTiltPercentage default = 50;
-    ram      attribute operationalStatus;
+    ram      attribute operationalStatus default = 0x00;
     ram      attribute targetPositionLiftPercent100ths default = 5000;
     ram      attribute targetPositionTiltPercent100ths default = 5000;
-    ram      attribute endProductType;
+    ram      attribute endProductType default = 0x00;
     persist  attribute currentPositionLiftPercent100ths default = 5000;
     persist  attribute currentPositionTiltPercent100ths default = 5000;
-    persist  attribute installedOpenLimitLift;
+    persist  attribute installedOpenLimitLift default = 0x0000;
     persist  attribute installedClosedLimitLift default = 0xFFFF;
-    persist  attribute installedOpenLimitTilt;
+    persist  attribute installedOpenLimitTilt default = 0x0000;
     persist  attribute installedClosedLimitTilt default = 0xFFFF;
-    persist  attribute mode;
-    ram      attribute safetyStatus;
+    persist  attribute mode default = 0x00;
+    ram      attribute safetyStatus default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -4980,7 +5098,7 @@ endpoint 1 {
     ram      attribute barrierSafetyStatus;
     ram      attribute barrierCapabilities;
     ram      attribute barrierPosition;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -5003,11 +5121,11 @@ endpoint 1 {
     ram      attribute effectiveControlMode;
     ram      attribute capacity;
     ram      attribute speed;
-    ram      attribute lifetimeRunningHours;
+    ram      attribute lifetimeRunningHours default = 0x000000;
     ram      attribute power;
-    ram      attribute lifetimeEnergyConsumed;
-    ram      attribute operationMode;
-    ram      attribute controlMode;
+    ram      attribute lifetimeEnergyConsumed default = 0x00000000;
+    ram      attribute operationMode default = 0x00;
+    ram      attribute controlMode default = 0x00;
     ram      attribute featureMap default = 0x1F;
     ram      attribute clusterRevision default = 4;
   }
@@ -5035,40 +5153,40 @@ endpoint 1 {
   }
 
   server cluster FanControl {
-    ram      attribute fanMode;
+    ram      attribute fanMode default = 0x00;
     ram      attribute fanModeSequence default = 0x02;
-    ram      attribute percentSetting;
-    ram      attribute percentCurrent;
+    ram      attribute percentSetting default = 0x00;
+    ram      attribute percentCurrent default = 0x00;
     ram      attribute speedMax default = 100;
-    ram      attribute speedSetting;
-    ram      attribute speedCurrent;
-    ram      attribute rockSupport;
-    ram      attribute rockSetting;
-    ram      attribute windSupport;
-    ram      attribute windSetting;
+    ram      attribute speedSetting default = 0x00;
+    ram      attribute speedCurrent default = 0x00;
+    ram      attribute rockSupport default = 0x00;
+    ram      attribute rockSetting default = 0x00;
+    ram      attribute windSupport default = 0x00;
+    ram      attribute windSetting default = 0x00;
     ram      attribute featureMap default = 0x0F;
     ram      attribute clusterRevision default = 2;
   }
 
   server cluster ThermostatUserInterfaceConfiguration {
-    ram      attribute temperatureDisplayMode;
-    ram      attribute keypadLockout;
+    ram      attribute temperatureDisplayMode default = 0x00;
+    ram      attribute keypadLockout default = 0x00;
     ram      attribute scheduleProgrammingVisibility;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 2;
   }
 
   server cluster ColorControl {
-    ram      attribute currentHue;
-    ram      attribute currentSaturation;
-    ram      attribute remainingTime;
+    ram      attribute currentHue default = 0x00;
+    ram      attribute currentSaturation default = 0x00;
+    ram      attribute remainingTime default = 0x0000;
     ram      attribute currentX default = 0x616B;
     ram      attribute currentY default = 0x607D;
     ram      attribute driftCompensation;
     ram      attribute compensationText;
     ram      attribute colorTemperatureMireds default = 0x00FA;
     ram      attribute colorMode default = 0x01;
-    ram      attribute options;
+    ram      attribute options default = 0x00;
     ram      attribute numberOfPrimaries;
     ram      attribute primary1X;
     ram      attribute primary1Y;
@@ -5099,15 +5217,15 @@ endpoint 1 {
     ram      attribute colorPointBX;
     ram      attribute colorPointBY;
     ram      attribute colorPointBIntensity;
-    ram      attribute enhancedCurrentHue;
+    ram      attribute enhancedCurrentHue default = 0x0000;
     ram      attribute enhancedColorMode default = 0x01;
-    ram      attribute colorLoopActive;
-    ram      attribute colorLoopDirection;
+    ram      attribute colorLoopActive default = 0x00;
+    ram      attribute colorLoopDirection default = 0x00;
     ram      attribute colorLoopTime default = 0x0019;
     ram      attribute colorLoopStartEnhancedHue default = 0x2300;
-    ram      attribute colorLoopStoredEnhancedHue;
+    ram      attribute colorLoopStoredEnhancedHue default = 0x0000;
     ram      attribute colorCapabilities default = 0x1F;
-    ram      attribute colorTempPhysicalMinMireds;
+    ram      attribute colorTempPhysicalMinMireds default = 0x0000;
     ram      attribute colorTempPhysicalMaxMireds default = 0xFEFF;
     ram      attribute coupleColorTempToLevelMinMireds;
     ram      attribute startUpColorTemperatureMireds;
@@ -5118,7 +5236,7 @@ endpoint 1 {
   server cluster BallastConfiguration {
     ram      attribute physicalMinLevel default = 0x01;
     ram      attribute physicalMaxLevel default = 0xFE;
-    ram      attribute ballastStatus;
+    ram      attribute ballastStatus default = 0x00;
     ram      attribute minLevel default = 0x01;
     ram      attribute maxLevel default = 0xFE;
     ram      attribute intrinsicBallastFactor;
@@ -5127,23 +5245,23 @@ endpoint 1 {
     ram      attribute lampType;
     ram      attribute lampManufacturer;
     ram      attribute lampRatedHours default = 0xFFFFFF;
-    ram      attribute lampBurnHours;
-    ram      attribute lampAlarmMode;
+    ram      attribute lampBurnHours default = 0x000000;
+    ram      attribute lampAlarmMode default = 0x00;
     ram      attribute lampBurnHoursTripPoint default = 0xFFFFFF;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
   }
 
   server cluster IlluminanceMeasurement {
-    ram      attribute measuredValue;
+    ram      attribute measuredValue default = 0x0000;
     ram      attribute minMeasuredValue default = 0x01;
     ram      attribute maxMeasuredValue default = 0xFFFE;
     ram      attribute tolerance;
     ram      attribute lightSensorType default = 0xFF;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -5152,15 +5270,15 @@ endpoint 1 {
     ram      attribute minMeasuredValue default = 0x8000;
     ram      attribute maxMeasuredValue default = 0x8000;
     ram      attribute tolerance;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
   }
 
   server cluster PressureMeasurement {
-    ram      attribute measuredValue;
+    ram      attribute measuredValue default = 0x0000;
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -5168,17 +5286,17 @@ endpoint 1 {
     ram      attribute measuredValue;
     ram      attribute minMeasuredValue;
     ram      attribute maxMeasuredValue;
-    ram      attribute tolerance;
-    ram      attribute featureMap;
+    ram      attribute tolerance default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
   server cluster RelativeHumidityMeasurement {
     ram      attribute measuredValue;
-    ram      attribute minMeasuredValue;
+    ram      attribute minMeasuredValue default = 0;
     ram      attribute maxMeasuredValue default = 0x2710;
     ram      attribute tolerance;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -5186,74 +5304,74 @@ endpoint 1 {
     ram      attribute occupancy;
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
   server cluster WakeOnLan {
     ram      attribute MACAddress;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster Channel {
     callback attribute channelList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster TargetNavigator {
     callback attribute targetList;
-    ram      attribute currentTarget;
-    ram      attribute featureMap;
+    ram      attribute currentTarget default = 0x00;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster MediaPlayback {
-    ram      attribute currentState;
+    ram      attribute currentState default = 0x00;
     ram      attribute startTime default = 0xFF;
     ram      attribute duration;
     ram      attribute playbackSpeed;
     ram      attribute seekRangeEnd;
     ram      attribute seekRangeStart;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster MediaInput {
     callback attribute inputList;
-    ram      attribute currentInput;
-    ram      attribute featureMap;
+    ram      attribute currentInput default = 0x00;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster LowPower {
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster KeypadInput {
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster ContentLauncher {
     callback attribute acceptHeader;
     ram      attribute supportedStreamingProtocols;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster AudioOutput {
     callback attribute outputList;
-    ram      attribute currentOutput;
-    ram      attribute featureMap;
+    ram      attribute currentOutput default = 0x00;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster ApplicationLauncher {
     callback attribute catalogList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -5265,18 +5383,18 @@ endpoint 1 {
     ram      attribute status;
     ram      attribute applicationVersion;
     callback attribute allowedVendorList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster AccountLogin {
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
   server cluster ElectricalMeasurement {
-    ram      attribute measurementType;
-    ram      attribute totalActivePower;
+    ram      attribute measurementType default = 0x000000;
+    ram      attribute totalActivePower default = 0x000000;
     ram      attribute rmsVoltage default = 0xffff;
     ram      attribute rmsVoltageMin default = 0x8000;
     ram      attribute rmsVoltageMax default = 0x8000;
@@ -5286,38 +5404,38 @@ endpoint 1 {
     ram      attribute activePower default = 0xffff;
     ram      attribute activePowerMin default = 0xffff;
     ram      attribute activePowerMax default = 0xffff;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
   server cluster UnitTesting {
     emits event TestEvent;
     emits event TestFabricScopedEvent;
-    ram      attribute boolean;
-    ram      attribute bitmap8;
-    ram      attribute bitmap16;
-    ram      attribute bitmap32;
-    ram      attribute bitmap64;
-    ram      attribute int8u;
-    ram      attribute int16u;
-    ram      attribute int24u;
-    ram      attribute int32u;
-    ram      attribute int40u;
-    ram      attribute int48u;
-    ram      attribute int56u;
-    ram      attribute int64u;
-    ram      attribute int8s;
-    ram      attribute int16s;
-    ram      attribute int24s;
-    ram      attribute int32s;
-    ram      attribute int40s;
-    ram      attribute int48s;
-    ram      attribute int56s;
-    ram      attribute int64s;
-    ram      attribute enum8;
-    ram      attribute enum16;
-    ram      attribute floatSingle;
-    ram      attribute floatDouble;
+    ram      attribute boolean default = false;
+    ram      attribute bitmap8 default = 0;
+    ram      attribute bitmap16 default = 0;
+    ram      attribute bitmap32 default = 0;
+    ram      attribute bitmap64 default = 0;
+    ram      attribute int8u default = 0;
+    ram      attribute int16u default = 0;
+    ram      attribute int24u default = 0;
+    ram      attribute int32u default = 0;
+    ram      attribute int40u default = 0;
+    ram      attribute int48u default = 0;
+    ram      attribute int56u default = 0;
+    ram      attribute int64u default = 0;
+    ram      attribute int8s default = 0;
+    ram      attribute int16s default = 0;
+    ram      attribute int24s default = 0;
+    ram      attribute int32s default = 0;
+    ram      attribute int40s default = 0;
+    ram      attribute int48s default = 0;
+    ram      attribute int56s default = 0;
+    ram      attribute int64s default = 0;
+    ram      attribute enum8 default = 0;
+    ram      attribute enum16 default = 0;
+    ram      attribute floatSingle default = 0;
+    ram      attribute floatDouble default = 0;
     ram      attribute octetString;
     callback attribute listInt8u;
     callback attribute listOctetString;
@@ -5340,31 +5458,31 @@ endpoint 1 {
     ram      attribute timedWriteBoolean;
     callback attribute generalErrorBoolean;
     callback attribute clusterErrorBoolean;
-    ram      attribute nullableBoolean;
-    ram      attribute nullableBitmap8;
-    ram      attribute nullableBitmap16;
-    ram      attribute nullableBitmap32;
-    ram      attribute nullableBitmap64;
-    ram      attribute nullableInt8u;
-    ram      attribute nullableInt16u;
-    ram      attribute nullableInt24u;
-    ram      attribute nullableInt32u;
-    ram      attribute nullableInt40u;
-    ram      attribute nullableInt48u;
-    ram      attribute nullableInt56u;
-    ram      attribute nullableInt64u;
-    ram      attribute nullableInt8s;
-    ram      attribute nullableInt16s;
-    ram      attribute nullableInt24s;
-    ram      attribute nullableInt32s;
-    ram      attribute nullableInt40s;
-    ram      attribute nullableInt48s;
-    ram      attribute nullableInt56s;
-    ram      attribute nullableInt64s;
-    ram      attribute nullableEnum8;
-    ram      attribute nullableEnum16;
-    ram      attribute nullableFloatSingle;
-    ram      attribute nullableFloatDouble;
+    ram      attribute nullableBoolean default = false;
+    ram      attribute nullableBitmap8 default = 0;
+    ram      attribute nullableBitmap16 default = 0;
+    ram      attribute nullableBitmap32 default = 0;
+    ram      attribute nullableBitmap64 default = 0;
+    ram      attribute nullableInt8u default = 0;
+    ram      attribute nullableInt16u default = 0;
+    ram      attribute nullableInt24u default = 0;
+    ram      attribute nullableInt32u default = 0;
+    ram      attribute nullableInt40u default = 0;
+    ram      attribute nullableInt48u default = 0;
+    ram      attribute nullableInt56u default = 0;
+    ram      attribute nullableInt64u default = 0;
+    ram      attribute nullableInt8s default = 0;
+    ram      attribute nullableInt16s default = 0;
+    ram      attribute nullableInt24s default = 0;
+    ram      attribute nullableInt32s default = 0;
+    ram      attribute nullableInt40s default = 0;
+    ram      attribute nullableInt48s default = 0;
+    ram      attribute nullableInt56s default = 0;
+    ram      attribute nullableInt64s default = 0;
+    ram      attribute nullableEnum8 default = 0;
+    ram      attribute nullableEnum16 default = 0;
+    ram      attribute nullableFloatSingle default = 0;
+    ram      attribute nullableFloatDouble default = 0;
     ram      attribute nullableOctetString;
     ram      attribute nullableCharString;
     ram      attribute nullableEnumAttr;
@@ -5373,8 +5491,8 @@ endpoint 1 {
     ram      attribute nullableRangeRestrictedInt8s default = -20;
     ram      attribute nullableRangeRestrictedInt16u default = 200;
     ram      attribute nullableRangeRestrictedInt16s default = -100;
-    callback attribute writeOnlyInt8u;
-    ram      attribute featureMap;
+    callback attribute writeOnlyInt8u default = 0;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 }
@@ -5383,17 +5501,17 @@ endpoint 2 {
 
   server cluster Groups {
     ram      attribute nameSupport;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
   }
 
   server cluster OnOff {
-    ram      attribute onOff;
+    ram      attribute onOff default = 0x00;
     ram      attribute globalSceneControl default = 1;
-    ram      attribute onTime;
-    ram      attribute offWaitTime;
+    ram      attribute onTime default = 0;
+    ram      attribute offWaitTime default = 0;
     ram      attribute startUpOnOff;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0x0000;
     ram      attribute clusterRevision default = 4;
   }
 
@@ -5402,15 +5520,15 @@ endpoint 2 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
 
   server cluster PowerSource {
-    ram      attribute status;
+    ram      attribute status default = 0;
     ram      attribute order default = 1;
     ram      attribute description default = "B3";
-    ram      attribute batChargeLevel;
+    ram      attribute batChargeLevel default = 0;
     ram      attribute batReplacementNeeded;
     ram      attribute batReplaceability;
     ram      attribute featureMap default = 2;
@@ -5421,7 +5539,7 @@ endpoint 2 {
     ram      attribute occupancy;
     ram      attribute occupancySensorType;
     ram      attribute occupancySensorTypeBitmap;
-    ram      attribute featureMap;
+    ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 }
@@ -5437,7 +5555,7 @@ endpoint 65534 {
     callback attribute lastNetworkingStatus;
     callback attribute lastNetworkID;
     callback attribute lastConnectErrorValue;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
 }
