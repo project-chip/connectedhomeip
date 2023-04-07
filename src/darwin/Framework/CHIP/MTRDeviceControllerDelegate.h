@@ -28,6 +28,9 @@ typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
     = 3,
 } API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+extern NSString * const MTRVendorIDKey;
+extern NSString * const MTRProductIDKey;
+
 @class MTRDeviceController;
 
 /**
@@ -52,21 +55,21 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 /**
  * Notify the delegate when commissioning is completed.
  */
-- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error;
-
+- (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError * _Nullable)error
+MTR_NEWLY_DEPRECATED("Please use commissioningComplete:deviceId");
 /**
  * Notify the delegate when commissioning is completed.
  * For getting commissioning controllee's deviceId
  */
 - (void)controller:(MTRDeviceController *)controller
     commissioningComplete:(NSError * _Nullable)error
-                 deviceId:(NSNumber * _Nullable)deviceId;
-
+                 deviceId:(NSNumber * _Nullable)deviceId MTR_NEWLY_AVAILABLE;
 /**
  * Notify the delegate when read commissioning Infomation. (vendorID, productID)
- * Key : vendorID, productID, wifiEndpointID (device's Wi-Fi suport or not), threadEndpointID (device's Thread support or not)
+ * This value transmits the unproven value stored in the Basic Information Cluster in Controllee.
+ * The proof of the value is made during the Device Attestation step.
  */
-- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(NSDictionary<NSString *, id> * _Nullable)info;
+- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(NSDictionary<NSString *, id> * _Nullable)info MTR_NEWLY_AVAILABLE;
 @end
 
 typedef NS_ENUM(NSUInteger, MTRPairingStatus) {
