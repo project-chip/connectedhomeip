@@ -1,14 +1,14 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-struct LabelStruct {
-    char_string<16> label = 0;
-    char_string<16> value = 1;
-}
-
 struct ApplicationStruct {
     int16u catalogVendorID = 0;
     char_string applicationID = 1;
+}
+
+struct LabelStruct {
+    char_string<16> label = 0;
+    char_string<16> value = 1;
 }
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */

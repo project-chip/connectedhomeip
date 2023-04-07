@@ -1,6 +1,11 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
+struct ApplicationStruct {
+    int16u catalogVendorID = 0;
+    char_string applicationID = 1;
+}
+
 struct LabelStruct {
     char_string<16> label = 0;
     char_string<16> value = 1;
@@ -127,14 +132,14 @@ server cluster Scenes = 5 {
     kSceneNames = 0x1;
   }
 
-  struct ExtensionFieldSet {
-    cluster_id clusterID = 0;
-    AttributeValuePair attributeValueList[] = 1;
-  }
-
   struct AttributeValuePair {
     optional attrib_id attributeID = 0;
     int8u attributeValue[] = 1;
+  }
+
+  struct ExtensionFieldSet {
+    cluster_id clusterID = 0;
+    AttributeValuePair attributeValueList[] = 1;
   }
 
   readonly attribute int8u sceneCount = 0;
@@ -507,6 +512,12 @@ server cluster AccessControl = 31 {
     kRemoved = 2;
   }
 
+  struct Target {
+    nullable cluster_id cluster = 0;
+    nullable endpoint_no endpoint = 1;
+    nullable devtype_id deviceType = 2;
+  }
+
   fabric_scoped struct AccessControlEntryStruct {
     fabric_sensitive AccessControlEntryPrivilegeEnum privilege = 1;
     fabric_sensitive AccessControlEntryAuthModeEnum authMode = 2;
@@ -515,10 +526,9 @@ server cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  struct Target {
-    nullable cluster_id cluster = 0;
-    nullable endpoint_no endpoint = 1;
-    nullable devtype_id deviceType = 2;
+  fabric_scoped struct AccessControlExtensionStruct {
+    fabric_sensitive octet_string<128> data = 1;
+    fabric_idx fabricIndex = 254;
   }
 
   fabric_sensitive info event access(read: administer) AccessControlEntryChanged = 0 {
@@ -998,6 +1008,21 @@ server cluster PowerSource = 47 {
     kReplaceable = 0x8;
   }
 
+  struct BatChargeFaultChangeType {
+    BatChargeFaultEnum current[] = 0;
+    BatChargeFaultEnum previous[] = 1;
+  }
+
+  struct BatFaultChangeType {
+    BatFaultEnum current[] = 0;
+    BatFaultEnum previous[] = 1;
+  }
+
+  struct WiredFaultChangeType {
+    WiredFaultEnum current[] = 0;
+    WiredFaultEnum previous[] = 1;
+  }
+
   info event WiredFaultChange = 0 {
     WiredFaultEnum current[] = 0;
     WiredFaultEnum previous[] = 1;
@@ -1228,15 +1253,6 @@ server cluster NetworkCommissioning = 49 {
     boolean connected = 1;
   }
 
-  struct WiFiInterfaceScanResult {
-    WiFiSecurity security = 0;
-    octet_string<32> ssid = 1;
-    octet_string<6> bssid = 2;
-    int16u channel = 3;
-    WiFiBand wiFiBand = 4;
-    int8s rssi = 5;
-  }
-
   struct ThreadInterfaceScanResult {
     int16u panId = 0;
     int64u extendedPanId = 1;
@@ -1246,6 +1262,15 @@ server cluster NetworkCommissioning = 49 {
     octet_string<8> extendedAddress = 5;
     int8s rssi = 6;
     int8u lqi = 7;
+  }
+
+  struct WiFiInterfaceScanResult {
+    WiFiSecurity security = 0;
+    octet_string<32> ssid = 1;
+    octet_string<6> bssid = 2;
+    int16u channel = 3;
+    WiFiBand wiFiBand = 4;
+    int8s rssi = 5;
   }
 
   readonly attribute access(read: administer) int8u maxNetworks = 0;
@@ -1873,6 +1898,12 @@ server cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
+  fabric_scoped struct NOCStruct {
+    fabric_sensitive octet_string noc = 1;
+    nullable fabric_sensitive octet_string icac = 2;
+    fabric_idx fabricIndex = 254;
+  }
+
   readonly attribute FabricDescriptorStruct fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
@@ -1973,6 +2004,11 @@ client cluster FixedLabel = 64 {
 /** The Fixed Label Cluster provides a feature for the device to tag an endpoint with zero or more read only
 labels. */
 server cluster FixedLabel = 64 {
+  struct LabelStruct {
+    char_string<16> label = 0;
+    char_string<16> value = 1;
+  }
+
   readonly attribute LabelStruct labelList[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1984,6 +2020,11 @@ server cluster FixedLabel = 64 {
 
 /** The User Label Cluster provides a feature to tag an endpoint with zero or more labels. */
 server cluster UserLabel = 65 {
+  struct LabelStruct {
+    char_string<16> label = 0;
+    char_string<16> value = 1;
+  }
+
   attribute access(write: manage) LabelStruct labelList[] = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2052,15 +2093,15 @@ server cluster ModeSelect = 80 {
     kDeponoff = 0x1;
   }
 
+  struct SemanticTagStruct {
+    vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
   struct ModeOptionStruct {
     char_string<64> label = 0;
     int8u mode = 1;
     SemanticTagStruct semanticTags[] = 2;
-  }
-
-  struct SemanticTagStruct {
-    vendor_id mfgCode = 0;
-    enum16 value = 1;
   }
 
   readonly attribute char_string<32> description = 0;
@@ -3185,8 +3226,15 @@ server cluster ContentLauncher = 1290 {
     kHls = 0x2;
   }
 
-  struct ContentSearchStruct {
-    ParameterStruct parameterList[] = 0;
+  struct DimensionStruct {
+    double width = 0;
+    double height = 1;
+    MetricTypeEnum metric = 2;
+  }
+
+  struct AdditionalInfoStruct {
+    char_string name = 0;
+    char_string value = 1;
   }
 
   struct ParameterStruct {
@@ -3195,9 +3243,14 @@ server cluster ContentLauncher = 1290 {
     optional AdditionalInfoStruct externalIDList[] = 2;
   }
 
-  struct AdditionalInfoStruct {
-    char_string name = 0;
-    char_string value = 1;
+  struct ContentSearchStruct {
+    ParameterStruct parameterList[] = 0;
+  }
+
+  struct StyleInformationStruct {
+    optional char_string imageURL = 0;
+    optional char_string color = 1;
+    optional DimensionStruct size = 2;
   }
 
   struct BrandingInformationStruct {
@@ -3207,18 +3260,6 @@ server cluster ContentLauncher = 1290 {
     optional StyleInformationStruct progressBar = 3;
     optional StyleInformationStruct splash = 4;
     optional StyleInformationStruct waterMark = 5;
-  }
-
-  struct StyleInformationStruct {
-    optional char_string imageURL = 0;
-    optional char_string color = 1;
-    optional DimensionStruct size = 2;
-  }
-
-  struct DimensionStruct {
-    double width = 0;
-    double height = 1;
-    MetricTypeEnum metric = 2;
   }
 
   readonly attribute CHAR_STRING acceptHeader[] = 0;
