@@ -48,6 +48,8 @@ using SceneTableEntry = DefaultSceneTableImpl::SceneTableEntry;
 using SceneStorageId  = DefaultSceneTableImpl::SceneStorageId;
 using SceneData       = DefaultSceneTableImpl::SceneData;
 
+// Currently takes 5 Bytes to serialize Container and value in a TLV. 8 Bytes leaves space for potential increase in count_value
+// size.
 static constexpr size_t kPersistentBufferSceneCountBytes = 8;
 
 struct GlobalSceneCount : public PersistentData<kPersistentBufferSceneCountBytes>
@@ -206,6 +208,8 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
     uint8_t max_scenes_per_fabric;
     uint8_t max_scenes_global;
     SceneStorageId scene_map[kMaxScenesPerFabric];
+    bool deleted_scenes                       = 0;
+    PersistentStorageDelegate * scene_storage = nullptr;
 
     FabricSceneData(FabricIndex fabric = kUndefinedFabricIndex, uint8_t maxScenePerFabric = kMaxScenesPerFabric,
                     uint8_t maxScenesGlobal = kMaxScenesGlobal) :
@@ -252,59 +256,20 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         return writer.EndContainer(fabricSceneContainer);
     }
 
+    /// @brief This Deserialize method needs the member scene_storage to be defined previously (in this case in the load function).
+    /// It checks that the recovered scenes from the deserialization fit in the current max and if there are too many scenes in nvm,
+    /// it deletes them. The method sets the deleted_scene member to tru if scenes were deleted so that the load function can know
+    /// it needs to save the Fabric scene data to update the scene_count and the scene map in stored memory.
+    /// @param reader TLV reader, must be big enough to hold the scene map size
+    /// @return CHIP_NO_ERROR on success, specific CHIP_ERROR otherwise
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
     {
         ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-
         TLV::TLVType fabricSceneContainer;
         ReturnErrorOnFailure(reader.EnterContainer(fabricSceneContainer));
-
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kSceneCount)));
         ReturnErrorOnFailure(reader.Get(scene_count));
-
-        // In the event of an OTA, if max_scenes_per_fabric was reduced, this will return an error signaling the load function that
-        // the fabric in memory has too many scenes and needs to be trimmed down.
-        VerifyOrReturnError(scene_count <= max_scenes_per_fabric, CHIP_ERROR_BUFFER_TOO_SMALL);
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::ContextTag(TagScene::kStorageIDArray)));
-        TLV::TLVType sceneMapContainer;
-        ReturnErrorOnFailure(reader.EnterContainer(sceneMapContainer));
-
-        uint8_t i = 0;
-        CHIP_ERROR err;
-        while ((err = reader.Next(TLV::AnonymousTag())) == CHIP_NO_ERROR)
-        {
-            TLV::TLVType sceneIdContainer;
-            ReturnErrorOnFailure(reader.EnterContainer(sceneIdContainer));
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kEndpointID)));
-            ReturnErrorOnFailure(reader.Get(scene_map[i].mEndpointId));
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kGroupID)));
-            ReturnErrorOnFailure(reader.Get(scene_map[i].mGroupId));
-            ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kSceneID)));
-            ReturnErrorOnFailure(reader.Get(scene_map[i].mSceneId));
-            ReturnErrorOnFailure(reader.ExitContainer(sceneIdContainer));
-            i++;
-        }
-
-        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-
-        ReturnErrorOnFailure(reader.ExitContainer(sceneMapContainer));
-        return reader.ExitContainer(fabricSceneContainer);
-    }
-
-    /// @brief Called when the serialized SceneFabricData holds more scenes than max per fabric. Deserializes the fabric scene data
-    /// and then calls delete on each scene index above the maximum to ensure their flash memory is freed.
-    /// @param reader TLVReader on the serialized scene fabric data
-    /// @param storage Storage where extra scenes need to be deleted
-    /// @return CHIP_NO_ERROR if deserialize and delete were successfull.
-    CHIP_ERROR DeserializeAjust(TLV::TLVReader & reader, PersistentStorageDelegate * storage)
-    {
-        scene_count = max_scenes_per_fabric;
-
-        ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-        TLV::TLVType fabricSceneContainer;
-        ReturnErrorOnFailure(reader.EnterContainer(fabricSceneContainer));
-        ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kSceneCount)));
-        // Here our scene count is higher than the max so we don't need to retrieve it
+        scene_count = min(scene_count, max_scenes_per_fabric);
         ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::ContextTag(TagScene::kStorageIDArray)));
         TLV::TLVType sceneMapContainer;
         ReturnErrorOnFailure(reader.EnterContainer(sceneMapContainer));
@@ -337,16 +302,21 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
                 ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagScene::kSceneID)));
                 ReturnErrorOnFailure(reader.Get(scene.mStorageId.mSceneId));
                 ReturnErrorOnFailure(reader.ExitContainer(sceneIdContainer));
-                scene.Delete(storage);
+                ReturnErrorOnFailure(scene.Delete(scene_storage));
                 deleted_scenes_count++;
             }
 
             i++;
         }
-        GlobalSceneCount global_count;
-        ReturnErrorOnFailure(global_count.Load(storage));
-        global_count.count_value = static_cast<uint8_t>(global_count.count_value - deleted_scenes_count);
-        ReturnErrorOnFailure(global_count.Save(storage));
+
+        if (deleted_scenes_count)
+        {
+            deleted_scenes = true;
+            GlobalSceneCount global_count;
+            ReturnErrorOnFailure(global_count.Load(scene_storage));
+            global_count.count_value = static_cast<uint8_t>(global_count.count_value - deleted_scenes_count);
+            ReturnErrorOnFailure(global_count.Save(scene_storage));
+        }
 
         VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
         ReturnErrorOnFailure(reader.ExitContainer(sceneMapContainer));
@@ -438,6 +408,12 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         return err;
     }
 
+    /// @brief Removes a scene from the non-volatile memory and clears its index in the scene map. Decreases the number of scene in
+    /// the global scene count and in the scene fabric data if successful. As the scene map size is not compressed upon removal,
+    /// this only clears the entry correpsonding to the scene from the scene map.
+    /// @param storage Storage delegate to access the scene
+    /// @param scene_id Scene to remove
+    /// @return CHIP_NO_ERROR if successful, specific CHIP_ERROR otherwise
     CHIP_ERROR RemoveScene(PersistentStorageDelegate * storage, const SceneStorageId & scene_id)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
@@ -487,6 +463,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
     CHIP_ERROR Load(PersistentStorageDelegate * storage) override
     {
         VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
+        scene_storage = storage;
 
         uint8_t buffer[kPersistentFabricBufferMax] = { 0 };
         StorageKeyName key                         = StorageKeyName::Uninitialized();
@@ -507,24 +484,21 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         TLV::TLVReader reader;
         reader.Init(buffer, size);
 
-        err = Deserialize(reader);
-        // If Deserialize returns "buffer too small", the table in flash memory holds to many scenes (Can happend if
-        // max_scenes_per_fabric was reduced during an OTA). The fabric will then proceed to remove all scenes above the limit from
-        // the fabric
-        if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
+        ReturnErrorOnFailure(Deserialize(reader));
+        // If Deserialize sets the "deleted_scenes" member, the table in flash memory held to many scenes (Can happend if
+        // max_scenes_per_fabric was reduced during an OTA) and was adjusted during deserailizing . The fabric data must then be
+        // updated
+        if (deleted_scenes)
         {
-            reader.Init(buffer, size);
-            ReturnErrorOnFailure(DeserializeAjust(reader, storage));
             return this->Save(storage);
         }
 
-        return err;
+        return CHIP_NO_ERROR;
     }
 };
 
 CHIP_ERROR DefaultSceneTableImpl::Init(PersistentStorageDelegate * storage)
 {
-    GlobalSceneCount global_count;
 
     if (storage == nullptr)
     {
@@ -570,7 +544,8 @@ CHIP_ERROR DefaultSceneTableImpl::GetRemainingCapacity(FabricIndex fabric_index,
     uint8_t global_scene_count = 0;
     ReturnErrorOnFailure(GetGlobalSceneCount(global_scene_count));
 
-    // If the global scene count is higher than the maximal Global scene capacity, this returns a capacity of 0 until the
+    // If the global scene count is higher than the maximal Global scene capacity, this returns a capacity of 0 until enough scenes
+    // have been deleted to bring the global number of scenes under the global maximum.
     if (global_scene_count > mMaxScenesGlobal)
     {
         capacity = 0;
@@ -590,7 +565,7 @@ CHIP_ERROR DefaultSceneTableImpl::GetRemainingCapacity(FabricIndex fabric_index,
         remaining_capacity_fabric = static_cast<uint8_t>(mMaxScenesPerFabric - fabric.scene_count);
     }
 
-    capacity = (remaining_capacity_fabric > remaining_capacity_global) ? remaining_capacity_global : remaining_capacity_fabric;
+    capacity = min(remaining_capacity_fabric, remaining_capacity_global);
 
     return CHIP_NO_ERROR;
 }
@@ -671,24 +646,26 @@ CHIP_ERROR DefaultSceneTableImpl::GetAllSceneIdsInGroup(FabricIndex fabric_index
     FabricSceneData fabric(fabric_index, mMaxScenesPerFabric, mMaxScenesGlobal);
     SceneTableData scene(fabric_index);
 
-    auto * iterator     = this->IterateSceneEntries(fabric_index);
+    auto * iterator = this->IterateSceneEntries(fabric_index);
+    VerifyOrReturnError(nullptr != iterator, CHIP_ERROR_INTERNAL);
     SceneId * list      = scene_list.data();
     uint8_t scene_count = 0;
 
-    while (iterator->Next(scene) && scene_count < scene_list.size())
+    while (iterator->Next(scene))
     {
         if (scene.mStorageId.mGroupId == group_id)
         {
+            if (scene_count >= scene_list.size())
+            {
+                iterator->Release();
+                return CHIP_ERROR_BUFFER_TOO_SMALL;
+            }
             list[scene_count] = scene.mStorageId.mSceneId;
             scene_count++;
         }
     }
     scene_list.reduce_size(scene_count);
-
-    // Check that the buffer was big enough for all scenes within this group
-    bool more_scenes_left = iterator->Next(scene);
     iterator->Release();
-    VerifyOrReturnError(more_scenes_left == false, CHIP_ERROR_BUFFER_TOO_SMALL);
     return CHIP_NO_ERROR;
 }
 
@@ -705,6 +682,7 @@ CHIP_ERROR DefaultSceneTableImpl::DeleteAllScenesInGroup(FabricIndex fabric_inde
     {
         if (fabric.scene_map[i].mGroupId == group_id)
         {
+            // Removing each scene from the nvm and clearing their entry in the scene map
             ReturnErrorOnFailure(fabric.RemoveScene(mStorage, fabric.scene_map[i]));
         }
     }

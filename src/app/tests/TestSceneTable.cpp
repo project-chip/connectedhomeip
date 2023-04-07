@@ -747,7 +747,6 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
 {
     SceneTable * sceneTable = &sSceneTable;
     SceneId sceneList[scenes::kMaxScenesPerFabric];
-    Span<SceneId> sceneListSpan;
 
     NL_TEST_ASSERT(aSuite, sceneTable);
 
@@ -770,8 +769,22 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneSaveEFS(scene8));
 
     SceneTableEntry scene;
+    Span<SceneId> sceneListSpan = Span<SceneId>(sceneList);
+    Span<SceneId> emptyListSpan = Span<SceneId>(sceneList, 0);
+    Span<SceneId> smallListSpan = Span<SceneId>(sceneList, 1);
+
+    // Test Get All scenes in Group in empty scene table
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetAllSceneIdsInGroup(kFabric1, kGroup1, emptyListSpan));
+    NL_TEST_ASSERT(aSuite, 0 == emptyListSpan.size());
+
     // Set test
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene1));
+
+    // Test single scene in table with 0 size span
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_BUFFER_TOO_SMALL == sceneTable->GetAllSceneIdsInGroup(kFabric1, kGroup1, emptyListSpan));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetAllSceneIdsInGroup(kFabric1, kGroup1, smallListSpan));
+    NL_TEST_ASSERT(aSuite, 1 == smallListSpan.size());
+
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene2));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene3));
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SetSceneTableEntry(kFabric1, scene4));
@@ -785,6 +798,7 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
 
     // Not Found
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == sceneTable->GetSceneTableEntry(kFabric1, sceneId9, scene));
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_BUFFER_TOO_SMALL == sceneTable->GetAllSceneIdsInGroup(kFabric1, kGroup1, emptyListSpan));
 
     // Get test
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetSceneTableEntry(kFabric1, sceneId1, scene));
@@ -813,8 +827,17 @@ void TestStoreScenes(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, scene == scene8);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->SceneApplyEFS(scene));
 
-    // Test get scenes in group
-    sceneListSpan = Span<SceneId>(sceneList);
+    // Test error when list too small in a full table
+    // Test failure for 3 spaces in 4 scenes list
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_BUFFER_TOO_SMALL == sceneTable->GetAllSceneIdsInGroup(kFabric1, kGroup1, smallListSpan));
+    // Test failure for no space in a 4 scenes list
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_BUFFER_TOO_SMALL == sceneTable->GetAllSceneIdsInGroup(kFabric1, kGroup1, emptyListSpan));
+    // Test failure for no space in a 1 scene list
+    NL_TEST_ASSERT(aSuite, CHIP_ERROR_BUFFER_TOO_SMALL == sceneTable->GetAllSceneIdsInGroup(kFabric1, kGroup3, emptyListSpan));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetAllSceneIdsInGroup(kFabric1, kGroup3, smallListSpan));
+    NL_TEST_ASSERT(aSuite, 1 == smallListSpan.size());
+
+    // Test successfully getting Ids from various groups
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->GetAllSceneIdsInGroup(kFabric1, kGroup1, sceneListSpan));
     NL_TEST_ASSERT(aSuite, 4 == sceneListSpan.size());
     NL_TEST_ASSERT(aSuite, kScene1 == sceneList[0]);
@@ -1296,7 +1319,7 @@ void TestOTAChanges(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, scenes::kMaxScenesGlobal - 1 == scene_count);
 
     // Remove a Scene from the Fabric 1
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == sceneTable->RemoveSceneTableEntry(kFabric1, scene.mStorageId));
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == ReducedSceneTable.RemoveSceneTableEntry(kFabric1, scene.mStorageId));
     // Check count updated for fabric
     iterator = ReducedSceneTable.IterateSceneEntries(kFabric1);
     NL_TEST_ASSERT(aSuite, scenes::kMaxScenesPerFabric - 2 == iterator->Count());
