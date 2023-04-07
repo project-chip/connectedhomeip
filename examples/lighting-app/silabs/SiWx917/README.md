@@ -10,7 +10,7 @@ An example showing the use of CHIP on the Silicon Labs SiWx917.
     -   [Flashing the Application](#flashing-the-application)
     -   [Viewing Logging Output](#viewing-logging-output)
     -   [Running the Complete Example](#running-the-complete-example)
-    -   [Notes](#notes)
+        -   [Notes](#notes)
     -   [Memory settings](#memory-settings)
     -   [Group Communication (Multicast)](#group-communication-multicast)
     -   [Building options](#building-options)
@@ -77,7 +77,7 @@ Silicon Labs platform.
 *   Build the example application:
 
           cd ~/connectedhomeip
-          ./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/SiWx917/ out/lighting-app BRD4325B
+          ./scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs SiWx917/ out/lighting-app BRD4325B
 
 -   To delete generated executable, libraries and object files use:
 
