@@ -177,7 +177,9 @@ CHIP_ERROR AppTask::Init()
     // Init ZCL Data Model and start server
     PlatformMgr().ScheduleWork(InitServer, 0);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     CheckOtaEntry();
+#endif
 
     // Initialize device attestation config
 #if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
