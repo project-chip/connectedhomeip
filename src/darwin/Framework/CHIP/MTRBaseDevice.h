@@ -131,56 +131,35 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
 } API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
- * A path indicating a specific cluster on a device (i.e. without any
- * wildcards).
+ * A path indicating a attribute on a device.
+ * If value is a wildcard, set it to nil.
  */
-API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
-@interface MTRClusterPath : NSObject <NSCopying>
-@property (nonatomic, readonly, copy) NSNumber * endpoint;
-@property (nonatomic, readonly, copy) NSNumber * cluster;
+MTR_NEWLY_AVAILABLE;
+@interface MTRAttributeRequestPath : NSObject <NSCopying>
+@property (nonatomic, readonly, copy) NSNumber * _Nullable endpoint;
+@property (nonatomic, readonly, copy) NSNumber * _Nullable cluster;
+@property (nonatomic, readonly, copy) NSNumber * _Nullable attribute;
 
-+ (MTRClusterPath *)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
++ (MTRAttributeRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
+                                             clusterID:(NSNumber * _Nullable)clusterID
+                                           attributeID:(NSNumber * _Nullable)attributeID
+MTR_NEWLY_AVAILABLE;
 @end
 
 /**
- * A path indicating a specific attribute on a device (i.e. without any
- * wildcards).
+ * A path indicating a event on a device.
+ * If value is a wildcard, set it to nil.
  */
-@interface MTRAttributePath : MTRClusterPath
-@property (nonatomic, readonly, copy) NSNumber * attribute;
+MTR_NEWLY_AVAILABLE;
+@interface MTREventRequestPath : NSObject <NSCopying>
+@property (nonatomic, readonly, copy) NSNumber * _Nullable endpoint;
+@property (nonatomic, readonly, copy) NSNumber * _Nullable cluster;
+@property (nonatomic, readonly, copy) NSNumber * _Nullable event;
 
-+ (MTRAttributePath *)attributePathWithEndpointID:(NSNumber *)endpointID
-                                        clusterID:(NSNumber *)clusterID
-                                      attributeID:(NSNumber *)attributeID
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-@end
-
-/**
- * A path indicating a specific event that can be emitted on a device
- * (i.e. without any wildcards).  There can be multiple instances of actual
- * events for a given event path.
- */
-@interface MTREventPath : MTRClusterPath
-@property (nonatomic, readonly, copy) NSNumber * event;
-
-+ (MTREventPath *)eventPathWithEndpointID:(NSNumber *)endpointID
-                                clusterID:(NSNumber *)clusterID
-                                  eventID:(NSNumber *)eventID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
-@end
-
-/**
- * A path indicating a specific command on a device (i.e. without any
- * wildcards).
- */
-@interface MTRCommandPath : MTRClusterPath
-@property (nonatomic, readonly, copy) NSNumber * command;
-
-+ (MTRCommandPath *)commandPathWithEndpointID:(NSNumber *)endpointID
-                                    clusterID:(NSNumber *)clusterID
-                                    commandID:(NSNumber *)commandID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
++ (MTREventRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
+                                         clusterID:(NSNumber * _Nullable)clusterID
+                                           eventID:(NSNumber * _Nullable)eventID;
+MTR_NEWLY_AVAILABLE;
 @end
 
 @interface MTRBaseDevice : NSObject
@@ -293,12 +272,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * empty.) or the entire read interaction fails. Otherwise it will be called with values, which may be empty (e.g. if no paths
  * matched the wildcard) or may include per-path errors if particular paths failed.
  */
-- (void)readWithAttributePaths:(NSArray<MTRAttributePath *> * _Nullable)attributePaths
-                    EventPaths:(NSArray<MTREventPath *> * _Nullable)eventPaths
+- (void)readWithAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                    EventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
                         params:(MTRReadParams * _Nullable)params
                          queue:(dispatch_queue_t)queue
-                    completion:(MTRDeviceResponseHandler)completion;
-
+                    completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
 /**
  * Subscribes multiple attributes or events from the device.
  *
@@ -309,12 +287,12 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * The reportHandler will be called with an error if the input parameter has a problem(e.g., both attributePaths and eventPaths are
  * empty.).
  */
-- (void)subscribeWithAttributePaths:(NSArray<MTRAttributePath *> * _Nullable)attributePaths
-                         EventPaths:(NSArray<MTREventPath *> * _Nullable)eventPaths
+- (void)subscribeWithAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                         EventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
                              params:(MTRSubscribeParams * _Nullable)params
                               queue:(dispatch_queue_t)queue
                       reportHandler:(MTRDeviceResponseHandler)reportHandler
-            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished;
+            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished MTR_NEWLY_AVAILABLE;
 /**
  * Write to attribute in a designated attribute path
  *
@@ -471,6 +449,59 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
                           reportHandler:(MTRDeviceResponseHandler)reportHandler
                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@end
+
+/**
+ * A path indicating a specific cluster on a device (i.e. without any
+ * wildcards).
+ */
+API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
+@interface MTRClusterPath : NSObject <NSCopying>
+@property (nonatomic, readonly, copy) NSNumber * endpoint;
+@property (nonatomic, readonly, copy) NSNumber * cluster;
+
++ (MTRClusterPath *)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+@end
+
+/**
+ * A path indicating a specific attribute on a device (i.e. without any
+ * wildcards).
+ */
+@interface MTRAttributePath : MTRClusterPath
+@property (nonatomic, readonly, copy) NSNumber * attribute;
+
++ (MTRAttributePath *)attributePathWithEndpointID:(NSNumber *)endpointID
+                                        clusterID:(NSNumber *)clusterID
+                                      attributeID:(NSNumber *)attributeID
+    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@end
+
+/**
+ * A path indicating a specific event that can be emitted on a device
+ * (i.e. without any wildcards).  There can be multiple instances of actual
+ * events for a given event path.
+ */
+@interface MTREventPath : MTRClusterPath
+@property (nonatomic, readonly, copy) NSNumber * event;
+
++ (MTREventPath *)eventPathWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                                  eventID:(NSNumber *)eventID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@end
+
+/**
+ * A path indicating a specific command on a device (i.e. without any
+ * wildcards).
+ */
+@interface MTRCommandPath : MTRClusterPath
+@property (nonatomic, readonly, copy) NSNumber * command;
+
++ (MTRCommandPath *)commandPathWithEndpointID:(NSNumber *)endpointID
+                                    clusterID:(NSNumber *)clusterID
+                                    commandID:(NSNumber *)commandID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 @end
 
 @interface MTRAttributeReport : NSObject

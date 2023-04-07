@@ -964,8 +964,8 @@ private:
     std::move(*bridge).DispatchAction(self);
 }
 
-- (void)readWithAttributePaths:(NSArray<MTRAttributePath *> * _Nullable)attributePaths
-                    EventPaths:(NSArray<MTREventPath *> * _Nullable)eventPaths
+- (void)readWithAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                    EventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
                         params:(MTRReadParams * _Nullable)params
                          queue:(dispatch_queue_t)queue
                     completion:(MTRDeviceResponseHandler)completion
@@ -1116,8 +1116,8 @@ private:
     std::move(*bridge).DispatchAction(self);
 }
 
-- (void)subscribeWithAttributePaths:(NSArray<MTRAttributePath *> * _Nullable)attributePaths
-                         EventPaths:(NSArray<MTREventPath *> * _Nullable)eventPaths
+- (void)subscribeWithAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                         EventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
                              params:(MTRSubscribeParams * _Nullable)params
                               queue:(dispatch_queue_t)queue
                       reportHandler:(MTRDeviceResponseHandler)reportHandler
@@ -2195,21 +2195,114 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 @end
 
+@implementation MTRAttributeRequestPath
+- (instancetype)initWithEndpointID:(NSNumber * _Nullable)endpointID
+                         clusterID:(NSNumber * _Nullable)clusterID
+                       attributeID:(NSNumber * _Nullable)attributeID
+{
+    _endpoint = endpointID;
+    _cluster = clusterID;
+    _attribute = attributeID;
+    return self;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<MTRAttributeRequestPath> endpoint %u cluster %u attribute %u", (uint16_t) _endpoint.unsignedShortValue,
+        (uint32_t) _cluster.unsignedLongValue,
+        (uint32_t) _attribute.unsignedLongValue
+    ];
+}
+
++ (MTRAttributeRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
+                                             clusterID:(NSNumber * _Nullable)clusterID
+                                           attributeID:(NSNumber * _Nullable)attributeID
+{
+
+    return [[MTRAttributeRequestPath alloc] initWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID];
+}
+
+- (BOOL)isEqualToAttributeRequestPath:(MTRAttributeRequestPath *)path
+{
+    return [_endpoint isEqualToNumber:path.endpoint] && [_cluster isEqualToNumber:path.cluster] && [_attribute isEqualToNumber:path.attribute];
+}
+
+- (BOOL)isEqual:(id)object
+{
+    if (![object isKindOfClass:[self class]]) {
+        return NO;
+    }
+    return [self isEqualToAttributeRequestPath:object];
+}
+
+- (NSUInteger)hash
+{
+    return _endpoint.unsignedShortValue ^ _cluster.unsignedLongValue ^ _attribute.unsignedLongValue;
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    return [MTRAttributeRequestPath requestPathWithEndpointID:_endpoint clusterID:_cluster attributeID:_attribute];
+}
+@end
+
+@implementation MTREventRequestPath
+- (instancetype)initWithEndpointID:(NSNumber * _Nullable)endpointID
+                         clusterID:(NSNumber * _Nullable)clusterID
+                           eventID:(NSNumber * _Nullable)eventID
+{
+    _endpoint = endpointID;
+    _cluster = clusterID;
+    _event = eventID;
+    return self;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<MTREventRequestPath> endpoint %u cluster %u event %u", (uint16_t) _endpoint.unsignedShortValue,
+        (uint32_t) _cluster.unsignedLongValue,
+        (uint32_t) _event.unsignedLongValue
+    ];
+}
+
++ (MTREventRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
+                                         clusterID:(NSNumber * _Nullable)clusterID
+                                           eventID:(NSNumber * _Nullable)eventID
+{
+
+    return [[MTREventRequestPath alloc] initWithEndpointID:endpointID clusterID:clusterID eventID:eventID];
+}
+
+- (BOOL)isEqualToEventRequestPath:(MTREventRequestPath *)path
+{
+    return [_endpoint isEqualToNumber:path.endpoint] && [_cluster isEqualToNumber:path.cluster] && [_event isEqualToNumber:path.event];
+}
+
+- (BOOL)isEqual:(id)object
+{
+    if (![object isKindOfClass:[self class]]) {
+        return NO;
+    }
+    return [self isEqualToEventRequestPath:object];
+}
+
+- (NSUInteger)hash
+{
+    return _endpoint.unsignedShortValue ^ _cluster.unsignedLongValue ^ _event.unsignedLongValue;
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+    return [MTREventRequestPath requestPathWithEndpointID:_endpoint clusterID:_cluster eventID:_event];
+}
+@end
+
 @implementation MTRClusterPath
 - (instancetype)initWithPath:(const ConcreteClusterPath &)path
 {
     if (self = [super init]) {
         _endpoint = @(path.mEndpointId);
         _cluster = @(path.mClusterId);
-    }
-    return self;
-}
-
-- (instancetype)initWithEndpointID:(NSNumber * _Nullable)endpointID clusterID:(NSNumber * _Nullable)clusterID
-{
-    if (self = [super init]) {
-        _endpoint = endpointID;
-        _cluster = clusterID;
     }
     return self;
 }
@@ -2222,7 +2315,10 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 + (MTRClusterPath *)clusterPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID
 {
-    return [[MTRClusterPath alloc] initWithEndpointID:endpointID clusterID:clusterID];
+    ConcreteClusterPath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
+        static_cast<chip::ClusterId>([clusterID unsignedLongValue]));
+
+    return [[MTRClusterPath alloc] initWithPath:path];
 }
 
 - (BOOL)isEqualToClusterPath:(MTRClusterPath *)clusterPath
@@ -2259,16 +2355,6 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
     return self;
 }
 
-- (instancetype)initWithEndpointID:(NSNumber * _Nullable)endpointID
-                         clusterID:(NSNumber * _Nullable)clusterID
-                       attributeID:(NSNumber * _Nullable)attributeID
-{
-    if (self = [super initWithEndpointID:endpointID clusterID:clusterID]) {
-        _attribute = attributeID;
-    }
-    return self;
-}
-
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<MTRAttributePath> endpoint %u cluster %u attribute %u",
@@ -2280,7 +2366,11 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                                         clusterID:(NSNumber *)clusterID
                                       attributeID:(NSNumber *)attributeID
 {
-    return [[MTRAttributePath alloc] initWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID];
+    ConcreteDataAttributePath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
+        static_cast<chip::ClusterId>([clusterID unsignedLongValue]),
+        static_cast<chip::AttributeId>([attributeID unsignedLongValue]));
+
+    return [[MTRAttributePath alloc] initWithPath:path];
 }
 
 - (BOOL)isEqualToAttributePath:(MTRAttributePath *)attributePath
@@ -2325,16 +2415,6 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
     return self;
 }
 
-- (instancetype)initWithEndpointID:(NSNumber * _Nullable)endpointID
-                         clusterID:(NSNumber * _Nullable)clusterID
-                           eventID:(NSNumber * _Nullable)eventID
-{
-    if (self = [super initWithEndpointID:endpointID clusterID:clusterID]) {
-        _event = endpointID;
-    }
-    return self;
-}
-
 - (NSString *)description
 {
     return
@@ -2344,7 +2424,10 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 + (MTREventPath *)eventPathWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID eventID:(NSNumber *)eventID
 {
-    return [[MTREventPath alloc] initWithEndpointID:endpointID clusterID:clusterID eventID:eventID];
+    ConcreteEventPath path(static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
+        static_cast<chip::ClusterId>([clusterID unsignedLongValue]), static_cast<chip::EventId>([eventID unsignedLongValue]));
+
+    return [[MTREventPath alloc] initWithPath:path];
 }
 
 - (id)copyWithZone:(NSZone *)zone
