@@ -499,7 +499,6 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
 
 CHIP_ERROR DefaultSceneTableImpl::Init(PersistentStorageDelegate * storage)
 {
-
     if (storage == nullptr)
     {
         return CHIP_ERROR_INCORRECT_STATE;
