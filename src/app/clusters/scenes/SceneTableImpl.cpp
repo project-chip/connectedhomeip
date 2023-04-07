@@ -408,7 +408,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
         return err;
     }
 
-    /// @brief Removes a scene from the non-volatile memory and clears its index in the scene map. Decreases the number of scene in
+    /// @brief Removes a scene from the non-volatile memory and clears its index in the scene map. Decreases the number of scenes in
     /// the global scene count and in the scene fabric data if successful. As the scene map size is not compressed upon removal,
     /// this only clears the entry correpsonding to the scene from the scene map.
     /// @param storage Storage delegate to access the scene
