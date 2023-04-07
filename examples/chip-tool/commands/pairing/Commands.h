@@ -20,7 +20,6 @@
 
 #include "commands/common/Commands.h"
 #include "commands/pairing/CloseSessionCommand.h"
-#include "commands/pairing/CommissionedListCommand.h"
 #include "commands/pairing/GetCommissionerNodeIdCommand.h"
 #include "commands/pairing/OpenCommissioningWindowCommand.h"
 #include "commands/pairing/PairingCommand.h"

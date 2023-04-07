@@ -207,6 +207,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
 - (instancetype)initForNewFabric:(chip::FabricTable *)fabricTable
                         keystore:(chip::Crypto::OperationalKeystore *)keystore
+            advertiseOperational:(BOOL)advertiseOperational
                           params:(MTRDeviceControllerStartupParams *)params
 {
     if (!(self = [self initWithParams:params])) {
@@ -240,6 +241,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
     _fabricTable = fabricTable;
     _keystore = keystore;
+    _advertiseOperational = advertiseOperational;
 
     return self;
 }
@@ -247,6 +249,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 - (instancetype)initForExistingFabric:(FabricTable *)fabricTable
                           fabricIndex:(FabricIndex)fabricIndex
                              keystore:(chip::Crypto::OperationalKeystore *)keystore
+                 advertiseOperational:(BOOL)advertiseOperational
                                params:(MTRDeviceControllerStartupParams *)params
 {
     if (!(self = [self initWithParams:params])) {
@@ -352,6 +355,7 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     _fabricTable = fabricTable;
     _fabricIndex.Emplace(fabricIndex);
     _keystore = keystore;
+    _advertiseOperational = advertiseOperational;
 
     return self;
 }

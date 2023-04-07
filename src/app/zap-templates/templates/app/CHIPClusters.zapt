@@ -1,6 +1,6 @@
 {{> header}}
 
-{{#if (chip_has_client_clusters)}}
+{{#if_enabled_clusters side='client'}}
 // Prevent multiple inclusion
 #pragma once
 
@@ -25,4 +25,4 @@ public:
 {{/all_user_clusters}}
 } // namespace Controller
 } // namespace chip
-{{/if}}
+{{/if_enabled_clusters}}

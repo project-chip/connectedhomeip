@@ -985,6 +985,7 @@ otatesting
 otaURL
 OTBR
 otcli
+outform
 outgoingCommands
 OxygenConcentrationMeasurement
 OzoneConcentrationMeasurement
@@ -1024,6 +1025,7 @@ Pigweed
 PinCode
 pinrequest
 pkgconfig
+PKI
 plaintext
 PlatformManager
 PlatformManagerImpl
@@ -1180,6 +1182,7 @@ sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
+SecureCertDACProvider
 SED
 SEGGER
 semver

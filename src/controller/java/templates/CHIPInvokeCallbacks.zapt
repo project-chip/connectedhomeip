@@ -1,5 +1,5 @@
 {{> header}}
-{{#if (chip_has_client_clusters)}}
+{{#if_enabled_clusters side='client'}}
 #include <jni/CHIPCallbackTypes.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -26,4 +26,4 @@ private:
   {{/zcl_commands_source_server}}
 {{/all_user_clusters}}
 } // namespace chip
-{{/if}}
+{{/if_enabled_clusters}}
