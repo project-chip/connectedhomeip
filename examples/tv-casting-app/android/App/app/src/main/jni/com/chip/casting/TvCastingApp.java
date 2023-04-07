@@ -94,11 +94,10 @@ public class TvCastingApp {
       return ret;
     }
 
-    setDACProvider(appParameters.getDacProvider());
     return initJni(appParameters);
   }
 
-  private native void setDACProvider(DACProvider provider);
+  public native void setDACProvider(DACProvider provider);
 
   private native boolean preInitJni(AppParameters appParameters);
 

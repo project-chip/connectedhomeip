@@ -52,4 +52,9 @@
     return self;
 }
 
+- (NSString *)dumpStorageToString
+{
+    return [NSString stringWithFormat:@"%@", _values];
+}
+
 @end

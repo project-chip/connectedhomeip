@@ -1,5 +1,5 @@
 {{> header}}
-{{#if (chip_has_client_clusters)}}
+{{#if_enabled_clusters side='client'}}
 #include <jni/CHIPCallbackTypes.h>
 #include <jni/CHIPReadCallbacks.h>
 #include "CHIPInvokeCallbacks.h"
@@ -78,6 +78,6 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase na
 {{/if_unsupported_attribute_callback}}
 {{/zcl_attributes_server}}
 {{/all_user_clusters}}
-{{/if}}
+{{/if_enabled_clusters}}
 
 #pragma clang diagnostic pop
