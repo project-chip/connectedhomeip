@@ -216,8 +216,8 @@ public:
     SceneEntryIterator * IterateSceneEntries(FabricIndex fabric_index) override;
 
 protected:
-    // This constructor is meant for test purposes, it allows to change the defined max for scenes per fabric and global, which allows
-    // to simulate OTA where this value was changed
+    // This constructor is meant for test purposes, it allows to change the defined max for scenes per fabric and global, which
+    // allows to simulate OTA where this value was changed
     DefaultSceneTableImpl(uint8_t maxScenesPerFabric = scenes::kMaxScenesPerFabric,
                           uint8_t maxScenesGlobal    = scenes::kMaxScenesGlobal) :
         mMaxScenesPerFabric(maxScenesPerFabric),
