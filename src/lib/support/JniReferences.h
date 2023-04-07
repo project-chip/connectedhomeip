@@ -21,6 +21,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
+#include <lib/support/Span.h>
 #include <string>
 
 namespace chip {
@@ -167,7 +168,7 @@ public:
      *
      * Creates a java string type based on char array.
      */
-    CHIP_ERROR CharToStringUTF(const char * value, jobject & outString);
+    CHIP_ERROR CharToStringUTF(const chip::CharSpan & charSpan, jobject & outString);
 
 private:
     JniReferences() {}

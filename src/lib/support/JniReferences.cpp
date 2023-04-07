@@ -388,10 +388,10 @@ CHIP_ERROR JniReferences::GetObjectField(jobject objectToRead, const char * name
     return err;
 }
 
-CHIP_ERROR JniReferences::CharToStringUTF(const char * value, jobject & outStr)
+CHIP_ERROR JniReferences::CharToStringUTF(const chip::CharSpan & charSpan, jobject & outStr)
 {
     JNIEnv * env        = GetEnvForCurrentThread();
-    jobject jbyteBuffer = env->NewDirectByteBuffer((void *) value, static_cast<jlong>(strlen(value)));
+    jobject jbyteBuffer = env->NewDirectByteBuffer((void *) charSpan.data(), static_cast<jlong>(charSpan.size()));
 
     jclass charSetClass = env->FindClass("java/nio/charset/Charset");
     jmethodID charsetForNameMethod =
