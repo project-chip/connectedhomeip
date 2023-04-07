@@ -47,9 +47,10 @@ void spi_drv_reinit(uint32_t baudrate)
     usartInit.baudrate               = baudrate;
     uint32_t databits                = SL_SPIDRV_EXP_FRAME_LENGTH - 4U + _USART_FRAME_DATABITS_FOUR;
     usartInit.databits               = (USART_Databits_TypeDef) databits;
-    usartInit.autoCsEnable           = true;
+    // usartInit.autoCsEnable           = true;
 
     USART_InitSync(USART0, &usartInit);
+    vTaskDelay(100);
 }
 
 /****************************************************************************
