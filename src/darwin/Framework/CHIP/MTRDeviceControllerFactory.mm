@@ -85,6 +85,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 @property (readonly) Credentials::PersistentStorageOpCertStore * opCertStore;
 @property (readonly) MTROperationalBrowser * operationalBrowser;
 @property () chip::Credentials::DeviceAttestationVerifier * deviceAttestationVerifier;
+@property (readonly) BOOL advertiseOperational;
 
 - (BOOL)findMatchingFabric:(FabricTable &)fabricTable
                     params:(MTRDeviceControllerStartupParams *)params
@@ -435,9 +436,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         if (startupParams.port != nil) {
             params.listenPort = [startupParams.port unsignedShortValue];
         }
-        if (startupParams.shouldStartServer == YES) {
-            params.enableServerInteractions = true;
-        }
+        params.enableServerInteractions = startupParams.shouldStartServer;
 
         params.groupDataProvider = _groupDataProvider;
         params.sessionKeystore = _sessionKeystore;
@@ -470,6 +469,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         _controllerFactory->RetainSystemState();
         _controllerFactory->ReleaseSystemState();
 
+        self->_advertiseOperational = startupParams.shouldStartServer;
         self->_running = YES;
     });
 
@@ -566,6 +566,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         params = [[MTRDeviceControllerStartupParamsInternal alloc] initForExistingFabric:fabricTable
                                                                              fabricIndex:fabric->GetFabricIndex()
                                                                                 keystore:_keystore
+                                                                    advertiseOperational:self.advertiseOperational
                                                                                   params:startupParams];
         if (params == nil) {
             fabricError = CHIP_ERROR_NO_MEMORY;
@@ -649,6 +650,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
 
         params = [[MTRDeviceControllerStartupParamsInternal alloc] initForNewFabric:fabricTable
                                                                            keystore:_keystore
+                                                               advertiseOperational:self.advertiseOperational
                                                                              params:startupParams];
         if (params == nil) {
             fabricError = CHIP_ERROR_NO_MEMORY;

@@ -159,7 +159,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
     switch (header.mPath.mClusterId)
     {
 {{#all_user_clusters side='client'}}
-{{#chip_server_cluster_events}}
+{{#zcl_events}}
 {{#first}}
         case {{asUpperCamelCase parent.name}}::Id:
         {
@@ -177,7 +177,7 @@ CHIP_ERROR DataModelLogger::LogEvent(const chip::app::EventHeader & header, chip
           break;
         }
 {{/last}}
-{{/chip_server_cluster_events}}
+{{/zcl_events}}
 {{/all_user_clusters}}
         default:
           break;

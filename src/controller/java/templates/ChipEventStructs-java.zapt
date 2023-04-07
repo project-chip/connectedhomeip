@@ -1,16 +1,16 @@
 {{> header}}
 package chip.devicecontroller;
 
-{{#if (chip_has_client_clusters)}}
+{{#if_enabled_clusters side='client'}}
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
-{{/if}}
+{{/if_enabled_clusters}}
 
 {{! TODO: Use AutoValue for inner classes. }}
 public class ChipEventStructs {
-{{#if (chip_has_client_clusters)}}
+{{#if_enabled_clusters side='client'}}
 {{#all_user_clusters side='client'}}
 {{#zcl_events}}
 public static class {{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Event {
@@ -55,5 +55,5 @@ public {{asJavaType type null parent.parent.name includeAnnotations=true}} {{asL
 
 {{/zcl_events}}
 {{/all_user_clusters}}
-{{/if}}
+{{/if_enabled_clusters}}
 }

@@ -168,3 +168,10 @@ config CHIP_ENABLE_PM_DURING_BLE
 	default y
 	help
 	  Enable PM during BLE operation.
+
+config CHIP_OPENTHREAD_TX_POWER
+	int "OpenThread Transmission power"
+	range -30 9
+	default 0
+	help
+	  OpenThread Transmission power in dBm.

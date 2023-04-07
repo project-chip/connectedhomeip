@@ -60,11 +60,6 @@
             "output": "src/controller/java/zap-generated/CHIPClustersWrite-JNI.cpp"
         },
         {
-            "path": "CHIPReadCallbacks.zapt",
-            "name": "CHIP cluster attribute read callback for Java (native code)",
-            "output": "src/controller/java/zap-generated/CHIPReadCallbacks.h"
-        },
-        {
             "path": "CHIPReadCallbacks-src.zapt",
             "name": "CHIP cluster attribute read callback for Java (native code)",
             "output": "src/controller/java/zap-generated/CHIPReadCallbacks.cpp"

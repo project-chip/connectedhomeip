@@ -57,6 +57,9 @@ CHIP_ERROR CastingServer::Init(AppParams * AppParams)
     // Initialize binding handlers
     ReturnErrorOnFailure(InitBindingHandlers());
 
+    // Set FabricDelegate
+    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&mPersistenceManager);
+
     // Add callback to send Content casting commands after commissioning completes
     ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0));
 
