@@ -31,19 +31,19 @@
 
 @property NSData * deviceAttestationCertPrivateKey;
 
-@property NSData * deviceAttestationCertPublicKeyKey;
+@property NSData * deviceAttestationCertPublicKey;
 
 @end
 
 @implementation DeviceAttestationCredentialsHolder
 
-- (DeviceAttestationCredentialsHolder * _Nonnull)
-      initWithCertificationDeclaration:(NSData * _Nonnull)certificationDeclaration
-                   firmwareInformation:(NSData * _Nonnull)firmwareInformation
-                 deviceAttestationCert:(NSData * _Nonnull)deviceAttestationCert
-    productAttestationIntermediateCert:(NSData * _Nonnull)productAttestationIntermediateCert
-       deviceAttestationCertPrivateKey:(NSData * _Nonnull)deviceAttestationCertPrivateKey
-     deviceAttestationCertPublicKeyKey:(NSData * _Nonnull)deviceAttestationCertPublicKeyKey
+- (DeviceAttestationCredentialsHolder * _Nonnull)initWithCertificationDeclaration:(NSData * _Nonnull)certificationDeclaration
+                                                              firmwareInformation:(NSData * _Nonnull)firmwareInformation
+                                                            deviceAttestationCert:(NSData * _Nonnull)deviceAttestationCert
+                                               productAttestationIntermediateCert:
+                                                   (NSData * _Nonnull)productAttestationIntermediateCert
+                                                  deviceAttestationCertPrivateKey:(NSData * _Nonnull)deviceAttestationCertPrivateKey
+                                                deviceAttestationCertPublicKeyKey:(NSData * _Nonnull)deviceAttestationCertPublicKey
 {
     self = [super init];
     if (self) {
@@ -52,7 +52,7 @@
         _deviceAttestationCert = deviceAttestationCert;
         _productAttestationIntermediateCert = productAttestationIntermediateCert;
         _deviceAttestationCertPrivateKey = deviceAttestationCertPrivateKey;
-        _deviceAttestationCertPublicKeyKey = deviceAttestationCertPublicKeyKey;
+        _deviceAttestationCertPublicKey = deviceAttestationCertPublicKey;
     }
     return self;
 }
@@ -82,8 +82,8 @@
     return _deviceAttestationCertPrivateKey;
 }
 
-- (NSData * _Nonnull)getDeviceAttestationCertPublicKeyKey;
+- (NSData * _Nonnull)getDeviceAttestationCertPublicKey;
 {
-    return _deviceAttestationCertPublicKeyKey;
+    return _deviceAttestationCertPublicKey;
 }
 @end

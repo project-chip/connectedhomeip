@@ -40,7 +40,7 @@
 
 - (NSData * _Nonnull)getDeviceAttestationCertPrivateKey;
 
-- (NSData * _Nonnull)getDeviceAttestationCertPublicKeyKey;
+- (NSData * _Nonnull)getDeviceAttestationCertPublicKey;
 
 @end
 
