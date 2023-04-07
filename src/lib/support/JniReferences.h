@@ -20,8 +20,8 @@
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/TypeTraits.h>
 #include <lib/support/Span.h>
+#include <lib/support/TypeTraits.h>
 #include <string>
 
 namespace chip {
