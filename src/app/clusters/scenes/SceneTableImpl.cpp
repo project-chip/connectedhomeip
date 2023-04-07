@@ -258,7 +258,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
 
     /// @brief This Deserialize method needs the member scene_storage to be defined previously (in this case in the load function).
     /// It checks that the recovered scenes from the deserialization fit in the current max and if there are too many scenes in nvm,
-    /// it deletes them. The method sets the deleted_scene member to tru if scenes were deleted so that the load function can know
+    /// it deletes them. The method sets the deleted_scene member to true if scenes were deleted so that the load function can know
     /// it needs to save the Fabric scene data to update the scene_count and the scene map in stored memory.
     /// @param reader TLV reader, must be big enough to hold the scene map size
     /// @return CHIP_NO_ERROR on success, specific CHIP_ERROR otherwise
