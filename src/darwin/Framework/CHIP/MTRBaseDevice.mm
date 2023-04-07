@@ -2208,10 +2208,9 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRAttributeRequestPath> endpoint %u cluster %u attribute %u", (uint16_t) _endpoint.unsignedShortValue,
-        (uint32_t) _cluster.unsignedLongValue,
-        (uint32_t) _attribute.unsignedLongValue
-    ];
+    return [NSString stringWithFormat:@"<MTRAttributeRequestPath> endpoint %u cluster %u attribute %u",
+                     (uint16_t) _endpoint.unsignedShortValue, (uint32_t) _cluster.unsignedLongValue,
+                     (uint32_t) _attribute.unsignedLongValue];
 }
 
 + (MTRAttributeRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
@@ -2224,7 +2223,8 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 - (BOOL)isEqualToAttributeRequestPath:(MTRAttributeRequestPath *)path
 {
-    return [_endpoint isEqualToNumber:path.endpoint] && [_cluster isEqualToNumber:path.cluster] && [_attribute isEqualToNumber:path.attribute];
+    return [_endpoint isEqualToNumber:path.endpoint] && [_cluster isEqualToNumber:path.cluster] &&
+        [_attribute isEqualToNumber:path.attribute];
 }
 
 - (BOOL)isEqual:(id)object
@@ -2259,10 +2259,9 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTREventRequestPath> endpoint %u cluster %u event %u", (uint16_t) _endpoint.unsignedShortValue,
-        (uint32_t) _cluster.unsignedLongValue,
-        (uint32_t) _event.unsignedLongValue
-    ];
+    return [NSString stringWithFormat:@"<MTREventRequestPath> endpoint %u cluster %u event %u",
+                     (uint16_t) _endpoint.unsignedShortValue, (uint32_t) _cluster.unsignedLongValue,
+                     (uint32_t) _event.unsignedLongValue];
 }
 
 + (MTREventRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
@@ -2275,7 +2274,8 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 - (BOOL)isEqualToEventRequestPath:(MTREventRequestPath *)path
 {
-    return [_endpoint isEqualToNumber:path.endpoint] && [_cluster isEqualToNumber:path.cluster] && [_event isEqualToNumber:path.event];
+    return
+        [_endpoint isEqualToNumber:path.endpoint] && [_cluster isEqualToNumber:path.cluster] && [_event isEqualToNumber:path.event];
 }
 
 - (BOOL)isEqual:(id)object

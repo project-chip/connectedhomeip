@@ -142,8 +142,7 @@ MTR_NEWLY_AVAILABLE;
 
 + (MTRAttributeRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
                                              clusterID:(NSNumber * _Nullable)clusterID
-                                           attributeID:(NSNumber * _Nullable)attributeID
-MTR_NEWLY_AVAILABLE;
+                                           attributeID:(NSNumber * _Nullable)attributeID MTR_NEWLY_AVAILABLE;
 @end
 
 /**
