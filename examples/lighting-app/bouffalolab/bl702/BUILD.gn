@@ -43,7 +43,7 @@ declare_args() {
   # OTA periodic query timeout in seconds
   ota_periodic_query_timeout = 86400
 
-  # reboot delay in seconds to apply new OTA image 
+  # reboot delay in seconds to apply new OTA image
   ota_auto_reboot_delay = 5
 
   config_cache_size = 8192
