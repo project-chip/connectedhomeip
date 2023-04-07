@@ -48,7 +48,8 @@ using SceneTableEntry = DefaultSceneTableImpl::SceneTableEntry;
 using SceneStorageId  = DefaultSceneTableImpl::SceneStorageId;
 using SceneData       = DefaultSceneTableImpl::SceneData;
 
-// Currently takes 5 Bytes to serialize Container and value in a TLV. 8 Bytes leaves space for potential increase in count_value
+// Currently takes 5 Bytes to serialize Container and value in a TLV: 1 byte start struct, 2 bytes control + tag for the value, 1 byte value, 1 byte end struct.
+// 8 Bytes leaves space for potential increase in count_value
 // size.
 static constexpr size_t kPersistentBufferSceneCountBytes = 8;
 
