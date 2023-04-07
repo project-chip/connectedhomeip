@@ -123,7 +123,7 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
             GetAppTask().mIsConnected = true;
 #ifdef OTA_ENABLED
             chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
-                                                    OTAConfig::InitOTARequestorHandler, nullptr);
+                                                        OTAConfig::InitOTARequestorHandler, nullptr);
 #endif
         }
         break;
@@ -161,8 +161,8 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
             bl_route_hook_init();
 
 #ifdef OTA_ENABLED
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
-                                                    OTAConfig::InitOTARequestorHandler, nullptr);
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
+                                                        OTAConfig::InitOTARequestorHandler, nullptr);
 #endif
         }
         break;
