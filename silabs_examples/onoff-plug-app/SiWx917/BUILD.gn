@@ -65,7 +65,7 @@ siwx917_sdk("sdk") {
 }
 
 silabs_executable("onoff_plug_app") {
-  output_name = "chip-efr32-onoff-plug-example.out"
+  output_name = "chip-siwx917-onoff-plug-example.out"
   include_dirs = [ "include" ]
   defines = []
 
