@@ -747,7 +747,7 @@ public:
     using OnSuccessAttributeCallbackType = std::function<void(
         const ConcreteAttributePath & aPath, const DecodableValueType & aData)>;
     using OnSuccessEventCallbackType
-        = std::function<void(const app::ConcreteClusterPath & aPath, const EventId aEventId, const DecodableValueType & aData)>;
+        = std::function<void(const ConcreteEventPath & aPath, const DecodableValueType & aData)>;
     using OnErrorCallbackType
         = std::function<void(const app::ConcreteClusterPath * aPath, const uint32_t aValueId, CHIP_ERROR aError)>;
     using OnDoneCallbackType = std::function<void(BufferedReadClientCallback * callback)>;
