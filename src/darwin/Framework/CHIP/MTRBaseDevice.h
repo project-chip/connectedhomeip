@@ -135,7 +135,7 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  *
  * nil is used to represent wildcards.
  */
-MTR_NEWLY_AVAILABLE;
+MTR_NEWLY_AVAILABLE
 @interface MTRAttributeRequestPath : NSObject <NSCopying>
 @property (nonatomic, readonly, copy, nullable) NSNumber * endpoint;
 @property (nonatomic, readonly, copy, nullable) NSNumber * cluster;
