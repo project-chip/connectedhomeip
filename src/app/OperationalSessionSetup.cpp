@@ -442,6 +442,10 @@ CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
     {
         ++mAttemptsDone;
     }
+    if (mResolveAttemptsAllowed > 0)
+    {
+        --mResolveAttemptsAllowed;
+    }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
     // NOTE: This is public API that can be used to update our stored peer
@@ -502,9 +506,44 @@ void OperationalSessionSetup::OnNodeAddressResolutionFailed(const PeerId & peerI
     ChipLogError(Discovery, "OperationalSessionSetup[%u:" ChipLogFormatX64 "]: operational discovery failed: %" CHIP_ERROR_FORMAT,
                  mPeerId.GetFabricIndex(), ChipLogValueX64(mPeerId.GetNodeId()), reason.Format());
 
-    // Does it make sense to ScheduleSessionSetupReattempt() here?  DNS-SD
-    // resolution has its own retry/backoff mechanisms, so if it's failed we
-    // have already done a lot of that.
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    // If we're in a mode where we would generally retry CASE, retry operational
+    // discovery once.  That allows us to more-gracefully handle broken networks
+    // where multicast DNS does not actually work and hence only the initial
+    // unicast DNS-SD queries get a response.
+    //
+    // We check for State::ResolvingAddress just in case in the meantime
+    // something weird happened and we are no longer trying to resolve an
+    // address.
+    if (mState == State::ResolvingAddress && mResolveAttemptsAllowed > 0)
+    {
+        ChipLogProgress(Discovery, "Retrying operational DNS-SD discovery. Attempts remaining: %u", mResolveAttemptsAllowed);
+
+        // Pretend like our previous attempt (i.e. call to LookupPeerAddress)
+        // has not happened for purposes of the generic attempt counters, so we
+        // don't mess up the counters for our actual CASE retry logic.
+        if (mRemainingAttempts < UINT8_MAX)
+        {
+            ++mRemainingAttempts;
+        }
+        if (mAttemptsDone > 0)
+        {
+            --mAttemptsDone;
+        }
+
+        CHIP_ERROR err = LookupPeerAddress();
+        if (err == CHIP_NO_ERROR)
+        {
+            // We need to notify our consumer that the resolve will take more
+            // time, but we don't actually know how much time it will take,
+            // because the resolver does not expose that information.  Just use
+            // one minute to be safe.
+            using namespace chip::System::Clock::Literals;
+            NotifyRetryHandlers(reason, 60_s16);
+            return;
+        }
+    }
+#endif
 
     // No need to modify any variables in `this` since call below releases `this`.
     DequeueConnectionCallbacks(reason);
@@ -530,6 +569,11 @@ void OperationalSessionSetup::UpdateAttemptCount(uint8_t attemptCount)
     if (attemptCount > mRemainingAttempts)
     {
         mRemainingAttempts = attemptCount;
+    }
+
+    if (attemptCount > mResolveAttemptsAllowed)
+    {
+        mResolveAttemptsAllowed = attemptCount;
     }
 }
 
@@ -619,11 +663,16 @@ void OperationalSessionSetup::NotifyRetryHandlers(CHIP_ERROR error, const Reliab
     System::Clock::Timeout messageTimeout = CASESession::ComputeSigma1ResponseTimeout(remoteMrpConfig);
     auto timeoutSecs                      = std::chrono::duration_cast<System::Clock::Seconds16>(messageTimeout);
     // Add 1 second in case we had fractional milliseconds in messageTimeout.
-    timeoutSecs += System::Clock::Seconds16(1);
+    using namespace chip::System::Clock::Literals;
+    NotifyRetryHandlers(error, timeoutSecs + 1_s16 + retryDelay);
+}
+
+void OperationalSessionSetup::NotifyRetryHandlers(CHIP_ERROR error, System::Clock::Seconds16 timeoutEstimate)
+{
     for (auto * item = mConnectionRetry.First(); item && item != &mConnectionRetry; item = item->mNext)
     {
         auto cb = Callback::Callback<OnDeviceConnectionRetry>::FromCancelable(item);
-        cb->mCall(cb->mContext, mPeerId, error, timeoutSecs + retryDelay);
+        cb->mCall(cb->mContext, mPeerId, error, timeoutEstimate);
     }
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
