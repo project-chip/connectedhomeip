@@ -270,7 +270,7 @@ MTR_NEWLY_AVAILABLE;
  *
  * The completion will be called with an error if  the input parameters are invalid (e.g., both attributePaths and eventPaths are
  * empty.) or the entire read interaction fails. Otherwise it will be called with values, which may be empty (e.g. if no paths
- * matched the wildcard) or may include per-path errors if particular paths failed.
+ * matched the wildcard paths passed in) or may include per-path errors if particular paths failed.
  */
 - (void)readWithAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
                     EventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
