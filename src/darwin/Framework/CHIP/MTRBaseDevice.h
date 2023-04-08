@@ -278,7 +278,7 @@ MTR_NEWLY_AVAILABLE;
                          queue:(dispatch_queue_t)queue
                     completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
 /**
- * Subscribes multiple attributes or events from the device.
+ * Subscribes to multiple attribute or event paths.
  *
  * Nil value is treated as empty array for attributePaths and eventPaths.
  *
