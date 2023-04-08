@@ -272,7 +272,7 @@ MTR_NEWLY_AVAILABLE;
  * empty.) or the entire read interaction fails. Otherwise it will be called with values, which may be empty (e.g. if no paths
  * matched the wildcard paths passed in) or may include per-path errors if particular paths failed.
  */
-- (void)readWithAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+- (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
                     EventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
                         params:(MTRReadParams * _Nullable)params
                          queue:(dispatch_queue_t)queue
