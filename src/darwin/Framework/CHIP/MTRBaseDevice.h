@@ -131,8 +131,9 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
 } API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
- * A path indicating a attribute on a device.
- * If value is a wildcard, set it to nil.
+ * A path indicating an attribute being requested (for read or subscribe).  
+ *
+ * nil is used to represent wildcards.
  */
 MTR_NEWLY_AVAILABLE;
 @interface MTRAttributeRequestPath : NSObject <NSCopying>
