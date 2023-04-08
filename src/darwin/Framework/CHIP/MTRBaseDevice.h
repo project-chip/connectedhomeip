@@ -284,7 +284,7 @@ MTR_NEWLY_AVAILABLE;
  *
  * Lists of attribute and event paths to subscribe to can be provided via attributePaths and eventPaths.
  *
- * The reportHandler will be called with an error if the input parameter has a problem(e.g., both attributePaths and eventPaths are
+ * The reportHandler will be called with an error if the inputs are invalid (e.g., both attributePaths and eventPaths are
  * empty.).
  */
 - (void)subscribeWithAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
