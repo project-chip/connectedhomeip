@@ -273,7 +273,7 @@ MTR_NEWLY_AVAILABLE;
  * matched the wildcard paths passed in) or may include per-path errors if particular paths failed.
  */
 - (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
-                    EventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                    eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
                         params:(MTRReadParams * _Nullable)params
                          queue:(dispatch_queue_t)queue
                     completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
