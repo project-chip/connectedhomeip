@@ -150,7 +150,7 @@ MTR_NEWLY_AVAILABLE
  * A path indicating a event on a device.
  * If value is a wildcard, set it to nil.
  */
-MTR_NEWLY_AVAILABLE;
+MTR_NEWLY_AVAILABLE
 @interface MTREventRequestPath : NSObject <NSCopying>
 @property (nonatomic, readonly, copy, nullable) NSNumber * endpoint;
 @property (nonatomic, readonly, copy, nullable) NSNumber * cluster;
