@@ -127,7 +127,7 @@ class Flasher(firmware_utils.Flasher):
 
         for root, dirs, files in os.walk(config_path, topdown=False):
             for name in files:
-                print ("get_boot_image", root, boot2_image)
+                print("get_boot_image", root, boot2_image)
                 if boot2_image:
                     return os.path.join(root, boot2_image)
                 else:
@@ -245,7 +245,6 @@ class Flasher(firmware_utils.Flasher):
             if (has_private_key is not has_public_key) and (has_private_key or has_public_key):
                 print("For ota image signature, key pair must be used together")
                 return self
-
 
         print(dts_path, xtal_value)
         if not dts_path and xtal_value:
