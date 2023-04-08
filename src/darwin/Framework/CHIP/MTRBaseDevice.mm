@@ -829,7 +829,7 @@ private:
 
         SuccessOrExit(err = app::DataModel::Decode(*apData, value));
 
-        mOnEventSuccess(aEventHeader.mPath, aEventHeader.mPath.mEventId, value);
+        mOnEventSuccess(aEventHeader.mPath, value);
 
     exit:
         if (err != CHIP_NO_ERROR) {
