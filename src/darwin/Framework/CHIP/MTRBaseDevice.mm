@@ -1156,10 +1156,10 @@ private:
                    }
 
                    auto onAttributeReportCb
-                       = [queue, reportHandler](const app::ConcreteClusterPath & clusterPath, const AttributeId aAttributeId,
+                       = [queue, reportHandler](const ConcreteAttributePath & attributePath,
                              const MTRDataValueDictionaryDecodableType & data) {
                              id valueObject = data.GetDecodedObject();
-                             app::ConcreteAttributePath pathCopy(clusterPath.mEndpointId, clusterPath.mClusterId, aAttributeId);
+                             ConcreteAttributePath pathCopy(attributePath);
                              dispatch_async(queue, ^{
                                  reportHandler(@[ @ {
                                      MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:pathCopy],
