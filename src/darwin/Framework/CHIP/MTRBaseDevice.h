@@ -288,7 +288,7 @@ MTR_NEWLY_AVAILABLE;
  * empty), or if the subscription fails entirely.
  */
 - (void)subscribeToAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
-                         EventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                         eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
                              params:(MTRSubscribeParams * _Nullable)params
                               queue:(dispatch_queue_t)queue
                       reportHandler:(MTRDeviceResponseHandler)reportHandler
