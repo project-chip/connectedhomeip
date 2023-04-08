@@ -1209,8 +1209,8 @@ private:
                    MTRReadClientContainer * container = [[MTRReadClientContainer alloc] init];
                    container.deviceID = self.nodeID;
 
-                   std::vector<app::AttributePathParams> attributePathParamsList;
-                   std::vector<app::EventPathParams> eventPathParamsList;
+                   std::vector<AttributePathParams> attributePathParamsList;
+                   std::vector<EventPathParams> eventPathParamsList;
 
                    if (attributePaths != nil) {
                        for (uint8_t i = 0; i < [attributePaths count]; i++) {
