@@ -1168,10 +1168,10 @@ private:
                              });
                          };
 
-                   auto onEventReportCb = [queue, reportHandler](const app::ConcreteClusterPath & clusterPath,
-                                              const EventId aEventId, const MTRDataValueDictionaryDecodableType & data) {
+                   auto onEventReportCb = [queue, reportHandler](const ConcreteEventPath & eventPath,
+                                               const MTRDataValueDictionaryDecodableType & data) {
                        id valueObject = data.GetDecodedObject();
-                       app::ConcreteEventPath pathCopy(clusterPath.mEndpointId, clusterPath.mClusterId, aEventId);
+                       ConcreteEventPath pathCopy(eventPath);
                        dispatch_async(queue, ^{
                            reportHandler(
                                @[ @ { MTREventPathKey : [[MTREventPath alloc] initWithPath:pathCopy], MTRDataKey : valueObject } ],
