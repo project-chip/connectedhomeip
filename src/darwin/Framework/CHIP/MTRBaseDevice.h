@@ -262,7 +262,7 @@ MTR_NEWLY_AVAILABLE;
     API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
- * Reads multiple attributes or events from the device.
+ * Reads multiple attribute or event paths from the device.
  *
  * Nil is treated as an empty array for attributePaths and eventPaths.
  *
