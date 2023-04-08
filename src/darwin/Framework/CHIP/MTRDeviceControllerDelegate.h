@@ -66,9 +66,11 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
     commissioningComplete:(NSError * _Nullable)error
                  nodeID:(NSNumber * _Nullable)nodeID MTR_NEWLY_AVAILABLE;
 /**
- * Notify the delegate when read commissioning Infomation. (vendorID, productID)
- * This value transmits the unproven value stored in the Basic Information Cluster in Controllee.
- * The proof of the value is made during the Device Attestation step.
+ * Notify the delegate when commissioning infomation has been read from the Basic
+ * Information cluster of the commissionee.
+ *
+ * At the point when this notification happens, device attestation has not been performed yet,
+ * so the information delivered by this notification should not be trusted.
  */
 - (void)controller:(MTRDeviceController *)controller
     readCommissioningInfo:(NSDictionary<NSString *, id> * _Nullable)info MTR_NEWLY_AVAILABLE;
