@@ -152,9 +152,9 @@ MTR_NEWLY_AVAILABLE;
  */
 MTR_NEWLY_AVAILABLE;
 @interface MTREventRequestPath : NSObject <NSCopying>
-@property (nonatomic, readonly, copy) NSNumber * _Nullable endpoint;
-@property (nonatomic, readonly, copy) NSNumber * _Nullable cluster;
-@property (nonatomic, readonly, copy) NSNumber * _Nullable event;
+@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint;
+@property (nonatomic, readonly, copy, nullable) NSNumber * cluster;
+@property (nonatomic, readonly, copy, nullable) NSNumber * event;
 
 + (MTREventRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
                                          clusterID:(NSNumber * _Nullable)clusterID
