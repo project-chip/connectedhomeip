@@ -282,7 +282,7 @@ MTR_NEWLY_AVAILABLE;
  *
  * Nil is treated as an empty array for attributePaths and eventPaths.
  *
- * Lists of attribute and event paths to subscribe can be provided via attributePaths and eventPaths.
+ * Lists of attribute and event paths to subscribe to can be provided via attributePaths and eventPaths.
  *
  * The reportHandler will be called with an error if the input parameter has a problem(e.g., both attributePaths and eventPaths are
  * empty.).
