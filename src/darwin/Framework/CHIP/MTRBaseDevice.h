@@ -137,9 +137,9 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
  */
 MTR_NEWLY_AVAILABLE;
 @interface MTRAttributeRequestPath : NSObject <NSCopying>
-@property (nonatomic, readonly, copy) NSNumber * _Nullable endpoint;
-@property (nonatomic, readonly, copy) NSNumber * _Nullable cluster;
-@property (nonatomic, readonly, copy) NSNumber * _Nullable attribute;
+@property (nonatomic, readonly, copy, nullable) NSNumber * endpoint;
+@property (nonatomic, readonly, copy, nullable) NSNumber * cluster;
+@property (nonatomic, readonly, copy, nullable) NSNumber * attribute;
 
 + (MTRAttributeRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
                                              clusterID:(NSNumber * _Nullable)clusterID
