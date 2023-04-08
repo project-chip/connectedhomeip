@@ -62,9 +62,9 @@ static_library("BL602") {
   ]
 
   sources += [
+    "${chip_root}/src/credentials/CHIPCert.h",
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
     "../common/FactoryDataProvider.cpp",
     "../common/FactoryDataProvider.h",
-    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
-    "${chip_root}/src/credentials/CHIPCert.h",
   ]
 }

@@ -64,7 +64,6 @@ public:
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
 
 private:
-
 #if !CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE
     uint8_t mSpake2pSalt[32];
     uint32_t mSpake2pSaltLen;

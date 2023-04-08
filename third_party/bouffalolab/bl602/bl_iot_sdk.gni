@@ -937,23 +937,15 @@ template("bl_iot_sdk") {
     ]
   }
 
-
   config("${sdk_target_name}_config_factory_data") {
-    include_dirs = [
-      "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/include",
-    ]
+    include_dirs = [ "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/include" ]
   }
 
   source_set("${sdk_target_name}_factory_data") {
-
     libs = [ "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/lib/libmatter_factory_data.a" ]
 
-    configs += [
-      ":${sdk_target_name}_config",
-    ]
-    public_configs = [
-      ":${sdk_target_name}_config_factory_data"
-    ]
+    configs += [ ":${sdk_target_name}_config" ]
+    public_configs = [ ":${sdk_target_name}_config_factory_data" ]
   }
 
   group(sdk_target_name) {
@@ -962,6 +954,7 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_bl602_freertos",
       ":${sdk_target_name}_blcrypto_suite",
       ":${sdk_target_name}_ble",
+      ":${sdk_target_name}_factory_data",
       ":${sdk_target_name}_fs",
       ":${sdk_target_name}_hosal",
       ":${sdk_target_name}_libc",
@@ -972,7 +965,6 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_sys",
       ":${sdk_target_name}_utils",
       ":${sdk_target_name}_wifi",
-      ":${sdk_target_name}_factory_data",
     ]
   }
 }
