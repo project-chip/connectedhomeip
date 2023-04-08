@@ -1025,7 +1025,7 @@ private:
             std::vector<app::EventPathParams> eventPathParamsList;
 
             if (attributePaths != nil) {
-                for (uint8_t i = 0; i < [attributePaths count]; i++) {
+                for (MTRAttributeRequestPath * attributePath in attributePaths) {
                     chip::EndpointId endpointId = kInvalidEndpointId;
                     chip::ClusterId clusterId = kInvalidClusterId;
                     chip::AttributeId attributeId = kInvalidAttributeId;
