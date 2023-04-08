@@ -804,7 +804,7 @@ private:
 
         SuccessOrExit(err = app::DataModel::Decode(*apData, value));
 
-        mOnAttributeSuccess(aPath, aPath.mAttributeId, value);
+        mOnAttributeSuccess(aPath, value);
 
     exit:
         if (err != CHIP_NO_ERROR) {
