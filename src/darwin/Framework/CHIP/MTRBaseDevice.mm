@@ -989,11 +989,10 @@ private:
             auto interactionStatus = std::make_shared<CHIP_ERROR>(CHIP_NO_ERROR);
 
             auto resultArray = [[NSMutableArray alloc] init];
-            auto onAttributeSuccessCb = [resultArray](const app::ConcreteClusterPath & clusterPath, const AttributeId aAttributeId,
+            auto onAttributeSuccessCb = [resultArray](const ConcreteAttributePath & attributePath,
                                             const MTRDataValueDictionaryDecodableType & aData) {
-                app::ConcreteAttributePath attribPath(clusterPath.mEndpointId, clusterPath.mClusterId, aAttributeId);
                 [resultArray addObject:@ {
-                    MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath],
+                    MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attributePath],
                     MTRDataKey : aData.GetDecodedObject()
                 }];
             };
