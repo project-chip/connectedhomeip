@@ -264,7 +264,7 @@ MTR_NEWLY_AVAILABLE;
 /**
  * Reads multiple attributes or events from the device.
  *
- * Nil value is treated as empty array for attributePaths and eventPaths.
+ * Nil is treated as an empty array for attributePaths and eventPaths.
  *
  * Lists of attribute and event paths to read can be provided via attributePaths and eventPaths.
  *
