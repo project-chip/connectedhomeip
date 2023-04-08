@@ -287,7 +287,7 @@ MTR_NEWLY_AVAILABLE;
  * The reportHandler will be called with an error if the inputs are invalid (e.g., both attributePaths and eventPaths are
  * empty), or if the subscription fails entirely.
  */
-- (void)subscribeWithAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+- (void)subscribeToAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
                          EventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
                              params:(MTRSubscribeParams * _Nullable)params
                               queue:(dispatch_queue_t)queue
