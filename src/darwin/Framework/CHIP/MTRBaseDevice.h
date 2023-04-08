@@ -280,7 +280,7 @@ MTR_NEWLY_AVAILABLE;
 /**
  * Subscribes to multiple attribute or event paths.
  *
- * Nil value is treated as empty array for attributePaths and eventPaths.
+ * Nil is treated as an empty array for attributePaths and eventPaths.
  *
  * Lists of attribute and event paths to subscribe can be provided via attributePaths and eventPaths.
  *
