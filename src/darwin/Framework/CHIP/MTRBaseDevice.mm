@@ -997,9 +997,8 @@ private:
                 }];
             };
 
-            auto onEventSuccessCb = [resultArray](const app::ConcreteClusterPath & clusterPath, const EventId aEventId,
+            auto onEventSuccessCb = [resultArray](const ConcreteEventPath & eventPath,
                                         const MTRDataValueDictionaryDecodableType & aData) {
-                app::ConcreteEventPath eventPath(clusterPath.mEndpointId, clusterPath.mClusterId, aEventId);
                 [resultArray addObject:@ {
                     MTREventPathKey : [[MTREventPath alloc] initWithPath:eventPath],
                     MTRDataKey : aData.GetDecodedObject()
