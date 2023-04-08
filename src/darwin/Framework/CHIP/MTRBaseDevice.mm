@@ -745,7 +745,7 @@ public:
 template <typename DecodableValueType> class BufferedReadClientCallback final : public app::ReadClient::Callback {
 public:
     using OnSuccessAttributeCallbackType = std::function<void(
-        const app::ConcreteClusterPath & aPath, const AttributeId aAttributeId, const DecodableValueType & aData)>;
+        const ConcreteAttributePath & aPath, const DecodableValueType & aData)>;
     using OnSuccessEventCallbackType
         = std::function<void(const app::ConcreteClusterPath & aPath, const EventId aEventId, const DecodableValueType & aData)>;
     using OnErrorCallbackType
