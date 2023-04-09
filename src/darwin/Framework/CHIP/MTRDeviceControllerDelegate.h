@@ -44,8 +44,7 @@ MTR_NEWLY_AVAILABLE
  */
 @property (nonatomic, copy, readonly, nonnull) NSNumber * productID MTR_NEWLY_AVAILABLE;
 
-- (instancetype)initWithVendorID:(NSNumber * _Nonnull)vendorID
-                       productID:(NSNumber * _Nonnull)productID;
+- (instancetype)initWithVendorID:(NSNumber * _Nonnull)vendorID productID:(NSNumber * _Nonnull)productID;
 @end
 
 @class MTRDeviceController;
@@ -89,8 +88,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * At the point when this notification happens, device attestation has not been performed yet,
  * so the information delivered by this notification should not be trusted.
  */
-- (void)controller:(MTRDeviceController *)controller
-    readCommissioningInfo:(MTRReadCommissioningInfo *)info MTR_NEWLY_AVAILABLE;
+- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(MTRReadCommissioningInfo *)info MTR_NEWLY_AVAILABLE;
 @end
 
 typedef NS_ENUM(NSUInteger, MTRPairingStatus) {
