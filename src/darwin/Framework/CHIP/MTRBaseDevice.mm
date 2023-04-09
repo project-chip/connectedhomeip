@@ -1302,6 +1302,7 @@ private:
                            Platform::Delete(container.eventPathParams);
                        }
                        container.pathParams = nullptr;
+                       container.eventPathParams = nullptr;
                        return;
                    }
 
