@@ -101,8 +101,6 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
 {
     chip::VendorId vendorId = info.basic.vendorId;
     uint16_t productId = info.basic.productId;
-    chip::EndpointId wifiEndpointId = info.network.wifi.endpoint;
-    chip::EndpointId threadEndpointId = info.network.thread.endpoint;
 
     MTR_LOG_DEFAULT("DeviceControllerDelegate Read Commissioning Info. VendorId %u ProductId %u", vendorId, productId);
 
@@ -127,11 +125,11 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     MTRDeviceController * strongController = mController;
     if (strongDelegate && mQueue && strongController) {
-        if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:deviceId:)]) {
+        if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)]) {
             dispatch_async(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
-                NSNumber * deviceId = [NSNumber numberWithUnsignedLongLong:nodeId];
-                [strongDelegate controller:strongController commissioningComplete:nsError deviceId:deviceId];
+                NSNumber * nodeID = [NSNumber numberWithUnsignedLongLong:nodeId];
+                [strongDelegate controller:strongController commissioningComplete:nsError nodeID:nodeID];
             });
             return;
         }

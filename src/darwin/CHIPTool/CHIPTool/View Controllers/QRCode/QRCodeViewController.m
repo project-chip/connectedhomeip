@@ -674,14 +674,14 @@
 
 // MARK: MTRDeviceControllerDelegate
 - (void)controller:(MTRDeviceController *)controller commissioningComplete:(NSError *)error
-          deviceId:(NSNumber *)deviceId
+          nodeID:(NSNumber *)nodeID
 {
     if (error != nil) {
         NSLog(@"Error retrieving device informations over Mdns: %@", error);
         return;
     }
     // track this device
-    MTRSetDevicePaired([deviceId unsignedLongLongValue], YES);
+    MTRSetDevicePaired([nodeID unsignedLongLongValue], YES);
     [self setVendorIDOnAccessory];
 }
 
