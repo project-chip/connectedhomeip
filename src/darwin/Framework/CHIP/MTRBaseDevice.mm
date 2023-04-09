@@ -881,11 +881,10 @@ private:
             auto interactionStatus = std::make_shared<CHIP_ERROR>(CHIP_NO_ERROR);
 
             auto resultArray = [[NSMutableArray alloc] init];
-            auto onSuccessCb = [resultArray](const app::ConcreteClusterPath & clusterPath, const uint32_t aValueId,
+            auto onSuccessCb = [resultArray](const app::ConcreteAttributePath & attributePath,
                                    const MTRDataValueDictionaryDecodableType & aData) {
-                app::ConcreteAttributePath attribPath(clusterPath.mEndpointId, clusterPath.mClusterId, aValueId);
                 [resultArray addObject:@ {
-                    MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attribPath],
+                    MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attributePath],
                     MTRDataKey : aData.GetDecodedObject()
                 }];
             };
@@ -1030,37 +1029,37 @@ private:
                     chip::ClusterId clusterId = kInvalidClusterId;
                     chip::AttributeId attributeId = kInvalidAttributeId;
 
-                    if ([attributePaths[i] endpoint]) {
-                        endpointId = static_cast<chip::EndpointId>([[attributePaths[i] endpoint] unsignedShortValue]);
+                    if ([attributePath endpoint]) {
+                        endpointId = static_cast<chip::EndpointId>([[attributePath endpoint] unsignedShortValue]);
                     }
 
-                    if ([attributePaths[i] cluster]) {
-                        clusterId = static_cast<chip::ClusterId>([[attributePaths[i] cluster] unsignedLongValue]);
+                    if ([attributePath cluster]) {
+                        clusterId = static_cast<chip::ClusterId>([[attributePath cluster] unsignedLongValue]);
                     }
 
-                    if ([attributePaths[i] attribute]) {
-                        attributeId = static_cast<chip::AttributeId>([[attributePaths[i] attribute] unsignedLongValue]);
+                    if ([attributePath attribute]) {
+                        attributeId = static_cast<chip::AttributeId>([[attributePath attribute] unsignedLongValue]);
                     }
                     attributePathParamsList.push_back(app::AttributePathParams(endpointId, clusterId, attributeId));
                 }
             }
 
             if (eventPaths != nil) {
-                for (uint8_t i = 0; i < [eventPaths count]; i++) {
+                for (MTREventRequestPath * eventPath in eventPaths) {
                     chip::EndpointId endpointId = kInvalidEndpointId;
                     chip::ClusterId clusterId = kInvalidClusterId;
                     chip::EventId eventId = kInvalidEventId;
 
-                    if ([eventPaths[i] endpoint]) {
-                        endpointId = static_cast<chip::EndpointId>([[eventPaths[i] endpoint] unsignedShortValue]);
+                    if ([eventPath endpoint]) {
+                        endpointId = static_cast<chip::EndpointId>([[eventPath endpoint] unsignedShortValue]);
                     }
 
-                    if ([eventPaths[i] cluster]) {
-                        clusterId = static_cast<chip::ClusterId>([[eventPaths[i] cluster] unsignedLongValue]);
+                    if ([eventPath cluster]) {
+                        clusterId = static_cast<chip::ClusterId>([[eventPath cluster] unsignedLongValue]);
                     }
 
-                    if ([eventPaths[i] event]) {
-                        eventId = static_cast<chip::EventId>([[eventPaths[i] event] unsignedLongValue]);
+                    if ([eventPath event]) {
+                        eventId = static_cast<chip::EventId>([[eventPath event] unsignedLongValue]);
                     }
                     eventPathParamsList.push_back(app::EventPathParams(endpointId, clusterId, eventId));
                 }
@@ -1547,13 +1546,12 @@ exit:
                        return;
                    }
 
-                   auto onReportCb = [queue, reportHandler](const app::ConcreteClusterPath & clusterPath, const uint32_t aValueId,
+                   auto onReportCb = [queue, reportHandler](const app::ConcreteAttributePath & attributePath,
                                          const MTRDataValueDictionaryDecodableType & data) {
                        id valueObject = data.GetDecodedObject();
-                       app::ConcreteAttributePath pathCopy(clusterPath.mEndpointId, clusterPath.mClusterId, aValueId);
                        dispatch_async(queue, ^{
                            reportHandler(@[ @ {
-                               MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:pathCopy],
+                               MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attributePath],
                                MTRDataKey : valueObject
                            } ],
                                nil);
@@ -1863,9 +1861,8 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
             auto interactionStatus = std::make_shared<CHIP_ERROR>(CHIP_NO_ERROR);
 
             auto resultArray = [[NSMutableArray alloc] init];
-            auto onSuccessCb = [resultArray](const app::ConcreteClusterPath & clusterPath, const uint32_t aValueId,
+            auto onSuccessCb = [resultArray](const app::ConcreteEventPath & eventPath,
                                    const MTRDataValueDictionaryDecodableType & aData) {
-                app::ConcreteEventPath eventPath(clusterPath.mEndpointId, clusterPath.mClusterId, aValueId);
                 [resultArray addObject:@ {
                     MTREventPathKey : [[MTREventPath alloc] initWithPath:eventPath],
                     MTRDataKey : aData.GetDecodedObject()
@@ -1980,13 +1977,12 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                        return;
                    }
 
-                   auto onReportCb = [queue, reportHandler](const app::ConcreteClusterPath & clusterPath, const uint32_t aValueId,
+                   auto onReportCb = [queue, reportHandler](const app::ConcreteEventPath & eventPath,
                                          const MTRDataValueDictionaryDecodableType & data) {
                        id valueObject = data.GetDecodedObject();
-                       app::ConcreteEventPath pathCopy(clusterPath.mEndpointId, clusterPath.mClusterId, aValueId);
                        dispatch_async(queue, ^{
                            reportHandler(
-                               @[ @ { MTREventPathKey : [[MTREventPath alloc] initWithPath:pathCopy], MTRDataKey : valueObject } ],
+                               @[ @ { MTREventPathKey : [[MTREventPath alloc] initWithPath:eventPath], MTRDataKey : valueObject } ],
                                nil);
                        });
                    };

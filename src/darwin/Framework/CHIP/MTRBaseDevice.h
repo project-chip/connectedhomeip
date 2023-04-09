@@ -147,8 +147,9 @@ MTR_NEWLY_AVAILABLE
 @end
 
 /**
- * A path indicating a event on a device.
- * If value is a wildcard, set it to nil.
+ * A path indicating an event being requested (for read or subscribe).
+ *
+ * nil is used to represent wildcards.
  */
 MTR_NEWLY_AVAILABLE
 @interface MTREventRequestPath : NSObject <NSCopying>
