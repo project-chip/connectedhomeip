@@ -744,10 +744,9 @@ public:
 
 template <typename DecodableValueType> class BufferedReadClientCallback final : public app::ReadClient::Callback {
 public:
-    using OnSuccessAttributeCallbackType = std::function<void(
-        const ConcreteAttributePath & aPath, const DecodableValueType & aData)>;
-    using OnSuccessEventCallbackType
-        = std::function<void(const ConcreteEventPath & aPath, const DecodableValueType & aData)>;
+    using OnSuccessAttributeCallbackType
+        = std::function<void(const ConcreteAttributePath & aPath, const DecodableValueType & aData)>;
+    using OnSuccessEventCallbackType = std::function<void(const ConcreteEventPath & aPath, const DecodableValueType & aData)>;
     using OnErrorCallbackType
         = std::function<void(const app::ConcreteClusterPath * aPath, const uint32_t aValueId, CHIP_ERROR aError)>;
     using OnDoneCallbackType = std::function<void(BufferedReadClientCallback * callback)>;
@@ -963,11 +962,11 @@ private:
     std::move(*bridge).DispatchAction(self);
 }
 
-- (void)readWithAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
-                    EventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
-                        params:(MTRReadParams * _Nullable)params
-                         queue:(dispatch_queue_t)queue
-                    completion:(MTRDeviceResponseHandler)completion
+- (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                    params:(MTRReadParams * _Nullable)params
+                     queue:(dispatch_queue_t)queue
+                completion:(MTRDeviceResponseHandler)completion
 {
     if ((attributePaths == nil || [attributePaths count] == 0) && (eventPaths == nil || [eventPaths count] == 0)) {
         dispatch_async(queue, ^{
@@ -988,21 +987,21 @@ private:
             auto interactionStatus = std::make_shared<CHIP_ERROR>(CHIP_NO_ERROR);
 
             auto resultArray = [[NSMutableArray alloc] init];
-            auto onAttributeSuccessCb = [resultArray](const ConcreteAttributePath & attributePath,
-                                            const MTRDataValueDictionaryDecodableType & aData) {
-                [resultArray addObject:@ {
-                    MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attributePath],
-                    MTRDataKey : aData.GetDecodedObject()
-                }];
-            };
+            auto onAttributeSuccessCb
+                = [resultArray](const ConcreteAttributePath & attributePath, const MTRDataValueDictionaryDecodableType & aData) {
+                      [resultArray addObject:@ {
+                          MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:attributePath],
+                          MTRDataKey : aData.GetDecodedObject()
+                      }];
+                  };
 
-            auto onEventSuccessCb = [resultArray](const ConcreteEventPath & eventPath,
-                                        const MTRDataValueDictionaryDecodableType & aData) {
-                [resultArray addObject:@ {
-                    MTREventPathKey : [[MTREventPath alloc] initWithPath:eventPath],
-                    MTRDataKey : aData.GetDecodedObject()
-                }];
-            };
+            auto onEventSuccessCb
+                = [resultArray](const ConcreteEventPath & eventPath, const MTRDataValueDictionaryDecodableType & aData) {
+                      [resultArray addObject:@ {
+                          MTREventPathKey : [[MTREventPath alloc] initWithPath:eventPath],
+                          MTRDataKey : aData.GetDecodedObject()
+                      }];
+                  };
 
             auto onFailureCb = [resultArray, interactionStatus](
                                    const app::ConcreteClusterPath * clusterPath, const uint32_t aValueId, CHIP_ERROR aError) {
@@ -1113,12 +1112,12 @@ private:
     std::move(*bridge).DispatchAction(self);
 }
 
-- (void)subscribeWithAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
-                         EventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
-                             params:(MTRSubscribeParams * _Nullable)params
-                              queue:(dispatch_queue_t)queue
-                      reportHandler:(MTRDeviceResponseHandler)reportHandler
-            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+- (void)subscribeToAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
+                       EventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                           params:(MTRSubscribeParams * _Nullable)params
+                            queue:(dispatch_queue_t)queue
+                    reportHandler:(MTRDeviceResponseHandler)reportHandler
+          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
 {
     if ((attributePaths == nil || [attributePaths count] == 0) && (eventPaths == nil || [eventPaths count] == 0)) {
         dispatch_async(queue, ^{
@@ -1153,22 +1152,21 @@ private:
                        return;
                    }
 
-                   auto onAttributeReportCb
-                       = [queue, reportHandler](const ConcreteAttributePath & attributePath,
-                             const MTRDataValueDictionaryDecodableType & data) {
-                             id valueObject = data.GetDecodedObject();
-                             ConcreteAttributePath pathCopy(attributePath);
-                             dispatch_async(queue, ^{
-                                 reportHandler(@[ @ {
-                                     MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:pathCopy],
-                                     MTRDataKey : valueObject
-                                 } ],
-                                     nil);
-                             });
-                         };
+                   auto onAttributeReportCb = [queue, reportHandler](const ConcreteAttributePath & attributePath,
+                                                  const MTRDataValueDictionaryDecodableType & data) {
+                       id valueObject = data.GetDecodedObject();
+                       ConcreteAttributePath pathCopy(attributePath);
+                       dispatch_async(queue, ^{
+                           reportHandler(@[ @ {
+                               MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:pathCopy],
+                               MTRDataKey : valueObject
+                           } ],
+                               nil);
+                       });
+                   };
 
                    auto onEventReportCb = [queue, reportHandler](const ConcreteEventPath & eventPath,
-                                               const MTRDataValueDictionaryDecodableType & data) {
+                                              const MTRDataValueDictionaryDecodableType & data) {
                        id valueObject = data.GetDecodedObject();
                        ConcreteEventPath pathCopy(eventPath);
                        dispatch_async(queue, ^{
@@ -1862,13 +1860,13 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
             auto interactionStatus = std::make_shared<CHIP_ERROR>(CHIP_NO_ERROR);
 
             auto resultArray = [[NSMutableArray alloc] init];
-            auto onSuccessCb = [resultArray](const app::ConcreteEventPath & eventPath,
-                                   const MTRDataValueDictionaryDecodableType & aData) {
-                [resultArray addObject:@ {
-                    MTREventPathKey : [[MTREventPath alloc] initWithPath:eventPath],
-                    MTRDataKey : aData.GetDecodedObject()
-                }];
-            };
+            auto onSuccessCb
+                = [resultArray](const app::ConcreteEventPath & eventPath, const MTRDataValueDictionaryDecodableType & aData) {
+                      [resultArray addObject:@ {
+                          MTREventPathKey : [[MTREventPath alloc] initWithPath:eventPath],
+                          MTRDataKey : aData.GetDecodedObject()
+                      }];
+                  };
 
             auto onFailureCb = [resultArray, interactionStatus](
                                    const app::ConcreteClusterPath * clusterPath, const uint32_t aValueId, CHIP_ERROR aError) {
