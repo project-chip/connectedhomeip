@@ -28,8 +28,25 @@ typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
     = 3,
 } API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
-extern NSString * const MTRVendorIDKey;
-extern NSString * const MTRProductIDKey;
+/**
+ * Read from controllee's Information  at Commissioning
+ */
+MTR_NEWLY_AVAILABLE
+@interface MTRReadCommissioningInfo : NSObject
+
+/**
+ * Controllee's VendorID Attribute of Basic Information cluster
+ */
+@property (nonatomic, copy, readonly, nonnull) NSNumber * vendorID MTR_NEWLY_AVAILABLE;
+
+/**
+ * Controllee's ProductID Attribute of Basic Information cluster
+ */
+@property (nonatomic, copy, readonly, nonnull) NSNumber * productID MTR_NEWLY_AVAILABLE;
+
+- (instancetype)initWithVendorID:(NSNumber * _Nonnull)vendorID
+                       productID:(NSNumber * _Nonnull)productID;
+@end
 
 @class MTRDeviceController;
 
@@ -73,7 +90,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * so the information delivered by this notification should not be trusted.
  */
 - (void)controller:(MTRDeviceController *)controller
-    readCommissioningInfo:(NSDictionary<NSString *, id> * _Nullable)info MTR_NEWLY_AVAILABLE;
+    readCommissioningInfo:(MTRReadCommissioningInfo *)info MTR_NEWLY_AVAILABLE;
 @end
 
 typedef NS_ENUM(NSUInteger, MTRPairingStatus) {

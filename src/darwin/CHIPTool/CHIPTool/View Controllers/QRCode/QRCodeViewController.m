@@ -686,11 +686,9 @@
 }
 
 // MARK: MTRDeviceControllerDelegate
-- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(NSDictionary<NSString *,id> *)info
+- (void)controller:(MTRDeviceController *)controller readCommissioningInfo:(MTRReadCommissioningInfo *)info
 {
-    NSNumber *vendorID = info[MTRVendorIDKey];
-    NSNumber *productID = info[MTRProductIDKey];
-    NSLog(@"readCommissioningInfo, vendorID:%@, productID:%@", vendorID, productID);
+    NSLog(@"readCommissioningInfo, vendorID:%@, productID:%@", info.vendorID, info.productID);
 }
 
 - (void)updateUIFields:(MTRSetupPayload *)payload rawPayload:(nullable NSString *)rawPayload isManualCode:(BOOL)isManualCode

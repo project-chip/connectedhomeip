@@ -20,9 +20,6 @@
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
 
-NSString * const MTRVendorIDKey = @"vendorID";
-NSString * const MTRProductIDKey = @"productID";
-
 MTRDeviceControllerDelegateBridge::MTRDeviceControllerDelegateBridge(void)
     : mDelegate(nil)
 {
@@ -109,9 +106,7 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
     if (strongDelegate && mQueue && strongController) {
         if ([strongDelegate respondsToSelector:@selector(controller:readCommissioningInfo:)]) {
             dispatch_async(mQueue, ^{
-                NSDictionary<NSString *, id> * info =
-                    [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithUnsignedShort:vendorId], MTRVendorIDKey,
-                                  [NSNumber numberWithUnsignedShort:productId], MTRProductIDKey, nil];
+                __auto_type * info = [[MTRReadCommissioningInfo alloc] initWithVendorID:[NSNumber numberWithUnsignedShort:vendorId] productID:[NSNumber numberWithUnsignedShort:productId]];
                 [strongDelegate controller:strongController readCommissioningInfo:info];
             });
         }
@@ -142,3 +137,16 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
         }
     }
 }
+
+@implementation MTRReadCommissioningInfo
+
+- (instancetype)initWithVendorID:(NSNumber *)vendorID productID:(NSNumber *)productID
+{
+    if (self = [super init]) {
+        _vendorID = vendorID;
+        _productID = productID;
+    }
+    return self;
+}
+
+@end
