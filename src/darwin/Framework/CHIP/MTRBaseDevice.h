@@ -131,7 +131,7 @@ typedef NS_ENUM(uint8_t, MTRTransportType) {
 } API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
- * A path indicating an attribute being requested (for read or subscribe).  
+ * A path indicating an attribute being requested (for read or subscribe).
  *
  * nil is used to represent wildcards.
  */
@@ -274,10 +274,10 @@ MTR_NEWLY_AVAILABLE;
  * matched the wildcard paths passed in) or may include per-path errors if particular paths failed.
  */
 - (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
-                    eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
-                        params:(MTRReadParams * _Nullable)params
-                         queue:(dispatch_queue_t)queue
-                    completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
+                eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                    params:(MTRReadParams * _Nullable)params
+                     queue:(dispatch_queue_t)queue
+                completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
 /**
  * Subscribes to multiple attribute or event paths.
  *
@@ -289,11 +289,11 @@ MTR_NEWLY_AVAILABLE;
  * empty), or if the subscription fails entirely.
  */
 - (void)subscribeToAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
-                         eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
-                             params:(MTRSubscribeParams * _Nullable)params
-                              queue:(dispatch_queue_t)queue
-                      reportHandler:(MTRDeviceResponseHandler)reportHandler
-            subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished MTR_NEWLY_AVAILABLE;
+                       eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
+                           params:(MTRSubscribeParams * _Nullable)params
+                            queue:(dispatch_queue_t)queue
+                    reportHandler:(MTRDeviceResponseHandler)reportHandler
+          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished MTR_NEWLY_AVAILABLE;
 /**
  * Write to attribute in a designated attribute path
  *
