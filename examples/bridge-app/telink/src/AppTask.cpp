@@ -360,11 +360,13 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
     }
     else if ((attributeId == FeatureMap::Id) && (maxReadLength == 4))
     {
-        *buffer = (uint32_t) ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP;
+        uint32_t featureMap = ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP;
+        memcpy(buffer, &featureMap, sizeof(featureMap));
     }
     else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 4))
     {
-        *buffer = (uint16_t) ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION;
+        uint16_t clusterRevision = ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION;
+        memcpy(buffer, &clusterRevision, sizeof(clusterRevision));
     }
     else
     {
@@ -384,7 +386,8 @@ EmberAfStatus HandleReadOnOffAttribute(Device * dev, chip::AttributeId attribute
     }
     else if ((attributeId == Clusters::OnOff::Attributes::ClusterRevision::Id) && (maxReadLength == 4))
     {
-        *buffer = (uint16_t) ZCL_ON_OFF_CLUSTER_REVISION;
+        uint16_t clusterRevision = ZCL_ON_OFF_CLUSTER_REVISION;
+        memcpy(buffer, &clusterRevision, sizeof(clusterRevision));
     }
     else
     {
