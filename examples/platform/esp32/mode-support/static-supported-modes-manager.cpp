@@ -15,7 +15,7 @@ template <typename T>
 using List = app::DataModel::List<T>;
 
 StaticSupportedModesManager::ModeOptionStructType * StaticSupportedModesManager::modeOptionStructList = nullptr;
-StaticSupportedModesManager::SemanticTag * StaticSupportedModesManager::semanticTags              = nullptr;
+StaticSupportedModesManager::SemanticTag * StaticSupportedModesManager::semanticTags                  = nullptr;
 
 const StaticSupportedModesManager StaticSupportedModesManager::instance = StaticSupportedModesManager();
 
@@ -46,7 +46,8 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
                         ModeOptionsProvider(nullptr, nullptr));
 
     modeOptionStructList = new ModeOptionStructType[supportedModeCount];
-    if (modeOptionStructList == nullptr) {
+    if (modeOptionStructList == nullptr)
+    {
         return ModeOptionsProvider(nullptr, nullptr);
     }
 
@@ -65,7 +66,7 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
         VerifyOrReturnValue(ESP32Config::ReadConfigValueStr(labelKey, nullptr, 0, outLen) == CHIP_NO_ERROR,
                             ModeOptionsProvider(nullptr, nullptr), CleanUp());
 
-        char *modeLabel = new char[outLen + 1];
+        char * modeLabel = new char[outLen + 1];
         VerifyOrReturnValue(ESP32Config::ReadConfigValueStr(labelKey, modeLabel, outLen + 1, outLen) == CHIP_NO_ERROR,
                             ModeOptionsProvider(nullptr, nullptr), CleanUp());
 
@@ -86,7 +87,8 @@ SupportedModesManager::ModeOptionsProvider StaticSupportedModesManager::getModeO
                             ModeOptionsProvider(nullptr, nullptr), CleanUp());
 
         semanticTags = new SemanticTag[semanticTagCount];
-        if (semanticTags == nullptr) {
+        if (semanticTags == nullptr)
+        {
             CleanUp();
             return ModeOptionsProvider(nullptr, nullptr);
         }
@@ -176,7 +178,6 @@ void StaticSupportedModesManager::FreeSupportedModes() const
         }
         epModeOptionsProviderList[i] = ModeOptionsProvider();
     }
-
 }
 
 void StaticSupportedModesManager::CleanUp() const

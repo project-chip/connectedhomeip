@@ -53,8 +53,10 @@ public:
 
     StaticSupportedModesManager() { InitEndpointArray(); }
 
-    ~StaticSupportedModesManager() {
-        if(modeOptionStructList != nullptr) {
+    ~StaticSupportedModesManager()
+    {
+        if (modeOptionStructList != nullptr)
+        {
             FreeSupportedModes();
         }
     }
