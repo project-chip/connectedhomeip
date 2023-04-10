@@ -54,7 +54,7 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform darwin
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform darwin
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
@@ -120,6 +120,19 @@ jobs:
                      --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
                      --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                      --bridge-app ./out/darwin-x64-bridge-${BUILD_VARIANT}/chip-bridge-app \
+                  "
+            - name: Run OTA Test
+              timeout-minutes: 5
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                  "./scripts/tests/run_darwin_framework_ota_test.py \
+                     run \
+                     --darwin-framework-tool ./out/darwin-x64-darwin-framework-tool-${BUILD_VARIANT}/darwin-framework-tool \
+                     --ota-requestor-app ./out/darwin-x64-ota-requestor-${BUILD_VARIANT}/chip-ota-requestor-app \
+                     --ota-data-file /tmp/rawImage \
+                     --ota-image-file /tmp/otaImage \
+                     --ota-destination-file /tmp/downloadedImage \
+                     --ota-candidate-file /tmp/otaCandidateJSON \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v3

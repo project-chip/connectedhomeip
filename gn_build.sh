@@ -126,7 +126,7 @@ else
     echo
     echo "Hint: Set \$ANDROID_HOME and \$ANDROID_NDK_HOME to enable building for Android"
     echo "      The required android sdk platform version is 21. It can be obtained from"
-    echo "      https://dl.google.com/android/repository/android-21_r02.zip"
+    echo "      https://dl.google.com/android/repository/platform-26_r02.zip"
 fi
 
 echo

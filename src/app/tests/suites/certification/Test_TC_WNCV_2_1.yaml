@@ -157,6 +157,7 @@ tests:
       attribute: "InstalledOpenLimitLift"
       PICS: WNCV.S.A0010
       response:
+          saveAs: InstalledOpenLimitLift
           constraints:
               type: int16u
               minValue: 0
@@ -169,6 +170,7 @@ tests:
       attribute: "InstalledClosedLimitLift"
       PICS: WNCV.S.A0011
       response:
+          saveAs: InstalledClosedLimitLift
           constraints:
               type: int16u
               minValue: 0
@@ -181,6 +183,7 @@ tests:
       attribute: "InstalledOpenLimitTilt"
       PICS: WNCV.S.A0012
       response:
+          saveAs: InstalledOpenLimitTilt
           constraints:
               type: int16u
               minValue: 0
@@ -193,6 +196,7 @@ tests:
       attribute: "InstalledClosedLimitTilt"
       PICS: WNCV.S.A0013
       response:
+          saveAs: InstalledClosedLimitTilt
           constraints:
               type: int16u
               minValue: 0
@@ -238,7 +242,29 @@ tests:
     - label: "3d: read the RO optional attribute default: CurrentPositionLift"
       command: "readAttribute"
       attribute: "CurrentPositionLift"
-      PICS: WNCV.S.A0003
+      PICS: WNCV.S.A0003 && !WNCV.S.A0010 && !WNCV.S.A0011
+      response:
+          constraints:
+              type: int16u
+              minValue: 0
+              maxValue: 65535
+
+    ### Attribute[  3]: CurrentPositionLift  ====================
+    - label: "3d: read the RO optional attribute default: CurrentPositionLift"
+      command: "readAttribute"
+      attribute: "CurrentPositionLift"
+      PICS: WNCV.S.A0003 && WNCV.S.A0010 && WNCV.S.A0011
+      response:
+          constraints:
+              type: int16u
+              minValue: InstalledOpenLimitLift
+              maxValue: InstalledClosedLimitLift
+
+    ### Attribute[  4]: CurrentPositionTilt  ====================
+    - label: "3e: read the RO optional attribute default: CurrentPositionTilt"
+      command: "readAttribute"
+      attribute: "CurrentPositionTilt"
+      PICS: WNCV.S.A0004 && !WNCV.S.A0012 && !WNCV.S.A0013
       response:
           constraints:
               type: int16u
@@ -249,12 +275,12 @@ tests:
     - label: "3e: read the RO optional attribute default: CurrentPositionTilt"
       command: "readAttribute"
       attribute: "CurrentPositionTilt"
-      PICS: WNCV.S.A0004
+      PICS: WNCV.S.A0004 && WNCV.S.A0012 && WNCV.S.A0013
       response:
           constraints:
               type: int16u
-              minValue: 0
-              maxValue: 65535
+              minValue: InstalledOpenLimitTilt
+              maxValue: InstalledClosedLimitTilt
 
     ### Attribute[  5]: NumberOfActuationsLift  ====================
     - label:

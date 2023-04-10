@@ -37,20 +37,8 @@
 #define RSI_FEATURE_BIT_MAP (FEAT_SECURITY_OPEN)
 
 //! TCP IP BYPASS feature check
-#ifdef RS911X_SOCKETS
-#define RSI_TCP_IP_BYPASS RSI_DISABLE
-
-#define RSI_TCP_IP_FEATURE_BIT_MAP                                                                                                 \
-    (TCP_IP_FEAT_DHCPV4_CLIENT |                             /*TCP_IP_FEAT_HTTP_CLIENT | */                                        \
-     TCP_IP_FEAT_EXTENSION_VALID | /*TCP_IP_FEAT_SSL     |*/ /*TCP_IP_FEAT_DNS_CLIENT |*/                                          \
-     0)
-//! To set custom feature select bit map
-#define RSI_CUSTOM_FEATURE_BIT_MAP FEAT_CUSTOM_FEAT_EXTENTION_VALID
-
-#else /* Don't use RSI_SOCKETS */
 #define RSI_TCP_IP_BYPASS RSI_ENABLE
 #define RSI_TCP_IP_FEATURE_BIT_MAP (TCP_IP_FEAT_BYPASS /*| TCP_IP_FEAT_EXTENSION_VALID*/)
-#endif
 
 //! To set Extended custom feature select bit map
 #if WIFI_ENABLE_SECURITY_WPA3

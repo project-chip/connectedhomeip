@@ -30,6 +30,22 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.serialization import load_der_private_key
 
 try:
+    import qrcode
+    from generate_setup_payload import CommissioningFlow, SetupPayload
+except ImportError:
+    SDK_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
+    sys.path.append(os.path.join(SDK_ROOT, "src/setup_payload/python"))
+    try:
+        import qrcode
+        from generate_setup_payload import CommissioningFlow, SetupPayload
+    except ModuleNotFoundError or ImportError:
+        no_onboarding_modules = True
+    else:
+        no_onboarding_modules = False
+else:
+    no_onboarding_modules = False
+
+try:
     import jsonschema
 except ImportError:
     no_jsonschema_module = True
@@ -327,6 +343,9 @@ class FactoryDataGenerator:
             except IOError:
                 log.error("Cannot save output file into directory: {}".format(self._args.output))
 
+            if self._args.generate_onboarding:
+                self._generate_onboarding_data()
+
     def _add_entry(self, name: str, value: any):
         """ Add single entry to list of tuples ("key", "value") """
         if (isinstance(value, bytes) or isinstance(value, bytearray)):
@@ -374,6 +393,19 @@ class FactoryDataGenerator:
         except IOError as e:
             log.error(e)
             raise e
+
+    def _generate_onboarding_data(self):
+        setup_payload = SetupPayload(discriminator=self._args.discriminator,
+                                     pincode=self._args.passcode,
+                                     rendezvous=2,  # fixed pairing BLE
+                                     flow=CommissioningFlow.Standard,
+                                     vid=self._args.vendor_id,
+                                     pid=self._args.product_id)
+        with open(self._args.output[:-len(".json")] + ".txt", "w") as manual_code_file:
+            manual_code_file.write("Manualcode : " + setup_payload.generate_manualcode() + "\n")
+            manual_code_file.write("QRCode : " + setup_payload.generate_qrcode())
+        qr = qrcode.make(setup_payload.generate_qrcode())
+        qr.save(self._args.output[:-len(".json")] + ".png")
 
 
 def main():
@@ -481,6 +513,9 @@ def main():
                                     help=("Provide a path to the Product Attestation Authority (PAA) key to generate "
                                           "the PAI certificate. Without providing it, a testing PAA key stored in the Matter "
                                           "repository will be used."))
+    optional_arguments.add_argument("--generate_onboarding", action="store_true",
+                                    help=("Generate a Manual Code and QR Code according to provided factory data set."
+                                          "As a result a PNG image containing QRCode and a .txt file containing Manual Code will be available within output directory"))
     args = parser.parse_args()
 
     if args.verbose:
@@ -498,6 +533,12 @@ def main():
         log.error(("Requested verification of the JSON file using jsonschema, but the module is not installed. \n"
                   "Install only the module by invoking: pip3 install jsonschema \n"
                    "Alternatively, install it with all dependencies for Matter by invoking: pip3 install "
+                   "-r ./scripts/requirements.nrfconnect.txt from the Matter root directory."))
+        return
+
+    if args.generate_onboarding and no_onboarding_modules:
+        log.error(("Requested generation of onboarding codes, but the some modules are not installed. \n"
+                  "Install all dependencies for Matter by invoking: pip3 install "
                    "-r ./scripts/requirements.nrfconnect.txt from the Matter root directory."))
         return
 

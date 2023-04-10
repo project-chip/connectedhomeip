@@ -209,6 +209,10 @@ list(APPEND CHIP_DEFINES
     PW_RPC_USE_GLOBAL_MUTEX=0
 )
 
+# TODO: Update this to use target_link_libraries instead of
+# target_include_directories. target_include_directories never should be used to
+# access other libraries since it does not add source files to the build graph
+# and does not support transitive dependencies.
 target_include_directories(${APP_TARGET} PRIVATE
                     ${PIGWEED_ROOT}/pw_sys_io/public
                     ${PIGWEED_ROOT}/pw_assert/public
@@ -241,6 +245,7 @@ target_include_directories(${APP_TARGET} PRIVATE
                     ${PIGWEED_ROOT}/pw_function/public
                     ${PIGWEED_ROOT}/pw_preprocessor/public
                     ${PIGWEED_ROOT}/pw_rpc/system_server/public
+                    ${PIGWEED_ROOT}/pw_toolchain/public
                     ${PIGWEED_ROOT}/third_party/fuchsia/repo/sdk/lib/fit/include
                     ${PIGWEED_ROOT}/third_party/fuchsia/repo/sdk/lib/stdcompat/include
                     ${CHIP_ROOT}/third_party/nanopb/repo

@@ -134,6 +134,7 @@ static void InitServer(intptr_t context)
     {
         otaProvider.SetQueryImageStatus(OTAQueryStatus::kUpdateAvailable);
         otaProvider.SetOTAFilePath(otaImagePath);
+        otaProvider.SetApplyUpdateAction(OTAApplyUpdateAction::kProceed);
     }
     fclose(otaImageFile);
     otaImageFile = NULL;

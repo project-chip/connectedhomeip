@@ -58,7 +58,6 @@ assert(!(use_wf200 && chip_enable_openthread))
 
 if (chip_enable_wifi) {
   assert(use_rs9116 || use_wf200 || use_SiWx917)
-  enable_openthread_cli = false
   import("${chip_root}/src/platform/silabs/efr32/wifi_args.gni")
 
   if (use_rs9116) {
@@ -293,8 +292,7 @@ source_set("efr32-common") {
     sources += [ "LEDWidget.cpp" ]
   }
 
-  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli ||
-      use_wf200 || use_rs9116) {
+  if (chip_enable_pw_rpc || chip_build_libshell || enable_openthread_cli) {
     sources += [ "uart.cpp" ]
   }
 

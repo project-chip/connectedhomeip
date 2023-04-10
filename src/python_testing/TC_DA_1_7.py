@@ -66,6 +66,21 @@ def extract_akid(cert: Certificate) -> Optional[bytes]:
 class TC_DA_1_7(MatterBaseTest):
     @async_test_body
     async def test_TC_DA_1_7(self):
+        # For real tests, we require more than one DUT
+        # On the CI, this doesn't make sense to do since all the examples use the same DAC
+        # To specify more than 1 DUT, use a list of discriminators and passcodes
+        allow_sdk_dac = self.user_params.get("allow_sdk_dac", False)
+        if allow_sdk_dac:
+            asserts.assert_equal(len(self.matter_test_config.discriminator), 1, "Only one device can be tested with SDK DAC")
+        if not allow_sdk_dac:
+            asserts.assert_equal(len(self.matter_test_config.discriminator), 2, "This test requires 2 DUTs")
+        pk = []
+        for i in range(len(self.matter_test_config.dut_node_id)):
+            pk.append(await self.single_DUT(i, self.matter_test_config.dut_node_id[i]))
+
+        asserts.assert_equal(len(pk), len(set(pk)), "Found matching public keys in different DUTs")
+
+    async def single_DUT(self, dut_index: int, dut_node_id: int) -> bytes:
         # Option to allow SDK roots (skip step 4 check 2)
         allow_sdk_dac = self.user_params.get("allow_sdk_dac", False)
 
@@ -74,52 +89,56 @@ class TC_DA_1_7(MatterBaseTest):
         paa_by_skid = load_all_paa(conf.paa_trust_store_path)
         logging.info("Found %d PAAs" % len(paa_by_skid))
 
-        logging.info("Step 1: Commissioning, already done")
+        logging.info("DUT {} Step 1: Commissioning, already done".format(dut_index))
         dev_ctrl = self.default_controller
 
-        logging.info("Step 2: Get PAI of DUT1 with certificate chain request")
-        result = await dev_ctrl.SendCommand(self.dut_node_id, 0,
+        logging.info("DUT {} Step 2: Get PAI of DUT1 with certificate chain request".format(dut_index))
+        result = await dev_ctrl.SendCommand(dut_node_id, 0,
                                             Clusters.OperationalCredentials.Commands.CertificateChainRequest(2))
-        pai_1 = result.certificate
-        asserts.assert_less_equal(len(pai_1), 600, "PAI cert must be at most 600 bytes")
-        self.record_data({"pai_1": hex_from_bytes(pai_1)})
+        pai = result.certificate
+        asserts.assert_less_equal(len(pai), 600, "PAI cert must be at most 600 bytes")
+        key = 'pai_{}'.format(dut_index)
+        self.record_data({key: hex_from_bytes(pai)})
 
-        logging.info("Step 3: Get DAC of DUT1 with certificate chain request")
-        result = await dev_ctrl.SendCommand(self.dut_node_id, 0,
+        logging.info("DUT {} Step 3: Get DAC of DUT1 with certificate chain request".format(dut_index))
+        result = await dev_ctrl.SendCommand(dut_node_id, 0,
                                             Clusters.OperationalCredentials.Commands.CertificateChainRequest(1))
-        dac_1 = result.certificate
-        asserts.assert_less_equal(len(dac_1), 600, "DAC cert must be at most 600 bytes")
-        self.record_data({"dac_1": hex_from_bytes(dac_1)})
+        dac = result.certificate
+        asserts.assert_less_equal(len(dac), 600, "DAC cert must be at most 600 bytes")
+        key = 'dac_{}'.format(dut_index)
+        self.record_data({key: hex_from_bytes(dac)})
 
-        logging.info("Step 4 check 1: Ensure PAI's AKID matches a PAA and signature is valid")
-        pai1_cert = load_der_x509_certificate(pai_1)
-        pai1_akid = extract_akid(pai1_cert)
-        if pai1_akid not in paa_by_skid:
-            asserts.fail("DUT1's PAI (%s) not matched in PAA trust store" % hex_from_bytes(pai1_akid))
+        logging.info("DUT {} Step 4 check 1: Ensure PAI's AKID matches a PAA and signature is valid".format(dut_index))
+        pai_cert = load_der_x509_certificate(pai)
+        pai_akid = extract_akid(pai_cert)
+        if pai_akid not in paa_by_skid:
+            asserts.fail("DUT %d PAI (%s) not matched in PAA trust store" % (dut_index, hex_from_bytes(pai_akid)))
 
-        filename, paa_cert = paa_by_skid[pai1_akid]
+        filename, paa_cert = paa_by_skid[pai_akid]
         logging.info("Matched PAA file %s, subject: %s" % (filename, paa_cert.subject))
         public_key = paa_cert.public_key()
 
         try:
-            public_key.verify(signature=pai1_cert.signature, data=pai1_cert.tbs_certificate_bytes,
+            public_key.verify(signature=pai_cert.signature, data=pai_cert.tbs_certificate_bytes,
                               signature_algorithm=ec.ECDSA(hashes.SHA256()))
         except InvalidSignature as e:
-            asserts.fail("Failed to verify PAI signature against PAA public key: %s" % str(e))
+            asserts.fail("DUT %d: Failed to verify PAI signature against PAA public key: %s" % (dut_index, str(e)))
         logging.info("Validated PAI signature against PAA")
 
-        logging.info("Step 4 check 2: Verify PAI AKID not in denylist of SDK PAIs")
+        logging.info("DUT {} Step 4 check 2: Verify PAI AKID not in denylist of SDK PAIs".format(dut_index))
         if allow_sdk_dac:
             logging.warn("===> TEST STEP SKIPPED: Allowing SDK DACs!")
         else:
             for candidate in FORBIDDEN_AKID:
-                asserts.assert_not_equal(hex_from_bytes(pai1_akid), hex_from_bytes(candidate), "PAI AKID must not be in denylist")
+                asserts.assert_not_equal(hex_from_bytes(pai_akid), hex_from_bytes(candidate), "PAI AKID must not be in denylist")
 
-        logging.info("Step 5: Extract subject public key of DAC and save")
-        dac1_cert = load_der_x509_certificate(dac_1)
-        pk_1 = dac1_cert.public_key().public_bytes(encoding=Encoding.X962, format=PublicFormat.UncompressedPoint)
-        logging.info("Subject public key pk_1: %s" % hex_from_bytes(pk_1))
-        self.record_data({"pk_1": hex_from_bytes(pk_1)})
+        logging.info("DUT {} Step 5: Extract subject public key of DAC and save".format(dut_index))
+        dac_cert = load_der_x509_certificate(dac)
+        pk = dac_cert.public_key().public_bytes(encoding=Encoding.X962, format=PublicFormat.UncompressedPoint)
+        logging.info("Subject public key pk: %s" % hex_from_bytes(pk))
+        key = 'pk_{}'.format(dut_index)
+        self.record_data({key: hex_from_bytes(pk)})
+        return pk
 
 
 if __name__ == "__main__":

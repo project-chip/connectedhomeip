@@ -578,7 +578,8 @@ public class ChipDeviceController {
         maxInterval,
         false,
         false,
-        imTimeoutMs);
+        imTimeoutMs,
+        null);
   }
 
   /**
@@ -616,7 +617,33 @@ public class ChipDeviceController {
         maxInterval,
         false,
         false,
-        imTimeoutMs);
+        imTimeoutMs,
+        null);
+  }
+
+  public void subscribeToEventPath(
+      SubscriptionEstablishedCallback subscriptionEstablishedCallback,
+      ReportCallback reportCallback,
+      long devicePtr,
+      List<ChipEventPath> eventPaths,
+      int minInterval,
+      int maxInterval,
+      int imTimeoutMs,
+      @Nullable Long eventMin) {
+    ReportCallbackJni jniCallback =
+        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
+    subscribe(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        null,
+        eventPaths,
+        minInterval,
+        maxInterval,
+        false,
+        false,
+        imTimeoutMs,
+        eventMin);
   }
 
   /**
@@ -664,7 +691,39 @@ public class ChipDeviceController {
         maxInterval,
         keepSubscriptions,
         isFabricFiltered,
-        imTimeoutMs);
+        imTimeoutMs,
+        null);
+  }
+
+  public void subscribeToPath(
+      SubscriptionEstablishedCallback subscriptionEstablishedCallback,
+      ResubscriptionAttemptCallback resubscriptionAttemptCallback,
+      ReportCallback reportCallback,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths,
+      List<ChipEventPath> eventPaths,
+      int minInterval,
+      int maxInterval,
+      boolean keepSubscriptions,
+      boolean isFabricFiltered,
+      int imTimeoutMs,
+      @Nullable Long eventMin) {
+    // TODO: pass resubscriptionAttemptCallback to ReportCallbackJni since jni layer is not ready
+    // for auto-resubscribe
+    ReportCallbackJni jniCallback =
+        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback, null);
+    subscribe(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        attributePaths,
+        eventPaths,
+        minInterval,
+        maxInterval,
+        keepSubscriptions,
+        isFabricFiltered,
+        imTimeoutMs,
+        eventMin);
   }
 
   /**
@@ -689,7 +748,8 @@ public class ChipDeviceController {
         attributePaths,
         null,
         true,
-        imTimeoutMs);
+        imTimeoutMs,
+        null);
   }
 
   /**
@@ -711,7 +771,27 @@ public class ChipDeviceController {
         null,
         eventPaths,
         true,
-        imTimeoutMs);
+        imTimeoutMs,
+        null);
+  }
+
+  /** Read the given event path. */
+  public void readEventPath(
+      ReportCallback callback,
+      long devicePtr,
+      List<ChipEventPath> eventPaths,
+      int imTimeoutMs,
+      @Nullable Long eventMin) {
+    ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
+    read(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        null,
+        eventPaths,
+        true,
+        imTimeoutMs,
+        eventMin);
   }
 
   /**
@@ -739,7 +819,29 @@ public class ChipDeviceController {
         attributePaths,
         eventPaths,
         isFabricFiltered,
-        imTimeoutMs);
+        imTimeoutMs,
+        null);
+  }
+
+  /** Read the given attribute/event path with isFabricFiltered flag. */
+  public void readPath(
+      ReportCallback callback,
+      long devicePtr,
+      List<ChipAttributePath> attributePaths,
+      List<ChipEventPath> eventPaths,
+      boolean isFabricFiltered,
+      int imTimeoutMs,
+      @Nullable Long eventMin) {
+    ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
+    read(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        attributePaths,
+        eventPaths,
+        isFabricFiltered,
+        imTimeoutMs,
+        eventMin);
   }
 
   /**
@@ -840,7 +942,8 @@ public class ChipDeviceController {
       int maxInterval,
       boolean keepSubscriptions,
       boolean isFabricFiltered,
-      int imTimeoutMs);
+      int imTimeoutMs,
+      @Nullable Long eventMin);
 
   private native void read(
       long deviceControllerPtr,
@@ -849,7 +952,8 @@ public class ChipDeviceController {
       List<ChipAttributePath> attributePaths,
       List<ChipEventPath> eventPaths,
       boolean isFabricFiltered,
-      int imTimeoutMs);
+      int imTimeoutMs,
+      @Nullable Long eventMin);
 
   private native void write(
       long deviceControllerPtr,

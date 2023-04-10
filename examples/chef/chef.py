@@ -161,7 +161,7 @@ def bundle(platform: str, device_name: str) -> None:
     dest_item = os.path.join(_CD_STAGING_DIR, matter_file)
     shutil.copy(src_item, dest_item)
     flush_print(f"Generating metadata for {device_name}")
-    metadata_file = zap_file_parser.generate_hash_metadata_file(zap_file)
+    metadata_file = zap_file_parser.generate_metadata_file(zap_file)
     metadata_dest = os.path.join(_CD_STAGING_DIR,
                                  os.path.basename(metadata_file))
     shutil.copy(metadata_file, metadata_dest)

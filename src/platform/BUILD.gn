@@ -65,6 +65,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     # The string of device software version was built.
     chip_device_config_device_software_version_string = ""
+
+    # Define the default number of ip addresses to discover
+    chip_max_discovered_ip_addresses = 5
   }
 
   if (chip_stack_lock_tracking == "auto") {
@@ -291,6 +294,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     if (chip_device_config_device_software_version_string != "") {
       defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${chip_device_config_device_software_version_string}\"" ]
     }
+
+    defines += [ "CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES=${chip_max_discovered_ip_addresses}" ]
   }
 } else if (chip_device_platform == "none") {
   buildconfig_header("platform_buildconfig") {

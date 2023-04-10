@@ -5,10 +5,9 @@
 {{>idl_structure_definition extraIndent=0}}
 
 {{/chip_shared_structs}}
-{{!TODO: consider #chip_clusters as iteration point as well.
-{{!      Unsure about the differences}}
-{{#all_user_clusters}}
-  {{~side}} cluster {{asUpperCamelCase name}} = {{code}} {
+{{#all_user_clusters~}}
+/** {{description}} */
+{{side}} cluster {{asUpperCamelCase name}} = {{code}} {
   {{#zcl_enums}}
   enum {{asUpperCamelCase name}} : ENUM{{multiply size 8}} {
     {{#zcl_enum_items}}
@@ -25,10 +24,17 @@
   }
 
   {{/zcl_bitmaps}}
-  {{#chip_cluster_specific_structs}}
+  {{#if (is_client side)~}}
+    {{#zcl_structs}}
     {{~>idl_structure_definition extraIndent=1}}
 
-  {{/chip_cluster_specific_structs}}
+    {{/zcl_structs}}
+  {{~else~}}
+    {{#chip_cluster_specific_structs}}
+    {{~>idl_structure_definition extraIndent=1}}
+
+    {{/chip_cluster_specific_structs}}
+  {{/if}}
   {{#zcl_events}}
   {{#if isFabricSensitive}}fabric_sensitive {{/if~}} {{priority}} event {{!ensure space}}
   {{~#chip_access_elements entity="event"~}}
@@ -75,17 +81,16 @@
   {{~!--Close:Generating command request structs for all incoming commands into server side--~}}
   {{~!--Open:Generating command request structs for all outgoing commands from client side--~}}
   {{#if (is_client side)}}
-    {{#all_outgoing_commands_for_cluster name side}}
+    {{#zcl_commands}}
+      {{#if (isStrEqual source "client")}}
       {{~>idl_command_request_struct}}
-    {{/all_outgoing_commands_for_cluster}}
+      {{else}}
+      {{~>idl_command_response_struct}}
+      {{/if}}
+    {{/zcl_commands}}
   {{/if}}
   {{~!--Close:Generating command request structs for all outgoing commands from client side--~}}
   {{~!--Open:Generating command response structs for all incoming commands into client side--~}}
-  {{#if (is_client side)}}
-    {{#all_incoming_commands_for_cluster name side}}
-      {{~>idl_command_response_struct}}
-    {{/all_incoming_commands_for_cluster}}
-  {{/if}}
   {{~!--Close:Generating command response structs for all incoming commands into client side--~}}
   {{~!--Open:Generating command response structs for all outgoing commands from server side--~}}
   {{#if (is_server side)}}
@@ -100,9 +105,9 @@
     {{/all_incoming_commands_for_cluster}}
   {{/if}}
   {{#if (is_client side)}}
-    {{#all_outgoing_commands_for_cluster name side}}
+    {{#zcl_commands_source_client}}
       {{~>idl_command_request_response}}{{~new_line 1~}}
-    {{/all_outgoing_commands_for_cluster}}
+    {{/zcl_commands_source_client}}
   {{/if}}
 }
 
@@ -131,7 +136,7 @@ endpoint {{endpointId}} {
       {{/if}}
     {{/user_cluster_events}} 
     {{#user_cluster_attributes}}
-      {{#if included}}
+       {{#if included}}
         {{~#if (is_str_equal storageOption "NVM")}}
     persist  {{!align~}}
         {{~else if (is_str_equal storageOption "External")}}
@@ -140,9 +145,9 @@ endpoint {{endpointId}} {
     ram      {{!align~}}
         {{~/if~}}
         attribute {{asLowerCamelCase name}}
-        {{~#if_is_non_zero_default defaultValue~}}
-           {{!need space}} default = {{#if (isString type)}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
-        {{~/if_is_non_zero_default~}}
+        {{~#if defaultValue~}} 
+          {{!need space}} default = {{#if (isString type)}}"{{defaultValue}}"{{else}}{{defaultValue}}{{/if}}
+        {{~/if~}}
         ;
       {{/if}}
     {{/user_cluster_attributes}}
