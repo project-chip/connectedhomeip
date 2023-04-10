@@ -25,6 +25,7 @@ extern "C" {
 #include "sl_mx25_flash_shutdown_usart_config.h"
 #include "sl_spidrv_exp_config.h"
 #include "sl_wfx_host_api.h"
+#include "spidrv.h"
 
 #define SL_BIT_RATE_LCD 1100000
 #define SL_BIT_RATE_EXP_HDR 16000000
@@ -32,6 +33,16 @@ extern "C" {
 #define SL_BIT_RATE_UART_CONSOLE 16000000
 
 extern SemaphoreHandle_t spi_sem_sync_hdl;
+
+#ifdef RS911X_WIFI
+extern SPIDRV_Handle_t sl_spidrv_eusart_exp_handle;
+#define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
+#endif
+
+#ifdef WF200_WIFI
+extern SPIDRV_Handle_t sl_spidrv_exp_handle;
+#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
+#endif
 
 void spi_drv_reinit(uint32_t);
 
