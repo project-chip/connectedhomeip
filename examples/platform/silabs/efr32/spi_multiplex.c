@@ -40,6 +40,7 @@
  *****************************************************************************/
 void spi_drv_reinit(uint32_t baudrate)
 {
+    SILABS_LOG("%s: started", __func__);
     // USART is used in MG24 + WF200 combination
     USART_InitSync_TypeDef usartInit = USART_INITSYNC_DEFAULT;
     usartInit.msbf                   = true;
@@ -50,6 +51,9 @@ void spi_drv_reinit(uint32_t baudrate)
     usartInit.autoCsEnable           = true;
 
     USART_InitSync(USART0, &usartInit);
+
+    vTaskDelay(100);
+    SILABS_LOG("%s: completed", __func__);
 }
 
 /****************************************************************************
@@ -132,6 +136,8 @@ void pre_lcd_spi_transfer(void)
         return;
     }
     spi_drv_reinit(SL_BIT_RATE_LCD);
+    // TODO: Remove spi_drv_reinit once SPI issue is resolved.
+    // SPIDRV_DeInit(SL_SPIDRV_HANDLE);
     /*LCD CS is handled as part of LCD gsdk*/
     SILABS_LOG("%s: completed", __func__);
 }
@@ -146,6 +152,7 @@ void pre_lcd_spi_transfer(void)
 void post_lcd_spi_transfer(void)
 {
     SILABS_LOG("%s: started", __func__);
+    // spi_drv_reinit(SL_SPIDRV_EXP_BITRATE);
     xSemaphoreGive(spi_sem_sync_hdl);
     SILABS_LOG("%s: completed", __func__);
 }

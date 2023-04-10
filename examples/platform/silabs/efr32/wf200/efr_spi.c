@@ -54,7 +54,15 @@
 StaticSemaphore_t spi_sem_peripharal;
 SemaphoreHandle_t spi_sem_sync_hdl;
 #endif
+#ifdef RS911X_WIFI
+extern SPIDRV_Handle_t sl_spidrv_eusart_exp_handle;
+#define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
+#endif
+
+#ifdef WF200_WIFI
 extern SPIDRV_Handle_t sl_spidrv_exp_handle;
+#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
+#endif
 
 #define USART SL_WFX_HOST_PINOUT_SPI_PERIPHERAL
 
@@ -89,8 +97,8 @@ sl_status_t sl_wfx_host_init_bus(void)
     spi_enabled = true;
 
     /* Assign allocated DMA channel */
-    tx_dma_channel = sl_spidrv_exp_handle->txDMACh;
-    rx_dma_channel = sl_spidrv_exp_handle->rxDMACh;
+    tx_dma_channel = SL_SPIDRV_HANDLE->txDMACh;
+    rx_dma_channel = SL_SPIDRV_HANDLE->rxDMACh;
 
     /*
      * Route EUSART1 MOSI, MISO, and SCLK to the specified pins.  CS is
@@ -149,6 +157,11 @@ sl_status_t sl_wfx_host_deinit_bus(void)
  *****************************************************************************/
 sl_status_t sl_wfx_host_spi_cs_assert()
 {
+    configASSERT(spi_sem_sync_hdl);
+    if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
+    {
+        return SL_STATUS_TIMEOUT;
+    }
     GPIO_PinOutClear(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
     return SL_STATUS_OK;
 }
@@ -163,6 +176,7 @@ sl_status_t sl_wfx_host_spi_cs_assert()
 sl_status_t sl_wfx_host_spi_cs_deassert()
 {
     GPIO_PinOutSet(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
+    xSemaphoreGive(spi_sem_sync_hdl);
     return SL_STATUS_OK;
 }
 
@@ -258,7 +272,6 @@ void transmitDMA(uint8_t * buffer, uint16_t buffer_length)
 sl_status_t sl_wfx_host_spi_transfer_no_cs_assert(sl_wfx_host_bus_transfer_type_t type, uint8_t * header, uint16_t header_length,
                                                   uint8_t * buffer, uint16_t buffer_length)
 {
-    sl_status_t result = SL_STATUS_FAIL;
     const bool is_read = (type == SL_WFX_BUS_READ);
 
     while (!(MY_USART->STATUS & USART_STATUS_TXBL))
@@ -286,30 +299,29 @@ sl_status_t sl_wfx_host_spi_transfer_no_cs_assert(sl_wfx_host_bus_transfer_type_
     if (buffer_length > 0)
     {
         MY_USART->CMD = USART_CMD_CLEARRX | USART_CMD_CLEARTX;
-        if (xSemaphoreTake(spi_sem, portMAX_DELAY) == pdTRUE)
+        // Reset the semaphore
+        configASSERT(spi_sem);
+        if (xSemaphoreTake(spi_sem, portMAX_DELAY) != pdTRUE)
         {
-            if (is_read)
-            {
-                receiveDMA(buffer, buffer_length);
-                result = SL_STATUS_OK;
-            }
-            else
-            {
-                transmitDMA(buffer, buffer_length);
-                result = SL_STATUS_OK;
-            }
+            return SL_STATUS_TIMEOUT;
+        }
 
-            if (xSemaphoreTake(spi_sem, portMAX_DELAY) == pdTRUE)
-            {
-                xSemaphoreGive(spi_sem);
-            }
+        if (is_read)
+        {
+            receiveDMA(buffer, buffer_length);
         }
         else
         {
-            result = SL_STATUS_TIMEOUT;
+            transmitDMA(buffer, buffer_length);
         }
+        // wait for dma_complete by using the same spi_semaphore
+        if (xSemaphoreTake(spi_sem, portMAX_DELAY) != pdTRUE)
+        {
+            return SL_STATUS_TIMEOUT;
+        }
+        xSemaphoreGive(spi_sem);
     }
-    return result;
+    return SL_STATUS_OK;
 }
 
 /****************************************************************************
