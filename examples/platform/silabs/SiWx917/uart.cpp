@@ -33,13 +33,8 @@ extern ARM_DRIVER_USART Driver_USART0;
 static ARM_DRIVER_USART * UARTdrv = &Driver_USART0;
 
 ARM_USART_CAPABILITIES drv_capabilities;
-ARM_USART_STATUS status;
-
-#define BUFFER_SIZE 1
-uint8_t rx_buffer;
 
 #define BAUD_VALUE 115200
-
 #define UART_CONSOLE_ERR -1 // Negative value in case of UART Console action failed. Triggers a failure for PW_RPC
 
 void ARM_USART_SignalEvent(uint32_t event);
@@ -141,9 +136,6 @@ void uartConsoleInit(void)
         DEBUGOUT("\r\n Receives data success  \r\n");
     }
 
-    // Creating the receive event and storing in the rx_buffer
-    status = UARTdrv->Receive(&rx_buffer, 1);
-
     NVIC_EnableIRQ(USART0_IRQn);
 
     NVIC_SetPriority(USART0_IRQn, 7);
@@ -182,10 +174,7 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
     {
         return UART_CONSOLE_ERR;
     }
-    // storing the contents of rx_buffer in the Buf
-    *Buf = (char) rx_buffer;
-    // creating the uart receive and storing in the rx_buffer
-    status = UARTdrv->Receive(&rx_buffer, NbBytesToRead);
+    status = UARTdrv->Receive(Buf, NbBytesToRead);
     if (status != ARM_DRIVER_OK)
     {
         return status;
