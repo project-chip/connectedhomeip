@@ -75,11 +75,9 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * This will be called on the dispatch queue passed as
  * operationalCertificateIssuerQueue in the MTRDeviceControllerFactoryParams.
  *
- * The csrNonce in the provided MTROperationalCSRInfo will be the nonce _we_
- * provided when sending the CSRRequest commmand.  If device attestation
- * succeeded, this will match the nonce returned in the CSRResponse command.
- * The actual nonce returned in CSRResponse can be determined by initializing a
- * new MTROperationalCSRInfo with csrInfo.csrElementsTLV.
+ * The csrNonce in the provided MTROperationalCSRInfo will be the nonce that was
+ * sent in the CSRRequest command, which will be guaranteed, at this point, to
+ * match the nonce in the CSRResponse command.
  */
 - (void)issueOperationalCertificateForRequest:(MTROperationalCSRInfo *)csrInfo
                               attestationInfo:(MTRDeviceAttestationInfo *)attestationInfo

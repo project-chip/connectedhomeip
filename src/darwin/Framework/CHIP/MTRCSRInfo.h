@@ -35,10 +35,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, readonly) MTRCSRDERBytes csr;
 
 /**
- * The nonce associated with this CSR.  Depending on where the
- * MTROperationalCSRInfo comes from, this could be the nonce from the CSRRequest
- * command that led to this CSR being created, or the nonce from the
- * csrElementsTLV.
+ * The nonce associated with this CSR.
  */
 @property (nonatomic, copy, readonly) NSData * csrNonce;
 
@@ -58,9 +55,8 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, readonly) NSData * attestationSignature;
 
 /**
- * Initialize an MTROperationalCSRInfo by providing all the fields.  It's the
- * caller's responsibility to ensure that the provided csr matches
- * csrElementsTLV.
+ * Initialize an MTROperationalCSRInfo by providing all the fields.  This will
+ * ensure that csr and csrNonce match the data in csrElementsTLV.
  */
 - (instancetype)initWithCSR:(MTRCSRDERBytes)csr
                    csrNonce:(NSData *)csrNonce
@@ -70,7 +66,9 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 /**
  * Initialize an MTROperationalCSRInfo by providing the csrNonce (for example,
  * the nonce the client initially supplied), and the csrElementsTLV and
- * attestationSignature that the server returned.
+ * attestationSignature that the server returned.  This will ensure that
+ * csrNonce matches the data in csrElementsTLV, and extract the csr from
+ * csrElementsTLV.
  */
 - (instancetype)initWithCSRNonce:(NSData *)csrNonce
                   csrElementsTLV:(MTRTLVBytes)csrElementsTLV

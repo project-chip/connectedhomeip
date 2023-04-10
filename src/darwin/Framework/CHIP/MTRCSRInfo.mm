@@ -47,10 +47,10 @@ NS_ASSUME_NONNULL_BEGIN
     MTRFrameworkInit();
 }
 
-- (instancetype)initWithCSR:(MTRCSRDERBytes)csr
-                   csrNonce:(NSData *)csrNonce
-             csrElementsTLV:(MTRTLVBytes)csrElementsTLV
-       attestationSignature:(NSData *)attestationSignature;
+- (instancetype)_initWithValidatedCSR:(MTRCSRDERBytes)csr
+                             csrNonce:(NSData *)csrNonce
+                       csrElementsTLV:(MTRTLVBytes)csrElementsTLV
+                 attestationSignature:(NSData *)attestationSignature;
 {
     if (self = [super init]) {
         _csr = csr;
@@ -61,18 +61,46 @@ NS_ASSUME_NONNULL_BEGIN
     return self;
 }
 
+- (instancetype)initWithCSR:(MTRCSRDERBytes)csr
+                   csrNonce:(NSData *)csrNonce
+             csrElementsTLV:(MTRTLVBytes)csrElementsTLV
+       attestationSignature:(NSData *)attestationSignature;
+{
+    chip::ByteSpan extractedCSR, extractedNonce;
+    VerifyOrReturnValue(ExtractCSRAndNonce(csrElementsTLV, extractedCSR, extractedNonce) == CHIP_NO_ERROR, nil);
+
+    if (!extractedCSR.data_equal(AsByteSpan(csr))) {
+        MTR_LOG_ERROR("Provided CSR does not match provided csrElementsTLV");
+        return nil;
+    }
+
+    if (!extractedNonce.data_equal(AsByteSpan(csrNonce))) {
+        MTR_LOG_ERROR("Provided CSR nonce does not match provided csrElementsTLV");
+        return nil;
+    }
+
+    return [self _initWithValidatedCSR:csr
+                              csrNonce:csrNonce
+                        csrElementsTLV:csrElementsTLV
+                  attestationSignature:attestationSignature];
+}
+
 - (instancetype)initWithCSRNonce:(NSData *)csrNonce
                   csrElementsTLV:(MTRTLVBytes)csrElementsTLV
             attestationSignature:(NSData *)attestationSignature
 {
-    chip::ByteSpan csr;
-    {
-        // We don't care about the nonce.
-        chip::ByteSpan ignoredNonce;
-        VerifyOrReturnValue(ExtractCSRAndNonce(csrElementsTLV, csr, ignoredNonce) == CHIP_NO_ERROR, nil);
+    chip::ByteSpan csr, extractedNonce;
+    VerifyOrReturnValue(ExtractCSRAndNonce(csrElementsTLV, csr, extractedNonce) == CHIP_NO_ERROR, nil);
+
+    if (!extractedNonce.data_equal(AsByteSpan(csrNonce))) {
+        MTR_LOG_ERROR("Provided CSR nonce does not match provided csrElementsTLV");
+        return nil;
     }
 
-    return [self initWithCSR:AsData(csr) csrNonce:csrNonce csrElementsTLV:csrElementsTLV attestationSignature:attestationSignature];
+    return [self _initWithValidatedCSR:AsData(csr)
+                              csrNonce:csrNonce
+                        csrElementsTLV:csrElementsTLV
+                  attestationSignature:attestationSignature];
 }
 
 - (instancetype)initWithCSRElementsTLV:(MTRTLVBytes)csrElementsTLV attestationSignature:(NSData *)attestationSignature
@@ -80,10 +108,10 @@ NS_ASSUME_NONNULL_BEGIN
     chip::ByteSpan csr, csrNonce;
     VerifyOrReturnValue(ExtractCSRAndNonce(csrElementsTLV, csr, csrNonce) == CHIP_NO_ERROR, nil);
 
-    return [self initWithCSR:AsData(csr)
-                    csrNonce:AsData(csrNonce)
-              csrElementsTLV:csrElementsTLV
-        attestationSignature:attestationSignature];
+    return [self _initWithValidatedCSR:AsData(csr)
+                              csrNonce:AsData(csrNonce)
+                        csrElementsTLV:csrElementsTLV
+                  attestationSignature:attestationSignature];
 }
 
 - (instancetype)initWithCSRResponseParams:(MTROperationalCredentialsClusterCSRResponseParams *)responseParams
