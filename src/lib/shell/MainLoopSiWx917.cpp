@@ -176,10 +176,10 @@ void ProcessShellLine(intptr_t args)
         }
     }
     MemoryFree(line);
-#ifdef BRD4325A
+
     // small delay for uart print
     vTaskDelay(10);
-#endif
+
     streamer_printf(streamer_get(), kShellPrompt);
 }
 
@@ -194,7 +194,8 @@ void Engine::RunMainLoop()
 
     while (true)
     {
-        char * line = static_cast<char *>(chip::Platform::MemoryAlloc(CHIP_SHELL_MAX_LINE_SIZE));        ReadLine(line, CHIP_SHELL_MAX_LINE_SIZE);
+        char * line = static_cast<char *>(chip::Platform::MemoryAlloc(CHIP_SHELL_MAX_LINE_SIZE));
+        ReadLine(line, CHIP_SHELL_MAX_LINE_SIZE);
 #if CONFIG_DEVICE_LAYER
         DeviceLayer::PlatformMgr().ScheduleWork(ProcessShellLine, reinterpret_cast<intptr_t>(line));
 #else
