@@ -264,7 +264,7 @@ Send commands to the lock-app. Here are some example commands:
 Set a new user "TST" with user index of 1 with a default pin of 123456
 
 ```
-./chip-tool doorlock set-user 0 1 TST 6452 1 0 0 1 1  --timedInteractionTimeoutMs 1000
+./chip-tool doorlock set-user 0 1 TST 6452 1 0 0 1 1 --timedInteractionTimeoutMs 1000
 ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
 ```
 Require a pin mode for lock operations:

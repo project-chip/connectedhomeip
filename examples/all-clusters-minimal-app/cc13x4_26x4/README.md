@@ -255,7 +255,7 @@ Send commands to the all-cluster-app. Here are some example commands:
 
 Basic
 ```
-./chip-tool basic read <attribute-id> <destination-id> <endpoint-id-ignored-for-group-commands> e.g.  ./chip-tool basic read product-id 1 1
+./chip-tool basic read <attribute-id> <destination-id> <endpoint-id-ignored-for-group-commands> e.g.  ./chip-tool basic read product-id 1 0
 ```
 
 Identify
