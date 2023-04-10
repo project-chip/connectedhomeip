@@ -491,14 +491,14 @@ static void wfx_rsi_do_join(void)
 void wfx_rsi_task(void * arg)
 {
     EventBits_t flags;
-    int32_t status = 0;
+    int32_t status;
     TickType_t last_dhcp_poll, now;
     struct netif * sta_netif;
     (void) arg;
-    uint32_t rsi_status = wfx_rsi_init();
-    if (rsi_status != RSI_SUCCESS)
+    status = wfx_rsi_init();
+    if (status != RSI_SUCCESS)
     {
-        SILABS_LOG("%s: error: wfx_rsi_init with status: %02x", __func__, rsi_status);
+        SILABS_LOG("%s: error: wfx_rsi_init with status: %02x", __func__, status);
         return;
     }
     wfx_lwip_start();

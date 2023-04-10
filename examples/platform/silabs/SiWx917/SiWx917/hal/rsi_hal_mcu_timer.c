@@ -23,7 +23,7 @@
 #ifdef RSI_WITH_OS
 /* FreeRTOS includes. */
 #include "FreeRTOS.h"
-#include "StackMacros.h"
+#include "stack_macros.h"
 #include "task.h"
 #include "timers.h"
 
