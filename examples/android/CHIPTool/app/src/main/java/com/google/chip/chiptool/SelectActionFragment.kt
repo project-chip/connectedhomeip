@@ -168,7 +168,7 @@ class SelectActionFragment : Fragment() {
    * Notifies listener of Scan QR code button click.
    */
   private fun handleScanQrCodeClicked() {
-    showFragment(BarcodeFragment.newInstance(), false)
+    showFragment(BarcodeFragment.newInstance())
   }
 
   /**
