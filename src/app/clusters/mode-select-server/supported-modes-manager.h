@@ -53,6 +53,8 @@ public:
          */
         inline pointer end() const { return mEnd; }
 
+        ModeOptionsProvider() : mBegin(nullptr), mEnd(nullptr) {}
+
         ModeOptionsProvider(const pointer aBegin, const pointer aEnd) : mBegin(aBegin), mEnd(aEnd) {}
 
         pointer mBegin;
