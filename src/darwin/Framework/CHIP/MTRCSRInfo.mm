@@ -69,7 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
     {
         // We don't care about the nonce.
         chip::ByteSpan ignoredNonce;
-        VerifyOrReturnValue(ExtracCSRAndNonce(csrElementsTLV, csr, ignoredNonce) == CHIP_NO_ERROR, nil);
+        VerifyOrReturnValue(ExtractCSRAndNonce(csrElementsTLV, csr, ignoredNonce) == CHIP_NO_ERROR, nil);
     }
 
     return [self initWithCSR:AsData(csr) csrNonce:csrNonce csrElementsTLV:csrElementsTLV attestationSignature:attestationSignature];
@@ -78,7 +78,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithCSRElementsTLV:(MTRTLVBytes)csrElementsTLV attestationSignature:(NSData *)attestationSignature
 {
     chip::ByteSpan csr, csrNonce;
-    VerifyOrReturnValue(ExtracCSRAndNonce(csrElementsTLV, csr, csrNonce) == CHIP_NO_ERROR, nil);
+    VerifyOrReturnValue(ExtractCSRAndNonce(csrElementsTLV, csr, csrNonce) == CHIP_NO_ERROR, nil);
 
     return [self initWithCSR:AsData(csr)
                     csrNonce:AsData(csrNonce)
