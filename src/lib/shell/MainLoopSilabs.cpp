@@ -49,11 +49,19 @@ void ReadLine(char * buffer, size_t max)
             break;
         }
 
-        chip::WaitForShellActivity();
+#ifdef BRD4325A
         if (streamer_read(streamer_get(), buffer + line_sz, 1) != 1)
         {
             continue;
         }
+#endif
+        chip::WaitForShellActivity();
+#ifndef BRD4325A
+        if (streamer_read(streamer_get(), buffer + line_sz, 1) != 1)
+        {
+            continue;
+        }
+#endif
 
         // Process character we just read.
         switch (buffer[line_sz])
@@ -176,6 +184,10 @@ void ProcessShellLine(intptr_t args)
         }
     }
     MemoryFree(line);
+#ifdef BRD4325A
+    // small delay for uart print
+    vTaskDelay(1);
+#endif
     streamer_printf(streamer_get(), kShellPrompt);
 }
 
