@@ -239,7 +239,7 @@ class SelectActionFragment : Fragment() {
    */
   private fun handleProvisionWiFiCredentialsClicked() {
     getCallback()?.SetNetworkType(ProvisionNetworkType.WIFI)
-    showFragment(BarcodeFragment.newInstance(), false)
+    showFragment(BarcodeFragment.newInstance())
   }
 
   /**
@@ -247,14 +247,14 @@ class SelectActionFragment : Fragment() {
    */
   private fun handleProvisionThreadCredentialsClicked() {
     getCallback()?.SetNetworkType(ProvisionNetworkType.THREAD)
-    showFragment(BarcodeFragment.newInstance(), false)
+    showFragment(BarcodeFragment.newInstance())
   }
 
   /**
    * Notifies listener of provision-custom-flow button click.
    */
   private fun handleProvisionCustomFlowClicked() {
-    showFragment(BarcodeFragment.newInstance(), false)
+    showFragment(BarcodeFragment.newInstance())
   }
 
   companion object {
