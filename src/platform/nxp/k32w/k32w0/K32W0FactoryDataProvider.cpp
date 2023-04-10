@@ -68,6 +68,7 @@ extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism()
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint16_t backupLength = 0;
 
+#if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
     // Check if PDM id related to factory data backup exists.
     // If it does, it means an external event (such as a power loss)
     // interrupted the factory data update process and the section
@@ -88,6 +89,7 @@ extern "C" WEAK CHIP_ERROR FactoryDataDefaultRestoreMechanism()
             ChipLogProgress(DeviceLayer, "Factory data was restored successfully");
         }
     }
+#endif
 
     return error;
 }
@@ -159,6 +161,12 @@ CHIP_ERROR K32W0FactoryDataProvider::Init()
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Factory data init failed with: %s", ErrorStr(error));
+    }
+    else
+    {
+#if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
+        PDM_vDeleteDataRecord(kNvmId_FactoryDataBackup);
+#endif
     }
 
     return error;

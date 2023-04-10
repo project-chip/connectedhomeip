@@ -145,7 +145,7 @@ static void CheckOtaEntry()
 		if(ota_entries.ota_state == otaApplied)
 		{
 			K32W_LOG("OTA successfully applied");
-#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR
             // If this point is reached, it means OTA_CommitCustomEntries was successfully called.
             // Delete the factory data backup to stop doing a restore when the factory data provider
             // is initialized. This ensures that both the factory data and app were updated, otherwise
