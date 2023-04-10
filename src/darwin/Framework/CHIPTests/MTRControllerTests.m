@@ -29,6 +29,22 @@
 
 static uint16_t kTestVendorId = 0xFFF1u;
 
+static void CheckStoredOpcertCats(id<MTRStorage> storage, uint8_t fabricIndex, NSSet<NSNumber *> * cats)
+{
+    __auto_type * certData = [storage storageDataForKey:[NSString stringWithFormat:@"f/%x/n", fabricIndex]];
+    XCTAssertNotNil(certData);
+
+    __auto_type * info = [[MTRCertificateInfo alloc] initWithTLVBytes:certData];
+    XCTAssertNotNil(info);
+
+    __auto_type * storedCATs = info.subject.caseAuthenticatedTags;
+    if (cats == nil) {
+        XCTAssertTrue(storedCATs.count == 0);
+    } else {
+        XCTAssertEqualObjects(storedCATs, cats);
+    }
+}
+
 @interface MTRControllerTests : XCTestCase
 
 @end
@@ -1354,6 +1370,179 @@ static uint16_t kTestVendorId = 0xFFF1u;
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
+
+    [factory stopControllerFactory];
+    XCTAssertFalse([factory isRunning]);
+}
+
+- (void)testControllerCATs
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * storage = [[MTRTestStorage alloc] init];
+    __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
+    XCTAssertTrue([factory startControllerFactory:factoryParams error:nil]);
+    XCTAssertTrue([factory isRunning]);
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:rootKeys.ipk fabricID:@(1) nocSigner:rootKeys];
+    XCTAssertNotNil(params);
+
+    params.vendorID = @(kTestVendorId);
+
+    //
+    // Trying to bring up a controller with too-long CATs should fail.
+    //
+    __auto_type * tooLongCATs = [NSSet setWithObjects:@(0x10001), @(0x20001), @(0x30001), @(0x40001), nil];
+    params.caseAuthenticatedTags = tooLongCATs;
+    MTRDeviceController * controller = [factory createControllerOnExistingFabric:params error:nil];
+    XCTAssertNil(controller);
+
+    //
+    // Trying to bring up a controller that has an invalid CAT value should
+    // fail.
+    //
+    __auto_type * invalidCATs = [NSSet setWithObjects:@(0x10001), @(0x20001), @(0x0), nil];
+    params.caseAuthenticatedTags = invalidCATs;
+    controller = [factory createControllerOnExistingFabric:params error:nil];
+    XCTAssertNil(controller);
+
+    //
+    // Bring up a controller with valid CATs
+    //
+    __auto_type * validCATs = [NSSet setWithObjects:@(0x10001), @(0x20007), @(0x30005), nil];
+    params.nodeID = @(17);
+    params.caseAuthenticatedTags = validCATs;
+    controller = [factory createControllerOnNewFabric:params error:nil];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    // Check that the resulting certificate has the right CATs and node ID
+    CheckStoredOpcertCats(storage, 1, validCATs);
+    XCTAssertEqualObjects([controller controllerNodeID], @(17));
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    //
+    // Trying to bring up the same fabric without specifying any node id
+    // should not allow trying to specify the same CATs.
+    //
+    params.nodeID = nil;
+    params.caseAuthenticatedTags = validCATs;
+    controller = [factory createControllerOnExistingFabric:params error:nil];
+    XCTAssertNil(controller);
+
+    //
+    // Trying to bring up the same fabric without specifying any node id
+    // should not allow trying to specify different CATs.
+    //
+    __auto_type * newCATs = [NSSet setWithObjects:@(0x20005), @(0x70009), @(0x80004), nil];
+    XCTAssertNotEqualObjects(validCATs, newCATs);
+    params.nodeID = nil;
+    params.caseAuthenticatedTags = newCATs;
+    controller = [factory createControllerOnExistingFabric:params error:nil];
+    XCTAssertNil(controller);
+
+    //
+    // Trying to bring up the same fabric without specifying any node id
+    // should end up using the existing CATs.
+    //
+    params.nodeID = nil;
+    params.caseAuthenticatedTags = nil;
+    controller = [factory createControllerOnExistingFabric:params error:nil];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    // Check that the resulting certificate has the right CATs and node ID
+    CheckStoredOpcertCats(storage, 1, validCATs);
+    XCTAssertEqualObjects([controller controllerNodeID], @(17));
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    //
+    // Trying to bring up the same fabric without specifying any node id
+    // should end up using the existing CATs, even if a new
+    // operational key is specified.
+    //
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+    params.nodeID = nil;
+    params.operationalKeypair = operationalKeys;
+    params.caseAuthenticatedTags = nil;
+
+    controller = [factory createControllerOnExistingFabric:params error:nil];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    // Check that the resulting certificate has the right CATs and node ID
+    CheckStoredOpcertCats(storage, 1, validCATs);
+    XCTAssertEqualObjects([controller controllerNodeID], @(17));
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    //
+    // Trying to bring up the same fabric while specifying the node ID, even if
+    // it's the same one, should pick up the new CATs.
+    //
+    params.nodeID = @(17);
+    params.operationalKeypair = operationalKeys;
+    params.caseAuthenticatedTags = newCATs;
+
+    controller = [factory createControllerOnExistingFabric:params error:nil];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    // Check that the resulting certificate has the right CATs and node ID
+    CheckStoredOpcertCats(storage, 1, newCATs);
+    XCTAssertEqualObjects([controller controllerNodeID], @(17));
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    //
+    // Trying to bring up the same fabric while specifying the node ID should
+    // let us remove CATs altogether.
+    //
+    params.nodeID = @(17);
+    params.operationalKeypair = operationalKeys;
+    params.caseAuthenticatedTags = nil;
+
+    controller = [factory createControllerOnExistingFabric:params error:nil];
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    // Check that the resulting certificate has the right CATs and node ID
+    CheckStoredOpcertCats(storage, 1, nil);
+    XCTAssertEqualObjects([controller controllerNodeID], @(17));
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+
+    //
+    // Trying to bring up the same fabric with too-long CATs should fail, if we
+    // are taking the provided CATs into account.
+    //
+    params.nodeID = @(17);
+    params.operationalKeypair = operationalKeys;
+    params.caseAuthenticatedTags = tooLongCATs;
+    controller = [factory createControllerOnExistingFabric:params error:nil];
+    XCTAssertNil(controller);
+
+    //
+    // Trying to bring up the same fabric with invalid CATs should fail, if we
+    // are taking the provided CATs into account.
+    //
+    params.nodeID = @(17);
+    params.operationalKeypair = operationalKeys;
+    params.caseAuthenticatedTags = invalidCATs;
+    controller = [factory createControllerOnExistingFabric:params error:nil];
+    XCTAssertNil(controller);
 
     [factory stopControllerFactory];
     XCTAssertFalse([factory isRunning]);

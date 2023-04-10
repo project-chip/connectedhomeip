@@ -91,9 +91,9 @@ NS_ASSUME_NONNULL_BEGIN
  * fabricID must be a valid Matter fabric id.
  *
  * caseAuthenticatedTags may be nil to indicate no CASE Authenticated Tags
- * should be used.  If caseAuthenticatedTags is not nil, it must have length at
- * most 3 and the values in the array are expected to be 32-bit unsigned Case
- * Authenticated Tag values.
+ * should be used.  If caseAuthenticatedTags is not nil, it must contain at most
+ * 3 numbers, which are expected to be 32-bit unsigned Case Authenticated Tag
+ * values.
  *
  * On failure returns nil and if "error" is not null sets *error to the relevant
  * error.
