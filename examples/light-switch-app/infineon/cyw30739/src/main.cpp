@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2022 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +21,7 @@
 #include <ButtonHandler.h>
 #include <ChipShellCollection.h>
 #include <DeviceInfoProviderImpl.h>
+#include <LightSwitch.h>
 #include <LightingManager.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <OTAConfig.h>
@@ -47,16 +47,17 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Shell;
 
+constexpr chip::EndpointId kLightDimmerSwitchEndpointId = 1;
+
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 static FactoryDataProvider sFactoryDataProvider;
+static bool sIsThreadProvisioned    = false;
+static bool sIsThreadEnabled        = false;
+static bool sIsThreadBLEAdvertising = false;
+static bool sHaveBLEConnections     = false;
 
 static void InitApp(intptr_t args);
-static void LightManagerCallback(LightingManager::Actor_t actor, LightingManager::Action_t action, uint8_t value);
-
-static wiced_led_config_t chip_lighting_led_config = {
-    .led    = PLATFORM_LED_1,
-    .bright = 50,
-};
+static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent *, intptr_t);
 
 // NOTE! This key is for test/certification only and should not be available in production devices!
 uint8_t sTestEventTriggerEnableKey[chip::TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
@@ -103,7 +104,7 @@ APPLICATION_START()
     CHIP_ERROR err;
     wiced_result_t result;
 
-    printf("\nChipLighting App starting\n");
+    printf("\nChip Light-Switch App starting\n");
 
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
@@ -120,9 +121,7 @@ APPLICATION_START()
     }
 
     /* Init. LED Manager. */
-    result = wiced_led_manager_init(&chip_lighting_led_config);
-    if (result != WICED_SUCCESS)
-        printf("wiced_led_manager_init fail (%d)\n", result);
+    LightMgr().Init();
 
     printf("Initializing CHIP\n");
     err = PlatformMgr().InitChipStack();
@@ -153,6 +152,8 @@ APPLICATION_START()
     {
         printf("ERROR SetThreadDeviceType %ld\n", err.AsInteger());
     }
+
+    PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 
     printf("Starting event loop task\n");
     err = PlatformMgr().StartEventLoopTask();
@@ -205,31 +206,118 @@ void InitApp(intptr_t args)
 
     SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
 
-    LightMgr().Init();
-    LightMgr().SetCallbacks(LightManagerCallback, nullptr);
-    LightMgr().WriteClusterLevel(254);
+    LightSwitch::GetInstance().Init(kLightDimmerSwitchEndpointId);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     OTAConfig::Init();
 #endif
 }
 
-void LightManagerCallback(LightingManager::Actor_t actor, LightingManager::Action_t action, uint8_t level)
+void UpdateStatusLED()
 {
-    if (action == LightingManager::ON_ACTION)
+    LightMgr().Set(false, PLATFORM_LED_2);
+    // Status LED indicates:
+    // - blinking 1 s - advertising, ready to commission
+    // - blinking 200 ms - commissioning in progress
+    // - constant lightning means commissioned with Thread network
+    if (sIsThreadBLEAdvertising && !sHaveBLEConnections)
     {
-        printf("Turning light ON\n");
-        wiced_led_manager_enable_led(PLATFORM_LED_1);
+        LightMgr().Blink(PLATFORM_LED_2, 50, 950);
     }
-    else if (action == LightingManager::OFF_ACTION)
+    else if (sIsThreadProvisioned && sIsThreadEnabled)
     {
-        printf("Turning light OFF\n");
-        wiced_led_manager_disable_led(PLATFORM_LED_1);
+        LightMgr().Set(true, PLATFORM_LED_2);
     }
-    else if (action == LightingManager::LEVEL_ACTION)
+    else if (sHaveBLEConnections)
     {
-        printf("Set light level = %d\n", level);
-        chip_lighting_led_config.bright = (uint16_t) level * 100 / 0xfe;
-        wiced_led_manager_reconfig_led(&chip_lighting_led_config);
+        LightMgr().Blink(PLATFORM_LED_2, 50, 150);
     }
+    else
+    {
+        /* back to default status */
+        LightMgr().Set(false, PLATFORM_LED_2);
+    }
+}
+
+void ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t arg)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_LOCAL_LEDSTATUS_DEBUG
+    switch (aEvent->Type)
+    {
+    case DeviceEventType::kCHIPoBLEAdvertisingChange:
+        sIsThreadBLEAdvertising = true;
+        sHaveBLEConnections     = ConnectivityMgr().NumBLEConnections() != 0;
+        UpdateStatusLED();
+        break;
+    case DeviceEventType::kThreadStateChange:
+        sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+        sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+        UpdateStatusLED();
+        break;
+    case DeviceEventType::kThreadConnectivityChange:
+        if (aEvent->ThreadConnectivityChange.Result == kConnectivity_Established)
+            sHaveBLEConnections = true;
+        break;
+    default:
+        if ((ConnectivityMgr().NumBLEConnections() == 0) && (!sIsThreadProvisioned || !sIsThreadEnabled))
+        {
+            printf("[Event] Commissioning with a Thread network has not been done. An error occurred\n");
+            sIsThreadBLEAdvertising = false;
+            sHaveBLEConnections     = false;
+            UpdateStatusLED();
+        }
+        break;
+    }
+#endif /* CHIP_DEVICE_CONFIG_ENABLE_LOCAL_LEDSTATUS_DEBUG */
+}
+
+CHIP_ERROR StartBLEAdvertisingHandler()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    /// Don't allow on starting Matter service BLE advertising after Thread provisioning.
+    if (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0)
+    {
+        printf("Matter service BLE advertising not started - device is already commissioned\n");
+        return err;
+    }
+
+    if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+    {
+        printf("BLE advertising is already enabled\n");
+        return err;
+    }
+    else
+    {
+        printf("Start BLE advertising...\n");
+        err = ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+        if (err != CHIP_NO_ERROR)
+        {
+            printf("Enable BLE advertising failed\n");
+            return err;
+        }
+    }
+
+    printf("Enabling BLE advertising...\n");
+    /* Check Commissioning Window*/
+    if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
+    {
+        printf("OpenBasicCommissioningWindow() failed\n");
+        err = CHIP_ERROR_UNEXPECTED_EVENT;
+    }
+
+    return err;
+}
+
+CHIP_ERROR StopBLEAdvertisingHandler()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    printf("Stop BLE advertising...\n");
+    err = ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+    if (err != CHIP_NO_ERROR)
+    {
+        printf("Disable BLE advertising failed\n");
+        return err;
+    }
+    return err;
 }

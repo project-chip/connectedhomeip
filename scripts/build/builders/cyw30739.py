@@ -22,6 +22,7 @@ class Cyw30739App(Enum):
     LIGHT = auto()
     LOCK = auto()
     OTA_REQUESTOR = auto()
+    SWITCH = auto()
 
     def ExampleName(self):
         if self == Cyw30739App.LIGHT:
@@ -30,6 +31,8 @@ class Cyw30739App(Enum):
             return "lock-app"
         elif self == Cyw30739App.OTA_REQUESTOR:
             return "ota-requestor-app"
+        elif self == Cyw30739App.SWITCH:
+            return "light-switch-app"
         else:
             raise Exception("Unknown app type: %r" % self)
 
@@ -40,6 +43,8 @@ class Cyw30739App(Enum):
             return "chip-cyw30739-lock-example"
         elif self == Cyw30739App.OTA_REQUESTOR:
             return "chip-cyw30739-ota-requestor-example"
+        elif self == Cyw30739App.SWITCH:
+            return "chip-cyw30739-light-switch-example"
         else:
             raise Exception("Unknown app type: %r" % self)
 
