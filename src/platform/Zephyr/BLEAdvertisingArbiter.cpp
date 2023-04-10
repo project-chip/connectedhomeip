@@ -88,7 +88,6 @@ CHIP_ERROR InsertRequest(Request & request)
 
     if (prev == nullptr)
     {
-        NotifyAdvertisingStopped(sys_slist_peek_head(&sRequests));
         sys_slist_prepend(&sRequests, &request);
     }
     else
@@ -108,6 +107,13 @@ CHIP_ERROR InsertRequest(Request & request)
 void CancelRequest(Request & request)
 {
     const bool isTopPriority = (sys_slist_peek_head(&sRequests) == &request);
+
+    // If cancelled request was top-priority, stop the advertising.
+    if (isTopPriority)
+    {
+        NotifyAdvertisingStopped(sys_slist_peek_head(&sRequests));
+    }
+
     VerifyOrReturn(sys_slist_find_and_remove(&sRequests, &request));
 
     // If cancelled request was top-priority, restart the advertising.
