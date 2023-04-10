@@ -25,7 +25,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
-static CHIP_ERROR ExtracCSRAndNonce(MTRTLVBytes csrElementsTLV, chip::ByteSpan & csr, chip::ByteSpan & nonce)
+static CHIP_ERROR ExtractCSRAndNonce(MTRTLVBytes csrElementsTLV, chip::ByteSpan & csr, chip::ByteSpan & nonce)
 {
     // We don't care about vendor_reserved*.
     chip::ByteSpan vendor_reserved1, vendor_reserved2, vendor_reserved3;
