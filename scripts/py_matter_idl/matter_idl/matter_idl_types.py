@@ -192,6 +192,7 @@ class Command:
     output_param: str
     qualities: CommandQuality = CommandQuality.NONE
     invokeacl: AccessPrivilege = AccessPrivilege.OPERATE
+    description: Optional[str] = None
 
     @property
     def is_timed_invoke(self):
@@ -209,6 +210,7 @@ class Cluster:
     attributes: List[Attribute] = field(default_factory=list)
     structs: List[Struct] = field(default_factory=list)
     commands: List[Command] = field(default_factory=list)
+    description: Optional[str] = None
 
     # Parsing meta data missing only when skip meta data is requested
     parse_meta: Optional[ParseMetaData] = field(default=None)
