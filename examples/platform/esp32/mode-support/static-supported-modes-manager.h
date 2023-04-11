@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,14 +32,11 @@ private:
     using ModeOptionStructType = Structs::ModeOptionStruct::Type;
     using SemanticTag          = Structs::SemanticTagStruct::Type;
 
-    static ModeOptionStructType * modeOptionStructList;
-    static SemanticTag * semanticTags;
-
     static ModeOptionsProvider epModeOptionsProviderList[FIXED_ENDPOINT_COUNT];
 
     void InitEndpointArray();
 
-    void FreeSupportedModes() const;
+    void FreeSupportedModes(EndpointId endpointId) const;
 
 public:
     static const StaticSupportedModesManager instance;
@@ -49,15 +46,15 @@ public:
     Protocols::InteractionModel::Status getModeOptionByMode(EndpointId endpointId, uint8_t mode,
                                                             const ModeOptionStructType ** dataPtr) const override;
 
-    void CleanUp() const;
+    void CleanUp(EndpointId endpointId) const;
 
     StaticSupportedModesManager() { InitEndpointArray(); }
 
     ~StaticSupportedModesManager()
     {
-        if (modeOptionStructList != nullptr)
+        for (int i = 0; i < FIXED_ENDPOINT_COUNT; i++)
         {
-            FreeSupportedModes();
+            FreeSupportedModes(i);
         }
     }
 
