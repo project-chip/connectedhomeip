@@ -931,7 +931,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FELoad(const uint8_t * in, size_t in_l
 
 CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEWrite(const void * fe, uint8_t * out, size_t out_len)
 {
-    (void)out_len;
+    (void) out_len;
     uECC_vli_nativeToBytes(out, NUM_ECC_BYTES, (const unsigned int *) fe);
 
     return CHIP_NO_ERROR;
