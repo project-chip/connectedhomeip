@@ -209,7 +209,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
     uint8_t max_scenes_global;
     SceneStorageId scene_map[kMaxScenesPerFabric];
 
-    FabricSceneData(FabricIndex fabric = kUndefinedFabricIndex, uint8_t maxScenePerFabric = kMaxScenesPerFabric,
+    FabricSceneData(FabricIndex fabric = kUndefinedFabricIndex, uint8_t maxScenesPerFabric = kMaxScenesPerFabric,
                     uint8_t maxScenesGlobal = kMaxScenesGlobal) :
         fabric_index(fabric),
         max_scenes_per_fabric(maxScenePerFabric), max_scenes_global(maxScenesGlobal)
@@ -260,13 +260,13 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override { return CHIP_NO_ERROR; }
 
     /// @brief This Deserialize method checks that the recovered scenes from the deserialization fit in the current max and if
-    /// there are too many scenes in nvm, it deletes them. The method sets the deleted_scene output parameter to true if scenes were
+    /// there are too many scenes in nvm, it deletes them. The method sets the deleted_scenes output parameter to true if scenes were
     /// deleted so that the load function can know it needs to save the Fabric scene data to update the scene_count and the scene
     /// map in stored memory.
     /// @param reade [in] TLV reader, must be big enough to hold the scene map size
-    /// @param storage [in] Persistent Storage Delegate, required to delete scenes if the number of scene in storage is greater than
+    /// @param storage [in] Persistent Storage Delegate, required to delete scenes if the number of scenes in storage is greater than
     /// the maximum allowed
-    /// @param deleted_scenes [out] bool letting the caller (in this case the load method) know wether or not it was necessary to
+    /// @param deleted_scenes [out] bool letting the caller (in this case the load method) know whether or not it was necessary to
     /// delete scenes from the memory
     /// @return CHIP_NO_ERROR on success, specific CHIP_ERROR otherwise
     CHIP_ERROR DeserializeAdjust(TLV::TLVReader & reader, PersistentStorageDelegate * storage, bool & deleted_scenes)
