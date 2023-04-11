@@ -228,8 +228,7 @@ void AmebaWiFiDriver::OnScanWiFiNetworkDone()
         return;
     }
 
-    rtw_scan_result_t * ScanResult = (rtw_scan_result *) pvPortMalloc(NumAP * sizeof(rtw_scan_result));
-    matter_get_scan_results(ScanResult, NumAP);
+    rtw_scan_result_t * ScanResult = matter_get_scan_results();
 
     if (ScanResult)
     {
@@ -258,7 +257,6 @@ void AmebaWiFiDriver::OnScanWiFiNetworkDone()
             mpScanCallback = nullptr;
         }
     }
-    vPortFree(ScanResult);
 }
 
 CHIP_ERROR GetConfiguredNetwork(Network & network)
