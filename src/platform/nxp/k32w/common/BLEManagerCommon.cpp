@@ -975,11 +975,6 @@ void BLEManagerCommon::DoBleProcessing(void)
     }
 }
 
-void BLEManagerCommon::DoBleProcessing(intptr_t arg)
-{
-    sImplInstance->DoBleProcessing();
-}
-
 void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
 {
     uint8_t device_id_loc = msg->data.u8;

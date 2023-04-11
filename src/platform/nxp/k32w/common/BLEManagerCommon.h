@@ -247,7 +247,6 @@ protected:
     static void blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionEvent_t * pConnectionEvent);
     static void blekw_start_connection_timeout(void);
     static void blekw_stop_connection_timeout(void);
-    static void DoBleProcessing(intptr_t arg);
 
 public:
     virtual CHIP_ERROR InitHostController(ble_generic_cb_fp cb_fp) = 0;
