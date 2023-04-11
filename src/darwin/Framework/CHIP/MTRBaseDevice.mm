@@ -752,9 +752,10 @@ public:
     using OnDoneCallbackType = std::function<void(BufferedReadClientCallback * callback)>;
     using OnSubscriptionEstablishedCallbackType = std::function<void()>;
 
-    BufferedReadClientCallback(app::AttributePathParams *aAttributePathParamsList, size_t aAttributePathParamsSize,
-        app::EventPathParams *aEventPathParamsList, size_t aEventPathParamsSize, OnSuccessAttributeCallbackType aOnAttributeSuccess,
-        OnSuccessEventCallbackType aOnEventSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
+    BufferedReadClientCallback(app::AttributePathParams * aAttributePathParamsList, size_t aAttributePathParamsSize,
+        app::EventPathParams * aEventPathParamsList, size_t aEventPathParamsSize,
+        OnSuccessAttributeCallbackType aOnAttributeSuccess, OnSuccessEventCallbackType aOnEventSuccess,
+        OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
         OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr)
         : mAttributePathParamsList(aAttributePathParamsList)
         , mAttributePathParamsSize(aAttributePathParamsSize)
@@ -788,7 +789,7 @@ private:
         DecodableValueType value;
 
         VerifyOrExit(mOnAttributeSuccess != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-        
+
         VerifyOrExit(mAttributePathParamsList != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         //
@@ -821,7 +822,7 @@ private:
         DecodableValueType value;
 
         VerifyOrExit(mOnEventSuccess != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-        
+
         VerifyOrExit(mEventPathParamsList != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         VerifyOrExit(std::find_if(mEventPathParamsList, mEventPathParamsList + mEventPathParamsSize,
@@ -912,7 +913,8 @@ private:
                 }
             };
 
-            app::AttributePathParams *attributePath = static_cast<app::AttributePathParams *>(Platform::MemoryCalloc(1, sizeof(AttributePathParams)));
+            app::AttributePathParams * attributePath
+                = static_cast<app::AttributePathParams *>(Platform::MemoryCalloc(1, sizeof(AttributePathParams)));
             if (endpointID) {
                 attributePath->mEndpointId = static_cast<chip::EndpointId>([endpointID unsignedShortValue]);
             }
@@ -1031,7 +1033,8 @@ private:
 
             if (attributePaths != nil) {
                 size_t count = 0;
-                attributePathParamsList = static_cast<AttributePathParams *>(Platform::MemoryCalloc([attributePaths count], sizeof(AttributePathParams)));
+                attributePathParamsList = static_cast<AttributePathParams *>(
+                    Platform::MemoryCalloc([attributePaths count], sizeof(AttributePathParams)));
                 VerifyOrReturnError(attributePathParamsList != nullptr, CHIP_ERROR_NO_MEMORY);
                 for (MTRAttributeRequestPath * attributePath in attributePaths) {
                     [attributePath convertToAttributePathParams:attributePathParamsList[count++]];
@@ -1040,7 +1043,8 @@ private:
 
             if (eventPaths != nil) {
                 size_t count = 0;
-                eventPathParamsList = static_cast<EventPathParams *>(Platform::MemoryCalloc([eventPaths count], sizeof(EventPathParams)));
+                eventPathParamsList
+                    = static_cast<EventPathParams *>(Platform::MemoryCalloc([eventPaths count], sizeof(EventPathParams)));
                 VerifyOrReturnError(eventPathParamsList != nullptr, CHIP_ERROR_NO_MEMORY);
                 for (MTREventRequestPath * eventPath in eventPaths) {
                     [eventPath convertToEventPathParams:eventPathParamsList[count++]];
@@ -1057,8 +1061,8 @@ private:
             readParams.mpEventPathParamsList = eventPathParamsList;
             readParams.mEventPathParamsListSize = [eventPaths count];
 
-            auto onDone = [resultArray, interactionStatus, bridge, successCb, failureCb, attributePathParamsList, eventPathParamsList](
-                              BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
+            auto onDone = [resultArray, interactionStatus, bridge, successCb, failureCb, attributePathParamsList,
+                              eventPathParamsList](BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
                 if (*interactionStatus != CHIP_NO_ERROR) {
                     // Failure
                     failureCb(bridge, *interactionStatus);
@@ -1076,7 +1080,8 @@ private:
             };
 
             auto callback = chip::Platform::MakeUnique<BufferedReadClientCallback<MTRDataValueDictionaryDecodableType>>(
-                attributePathParamsList, readParams.mAttributePathParamsListSize, eventPathParamsList, readParams.mEventPathParamsListSize, onAttributeSuccessCb, onEventSuccessCb, onFailureCb, onDone, nullptr);
+                attributePathParamsList, readParams.mAttributePathParamsListSize, eventPathParamsList,
+                readParams.mEventPathParamsListSize, onAttributeSuccessCb, onEventSuccessCb, onFailureCb, onDone, nullptr);
             VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
             auto readClient = chip::Platform::MakeUnique<app::ReadClient>(
@@ -1196,16 +1201,16 @@ private:
 
                    if (attributePaths != nil) {
                        container.pathParamsSize = 0;
-                       container.pathParams = static_cast<AttributePathParams *>(Platform::MemoryCalloc([attributePaths count], sizeof(AttributePathParams)));
+                       container.pathParams = static_cast<AttributePathParams *>(
+                           Platform::MemoryCalloc([attributePaths count], sizeof(AttributePathParams)));
                        for (MTRAttributeRequestPath * attributePath in attributePaths) {
                            [attributePath convertToAttributePathParams:container.pathParams[container.pathParamsSize++]];
                        }
-                       
-
                    }
                    if (eventPaths != nil) {
                        container.eventPathParamsSize = 0;
-                       container.eventPathParams = static_cast<EventPathParams *>(Platform::MemoryCalloc([eventPaths count], sizeof(EventPathParams)));
+                       container.eventPathParams
+                           = static_cast<EventPathParams *>(Platform::MemoryCalloc([eventPaths count], sizeof(EventPathParams)));
                        for (MTREventRequestPath * eventPath in eventPaths) {
                            [eventPath convertToEventPathParams:container.eventPathParams[container.eventPathParamsSize++]];
                        }
@@ -1229,8 +1234,8 @@ private:
                    };
 
                    auto callback = chip::Platform::MakeUnique<BufferedReadClientCallback<MTRDataValueDictionaryDecodableType>>(
-                       container.pathParams, container.pathParamsSize, container.eventPathParams, container.eventPathParamsSize, onAttributeReportCb, onEventReportCb, onFailureCb, onDone,
-                       onEstablishedCb);
+                       container.pathParams, container.pathParamsSize, container.eventPathParams, container.eventPathParamsSize,
+                       onAttributeReportCb, onEventReportCb, onFailureCb, onDone, onEstablishedCb);
 
                    auto readClient = Platform::New<app::ReadClient>(
                        engine, exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
@@ -1541,7 +1546,8 @@ exit:
 
                    MTRReadClientContainer * container = [[MTRReadClientContainer alloc] init];
                    container.deviceID = self.nodeID;
-                   container.pathParams = static_cast<app::AttributePathParams *>(Platform::MemoryCalloc(1, sizeof(app::AttributePathParams)));
+                   container.pathParams
+                       = static_cast<app::AttributePathParams *>(Platform::MemoryCalloc(1, sizeof(app::AttributePathParams)));
                    container.pathParamsSize = 1;
                    if (endpointID) {
                        container.pathParams->mEndpointId = static_cast<chip::EndpointId>([endpointID unsignedShortValue]);
@@ -1569,7 +1575,8 @@ exit:
                    };
 
                    auto callback = chip::Platform::MakeUnique<BufferedReadClientCallback<MTRDataValueDictionaryDecodableType>>(
-                       container.pathParams, container.pathParamsSize, nullptr, 0, onReportCb, nullptr, onFailureCb, onDone, onEstablishedCb);
+                       container.pathParams, container.pathParamsSize, nullptr, 0, onReportCb, nullptr, onFailureCb, onDone,
+                       onEstablishedCb);
 
                    auto readClient = Platform::New<app::ReadClient>(
                        engine, exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
@@ -1838,7 +1845,8 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                 }
             };
 
-            app::EventPathParams *eventPath = static_cast<app::EventPathParams *>(Platform::MemoryCalloc(1, sizeof(app::EventPathParams)));
+            app::EventPathParams * eventPath
+                = static_cast<app::EventPathParams *>(Platform::MemoryCalloc(1, sizeof(app::EventPathParams)));
             if (endpointID) {
                 eventPath->mEndpointId = static_cast<chip::EndpointId>([endpointID unsignedShortValue]);
             }
@@ -1966,7 +1974,8 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
                    MTRReadClientContainer * container = [[MTRReadClientContainer alloc] init];
                    container.deviceID = self.nodeID;
-                   container.eventPathParams = static_cast<app::EventPathParams *>(Platform::MemoryCalloc(1, sizeof(app::EventPathParams)));
+                   container.eventPathParams
+                       = static_cast<app::EventPathParams *>(Platform::MemoryCalloc(1, sizeof(app::EventPathParams)));
                    container.eventPathParamsSize = 1;
                    if (endpointID) {
                        container.eventPathParams->mEndpointId = static_cast<chip::EndpointId>([endpointID unsignedShortValue]);
@@ -2193,7 +2202,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
     params.mEndpointId = kInvalidEndpointId;
     params.mClusterId = kInvalidClusterId;
     params.mAttributeId = kInvalidAttributeId;
-    
+
     if (_endpoint) {
         params.mEndpointId = static_cast<chip::EndpointId>([_endpoint unsignedShortValue]);
     }
@@ -2263,7 +2272,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
     params.mEndpointId = kInvalidEndpointId;
     params.mClusterId = kInvalidClusterId;
     params.mEventId = kInvalidEventId;
-    
+
     if (_endpoint) {
         params.mEndpointId = static_cast<chip::EndpointId>([_endpoint unsignedShortValue]);
     }
