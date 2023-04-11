@@ -484,7 +484,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
 
         err = Deserialize(reader, storage, deleted_scenes_count);
 
-        // If DeserializeAdjust sets the "deleted_scenes" variable, the table in flash memory held to many scenes (Can happend
+        // If Deserialize sets the "deleted_scenes" variable, the table in flash memory held too many scenes (can happen
         // if max_scenes_per_fabric was reduced during an OTA) and was adjusted during deserailizing . The fabric data must then
         // be updated
         if (deleted_scenes_count)
