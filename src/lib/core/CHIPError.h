@@ -1362,7 +1362,14 @@ using CHIP_ERROR = ::chip::ChipError;
 
 // AVAILABLE: 0xa2
 // AVAILABLE: 0xa3
-// AVAILABLE: 0xa4
+
+/**
+ * @def CHIP_ERROR_IN_PROGRESS
+ *
+ * @brief
+ *   The operation is still in progress
+ */
+#define CHIP_ERROR_IN_PROGRESS                                 CHIP_CORE_ERROR(0xa4)
 
 /**
  *  @def CHIP_ERROR_ACCESS_DENIED
