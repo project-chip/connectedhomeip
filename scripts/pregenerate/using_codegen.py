@@ -44,14 +44,14 @@ class CodegenTarget:
             output_root, self.idl.pregen_subdir, self.generator)
 
         logging.info(
-            f"Generating: {self.generator}:{self.idl.relative_path} into {output_dir}")
+            f"Generating: {self.generator}:{self.idl.full_path} into {output_dir}")
 
         cmd = [
             CODEGEN_PY_PATH,
             '--log-level', 'fatal',
             '--generator', self.generator,
             '--output-dir', output_dir,
-            os.path.join(self.sdk_root, self.idl.relative_path)
+            self.idl.full_path
         ]
 
         logging.debug(f"Executing {cmd}")
