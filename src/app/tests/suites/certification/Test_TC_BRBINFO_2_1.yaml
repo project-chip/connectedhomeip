@@ -38,7 +38,7 @@ tests:
     - label: "TH writes VendorName as sample"
       PICS: BRBINFO.S.A0001
       verification: |
-          ./chip-tool bridgeddevicebasicinformation write-by-id 1 ""vendor-name sample"" 1 3
+          ./chip-tool bridgeddevicebasicinformation write-by-id 1 '"vendor-name sample"' 1 3
 
           Verify response has UNSUPPORTED_WRITE write on TH(chip-tool) Log:
 
@@ -102,7 +102,7 @@ tests:
     - label: "TH writes ProductName as newproduct"
       PICS: BRBINFO.S.A0003
       verification: |
-          ./chip-tool bridgeddevicebasicinformation write-by-id 3 ""newproduct"" 1 3
+          ./chip-tool bridgeddevicebasicinformation write-by-id 3 '"newproduct"' 1 3
 
           Verify DUT responds with  unsupported write on TH(chip-tool) Log:
 
@@ -136,7 +136,7 @@ tests:
     - label: "TH writes newnode to NodeLabel"
       PICS: BRBINFO.S.A0005
       verification: |
-          ./chip-tool bridgeddevicebasicinformation write node-label ""newnode"" 1 3
+          ./chip-tool bridgeddevicebasicinformation write node-label '"newnode"' 1 3
 
           Verify response has UNSUPPORTED_WRITE on TH(chip-tool) Log:
 
@@ -179,7 +179,7 @@ tests:
     - label: "TH writes HardwareVersion as 0x4531"
       PICS: BRBINFO.S.A0007
       verification: |
-          ./chip-tool bridgeddevicebasicinformation write-by-id 7 ""hardware-version 0x4531""  1 3
+          ./chip-tool bridgeddevicebasicinformation write-by-id 7 '"hardware-version 0x4531"'  1 3
 
           Verify DUT responds with unsupported write on TH(chip-tool) Log:
 
@@ -211,7 +211,7 @@ tests:
     - label: "TH writes HardwareVersionString as newhardwareversion"
       PICS: BRBINFO.S.A0008
       verification: |
-          ./chip-tool bridgeddevicebasicinformation write-by-id 8 ""hardware-version-string newhardwareversion""  1 3
+          ./chip-tool bridgeddevicebasicinformation write-by-id 8 '"hardware-version-string newhardwareversion"'  1 3
 
           Verify response has unsupported write on TH(chip-tool) Log:
 
@@ -243,7 +243,7 @@ tests:
     - label: "TH writes SoftwareVersion as 0x8213"
       PICS: BRBINFO.S.A0009
       verification: |
-          ./chip-tool bridgeddevicebasicinformation write-by-id 9 ""software-version 0x8213"" 1 3
+          ./chip-tool bridgeddevicebasicinformation write-by-id 9 '"software-version 0x8213"' 1 3
 
           Verify DUT responds with unsupported write on TH(chip-tool) Log:
 
@@ -275,7 +275,7 @@ tests:
     - label: "TH writes SoftwareVersionString as 1.0"
       PICS: BRBINFO.S.A000a
       verification: |
-          ./chip-tool bridgeddevicebasicinformation write-by-id 10 ""software-version-string 1.0""  1 3
+          ./chip-tool bridgeddevicebasicinformation write-by-id 10 '"software-version-string 1.0"'  1 3
 
           Verify response has unsupported write on TH(chip-tool) Log:
 
@@ -308,7 +308,7 @@ tests:
     - label: "TH writes ManufacturingDate as 20210814789452IN"
       PICS: BRBINFO.S.A000b
       verification: |
-          ./chip-tool bridgeddevicebasicinformation write-by-id 11 ""manufacturing-date  20210814789452IN"" 1 3
+          ./chip-tool bridgeddevicebasicinformation write-by-id 11 '"manufacturing-date  20210814789452IN"' 1 3
 
           Verify  DUT responds with unsupported write on TH(chip-tool) Log:
 
@@ -341,7 +341,7 @@ tests:
     - label: "TH writes PartNumber as newpart"
       PICS: BRBINFO.S.A000c
       verification: |
-          ./chip-tool bridgeddevicebasicinformation write-by-id 12 ""part-number newpart""  1 3
+          ./chip-tool bridgeddevicebasicinformation write-by-id 12 '"part-number newpart"'  1 3
 
           Verify response has unsupported write on TH(chip-tool) Log:
 
@@ -374,7 +374,7 @@ tests:
     - label: "TH writes ProductURL as https://www.example.com"
       PICS: BRBINFO.S.A000d
       verification: |
-          ./chip-tool bridgeddevicebasicinformation write-by-id 13 ""product-url  https://www.example.com"" 1 3
+          ./chip-tool bridgeddevicebasicinformation write-by-id 13 '"product-url  https://www.example.com"' 1 3
 
           Verify response has unsupported write on TH(chip-tool) Log:
 
@@ -407,7 +407,7 @@ tests:
     - label: "TH writes ProductLabel as newproductlabel"
       PICS: BRBINFO.S.A000e
       verification: |
-          ./chip-tool bridgeddevicebasicinformation write-by-id 14 ""product-label newproductlabel""  1 3
+          ./chip-tool bridgeddevicebasicinformation write-by-id 14 '"product-label newproductlabel"'  1 3
 
           Optional Attribute - If it is supported, then in TH log it will results in displaying the value, else it will display UNSUPPORTED_ATTRIBUTE
 
@@ -441,7 +441,7 @@ tests:
     - label: "TH writes SerialNumber_test as newserialnumber"
       PICS: BRBINFO.S.A000f
       verification: |
-          ./chip-tool bridgeddevicebasicinformation write-by-id 15 ""serial-number newserialnumber""  1 3
+          ./chip-tool bridgeddevicebasicinformation write-by-id 15 '"serial-number newserialnumber"'  1 3
 
           Verify DUT responds with unsupported write on TH(chip-tool) Log:
 
@@ -511,7 +511,7 @@ tests:
     - label: "TH writes UniqueID as newid"
       PICS: BRBINFO.S.A0012
       verification: |
-          ./chip-tool bridgeddevicebasicinformation write-by-id 18 ""unique-id newid""  1 3
+          ./chip-tool bridgeddevicebasicinformation write-by-id 18 '"unique-id newid"'  1 3
 
           Verify response has unsupported write on TH(chip-tool) Log:
 

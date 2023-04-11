@@ -33,6 +33,7 @@ tests:
 
     - label: "Precondition"
       verification: |
+          Group Member is commissioned with Admin TH supports Groups Cluster and Onoff Cluster
           Execute this step before executing the test steps.
 
           ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },{"fabricIndex": 1, "privilege": 4, "authMode": 3, "subjects": [1], "targets": null }]' 1 0
@@ -82,11 +83,11 @@ tests:
           and GroupKeySetID. Admin sets GroupKeySecurityPolicy = TrustFirst (1)
           GroupKeyMulticastPolicy = PerGroupID (0) EpochStartTime0 = 0"
       verification: |
-          ./chip-tool groupkeymanagement key-set-write "{"groupKeySetID": 42,
+          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 42,
           "groupKeySecurityPolicy": 0, "epochKey0":
           "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000,"epochKey1":
           "d1d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime1": 2220001,"epochKey2":
-          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }" 1 0
+          "d2d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime2": 2220002 }' 1 0
       disabled: true
 
     - label:
@@ -148,7 +149,7 @@ tests:
           list on GroupKeyManagement cluster"
       PICS: GRPKEY.C.A0000
       verification: |
-          ./chip-tool groupkeymanagement write group-key-map "[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]" 1 0
+          ./chip-tool groupkeymanagement write group-key-map '[{"groupId": 1, "groupKeySetID": 42, "fabricIndex": 1}]' 1 0
 
           Verify TH recieves GroupKeyMap attribute on TH(Reference app)log:
 
