@@ -77,7 +77,6 @@
   readonly attribute int16u clusterRevision = 65533;
 {{!--Open:Generating command request structs for all incoming commands into server side--~}}
   {{#if (is_server side)}}
-
     {{#all_incoming_commands_for_cluster name side}}
       {{~>idl_command_request_struct}}
     {{/all_incoming_commands_for_cluster}}
