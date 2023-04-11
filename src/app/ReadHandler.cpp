@@ -142,7 +142,7 @@ ReadHandler::~ReadHandler()
 void ReadHandler::Close(CloseOptions options)
 {
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
-    if (options == CloseOptions::kDropPersistedSubscription)
+    if (IsType(InteractionType::Subscribe) && options == CloseOptions::kDropPersistedSubscription)
     {
         auto * subscriptionResumptionStorage = InteractionModelEngine::GetInstance()->GetSubscriptionResumptionStorage();
         if (subscriptionResumptionStorage)
@@ -177,7 +177,12 @@ void ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
             status = StatusIB(err).mStatus;
         }
         StatusResponse::Send(status, mExchangeCtx.Get(), /* aExpectResponse = */ false);
-        Close();
+        // At this point we can't have a persisted subscription, since that
+        // happens only when ProcessSubscribeRequest returns success. And our
+        // subscription id is almost certianly not actually useful at this
+        // point, either.  So don't try to mess with persisted subscriptions in
+        // Close().
+        Close(CloseOptions::kKeepPersistedSubscription);
     }
     else
     {
