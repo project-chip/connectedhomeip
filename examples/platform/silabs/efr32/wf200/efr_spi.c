@@ -54,15 +54,6 @@
 StaticSemaphore_t spi_sem_peripharal;
 SemaphoreHandle_t spi_sem_sync_hdl;
 #endif
-#ifdef RS911X_WIFI
-extern SPIDRV_Handle_t sl_spidrv_eusart_exp_handle;
-#define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
-#endif
-
-#ifdef WF200_WIFI
-extern SPIDRV_Handle_t sl_spidrv_exp_handle;
-#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
-#endif
 
 #define USART SL_WFX_HOST_PINOUT_SPI_PERIPHERAL
 

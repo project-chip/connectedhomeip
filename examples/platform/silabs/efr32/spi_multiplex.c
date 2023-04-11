@@ -29,8 +29,6 @@
 #include "spi_multiplex.h"
 #endif /* SL_WIFI */
 
-#include "efr32_utils.h"
-
 /****************************************************************************
  * @fn  void spi_drv_reinit()
  * @brief
@@ -40,7 +38,6 @@
  *****************************************************************************/
 void spi_drv_reinit(uint32_t baudrate)
 {
-    SILABS_LOG("%s: started", __func__);
     // USART is used in MG24 + WF200 combination
     USART_InitSync_TypeDef usartInit = USART_INITSYNC_DEFAULT;
     usartInit.msbf                   = true;
@@ -51,9 +48,6 @@ void spi_drv_reinit(uint32_t baudrate)
     usartInit.autoCsEnable           = true;
 
     USART_InitSync(USART0, &usartInit);
-
-    vTaskDelay(100);
-    SILABS_LOG("%s: completed", __func__);
 }
 
 /****************************************************************************
@@ -130,16 +124,12 @@ void post_bootloader_spi_transfer(void)
  *****************************************************************************/
 void pre_lcd_spi_transfer(void)
 {
-    SILABS_LOG("%s: started", __func__);
     if (xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY) != pdTRUE)
     {
         return;
     }
     spi_drv_reinit(SL_BIT_RATE_LCD);
-    // TODO: Remove spi_drv_reinit once SPI issue is resolved.
-    // SPIDRV_DeInit(SL_SPIDRV_HANDLE);
     /*LCD CS is handled as part of LCD gsdk*/
-    SILABS_LOG("%s: completed", __func__);
 }
 
 /****************************************************************************
@@ -151,10 +141,7 @@ void pre_lcd_spi_transfer(void)
  *****************************************************************************/
 void post_lcd_spi_transfer(void)
 {
-    SILABS_LOG("%s: started", __func__);
-    // spi_drv_reinit(SL_SPIDRV_EXP_BITRATE);
     xSemaphoreGive(spi_sem_sync_hdl);
-    SILABS_LOG("%s: completed", __func__);
 }
 #if (defined(EFR32MG24) && defined(WF200_WIFI))
 /****************************************************************************
@@ -166,13 +153,11 @@ void post_lcd_spi_transfer(void)
  *****************************************************************************/
 void pre_uart_transfer(void)
 {
-    SILABS_LOG("%s: started", __func__);
     if (spi_sem_sync_hdl == NULL)
     {
         // UART is initialized before host SPI interface
         // spi_sem_sync_hdl will not be initalized during execution
         GPIO_PinModeSet(gpioPortA, 8, gpioModePushPull, 1);
-        SILABS_LOG("%s: completed", __func__);
         return;
     }
     sl_wfx_disable_irq();
@@ -192,7 +177,6 @@ void pre_uart_transfer(void)
  *****************************************************************************/
 void post_uart_transfer(void)
 {
-    SILABS_LOG("%s: started", __func__);
     if (spi_sem_sync_hdl == NULL)
     {
         return;
@@ -201,6 +185,5 @@ void post_uart_transfer(void)
     xSemaphoreGive(spi_sem_sync_hdl);
     sl_wfx_host_enable_platform_interrupt();
     sl_wfx_enable_irq();
-    SILABS_LOG("%s: completed", __func__);
 }
 #endif /* EFR32MG24 && WF200_WIFI */
