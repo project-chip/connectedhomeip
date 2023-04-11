@@ -55,24 +55,25 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @property (nonatomic, copy, readonly) NSData * attestationSignature;
 
 /**
- * Initialize an MTROperationalCSRInfo by providing all the fields.  This will
- * ensure that csr and csrNonce match the data in csrElementsTLV.
+ * Initialize an MTROperationalCSRInfo by providing all the fields.  It's the
+ * caller's responsibility to ensure that csr and csrNonce match the csrElementsTLV.
  */
 - (instancetype)initWithCSR:(MTRCSRDERBytes)csr
                    csrNonce:(NSData *)csrNonce
              csrElementsTLV:(MTRTLVBytes)csrElementsTLV
-       attestationSignature:(NSData *)attestationSignature;
+       attestationSignature:(NSData *)attestationSignature
+    MTR_NEWLY_DEPRECATED("Please use one of the initializers that validates the input");
 
 /**
  * Initialize an MTROperationalCSRInfo by providing the csrNonce (for example,
  * the nonce the client initially supplied), and the csrElementsTLV and
  * attestationSignature that the server returned.  This will ensure that
- * csrNonce matches the data in csrElementsTLV, and extract the csr from
- * csrElementsTLV.
+ * csrNonce matches the data in csrElementsTLV, returning nil if it does not,
+ * and extract the csr from csrElementsTLV.
  */
-- (instancetype)initWithCSRNonce:(NSData *)csrNonce
-                  csrElementsTLV:(MTRTLVBytes)csrElementsTLV
-            attestationSignature:(NSData *)attestationSignature MTR_NEWLY_AVAILABLE;
+- (nullable instancetype)initWithCSRNonce:(NSData *)csrNonce
+                           csrElementsTLV:(MTRTLVBytes)csrElementsTLV
+                     attestationSignature:(NSData *)attestationSignature MTR_NEWLY_AVAILABLE;
 
 /**
  * Initialize an MTROperationalCSRInfo by providing just the csrElementsTLV and
@@ -81,15 +82,16 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
  * csr and csrNonce from the csrElementsTLV, if possible, and return nil if that
  * fails.
  */
-- (instancetype)initWithCSRElementsTLV:(MTRTLVBytes)csrElementsTLV
-                  attestationSignature:(NSData *)attestationSignature MTR_NEWLY_AVAILABLE;
+- (nullable instancetype)initWithCSRElementsTLV:(MTRTLVBytes)csrElementsTLV
+                           attestationSignature:(NSData *)attestationSignature MTR_NEWLY_AVAILABLE;
 
 /**
  * Initialize an MTROperationalCSRInfo by providing an
  * MTROperationalCredentialsClusterCSRResponseParams.  This will extract the
  * relevant fields from the response data.
  */
-- (instancetype)initWithCSRResponseParams:(MTROperationalCredentialsClusterCSRResponseParams *)responseParams MTR_NEWLY_AVAILABLE;
+- (nullable instancetype)initWithCSRResponseParams:(MTROperationalCredentialsClusterCSRResponseParams *)responseParams
+    MTR_NEWLY_AVAILABLE;
 @end
 
 MTR_DEPRECATED("Please use MTROperationalCSRInfo", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))

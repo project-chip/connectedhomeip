@@ -66,28 +66,15 @@ NS_ASSUME_NONNULL_BEGIN
              csrElementsTLV:(MTRTLVBytes)csrElementsTLV
        attestationSignature:(NSData *)attestationSignature;
 {
-    chip::ByteSpan extractedCSR, extractedNonce;
-    VerifyOrReturnValue(ExtractCSRAndNonce(csrElementsTLV, extractedCSR, extractedNonce) == CHIP_NO_ERROR, nil);
-
-    if (!extractedCSR.data_equal(AsByteSpan(csr))) {
-        MTR_LOG_ERROR("Provided CSR does not match provided csrElementsTLV");
-        return nil;
-    }
-
-    if (!extractedNonce.data_equal(AsByteSpan(csrNonce))) {
-        MTR_LOG_ERROR("Provided CSR nonce does not match provided csrElementsTLV");
-        return nil;
-    }
-
     return [self _initWithValidatedCSR:csr
                               csrNonce:csrNonce
                         csrElementsTLV:csrElementsTLV
                   attestationSignature:attestationSignature];
 }
 
-- (instancetype)initWithCSRNonce:(NSData *)csrNonce
-                  csrElementsTLV:(MTRTLVBytes)csrElementsTLV
-            attestationSignature:(NSData *)attestationSignature
+- (nullable instancetype)initWithCSRNonce:(NSData *)csrNonce
+                           csrElementsTLV:(MTRTLVBytes)csrElementsTLV
+                     attestationSignature:(NSData *)attestationSignature
 {
     chip::ByteSpan csr, extractedNonce;
     VerifyOrReturnValue(ExtractCSRAndNonce(csrElementsTLV, csr, extractedNonce) == CHIP_NO_ERROR, nil);
@@ -103,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
                   attestationSignature:attestationSignature];
 }
 
-- (instancetype)initWithCSRElementsTLV:(MTRTLVBytes)csrElementsTLV attestationSignature:(NSData *)attestationSignature
+- (nullable instancetype)initWithCSRElementsTLV:(MTRTLVBytes)csrElementsTLV attestationSignature:(NSData *)attestationSignature
 {
     chip::ByteSpan csr, csrNonce;
     VerifyOrReturnValue(ExtractCSRAndNonce(csrElementsTLV, csr, csrNonce) == CHIP_NO_ERROR, nil);
@@ -114,7 +101,7 @@ NS_ASSUME_NONNULL_BEGIN
                   attestationSignature:attestationSignature];
 }
 
-- (instancetype)initWithCSRResponseParams:(MTROperationalCredentialsClusterCSRResponseParams *)responseParams
+- (nullable instancetype)initWithCSRResponseParams:(MTROperationalCredentialsClusterCSRResponseParams *)responseParams
 {
     return [self initWithCSRElementsTLV:responseParams.nocsrElements attestationSignature:responseParams.attestationSignature];
 }
