@@ -345,12 +345,14 @@ class DescriptionHandler(BaseHandler):
 
        Attaches a "description" attribute to a given structure
     """
+
     def __init__(self, context: Context, target: Any):
         super().__init__(context)
         self.target = target
 
     def HandleContent(self, content):
         self.target.description = content
+
 
 class CommandHandler(BaseHandler):
     """Handles /configurator/cluster/command elements."""

@@ -158,16 +158,18 @@ class TestParser(unittest.TestCase):
                 /** Some command doc comment */
                 command InOutStuff(InParam): OutParam = 222;
             }
-        """, skip_meta = False)
+        """, skip_meta=False)
 
         # meta_data may not match but is required for doc comments. Clean it up
 
         # Metadata parsing varies line/column, so only check doc comments
-        self.assertEqual(actual.clusters[0].description, "Documentation for MyCluster")
-        self.assertEqual(actual.clusters[1].description, "Documentation for MyCluster #2")
+        self.assertEqual(
+            actual.clusters[0].description, "Documentation for MyCluster")
+        self.assertEqual(
+            actual.clusters[1].description, "Documentation for MyCluster #2")
         self.assertIsNone(actual.clusters[1].commands[0].description)
-        self.assertEqual(actual.clusters[1].commands[1].description, "Some command doc comment")
-
+        self.assertEqual(
+            actual.clusters[1].commands[1].description, "Some command doc comment")
 
     def test_sized_attribute(self):
         actual = parseText("""

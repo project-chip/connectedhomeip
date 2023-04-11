@@ -2,7 +2,7 @@
 
 import functools
 import logging
-from typing import Optional, Any
+from typing import Any, Optional
 
 from lark import Lark
 from lark.lexer import Token
@@ -28,6 +28,7 @@ def UnionOfAllFlags(flags_list):
     if not flags_list:
         return None
     return functools.reduce(lambda a, b: a | b, flags_list)
+
 
 class PrefixCppDocComment:
     def __init__(self, token):
@@ -508,7 +509,7 @@ class ParserWithLines:
             'matter_grammar.lark', rel_to=__file__, start='idl', parser='lalr', propagate_positions=True,
             # separate callbacks to ignore from regular parsing (no tokens)
             # while still getting notified about them
-            lexer_callbacks = {
+            lexer_callbacks={
                 'C_COMMENT': self.transformer.c_comment,
             }
         )
