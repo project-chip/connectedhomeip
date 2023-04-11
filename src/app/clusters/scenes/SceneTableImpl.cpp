@@ -267,7 +267,8 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
     /// @param storage [in] Persistent Storage Delegate, required to delete scenes if the number of scenes in storage is greater
     /// than the maximum allowed
     /// @param deleted_scenes_count [out] uint8_t letting the caller (in this case the load method) know how many scenes were
-    /// deleted so it can adjust the fabric and global scene count accordingly
+    /// deleted so it can adjust the fabric and global scene count accordingly. Upon failure of Deserialize, this value will return
+    /// the number of scenes deleted before the failure happened.
     /// @return CHIP_NO_ERROR on success, specific CHIP_ERROR otherwise
     CHIP_ERROR Deserialize(TLV::TLVReader & reader, PersistentStorageDelegate * storage, uint8_t & deleted_scenes_count)
     {
@@ -283,6 +284,7 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
 
         uint8_t i = 0;
         CHIP_ERROR err;
+        deleted_scenes_count = 0;
 
         while ((err = reader.Next(TLV::AnonymousTag())) == CHIP_NO_ERROR)
         {
@@ -493,7 +495,8 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
             ReturnErrorOnFailure(global_count.Load(storage));
             global_count.count_value = static_cast<uint8_t>(global_count.count_value - deleted_scenes_count);
             ReturnErrorOnFailure(global_count.Save(storage));
-            return this->Save(storage);
+            ReturnErrorOnFailure(this->Save(storage));
+            return err;
         }
         ReturnErrorOnFailure(err);
 
