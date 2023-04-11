@@ -260,19 +260,9 @@
             const_cast<uint8_t *>(static_cast<const uint8_t *>(productAttestationIntermediateCertNsData.bytes)),
             productAttestationIntermediateCertNsData.length);
 
-        NSData * deviceAttestationCertPrivateKeyNsData = deviceAttestationCredentials.getDeviceAttestationCertPrivateKey;
-        chip::MutableByteSpan deviceAttestationCertPrivateKey = chip::MutableByteSpan(
-            const_cast<uint8_t *>(static_cast<const uint8_t *>(deviceAttestationCertPrivateKeyNsData.bytes)),
-            deviceAttestationCertPrivateKeyNsData.length);
-
-        NSData * deviceAttestationCertPublicKeyKeyNsData = deviceAttestationCredentials.getDeviceAttestationCertPublicKey;
-        chip::MutableByteSpan deviceAttestationCertPublicKeyKey = chip::MutableByteSpan(
-            const_cast<uint8_t *>(static_cast<const uint8_t *>(deviceAttestationCertPublicKeyKeyNsData.bytes)),
-            deviceAttestationCertPublicKeyKeyNsData.length);
-
         self->_deviceAttestationCredentialsProvider
             = new DeviceAttestationCredentialsProviderImpl(&certificationDeclaration, &firmwareInformation, &deviceAttestationCert,
-                &productAttestationIntermediateCert, &deviceAttestationCertPrivateKey, &deviceAttestationCertPublicKeyKey);
+                &productAttestationIntermediateCert, deviceAttestationCredentials.getDeviceAttestationCertPrivateKeyRef);
 
         SetDeviceAttestationCredentialsProvider(self->_deviceAttestationCredentialsProvider);
 

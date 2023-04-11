@@ -33,11 +33,11 @@ public:
 
 private:
     CHIP_ERROR GetJavaByteByMethod(jmethodID method, chip::MutableByteSpan & out_buffer);
+    CHIP_ERROR GetJavaByteByMethod(jmethodID method, const chip::ByteSpan & in_buffer, chip::MutableByteSpan & out_buffer);
     jobject mJNIDACProviderObject                          = nullptr;
     jmethodID mGetCertificationDeclarationMethod           = nullptr;
     jmethodID mGetFirmwareInformationMethod                = nullptr;
     jmethodID mGetDeviceAttestationCertMethod              = nullptr;
     jmethodID mGetProductAttestationIntermediateCertMethod = nullptr;
-    jmethodID mGetDeviceAttestationCertPrivateKeyMethod    = nullptr;
-    jmethodID mGetDeviceAttestationCertPublicKeyKeyMethod  = nullptr;
+    jmethodID mSignWithDeviceAttestationKeyMethod          = nullptr;
 };
