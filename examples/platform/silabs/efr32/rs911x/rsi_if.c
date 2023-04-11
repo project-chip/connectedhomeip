@@ -408,7 +408,7 @@ static void wfx_rsi_save_ap_info() // translation
 #else  /* !WIFI_ENABLE_SECURITY_WPA3 */
         wfx_rsi.sec.security = WFX_SEC_WPA2;
 #endif /* WIFI_ENABLE_SECURITY_WPA3 */
-        WFX_RSI_LOG("%s: warn: failed with status: %02x", status);
+        SILABS_LOG("%s: warn: failed with status: %02x", status);
         return;
     }
     else
