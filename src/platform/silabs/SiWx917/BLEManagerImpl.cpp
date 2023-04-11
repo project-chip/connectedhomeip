@@ -497,7 +497,7 @@ void BLEManagerImpl::DriveBLEState(void)
     ChipLogProgress(DeviceLayer, "DriveBLEState starting");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Check if BLE stack is initialized
+    // Check if BLE stack is initialized ( TODO )
     // VerifyOrExit(mFlags.Has(Flags::kEFRBLEStackInitialized),);
 
     ChipLogProgress(DeviceLayer, "Start advertising if needed...");
