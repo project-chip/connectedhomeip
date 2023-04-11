@@ -224,7 +224,7 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
             int itemsRemaining   = 0;
             SPIDRV_GetTransferStatus(SPI_HANDLE, &itemsTransferred, &itemsRemaining);
             SILABS_LOG("SPI transfert timed out %d/%d (rx%x rx%x)", itemsTransferred, itemsRemaining, (uint32_t) tx_buf,
-                        (uint32_t) rx_buf);
+                       (uint32_t) rx_buf);
 
             SPIDRV_AbortTransfer(SPI_HANDLE);
             rsiError = RSI_ERROR_SPI_TIMEOUT;

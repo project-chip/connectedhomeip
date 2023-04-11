@@ -118,7 +118,7 @@ void wfx_get_wifi_mac_addr(sl_wfx_interface_t interface, sl_wfx_mac_address_t * 
 #endif
     *addr = *mac;
     SILABS_LOG("%s: %02x:%02x:%02x:%02x:%02x:%02x", __func__, mac->octet[0], mac->octet[1], mac->octet[2], mac->octet[3],
-                mac->octet[4], mac->octet[5]);
+               mac->octet[4], mac->octet[5]);
 }
 
 /*********************************************************************

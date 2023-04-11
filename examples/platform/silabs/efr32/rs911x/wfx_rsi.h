@@ -49,8 +49,8 @@
 #define WFX_RSI_ST_STA_MODE (0x80)      /* Enable Station Mode			*/
 #define WFX_RSI_ST_AP_MODE (0x100)      /* Enable AP Mode			*/
 #define WFX_RSI_ST_STA_READY (WFX_RSI_ST_STA_CONNECTED | WFX_RSI_ST_STA_DHCP_DONE)
-#define WFX_RSI_ST_STARTED (0x200)      /* RSI task started			*/
-#define WFX_RSI_ST_SCANSTARTED (0x400)  /* Scan Started				*/
+#define WFX_RSI_ST_STARTED (0x200)     /* RSI task started			*/
+#define WFX_RSI_ST_SCANSTARTED (0x400) /* Scan Started				*/
 
 struct wfx_rsi
 {

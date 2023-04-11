@@ -36,16 +36,16 @@
 #include "rsi_driver.h"
 #include "rsi_wlan_non_rom.h"
 
+#include "rsi_bootup_config.h"
 #include "rsi_common_apis.h"
 #include "rsi_data_types.h"
+#include "rsi_error.h"
 #include "rsi_nwk.h"
 #include "rsi_socket.h"
 #include "rsi_utils.h"
 #include "rsi_wlan.h"
 #include "rsi_wlan_apis.h"
 #include "rsi_wlan_config.h"
-#include "rsi_bootup_config.h"
-#include "rsi_error.h"
 
 #include "dhcp_client.h"
 #include "wfx_host_events.h"
@@ -358,7 +358,7 @@ static int32_t wfx_rsi_init(void)
     }
 
     SILABS_LOG("%s: WLAN: MAC %02x:%02x:%02x %02x:%02x:%02x", __func__, wfx_rsi.sta_mac.octet[0], wfx_rsi.sta_mac.octet[1],
-                wfx_rsi.sta_mac.octet[2], wfx_rsi.sta_mac.octet[3], wfx_rsi.sta_mac.octet[4], wfx_rsi.sta_mac.octet[5]);
+               wfx_rsi.sta_mac.octet[2], wfx_rsi.sta_mac.octet[3], wfx_rsi.sta_mac.octet[4], wfx_rsi.sta_mac.octet[5]);
     wfx_rsi.events = xEventGroupCreateStatic(&rsiDriverEventGroup);
     /*
      * Register callbacks - We are only interested in the connectivity CBs
@@ -444,7 +444,7 @@ static void wfx_rsi_save_ap_info() // translation
     }
 
     SILABS_LOG("%s: WLAN: connecting to %s==%s, sec=%d, status=%02x", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0],
-                wfx_rsi.sec.security, status);
+               wfx_rsi.sec.security, status);
 }
 
 /********************************************************************************************
@@ -487,7 +487,7 @@ static void wfx_rsi_do_join(void)
         }
 
         SILABS_LOG("%s: WLAN: connecting to %s==%s, sec=%d", __func__, &wfx_rsi.sec.ssid[0], &wfx_rsi.sec.passkey[0],
-                    wfx_rsi.sec.security);
+                   wfx_rsi.sec.security);
 
         /*
          * Join the network
@@ -515,8 +515,7 @@ static void wfx_rsi_do_join(void)
             {
 
                 wfx_rsi.dev_state &= ~WFX_RSI_ST_STA_CONNECTING;
-                SILABS_LOG("%s: rsi_wlan_connect_async failed with status: %02x on try %d", __func__, status,
-                            wfx_rsi.join_retries);
+                SILABS_LOG("%s: rsi_wlan_connect_async failed with status: %02x on try %d", __func__, status, wfx_rsi.join_retries);
 
                 wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries);
                 wfx_rsi.join_retries++;
@@ -524,7 +523,7 @@ static void wfx_rsi_do_join(void)
             else
             {
                 SILABS_LOG("%s: starting JOIN to %s after %d tries\n", __func__, (char *) &wfx_rsi.sec.ssid[0],
-                            wfx_rsi.join_retries);
+                           wfx_rsi.join_retries);
                 break; // exit while loop
             }
         }
@@ -773,7 +772,7 @@ void wfx_dhcp_got_ipv4(uint32_t ip)
     wfx_rsi.ip4_addr[2] = (ip >> 16) & HEX_VALUE_FF;
     wfx_rsi.ip4_addr[3] = (ip >> 24) & HEX_VALUE_FF;
     SILABS_LOG("%s: DHCP OK: IP=%d.%d.%d.%d", __func__, wfx_rsi.ip4_addr[0], wfx_rsi.ip4_addr[1], wfx_rsi.ip4_addr[2],
-                wfx_rsi.ip4_addr[3]);
+               wfx_rsi.ip4_addr[3]);
     /* Notify the Connectivity Manager - via the app */
     wfx_rsi.dev_state |= WFX_RSI_ST_STA_DHCP_DONE;
     wfx_ip_changed_notify(IP_STATUS_SUCCESS);
