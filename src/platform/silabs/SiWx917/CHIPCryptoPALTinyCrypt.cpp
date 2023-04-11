@@ -863,13 +863,6 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitInternal(void)
     G = curve_G;
 
     return error;
-
-/* commenting since this exit is defined but not used
-exit:
-    _log_mbedTLS_error(result);
-    Clear();
-    return error;
-*/
 }
 
 void Spake2p_P256_SHA256_HKDF_HMAC::Clear()
@@ -933,10 +926,6 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FELoad(const uint8_t * in, size_t in_l
 
     uECC_vli_mmod((uECC_word_t *) fe, tmp, curve_n);
 
-/* commenting since this exit is defined but not used
-  exit:
-    _log_mbedTLS_error(result);
-*/
     return error;
 }
 
@@ -973,10 +962,6 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::FEMul(void * fer, const void * fe1, co
 
     uECC_vli_modMult((uECC_word_t *) fer, (const uECC_word_t *) fe1, (const uECC_word_t *) fe2, (const uECC_word_t *) curve_n);
 
-/* commenting since this exit is defined but not used
-exit:
-    _log_mbedTLS_error(result);
-*/
     return error;
 }
 
