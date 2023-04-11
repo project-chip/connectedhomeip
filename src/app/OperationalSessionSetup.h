@@ -286,6 +286,8 @@ private:
     uint8_t mRemainingAttempts = 0;
     uint8_t mAttemptsDone      = 0;
 
+    uint8_t mResolveAttemptsAllowed = 0;
+
     Callback::CallbackDeque mConnectionRetry;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 
@@ -354,6 +356,12 @@ private:
      */
     void NotifyRetryHandlers(CHIP_ERROR error, const ReliableMessageProtocolConfig & remoteMrpConfig,
                              System::Clock::Seconds16 retryDelay);
+
+    /**
+     * A version of NotifyRetryHandlers that passes in a retry timeout estimate
+     * directly.
+     */
+    void NotifyRetryHandlers(CHIP_ERROR error, System::Clock::Seconds16 timeoutEstimate);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 };
 

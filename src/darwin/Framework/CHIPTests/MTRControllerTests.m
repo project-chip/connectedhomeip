@@ -391,8 +391,29 @@ static uint16_t kTestVendorId = 0xFFF1u;
     XCTAssertNotNil(controller2);
     XCTAssertTrue([controller2 isRunning]);
 
+    // Verify that we can't start on an existing fabric while we have a
+    // controller on that fabric already.
     XCTAssertNil([factory createControllerOnExistingFabric:params2 error:nil]);
 
+    // Now test restarting the controller on the first fabric while the
+    // controller on the second fabric is still running.
+    [controller1 shutdown];
+    XCTAssertFalse([controller1 isRunning]);
+
+    controller1 = [factory createControllerOnExistingFabric:params1 error:nil];
+    XCTAssertNotNil(controller1);
+    XCTAssertTrue([controller1 isRunning]);
+
+    // Now test restarting the controller on the second fabric while the
+    // controller on the first fabric is still running.
+    [controller2 shutdown];
+    XCTAssertFalse([controller2 isRunning]);
+
+    controller2 = [factory createControllerOnExistingFabric:params2 error:nil];
+    XCTAssertNotNil(controller2);
+    XCTAssertTrue([controller2 isRunning]);
+
+    // Shut down everything.
     [controller1 shutdown];
     XCTAssertFalse([controller1 isRunning]);
 
