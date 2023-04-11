@@ -266,10 +266,10 @@ client cluster OnOff = 6 {
   }
 
   readonly attribute boolean onOff = 0;
-  readonly attribute boolean globalSceneControl = 16384;
-  attribute int16u onTime = 16385;
-  attribute int16u offWaitTime = 16386;
-  attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
+  readonly attribute optional boolean globalSceneControl = 16384;
+  attribute optional int16u onTime = 16385;
+  attribute optional int16u offWaitTime = 16386;
+  attribute access(write: manage) optional nullable OnOffStartUpOnOff startUpOnOff = 16387;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -767,7 +767,7 @@ client cluster UnitLocalization = 45 {
     kTemperatureUnit = 0x1;
   }
 
-  attribute TempUnitEnum temperatureUnit = 0;
+  attribute optional TempUnitEnum temperatureUnit = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1617,7 +1617,7 @@ client cluster Switch = 59 {
 
   readonly attribute int8u numberOfPositions = 0;
   readonly attribute int8u currentPosition = 1;
-  readonly attribute int8u multiPressMax = 2;
+  readonly attribute optional int8u multiPressMax = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2029,8 +2029,8 @@ client cluster ModeSelect = 80 {
   readonly attribute nullable enum16 standardNamespace = 1;
   readonly attribute ModeOptionStruct supportedModes[] = 2;
   readonly attribute int8u currentMode = 3;
-  attribute nullable int8u startUpMode = 4;
-  attribute nullable int8u onMode = 5;
+  attribute optional nullable int8u startUpMode = 4;
+  attribute optional nullable int8u onMode = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2438,7 +2438,7 @@ server cluster Thermostat = 513 {
 client cluster ThermostatUserInterfaceConfiguration = 516 {
   attribute enum8 temperatureDisplayMode = 0;
   attribute access(write: manage) enum8 keypadLockout = 1;
-  attribute access(write: manage) enum8 scheduleProgrammingVisibility = 2;
+  attribute access(write: manage) optional enum8 scheduleProgrammingVisibility = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2596,7 +2596,7 @@ client cluster TemperatureMeasurement = 1026 {
   readonly attribute nullable int16s measuredValue = 0;
   readonly attribute nullable int16s minMeasuredValue = 1;
   readonly attribute nullable int16s maxMeasuredValue = 2;
-  readonly attribute int16u tolerance = 3;
+  readonly attribute optional int16u tolerance = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2661,7 +2661,7 @@ client cluster RelativeHumidityMeasurement = 1029 {
   readonly attribute nullable int16u measuredValue = 0;
   readonly attribute nullable int16u minMeasuredValue = 1;
   readonly attribute nullable int16u maxMeasuredValue = 2;
-  readonly attribute int16u tolerance = 3;
+  readonly attribute optional int16u tolerance = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2737,7 +2737,7 @@ client cluster TargetNavigator = 1285 {
   }
 
   readonly attribute TargetInfoStruct targetList[] = 0;
-  readonly attribute int8u currentTarget = 1;
+  readonly attribute optional int8u currentTarget = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3113,8 +3113,8 @@ client cluster ContentLauncher = 1290 {
     optional StyleInformationStruct waterMark = 5;
   }
 
-  readonly attribute CHAR_STRING acceptHeader[] = 0;
-  attribute bitmap32 supportedStreamingProtocols = 1;
+  readonly attribute optional CHAR_STRING acceptHeader[] = 0;
+  attribute optional bitmap32 supportedStreamingProtocols = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3265,10 +3265,10 @@ client cluster ApplicationBasic = 1293 {
     char_string applicationID = 1;
   }
 
-  readonly attribute char_string<32> vendorName = 0;
-  readonly attribute vendor_id vendorID = 1;
+  readonly attribute optional char_string<32> vendorName = 0;
+  readonly attribute optional vendor_id vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
-  readonly attribute int16u productID = 3;
+  readonly attribute optional int16u productID = 3;
   readonly attribute ApplicationStruct application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;

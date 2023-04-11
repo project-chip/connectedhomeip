@@ -97,9 +97,6 @@ def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, No
     if FieldQuality.NULLABLE & field.qualities:
         return None
 
-    if FieldQuality.OPTIONAL & field.qualities:
-        return None
-
     return _UnderlyingType(field, context)
 
 
