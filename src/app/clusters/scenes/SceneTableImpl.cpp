@@ -496,11 +496,9 @@ struct FabricSceneData : public PersistentData<kPersistentFabricBufferMax>
             global_count.count_value = static_cast<uint8_t>(global_count.count_value - deleted_scenes_count);
             ReturnErrorOnFailure(global_count.Save(storage));
             ReturnErrorOnFailure(this->Save(storage));
-            return err;
         }
-        ReturnErrorOnFailure(err);
 
-        return CHIP_NO_ERROR;
+        return err;
     }
 };
 
