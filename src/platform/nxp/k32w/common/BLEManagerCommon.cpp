@@ -837,6 +837,7 @@ CHIP_ERROR BLEManagerCommon::StopAdvertising(void)
 {
     ble_err_t err;
     CHIP_ERROR error = CHIP_NO_ERROR;
+    CHIPoBLEConState * bleConnState = GetConnectionState(g_device_id, false);
 
     if (mFlags.Has(Flags::kAdvertising))
     {
@@ -844,22 +845,28 @@ CHIP_ERROR BLEManagerCommon::StopAdvertising(void)
         mFlags.Clear(Flags::kFastAdvertisingEnabled);
         mFlags.Clear(Flags::kRestartAdvertising);
 
-        err = blekw_stop_advertising();
-        if (err != BLE_OK)
+        /* there is no need to stop advertising if we have an active connection.
+         * that's because the controller already stopped the advertising during
+         * the connect event. Stopping advertising twice will lead to errors.
+         */
+        if (bleConnState && !bleConnState->allocated)
         {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-        else
-        {
-            /* schedule NFC emulation stop */
+            err = blekw_stop_advertising();
+            if (err != BLE_OK)
             {
-                ChipDeviceEvent advChange;
-                advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
-                advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
-                error                                      = PlatformMgr().PostEvent(&advChange);
+                return CHIP_ERROR_INCORRECT_STATE;
             }
         }
+
+#if CONFIG_CHIP_NFC_COMMISSIONING
+		/* schedule NFC emulation stop */
+        ChipDeviceEvent advChange;
+        advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+        advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
+        error                                      = PlatformMgr().PostEvent(&advChange);
+#endif
     }
+
     CancelBleAdvTimeoutTimer();
 
     return error;
