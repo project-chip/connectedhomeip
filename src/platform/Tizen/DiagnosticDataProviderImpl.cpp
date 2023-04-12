@@ -131,8 +131,7 @@ CHIP_ERROR GetWiFiStatsCount(WiFiStatsCountType type, uint64_t & count)
     struct ifaddrs * ifa = nullptr;
     for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
     {
-        if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) ==
-            InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI)
+        if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI)
         {
             ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", StringOrNullMarker(ifa->ifa_name));
             break;
@@ -179,7 +178,7 @@ CHIP_ERROR GetWiFiStatsCount(WiFiStatsCountType type, uint64_t & count)
 }
 #endif // #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
-}
+} // namespace
 
 namespace chip {
 namespace DeviceLayer {
@@ -193,21 +192,21 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeapFree)
 {
     struct mallinfo mallocInfo = mallinfo();
-    currentHeapFree = mallocInfo.fordblks;
+    currentHeapFree            = mallocInfo.fordblks;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
 {
     struct mallinfo mallocInfo = mallinfo();
-    currentHeapUsed = mallocInfo.uordblks;
+    currentHeapUsed            = mallocInfo.uordblks;
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
     struct mallinfo mallocInfo = mallinfo();
-    currentHeapHighWatermark = mallocInfo.uordblks;
+    currentHeapHighWatermark   = mallocInfo.uordblks;
     return CHIP_NO_ERROR;
 }
 
@@ -221,9 +220,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void DiagnosticDataProviderImpl::ReleaseThreadMetrics(ThreadMetrics * threadMetrics)
-{
-}
+void DiagnosticDataProviderImpl::ReleaseThreadMetrics(ThreadMetrics * threadMetrics) {}
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
 {
@@ -332,8 +329,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 }
             }
 
-            if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, ifp->MacAddress, kMaxHardwareAddrSize) !=
-                CHIP_NO_ERROR)
+            if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, ifp->MacAddress, kMaxHardwareAddrSize) != CHIP_NO_ERROR)
             {
                 ChipLogError(DeviceLayer, "Failed to get network hardware address");
             }
@@ -378,7 +374,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetEthPHYRate(app::Clusters::EthernetNetw
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetEthFullDuplex(bool & fullDuplex)
 {
-     if (ConnectivityMgrImpl().GetEthernetIfName() == nullptr)
+    if (ConnectivityMgrImpl().GetEthernetIfName() == nullptr)
     {
         return CHIP_ERROR_READ_FAILED;
     }
@@ -634,8 +630,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
     struct ifaddrs * ifa = nullptr;
     for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
     {
-        if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) ==
-            InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI)
+        if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI)
         {
             ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", StringOrNullMarker(ifa->ifa_name));
             break;

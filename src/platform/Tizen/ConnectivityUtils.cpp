@@ -73,7 +73,7 @@ uint8_t ConnectivityUtils::MapFrequencyToChannel(const uint16_t frequency)
 InterfaceTypeEnum ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
 {
     InterfaceTypeEnum ret = InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED;
-    int sock = -1;
+    int sock              = -1;
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
@@ -139,7 +139,7 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceHardwareAddrs(const char * ifname, uin
 
 CHIP_ERROR ConnectivityUtils::GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
     if (getifaddrs(&ifaddr) == -1)
@@ -181,7 +181,7 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceIPv4Addrs(const char * ifname, uint8_t
 
 CHIP_ERROR ConnectivityUtils::GetInterfaceIPv6Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp)
 {
-    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
     if (getifaddrs(&ifaddr) == -1)

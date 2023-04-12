@@ -35,8 +35,8 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-static constexpr uint16_t kWiFi_BAND_2_4_GHZ      = 2400;
-static constexpr uint16_t kWiFi_BAND_5_0_GHZ      = 5000;
+static constexpr uint16_t kWiFi_BAND_2_4_GHZ = 2400;
+static constexpr uint16_t kWiFi_BAND_5_0_GHZ = 5000;
 
 class ConnectivityUtils
 {

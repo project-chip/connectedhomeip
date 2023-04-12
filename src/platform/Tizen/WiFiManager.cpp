@@ -530,7 +530,7 @@ void WiFiManager::_WiFiSetConnectionState(wifi_manager_connection_state_e connec
 
 wifi_manager_ap_h WiFiManager::_WiFiGetConnectedAP()
 {
-    int wifiErr = WIFI_MANAGER_ERROR_NONE;
+    int wifiErr                   = WIFI_MANAGER_ERROR_NONE;
     wifi_manager_ap_h connectedAp = nullptr;
 
     wifiErr = wifi_manager_get_connected_ap(mWiFiManagerHandle, &connectedAp);
@@ -845,8 +845,7 @@ CHIP_ERROR WiFiManager::GetBssId(uint8_t * bssId)
         return CHIP_ERROR_READ_FAILED;
     }
 
-    if (sscanf(bssIdStr, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &bssId[0], &bssId[1], &bssId[2], &bssId[3],
-               &bssId[4], &bssId[5]) != 6)
+    if (sscanf(bssIdStr, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &bssId[0], &bssId[1], &bssId[2], &bssId[3], &bssId[4], &bssId[5]) != 6)
     {
         ChipLogError(DeviceLayer, "FAIL: parse bssid");
         return CHIP_ERROR_READ_FAILED;
