@@ -287,8 +287,7 @@ Additionally, we welcome any feedback.
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-launch
 [ccs_manual_method]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-method
-[cc1352r1_launchxl]: https://www.ti.com/tool/LAUNCHXL-CC1352R1
-[e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-and-thread
+[e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
 [matter-e2e-faq]:
     https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum/1082428/faq-cc2652r7-matter----getting-started-guide
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG

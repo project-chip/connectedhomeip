@@ -250,7 +250,7 @@ Additionally, we welcome any feedback.
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-launch
 [ccs_manual_method]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-method
-[e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-and-thread
+[e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
 [sysconfig_recommended]:
     https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.10.0_2163-setup.run
