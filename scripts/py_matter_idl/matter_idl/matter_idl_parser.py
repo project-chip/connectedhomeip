@@ -2,7 +2,6 @@
 
 import functools
 import logging
-from typing import Any, Optional
 
 from lark import Lark
 from lark.lexer import Token
@@ -61,7 +60,7 @@ class PrefixCppDocComment:
                 yield command
 
     def __repr__(self):
-        return f"PREFIXDoc: %r at %r" % (self.value, self.start_pos)
+        return ("PREFIXDoc: %r at %r" % (self.value, self.start_pos))
 
 
 class AddServerClusterToEndpointTransform:
