@@ -22,7 +22,6 @@
 #pragma once
 
 #include <algorithm>
-#include <mutex>
 
 #include <app/util/basic-types.h>
 #include <credentials/CHIPCert.h>
@@ -719,6 +718,17 @@ public:
     bool HasOperationalKeyForFabric(FabricIndex fabricIndex) const;
 
     /**
+     * @brief Returns the operational keystore. This is used for
+     *        CASE and the only way the keystore should be used.
+     *
+     * @return The operational keystore, nullptr otherwise.
+     */
+    Crypto::OperationalKeystore * GetOperationalKeystore()
+    {
+        return mOperationalKeystore;
+    }
+
+    /**
      * @brief Add a pending trusted root certificate for the next fabric created with `AddNewPendingFabric*` methods.
      *
      * The root only becomes actually pending when the `AddNewPendingFabric*` is called afterwards. It is reverted
@@ -1147,8 +1157,6 @@ private:
     uint8_t mFabricCount = 0;
 
     BitFlags<StateFlags> mStateFlags;
-
-    mutable std::mutex mMutex;
 };
 
 } // namespace chip

@@ -169,6 +169,24 @@ public:
         return ptr;
     }
 
+    // Do the work immediately.
+    // No scheduling, no outstanding work, no shared lifetime management.
+    CHIP_ERROR DoWork()
+    {
+        if (!mSession || !mWorkCallback || !mAfterWorkCallback)
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+        WorkHelper * helper = this;
+        bool cancel = false;
+        helper->mStatus = helper->mWorkCallback(helper->mData, cancel);
+        if (!cancel)
+        {
+            (helper->mSession->*(helper->mAfterWorkCallback))(helper->mData, helper->mStatus);
+        }
+        return CHIP_NO_ERROR;
+    }
+
     // Schedule the work after configuring the data.
     // If lifetime is managed, the helper shares management while work is outstanding.
     CHIP_ERROR ScheduleWork()
@@ -245,6 +263,8 @@ struct CASESession::SendSigma3Data
 {
     FabricTable * fabricTable;
     std::atomic<FabricIndex> fabricIndex;
+
+    Crypto::OperationalKeystore * keystore;
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Signed;
     size_t msg_r3_signed_len;
@@ -1284,6 +1304,19 @@ CHIP_ERROR CASESession::SendSigma3a()
         data.fabricTable = mFabricsTable;
         data.fabricIndex = mFabricIndex;
 
+        // If an operational keystore is used, work will be performed in the background.
+        // Otherwise, legacy signing will be performed in the foreground.
+        data.keystore = nullptr;
+        {
+            const FabricInfo * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
+            VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_KEY_NOT_FOUND);
+            if (!fabricInfo->HasOperationalKey())
+            {
+                data.keystore = mFabricsTable->GetOperationalKeystore();
+                VerifyOrExit(data.keystore != nullptr, err = CHIP_ERROR_KEY_NOT_FOUND);
+            }
+        }
+
         VerifyOrExit(mEphemeralKey != nullptr, err = CHIP_ERROR_INTERNAL);
 
         VerifyOrExit(data.icacBuf.Alloc(kMaxCHIPCertLength), err = CHIP_ERROR_NO_MEMORY);
@@ -1305,10 +1338,17 @@ CHIP_ERROR CASESession::SendSigma3a()
                           data.nocCert, data.icaCert, ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()),
                           ByteSpan(mRemotePubKey, mRemotePubKey.Length()), data.msg_R3_Signed.Get(), data.msg_r3_signed_len));
 
-        SuccessOrExit(err = helper->ScheduleWork());
-        mSendSigma3Helper = helper;
-        mExchangeCtxt->WillSendMessage();
-        mState = State::kSendSigma3Pending;
+        if (data.keystore != nullptr)
+        {
+            SuccessOrExit(err = helper->ScheduleWork());
+            mSendSigma3Helper = helper;
+            mExchangeCtxt->WillSendMessage();
+            mState = State::kSendSigma3Pending;
+        }
+        else
+        {
+            SuccessOrExit(err = helper->DoWork());
+        }
     }
 
 exit:
@@ -1326,8 +1366,18 @@ CHIP_ERROR CASESession::SendSigma3b(SendSigma3Data & data, bool & cancel)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Generate a signature
-    err = data.fabricTable->SignWithOpKeypair(data.fabricIndex, ByteSpan{ data.msg_R3_Signed.Get(), data.msg_r3_signed_len },
-                                              data.tbsData3Signature);
+    if (data.keystore != nullptr)
+    {
+        // Recommended case: delegate to operational keystore
+        err = data.keystore->SignWithOpKeypair(data.fabricIndex, ByteSpan{ data.msg_R3_Signed.Get(), data.msg_r3_signed_len },
+                                               data.tbsData3Signature);
+    }
+    else
+    {
+        // Legacy case: delegate to fabric table fabric info
+        err = data.fabricTable->SignWithOpKeypair(data.fabricIndex, ByteSpan{ data.msg_R3_Signed.Get(), data.msg_r3_signed_len },
+                                                data.tbsData3Signature);
+    }
     SuccessOrExit(err);
 
     // Prepare Sigma3 TBE Data Blob
@@ -1380,7 +1430,7 @@ CHIP_ERROR CASESession::SendSigma3c(SendSigma3Data & data, CHIP_ERROR status)
 
     AutoReleaseSessionKey sr3k(*mSessionManager->GetSessionKeystore());
 
-    VerifyOrDieWithMsg(mState == State::kSendSigma3Pending, SecureChannel, "Bad internal state.");
+    VerifyOrDieWithMsg(data.keystore == nullptr || mState == State::kSendSigma3Pending, SecureChannel, "Bad internal state.");
 
     SuccessOrExit(err = status);
 

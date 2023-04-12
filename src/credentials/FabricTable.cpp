@@ -910,8 +910,6 @@ FabricTable::AddOrUpdateInner(FabricIndex fabricIndex, bool isAddition, Crypto::
 
 CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
 {
-    std::unique_lock<std::mutex> lock(mMutex);
-
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1021,8 +1019,6 @@ CHIP_ERROR FabricTable::Delete(FabricIndex fabricIndex)
 
 void FabricTable::DeleteAllFabrics()
 {
-    // Rely on mutex in impl methods
-
     static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
 
     RevertPendingFabricData();
@@ -1035,8 +1031,6 @@ void FabricTable::DeleteAllFabrics()
 
 CHIP_ERROR FabricTable::Init(const FabricTable::InitParams & initParams)
 {
-    // Mutex not necessary while initializing
-
     VerifyOrReturnError(initParams.storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(initParams.opCertStore != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1111,8 +1105,6 @@ CHIP_ERROR FabricTable::Init(const FabricTable::InitParams & initParams)
 
 void FabricTable::Forget(FabricIndex fabricIndex)
 {
-    std::unique_lock<std::mutex> lock(mMutex);
-
     ChipLogProgress(FabricProvisioning, "Forgetting fabric 0x%x", static_cast<unsigned>(fabricIndex));
 
     auto * fabricInfo = GetMutableFabricByIndex(fabricIndex);
@@ -1124,8 +1116,6 @@ void FabricTable::Forget(FabricIndex fabricIndex)
 
 void FabricTable::Shutdown()
 {
-    std::unique_lock<std::mutex> lock(mMutex);
-
     VerifyOrReturn(mStorage != nullptr);
     ChipLogProgress(FabricProvisioning, "Shutting down FabricTable");
 
@@ -1151,8 +1141,6 @@ void FabricTable::Shutdown()
 
 FabricIndex FabricTable::GetDeletedFabricFromCommitMarker()
 {
-    std::unique_lock<std::mutex> lock(mMutex);
-
     FabricIndex retVal = mDeletedFabricIndexFromInit;
 
     // Reset for next read
@@ -1163,8 +1151,6 @@ FabricIndex FabricTable::GetDeletedFabricFromCommitMarker()
 
 CHIP_ERROR FabricTable::AddFabricDelegate(FabricTable::Delegate * delegate)
 {
-    // Mutex not necessary while adding/removing delegates
-
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     for (FabricTable::Delegate * iter = mDelegateListRoot; iter != nullptr; iter = iter->next)
     {
@@ -1180,8 +1166,6 @@ CHIP_ERROR FabricTable::AddFabricDelegate(FabricTable::Delegate * delegate)
 
 void FabricTable::RemoveFabricDelegate(FabricTable::Delegate * delegateToRemove)
 {
-    // Mutex not necessary while adding/removing delegates
-
     VerifyOrReturn(delegateToRemove != nullptr);
 
     if (delegateToRemove == mDelegateListRoot)
@@ -1213,8 +1197,6 @@ void FabricTable::RemoveFabricDelegate(FabricTable::Delegate * delegateToRemove)
 
 CHIP_ERROR FabricTable::SetLastKnownGoodChipEpochTime(System::Clock::Seconds32 lastKnownGoodChipEpochTime)
 {
-    std::unique_lock<std::mutex> lock(mMutex);
-
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Find our latest NotBefore time for any installed certificate.
     System::Clock::Seconds32 latestNotBefore = System::Clock::Seconds32(0);
@@ -1408,8 +1390,6 @@ CHIP_ERROR FabricTable::ReadFabricInfo(TLV::ContiguousBufferTLVReader & reader)
 
 Crypto::P256Keypair * FabricTable::AllocateEphemeralKeypairForCASE()
 {
-    std::unique_lock<std::mutex> lock(mMutex);
-
     if (mOperationalKeystore != nullptr)
     {
         return mOperationalKeystore->AllocateEphemeralKeypairForCASE();
@@ -1420,8 +1400,6 @@ Crypto::P256Keypair * FabricTable::AllocateEphemeralKeypairForCASE()
 
 void FabricTable::ReleaseEphemeralKeypair(Crypto::P256Keypair * keypair)
 {
-    std::unique_lock<std::mutex> lock(mMutex);
-
     if (mOperationalKeystore != nullptr)
     {
         mOperationalKeystore->ReleaseEphemeralKeypair(keypair);
@@ -1503,8 +1481,6 @@ bool FabricTable::HasOperationalKeyForFabric(FabricIndex fabricIndex) const
 
 CHIP_ERROR FabricTable::SignWithOpKeypair(FabricIndex fabricIndex, ByteSpan message, P256ECDSASignature & outSignature) const
 {
-    std::unique_lock<std::mutex> lock(mMutex);
-
     const FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
     VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
 
@@ -1549,8 +1525,6 @@ bool FabricTable::SetPendingDataFabricIndex(FabricIndex fabricIndex)
 
 CHIP_ERROR FabricTable::AllocatePendingOperationalKey(Optional<FabricIndex> fabricIndex, MutableByteSpan & outputCsr)
 {
-    std::unique_lock<std::mutex> lock(mMutex);
-
     // We can only manage commissionable pending fail-safe state if we have a keystore
     VerifyOrReturnError(mOperationalKeystore != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1593,8 +1567,6 @@ CHIP_ERROR FabricTable::AllocatePendingOperationalKey(Optional<FabricIndex> fabr
 
 CHIP_ERROR FabricTable::AddNewPendingTrustedRootCert(const ByteSpan & rcac)
 {
-    std::unique_lock<std::mutex> lock(mMutex);
-
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // We should not already have pending NOC chain elements when we get here
@@ -1672,8 +1644,6 @@ CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const By
                                                   Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned,
                                                   FabricIndex * outNewFabricIndex)
 {
-    std::unique_lock<std::mutex> lock(mMutex);
-
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(outNewFabricIndex != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     static_assert(kMaxValidFabricIndex <= UINT8_MAX, "Cannot create more fabrics than UINT8_MAX");
@@ -1744,8 +1714,6 @@ CHIP_ERROR FabricTable::AddNewPendingFabricCommon(const ByteSpan & noc, const By
 CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac,
                                                   Crypto::P256Keypair * existingOpKey, bool isExistingOpKeyExternallyOwned)
 {
-    std::unique_lock<std::mutex> lock(mMutex);
-
     VerifyOrReturnError(mOpCertStore != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1804,8 +1772,6 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
 
 CHIP_ERROR FabricTable::CommitPendingFabricData()
 {
-    std::unique_lock<std::mutex> lock(mMutex);
-
     VerifyOrReturnError((mStorage != nullptr) && (mOpCertStore != nullptr), CHIP_ERROR_INCORRECT_STATE);
 
     bool haveNewTrustedRoot      = mStateFlags.Has(StateFlags::kIsTrustedRootPending);
@@ -2084,8 +2050,6 @@ void FabricTable::RevertPendingOpCertsExceptRoot()
 
 CHIP_ERROR FabricTable::SetFabricLabel(FabricIndex fabricIndex, const CharSpan & fabricLabel)
 {
-    std::unique_lock<std::mutex> lock(mMutex);
-
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
@@ -2109,8 +2073,6 @@ CHIP_ERROR FabricTable::SetFabricLabel(FabricIndex fabricIndex, const CharSpan &
 
 CHIP_ERROR FabricTable::GetFabricLabel(FabricIndex fabricIndex, CharSpan & outFabricLabel)
 {
-    std::unique_lock<std::mutex> lock(mMutex);
-
     const FabricInfo * fabricInfo = FindFabricWithIndex(fabricIndex);
     VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
