@@ -406,6 +406,9 @@ CHIP_ERROR JniReferences::CharToStringUTF(const chip::CharSpan & charSpan, jobje
     jobject decodeObject          = env->CallObjectMethod(decoderObject, charSetDecodeMethod, jbyteBuffer);
     env->DeleteLocalRef(jbyteBuffer);
 
+    // If decode exception occur, outStr will be set null.
+    outStr = nullptr;
+
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
     jclass charBufferClass       = env->FindClass("java/nio/CharBuffer");
