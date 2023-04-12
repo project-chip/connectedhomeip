@@ -145,12 +145,18 @@ static void PurgeReadClientContainers(
         asyncDispatchToMatterQueue:^() {
             for (MTRReadClientContainer * container in listToDelete) {
                 if (container.readClientPtr) {
-                    Platform::MemoryFree(container.readClientPtr);
+                    Platform::Delete(container.readClientPtr);
                     container.readClientPtr = nullptr;
                 }
                 if (container.pathParams) {
                     Platform::MemoryFree(container.pathParams);
                     container.pathParams = nullptr;
+                    container.pathParamsSize = 0;
+                }
+                if (container.eventPathParams) {
+                    Platform::MemoryFree(container.eventPathParams);
+                    container.eventPathParams = nullptr;
+                    container.eventPathParamsSize = 0;
                 }
             }
             [listToDelete removeAllObjects];
@@ -1230,6 +1236,8 @@ private:
                        }
                        container.pathParams = nullptr;
                        container.eventPathParams = nullptr;
+                       container.pathParamsSize = 0;
+                       container.eventPathParamsSize = 0;
                        return;
                    }
 
