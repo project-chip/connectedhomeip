@@ -747,8 +747,8 @@ public:
     using OnSuccessAttributeCallbackType
         = std::function<void(const ConcreteAttributePath & aPath, const DecodableValueType & aData)>;
     using OnSuccessEventCallbackType = std::function<void(const ConcreteEventPath & aPath, const DecodableValueType & aData)>;
-    using OnErrorCallbackType
-        = std::function<void(const app::ConcreteAttributePath * attributePath, const app::ConcreteEventPath * eventPath, CHIP_ERROR aError)>;
+    using OnErrorCallbackType = std::function<void(
+        const app::ConcreteAttributePath * attributePath, const app::ConcreteEventPath * eventPath, CHIP_ERROR aError)>;
     using OnDoneCallbackType = std::function<void(BufferedReadClientCallback * callback)>;
     using OnSubscriptionEstablishedCallbackType = std::function<void()>;
     using OnDeviceResubscriptionScheduledCallbackType = std::function<void(NSError * error, NSNumber * resubscriptionDelay)>;
@@ -894,7 +894,8 @@ private:
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {
-    NSArray<MTRAttributeRequestPath *> * attributePaths = [NSArray arrayWithObject:[MTRAttributeRequestPath requestPathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID]];
+    NSArray<MTRAttributeRequestPath *> * attributePaths = [NSArray
+        arrayWithObject:[MTRAttributeRequestPath requestPathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID]];
     [self readAttributePaths:attributePaths eventPaths:nil params:params queue:queue completion:completion];
 }
 
@@ -952,8 +953,8 @@ private:
                       }];
                   };
 
-            auto onFailureCb = [resultArray, interactionStatus](
-                                   const app::ConcreteAttributePath * attributePath, const app::ConcreteEventPath * eventPath, CHIP_ERROR aError) {
+            auto onFailureCb = [resultArray, interactionStatus](const app::ConcreteAttributePath * attributePath,
+                                   const app::ConcreteEventPath * eventPath, CHIP_ERROR aError) {
                 if (attributePath != nullptr) {
                     [resultArray addObject:@ {
                         MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:*attributePath],
@@ -977,8 +978,8 @@ private:
 
             if (attributes != nil) {
                 size_t count = 0;
-                attributePathParamsList = static_cast<AttributePathParams *>(
-                    Platform::MemoryCalloc([attributes count], sizeof(AttributePathParams)));
+                attributePathParamsList
+                    = static_cast<AttributePathParams *>(Platform::MemoryCalloc([attributes count], sizeof(AttributePathParams)));
                 VerifyOrReturnError(attributePathParamsList != nullptr, CHIP_ERROR_NO_MEMORY);
                 for (MTRAttributeRequestPath * attribute in attributes) {
                     [attribute convertToAttributePathParams:attributePathParamsList[count++]];
@@ -1131,7 +1132,8 @@ private:
 
                    auto establishedOrFailed = chip::Platform::MakeShared<BOOL>(NO);
                    auto onFailureCb = [establishedOrFailed, queue, subscriptionEstablished, reportHandler](
-                                          const app::ConcreteAttributePath * attributePath, const app::ConcreteEventPath * eventPath, CHIP_ERROR error) {
+                                          const app::ConcreteAttributePath * attributePath,
+                                          const app::ConcreteEventPath * eventPath, CHIP_ERROR error) {
                        // TODO, Requires additional logic if attributePath or eventPath is not null
                        if (!(*establishedOrFailed)) {
                            *establishedOrFailed = YES;
@@ -1155,7 +1157,7 @@ private:
                            dispatch_async(queue, subscriptionEstablished);
                        }
                    };
-        
+
                    auto onResubscriptionScheduledCb = [resubscriptionScheduled](NSError * error, NSNumber * resubscriptionDelay) {
                        if (resubscriptionScheduled) {
                            resubscriptionScheduled(error, resubscriptionDelay);
@@ -1445,8 +1447,15 @@ exit:
                               reportHandler:(MTRDeviceResponseHandler)reportHandler
                     subscriptionEstablished:(MTRSubscriptionEstablishedHandler)subscriptionEstablished
 {
-    NSArray<MTRAttributeRequestPath *> * attributePaths = [NSArray arrayWithObject:[MTRAttributeRequestPath requestPathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID]];
-    [self subscribeToAttributePaths:attributePaths eventPaths:nil params:params queue:queue reportHandler:reportHandler subscriptionEstablished:subscriptionEstablished resubscriptionScheduled:nil];
+    NSArray<MTRAttributeRequestPath *> * attributePaths = [NSArray
+        arrayWithObject:[MTRAttributeRequestPath requestPathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID]];
+    [self subscribeToAttributePaths:attributePaths
+                         eventPaths:nil
+                             params:params
+                              queue:queue
+                      reportHandler:reportHandler
+            subscriptionEstablished:subscriptionEstablished
+            resubscriptionScheduled:nil];
 }
 
 - (void)deregisterReportHandlersWithQueue:(dispatch_queue_t)queue completion:(dispatch_block_t)completion
@@ -1651,7 +1660,9 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                            queue:(dispatch_queue_t)queue
                       completion:(MTRDeviceResponseHandler)completion
 {
-    NSArray<MTREventRequestPath *> * eventPaths = [NSArray arrayWithObject:[MTREventRequestPath requestPathWithEndpointID:endpointID clusterID:clusterID eventID:eventID]];
+    NSArray<MTREventRequestPath *> * eventPaths = [NSArray arrayWithObject:[MTREventRequestPath requestPathWithEndpointID:endpointID
+                                                                                                                clusterID:clusterID
+                                                                                                                  eventID:eventID]];
     [self readAttributePaths:nil eventPaths:eventPaths params:params queue:queue completion:completion];
 }
 
@@ -1663,8 +1674,16 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                           reportHandler:(MTRDeviceResponseHandler)reportHandler
                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler)subscriptionEstablished
 {
-    NSArray<MTREventRequestPath *> * eventPaths = [NSArray arrayWithObject:[MTREventRequestPath requestPathWithEndpointID:endpointID clusterID:clusterID eventID:eventID]];
-    [self subscribeToAttributePaths:nil eventPaths:eventPaths params:params queue:queue reportHandler:reportHandler subscriptionEstablished:subscriptionEstablished resubscriptionScheduled:nil];
+    NSArray<MTREventRequestPath *> * eventPaths = [NSArray arrayWithObject:[MTREventRequestPath requestPathWithEndpointID:endpointID
+                                                                                                                clusterID:clusterID
+                                                                                                                  eventID:eventID]];
+    [self subscribeToAttributePaths:nil
+                         eventPaths:eventPaths
+                             params:params
+                              queue:queue
+                      reportHandler:reportHandler
+            subscriptionEstablished:subscriptionEstablished
+            resubscriptionScheduled:nil];
 }
 @end
 
