@@ -1200,8 +1200,8 @@ private:
                    };
 
                    auto callback = chip::Platform::MakeUnique<BufferedReadClientCallback<MTRDataValueDictionaryDecodableType>>(
-                       container.pathParams, attributePathSize, container.eventPathParams, eventPathSize,
-                       onAttributeReportCb, onEventReportCb, onFailureCb, onDone, onEstablishedCb, onResubscriptionScheduledCb);
+                       container.pathParams, attributePathSize, container.eventPathParams, eventPathSize, onAttributeReportCb,
+                       onEventReportCb, onFailureCb, onDone, onEstablishedCb, onResubscriptionScheduledCb);
 
                    auto readClient = Platform::New<app::ReadClient>(
                        engine, exchangeManager, callback->GetBufferedCallback(), chip::app::ReadClient::InteractionType::Subscribe);
