@@ -302,10 +302,34 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         } else {
             chip::MutableByteSpan noc(nocBuffer);
 
+            chip::CATValues cats = chip::kUndefinedCATs;
+            if (startupParams.caseAuthenticatedTags != nil) {
+                unsigned long long tagCount = startupParams.caseAuthenticatedTags.count;
+                if (tagCount > chip::kMaxSubjectCATAttributeCount) {
+                    MTR_LOG_ERROR("%llu CASE Authenticated Tags cannot be represented in a certificate.", tagCount);
+                    return;
+                }
+
+                size_t tagIndex = 0;
+                for (NSNumber * boxedTag in startupParams.caseAuthenticatedTags) {
+                    if (!chip::CanCastTo<chip::CASEAuthTag>(boxedTag.unsignedLongLongValue)) {
+                        MTR_LOG_ERROR("0x%llx is not a valid CASE Authenticated Tag value.", boxedTag.unsignedLongLongValue);
+                        return;
+                    }
+
+                    auto tag = static_cast<chip::CASEAuthTag>(boxedTag.unsignedLongLongValue);
+                    if (!chip::IsValidCASEAuthTag(tag)) {
+                        MTR_LOG_ERROR("0x%" PRIx32 " is not a valid CASE Authenticated Tag value.", tag);
+                        return;
+                    }
+
+                    cats.values[tagIndex++] = tag;
+                }
+            }
+
             if (commissionerParams.operationalKeypair != nullptr) {
                 errorCode = _operationalCredentialsDelegate->GenerateNOC(startupParams.nodeID.unsignedLongLongValue,
-                    startupParams.fabricID.unsignedLongLongValue, chip::kUndefinedCATs,
-                    commissionerParams.operationalKeypair->Pubkey(), noc);
+                    startupParams.fabricID.unsignedLongLongValue, cats, commissionerParams.operationalKeypair->Pubkey(), noc);
 
                 if ([self checkForStartError:errorCode logMsg:kErrorGenerateNOC]) {
                     return;
@@ -325,8 +349,8 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                     return;
                 }
 
-                errorCode = _operationalCredentialsDelegate->GenerateNOC(startupParams.nodeID.unsignedLongLongValue,
-                    startupParams.fabricID.unsignedLongLongValue, chip::kUndefinedCATs, pubKey, noc);
+                errorCode = _operationalCredentialsDelegate->GenerateNOC(
+                    startupParams.nodeID.unsignedLongLongValue, startupParams.fabricID.unsignedLongLongValue, cats, pubKey, noc);
 
                 if ([self checkForStartError:errorCode logMsg:kErrorGenerateNOC]) {
                     return;

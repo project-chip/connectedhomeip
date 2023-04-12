@@ -16,6 +16,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <Security/Security.h>
 
 #ifndef DeviceAttestationCredentialsHolder_h
 #define DeviceAttestationCredentialsHolder_h
@@ -27,8 +28,7 @@
                    firmwareInformation:(NSData * _Nonnull)firmwareInformation
                  deviceAttestationCert:(NSData * _Nonnull)deviceAttestationCert
     productAttestationIntermediateCert:(NSData * _Nonnull)productAttestationIntermediateCert
-       deviceAttestationCertPrivateKey:(NSData * _Nonnull)deviceAttestationCertPrivateKey
-     deviceAttestationCertPublicKeyKey:(NSData * _Nonnull)deviceAttestationCertPublicKeyKey;
+    deviceAttestationCertPrivateKeyRef:(SecKeyRef _Nonnull)deviceAttestationCertPrivateKeyRef;
 
 - (NSData * _Nonnull)getCertificationDeclaration;
 
@@ -38,9 +38,7 @@
 
 - (NSData * _Nonnull)getProductAttestationIntermediateCert;
 
-- (NSData * _Nonnull)getDeviceAttestationCertPrivateKey;
-
-- (NSData * _Nonnull)getDeviceAttestationCertPublicKey;
+- (SecKeyRef _Nonnull)getDeviceAttestationCertPrivateKeyRef;
 
 @end
 

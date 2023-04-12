@@ -143,10 +143,10 @@ client cluster OnOff = 6 {
   }
 
   readonly attribute boolean onOff = 0;
-  readonly attribute boolean globalSceneControl = 16384;
-  attribute int16u onTime = 16385;
-  attribute int16u offWaitTime = 16386;
-  attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
+  readonly attribute optional boolean globalSceneControl = 16384;
+  attribute optional int16u onTime = 16385;
+  attribute optional int16u offWaitTime = 16386;
+  attribute access(write: manage) optional nullable OnOffStartUpOnOff startUpOnOff = 16387;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -203,19 +203,19 @@ client cluster LevelControl = 8 {
   }
 
   readonly attribute nullable int8u currentLevel = 0;
-  readonly attribute int16u remainingTime = 1;
-  readonly attribute int8u minLevel = 2;
-  readonly attribute int8u maxLevel = 3;
-  readonly attribute int16u currentFrequency = 4;
-  readonly attribute int16u minFrequency = 5;
-  readonly attribute int16u maxFrequency = 6;
+  readonly attribute optional int16u remainingTime = 1;
+  readonly attribute optional int8u minLevel = 2;
+  readonly attribute optional int8u maxLevel = 3;
+  readonly attribute optional int16u currentFrequency = 4;
+  readonly attribute optional int16u minFrequency = 5;
+  readonly attribute optional int16u maxFrequency = 6;
   attribute LevelControlOptions options = 15;
-  attribute int16u onOffTransitionTime = 16;
+  attribute optional int16u onOffTransitionTime = 16;
   attribute nullable int8u onLevel = 17;
-  attribute nullable int16u onTransitionTime = 18;
-  attribute nullable int16u offTransitionTime = 19;
-  attribute nullable int8u defaultMoveRate = 20;
-  attribute access(write: manage) nullable int8u startUpCurrentLevel = 16384;
+  attribute optional nullable int16u onTransitionTime = 18;
+  attribute optional nullable int16u offTransitionTime = 19;
+  attribute optional nullable int8u defaultMoveRate = 20;
+  attribute access(write: manage) optional nullable int8u startUpCurrentLevel = 16384;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1262,7 +1262,7 @@ server cluster FixedLabel = 64 {
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
 client cluster WakeOnLan = 1283 {
-  readonly attribute char_string<32> MACAddress = 0;
+  readonly attribute optional char_string<32> MACAddress = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1303,9 +1303,9 @@ client cluster Channel = 1284 {
     LineupInfoTypeEnum lineupInfoType = 3;
   }
 
-  readonly attribute ChannelInfoStruct channelList[] = 0;
-  readonly attribute nullable LineupInfoStruct lineup = 1;
-  readonly attribute nullable ChannelInfoStruct currentChannel = 2;
+  readonly attribute optional ChannelInfoStruct channelList[] = 0;
+  readonly attribute optional nullable LineupInfoStruct lineup = 1;
+  readonly attribute optional nullable ChannelInfoStruct currentChannel = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1353,7 +1353,7 @@ client cluster TargetNavigator = 1285 {
   }
 
   readonly attribute TargetInfoStruct targetList[] = 0;
-  readonly attribute int8u currentTarget = 1;
+  readonly attribute optional int8u currentTarget = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1404,12 +1404,12 @@ client cluster MediaPlayback = 1286 {
   }
 
   readonly attribute PlaybackStateEnum currentState = 0;
-  readonly attribute nullable epoch_us startTime = 1;
-  readonly attribute nullable int64u duration = 2;
-  readonly attribute nullable PlaybackPositionStruct sampledPosition = 3;
-  readonly attribute single playbackSpeed = 4;
-  readonly attribute nullable int64u seekRangeEnd = 5;
-  readonly attribute nullable int64u seekRangeStart = 6;
+  readonly attribute optional nullable epoch_us startTime = 1;
+  readonly attribute optional nullable int64u duration = 2;
+  readonly attribute optional nullable PlaybackPositionStruct sampledPosition = 3;
+  readonly attribute optional single playbackSpeed = 4;
+  readonly attribute optional nullable int64u seekRangeEnd = 5;
+  readonly attribute optional nullable int64u seekRangeStart = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1725,8 +1725,8 @@ client cluster ContentLauncher = 1290 {
     optional StyleInformationStruct waterMark = 5;
   }
 
-  readonly attribute CHAR_STRING acceptHeader[] = 0;
-  attribute bitmap32 supportedStreamingProtocols = 1;
+  readonly attribute optional CHAR_STRING acceptHeader[] = 0;
+  attribute optional bitmap32 supportedStreamingProtocols = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1779,7 +1779,7 @@ client cluster AudioOutput = 1291 {
   }
 
   readonly attribute OutputInfoStruct outputList[] = 0;
-  readonly attribute int8u currentOutput = 1;
+  readonly attribute optional int8u currentOutput = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1824,8 +1824,8 @@ client cluster ApplicationLauncher = 1292 {
     optional endpoint_no endpoint = 1;
   }
 
-  readonly attribute INT16U catalogList[] = 0;
-  attribute nullable ApplicationEPStruct currentApp = 1;
+  readonly attribute optional INT16U catalogList[] = 0;
+  attribute optional nullable ApplicationEPStruct currentApp = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1873,10 +1873,10 @@ client cluster ApplicationBasic = 1293 {
     char_string applicationID = 1;
   }
 
-  readonly attribute char_string<32> vendorName = 0;
-  readonly attribute vendor_id vendorID = 1;
+  readonly attribute optional char_string<32> vendorName = 0;
+  readonly attribute optional vendor_id vendorID = 1;
   readonly attribute char_string<32> applicationName = 2;
-  readonly attribute int16u productID = 3;
+  readonly attribute optional int16u productID = 3;
   readonly attribute ApplicationStruct application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;

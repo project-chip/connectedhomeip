@@ -75,7 +75,7 @@ static bool KeyExists(FabricIndex fabricIndex, GroupId groupId)
 
 static Status GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId, const CharSpan & groupName)
 {
-    VerifyOrReturnError(IsFabricGroupId(groupId), Status::ConstraintError);
+    VerifyOrReturnError(IsValidGroupId(groupId), Status::ConstraintError);
 
     GroupDataProvider * provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, Status::NotFound);
@@ -99,7 +99,7 @@ static Status GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, GroupId g
 
 static EmberAfStatus GroupRemove(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId)
 {
-    VerifyOrReturnError(IsFabricGroupId(groupId), EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrReturnError(IsValidGroupId(groupId), EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
     VerifyOrReturnError(GroupExists(fabricIndex, endpointId, groupId), EMBER_ZCL_STATUS_NOT_FOUND);
 
     GroupDataProvider * provider = GetGroupDataProvider();
@@ -159,7 +159,7 @@ bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, con
     CHIP_ERROR err       = CHIP_NO_ERROR;
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
 
-    VerifyOrExit(IsFabricGroupId(groupId), status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    VerifyOrExit(IsValidGroupId(groupId), status = EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
     VerifyOrExit(nullptr != provider, status = EMBER_ZCL_STATUS_FAILURE);
     VerifyOrExit(provider->HasEndpoint(fabricIndex, groupId, commandPath.mEndpointId), status = EMBER_ZCL_STATUS_NOT_FOUND);
 
