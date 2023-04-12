@@ -269,7 +269,7 @@ MTR_NEWLY_AVAILABLE;
  *
  * Lists of attribute and event paths to read can be provided via attributePaths and eventPaths.
  *
- * The completion will be called with an error if  the input parameters are invalid (e.g., both attributePaths and eventPaths are
+ * The completion will be called with an error if the input parameters are invalid (e.g., both attributePaths and eventPaths are
  * empty.) or the entire read interaction fails. Otherwise it will be called with values, which may be empty (e.g. if no paths
  * matched the wildcard paths passed in) or may include per-path errors if particular paths failed.
  *
