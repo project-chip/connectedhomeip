@@ -34,7 +34,7 @@ CHIP_ERROR WaitForCommissioneeCommand::RunCommand()
 }
 
 void WaitForCommissioneeCommand::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
-                                                     SessionHandle & sessionHandle)
+                                                     const SessionHandle & sessionHandle)
 {
     auto * command = reinterpret_cast<WaitForCommissioneeCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));

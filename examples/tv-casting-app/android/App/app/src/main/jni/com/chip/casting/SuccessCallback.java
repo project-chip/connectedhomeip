@@ -17,6 +17,18 @@
  */
 package com.chip.casting;
 
-public interface SuccessCallback<R> {
-  void handle(R response);
+import android.util.Log;
+
+public abstract class SuccessCallback<R> {
+  private static final String TAG = SuccessCallback.class.getSimpleName();
+
+  public abstract void handle(R response);
+
+  public void handleInternal(R response) {
+    try {
+      handle(response);
+    } catch (Throwable t) {
+      Log.e(TAG, "SuccessCallback::Caught an unhandled Throwable from the client: " + t);
+    }
+  }
 }

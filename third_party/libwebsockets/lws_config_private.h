@@ -17,3 +17,5 @@
  */
 
 #pragma once
+
+#define LWS_HAVE_SYS_RESOURCE_H

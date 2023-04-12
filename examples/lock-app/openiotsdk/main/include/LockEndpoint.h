@@ -25,10 +25,10 @@ struct LockUserInfo
 {
     char userName[DOOR_LOCK_USER_NAME_BUFFER_SIZE];
     uint32_t userUniqueId;
-    DlUserStatus userStatus;
-    DlUserType userType;
-    DlCredentialRule credentialRule;
-    std::vector<DlCredential> credentials;
+    UserStatusEnum userStatus;
+    UserTypeEnum userType;
+    CredentialRuleEnum credentialRule;
+    std::vector<CredentialStruct> credentials;
     chip::FabricIndex createdBy;
     chip::FabricIndex lastModifiedBy;
 };
@@ -58,29 +58,30 @@ public:
 
     inline chip::EndpointId GetEndpointId() const { return mEndpointId; }
 
-    bool Lock(const Optional<chip::ByteSpan> & pin, DlOperationError & err);
-    bool Unlock(const Optional<chip::ByteSpan> & pin, DlOperationError & err);
+    bool Lock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err);
+    bool Unlock(const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err);
 
     bool GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const;
     bool SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier, const chip::CharSpan & userName,
-                 uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype, DlCredentialRule credentialRule,
-                 const DlCredential * credentials, size_t totalCredentials);
+                 uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype, CredentialRuleEnum credentialRule,
+                 const CredentialStruct * credentials, size_t totalCredentials);
 
-    bool GetCredential(uint16_t credentialIndex, DlCredentialType credentialType,
+    bool GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType,
                        EmberAfPluginDoorLockCredentialInfo & credential) const;
 
     bool SetCredential(uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
-                       DlCredentialStatus credentialStatus, DlCredentialType credentialType, const chip::ByteSpan & credentialData);
+                       DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
+                       const chip::ByteSpan & credentialData);
 
     DlStatus GetSchedule(uint8_t weekDayIndex, uint16_t userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule);
     DlStatus GetSchedule(uint8_t yearDayIndex, uint16_t userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule);
-    DlStatus SetSchedule(uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status, DlDaysMaskMap daysMask,
-                         uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
+    DlStatus SetSchedule(uint8_t weekDayIndex, uint16_t userIndex, DlScheduleStatus status, DaysMaskMap daysMask, uint8_t startHour,
+                         uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
     DlStatus SetSchedule(uint8_t yearDayIndex, uint16_t userIndex, DlScheduleStatus status, uint32_t localStartTime,
                          uint32_t localEndTime);
 
 private:
-    bool setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, DlOperationError & err);
+    bool setLockState(DlLockState lockState, const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err);
     const char * lockStateToString(DlLockState lockState) const;
 
     chip::EndpointId mEndpointId;
@@ -97,7 +98,7 @@ private:
 struct LockCredentialInfo
 {
     DlCredentialStatus status;
-    DlCredentialType credentialType;
+    CredentialTypeEnum credentialType;
     chip::FabricIndex createdBy;
     chip::FabricIndex modifiedBy;
     uint8_t credentialData[DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE];

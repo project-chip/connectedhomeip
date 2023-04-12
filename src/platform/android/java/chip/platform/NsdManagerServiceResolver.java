@@ -71,8 +71,6 @@ public class NsdManagerServiceResolver implements ServiceResolver {
       final long callbackHandle,
       final long contextHandle,
       final ChipMdnsCallback chipMdnsCallback) {
-    multicastLock.acquire();
-
     NsdServiceInfo serviceInfo = new NsdServiceInfo();
     serviceInfo.setServiceName(instanceName);
     serviceInfo.setServiceType(serviceType);
@@ -102,60 +100,18 @@ public class NsdManagerServiceResolver implements ServiceResolver {
           }
         };
 
-    if (nsdManagerResolverAvailState != null) {
-      nsdManagerResolverAvailState.acquireResolver();
-    }
-
-    this.nsdManager.resolveService(
-        serviceInfo,
-        new NsdManager.ResolveListener() {
-          @Override
-          public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
-            Log.w(
-                TAG,
-                "Failed to resolve service '" + serviceInfo.getServiceName() + "': " + errorCode);
-            chipMdnsCallback.handleServiceResolve(
-                instanceName, serviceType, null, null, 0, null, callbackHandle, contextHandle);
-
-            if (multicastLock.isHeld()) {
-              multicastLock.release();
-
-              if (nsdManagerResolverAvailState != null) {
-                nsdManagerResolverAvailState.signalFree();
-              }
-            }
-            mainThreadHandler.removeCallbacks(timeoutRunnable);
-          }
-
-          @Override
-          public void onServiceResolved(NsdServiceInfo serviceInfo) {
-            Log.i(
-                TAG,
-                "Resolved service '"
-                    + serviceInfo.getServiceName()
-                    + "' to "
-                    + serviceInfo.getHost());
-            // TODO: Find out if DNS-SD results for Android should contain interface ID
-            chipMdnsCallback.handleServiceResolve(
-                instanceName,
-                serviceType,
-                serviceInfo.getHost().getHostName(),
-                serviceInfo.getHost().getHostAddress(),
-                serviceInfo.getPort(),
-                serviceInfo.getAttributes(),
-                callbackHandle,
-                contextHandle);
-
-            if (multicastLock.isHeld()) {
-              multicastLock.release();
-
-              if (nsdManagerResolverAvailState != null) {
-                nsdManagerResolverAvailState.signalFree();
-              }
-            }
-            mainThreadHandler.removeCallbacks(timeoutRunnable);
-          }
-        });
+    NsdServiceFinderAndResolver serviceFinderResolver =
+        new NsdServiceFinderAndResolver(
+            this.nsdManager,
+            serviceInfo,
+            callbackHandle,
+            contextHandle,
+            chipMdnsCallback,
+            timeoutRunnable,
+            multicastLock,
+            mainThreadHandler,
+            nsdManagerResolverAvailState);
+    serviceFinderResolver.start();
 
     mainThreadHandler.postDelayed(timeoutRunnable, RESOLVE_SERVICE_TIMEOUT);
   }

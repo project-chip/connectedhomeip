@@ -208,7 +208,7 @@ exit:
 CHIP_ERROR P256KeypairHSM::Serialize(P256SerializedKeypair & output) const
 {
     const size_t len = output.Length() == 0 ? output.Capacity() : output.Length();
-    Encoding::BufferWriter bbuf(output, len);
+    Encoding::BufferWriter bbuf(output.Bytes(), len);
     uint8_t privkey[kP256_PrivateKey_Length] = {
         0,
     };
@@ -249,7 +249,7 @@ CHIP_ERROR P256KeypairHSM::Deserialize(P256SerializedKeypair & input)
     VerifyOrReturnError(bbuf.Fit(), CHIP_ERROR_NO_MEMORY);
     {
         /* When HSM is used for ECC key generation, key info in stored in private key buffer */
-        const uint8_t * privkey = Uint8::to_const_uchar(input) + public_key.Length();
+        const uint8_t * privkey = input.ConstBytes() + public_key.Length();
         keyid                   = Encoding::LittleEndian::Get32(privkey);
         public_key.SetPublicKeyId(keyid);
     }
@@ -274,7 +274,7 @@ CHIP_ERROR P256KeypairHSM::ECDH_derive_secret(const P256PublicKey & remote_publi
     VerifyOrReturnError(gex_sss_chip_ctx.ks.session != nullptr, CHIP_ERROR_INTERNAL);
 
     const smStatus_t smstatus = Se05x_API_ECGenSharedSecret(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyid,
-                                                            rem_pubKey, rem_pubKeyLen, Uint8::to_uchar(out_secret), &secret_length);
+                                                            rem_pubKey, rem_pubKeyLen, out_secret.Bytes(), &secret_length);
     VerifyOrReturnError(smstatus == SM_OK, CHIP_ERROR_INTERNAL);
 
     return out_secret.SetLength(secret_length);

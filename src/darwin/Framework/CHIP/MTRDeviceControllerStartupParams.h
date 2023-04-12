@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,6 +24,40 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MTRKeypair;
 
 @interface MTRDeviceControllerStartupParams : NSObject
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * Prepare to initialize a controller given a keypair to use for signing
+ * operational certificates.
+ *
+ * @param ipk The Identity Protection Key, must be 16 bytes in length
+ * @param fabricID The fabric identifier, must be non-zero.
+ */
+- (instancetype)initWithIPK:(NSData *)ipk
+                   fabricID:(NSNumber *)fabricID
+                  nocSigner:(id<MTRKeypair>)nocSigner API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Prepare to initialize a controller with a complete operational certificate
+ * chain.  This initialization method should be used when none of the
+ * certificate-signing private keys are available locally.
+ *
+ * The fabric id and node id to use will be derived from the provided
+ * operationalCertificate.
+ *
+ * @param ipk The Identity Protection Key, must be 16 bytes in length
+ * @param intermediateCertificate may be nil if operationalCertificate is directly signed by rootCertificate.
+ *
+ * ipk must be 16 bytes in length.
+ */
+- (instancetype)initWithIPK:(NSData *)ipk
+         operationalKeypair:(id<MTRKeypair>)operationalKeypair
+     operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
+    intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
+            rootCertificate:(MTRCertificateDERBytes)rootCertificate API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
 /**
  * Keypair used to sign operational certificates.  This is the root CA keypair
  * if not using an intermediate CA, the intermediate CA's keypair otherwise.
@@ -35,6 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
  * (to provide the operational credentials for t2he controller itself).
  */
 @property (nonatomic, copy, readonly, nullable) id<MTRKeypair> nocSigner;
+
 /**
  * Fabric id for the controller.  Must be set to a nonzero value.  This is
  * scoped by the root public key, which is determined as follows:
@@ -46,7 +81,8 @@ NS_ASSUME_NONNULL_BEGIN
  *   key of the nocSigner keypair, since in this case we are not using an
  *   intermediate certificate.
  */
-@property (nonatomic, copy, readonly) NSNumber * fabricID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, readonly) NSNumber * fabricID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
 /**
  * IPK to use for the controller's fabric.  Allowed to change from the last time
  * a controller was started on this fabric if a new IPK has been distributed to
@@ -69,7 +105,7 @@ NS_ASSUME_NONNULL_BEGIN
  * * Will override existing value if not nil. Otherwise existing value will be
  *   used.
  */
-@property (nonatomic, copy, nullable) NSNumber * vendorID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, nullable) NSNumber * vendorID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Node id for this controller.
@@ -91,15 +127,27 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * ** nodeID is allowed to be nil to indicate that the existing operational node
  *    id should be used.  The existing operational keys will also be used,
- *    unless operationalKeypair is provided.
+ *    unless operationalKeypair is provided.  The existing caseAuthenticatedTags
+ *    will be used.
  *
  * ** If nodeID is not nil, a new operational certificate will be generated for
  *    the provided node id (even if that matches the existing node id), using
  *    either the operationalKeypair if that is provided or a new randomly
- *    generated operational key.
- *
+ *    generated operational key, and using the provided caseAuthenticatedTags.
  */
-@property (nonatomic, copy, nullable) NSNumber * nodeID MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy, nullable) NSNumber * nodeID API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * CASE authenticated tags to use for this controller's operational certificate.
+ *
+ * Only allowed to be not nil if nodeID is not nil.  In particular, if
+ * operationalCertificate is not nil, must be nil.  The provided operational
+ * certificate will be used as-is.
+ *
+ * If not nil, must contain at most 3 numbers, which are expected to be 32-bit
+ * unsigned Case Authenticated Tag values.
+ */
+@property (nonatomic, copy, nullable) NSSet<NSNumber *> * caseAuthenticatedTags MTR_NEWLY_AVAILABLE;
 
 /**
  * Root certificate, in X.509 DER form, to use.
@@ -183,8 +231,8 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * If not nil, and if operationalCertificate is nil, a new operational
  * certificate will be generated for the given operationalKeypair.  The node id
- * will for that certificated will be determined as described in the
- * documentation for nodeID.
+ * for that certificate will be determined as described in the documentation for
+ * nodeID.
  */
 @property (nonatomic, strong, nullable) id<MTRKeypair> operationalKeypair;
 
@@ -193,75 +241,39 @@ NS_ASSUME_NONNULL_BEGIN
  * when commmissioning devices.  Allowed to be nil if this controller either
  * does not issue operational certificates at all or internally generates the
  * certificates to be issued.  In the latter case, nocSigner must not be nil.
- *
- * When this property is non-nill, all device attestation checks that require
- * some sort of trust anchors are delegated to the operationalCertificateIssuer.
- * Specifically, the following device attestation checks are not performed and
- * must be done by the operationalCertificateIssuer:
- *
- * (1) Make sure the PAA is valid and approved by CSA.
- * (2) VID-scoped PAA check: if the PAA is VID scoped, then its VID must match the DAC VID.
- * (3) cert chain check: verify PAI is signed by PAA, and DAC is signed by PAI.
- * (4) PAA subject key id extraction: the PAA subject key must match the PAA key referenced in the PAI.
- * (5) CD signature check: make sure a valid CSA CD key is used to sign the CD.
  */
-@property (nonatomic, strong, nullable) id<MTROperationalCertificateIssuer> operationalCertificateIssuer MTR_NEWLY_AVAILABLE;
+@property (nonatomic, strong, nullable) id<MTROperationalCertificateIssuer> operationalCertificateIssuer API_AVAILABLE(
+    ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The dispatch queue on which operationalCertificateIssuer should be called.
  * Allowed to be nil if and only if operationalCertificateIssuer is nil.
  */
-@property (nonatomic, strong, nullable) dispatch_queue_t operationalCertificateIssuerQueue MTR_NEWLY_AVAILABLE;
-
-- (instancetype)init NS_UNAVAILABLE;
-
-/**
- * Prepare to initialize a controller given a keypair to use for signing
- * operational certificates.
- *
- * fabricID must be set to a valid (i.e. nonzero) value.
- *
- * ipk must be 16 bytes in length
- */
-- (instancetype)initWithIPK:(NSData *)ipk fabricID:(NSNumber *)fabricID nocSigner:(id<MTRKeypair>)nocSigner MTR_NEWLY_AVAILABLE;
-
-/**
- * Prepare to initialize a controller with a complete operational certificate
- * chain.  This initialization method should be used when none of the
- * certificate-signing private keys are available locally.
- *
- * The fabric id and node id to use will be derived from the provided
- * operationalCertificate.
- *
- * intermediateCertificate may be nil if operationalCertificate is signed by
- * rootCertificate.
- *
- * ipk must be 16 bytes in length.
- */
-- (instancetype)initWithIPK:(NSData *)ipk
-         operationalKeypair:(id<MTRKeypair>)operationalKeypair
-     operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
-    intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
-            rootCertificate:(MTRCertificateDERBytes)rootCertificate MTR_NEWLY_AVAILABLE;
+@property (nonatomic, strong, nullable)
+    dispatch_queue_t operationalCertificateIssuerQueue API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 @end
 
 @interface MTRDeviceControllerStartupParams (Deprecated)
 
-@property (nonatomic, assign, readonly) uint64_t fabricId MTR_NEWLY_DEPRECATED("Please use fabricID");
-@property (nonatomic, copy, nullable) NSNumber * vendorId MTR_NEWLY_DEPRECATED("Please use vendorID");
-@property (nonatomic, copy, nullable) NSNumber * nodeId MTR_NEWLY_DEPRECATED("Please use nodeID");
+@property (nonatomic, assign, readonly) uint64_t fabricId MTR_DEPRECATED(
+    "Please use fabricID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+@property (nonatomic, copy, nullable) NSNumber * vendorId MTR_DEPRECATED(
+    "Please use vendorID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
+@property (nonatomic, copy, nullable)
+    NSNumber * nodeId MTR_DEPRECATED("Please use nodeID", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 - (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner
                               fabricId:(uint64_t)fabricId
-                                   ipk:(NSData *)ipk MTR_NEWLY_DEPRECATED("Please use initWithIPK:fabricID:nocSigner:");
+                                   ipk:(NSData *)ipk MTR_DEPRECATED("Please use initWithIPK:fabricID:nocSigner:", ios(16.1, 16.4),
+                                           macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 - (instancetype)initWithOperationalKeypair:(id<MTRKeypair>)operationalKeypair
                     operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
                    intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
                            rootCertificate:(MTRCertificateDERBytes)rootCertificate
                                        ipk:(NSData *)ipk
-    MTR_NEWLY_DEPRECATED(
-        "Please use initWithIPK:operationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:");
+    MTR_DEPRECATED("Please use initWithIPK:operationalKeypair:operationalCertificate:intermediateCertificate:rootCertificate:",
+        ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 @end
 

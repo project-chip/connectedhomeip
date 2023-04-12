@@ -21,25 +21,28 @@
 
 namespace chip {
 namespace DeviceLayer {
-namespace EFR32 {
+namespace SIWx917 {
 
 /**
  * @brief This class provides Commissionable data, Device Attestation Credentials,
  *        and Device Instance Info.
  */
 
-class EFR32DeviceDataProvider : public CommissionableDataProvider,
-                                public Internal::GenericDeviceInstanceInfoProvider<Internal::SILABSConfig>
+class SIWx917DeviceDataProvider : public CommissionableDataProvider,
+                                  public Internal::GenericDeviceInstanceInfoProvider<Internal::SilabsConfig>
 {
 public:
-    EFR32DeviceDataProvider() :
-        CommissionableDataProvider(), Internal::GenericDeviceInstanceInfoProvider<Internal::SILABSConfig>(
+    SIWx917DeviceDataProvider() :
+        CommissionableDataProvider(), Internal::GenericDeviceInstanceInfoProvider<Internal::SilabsConfig>(
                                           ConfigurationManagerImpl::GetDefaultInstance())
     {}
 
-    static EFR32DeviceDataProvider & GetDeviceDataProvider();
+    static SIWx917DeviceDataProvider & GetDeviceDataProvider();
     CHIP_ERROR GetSetupPayload(MutableCharSpan & payloadBuf);
-
+#ifdef SIWX917_USE_COMISSIONABLE_DATA
+    void setupPayload(uint8_t * outBuf);
+    CHIP_ERROR FlashFactoryData();
+#endif /* SIWX917_USE_COMISSIONABLE_DATA */
     // ===== Members functions that implement the CommissionableDataProvider
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
     CHIP_ERROR SetSetupDiscriminator(uint16_t setupDiscriminator) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -62,6 +65,6 @@ public:
     CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override;
 };
 
-} // namespace EFR32
+} // namespace SIWx917
 } // namespace DeviceLayer
 } // namespace chip

@@ -41,19 +41,23 @@ LinuxDeviceOptions gDeviceOptions;
 // Follow the code style of command line arguments in case we need to add more options in the future.
 enum
 {
-    kDeviceOption_BleDevice                             = 0x1000,
-    kDeviceOption_WiFi                                  = 0x1001,
-    kDeviceOption_Thread                                = 0x1002,
-    kDeviceOption_Version                               = 0x1003,
-    kDeviceOption_VendorID                              = 0x1004,
-    kDeviceOption_ProductID                             = 0x1005,
-    kDeviceOption_CustomFlow                            = 0x1006,
-    kDeviceOption_Capabilities                          = 0x1007,
-    kDeviceOption_Discriminator                         = 0x1008,
-    kDeviceOption_Passcode                              = 0x1009,
-    kDeviceOption_SecuredDevicePort                     = 0x100a,
-    kDeviceOption_SecuredCommissionerPort               = 0x100b,
-    kDeviceOption_UnsecuredCommissionerPort             = 0x100c,
+    kDeviceOption_BleDevice     = 0x1000,
+    kDeviceOption_WiFi          = 0x1001,
+    kDeviceOption_Thread        = 0x1002,
+    kDeviceOption_Version       = 0x1003,
+    kDeviceOption_VendorID      = 0x1004,
+    kDeviceOption_ProductID     = 0x1005,
+    kDeviceOption_CustomFlow    = 0x1006,
+    kDeviceOption_Capabilities  = 0x1007,
+    kDeviceOption_Discriminator = 0x1008,
+    kDeviceOption_Passcode      = 0x1009,
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
+    kDeviceOption_SecuredDevicePort         = 0x100a,
+    kDeviceOption_UnsecuredCommissionerPort = 0x100b,
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    kDeviceOption_SecuredCommissionerPort = 0x100c,
+#endif
     kDeviceOption_Command                               = 0x100d,
     kDeviceOption_PICS                                  = 0x100e,
     kDeviceOption_KVS                                   = 0x100f,
@@ -98,9 +102,13 @@ OptionDef sDeviceOptionDefs[] = {
     { "spake2p-verifier-base64", kArgumentRequired, kDeviceOption_Spake2pVerifierBase64 },
     { "spake2p-salt-base64", kArgumentRequired, kDeviceOption_Spake2pSaltBase64 },
     { "spake2p-iterations", kArgumentRequired, kDeviceOption_Spake2pIterations },
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     { "secured-device-port", kArgumentRequired, kDeviceOption_SecuredDevicePort },
-    { "secured-commissioner-port", kArgumentRequired, kDeviceOption_SecuredCommissionerPort },
     { "unsecured-commissioner-port", kArgumentRequired, kDeviceOption_UnsecuredCommissionerPort },
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    { "secured-commissioner-port", kArgumentRequired, kDeviceOption_SecuredCommissionerPort },
+#endif
     { "command", kArgumentRequired, kDeviceOption_Command },
     { "PICS", kArgumentRequired, kDeviceOption_PICS },
     { "KVS", kArgumentRequired, kDeviceOption_KVS },
@@ -175,16 +183,20 @@ const char * sDeviceOptionHelp =
     "       passed, the iteration counts must match that used to generate the verifier otherwise failure will\n"
     "       arise.\n"
     "\n"
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     "  --secured-device-port <port>\n"
     "       A 16-bit unsigned integer specifying the listen port to use for secure device messages (default is 5540).\n"
-    "\n"
-    "  --secured-commissioner-port <port>\n"
-    "       A 16-bit unsigned integer specifying the listen port to use for secure commissioner messages (default is 5542). Only "
-    "valid when app is both device and commissioner\n"
     "\n"
     "  --unsecured-commissioner-port <port>\n"
     "       A 16-bit unsigned integer specifying the port to use for unsecured commissioner messages (default is 5550).\n"
     "\n"
+#endif
+#if CHIP_DEVICE_ENABLE_PORT_PARAMS
+    "  --secured-commissioner-port <port>\n"
+    "       A 16-bit unsigned integer specifying the listen port to use for secure commissioner messages (default is 5552). Only "
+    "valid when app is both device and commissioner\n"
+    "\n"
+#endif
     "  --commissioner-fabric-id <fabricid>\n"
     "       The fabric ID to be used when this device is a commissioner (default in code is 1).\n"
     "\n"
@@ -377,17 +389,22 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         break;
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     case kDeviceOption_SecuredDevicePort:
         LinuxDeviceOptions::GetInstance().securedDevicePort = static_cast<uint16_t>(atoi(aValue));
-        break;
-
-    case kDeviceOption_SecuredCommissionerPort:
-        LinuxDeviceOptions::GetInstance().securedCommissionerPort = static_cast<uint16_t>(atoi(aValue));
         break;
 
     case kDeviceOption_UnsecuredCommissionerPort:
         LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort = static_cast<uint16_t>(atoi(aValue));
         break;
+
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+    case kDeviceOption_SecuredCommissionerPort:
+        LinuxDeviceOptions::GetInstance().securedCommissionerPort = static_cast<uint16_t>(atoi(aValue));
+        break;
+#endif
 
     case kDeviceOption_Command:
         LinuxDeviceOptions::GetInstance().command = aValue;

@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+#import <Matter/MTRDefines.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -23,8 +23,10 @@ typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
     MTRCommissioningStatusUnknown = 0,
     MTRCommissioningStatusSuccess = 1,
     MTRCommissioningStatusFailed = 2,
-    MTRCommissioningStatusDiscoveringMoreDevices = 3
-} MTR_NEWLY_AVAILABLE;
+    MTRCommissioningStatusDiscoveringMoreDevices MTR_DEPRECATED("MTRCommissioningStatusDiscoveringMoreDevices is not used.",
+        ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5))
+    = 3,
+} API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 @class MTRDeviceController;
 
@@ -33,7 +35,7 @@ typedef NS_ENUM(NSInteger, MTRCommissioningStatus) {
  *
  * All delegate methods will be called on the supplied Delegate Queue.
  */
-MTR_NEWLY_AVAILABLE
+API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @protocol MTRDeviceControllerDelegate <NSObject>
 @optional
 /**
@@ -55,13 +57,21 @@ MTR_NEWLY_AVAILABLE
 @end
 
 typedef NS_ENUM(NSUInteger, MTRPairingStatus) {
-    MTRPairingStatusUnknown MTR_NEWLY_DEPRECATED("Please use MTRCommissioningStatusUnknown") = 0,
-    MTRPairingStatusSuccess MTR_NEWLY_DEPRECATED("Please use MTRCommissioningStatusSuccess") = 1,
-    MTRPairingStatusFailed MTR_NEWLY_DEPRECATED("Please use MTRCommissioningStatusFailed") = 2,
-    MTRPairingStatusDiscoveringMoreDevices MTR_NEWLY_DEPRECATED("Please use MTRCommissioningStatusDiscoveringMoreDevices") = 3
-} MTR_NEWLY_DEPRECATED("Please use MTRCommissioningStatus");
+    MTRPairingStatusUnknown MTR_DEPRECATED(
+        "Please use MTRCommissioningStatusUnknown", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 0,
+    MTRPairingStatusSuccess MTR_DEPRECATED(
+        "Please use MTRCommissioningStatusSuccess", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 1,
+    MTRPairingStatusFailed MTR_DEPRECATED(
+        "Please use MTRCommissioningStatusFailed", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 2,
+    MTRPairingStatusDiscoveringMoreDevices MTR_DEPRECATED("MTRPairingStatusDiscoveringMoreDevices is not used.", ios(16.1, 16.4),
+        macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
+    = 3
+} MTR_DEPRECATED("Please use MTRCommissioningStatus", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
-MTR_NEWLY_DEPRECATED("Please use MTRDeviceControllerDelegate")
+MTR_DEPRECATED("Please use MTRDeviceControllerDelegate", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4))
 @protocol MTRDevicePairingDelegate <NSObject>
 @optional
 - (void)onStatusUpdate:(MTRPairingStatus)status;

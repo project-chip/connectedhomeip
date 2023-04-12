@@ -37,7 +37,7 @@ tests:
     - label: "Reads mandatory attribute constrains: OccupancySensorType"
       PICS: OCC.S.A0001
       command: "readAttribute"
-      attribute: "occupancy sensor type"
+      attribute: "OccupancySensorType"
       response:
           constraints:
               type: enum8
@@ -47,7 +47,7 @@ tests:
     - label: "Reads mandatory attribute constrains: OccupancySensorTypeBitmap"
       PICS: OCC.S.A0002
       command: "readAttribute"
-      attribute: "occupancy sensor type bitmap"
+      attribute: "OccupancySensorTypeBitmap"
       response:
           constraints:
               type: bitmap8

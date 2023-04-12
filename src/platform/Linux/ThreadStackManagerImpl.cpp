@@ -496,9 +496,10 @@ CHIP_ERROR ThreadStackManagerImpl::_SetSEDIntervalsConfig(const ConnectivityMana
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_RequestSEDActiveMode(bool onOff)
+CHIP_ERROR ThreadStackManagerImpl::_RequestSEDActiveMode(bool onOff, bool delayIdle)
 {
     (void) onOff;
+    (void) delayIdle;
 
     ChipLogError(DeviceLayer, "SED intervals config is not supported on linux");
     return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -564,6 +565,11 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
 {
     // TODO: Remove Weave legacy APIs
     return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+void ThreadStackManagerImpl::_SetRouterPromotion(bool val)
+{
+    // Set Router Promotion is not supported on linux
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(ThreadDriver::ScanCallback * callback)

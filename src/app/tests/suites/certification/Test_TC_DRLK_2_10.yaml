@@ -127,7 +127,7 @@ tests:
 
 
 
-          ./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
+          ./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 123456
 
           Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
@@ -180,7 +180,7 @@ tests:
           PINCode"
       PICS: DRLK.S.C01.Rsp
       verification: |
-          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 123456
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 123456
 
           Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
@@ -247,7 +247,7 @@ tests:
           PINCode"
       PICS: DRLK.S.C00.Rsp
       verification: |
-          ./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 12345678
+          ./chip-tool doorlock lock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 12345678
 
           Verify "DUT sends SUCCESS response" on the TH(Chip-tool) Log:
 
@@ -298,7 +298,7 @@ tests:
     - label: "TH sends Unlock Door Command to the DUT with InvalidPINCode."
       PICS: DRLK.S.C01.Rsp
       verification: |
-          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PinCode 12345678
+          ./chip-tool doorlock unlock-door 1 1 --timedInteractionTimeoutMs 1000 --PINCode 12345678
 
           Verify "DUT sends failure response" on the TH(Chip-tool) Log:
 

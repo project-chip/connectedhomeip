@@ -25,9 +25,15 @@
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#ifdef RSI_BLE_ENABLE
+#define BLE_MIN_CONNECTION_INTERVAL_MS 45 // 45 msec
+#define BLE_MAX_CONNECTION_INTERVAL_MS 45 // 45 msec
+#define BLE_SLAVE_LATENCY_MS 0
+#define BLE_TIMEOUT_MS 400
+#endif // RSI_BLE_ENABLE
 #include "FreeRTOS.h"
 #include "timers.h"
-#ifdef RS91X_BLE_ENABLE
+#ifdef RSI_BLE_ENABLE
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -41,7 +47,7 @@ extern "C" {
 #include "gatt_db.h"
 #include "sl_bgapi.h"
 #include "sl_bt_api.h"
-#endif // RS91X_BLE_ENABLE
+#endif // RSI_BLE_ENABLE
 
 namespace chip {
 namespace DeviceLayer {
@@ -58,7 +64,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
 public:
     void HandleBootEvent(void);
 
-#ifdef RS91X_BLE_ENABLE
+#ifdef RSI_BLE_ENABLE
     void HandleConnectEvent(void);
     void HandleConnectionCloseEvent(uint16_t reason);
     void HandleWriteEvent(rsi_ble_event_write_t evt);
@@ -76,10 +82,10 @@ public:
     void HandleTXCharCCCDWrite(volatile sl_bt_msg_t * evt);
     void HandleSoftTimerEvent(volatile sl_bt_msg_t * evt);
     CHIP_ERROR StartAdvertising(void);
-#endif // RS91X_BLE_ENABLE
+#endif // RSI_BLE_ENABLE
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-#ifdef RS91X_BLE_ENABLE
+#ifdef RSI_BLE_ENABLE
     static void HandleC3ReadRequest(void);
 #else
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
@@ -156,7 +162,7 @@ private:
 
     struct CHIPoBLEConState
     {
-#ifndef RS91X_BLE_ENABLE
+#ifndef RSI_BLE_ENABLE
         bd_addr address;
 #endif
         uint16_t mtu : 10;
@@ -186,7 +192,7 @@ private:
     CHIP_ERROR EncodeAdditionalDataTlv();
 #endif
 
-#ifdef RS91X_BLE_ENABLE
+#ifdef RSI_BLE_ENABLE
     void HandleRXCharWrite(rsi_ble_event_write_t * evt);
 #else
     void HandleRXCharWrite(volatile sl_bt_msg_t * evt);

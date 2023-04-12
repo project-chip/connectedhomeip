@@ -70,7 +70,7 @@ tests:
           error: FAILURE
 
     - label: "Open Commissioning Window from alpha"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -98,15 +98,15 @@ tests:
       attribute: "Fabrics"
       fabricFiltered: false
       response:
-          value: [{ "NodeId": nodeId }]
+          value: [{ "NodeID": nodeId }]
 
     - label: "Close Commissioning Window after failed commissioning"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "RevokeCommissioning"
       timedInteractionTimeoutMs: 10000
 
     - label: "Open Commissioning Window from alpha again"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:
@@ -136,7 +136,7 @@ tests:
 
     - label: "Open Commissioning Window from beta"
       identity: "beta"
-      cluster: "AdministratorCommissioning"
+      cluster: "Administrator Commissioning"
       command: "OpenBasicCommissioningWindow"
       timedInteractionTimeoutMs: 10000
       arguments:

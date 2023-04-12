@@ -22,6 +22,8 @@ assert(chip_device_platform == "telink")
 static_library("telink") {
   sources = [
     "../SingletonConfigurationManager.cpp",
+    "../Zephyr/BLEAdvertisingArbiter.cpp",
+    "../Zephyr/BLEAdvertisingArbiter.h",
     "../Zephyr/ConfigurationManagerImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.cpp",
     "../Zephyr/DiagnosticDataProviderImpl.h",
@@ -67,7 +69,7 @@ static_library("telink") {
   if (chip_enable_openthread) {
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",
-      "../Zephyr/ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
 

@@ -22,21 +22,23 @@ network.
     -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
 -   [Device UI](#device-ui)
 -   [Building](#building)
-    -   [Known issues](#known-issues)
+    -   [Known issues](#known-issues-building)
 -   [Manufacturing data](#manufacturing-data)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Pigweed Tokenizer](#pigweed-tokenizer)
     -   [Detokenizer script](#detokenizer-script)
     -   [Notes](#notes)
-    -   [Known issues](#known-issues-1)
--   [Tinycrypt ECC operations](#tinycrypt-ecc-operations)
+    -   [Known issues](#known-issues-tokenizer)
+-   [NXP Ultrafast P256 ECC Library](#nxp-ultrafast-p256-ecc-library)
     -   [Building steps](#building-steps)
+-   [Tinycrypt ECC library](#tinycrypt-ecc-library)
+    -   [Building steps](#building-steps-1)
 -   [OTA](#ota)
     -   [Writing the SSBL](#writing-the-ssbl)
     -   [Writing the PSECT](#writing-the-psect)
     -   [Writing the application](#writing-the-application)
     -   [OTA Testing](#ota-testing)
-    -   [Known issues](#known-issues-2)
+    -   [Known issues](#known-issues-ota)
         </hr>
 
 ## Introduction
@@ -190,17 +192,16 @@ In order to build the Project CHIP example, we recommend using a Linux
 distribution (the demo-application was compiled on Ubuntu 20.04).
 
 -   Download
-    [K32W0 SDK 2.6.7](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_7_K32W061DK6.zip).
+    [K32W061DK6 SDK 2.6.10](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_10_K32W061DK6.zip).
 
 -   Start building the application either with Secure Element or without
     -   without Secure Element
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_7_K32W061DK6/
-user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
+user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W0_SDK_ROOT=/home/user/Desktop/SDK_2_6_10_K32W061DK6/
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lighting-app/nxp/k32w/k32w0
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"tinycrypt\" chip_with_se05x=0 chip_pw_tokenizer_logging=true mbedtls_repo=\"//third_party/connectedhomeip/third_party/nxp/libs/mbedtls\""
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${NXP_K32W0_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"platform\" chip_with_se05x=0 chip_pw_tokenizer_logging=true"
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ ninja -C out/debug
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ $NXP_K32W0_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
@@ -212,9 +213,11 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/lighting-app/nxp/k32w/k32w0$ 
 Note that option chip_enable_ota_requestor=false are required for building with
 Secure Element. These can be changed if building without Secure Element
 
-    -   for K32W041AM flavor:
-        Exactly the same steps as above but set build_for_k32w041am=1 in the gn command.
-        Also, select the K32W041AM SDK from the SDK Builder.
+-   K32W041AM flavor
+
+    Exactly the same steps as above but set argument build_for_k32w041am=1 in
+    the gn command and use
+    [K32W041AMDK6 SDK 2.6.10](https://cache.nxp.com/lgfiles/bsps/SDK_2_6_10_K32W041AMDK6.zip).
 
 Also, in case the OM15082 Expansion Board is not attached to the DK6 board, the
 build argument (chip_with_OM15082) inside the gn build instruction should be set
@@ -222,6 +225,10 @@ to zero. The argument chip_with_OM15082 is set to zero by default.
 
 In case that Openthread CLI is needed, chip_with_ot_cli build argument must be
 set to 1.
+
+In case the board doesn't have 32KHz crystal fitted, one can use the 32KHz free
+running oscillator as a clock source. In this case one must set the use_fro_32k
+argument to 1.
 
 In case signing errors are encountered when running the "sign_images.sh" script
 install the recommanded packages (python version > 3, pip3, pycrypto,
@@ -239,7 +246,7 @@ pycryptodome           3.9.8
 
 The resulting output file can be found in out/debug/chip-k32w0x-light-example.
 
-## Known issues
+## Known issues building
 
 -   When using Secure element and cross-compiling on Linux, log messages from
     the Plug&Trust middleware stack may not echo to the console.
@@ -248,6 +255,30 @@ The resulting output file can be found in out/debug/chip-k32w0x-light-example.
 
 See
 [Guide for writing manufacturing data on NXP devices](../../../../platform/nxp/doc/manufacturing_flow.md).
+
+There are factory data generated binaries available in
+examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data folder.
+These are based on the DAC, PAI and PAA certificates found in
+scripts/tools/nxp/demo_generated_certs folder. The demo_factory_data_dut1.bin
+uses the DAC certificate and private key found in
+examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data/dac/dut1
+folder. The demo_factory_data_dut2.bin uses the DAC certificate and private key
+found in
+examples/platform/nxp/k32w/k32w0/scripts/demo_generated_factory_data/dac/dut2
+folder. These two factory data binaries can be used for testing topologies with
+2 DUTS. They contain the corresponding DACs/PAIs generated using
+generate_nxp_chip_factory_bin.py script. The discriminator is 14014 and the
+passcode is 1000. These demo certificates are working with the CDs installed in
+CHIPProjectConfig.h.
+
+Regarding factory data provider, there are two options:
+
+-   use the default factory data provider: `K32W0FactoryDataProvider` by setting
+    `chip_with_factory_data=1` in the gn build command.
+-   use a custom factory data provider: please see
+    [Guide for implementing a custom factory data provider](../../../../platform/nxp/k32w/k32w0/common/README.md).
+    This can be enabled when `chip_with_factory_data=1` by setting
+    `use_custom_factory_provider=1` in the gn build command.
 
 ## Flashing and debugging
 
@@ -307,7 +338,7 @@ detokenizer script to see logs of a lighting app:
 python3 ../../../../../examples/platform/nxp/k32w/k32w0/scripts/detokenizer.py serial -i /dev/ttyACM0 -d out/debug/chip-k32w0x-light-example-database.bin -o device.txt
 ```
 
-### Known issues
+### Known issues tokenizer
 
 The building process will not update the token database if it already exists. In
 case that new strings are added and the database already exists in the output
@@ -324,21 +355,28 @@ If run, closed and rerun with the serial option on the same serial port, the
 detokenization script will get stuck and not show any logs. The solution is to
 unplug and plug the board and then rerun the script.
 
-## Tinycrypt ECC operations
+## NXP Ultrafast P256 ECC Library
 
 ### Building steps
 
-Note: This solution is temporary.
+By default, the application builds with NXP Ultrafast P256 ECC Library. To build
+with this library, use the following arguments:
 
-In order to use the tinycrypt ecc operations, use the following build arguments:
+-   Build without Secure element (_chip_with_se05x=0_) and with crypto platform
+    (_chip_crypto=\"platform\"_).
 
--   Build without Secure element (_chip_with_se05x=0_), with tinycrypt enabled
-    (_chip_crypto=\"tinycrypt\"_) and with the `NXPmicro/mbedtls` library
-    (_mbedtls_repo=`\"//third_party/connectedhomeip/third_party/nxp/libs/mbedtls\"`_).
+To stop using Ultrafast P256 ECC Library, simply build with
+_chip_crypto=\"mbedtls\"_ or with Tinycrypt.
 
-To disable tinycrypt ecc operations, simply build with _chip_crypto=\"mbedtls\"_
-and with or without _mbedtls_repo_. If used with _mbedtls_repo_ the mbedtls
-implementation from `NXPmicro/mbedtls` library will be used.
+## Tinycrypt ECC library
+
+### Building steps
+
+In order to use the Tinycrypt ECC library, use the following build arguments:
+
+-   Build without Secure element (_chip_with_se05x=0_), with crypto platform
+    (_chip_crypto=\"platform\"_) and with tinycrypt selected
+    (_chip_crypto_flavor=\"tinycrypt\"_).
 
 ## OTA
 
@@ -464,19 +502,43 @@ Build the Linux OTA provider application:
 user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/ota-provider-app chip_config_network_layer_ble=false
 ```
 
-Build OTA image and start the OTA Provider Application:
-
-```
-user@computer1:~/connectedhomeip$ : ./src/app/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 chip-k32w0x-light-example.bin chip-k32w0x-light-example.ota
-user@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
-user@computer1:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-k32w0x-light-example.ota
-```
-
 Build Linux chip-tool:
 
 ```
 user@computer1:~/connectedhomeip$ : ./scripts/examples/gn_build_example.sh examples/chip-tool out/chip-tool-app
 ```
+
+Build OTA image:
+
+In order to build an OTA image, use NXP wrapper over the standard tool
+`src/app/ota_image_tool.py`:
+
+-   `scripts/tools/nxp/factory_data_generator/ota_image_tool.py` The tool can be
+    used to generate an OTA image with the following format:
+    `| OTA image header | TLV1 | TLV2 | ... | TLVn |` where each TLV is in the
+    form `|tag|length|value|`
+
+Note that "standard" TLV format is used. Matter TLV format is only used for
+factory data TLV value. A user can enable the default processors by specifying
+`chip_enable_ota_default_processors=1` in the build command. Please see more in
+the [OTA image tool guide](../../../../../scripts/tools/nxp/ota/README.md).
+
+Here is an example that generate an OTA image with factory data and app TLV:
+`user@computer1:~/connectedhomeip$ : ./scripts/tools/nxp/ota/ota_image_tool.py create -v 0xDEAD -p 0xBEEF -vn 1 -vs "1.0" -da sha256 -fd --cert_declaration ~/manufacturing/Chip-Test-CD-1037-a220.der -app chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.bin chip-k32w0x-contact-example.ota`
+
+Start the OTA Provider Application:
+
+```
+user@computer1:~/connectedhomeip$ : rm -rf /tmp/chip_*
+user@computer1:~/connectedhomeip$ : ./out/ota-provider-app/chip-ota-provider-app -f chip-k32w0x-light-example.ota
+```
+
+A note regarding OTA image header version (`-vn` option). An application binary
+has its own software version (given by
+`CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION`, which can be overwritten). For
+having a correct OTA process, the OTA header version should be the same as the
+binary embedded software version. A user can set a custom software version in
+the gn build args by setting `chip_software_version` to the wanted version.
 
 Provision the OTA provider application and assign node id _1_. Also, grant ACL
 entries to allow OTA requestors:
@@ -490,7 +552,7 @@ user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool accesscontrol 
 Provision the device and assign node id _2_:
 
 ```
-user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021   3840
+user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021 3840
 ```
 
 Start the OTA process:
@@ -499,7 +561,7 @@ Start the OTA process:
 user@computer1:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
 ```
 
-## Known issues
+## Known issues ota
 
 -   SRP cache on the openthread border router needs to flushed each time a new
     commissioning process is attempted. For this, factory reset the device, then

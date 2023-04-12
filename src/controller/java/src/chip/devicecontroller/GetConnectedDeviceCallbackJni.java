@@ -19,7 +19,7 @@ package chip.devicecontroller;
 
 /** JNI wrapper callback class for getting a connected device. */
 public class GetConnectedDeviceCallbackJni {
-  private GetConnectedDeviceCallback wrappedCallback;
+  private final GetConnectedDeviceCallback wrappedCallback;
   private long callbackHandle;
 
   public GetConnectedDeviceCallbackJni(GetConnectedDeviceCallback wrappedCallback) {

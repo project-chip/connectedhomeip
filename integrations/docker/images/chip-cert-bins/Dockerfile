@@ -2,12 +2,12 @@
 FROM ubuntu:22.04 as chip-build-cert
 ARG TARGETPLATFORM
 # COMMITHASH defines the target commit to build from. May be passed in using --build-arg.
-ARG COMMITHASH=451e602649b8b37ba6c9aab8ba5e30747293f778
+ARG COMMITHASH=7b99e6399c6069037c613782d78132c69b9dcabb
 
 # ZAP Development install, so that it runs on both x64 and arm64
 # Generally this should match with the ZAP version that is used for codegen within the
 # specified SHA
-ARG ZAP_VERSION=v2023.01.09-nightly
+ARG ZAP_VERSION=v2023.04.05-nightly
 
 # Ensure TARGETPLATFORM is set
 RUN case ${TARGETPLATFORM} in \
@@ -163,10 +163,10 @@ RUN case ${TARGETPLATFORM} in \
             set -x \
             && mkdir node_js \
             && cd node_js \
-            && wget https://nodejs.org/dist/v12.19.0/node-v12.19.0-linux-x64.tar.xz \
-            && tar xfvJ node-v12.19.0-linux-x64.tar.xz \
-            && mv node-v12.19.0-linux-x64 /opt/ \
-            && ln -s /opt/node-v12.19.0-linux-x64 /opt/node \
+            && wget https://nodejs.org/dist/v12.22.12/node-v12.22.12-linux-x64.tar.xz \
+            && tar xfvJ node-v12.22.12-linux-x64.tar.xz \
+            && mv node-v12.22.12-linux-x64 /opt/ \
+            && ln -s /opt/node-v12.22.12-linux-x64 /opt/node \
             && ln -s /opt/node/bin/* /usr/bin \
             && cd .. \
             && rm -rf node_js \
@@ -175,10 +175,10 @@ RUN case ${TARGETPLATFORM} in \
             set -x \
             && mkdir node_js \
             && cd node_js \
-            && wget https://nodejs.org/dist/v12.19.0/node-v12.19.0-linux-arm64.tar.xz \
-            && tar xfvJ node-v12.19.0-linux-arm64.tar.xz \
-            && mv node-v12.19.0-linux-arm64 /opt/ \
-            && ln -s /opt/node-v12.19.0-linux-arm64 /opt/node \
+            && wget https://nodejs.org/dist/v12.22.12/node-v12.22.12-linux-arm64.tar.xz \
+            && tar xfvJ node-v12.22.12-linux-arm64.tar.xz \
+            && mv node-v12.22.12-linux-arm64 /opt/ \
+            && ln -s /opt/node-v12.22.12-linux-arm64 /opt/node \
             && ln -s /opt/node/bin/* /usr/bin \
             && cd .. \
             && rm -rf node_js \
@@ -186,12 +186,21 @@ RUN case ${TARGETPLATFORM} in \
         *) ;; \
     esac
 
+RUN set -x \
+    && mkdir -p /opt/zap-${ZAP_VERSION} \
+    && git clone https://github.com/project-chip/zap.git /opt/zap-${ZAP_VERSION} \
+    && cd /opt/zap-${ZAP_VERSION} \
+    && git checkout ${ZAP_VERSION} \
+    && npm config set user 0 \
+    && npm ci
+ENV ZAP_DEVELOPMENT_PATH=/opt/zap-${ZAP_VERSION}
+
 # Stage 1.5: Bootstrap Matter.
 RUN mkdir /root/connectedhomeip
 RUN git clone https://github.com/project-chip/connectedhomeip.git /root/connectedhomeip
 WORKDIR /root/connectedhomeip/
 RUN git checkout ${COMMITHASH}
-RUN ./scripts/checkout_submodules.py --shallow --platform linux
+RUN ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
 RUN scripts/build/gn_bootstrap.sh
 SHELL ["/bin/bash", "-c"]
 RUN set -x && \
@@ -201,7 +210,9 @@ RUN set -x && \
 
 # Stage 2: Build.
 from chip-build-cert as chip-build-cert-bins
+
 SHELL ["/bin/bash", "-c"]
+
 # Records Matter SDK commit hash to include in the image.
 RUN git rev-parse HEAD > /root/.sdk-sha-version
 
@@ -220,6 +231,7 @@ RUN case ${TARGETPLATFORM} in \
             --target linux-x64-ota-provider-ipv6only \
             --target linux-x64-ota-requestor-ipv6only \
             --target linux-x64-lock-ipv6only \
+            --target linux-x64-simulated-app1-ipv6only \
             build \
             && mv out/linux-x64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
             && mv out/linux-x64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
@@ -231,6 +243,7 @@ RUN case ${TARGETPLATFORM} in \
             && mv out/linux-x64-ota-provider-ipv6only/chip-ota-provider-app out/chip-ota-provider-app \
             && mv out/linux-x64-ota-requestor-ipv6only/chip-ota-requestor-app out/chip-ota-requestor-app \
             && mv out/linux-x64-lock-ipv6only/chip-lock-app out/chip-lock-app \
+            && mv out/linux-x64-simulated-app1-ipv6only/chip-app1 out/chip-app1 \
                 ;; \
         "linux/arm64")\
             set -x \
@@ -246,6 +259,7 @@ RUN case ${TARGETPLATFORM} in \
             --target linux-arm64-ota-provider-ipv6only \
             --target linux-arm64-ota-requestor-ipv6only \
             --target linux-arm64-lock-ipv6only \
+            --target linux-arm64-simulated-app1-ipv6only \
             build \
             && mv out/linux-arm64-all-clusters-ipv6only/chip-all-clusters-app out/chip-all-clusters-app \
             && mv out/linux-arm64-all-clusters-minimal-ipv6only/chip-all-clusters-minimal-app out/chip-all-clusters-minimal-app \
@@ -257,19 +271,10 @@ RUN case ${TARGETPLATFORM} in \
             && mv out/linux-arm64-ota-provider-ipv6only/chip-ota-provider-app out/chip-ota-provider-app \
             && mv out/linux-arm64-ota-requestor-ipv6only/chip-ota-requestor-app out/chip-ota-requestor-app \
             && mv out/linux-arm64-lock-ipv6only/chip-lock-app out/chip-lock-app \
+            && mv out/linux-arm64-simulated-app1-ipv6only/chip-app1 out/chip-app1 \
             ;; \
         *) ;; \
     esac
-
-RUN set -x \
-    && mkdir -p /opt/zap-${ZAP_VERSION} \
-    && git clone https://github.com/project-chip/zap.git /opt/zap-${ZAP_VERSION} \
-    && cd /opt/zap-${ZAP_VERSION} \
-    && git checkout ${ZAP_VERSION} \
-    && npm config set user 0 \
-    && npm ci
-ENV ZAP_DEVELOPMENT_PATH=/opt/zap-${ZAP_VERSION}
-RUN scripts/examples/gn_build_test_example.sh app1
 
 RUN source scripts/activate.sh && scripts/build_python.sh -m platform -d true -i no
 
@@ -294,7 +299,7 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/out/thermostat-app thermo
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-provider-app chip-ota-provider-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-ota-requestor-app chip-ota-requestor-app
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-lock-app chip-lock-app
-COPY --from=chip-build-cert-bins /root/connectedhomeip/out/app1/chip-app1 chip-app1
+COPY --from=chip-build-cert-bins /root/connectedhomeip/out/chip-app1 chip-app1
 
 # Stage 3.1 Setup the Matter Python environment
 COPY --from=chip-build-cert-bins /root/connectedhomeip/out/python_lib python_lib

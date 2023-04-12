@@ -14,10 +14,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from matter_yamltests.definitions import *
-
-import unittest
 import io
+import unittest
+
+from matter_yamltests.definitions import *
 
 source_cluster = '''<?xml version="1.0"?>
   <configurator>
@@ -54,6 +54,21 @@ source_response = '''<?xml version="1.0"?>
   </configurator>
 '''
 
+source_response_with_nullable = '''<?xml version="1.0"?>
+  <configurator>
+    <cluster>
+      <name>Test</name>
+      <code>0x1234</code>
+
+      <command source="server" code="0x0" name="TestCommandResponse">
+          <arg name="arg1" type="int8u"/>
+          <arg name="arg2" type="int8u" isNullable="true"/>
+      </command>
+
+    </cluster>
+  </configurator>
+'''
+
 source_attribute = '''<?xml version="1.0"?>
   <configurator>
     <global>
@@ -78,6 +93,8 @@ source_event = '''<?xml version="1.0"?>
       <code>0x1234</code>
 
       <event code="0x0" name="TestEvent" priority="info" side="server"></event>
+
+      <event code="0x1" name="TestEventFabricScoped" priority="info" side="server" isFabricSensitive="true"></event>
 
     </cluster>
   </configurator>
@@ -184,6 +201,24 @@ class TestSpecDefinitions(unittest.TestCase):
         self.assertEqual(definitions.get_response_name(
             0x1234, 0x0), 'TestCommandResponse')
 
+    def test_response_name_with_nullable(self):
+        definitions = SpecDefinitions(
+            [ParseSource(source=io.StringIO(source_response_with_nullable), name='source_response_with_nullable')])
+        cluster_name = 'Test'
+        response_name = 'TestCommandResponse'
+
+        self.assertEqual(definitions.get_cluster_name(0x1234), cluster_name)
+        self.assertEqual(definitions.get_response_name(
+            0x1234, 0x0), response_name)
+
+        response = definitions.get_response_by_name(
+            cluster_name, response_name)
+        for field in response.fields:
+            if field.name == 'arg1':
+                self.assertFalse(definitions.is_nullable(field))
+            else:
+                self.assertTrue(definitions.is_nullable(field))
+
     def test_attribute_name(self):
         definitions = SpecDefinitions(
             [ParseSource(source=io.StringIO(source_attribute), name='source_attribute')])
@@ -199,8 +234,10 @@ class TestSpecDefinitions(unittest.TestCase):
         definitions = SpecDefinitions(
             [ParseSource(source=io.StringIO(source_event), name='source_event')])
         self.assertIsNone(definitions.get_event_name(0x4321, 0x0))
-        self.assertIsNone(definitions.get_event_name(0x1234, 0x1))
+        self.assertIsNone(definitions.get_event_name(0x1234, 0x2))
         self.assertEqual(definitions.get_event_name(0x1234, 0x0), 'TestEvent')
+        self.assertEqual(definitions.get_event_name(
+            0x1234, 0x1), 'TestEventFabricScoped')
 
     def test_get_command_by_name(self):
         definitions = SpecDefinitions(
@@ -215,8 +252,8 @@ class TestSpecDefinitions(unittest.TestCase):
             'Test', 'TestCommand'), Command)
         self.assertIsNone(
             definitions.get_command_by_name('test', 'TestCommand'))
-        self.assertIsInstance(definitions.get_command_by_name(
-            'Test', 'testcommand'), Command)
+        self.assertIsNone(
+            definitions.get_command_by_name('Test', 'testcommand'))
 
     def test_get_response_by_name(self):
         definitions = SpecDefinitions(
@@ -231,8 +268,8 @@ class TestSpecDefinitions(unittest.TestCase):
             'Test', 'TestCommandResponse'), Struct)
         self.assertIsNone(definitions.get_response_by_name(
             'test', 'TestCommandResponse'))
-        self.assertIsInstance(definitions.get_response_by_name(
-            'Test', 'testcommandresponse'), Struct)
+        self.assertIsNone(definitions.get_response_by_name(
+            'Test', 'testcommandresponse'))
 
     def test_get_attribute_by_name(self):
         definitions = SpecDefinitions(
@@ -251,10 +288,10 @@ class TestSpecDefinitions(unittest.TestCase):
             'test', 'TestAttribute'))
         self.assertIsNone(definitions.get_attribute_by_name(
             'test', 'TestGlobalAttribute'))
-        self.assertIsInstance(definitions.get_attribute_by_name(
-            'Test', 'testattribute'), Attribute)
-        self.assertIsInstance(definitions.get_attribute_by_name(
-            'Test', 'testglobalattribute'), Attribute)
+        self.assertIsNone(definitions.get_attribute_by_name(
+            'Test', 'testattribute'))
+        self.assertIsNone(definitions.get_attribute_by_name(
+            'Test', 'testglobalattribute'))
 
     def test_get_event_by_name(self):
         definitions = SpecDefinitions(
@@ -266,8 +303,7 @@ class TestSpecDefinitions(unittest.TestCase):
         self.assertIsInstance(
             definitions.get_event_by_name('Test', 'TestEvent'), Event)
         self.assertIsNone(definitions.get_event_by_name('test', 'TestEvent'))
-        self.assertIsInstance(
-            definitions.get_event_by_name('Test', 'testevent'), Event)
+        self.assertIsNone(definitions.get_event_by_name('Test', 'testevent'))
 
     def test_get_bitmap_by_name(self):
         definitions = SpecDefinitions(
@@ -279,8 +315,7 @@ class TestSpecDefinitions(unittest.TestCase):
         self.assertIsInstance(definitions.get_bitmap_by_name(
             'Test', 'TestBitmap'), Bitmap)
         self.assertIsNone(definitions.get_bitmap_by_name('test', 'TestBitmap'))
-        self.assertIsInstance(definitions.get_bitmap_by_name(
-            'Test', 'testbitmap'), Bitmap)
+        self.assertIsNone(definitions.get_bitmap_by_name('Test', 'testbitmap'))
 
     def test_get_enum_by_name(self):
         definitions = SpecDefinitions(
@@ -292,8 +327,7 @@ class TestSpecDefinitions(unittest.TestCase):
         self.assertIsInstance(
             definitions.get_enum_by_name('Test', 'TestEnum'), Enum)
         self.assertIsNone(definitions.get_enum_by_name('test', 'TestEnum'))
-        self.assertIsInstance(
-            definitions.get_enum_by_name('Test', 'testenum'), Enum)
+        self.assertIsNone(definitions.get_enum_by_name('Test', 'testenum'))
 
     def test_get_struct_by_name(self):
         definitions = SpecDefinitions(
@@ -305,8 +339,7 @@ class TestSpecDefinitions(unittest.TestCase):
         self.assertIsInstance(definitions.get_struct_by_name(
             'Test', 'TestStruct'), Struct)
         self.assertIsNone(definitions.get_struct_by_name('test', 'TestStruct'))
-        self.assertIsInstance(definitions.get_struct_by_name(
-            'Test', 'teststruct'), Struct)
+        self.assertIsNone(definitions.get_struct_by_name('Test', 'teststruct'))
 
     def test_get_type_by_name(self):
         definitions = SpecDefinitions(
@@ -325,7 +358,8 @@ class TestSpecDefinitions(unittest.TestCase):
 
         definitions = SpecDefinitions(
             [ParseSource(source=io.StringIO(source_event), name='source_event')])
-        self.assertIsNone(definitions.get_type_by_name('Test', 'TestEvent'))
+        self.assertIsInstance(
+            definitions.get_type_by_name('Test', 'TestEvent'), Event)
 
         definitions = SpecDefinitions(
             [ParseSource(source=io.StringIO(source_bitmap), name='source_bitmap')])
@@ -342,7 +376,7 @@ class TestSpecDefinitions(unittest.TestCase):
         self.assertIsInstance(definitions.get_type_by_name(
             'Test', 'TestStruct'), Struct)
 
-    def test_is_fabric_scoped(self):
+    def test_struct_is_fabric_scoped(self):
         definitions = SpecDefinitions(
             [ParseSource(source=io.StringIO(source_struct), name='source_struct')])
 
@@ -352,6 +386,57 @@ class TestSpecDefinitions(unittest.TestCase):
         struct = definitions.get_struct_by_name(
             'Test', 'TestStructFabricScoped')
         self.assertTrue(definitions.is_fabric_scoped(struct))
+
+    def test_event_is_fabric_scoped(self):
+        definitions = SpecDefinitions(
+            [ParseSource(source=io.StringIO(source_event), name='source_event')])
+
+        event = definitions.get_event_by_name('Test', 'TestEvent')
+        self.assertFalse(definitions.is_fabric_scoped(event))
+
+        event = definitions.get_event_by_name(
+            'Test', 'TestEventFabricScoped')
+        self.assertTrue(definitions.is_fabric_scoped(event))
+
+    def test_get_cluster_id_by_name(self):
+        definitions = SpecDefinitions(
+            [ParseSource(source=io.StringIO(source_cluster), name='source_cluster')])
+
+        cluster_id = definitions.get_cluster_id_by_name('Test')
+        self.assertEqual(cluster_id, 0x1234)
+
+        cluster_id = definitions.get_cluster_id_by_name('test')
+        self.assertIsNone(cluster_id)
+
+    def test_get_command_names(self):
+        definitions = SpecDefinitions(
+            [ParseSource(source=io.StringIO(source_command), name='source_command')])
+
+        commands = definitions.get_command_names('Test')
+        self.assertEqual(commands, ['TestCommand'])
+
+        commands = definitions.get_command_names('test')
+        self.assertEqual(commands, [])
+
+    def test_get_attribute_names(self):
+        definitions = SpecDefinitions(
+            [ParseSource(source=io.StringIO(source_attribute), name='source_attribute')])
+
+        attributes = definitions.get_attribute_names('Test')
+        self.assertEqual(attributes, ['TestAttribute', 'TestGlobalAttribute'])
+
+        attributes = definitions.get_attribute_names('test')
+        self.assertEqual(attributes, [])
+
+    def test_get_event_names(self):
+        definitions = SpecDefinitions(
+            [ParseSource(source=io.StringIO(source_event), name='source_event')])
+
+        events = definitions.get_event_names('Test')
+        self.assertEqual(events, ['TestEvent', 'TestEventFabricScoped'])
+
+        events = definitions.get_event_names('test')
+        self.assertEqual(events, [])
 
 
 if __name__ == '__main__':

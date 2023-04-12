@@ -249,6 +249,10 @@ config("strict_warnings") {
     ]
   }
 
+  if (current_os == "mac" || current_os == "ios") {
+    cflags += [ "-Wconversion" ]
+  }
+
   if (build_java_matter_controller) {
     cflags -= [ "-Wshadow" ]
   }
@@ -449,10 +453,19 @@ config("libfuzzer_fuzzing") {
   ldflags = cflags
 }
 
+config("oss_fuzz") {
+  cflags = string_split(getenv("CFLAGS"))
+  ldflags = string_split(getenv("CXXFLAGS"))
+  ldflags += [ getenv("LIB_FUZZING_ENGINE") ]
+}
+
 config("fuzzing_default") {
   configs = []
   if (is_libfuzzer) {
     configs += [ ":libfuzzer_fuzzing" ]
+  }
+  if (oss_fuzz) {
+    configs += [ ":oss_fuzz" ]
   }
 }
 
@@ -535,6 +548,13 @@ config("size_default") {
 
 config("stack_protector_default") {
   cflags = [ "-fno-stack-protector" ]
+}
+
+config("prefix_mappings_default") {
+  cflags = []
+  foreach(prefix_mapping, prefix_mappings) {
+    cflags += [ "-fdebug-prefix-map=${prefix_mapping}" ]
+  }
 }
 
 config("pic_default") {

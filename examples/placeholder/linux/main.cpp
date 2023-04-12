@@ -33,6 +33,19 @@ int main(int argc, char * argv[])
     }
 
     LinuxDeviceOptions::GetInstance().dacProvider = AppOptions::GetDACProvider();
+
+    auto & server = InteractiveServer::GetInstance();
+    if (AppOptions::GetInteractiveMode())
+    {
+        server.Run(AppOptions::GetInteractiveModePort());
+    }
+
     ChipLinuxAppMainLoop();
+
+    if (test != nullptr)
+    {
+        return test->GetCommandExitCode();
+    }
+
     return 0;
 }

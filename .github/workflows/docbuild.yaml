@@ -1,6 +1,14 @@
 name: Documentation Build
 
 on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - master
+    paths:
+    - '.github/workflows/docbuild.yaml'
+    - '**.md'
+    - 'docs/**'
   push:
     branches:
       - master
@@ -9,24 +17,21 @@ permissions:
   contents: write
 
 jobs:
-  build-and-deploy:
+  build-and-publish:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: matter
           fetch-depth: 0
       - name: Install Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
-      - name: cache-pip
-        uses: actions/cache@v1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-doc-pip
+          cache-dependency-path: matter/docs/requirements.txt
+          cache: pip
       - name: Install base dependencies
         working-directory: matter
         run: |
@@ -39,7 +44,7 @@ jobs:
           make html
           touch _build/html/.nojekyll
       - name: Deploy to gh-pages
-        if: github.repository == 'project-chip/connectedhomeip'
+        if: github.repository == 'project-chip/connectedhomeip' && github.event_name == 'push' && github.ref_name == 'master'
         uses: peaceiris/actions-gh-pages@v3
         with:
           deploy_key: ${{ secrets.DOXYGEN_DEPLOY_KEY }}

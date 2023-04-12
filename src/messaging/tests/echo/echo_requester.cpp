@@ -184,7 +184,7 @@ void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::Sys
     gEchoRespCount++;
 
     printf("Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fs\n", gEchoRespCount, gEchoCount,
-           static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(),
+           static_cast<double>(gEchoRespCount) * 100 / static_cast<double>(gEchoCount), payload->DataLength(),
            static_cast<double>(chip::System::Clock::Milliseconds32(transitTime).count()) / 1000);
 }
 
@@ -227,7 +227,7 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
 
         err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTCPManager, &gMessageCounterManager, &gStorage,
-                                   &gFabricTable);
+                                   &gFabricTable, gSessionKeystore);
         SuccessOrExit(err);
     }
     else
@@ -238,7 +238,7 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
 
         err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gUDPManager, &gMessageCounterManager, &gStorage,
-                                   &gFabricTable);
+                                   &gFabricTable, gSessionKeystore);
         SuccessOrExit(err);
     }
 

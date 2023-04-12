@@ -177,7 +177,7 @@ void CommissionerDiscoveryController::Cancel()
 
 void CommissionerDiscoveryController::CommissioningSucceeded(uint16_t vendorId, uint16_t productId, NodeId nodeId,
                                                              Messaging::ExchangeManager & exchangeMgr,
-                                                             SessionHandle & sessionHandle)
+                                                             const SessionHandle & sessionHandle)
 {
     mVendorId  = vendorId;
     mProductId = productId;

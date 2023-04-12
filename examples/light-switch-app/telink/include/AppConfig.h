@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@
 
 #pragma once
 
-// ---- Lighting Example App Config ----
+// ---- Light Switch Example App Config ----
 
 // Buttons config
 #define BUTTON_PORT DEVICE_DT_GET(DT_NODELABEL(gpioc))
@@ -29,10 +29,6 @@
 #define BUTTON_PIN_2 0
 
 // LEDs config
-// System led config
-#define SYSTEM_STATE_LED_PORT DEVICE_DT_GET(DT_NODELABEL(gpiob))
-#define SYSTEM_STATE_LED_PIN 7
-
-// Lighting LED config
-#define LIGHTING_PWM_DEVICE DEVICE_DT_GET(DT_PWMS_CTLR(DT_ALIAS(pwm_led0)))
-#define LIGHTING_PWM_CHANNEL DT_PWMS_CHANNEL(DT_ALIAS(pwm_led0))
+#define LEDS_PORT DEVICE_DT_GET(DT_NODELABEL(gpiob))
+#define SYSTEM_STATE_LED 7
+#define LIGHTING_PWM_SPEC_IDENTIFY_GREEN PWM_DT_SPEC_GET(DT_ALIAS(pwm_led3))

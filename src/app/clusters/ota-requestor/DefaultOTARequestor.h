@@ -173,6 +173,12 @@ private:
         void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override
         {
             ChipLogError(BDX, "exchange timed out");
+            // Null out mExchangeCtx before calling OnDownloadTimeout, in case
+            // the downloader decides to call Reset() on us.  If we don't, we
+            // will end up closing the exchange from Reset and then the caller
+            // will close it _again_ (see API documentation for
+            // OnResponseTimeout), which will lead to refcount underflow.
+            mExchangeCtx = nullptr;
             if (mDownloader != nullptr)
             {
                 mDownloader->OnDownloadTimeout();
@@ -232,7 +238,7 @@ private:
     /**
      * Send QueryImage request using values matching Basic cluster
      */
-    CHIP_ERROR SendQueryImageRequest(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    CHIP_ERROR SendQueryImageRequest(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
 
     /**
      * Validate and extract mandatory information from QueryImageResponse
@@ -263,17 +269,17 @@ private:
     /**
      * Start download of the software image returned in QueryImageResponse
      */
-    CHIP_ERROR StartDownload(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    CHIP_ERROR StartDownload(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
 
     /**
      * Send ApplyUpdate request using values obtained from QueryImageResponse
      */
-    CHIP_ERROR SendApplyUpdateRequest(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    CHIP_ERROR SendApplyUpdateRequest(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
 
     /**
      * Send NotifyUpdateApplied request
      */
-    CHIP_ERROR SendNotifyUpdateAppliedRequest(Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    CHIP_ERROR SendNotifyUpdateAppliedRequest(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
 
     /**
      * Store current update information to KVS
@@ -288,7 +294,7 @@ private:
     /**
      * Session connection callbacks
      */
-    static void OnConnected(void * context, Messaging::ExchangeManager & exchangeMgr, SessionHandle & sessionHandle);
+    static void OnConnected(void * context, Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     static void OnConnectionFailure(void * context, const ScopedNodeId & peerId, CHIP_ERROR error);
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;

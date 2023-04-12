@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,10 @@
 
 #include "AppEvent.h"
 #include "ContactSensorManager.h"
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
 #include "LEDWidget.h"
+#endif
+#include "PWMDevice.h"
 
 #include <zephyr/drivers/gpio.h>
 
@@ -36,14 +39,17 @@
 #define APP_ERROR_UNHANDLED_EVENT CHIP_APPLICATION_ERROR(0x03)
 
 struct k_timer;
+struct Identify;
 
 class AppTask
 {
 public:
     CHIP_ERROR StartApp(void);
 
-    void PostContactActionRequest(ContactSensorManager::Action aAction);
     void PostEvent(AppEvent * event);
+    static void IdentifyEffectHandler(EmberAfIdentifyEffectIdentifier aEffect);
+
+    void PostContactActionRequest(ContactSensorManager::Action aAction);
     void UpdateClusterState(void);
     void UpdateDeviceState(void);
 
@@ -52,7 +58,10 @@ public:
 
 private:
     friend AppTask & GetAppTask(void);
+
     CHIP_ERROR Init(void);
+
+    static void ActionIdentifyStateUpdateHandler(k_timer * timer);
 
     void DispatchEvent(AppEvent * event);
 
@@ -61,8 +70,11 @@ private:
     static void UpdateClusterStateInternal(intptr_t arg);
     static void UpdateDeviceStateInternal(intptr_t arg);
 
-    static void UpdateStatusLED(void);
+#if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
+    static void UpdateLedStateEventHandler(AppEvent * aEvent);
     static void LEDStateUpdateHandler(LEDWidget * ledWidget);
+    static void UpdateStatusLED();
+#endif
     static void FactoryResetButtonEventHandler(void);
     static void StartBleAdvButtonEventHandler(void);
     static void ToggleContactStateButtonEventHandler(void);
@@ -75,7 +87,7 @@ private:
     static void FactoryResetHandler(AppEvent * aEvent);
     static void StartBleAdvHandler(AppEvent * aEvent);
     static void ContactActionEventHandler(AppEvent * aEvent);
-    static void UpdateLedStateEventHandler(AppEvent * aEvent);
+    static void UpdateIdentifyStateEventHandler(AppEvent * aEvent);
 
     static void InitButtons(void);
 
@@ -84,6 +96,7 @@ private:
     bool mSyncClusterToButtonAction = false;
 
     static AppTask sAppTask;
+    PWMDevice mPwmIdentifyLed;
 
 #if CONFIG_CHIP_FACTORY_DATA
     // chip::DeviceLayer::FactoryDataProvider<chip::DeviceLayer::InternalFlashFactoryData> mFactoryDataProvider;

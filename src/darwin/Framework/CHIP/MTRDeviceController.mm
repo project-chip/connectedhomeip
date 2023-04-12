@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -48,9 +48,12 @@
 #include <credentials/attestation_verifier/DacOnlyPartialAttestationVerifier.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <platform/LockTracker.h>
 #include <platform/PlatformManager.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <system/SystemClock.h>
+
+#include <atomic>
 
 #import <os/lock.h>
 
@@ -64,7 +67,7 @@ static NSString * const kErrorPartialDacVerifierInit = @"Init failure while crea
 static NSString * const kErrorPairDevice = @"Failure while pairing the device";
 static NSString * const kErrorUnpairDevice = @"Failure while unpairing the device";
 static NSString * const kErrorStopPairing = @"Failure while trying to stop the pairing process";
-static NSString * const kErrorPrepareCommissioning = @"Failure while trying to prepare the commissioning process";
+static NSString * const kErrorPreWarmCommissioning = @"Failure while trying to pre-warm the commissioning process";
 static NSString * const kErrorOpenPairingWindow = @"Open Pairing Window failed";
 static NSString * const kErrorGetPairedDevice = @"Failure while trying to retrieve a paired device";
 static NSString * const kErrorNotRunning = @"Controller is not running. Call startup first.";
@@ -82,7 +85,10 @@ typedef void (^SyncWorkQueueBlock)(void);
 typedef id (^SyncWorkQueueBlockWithReturnValue)(void);
 typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
-@interface MTRDeviceController ()
+@interface MTRDeviceController () {
+    // Atomic because it can be touched from multiple threads.
+    std::atomic<chip::FabricIndex> _storedFabricIndex;
+}
 
 // queue used to serialize all work performed by the MTRDeviceController
 @property (atomic, readonly) dispatch_queue_t chipWorkQueue;
@@ -123,6 +129,8 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kErrorOperationalCredentialsInit]) {
             return nil;
         }
+
+        _storedFabricIndex = chip::kUndefinedFabricIndex;
     }
     return self;
 }
@@ -145,6 +153,14 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 // Clean up from a state where startup was called.
 - (void)cleanupAfterStartup
 {
+    // Invalidate our MTRDevice instances before we shut down our secure
+    // sessions and whatnot, so they don't start trying to resubscribe when we
+    // do the secure session shutdowns.
+    for (MTRDevice * device in [self.nodeIDToDeviceMap allValues]) {
+        [device invalidate];
+    }
+    [self.nodeIDToDeviceMap removeAllObjects];
+
     [_factory controllerShuttingDown:self];
 }
 
@@ -152,12 +168,15 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 // in a very specific way that only MTRDeviceControllerFactory knows about.
 - (void)shutDownCppController
 {
+    assertChipStackLockedByCurrentThread();
+
     if (_cppCommissioner) {
         auto * commissionerToShutDown = _cppCommissioner;
         // Flag ourselves as not running before we start shutting down
         // _cppCommissioner, so we're not in a state where we claim to be
         // running but are actually partially shut down.
         _cppCommissioner = nullptr;
+        _storedFabricIndex = chip::kUndefinedFabricIndex;
         commissionerToShutDown->Shutdown();
         delete commissionerToShutDown;
         if (_operationalCredentialsDelegate != nil) {
@@ -192,11 +211,6 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         delete _deviceControllerDelegateBridge;
         _deviceControllerDelegateBridge = nullptr;
     }
-
-    for (MTRDevice * device in [self.nodeIDToDeviceMap allValues]) {
-        [device invalidate];
-    }
-    [self.nodeIDToDeviceMap removeAllObjects];
 }
 
 - (BOOL)startup:(MTRDeviceControllerStartupParamsInternal *)startupParams
@@ -288,10 +302,34 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
         } else {
             chip::MutableByteSpan noc(nocBuffer);
 
+            chip::CATValues cats = chip::kUndefinedCATs;
+            if (startupParams.caseAuthenticatedTags != nil) {
+                unsigned long long tagCount = startupParams.caseAuthenticatedTags.count;
+                if (tagCount > chip::kMaxSubjectCATAttributeCount) {
+                    MTR_LOG_ERROR("%llu CASE Authenticated Tags cannot be represented in a certificate.", tagCount);
+                    return;
+                }
+
+                size_t tagIndex = 0;
+                for (NSNumber * boxedTag in startupParams.caseAuthenticatedTags) {
+                    if (!chip::CanCastTo<chip::CASEAuthTag>(boxedTag.unsignedLongLongValue)) {
+                        MTR_LOG_ERROR("0x%llx is not a valid CASE Authenticated Tag value.", boxedTag.unsignedLongLongValue);
+                        return;
+                    }
+
+                    auto tag = static_cast<chip::CASEAuthTag>(boxedTag.unsignedLongLongValue);
+                    if (!chip::IsValidCASEAuthTag(tag)) {
+                        MTR_LOG_ERROR("0x%" PRIx32 " is not a valid CASE Authenticated Tag value.", tag);
+                        return;
+                    }
+
+                    cats.values[tagIndex++] = tag;
+                }
+            }
+
             if (commissionerParams.operationalKeypair != nullptr) {
                 errorCode = _operationalCredentialsDelegate->GenerateNOC(startupParams.nodeID.unsignedLongLongValue,
-                    startupParams.fabricID.unsignedLongLongValue, chip::kUndefinedCATs,
-                    commissionerParams.operationalKeypair->Pubkey(), noc);
+                    startupParams.fabricID.unsignedLongLongValue, cats, commissionerParams.operationalKeypair->Pubkey(), noc);
 
                 if ([self checkForStartError:errorCode logMsg:kErrorGenerateNOC]) {
                     return;
@@ -311,8 +349,8 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                     return;
                 }
 
-                errorCode = _operationalCredentialsDelegate->GenerateNOC(startupParams.nodeID.unsignedLongLongValue,
-                    startupParams.fabricID.unsignedLongLongValue, chip::kUndefinedCATs, pubKey, noc);
+                errorCode = _operationalCredentialsDelegate->GenerateNOC(
+                    startupParams.nodeID.unsignedLongLongValue, startupParams.fabricID.unsignedLongLongValue, cats, pubKey, noc);
 
                 if ([self checkForStartError:errorCode logMsg:kErrorGenerateNOC]) {
                     return;
@@ -321,6 +359,12 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
             commissionerParams.controllerNOC = noc;
         }
         commissionerParams.controllerVendorId = static_cast<chip::VendorId>([startupParams.vendorID unsignedShortValue]);
+        commissionerParams.enableServerInteractions = startupParams.advertiseOperational;
+        // We don't want to remove things from the fabric table on controller
+        // shutdown, since our controller setup depends on being able to fetch
+        // fabric information for the relevant fabric indices on controller
+        // bring-up.
+        commissionerParams.removeFromFabricTableOnShutdown = false;
         commissionerParams.deviceAttestationVerifier = _factory.deviceAttestationVerifier;
 
         auto & factory = chip::Controller::DeviceControllerFactory::GetInstance();
@@ -345,6 +389,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
             return;
         }
 
+        self->_storedFabricIndex = fabricIdx;
         commissionerInitialized = YES;
     });
 
@@ -431,13 +476,13 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
             [self clearDeviceAttestationDelegateBridge];
 
             chip::Optional<uint16_t> timeoutSecs;
-            if (commissioningParams.failSafeExpiryTimeout) {
-                timeoutSecs
-                    = chip::MakeOptional(static_cast<uint16_t>([commissioningParams.failSafeExpiryTimeout unsignedIntValue]));
+            if (commissioningParams.failSafeTimeout) {
+                timeoutSecs = chip::MakeOptional(static_cast<uint16_t>([commissioningParams.failSafeTimeout unsignedIntValue]));
             }
             BOOL shouldWaitAfterDeviceAttestation = NO;
             if ([commissioningParams.deviceAttestationDelegate
-                    respondsToSelector:@selector(deviceAttestationCompletedForController:device:attestationDeviceInfo:error:)]
+                    respondsToSelector:@selector(deviceAttestationCompletedForController:
+                                                                      opaqueDeviceHandle:attestationDeviceInfo:error:)]
                 || [commissioningParams.deviceAttestationDelegate
                     respondsToSelector:@selector(deviceAttestation:completedForDevice:attestationDeviceInfo:error:)]) {
                 shouldWaitAfterDeviceAttestation = YES;
@@ -485,14 +530,15 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
 }
 
-- (BOOL)prepareCommissioningSession:(NSError * __autoreleasing *)error
+- (void)preWarmCommissioningSession
 {
-    auto block = ^BOOL {
+    auto block = ^{
         auto errorCode = chip::DeviceLayer::PlatformMgrImpl().PrepareCommissioning();
-        return ![MTRDeviceController checkForError:errorCode logMsg:kErrorPrepareCommissioning error:error];
+        // The checkForError is just so it logs
+        [MTRDeviceController checkForError:errorCode logMsg:kErrorPreWarmCommissioning error:nil];
     };
 
-    return [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
+    [self syncRunOnWorkQueue:block error:nil];
 }
 
 - (MTRBaseDevice *)deviceBeingCommissionedWithNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
@@ -521,7 +567,13 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     MTRDevice * deviceToReturn = self.nodeIDToDeviceMap[nodeID];
     if (!deviceToReturn) {
         deviceToReturn = [[MTRDevice alloc] initWithNodeID:nodeID controller:self];
-        self.nodeIDToDeviceMap[nodeID] = deviceToReturn;
+        // If we're not running, don't add the device to our map.  That would
+        // create a cycle that nothing would break.  Just return the device,
+        // which will be in exactly the state it would be in if it were created
+        // while we were running and then we got shut down.
+        if ([self isRunning]) {
+            self.nodeIDToDeviceMap[nodeID] = deviceToReturn;
+        }
     }
     os_unfair_lock_unlock(&_deviceMapLock);
 
@@ -558,8 +610,12 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     }
 
     auto block = ^{
+        BOOL usePartialDACVerifier = NO;
         if (operationalCertificateIssuer != nil) {
             self->_operationalCredentialsDelegate->SetOperationalCertificateIssuer(operationalCertificateIssuer, queue);
+            usePartialDACVerifier = operationalCertificateIssuer.shouldSkipAttestationCertificateValidation;
+        }
+        if (usePartialDACVerifier) {
             self->_cppCommissioner->SetDeviceAttestationVerifier(self->_partialDACVerifier);
         } else {
             // TODO: Once we are not supporting setNocChainIssuer this
@@ -808,17 +864,26 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 - (chip::FabricIndex)fabricIndex
 {
+    return _storedFabricIndex;
+}
+
+- (nullable NSNumber *)compressedFabricID
+{
+    assertChipStackLockedByCurrentThread();
+
     if (!_cppCommissioner) {
-        return chip::kUndefinedFabricIndex;
+        return nil;
     }
 
-    return _cppCommissioner->GetFabricIndex();
+    return @(_cppCommissioner->GetCompressedFabricId());
 }
 
 - (CHIP_ERROR)isRunningOnFabric:(chip::FabricTable *)fabricTable
                     fabricIndex:(chip::FabricIndex)fabricIndex
                       isRunning:(BOOL *)isRunning
 {
+    assertChipStackLockedByCurrentThread();
+
     if (![self isRunning]) {
         *isRunning = NO;
         return CHIP_NO_ERROR;
@@ -854,6 +919,22 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
     };
 
     [self syncRunOnWorkQueue:block error:nil];
+}
+
+- (void)operationalInstanceAdded:(chip::NodeId)nodeID
+{
+    // Don't use deviceForNodeID here, because we don't want to create the
+    // device if it does not already exist.
+    os_unfair_lock_lock(&_deviceMapLock);
+    MTRDevice * device = self.nodeIDToDeviceMap[@(nodeID)];
+    os_unfair_lock_unlock(&_deviceMapLock);
+
+    if (device == nil) {
+        return;
+    }
+
+    ChipLogProgress(Controller, "Notifying device about node 0x" ChipLogFormatX64 " advertising", ChipLogValueX64(nodeID));
+    [device nodeMayBeAdvertisingOperational];
 }
 
 @end
@@ -921,6 +1002,7 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
  */
 @interface MTROperationalCertificateChainIssuerShim : NSObject <MTROperationalCertificateIssuer>
 @property (nonatomic, readonly) id<MTRNOCChainIssuer> nocChainIssuer;
+@property (nonatomic, readonly) BOOL shouldSkipAttestationCertificateValidation;
 - (instancetype)initWithIssuer:(id<MTRNOCChainIssuer>)nocChainIssuer;
 @end
 
@@ -929,14 +1011,16 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 {
     if (self = [super init]) {
         _nocChainIssuer = nocChainIssuer;
+        _shouldSkipAttestationCertificateValidation = YES;
     }
     return self;
 }
 
 - (void)issueOperationalCertificateForRequest:(MTROperationalCSRInfo *)csrInfo
-                              attestationInfo:(MTRAttestationInfo *)attestationInfo
+                              attestationInfo:(MTRDeviceAttestationInfo *)attestationInfo
                                    controller:(MTRDeviceController *)controller
-                                   completion:(MTROperationalCertificateIssuedHandler)completion
+                                   completion:(void (^)(MTROperationalCertificateChain * _Nullable info,
+                                                  NSError * _Nullable error))completion
 {
     CSRInfo * oldCSRInfo = [[CSRInfo alloc] initWithNonce:csrInfo.csrNonce
                                                  elements:csrInfo.csrElementsTLV
@@ -960,11 +1044,11 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
                      attestationInfo:oldAttestationInfo
         onNOCChainGenerationComplete:^(NSData * operationalCertificate, NSData * intermediateCertificate, NSData * rootCertificate,
             NSData * _Nullable ipk, NSNumber * _Nullable adminSubject, NSError * __autoreleasing * error) {
-            auto * info = [[MTROperationalCertificateInfo alloc] initWithOperationalCertificate:operationalCertificate
-                                                                        intermediateCertificate:intermediateCertificate
-                                                                                rootCertificate:rootCertificate
-                                                                                   adminSubject:adminSubject];
-            completion(info, nil);
+            auto * chain = [[MTROperationalCertificateChain alloc] initWithOperationalCertificate:operationalCertificate
+                                                                          intermediateCertificate:intermediateCertificate
+                                                                                  rootCertificate:rootCertificate
+                                                                                     adminSubject:adminSubject];
+            completion(chain, nil);
             if (error != nil) {
                 *error = nil;
             }

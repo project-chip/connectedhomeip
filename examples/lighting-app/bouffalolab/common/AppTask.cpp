@@ -17,11 +17,9 @@
  *    limitations under the License.
  */
 
-#include "AppConfig.h"
-#include "LEDWidget.h"
+#include <LEDWidget.h>
+#include <plat.h>
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/identify-server/identify-server.h>
@@ -36,16 +34,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <system/SystemClock.h>
-#ifdef OTA_ENABLED
-#include "OTAConfig.h"
-#endif // OTA_ENABLED
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <NetworkCommissioningDriver.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
-#include <route_hook/bl_route_hook.h>
-#endif
-#include <PlatformManagerImpl.h>
 
 #if HEAP_MONITORING
 #include "MemMonitoring.h"
@@ -58,18 +46,9 @@
 #include <utils_list.h>
 #endif
 
-#if PW_RPC_ENABLED
-#include "PigweedLogger.h"
-#include "Rpc.h"
-#endif
-
 #if CONFIG_ENABLE_CHIP_SHELL
 #include <ChipShellCollection.h>
 #include <lib/shell/Engine.h>
-#endif
-
-#if CONFIG_ENABLE_CHIP_SHELL || PW_RPC_ENABLED
-#include "uart.h"
 #endif
 
 extern "C" {
@@ -83,11 +62,6 @@ extern "C" {
 #include "AppTask.h"
 
 namespace {
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-chip::app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::BLWiFiDriver::GetInstance()));
-#endif
 
 #if defined(BL706_NIGHT_LIGHT) || defined(BL602_NIGHT_LIGHT)
 ColorLEDWidget sLightLED;
@@ -116,116 +90,6 @@ using namespace chip::Shell;
 AppTask AppTask::sAppTask;
 StackType_t AppTask::appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t AppTask::appTaskStruct;
-
-void PlatformManagerImpl::PlatformInit(void)
-{
-#if CONFIG_ENABLE_CHIP_SHELL || PW_RPC_ENABLED
-    uartInit();
-#endif
-
-#if PW_RPC_ENABLED
-    PigweedLogger::pw_init();
-#elif CONFIG_ENABLE_CHIP_SHELL
-    AppTask::StartAppShellTask();
-#endif
-
-#if HEAP_MONITORING
-    MemMonitoring::startHeapMonitoring();
-#endif
-
-    ChipLogProgress(NotSpecified, "Initializing CHIP stack");
-    CHIP_ERROR ret = PlatformMgr().InitChipStack();
-    if (ret != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "PlatformMgr().InitChipStack() failed");
-        appError(ret);
-    }
-
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("MatterLight");
-
-#if CHIP_ENABLE_OPENTHREAD
-#if CONFIG_ENABLE_CHIP_SHELL
-    cmd_otcli_init();
-#endif
-
-    ChipLogProgress(NotSpecified, "Initializing OpenThread stack");
-    ret = ThreadStackMgr().InitThreadStack();
-    if (ret != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "ThreadStackMgr().InitThreadStack() failed");
-        appError(ret);
-    }
-
-#if CHIP_DEVICE_CONFIG_THREAD_FTD
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
-#else
-    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-#endif
-    if (ret != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "ConnectivityMgr().SetThreadDeviceType() failed");
-        appError(ret);
-    }
-#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
-
-    ret = sWiFiNetworkCommissioningInstance.Init();
-    if (CHIP_NO_ERROR != ret)
-    {
-        ChipLogError(NotSpecified, "sWiFiNetworkCommissioningInstance.Init() failed");
-    }
-#endif
-
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
-#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXT_DISCOVERY_TIMEOUT_SECS);
-#endif
-
-    // Init ZCL Data Model
-    static chip::CommonCaseDeviceServerInitParams initParams;
-    (void) initParams.InitializeStaticResourcesBeforeServerInit();
-
-    ret = chip::Server::GetInstance().Init(initParams);
-    if (ret != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "chip::Server::GetInstance().Init(initParams) failed");
-        appError(ret);
-    }
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-#if CHIP_ENABLE_OPENTHREAD
-    ChipLogProgress(NotSpecified, "Starting OpenThread task");
-    // Start OpenThread task
-    ret = ThreadStackMgrImpl().StartThreadTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "ThreadStackMgr().StartThreadTask() failed");
-        appError(ret);
-    }
-#endif
-
-    ConfigurationMgr().LogDeviceConfig();
-
-    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
-    PlatformMgr().AddEventHandler(AppTask::ChipEventHandler, 0);
-
-#ifdef OTA_ENABLED
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    OTAConfig::Init();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-#endif // OTA_ENABLED
-
-#if PW_RPC_ENABLED
-    chip::rpc::Init();
-#endif
-
-    GetAppTask().PostEvent(AppTask::APP_EVENT_TIMER);
-
-    vTaskResume(GetAppTask().sAppTaskHandle);
-}
 
 void StartAppTask(void)
 {
@@ -274,39 +138,24 @@ void AppTask::PostEvent(app_event_t event)
 void AppTask::AppTaskMain(void * pvParameter)
 {
     app_event_t appEvent;
-    bool isStateReady = false;
+    bool onoff = false;
 
     sLightLED.Init();
 
 #ifdef LED_BTN_RESET
     ButtonInit();
 #else
-
+    /** Without RESET PIN defined, factory reset will be executed if power cycle count(resetCnt) >= APP_REBOOT_RESET_COUNT */
     uint32_t resetCnt      = 0;
     size_t saved_value_len = 0;
     ef_get_env_blob(APP_REBOOT_RESET_COUNT_KEY, &resetCnt, sizeof(resetCnt), &saved_value_len);
     resetCnt++;
     ef_set_env_blob(APP_REBOOT_RESET_COUNT_KEY, &resetCnt, sizeof(resetCnt));
-#endif
 
-    ChipLogProgress(NotSpecified, "Starting Platform Manager Event Loop");
-    CHIP_ERROR ret = PlatformMgr().StartEventLoopTask();
-    if (ret != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "PlatformMgr().StartEventLoopTask() failed");
-        appError(ret);
-    }
-    vTaskSuspend(NULL);
-
-#ifndef LED_BTN_RESET
+    /** To share with RESET PIN logic, mButtonPressedTime is used to recorded resetCnt increased.
+     * +1 makes sure mButtonPressedTime is not zero */
     GetAppTask().mButtonPressedTime = chip::System::SystemClock().GetMonotonicMilliseconds64().count() + 1;
-    if (ConnectivityMgr().IsThreadProvisioned())
-    {
-        GetAppTask().PostEvent(APP_EVENT_SYS_PROVISIONED);
-    }
 #endif
-
-    GetAppTask().mIsConnected = false;
 
     GetAppTask().sTimer = xTimerCreate("lightTmr", pdMS_TO_TICKS(1000), false, NULL, AppTask::TimerCallback);
     if (GetAppTask().sTimer == NULL)
@@ -315,9 +164,20 @@ void AppTask::AppTaskMain(void * pvParameter)
         appError(APP_ERROR_EVENT_QUEUE_FAILED);
     }
 
-    ChipLogProgress(NotSpecified, "App Task started, with heap %d left\r\n", xPortGetFreeHeapSize());
+    ChipLogProgress(NotSpecified, "Starting Platform Manager Event Loop");
+    CHIP_ERROR ret = PlatformMgr().StartEventLoopTask();
+    if (ret != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "PlatformMgr().StartEventLoopTask() failed");
+        appError(ret);
+    }
 
-    StartTimer();
+    GetAppTask().PostEvent(AppTask::APP_EVENT_TIMER);
+    vTaskSuspend(NULL);
+
+    GetAppTask().mIsConnected = false;
+
+    ChipLogProgress(NotSpecified, "App Task started, with heap %d left\r\n", xPortGetFreeHeapSize());
 
     while (true)
     {
@@ -327,29 +187,21 @@ void AppTask::AppTaskMain(void * pvParameter)
         if (eventReceived)
         {
             PlatformMgr().LockChipStack();
-            if (APP_EVENT_SYS_BLE_ADV & appEvent)
-            {
-                LightingSetStatus(APP_EVENT_SYS_BLE_ADV);
-                LightingUpdate(APP_EVENT_LIGHTING_GO_THROUGH);
-
-                isStateReady = false;
-            }
 
             if (APP_EVENT_SYS_PROVISIONED & appEvent)
             {
-                LightingSetStatus(APP_EVENT_SYS_PROVISIONED);
-                LightingUpdate(APP_EVENT_LIGHTING_GO_THROUGH);
-
-                isStateReady = true;
+                LightingUpdate(APP_EVENT_LIGHTING_MASK);
             }
 
             if (APP_EVENT_BTN_SHORT & appEvent)
             {
-                LightingSetStatus(APP_EVENT_SYS_LIGHT_TOGGLE);
-                LightingUpdate(APP_EVENT_LIGHTING_GO_THROUGH);
+                Clusters::OnOff::Attributes::OnOff::Get(GetAppTask().GetEndpointId(), &onoff);
+                onoff = !onoff;
+                Clusters::OnOff::Attributes::OnOff::Set(GetAppTask().GetEndpointId(), onoff);
+                LightingUpdate((app_event_t)(APP_EVENT_LIGHTING_MASK & appEvent));
             }
 
-            if ((APP_EVENT_LIGHTING_MASK & appEvent) && isStateReady)
+            if (APP_EVENT_LIGHTING_MASK & appEvent)
             {
                 LightingUpdate((app_event_t)(APP_EVENT_LIGHTING_MASK & appEvent));
             }
@@ -357,6 +209,11 @@ void AppTask::AppTaskMain(void * pvParameter)
             if (APP_EVENT_IDENTIFY_MASK & appEvent)
             {
                 IdentifyHandleOp(appEvent);
+            }
+
+            if (APP_EVENT_SYS_BLE_ADV & appEvent)
+            {
+                LightingUpdate(APP_EVENT_SYS_BLE_ADV);
             }
 
             if (APP_EVENT_FACTORY_RESET & appEvent)
@@ -371,200 +228,67 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
-void AppTask::ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
+void AppTask::LightingUpdate(app_event_t status)
 {
-    switch (event->Type)
-    {
-    case DeviceEventType::kCHIPoBLEAdvertisingChange:
-
-#ifndef LED_BTN_RESET
-        if (ConnectivityMgr().IsThreadProvisioned())
-        {
-            GetAppTask().PostEvent(APP_EVENT_SYS_PROVISIONED);
-            break;
-        }
-#endif
-
-        if (ConnectivityMgr().NumBLEConnections())
-        {
-            GetAppTask().PostEvent(APP_EVENT_SYS_BLE_CONN);
-        }
-        else
-        {
-            GetAppTask().PostEvent(APP_EVENT_SYS_BLE_ADV);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-            GetAppTask().mIsConnected = ConnectivityMgr().IsWiFiStationConnected();
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-            GetAppTask().mIsConnected = ConnectivityMgr().IsThreadAttached();
-#endif
-        }
-        ChipLogProgress(NotSpecified, "BLE adv changed, connection number: %d\r\n", ConnectivityMgr().NumBLEConnections());
-        break;
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    case DeviceEventType::kThreadStateChange:
-
-        ChipLogProgress(NotSpecified, "Thread state changed, IsThreadAttached: %d\r\n", ConnectivityMgr().IsThreadAttached());
-        if (!GetAppTask().mIsConnected && ConnectivityMgr().IsThreadAttached())
-        {
-            GetAppTask().PostEvent(APP_EVENT_SYS_PROVISIONED);
-            GetAppTask().mIsConnected = true;
-        }
-        break;
-#endif
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    case DeviceEventType::kWiFiConnectivityChange:
-
-        ChipLogProgress(NotSpecified, "Wi-Fi state changed to %s.\r\n",
-                        ConnectivityMgr().IsWiFiStationConnected() ? "connected" : "disconnected");
-
-        chip::app::DnssdServer::Instance().StartServer();
-        NetworkCommissioning::BLWiFiDriver::GetInstance().SaveConfiguration();
-        if (!GetAppTask().mIsConnected && ConnectivityMgr().IsWiFiStationConnected())
-        {
-            GetAppTask().PostEvent(APP_EVENT_SYS_PROVISIONED);
-            GetAppTask().mIsConnected = true;
-        }
-        break;
-
-    case DeviceEventType::kInterfaceIpAddressChanged:
-        if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
-            (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
-        {
-            // MDNS server restart on any ip assignment: if link local ipv6 is configured, that
-            // will not trigger a 'internet connectivity change' as there is no internet
-            // connectivity. MDNS still wants to refresh its listening interfaces to include the
-            // newly selected address.
-            chip::app::DnssdServer::Instance().StartServer();
-        }
-
-        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
-        {
-            ChipLogProgress(NotSpecified, "Initializing route hook...");
-            bl_route_hook_init();
-        }
-        break;
-#endif
-    case DeviceEventType::kFailSafeTimerExpired:
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        GetAppTask().mIsConnected = ConnectivityMgr().IsWiFiStationConnected();
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        GetAppTask().mIsConnected = ConnectivityMgr().IsThreadAttached();
-#endif
-
-        break;
-    default:
-        break;
-    }
-}
-
-void AppTask::LightingUpdate(app_event_t event)
-{
-    uint8_t v, onoff, hue, sat;
+    uint8_t hue, sat;
+    bool onoff;
+    DataModel::Nullable<uint8_t> v(0);
     EndpointId endpoint = GetAppTask().GetEndpointId();
 
-    do
+    if (APP_EVENT_LIGHTING_MASK & status)
     {
-        if (EMBER_ZCL_STATUS_SUCCESS !=
-            emberAfReadAttribute(endpoint, Clusters::OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID, &onoff, sizeof(onoff)))
+        do
         {
-            break;
-        }
+            if (EMBER_ZCL_STATUS_SUCCESS != Clusters::OnOff::Attributes::OnOff::Get(endpoint, &onoff))
+            {
+                break;
+            }
 
-        if (EMBER_ZCL_STATUS_SUCCESS !=
-            emberAfReadAttribute(endpoint, Clusters::LevelControl::Id, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, &v, sizeof(v)))
-        {
-            break;
-        }
+            if (EMBER_ZCL_STATUS_SUCCESS != Clusters::LevelControl::Attributes::CurrentLevel::Get(endpoint, v))
+            {
+                break;
+            }
 
-        if (EMBER_ZCL_STATUS_SUCCESS !=
-            emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID, &hue, sizeof(v)))
-        {
-            break;
-        }
+            if (EMBER_ZCL_STATUS_SUCCESS != Clusters::ColorControl::Attributes::CurrentHue::Get(endpoint, &hue))
+            {
+                break;
+            }
 
-        if (EMBER_ZCL_STATUS_SUCCESS !=
-            emberAfReadAttribute(endpoint, Clusters::ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID, &sat,
-                                 sizeof(v)))
-        {
-            break;
-        }
+            if (EMBER_ZCL_STATUS_SUCCESS != Clusters::ColorControl::Attributes::CurrentSaturation::Get(endpoint, &sat))
+            {
+                break;
+            }
 
-        if (0 == onoff)
-        {
-            sLightLED.SetLevel(0);
-        }
-        else
-        {
+            if (!onoff)
+            {
+                sLightLED.SetLevel(0);
+            }
+            else
+            {
+                if (v.IsNull())
+                {
+                    // Just pick something.
+                    v.SetNonNull(254);
+                }
 #if defined(BL706_NIGHT_LIGHT) || defined(BL602_NIGHT_LIGHT)
-            sLightLED.SetColor(v, hue, sat);
+                sLightLED.SetColor(v.Value(), hue, sat);
 #else
-            sLightLED.SetLevel(v);
+                sLightLED.SetLevel(v.Value());
 #endif
-        }
+            }
 
-    } while (0);
-}
-
-void AppTask::LightingSetOnoff(uint8_t bonoff)
-{
-    uint8_t newValue    = bonoff;
-    EndpointId endpoint = GetAppTask().GetEndpointId();
-
-    // write the new on/off value
-    emberAfWriteAttribute(endpoint, Clusters::OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &newValue,
-                          ZCL_BOOLEAN_ATTRIBUTE_TYPE);
-    newValue = 254;
-    emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, (uint8_t *) &newValue,
-                          ZCL_INT8U_ATTRIBUTE_TYPE);
-}
-
-void AppTask::LightingSetStatus(app_event_t status)
-{
-    uint8_t onoff             = 1, level, hue, sat;
-    EndpointId endpoint       = GetAppTask().GetEndpointId();
-    static bool isProvisioned = false;
-
-    if (APP_EVENT_SYS_LIGHT_TOGGLE == status)
-    {
-        emberAfReadAttribute(endpoint, Clusters::OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &onoff,
-                             ZCL_BOOLEAN_ATTRIBUTE_TYPE);
-        onoff = 1 - onoff;
+        } while (0);
     }
-    else if (APP_EVENT_SYS_BLE_ADV == status)
+    else if (APP_EVENT_SYS_BLE_ADV & status)
     {
-        hue = 35;
-        emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID, (uint8_t *) &hue,
-                              ZCL_INT8U_ATTRIBUTE_TYPE);
-        sat = 254;
-        emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
-                              (uint8_t *) &sat, ZCL_INT8U_ATTRIBUTE_TYPE);
-        level = 254;
-        emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, (uint8_t *) &level,
-                              ZCL_INT8U_ATTRIBUTE_TYPE);
-
-        isProvisioned = false;
+#if defined(BL706_NIGHT_LIGHT) || defined(BL602_NIGHT_LIGHT)
+        /** show yellow to indicate BLE advertisement */
+        sLightLED.SetColor(254, 35, 254);
+#else
+        /** show 30% brightness to indicate BLE advertisement */
+        sLightLED.SetLevel(25);
+#endif
     }
-    else if (APP_EVENT_SYS_PROVISIONED == status)
-    {
-        if (isProvisioned)
-        {
-            return;
-        }
-        isProvisioned = true;
-        sat           = 0;
-        emberAfWriteAttribute(endpoint, Clusters::ColorControl::Id, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
-                              (uint8_t *) &sat, ZCL_INT8U_ATTRIBUTE_TYPE);
-        level = 254;
-        emberAfWriteAttribute(endpoint, Clusters::LevelControl::Id, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, (uint8_t *) &level,
-                              ZCL_INT8U_ATTRIBUTE_TYPE);
-    }
-
-    emberAfWriteAttribute(endpoint, Clusters::OnOff::Id, ZCL_ON_OFF_ATTRIBUTE_ID, (uint8_t *) &onoff, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 bool AppTask::StartTimer(void)
@@ -633,7 +357,14 @@ void AppTask::TimerEventHandler(app_event_t event)
         StartTimer();
         if (GetAppTask().mIsFactoryResetIndicat)
         {
-            LightingUpdate(APP_EVENT_LIGHTING_GO_THROUGH);
+            if (GetAppTask().mIsConnected)
+            {
+                LightingUpdate(APP_EVENT_LIGHTING_MASK);
+            }
+            else
+            {
+                LightingUpdate(APP_EVENT_SYS_BLE_ADV);
+            }
         }
         GetAppTask().mIsFactoryResetIndicat = false;
         GetAppTask().mButtonPressedTime     = 0;
@@ -662,7 +393,7 @@ void AppTask::TimerEventHandler(app_event_t event)
             else
             {
 
-#ifdef BL706_NIGHT_LIGHT
+#if defined(BL706_NIGHT_LIGHT) && !defined(LED_BTN_RESET)
 
                 if (GetAppTask().mButtonPressedTime)
                 {
@@ -691,7 +422,6 @@ void AppTask::TimerEventHandler(app_event_t event)
                     }
                 }
 #else
-#ifdef LED_BTN_RESET
                 if (ButtonPressed())
                 {
                     if (!GetAppTask().mIsFactoryResetIndicat &&
@@ -705,7 +435,6 @@ void AppTask::TimerEventHandler(app_event_t event)
                 {
                     GetAppTask().PostEvent(APP_EVENT_BTN_FACTORY_RESET_CANCEL);
                 }
-#endif
 #endif
             }
         }
@@ -743,7 +472,7 @@ void AppTask::IdentifyHandleOp(app_event_t event)
     if (APP_EVENT_IDENTIFY_STOP & event)
     {
         identifyState = 0;
-        LightingUpdate(APP_EVENT_LIGHTING_GO_THROUGH);
+        LightingUpdate(APP_EVENT_LIGHTING_MASK);
         ChipLogProgress(NotSpecified, "identify stop");
     }
 }
@@ -777,18 +506,17 @@ void AppTask::ButtonEventHandler(void * arg)
     uint32_t presstime;
     if (ButtonPressed())
     {
-        hosal_gpio_irq_set(&gpio_key, HOSAL_IRQ_TRIG_NEG_LEVEL, GetAppTask().ButtonEventHandler, NULL);
+        bl_set_gpio_intmod(gpio_key.port, 1, HOSAL_IRQ_TRIG_NEG_LEVEL);
 
         GetAppTask().mButtonPressedTime = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
         GetAppTask().PostEvent(APP_EVENT_BTN_FACTORY_RESET_PRESS);
     }
     else
     {
-        hosal_gpio_irq_set(&gpio_key, HOSAL_IRQ_TRIG_POS_PULSE, GetAppTask().ButtonEventHandler, NULL);
+        bl_set_gpio_intmod(gpio_key.port, 1, HOSAL_IRQ_TRIG_POS_PULSE);
 
         if (GetAppTask().mButtonPressedTime)
         {
-
             presstime = chip::System::SystemClock().GetMonotonicMilliseconds64().count() - GetAppTask().mButtonPressedTime;
             if (presstime >= APP_BUTTON_PRESS_LONG)
             {

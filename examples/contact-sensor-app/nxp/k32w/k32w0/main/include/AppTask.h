@@ -23,7 +23,15 @@
 
 #include "AppEvent.h"
 #include "ContactSensorManager.h"
+
+#include "CHIPProjectConfig.h"
+
+#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
 #include "K32W0FactoryDataProvider.h"
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+#include "CustomFactoryDataProvider.h"
+#endif
+#endif
 
 #include <app/clusters/identify-server/identify-server.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -41,6 +49,15 @@
 
 class AppTask
 {
+public:
+#if CONFIG_CHIP_K32W0_REAL_FACTORY_DATA
+#if CHIP_DEVICE_CONFIG_USE_CUSTOM_PROVIDER
+    using FactoryDataProvider = chip::DeviceLayer::CustomFactoryDataProvider;
+#else
+    using FactoryDataProvider = chip::DeviceLayer::K32W0FactoryDataProvider;
+#endif
+#endif
+
 public:
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
@@ -75,7 +92,6 @@ private:
     static void BleHandler(void * aGenericEvent);
     static void BleStartAdvertising(intptr_t arg);
     static void ContactActionEventHandler(void * aGenericEvent);
-    static void OTAResumeEventHandler(void * aGenericEvent);
     static void ResetActionEventHandler(void * aGenericEvent);
     static void InstallEventHandler(void * aGenericEvent);
 
@@ -88,18 +104,16 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     static void InitOTA(intptr_t arg);
     static void StartOTAQuery(intptr_t arg);
-    static void PostOTAResume();
-    static void OnScheduleInitOTA(chip::System::Layer * systemLayer, void * appState);
 #endif
 
     static void UpdateClusterStateInternal(intptr_t arg);
     static void UpdateDeviceStateInternal(intptr_t arg);
     static void InitServer(intptr_t arg);
+    static void PrintOnboardingInfo();
 
     enum class Function : uint8_t
     {
-        kNoneSelected   = 0,
-        kSoftwareUpdate = 0,
+        kNoneSelected = 0,
         kFactoryReset,
         kContact,
         kIdentify,
@@ -111,8 +125,6 @@ private:
     bool mSyncClusterToButtonAction = false;
 
     static AppTask sAppTask;
-
-    chip::DeviceLayer::K32W0FactoryDataProvider mK32W0FactoryDataProvider;
 };
 
 inline AppTask & GetAppTask(void)

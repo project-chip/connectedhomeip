@@ -28,6 +28,22 @@
 using namespace ::chip;
 using namespace ::chip::Controller;
 
+// A no-op MTRDeviceAttestationDelegate which lets us test (by default, in CI)
+// commissioning flows that have such a delegate.
+@interface NoOpAttestationDelegate : NSObject <MTRDeviceAttestationDelegate>
+@end
+
+@implementation NoOpAttestationDelegate
+- (void)deviceAttestationCompletedForController:(MTRDeviceController *)controller
+                             opaqueDeviceHandle:(void *)opaqueDeviceHandle
+                          attestationDeviceInfo:(MTRDeviceAttestationDeviceInfo *)attestationDeviceInfo
+                                          error:(NSError * _Nullable)error
+{
+    [controller continueCommissioningDevice:opaqueDeviceHandle ignoreAttestationFailure:NO error:nil];
+}
+
+@end
+
 void PairingCommandBridge::SetUpDeviceControllerDelegate()
 {
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL);
@@ -47,6 +63,13 @@ void PairingCommandBridge::SetUpDeviceControllerDelegate()
     case PairingNetworkType::Thread:
         [params setThreadOperationalDataset:[NSData dataWithBytes:mOperationalDataset.data() length:mOperationalDataset.size()]];
         break;
+    }
+
+    if (mUseDeviceAttestationDelegate.ValueOr(false)) {
+        params.deviceAttestationDelegate = [[NoOpAttestationDelegate alloc] init];
+        if (mDeviceAttestationFailsafeTime.HasValue()) {
+            params.failSafeTimeout = @(mDeviceAttestationFailsafeTime.Value());
+        }
     }
 
     [deviceControllerDelegate setCommandBridge:this];

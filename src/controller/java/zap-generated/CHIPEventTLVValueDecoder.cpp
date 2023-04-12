@@ -1420,8 +1420,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             else
             {
                 jobject value_nameInsideOptional;
-                value_nameInsideOptional =
-                    env->NewStringUTF(std::string(cppValue.name.Value().data(), cppValue.name.Value().size()).c_str());
+                LogErrorOnFailure(
+                    chip::JniReferences::GetInstance().CharToStringUTF(cppValue.name.Value(), value_nameInsideOptional));
                 chip::JniReferences::GetInstance().CreateOptional(value_nameInsideOptional, value_name);
             }
 
@@ -1707,8 +1707,8 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
-    case app::Clusters::BridgedDeviceBasic::Id: {
-        using namespace app::Clusters::BridgedDeviceBasic;
+    case app::Clusters::BridgedDeviceBasicInformation::Id: {
+        using namespace app::Clusters::BridgedDeviceBasicInformation;
         switch (aPath.mEventId)
         {
         case Events::StartUp::Id: {
@@ -1727,16 +1727,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jclass startUpStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicClusterStartUpEvent", startUpStructClass);
+                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicInformationClusterStartUpEvent", startUpStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedDeviceBasicClusterStartUpEvent");
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedDeviceBasicInformationClusterStartUpEvent");
                 return nullptr;
             }
             jmethodID startUpStructCtor = env->GetMethodID(startUpStructClass, "<init>", "(Ljava/lang/Long;)V");
             if (startUpStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$BridgedDeviceBasicClusterStartUpEvent constructor");
+                ChipLogError(Zcl, "Could not find ChipEventStructs$BridgedDeviceBasicInformationClusterStartUpEvent constructor");
                 return nullptr;
             }
 
@@ -1753,16 +1753,17 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
             jclass shutDownStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicClusterShutDownEvent", shutDownStructClass);
+                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicInformationClusterShutDownEvent",
+                shutDownStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedDeviceBasicClusterShutDownEvent");
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedDeviceBasicInformationClusterShutDownEvent");
                 return nullptr;
             }
             jmethodID shutDownStructCtor = env->GetMethodID(shutDownStructClass, "<init>", "()V");
             if (shutDownStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$BridgedDeviceBasicClusterShutDownEvent constructor");
+                ChipLogError(Zcl, "Could not find ChipEventStructs$BridgedDeviceBasicInformationClusterShutDownEvent constructor");
                 return nullptr;
             }
 
@@ -1779,16 +1780,16 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
             }
             jclass leaveStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicClusterLeaveEvent", leaveStructClass);
+                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicInformationClusterLeaveEvent", leaveStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedDeviceBasicClusterLeaveEvent");
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedDeviceBasicInformationClusterLeaveEvent");
                 return nullptr;
             }
             jmethodID leaveStructCtor = env->GetMethodID(leaveStructClass, "<init>", "()V");
             if (leaveStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$BridgedDeviceBasicClusterLeaveEvent constructor");
+                ChipLogError(Zcl, "Could not find ChipEventStructs$BridgedDeviceBasicInformationClusterLeaveEvent constructor");
                 return nullptr;
             }
 
@@ -1812,18 +1813,20 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
 
             jclass reachableChangedStructClass;
             err = chip::JniReferences::GetInstance().GetClassRef(
-                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicClusterReachableChangedEvent",
+                env, "chip/devicecontroller/ChipEventStructs$BridgedDeviceBasicInformationClusterReachableChangedEvent",
                 reachableChangedStructClass);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Could not find class ChipEventStructs$BridgedDeviceBasicClusterReachableChangedEvent");
+                ChipLogError(Zcl,
+                             "Could not find class ChipEventStructs$BridgedDeviceBasicInformationClusterReachableChangedEvent");
                 return nullptr;
             }
             jmethodID reachableChangedStructCtor =
                 env->GetMethodID(reachableChangedStructClass, "<init>", "(Ljava/lang/Boolean;)V");
             if (reachableChangedStructCtor == nullptr)
             {
-                ChipLogError(Zcl, "Could not find ChipEventStructs$BridgedDeviceBasicClusterReachableChangedEvent constructor");
+                ChipLogError(
+                    Zcl, "Could not find ChipEventStructs$BridgedDeviceBasicInformationClusterReachableChangedEvent constructor");
                 return nullptr;
             }
 
@@ -2365,23 +2368,24 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                             newElement_2_credentialIndexClassName.c_str(), newElement_2_credentialIndexCtorSignature.c_str(),
                             entry_2.credentialIndex, newElement_2_credentialIndex);
 
-                        jclass dlCredentialStructClass_3;
+                        jclass credentialStructStructClass_3;
                         err = chip::JniReferences::GetInstance().GetClassRef(
-                            env, "chip/devicecontroller/ChipStructs$DoorLockClusterDlCredential", dlCredentialStructClass_3);
+                            env, "chip/devicecontroller/ChipStructs$DoorLockClusterCredentialStruct",
+                            credentialStructStructClass_3);
                         if (err != CHIP_NO_ERROR)
                         {
-                            ChipLogError(Zcl, "Could not find class ChipStructs$DoorLockClusterDlCredential");
+                            ChipLogError(Zcl, "Could not find class ChipStructs$DoorLockClusterCredentialStruct");
                             return nullptr;
                         }
-                        jmethodID dlCredentialStructCtor_3 =
-                            env->GetMethodID(dlCredentialStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
-                        if (dlCredentialStructCtor_3 == nullptr)
+                        jmethodID credentialStructStructCtor_3 =
+                            env->GetMethodID(credentialStructStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+                        if (credentialStructStructCtor_3 == nullptr)
                         {
-                            ChipLogError(Zcl, "Could not find ChipStructs$DoorLockClusterDlCredential constructor");
+                            ChipLogError(Zcl, "Could not find ChipStructs$DoorLockClusterCredentialStruct constructor");
                             return nullptr;
                         }
 
-                        newElement_2 = env->NewObject(dlCredentialStructClass_3, dlCredentialStructCtor_3,
+                        newElement_2 = env->NewObject(credentialStructStructClass_3, credentialStructStructCtor_3,
                                                       newElement_2_credentialType, newElement_2_credentialIndex);
                         chip::JniReferences::GetInstance().AddToList(value_credentialsInsideOptional, newElement_2);
                     }
@@ -2516,23 +2520,24 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                             newElement_2_credentialIndexClassName.c_str(), newElement_2_credentialIndexCtorSignature.c_str(),
                             entry_2.credentialIndex, newElement_2_credentialIndex);
 
-                        jclass dlCredentialStructClass_3;
+                        jclass credentialStructStructClass_3;
                         err = chip::JniReferences::GetInstance().GetClassRef(
-                            env, "chip/devicecontroller/ChipStructs$DoorLockClusterDlCredential", dlCredentialStructClass_3);
+                            env, "chip/devicecontroller/ChipStructs$DoorLockClusterCredentialStruct",
+                            credentialStructStructClass_3);
                         if (err != CHIP_NO_ERROR)
                         {
-                            ChipLogError(Zcl, "Could not find class ChipStructs$DoorLockClusterDlCredential");
+                            ChipLogError(Zcl, "Could not find class ChipStructs$DoorLockClusterCredentialStruct");
                             return nullptr;
                         }
-                        jmethodID dlCredentialStructCtor_3 =
-                            env->GetMethodID(dlCredentialStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
-                        if (dlCredentialStructCtor_3 == nullptr)
+                        jmethodID credentialStructStructCtor_3 =
+                            env->GetMethodID(credentialStructStructClass_3, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V");
+                        if (credentialStructStructCtor_3 == nullptr)
                         {
-                            ChipLogError(Zcl, "Could not find ChipStructs$DoorLockClusterDlCredential constructor");
+                            ChipLogError(Zcl, "Could not find ChipStructs$DoorLockClusterCredentialStruct constructor");
                             return nullptr;
                         }
 
-                        newElement_2 = env->NewObject(dlCredentialStructClass_3, dlCredentialStructCtor_3,
+                        newElement_2 = env->NewObject(credentialStructStructClass_3, credentialStructStructCtor_3,
                                                       newElement_2_credentialType, newElement_2_credentialIndex);
                         chip::JniReferences::GetInstance().AddToList(value_credentialsInsideOptional, newElement_2);
                     }
@@ -3493,7 +3498,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                     reinterpret_cast<const jbyte *>(cppValue.arg4.d.data()));
             value_arg4_d = value_arg4_dByteArray;
             jobject value_arg4_e;
-            value_arg4_e = env->NewStringUTF(std::string(cppValue.arg4.e.data(), cppValue.arg4.e.size()).c_str());
+            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(cppValue.arg4.e, value_arg4_e));
             jobject value_arg4_f;
             std::string value_arg4_fClassName     = "java/lang/Integer";
             std::string value_arg4_fCtorSignature = "(I)V";
@@ -3561,7 +3566,7 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
                                         reinterpret_cast<const jbyte *>(entry_0.d.data()));
                 newElement_0_d = newElement_0_dByteArray;
                 jobject newElement_0_e;
-                newElement_0_e = env->NewStringUTF(std::string(entry_0.e.data(), entry_0.e.size()).c_str());
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.e, newElement_0_e));
                 jobject newElement_0_f;
                 std::string newElement_0_fClassName     = "java/lang/Integer";
                 std::string newElement_0_fCtorSignature = "(I)V";

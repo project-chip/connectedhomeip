@@ -36,6 +36,11 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 // called by controller to clean up and shutdown
 - (void)invalidate;
 
+// Called by controller when a new operational advertisement for what we think
+// is this device's identity has been observed.  This could have
+// false-positives, for example due to compressed fabric id collisions.
+- (void)nodeMayBeAdvertisingOperational;
+
 @property (nonatomic, readonly) MTRDeviceController * deviceController;
 @property (nonatomic, readonly, copy) NSNumber * nodeID;
 // Queue used for various internal bookkeeping work.  In general endWork calls
@@ -50,5 +55,12 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 // Returns a NSNumber object that is aNumber if it falls within the range [min, max].
 // Returns min or max, if it is below or above, respectively.
 NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max);
+
+#pragma mark - Utility for time conversion
+NSTimeInterval MTRTimeIntervalForEventTimestampValue(uint64_t timeValue);
+
+#pragma mark - Utility for event priority conversion
+BOOL MTRPriorityLevelIsValid(chip::app::PriorityLevel priorityLevel);
+MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel);
 
 NS_ASSUME_NONNULL_END

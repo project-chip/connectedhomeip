@@ -35,11 +35,13 @@
 #include <lib/support/Base64.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/CASEDestinationId.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/PairingSession.h>
 #include <protocols/secure_channel/SessionEstablishmentExchangeDispatch.h>
 #include <protocols/secure_channel/SessionResumptionStorage.h>
+#include <system/SystemClock.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/CryptoContext.h>
 #include <transport/raw/MessageHeader.h>
@@ -175,6 +177,14 @@ public:
 
     FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
+    // Compute our Sigma1 response timeout.  This can give consumers an idea of
+    // how long it will take to detect that our Sigma1 did not get through.
+    static System::Clock::Timeout ComputeSigma1ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig);
+
+    // Compute our Sigma2 response timeout.  This can give consumers an idea of
+    // how long it will take to detect that our Sigma1 did not get through.
+    static System::Clock::Timeout ComputeSigma2ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig);
+
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     /** @brief This function zeroes out and resets the memory used by the object.
      **/
@@ -192,6 +202,7 @@ private:
         kSentSigma2Resume  = 5,
         kFinished          = 6,
         kFinishedViaResume = 7,
+        kBackgroundPending = 8,
     };
 
     /*
@@ -221,21 +232,24 @@ private:
     CHIP_ERROR HandleSigma2_and_SendSigma3(System::PacketBufferHandle && msg);
     CHIP_ERROR HandleSigma2(System::PacketBufferHandle && msg);
     CHIP_ERROR HandleSigma2Resume(System::PacketBufferHandle && msg);
+
     CHIP_ERROR SendSigma3();
-    CHIP_ERROR HandleSigma3(System::PacketBufferHandle && msg);
+    struct Sigma3Work;
+    CHIP_ERROR HandleSigma3a(System::PacketBufferHandle && msg);
+    static void HandleSigma3b(Sigma3Work & work);
+    CHIP_ERROR HandleSigma3c(Sigma3Work & work);
 
     CHIP_ERROR SendSigma2Resume();
 
+    CHIP_ERROR DeriveSigmaKey(const ByteSpan & salt, const ByteSpan & info, Crypto::AutoReleaseSessionKey & key) const;
     CHIP_ERROR ConstructSaltSigma2(const ByteSpan & rand, const Crypto::P256PublicKey & pubkey, const ByteSpan & ipk,
                                    MutableByteSpan & salt);
-    CHIP_ERROR ValidatePeerIdentity(const ByteSpan & peerNOC, const ByteSpan & peerICAC, NodeId & peerNodeId,
-                                    Crypto::P256PublicKey & peerPublicKey);
     CHIP_ERROR ConstructTBSData(const ByteSpan & senderNOC, const ByteSpan & senderICAC, const ByteSpan & senderPubKey,
                                 const ByteSpan & receiverPubKey, uint8_t * tbsData, size_t & tbsDataLen);
     CHIP_ERROR ConstructSaltSigma3(const ByteSpan & ipk, MutableByteSpan & salt);
 
     CHIP_ERROR ConstructSigmaResumeKey(const ByteSpan & initiatorRandom, const ByteSpan & resumptionID, const ByteSpan & skInfo,
-                                       const ByteSpan & nonce, MutableByteSpan & resumeKey);
+                                       const ByteSpan & nonce, Crypto::AutoReleaseSessionKey & resumeKey);
 
     CHIP_ERROR GenerateSigmaResumeMIC(const ByteSpan & initiatorRandom, const ByteSpan & resumptionID, const ByteSpan & skInfo,
                                       const ByteSpan & nonce, MutableByteSpan & resumeMIC);
@@ -282,6 +296,10 @@ private:
     SessionResumptionStorage::ResumptionIdStorage mNewResumptionId;    // ResumptionId which is stored to resume future session
     // Sigma1 initiator random, maintained to be reused post-Sigma1, such as when generating Sigma2 S2RK key
     uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
+
+    // Sequence number used to coordinate foreground/background work for a
+    // particular session establishment.
+    int mSequence = 0;
 
     State mState;
 

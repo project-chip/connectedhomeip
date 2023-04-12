@@ -9,6 +9,7 @@
 #import "MTRCluster_Internal.h"
 #import "MTRClusterStateCacheContainer_Internal.h"
 #import "MTRCommandPayloadsObjc.h"
+#import "MTRDevice_Internal.h"
 #import "MTRStructsObjc.h"
 
 #include <lib/support/CHIPListUtils.h>
@@ -20,9 +21,12 @@ using chip::Callback::Cancelable;
 using namespace chip::app::Clusters;
 using chip::Messaging::ExchangeManager;
 using chip::SessionHandle;
+using chip::Optional;
+using chip::System::Clock::Timeout;
+using chip::System::Clock::Seconds16;
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
-{{#chip_client_clusters includeAll=true}}
+{{#all_user_clusters side='client'}}
 {{#unless (wasRemoved (asUpperCamelCase name preserveAcronyms=true))}}
 @implementation MTRBaseCluster{{asUpperCamelCase name preserveAcronyms=true}}
 
@@ -41,7 +45,8 @@ using chip::SessionHandle;
     return self;
 }
 
-{{#chip_cluster_commands}}
+{{#zcl_commands}}
+{{#if (is_str_equal source 'client')}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandImpl"}}
 {{! This is used as the implementation for both the new-name and old-name bits, so check for both here. }}
@@ -55,13 +60,13 @@ MTR{{compatClusterNameRemapping parent.name}}Cluster{{compatCommandNameRemapping
 MTR{{cluster}}Cluster{{command}}Params
 {{/if}}
 {{/inline}}
-{{#unless (hasArguments)}}
+{{#unless hasArguments}}
 - (void){{asLowerCamelCase name}}WithCompletion:({{>command_completion_type command=.}})completion
 {
   [self {{asLowerCamelCase name}}WithParams:nil completion:completion];
 }
 {{/unless}}
-- (void){{asLowerCamelCase name}}WithParams: ({{> paramsType}} * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion
+- (void){{asLowerCamelCase name}}WithParams: ({{> paramsType}} * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params completion:({{>command_completion_type command=.}})completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -80,12 +85,20 @@ MTR{{cluster}}Cluster{{command}}Params
       {{/if}}
       ^(ExchangeManager & exchangeManager, const SessionHandle & session, {{>callbackName}}CallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
         auto * typedBridge = static_cast<MTR{{>callbackName}}CallbackBridge *>(bridge);
-        chip::Optional<uint16_t> timedInvokeTimeoutMs;
+        Optional<uint16_t> timedInvokeTimeoutMs;
+        Optional<Timeout> invokeTimeout;
         ListFreer listFreer;
         {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
         if (params != nil) {
           if (params.timedInvokeTimeoutMs != nil) {
+            params.timedInvokeTimeoutMs = MTRClampedNumber(params.timedInvokeTimeoutMs, @(1), @(UINT16_MAX));
             timedInvokeTimeoutMs.SetValue(params.timedInvokeTimeoutMs.unsignedShortValue);
+          }
+          if (params.serverSideProcessingTimeout != nil) {
+            // Clamp to a number of seconds that will not overflow 32-bit
+            // int when converted to ms.
+            auto * serverSideProcessingTimeout = MTRClampedNumber(params.serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+            invokeTimeout.SetValue(Seconds16(serverSideProcessingTimeout.unsignedShortValue));
           }
         }
         {{#if mustUseTimedInvoke}}
@@ -93,21 +106,21 @@ MTR{{cluster}}Cluster{{command}}Params
           timedInvokeTimeoutMs.SetValue(10000);
         }
         {{/if}}
-        {{#chip_cluster_command_arguments}}
+        {{#zcl_command_arguments}}
           {{#first}}
-            {{#unless (commandHasRequiredField parent)}}
+            {{#unless parent.commandHasRequiredField}}
             if (params != nil) {
             {{/unless}}
           {{/first}}
           {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(concat "params." (asStructPropertyName label)) cluster=parent.parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
           {{#last}}
-            {{#unless (commandHasRequiredField parent)}}
+            {{#unless parent.commandHasRequiredField}}
             }
            {{/unless}}
           {{/last}}
-        {{/chip_cluster_command_arguments}}
+        {{/zcl_command_arguments}}
 
-        return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb, self->_endpoint, timedInvokeTimeoutMs);
+        return MTRStartInvokeInteraction(typedBridge, request, exchangeManager, session, successCb, failureCb, self->_endpoint, timedInvokeTimeoutMs, invokeTimeout);
     });
     std::move(*bridge).DispatchAction(self.device);
 }
@@ -115,12 +128,14 @@ MTR{{cluster}}Cluster{{command}}Params
 {{/inline}}
 {{> commandImpl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
                 command=(asUpperCamelCase name preserveAcronyms=true)}}
-{{/chip_cluster_commands}}
+{{/if}}
+{{/zcl_commands}}
 
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server removeKeys='isOptional'}}
 {{! This is used as the implementation for both the new-name and old-name bits, so check for both here. }}
-{{#unless (and (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))
-               (wasRemoved (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
+{{#unless (and (wasRemoved (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true))
+               (or (wasRemoved (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
+                   (not wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))))}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (void)read{{>attribute}}With
 {{~#if_is_fabric_scoped_struct type~}}
@@ -219,7 +234,7 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
 
 {{/if}}
 {{/unless}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 
 @end
 {{/unless}}
@@ -235,11 +250,12 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
            (not (wasRemoved (compatClusterNameRemapping name))))}}
 @implementation MTRBaseCluster{{compatClusterNameRemapping name}} (Deprecated)
 
-{{#chip_cluster_commands}}
+{{#zcl_commands}}
+{{#if (is_str_equal source 'client')}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}
 {{#*inline "commandImpl"}}
 {{#unless (wasRemoved cluster command=command)}}
-- (void){{asLowerCamelCase command}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless (commandHasRequiredField .)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
+- (void){{asLowerCamelCase command}}WithParams:(MTR{{cluster}}Cluster{{command}}Params * {{#unless commandHasRequiredField}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
 {
   [self {{asLowerCamelCase name}}WithParams:params completion:
     {{#if hasSpecificResponse}}
@@ -252,19 +268,20 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
     {{/if}}
     ];
 }
-{{#unless (hasArguments)}}
+{{#unless hasArguments}}
 - (void){{asLowerCamelCase command}}WithCompletionHandler:({{>command_completion_type command=. compatRemapNames=true}})completionHandler
 {
-  [self {{asLowerCamelCase name}}WithParams:nil completionHandler:completionHandler];
+  [self {{asLowerCamelCase command}}WithParams:nil completionHandler:completionHandler];
 }
 {{/unless}}
 {{/unless}}
 {{/inline}}
 {{> commandImpl cluster=(compatClusterNameRemapping parent.name)
                 command=(compatCommandNameRemapping parent.name name)}}
-{{/chip_cluster_commands}}
+{{/if}}
+{{/zcl_commands}}
 
-{{#chip_server_cluster_attributes}}
+{{#zcl_attributes_server removeKeys='isOptional'}}
 {{#if (and (wasIntroducedBeforeRelease "First major API revamp" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))
            (not (wasRemoved (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))))}}
 {{#*inline "attribute"}}Attribute{{compatAttributeNameRemapping parent.name name}}{{/inline}}
@@ -320,7 +337,7 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 }
 {{/if}}
 {{/if}}
-{{/chip_server_cluster_attributes}}
+{{/zcl_attributes_server}}
 
 - (nullable instancetype)initWithDevice:(MTRBaseDevice *)device
                                endpoint:(uint16_t)endpoint
@@ -332,6 +349,6 @@ subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptio
 @end
 {{/if}}
 
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 
 // NOLINTEND(clang-analyzer-cplusplus.NewDeleteLeaks)

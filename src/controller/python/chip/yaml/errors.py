@@ -15,12 +15,12 @@
 #    limitations under the License.
 #
 
-class ParsingError(ValueError):
+class ActionCreationError(Exception):
     def __init__(self, message):
         super().__init__(message)
 
 
-class UnexpectedParsingError(ValueError):
+class UnexpectedActionCreationError(Exception):
     def __init__(self, message):
         super().__init__(message)
 

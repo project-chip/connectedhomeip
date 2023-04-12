@@ -45,6 +45,7 @@ extern "C" {
 #include <utils/uart.h>
 
 #include "platform-efr32.h"
+#include "sl_openthread.h"
 
 #if OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE
 #include "openthread/heap.h"
@@ -55,6 +56,9 @@ extern "C" {
 #include "sl_component_catalog.h"
 #include "sl_mbedtls.h"
 #include "sl_system_init.h"
+#if SILABS_LOG_OUT_UART || ENABLE_CHIP_SHELL || CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+#include "uart.h"
+#endif
 
 #if SL_SYSTEM_VIEW
 #include "SEGGER_SYSVIEW.h"
@@ -66,19 +70,25 @@ void init_efrPlatform(void)
 {
     sl_system_init();
     sl_mbedtls_init();
+#if CHIP_ENABLE_OPENTHREAD
+#ifdef MGM24
+    sl_openthread_init();
+#endif
+    efr32RadioInit();
+    efr32AlarmInit();
+    efr32MiscInit();
+#endif // CHIP_ENABLE_OPENTHREAD
+
 #if SL_SYSTEM_VIEW
     SEGGER_SYSVIEW_Conf();
     SEGGER_SYSVIEW_Start();
 #endif
-
+#if SILABS_LOG_OUT_UART || ENABLE_CHIP_SHELL || CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
+    uartConsoleInit();
+#endif
 #if SILABS_LOG_ENABLED
     silabsInitLog();
 #endif
-
-#if CHIP_ENABLE_OPENTHREAD
-    efr32RadioInit();
-    efr32AlarmInit();
-#endif // CHIP_ENABLE_OPENTHREAD
 }
 
 #ifdef __cplusplus

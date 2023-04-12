@@ -33,7 +33,7 @@ import chip.exceptions
 import chip.interaction_model
 import chip.tlv
 import construct
-from chip.native import PyChipError
+from chip.native import ErrorSDKPart, PyChipError
 from rich.pretty import pprint
 
 from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent
@@ -810,7 +810,11 @@ class AsyncWriteTransaction:
         # move on, possibly invalidating the provided _event_loop.
         #
         if self._resultError is not None:
-            self._future.set_exception(self._resultError.to_exception())
+            if self._resultError.sdk_part is ErrorSDKPart.IM_GLOBAL_STATUS:
+                im_status = chip.interaction_model.Status(self._resultError.sdk_code)
+                self._future.set_exception(chip.interaction_model.InteractionModelError(im_status))
+            else:
+                self._future.set_exception(self._resultError.to_exception())
         else:
             self._future.set_result(self._resultData)
 
@@ -910,14 +914,13 @@ def _OnWriteDoneCallback(closure):
     closure.handleDone()
 
 
-def WriteAttributes(future: Future, eventLoop, device, attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: int = None, interactionTimeoutMs: int = None) -> PyChipError:
+def WriteAttributes(future: Future, eventLoop, device, attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: Union[None, int] = None, interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None) -> PyChipError:
     handle = chip.native.GetLibraryHandle()
 
     writeargs = []
     for attr in attributes:
         if attr.Attribute.must_use_timed_write and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
-            raise ValueError(
-                f"Attribute {attr.__class__} must use timed write, please specify a valid timedRequestTimeoutMs value.")
+            raise chip.interaction_model.InteractionModelError(chip.interaction_model.Status.NeedsTimedInteraction)
         path = chip.interaction_model.AttributePathIBstruct.parse(
             b'\x00' * chip.interaction_model.AttributePathIBstruct.sizeof())
         path.EndpointId = attr.EndpointId
@@ -935,16 +938,47 @@ def WriteAttributes(future: Future, eventLoop, device, attributes: List[Attribut
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     res = builtins.chipStack.Call(
         lambda: handle.pychip_WriteClient_WriteAttributes(
-            ctypes.py_object(transaction), device, ctypes.c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), ctypes.c_uint16(0 if interactionTimeoutMs is None else interactionTimeoutMs), ctypes.c_size_t(len(attributes)), *writeargs))
+            ctypes.py_object(transaction), device,
+            ctypes.c_size_t(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs),
+            ctypes.c_size_t(0 if interactionTimeoutMs is None else interactionTimeoutMs),
+            ctypes.c_size_t(0 if busyWaitMs is None else busyWaitMs),
+            ctypes.c_size_t(len(attributes)), *writeargs)
+    )
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res
 
 
+def WriteGroupAttributes(groupId: int, devCtrl: c_void_p, attributes: List[AttributeWriteRequest], busyWaitMs: Union[None, int] = None) -> PyChipError:
+    handle = chip.native.GetLibraryHandle()
+
+    writeargs = []
+    for attr in attributes:
+        path = chip.interaction_model.AttributePathIBstruct.parse(
+            b'\x00' * chip.interaction_model.AttributePathIBstruct.sizeof())
+        path.EndpointId = attr.EndpointId
+        path.ClusterId = attr.Attribute.cluster_id
+        path.AttributeId = attr.Attribute.attribute_id
+        path.DataVersion = attr.DataVersion
+        path.HasDataVersion = attr.HasDataVersion
+        path = chip.interaction_model.AttributePathIBstruct.build(path)
+        tlv = attr.Attribute.ToTLV(None, attr.Data)
+        writeargs.append(ctypes.c_char_p(path))
+        writeargs.append(ctypes.c_char_p(bytes(tlv)))
+        writeargs.append(ctypes.c_int(len(tlv)))
+
+    return builtins.chipStack.Call(
+        lambda: handle.pychip_WriteClient_WriteGroupAttributes(
+            ctypes.c_size_t(groupId), devCtrl,
+            ctypes.c_size_t(0 if busyWaitMs is None else busyWaitMs),
+            ctypes.c_size_t(len(attributes)), *writeargs)
+    )
+
+
 # This struct matches the PyReadAttributeParams in attribute.cpp, for passing various params together.
 _ReadParams = construct.Struct(
-    "MinInterval" / construct.Int32ul,
-    "MaxInterval" / construct.Int32ul,
+    "MinInterval" / construct.Int16ul,
+    "MaxInterval" / construct.Int16ul,
     "IsSubscription" / construct.Flag,
     "IsFabricFiltered" / construct.Flag,
     "KeepSubscriptions" / construct.Flag,
@@ -1073,6 +1107,19 @@ def Init():
         setter = chip.native.NativeLibraryHandleMethodArguments(handle)
 
         handle.pychip_WriteClient_WriteAttributes.restype = PyChipError
+        handle.pychip_WriteClient_WriteGroupAttributes.restype = PyChipError
+
+        # Both WriteAttributes and WriteGroupAttributes are variadic functions. As per ctype documentation
+        # https://docs.python.org/3/library/ctypes.html#calling-varadic-functions, it is critical that we
+        # specify the argtypes attribute for the regular, non-variadic, function arguments for this to work
+        # on ARM64 for Apple Platforms.
+        # TODO We could move away from a variadic function to one where we provide a vector of the
+        # attribute information we want written using a vector. This possibility was not implemented at the
+        # time where simply specified the argtypes, because of time constraints. This solution was quicker
+        # to fix the crash on ARM64 Apple platforms without a refactor.
+        handle.pychip_WriteClient_WriteAttributes.argtypes = [py_object, c_void_p, c_size_t, c_size_t, c_size_t, c_size_t]
+        handle.pychip_WriteClient_WriteGroupAttributes.argtypes = [c_size_t, c_void_p, c_size_t, c_size_t]
+
         setter.Set('pychip_WriteClient_InitCallbacks', None, [
                    _OnWriteResponseCallbackFunct, _OnWriteErrorCallbackFunct, _OnWriteDoneCallbackFunct])
         handle.pychip_ReadClient_Read.restype = PyChipError

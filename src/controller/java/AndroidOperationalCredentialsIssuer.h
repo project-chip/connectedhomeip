@@ -53,7 +53,7 @@ public:
                                 Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
 
     CHIP_ERROR NOCChainGenerated(CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac, const ByteSpan & rcac,
-                                 Optional<Crypto::AesCcm128KeySpan> ipk, Optional<NodeId> adminSubject);
+                                 Optional<Crypto::IdentityProtectionKeySpan> ipk, Optional<NodeId> adminSubject);
 
     void SetUseJavaCallbackForNOCRequest(bool useJavaCallbackForNOCRequest)
     {

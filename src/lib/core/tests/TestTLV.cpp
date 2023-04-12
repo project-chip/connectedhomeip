@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -26,9 +26,9 @@
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
-#include <lib/core/CHIPCircularTLVBuffer.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/TLV.h>
+#include <lib/core/TLVCircularBuffer.h>
 #include <lib/core/TLVData.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
@@ -2278,7 +2278,7 @@ void CheckPacketBuffer(nlTestSuite * inSuite, void * inContext)
     ReadEncoding1(inSuite, reader);
 }
 
-CHIP_ERROR CountEvictedMembers(CHIPCircularTLVBuffer & inBuffer, void * inAppData, TLVReader & inReader)
+CHIP_ERROR CountEvictedMembers(TLVCircularBuffer & inBuffer, void * inAppData, TLVReader & inReader)
 {
     TestTLVContext * context = static_cast<TestTLVContext *>(inAppData);
     CHIP_ERROR err;
@@ -2307,7 +2307,7 @@ void CheckCircularTLVBufferSimple(nlTestSuite * inSuite, void * inContext)
     CircularTLVWriter writer;
     CircularTLVReader reader;
     TestTLVContext * context = static_cast<TestTLVContext *>(inContext);
-    CHIPCircularTLVBuffer buffer(backingStore, 30);
+    TLVCircularBuffer buffer(backingStore, 30);
     writer.Init(buffer);
     writer.ImplicitProfileId = TestProfile_2;
 
@@ -2357,7 +2357,7 @@ void CheckCircularTLVBufferStartMidway(nlTestSuite * inSuite, void * inContext)
     CircularTLVWriter writer;
     CircularTLVReader reader;
     TestTLVContext * context = static_cast<TestTLVContext *>(inContext);
-    CHIPCircularTLVBuffer buffer(backingStore, 30, &(backingStore[15]));
+    TLVCircularBuffer buffer(backingStore, 30, &(backingStore[15]));
     writer.Init(buffer);
     writer.ImplicitProfileId = TestProfile_2;
 
@@ -2408,7 +2408,7 @@ void CheckCircularTLVBufferEvictStraddlingEvent(nlTestSuite * inSuite, void * in
     uint8_t backingStore[30];
     CircularTLVWriter writer;
     CircularTLVReader reader;
-    CHIPCircularTLVBuffer buffer(backingStore, 30);
+    TLVCircularBuffer buffer(backingStore, 30);
     writer.Init(buffer);
     writer.ImplicitProfileId = TestProfile_2;
 
@@ -2470,8 +2470,8 @@ void CheckCircularTLVBufferEdge(nlTestSuite * inSuite, void * inContext)
     CircularTLVReader reader;
     TLVWriter writer1;
 
-    CHIPCircularTLVBuffer buffer(backingStore, sizeof(backingStore));
-    CHIPCircularTLVBuffer buffer1(backingStore1, sizeof(backingStore1));
+    TLVCircularBuffer buffer(backingStore, sizeof(backingStore));
+    TLVCircularBuffer buffer1(backingStore1, sizeof(backingStore1));
     writer.Init(buffer);
     writer.ImplicitProfileId = TestProfile_2;
 
@@ -2703,7 +2703,7 @@ void CheckTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
     uint8_t backingStore[bufsize];
     CircularTLVWriter writer;
     CircularTLVReader reader;
-    CHIPCircularTLVBuffer buffer(backingStore, bufsize);
+    TLVCircularBuffer buffer(backingStore, bufsize);
     size_t num     = 1;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -2789,6 +2789,161 @@ void CheckTLVByteSpan(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, memcmp(readerSpan.data(), bytesBuffer, sizeof(bytesBuffer)) == 0);
 }
 
+#define IS1_CHAR "\x1F"
+
+void CheckTLVCharSpan(nlTestSuite * inSuite, void * inContext)
+{
+    struct CharSpanTestCase
+    {
+        const char * testString;
+        const char * expectedString;
+    };
+
+    // clang-format off
+    static CharSpanTestCase sCharSpanTestCases[] = {
+        // Test String                                                           Expected String from Get()
+        // ==================================================================================================
+        {  "This is a test case #0",                                             "This is a test case #0"  },
+        {  "This is a test case #1" IS1_CHAR "Test Localized String Identifier", "This is a test case #1"  },
+        {  "This is a test case #2 " IS1_CHAR "abc" IS1_CHAR "def",              "This is a test case #2 " },
+        {  "This is a test case #3" IS1_CHAR,                                    "This is a test case #3"  },
+        {  "Thé" IS1_CHAR,                                                       "Thé"                     },
+        {  IS1_CHAR " abc " IS1_CHAR " def",                                     ""                        },
+    };
+    // clang-format on
+
+    for (auto & testCase : sCharSpanTestCases)
+    {
+        uint8_t backingStore[100];
+        TLVWriter writer;
+        TLVReader reader;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        writer.Init(backingStore);
+
+        err = writer.PutString(ProfileTag(TestProfile_1, 1), testCase.testString);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Finalize();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        reader.Init(backingStore, writer.GetLengthWritten());
+        err = reader.Next();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        chip::CharSpan readerSpan;
+        err = reader.Get(readerSpan);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(inSuite, strlen(testCase.expectedString) == readerSpan.size());
+        NL_TEST_ASSERT(inSuite, memcmp(readerSpan.data(), testCase.expectedString, strlen(testCase.expectedString)) == 0);
+    }
+}
+
+void CheckTLVGetLocalizedStringIdentifier(nlTestSuite * inSuite, void * inContext)
+{
+    struct CharSpanTestCase
+    {
+        const char * testString;
+        Optional<LocalizedStringIdentifier> expectedLSID;
+        CHIP_ERROR expectedResult;
+    };
+
+    // clang-format off
+    static CharSpanTestCase sCharSpanTestCases[] = {
+        // Test String                                               Expected LocalizedStringIdentifier from Get()      Expected Return
+        // =============================================================================================================================================
+        {  "This is a test case #0",                                 chip::Optional<LocalizedStringIdentifier>(),       CHIP_NO_ERROR                  },
+        {  "This is a test case #1" IS1_CHAR "0123",                 chip::Optional<LocalizedStringIdentifier>(),       CHIP_ERROR_INVALID_TLV_ELEMENT },
+        {  "This is a test case #2" IS1_CHAR "123" IS1_CHAR "3210",  chip::Optional<LocalizedStringIdentifier>(0x123),  CHIP_NO_ERROR                  },
+        {  "This is a test case #3" IS1_CHAR "012",                  chip::Optional<LocalizedStringIdentifier>(),       CHIP_ERROR_INVALID_TLV_ELEMENT },
+        {  "This is a test case #3" IS1_CHAR "12",                   chip::Optional<LocalizedStringIdentifier>(0x12),   CHIP_NO_ERROR                  },
+        {  "Thé" IS1_CHAR "",                                        chip::Optional<LocalizedStringIdentifier>(),       CHIP_NO_ERROR                  },
+        {  "Thé" IS1_CHAR "7",                                       chip::Optional<LocalizedStringIdentifier>(0x7),    CHIP_NO_ERROR                  },
+        {  "Thé" IS1_CHAR "1FA",                                     chip::Optional<LocalizedStringIdentifier>(0x1FA),  CHIP_NO_ERROR                  },
+        {  "" IS1_CHAR "1FA",                                        chip::Optional<LocalizedStringIdentifier>(0x1FA),  CHIP_NO_ERROR                  },
+        {  "Thé" IS1_CHAR "1FAB",                                    chip::Optional<LocalizedStringIdentifier>(0x1FAB), CHIP_NO_ERROR                  },
+        {  "Thé" IS1_CHAR "1FAb",                                    chip::Optional<LocalizedStringIdentifier>(),       CHIP_ERROR_INVALID_TLV_ELEMENT },
+        {  "Thé" IS1_CHAR "1FABC",                                   chip::Optional<LocalizedStringIdentifier>(),       CHIP_ERROR_INVALID_TLV_ELEMENT },
+        {  "Thé" IS1_CHAR "1FA" IS1_CHAR "",                         chip::Optional<LocalizedStringIdentifier>(0x1FA),  CHIP_NO_ERROR                  },
+        {  "Thé" IS1_CHAR "1FA" IS1_CHAR "F8sa===",                  chip::Optional<LocalizedStringIdentifier>(0x1FA),  CHIP_NO_ERROR                  },
+    };
+    // clang-format on
+
+    for (auto & testCase : sCharSpanTestCases)
+    {
+        uint8_t backingStore[100];
+        TLVWriter writer;
+        TLVReader reader;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        writer.Init(backingStore);
+
+        err = writer.PutString(ProfileTag(TestProfile_1, 1), testCase.testString);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Finalize();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        reader.Init(backingStore, writer.GetLengthWritten());
+        err = reader.Next();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        Optional<LocalizedStringIdentifier> readerLSID;
+        err = reader.Get(readerLSID);
+        NL_TEST_ASSERT(inSuite, testCase.expectedResult == err);
+        NL_TEST_ASSERT(inSuite, testCase.expectedLSID == readerLSID);
+    }
+
+    // Error case: A case of TLVReader buffer underrun.
+    // Expected error after Next() call is: CHIP_ERROR_TLV_UNDERRUN
+    {
+        uint8_t backingStore[100];
+        TLVWriter writer;
+        TLVReader reader;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        writer.Init(backingStore);
+
+        err = writer.PutString(ProfileTag(TestProfile_1, 1), sCharSpanTestCases[2].testString);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Finalize();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        reader.Init(backingStore, writer.GetLengthWritten() - 1);
+        err = reader.Next();
+        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_TLV_UNDERRUN);
+    }
+
+    // Error case: the reader is on a bytestring, not utf-8 string.
+    // Expected error after Get(Optional<LocalizedStringIdentifier> &) call is: CHIP_ERROR_WRONG_TLV_TYPE
+    {
+        uint8_t backingStore[100];
+        TLVWriter writer;
+        TLVReader reader;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        writer.Init(backingStore);
+
+        err = writer.PutBytes(ProfileTag(TestProfile_1, 1), reinterpret_cast<const uint8_t *>(sCharSpanTestCases[2].testString),
+                              static_cast<uint32_t>(strlen(sCharSpanTestCases[2].testString)));
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Finalize();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        reader.Init(backingStore, writer.GetLengthWritten());
+        err = reader.Next();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        Optional<LocalizedStringIdentifier> readerLSID;
+        err = reader.Get(readerLSID);
+        NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
+        NL_TEST_ASSERT(inSuite, readerLSID == Optional<LocalizedStringIdentifier>());
+    }
+}
+
 void CheckTLVSkipCircular(nlTestSuite * inSuite, void * inContext)
 {
     const size_t bufsize = 40; // large enough s.t. 2 elements fit, 3rd causes eviction
@@ -2797,7 +2952,7 @@ void CheckTLVSkipCircular(nlTestSuite * inSuite, void * inContext)
     // Any pair of reader and writer would work here, either PacketBuffer based or CircularTLV based.
     CircularTLVWriter writer;
     CircularTLVReader reader;
-    CHIPCircularTLVBuffer buffer(backingStore, bufsize);
+    TLVCircularBuffer buffer(backingStore, bufsize);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     writer.Init(buffer);
@@ -4466,6 +4621,8 @@ static const nlTest sTests[] =
     NL_TEST_DEF("CHIP TLV Printf, Circular TLV buf",   CheckTLVPutStringFCircular),
     NL_TEST_DEF("CHIP TLV Skip non-contiguous",        CheckTLVSkipCircular),
     NL_TEST_DEF("CHIP TLV ByteSpan",                   CheckTLVByteSpan),
+    NL_TEST_DEF("CHIP TLV CharSpan",                   CheckTLVCharSpan),
+    NL_TEST_DEF("CHIP TLV Get LocalizedStringIdentifier", CheckTLVGetLocalizedStringIdentifier),
     NL_TEST_DEF("CHIP TLV Scoped Buffer",              CheckTLVScopedBuffer),
     NL_TEST_DEF("CHIP TLV Check reserve",              CheckCloseContainerReserve),
     NL_TEST_DEF("CHIP TLV Reader Fuzz Test",           TLVReaderFuzzTest),

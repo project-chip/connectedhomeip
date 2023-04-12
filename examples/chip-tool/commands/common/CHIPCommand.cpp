@@ -102,6 +102,8 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     factoryInitParams.fabricIndependentStorage = &mDefaultStorage;
     factoryInitParams.operationalKeystore      = &mOperationalKeystore;
     factoryInitParams.opCertStore              = &mOpCertStore;
+    factoryInitParams.enableServerInteractions = NeedsOperationalAdvertising();
+    factoryInitParams.sessionKeystore          = &mSessionKeystore;
 
     // Init group data provider that will be used for all group keys and IPKs for the
     // chip-tool-configured fabrics. This is OK to do once since the fabric tables
@@ -109,6 +111,7 @@ CHIP_ERROR CHIPCommand::MaybeSetUpStack()
     // Different commissioner implementations may want to use alternate implementations
     // of GroupDataProvider for injection through factoryInitParams.
     sGroupDataProvider.SetStorageDelegate(&mDefaultStorage);
+    sGroupDataProvider.SetSessionKeystore(factoryInitParams.sessionKeystore);
     ReturnLogErrorOnFailure(sGroupDataProvider.Init());
     chip::Credentials::SetGroupDataProvider(&sGroupDataProvider);
     factoryInitParams.groupDataProvider = &sGroupDataProvider;
@@ -177,7 +180,7 @@ void CHIPCommand::MaybeTearDownStack()
 CHIP_ERROR CHIPCommand::EnsureCommissionerForIdentity(std::string identity)
 {
     chip::NodeId nodeId;
-    ReturnErrorOnFailure(GetCommissionerNodeId(identity, &nodeId));
+    ReturnErrorOnFailure(GetIdentityNodeId(identity, &nodeId));
     CommissionerIdentity lookupKey{ identity, nodeId };
     if (mCommissioners.find(lookupKey) != mCommissioners.end())
     {
@@ -309,7 +312,7 @@ std::string CHIPCommand::GetIdentity()
     return name;
 }
 
-CHIP_ERROR CHIPCommand::GetCommissionerNodeId(std::string identity, chip::NodeId * nodeId)
+CHIP_ERROR CHIPCommand::GetIdentityNodeId(std::string identity, chip::NodeId * nodeId)
 {
     if (mCommissionerNodeId.HasValue())
     {
@@ -327,6 +330,22 @@ CHIP_ERROR CHIPCommand::GetCommissionerNodeId(std::string identity, chip::NodeId
 
     *nodeId = mCommissionerStorage.GetLocalNodeId();
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CHIPCommand::GetIdentityRootCertificate(std::string identity, chip::ByteSpan & span)
+{
+    if (identity == kIdentityNull)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    chip::NodeId nodeId;
+    VerifyOrDie(GetIdentityNodeId(identity, &nodeId) == CHIP_NO_ERROR);
+    CommissionerIdentity lookupKey{ identity, nodeId };
+    auto item = mCommissioners.find(lookupKey);
+
+    span = chip::ByteSpan(item->first.mRCAC, item->first.mRCACLen);
     return CHIP_NO_ERROR;
 }
 
@@ -373,7 +392,7 @@ chip::Controller::DeviceCommissioner & CHIPCommand::GetCommissioner(std::string 
     VerifyOrDie(EnsureCommissionerForIdentity(identity) == CHIP_NO_ERROR);
 
     chip::NodeId nodeId;
-    VerifyOrDie(GetCommissionerNodeId(identity, &nodeId) == CHIP_NO_ERROR);
+    VerifyOrDie(GetIdentityNodeId(identity, &nodeId) == CHIP_NO_ERROR);
     CommissionerIdentity lookupKey{ identity, nodeId };
     auto item = mCommissioners.find(lookupKey);
     VerifyOrDie(item != mCommissioners.end());
@@ -385,20 +404,12 @@ void CHIPCommand::ShutdownCommissioner(const CommissionerIdentity & key)
     mCommissioners[key].get()->Shutdown();
 }
 
-CHIP_ERROR CHIPCommand::InitializeCommissioner(const CommissionerIdentity & identity, chip::FabricId fabricId)
+CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, chip::FabricId fabricId)
 {
-    chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
-    chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
-    chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
-
     std::unique_ptr<ChipDeviceCommissioner> commissioner = std::make_unique<ChipDeviceCommissioner>();
     chip::Controller::SetupParams commissionerParams;
 
     ReturnLogErrorOnFailure(mCredIssuerCmds->SetupDeviceAttestation(commissionerParams, sTrustStore));
-
-    VerifyOrReturnError(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
-    VerifyOrReturnError(icac.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
-    VerifyOrReturnError(rcac.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
 
     chip::Crypto::P256Keypair ephemeralKey;
 
@@ -417,15 +428,20 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(const CommissionerIdentity & iden
 
         ReturnLogErrorOnFailure(mCredIssuerCmds->InitializeCredentialsIssuer(mCommissionerStorage));
 
-        chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
-        chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
-        chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
+        chip::MutableByteSpan nocSpan(identity.mNOC);
+        chip::MutableByteSpan icacSpan(identity.mICAC);
+        chip::MutableByteSpan rcacSpan(identity.mRCAC);
 
         ReturnLogErrorOnFailure(ephemeralKey.Initialize(chip::Crypto::ECPKeyTarget::ECDSA));
 
         ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(identity.mLocalNodeId, fabricId,
                                                                             mCommissionerStorage.GetCommissionerCATs(),
                                                                             ephemeralKey, rcacSpan, icacSpan, nocSpan));
+
+        identity.mRCACLen = rcacSpan.size();
+        identity.mICACLen = icacSpan.size();
+        identity.mNOCLen  = nocSpan.size();
+
         commissionerParams.operationalKeypair           = &ephemeralKey;
         commissionerParams.controllerRCAC               = rcacSpan;
         commissionerParams.controllerICAC               = icacSpan;
@@ -503,7 +519,16 @@ CHIP_ERROR CHIPCommand::StartWaiting(chip::System::Clock::Timeout duration)
             mWaitingForResponse = true;
         }
 
-        chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
+        auto err = chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
+        if (CHIP_NO_ERROR != err)
+        {
+            {
+                std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
+                mWaitingForResponse = false;
+            }
+            return err;
+        }
+
         auto waitingUntil = std::chrono::system_clock::now() + std::chrono::duration_cast<std::chrono::seconds>(duration);
         {
             std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);

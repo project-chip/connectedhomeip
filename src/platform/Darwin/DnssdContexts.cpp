@@ -145,7 +145,13 @@ MdnsContexts::~MdnsContexts()
 
 CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
 {
-    VerifyOrReturnError(context != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(context != nullptr || sdRef != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (context == nullptr)
+    {
+        DNSServiceRefDeallocate(sdRef);
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     if (sdRef == nullptr)
     {
@@ -156,6 +162,9 @@ CHIP_ERROR MdnsContexts::Add(GenericContext * context, DNSServiceRef sdRef)
     auto err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
     if (kDNSServiceErr_NoError != err)
     {
+        // We can't just use our Delete to deallocate the service ref here,
+        // because our context may not have its serviceRef set yet.
+        DNSServiceRefDeallocate(sdRef);
         chip::Platform::Delete(context);
         return Error::ToChipError(err);
     }
@@ -297,6 +306,8 @@ void RegisterContext::DispatchSuccess()
     mHostNameRegistrar.Register();
 }
 
+BrowseContext * BrowseContext::sContextDispatchingSuccess = nullptr;
+
 BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol)
 {
     type     = ContextType::Browse;
@@ -314,18 +325,23 @@ void BrowseContext::DispatchFailure(DNSServiceErrorType err)
 
 void BrowseContext::DispatchSuccess()
 {
-    callback(context, services.data(), services.size(), true, CHIP_NO_ERROR);
-    MdnsContexts::GetInstance().Remove(this);
+    // This should never be called: We either DispatchPartialSuccess or
+    // DispatchFailure.
+    VerifyOrDie(false);
 }
 
 void BrowseContext::DispatchPartialSuccess()
 {
+    sContextDispatchingSuccess = this;
     callback(context, services.data(), services.size(), false, CHIP_NO_ERROR);
+    sContextDispatchingSuccess = nullptr;
     services.clear();
 }
 
 ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::Inet::IPAddressType cbAddressType,
-                               const char * instanceNameToResolve, std::shared_ptr<uint32_t> && consumerCounterToUse)
+                               const char * instanceNameToResolve, BrowseContext * browseCausingResolve,
+                               std::shared_ptr<uint32_t> && consumerCounterToUse) :
+    browseThatCausedResolve(browseCausingResolve)
 {
     type            = ContextType::Resolve;
     context         = cbContext;
@@ -368,7 +384,7 @@ void ResolveContext::DispatchSuccess()
             continue;
         }
 
-        ChipLogDetail(Discovery, "Mdns: Resolve success on interface %" PRIu32, interface.first);
+        ChipLogProgress(Discovery, "Mdns: Resolve success on interface %" PRIu32, interface.first);
         callback(context, &interface.second.service, Span<Inet::IPAddress>(ips.data(), ips.size()), CHIP_NO_ERROR);
         break;
     }
@@ -381,15 +397,26 @@ void ResolveContext::DispatchSuccess()
 
 CHIP_ERROR ResolveContext::OnNewAddress(uint32_t interfaceId, const struct sockaddr * address)
 {
+    // If we don't have any information about this interfaceId, just ignore the
+    // address, since it won't be usable anyway without things like the port.
+    // This can happen if "local" is set up as a search domain in the DNS setup
+    // on the system, because the hostnames we are looking up all end in
+    // ".local".  In other words, we can get regular DNS results in here, not
+    // just DNS-SD ones.
+    if (interfaces.find(interfaceId) == interfaces.end())
+    {
+        return CHIP_NO_ERROR;
+    }
+
     chip::Inet::IPAddress ip;
     ReturnErrorOnFailure(chip::Inet::IPAddress::GetIPAddressFromSockAddr(*address, ip));
     interfaces[interfaceId].addresses.push_back(ip);
 
-#ifdef CHIP_DETAIL_LOGGING
+#ifdef CHIP_PROGRESS_LOGGING
     char addrStr[INET6_ADDRSTRLEN];
     ip.ToString(addrStr, sizeof(addrStr));
-    ChipLogDetail(Discovery, "Mdns: %s interface: %" PRIu32 " ip:%s", __func__, interfaceId, addrStr);
-#endif // CHIP_DETAIL_LOGGING
+    ChipLogProgress(Discovery, "Mdns: %s interface: %" PRIu32 " ip:%s", __func__, interfaceId, addrStr);
+#endif // CHIP_PROGRESS_LOGGING
 
     return CHIP_NO_ERROR;
 }
@@ -422,7 +449,7 @@ bool ResolveContext::HasAddress()
 void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname, const char * hostnameWithDomain, uint16_t port,
                                     uint16_t txtLen, const unsigned char * txtRecord)
 {
-#if CHIP_DETAIL_LOGGING
+#if CHIP_PROGRESS_LOGGING
     std::string txtString;
     auto txtRecordIter  = txtRecord;
     size_t remainingLen = txtLen;
@@ -453,9 +480,9 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
         txtRecordIter += len;
         remainingLen -= len;
     }
-#endif // CHIP_DETAIL_LOGGING
-    ChipLogDetail(Discovery, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32 " port: %u TXT:\"%s\"", __func__,
-                  hostnameWithDomain, fullname, interfaceId, ntohs(port), txtString.c_str());
+#endif // CHIP_PROGRESS_LOGGING
+    ChipLogProgress(Discovery, "Mdns : %s hostname:%s fullname:%s interface: %" PRIu32 " port: %u TXT:\"%s\"", __func__,
+                    hostnameWithDomain, fullname, interfaceId, ntohs(port), txtString.c_str());
 
     InterfaceInfo interface;
     interface.service.mPort = ntohs(port);

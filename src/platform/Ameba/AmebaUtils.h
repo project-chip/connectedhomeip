@@ -36,7 +36,9 @@ public:
     static CHIP_ERROR GetWiFiConfig(rtw_wifi_config_t * config);
     static CHIP_ERROR ClearWiFiConfig(void);
     static CHIP_ERROR WiFiDisconnect(void);
-    static CHIP_ERROR WiFiConnect(void);
+    static CHIP_ERROR WiFiConnectProvisionedNetwork(void);
+    static CHIP_ERROR WiFiConnect(const char * ssid, const char * password);
+    static CHIP_ERROR SetCurrentProvisionedNetwork(void);
 };
 
 } // namespace Internal

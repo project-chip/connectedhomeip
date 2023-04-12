@@ -26,6 +26,7 @@
 #include <app/DefaultAttributePersistenceProvider.h>
 #include <app/FailSafeContext.h>
 #include <app/OperationalSessionSetupPool.h>
+#include <app/SimpleSubscriptionResumptionStorage.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/server/AclStorage.h>
 #include <app/server/AppDelegate.h>
@@ -37,6 +38,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <credentials/OperationalCertificateStore.h>
 #include <credentials/PersistentStorageOpCertStore.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <crypto/OperationalKeystore.h>
 #include <crypto/PersistentStorageOperationalKeystore.h>
 #include <inet/InetConfig.h>
@@ -54,6 +56,7 @@
 #include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
 #endif
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
+#include <system/SystemClock.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/TransportMgrBase.h>
@@ -83,8 +86,7 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 
 struct ServerInitParams
 {
-    ServerInitParams()          = default;
-    virtual ~ServerInitParams() = default;
+    ServerInitParams() = default;
 
     // Not copyable
     ServerInitParams(const ServerInitParams &) = delete;
@@ -105,12 +107,17 @@ struct ServerInitParams
     // Session resumption storage: Optional. Support session resumption when provided.
     // Must be initialized before being provided.
     SessionResumptionStorage * sessionResumptionStorage = nullptr;
+    // Session resumption storage: Optional. Support session resumption when provided.
+    // Must be initialized before being provided.
+    app::SubscriptionResumptionStorage * subscriptionResumptionStorage = nullptr;
     // Certificate validity policy: Optional. If none is injected, CHIPCert
     // enforces a default policy.
     Credentials::CertificateValidityPolicy * certificateValidityPolicy = nullptr;
     // Group data provider: MUST be injected. Used to maintain critical keys such as the Identity
     // Protection Key (IPK) for CASE. Must be initialized before being provided.
     Credentials::GroupDataProvider * groupDataProvider = nullptr;
+    // Session keystore: MUST be injected. Used to derive and manage lifecycle of symmetric keys.
+    Crypto::SessionKeystore * sessionKeystore = nullptr;
     // Access control delegate: MUST be injected. Used to look up access control rules. Must be
     // initialized before being provided.
     Access::AccessControl::Delegate * accessDelegate = nullptr;
@@ -210,19 +217,8 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
      * @return CHIP_NO_ERROR on success or a CHIP_ERROR value from APIs called to initialize
      *         resources on failure.
      */
-    virtual CHIP_ERROR InitializeStaticResourcesBeforeServerInit()
+    CHIP_ERROR InitializeStaticResourcesBeforeServerInit()
     {
-        static chip::KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
-        static chip::PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
-        static chip::Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
-        static chip::Credentials::GroupDataProviderImpl sGroupDataProvider;
-        static IgnoreCertificateValidityPolicy sDefaultCertValidityPolicy;
-
-#if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
-        static chip::SimpleSessionResumptionStorage sSessionResumptionStorage;
-#endif
-        static chip::app::DefaultAclStorage sAclStorage;
-
         // KVS-based persistent storage delegate injection
         if (persistentStorageDelegate == nullptr)
         {
@@ -251,8 +247,12 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
             this->opCertStore = &sPersistentStorageOpCertStore;
         }
 
+        // Session Keystore injection
+        this->sessionKeystore = &sSessionKeystore;
+
         // Group Data provider injection
         sGroupDataProvider.SetStorageDelegate(this->persistentStorageDelegate);
+        sGroupDataProvider.SetSessionKeystore(this->sessionKeystore);
         ReturnErrorOnFailure(sGroupDataProvider.Init());
         this->groupDataProvider = &sGroupDataProvider;
 
@@ -273,8 +273,31 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
         // embedded systems.
         this->certificateValidityPolicy = &sDefaultCertValidityPolicy;
 
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+        ChipLogProgress(AppServer, "Initializing subscription resumption storage...");
+        ReturnErrorOnFailure(sSubscriptionResumptionStorage.Init(this->persistentStorageDelegate));
+        this->subscriptionResumptionStorage = &sSubscriptionResumptionStorage;
+#else
+        ChipLogProgress(AppServer, "Subscription persistence not supported");
+#endif
+
         return CHIP_NO_ERROR;
     }
+
+private:
+    static KvsPersistentStorageDelegate sKvsPersistenStorageDelegate;
+    static PersistentStorageOperationalKeystore sPersistentStorageOperationalKeystore;
+    static Credentials::PersistentStorageOpCertStore sPersistentStorageOpCertStore;
+    static Credentials::GroupDataProviderImpl sGroupDataProvider;
+    static IgnoreCertificateValidityPolicy sDefaultCertValidityPolicy;
+#if CHIP_CONFIG_ENABLE_SESSION_RESUMPTION
+    static SimpleSessionResumptionStorage sSessionResumptionStorage;
+#endif
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    static app::SimpleSubscriptionResumptionStorage sSubscriptionResumptionStorage;
+#endif
+    static app::DefaultAclStorage sAclStorage;
+    static Crypto::DefaultSessionKeystore sSessionKeystore;
 };
 
 /**
@@ -289,7 +312,7 @@ struct CommonCaseDeviceServerInitParams : public ServerInitParams
  * after `Server::Shutdown()` is called.
  *
  * TODO: Separate lifecycle ownership for some more capabilities that should not belong to
- *       common logic, such as `DispatchShutDownAndStopEventLoop`.
+ *       common logic, such as `GenerateShutDownEvent`.
  *
  * TODO: Replace all uses of GetInstance() to "reach in" to this state from all cluster
  *       server common logic that deal with global node state with either a common NodeState
@@ -320,9 +343,13 @@ public:
 
     SessionResumptionStorage * GetSessionResumptionStorage() { return mSessionResumptionStorage; }
 
+    app::SubscriptionResumptionStorage * GetSubscriptionResumptionStorage() { return mSubscriptionResumptionStorage; }
+
     TransportMgrBase & GetTransportManager() { return mTransports; }
 
     Credentials::GroupDataProvider * GetGroupDataProvider() { return mGroupsProvider; }
+
+    Crypto::SessionKeystore * GetSessionKeystore() const { return mSessionKeystore; }
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * GetBleLayerObject() { return mBleLayer; }
@@ -343,14 +370,19 @@ public:
     app::DefaultAttributePersistenceProvider & GetDefaultAttributePersister() { return mAttributePersister; }
 
     /**
-     * This function send the ShutDown event before stopping
-     * the event loop.
+     * This function causes the ShutDown event to be generated async on the
+     * Matter event loop.  Should be called before stopping the event loop.
      */
-    void DispatchShutDownAndStopEventLoop();
+    void GenerateShutDownEvent();
 
     void Shutdown();
 
     void ScheduleFactoryReset();
+
+    System::Clock::Microseconds64 TimeSinceInit() const
+    {
+        return System::SystemClock().GetMonotonicMicroseconds64() - mInitTimestamp;
+    }
 
     static Server & GetInstance() { return sServer; }
 
@@ -360,6 +392,17 @@ private:
     static Server sServer;
 
     void InitFailSafe();
+    void OnPlatformEvent(const DeviceLayer::ChipDeviceEvent & event);
+    void CheckServerReadyEvent();
+
+    static void OnPlatformEventWrapper(const DeviceLayer::ChipDeviceEvent * event, intptr_t);
+
+#if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS
+    /**
+     * @brief Called at Server::Init time to resume persisted subscriptions if the feature flag is enabled
+     */
+    void ResumeSubscriptions();
+#endif
 
     class GroupDataProviderListener final : public Credentials::GroupDataProvider::GroupListener
     {
@@ -424,6 +467,7 @@ private:
         {
             (void) fabricTable;
             ClearCASEResumptionStateOnFabricChange(fabricIndex);
+            ClearSubscriptionResumptionStateOnFabricChange(fabricIndex);
 
             Credentials::GroupDataProvider * groupDataProvider = mServer->GetGroupDataProvider();
             if (groupDataProvider != nullptr)
@@ -479,6 +523,19 @@ private:
             }
         }
 
+        void ClearSubscriptionResumptionStateOnFabricChange(chip::FabricIndex fabricIndex)
+        {
+            auto * subscriptionResumptionStorage = mServer->GetSubscriptionResumptionStorage();
+            VerifyOrReturn(subscriptionResumptionStorage != nullptr);
+            CHIP_ERROR err = subscriptionResumptionStorage->DeleteAll(fabricIndex);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer,
+                             "Warning, failed to delete subscription resumption state for fabric index 0x%x: %" CHIP_ERROR_FORMAT,
+                             static_cast<unsigned>(fabricIndex), err.Format());
+            }
+        }
+
         Server * mServer = nullptr;
     };
 
@@ -505,8 +562,10 @@ private:
 
     PersistentStorageDelegate * mDeviceStorage;
     SessionResumptionStorage * mSessionResumptionStorage;
+    app::SubscriptionResumptionStorage * mSubscriptionResumptionStorage;
     Credentials::CertificateValidityPolicy * mCertificateValidityPolicy;
     Credentials::GroupDataProvider * mGroupsProvider;
+    Crypto::SessionKeystore * mSessionKeystore;
     app::DefaultAttributePersistenceProvider mAttributePersister;
     GroupDataProviderListener mListener;
     ServerFabricDelegate mFabricDelegate;
@@ -519,9 +578,12 @@ private:
     Credentials::OperationalCertificateStore * mOpCertStore;
     app::FailSafeContext mFailSafeContext;
 
+    bool mIsDnssdReady = false;
     uint16_t mOperationalServicePort;
     uint16_t mUserDirectedCommissioningPort;
     Inet::InterfaceId mInterfaceId;
+
+    System::Clock::Microseconds64 mInitTimestamp;
 };
 
 } // namespace chip

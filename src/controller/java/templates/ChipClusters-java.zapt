@@ -1,5 +1,5 @@
 {{> header}}
-{{#if (chip_has_client_clusters)}}
+{{#if_enabled_clusters side='client'}}
 
 package chip.devicecontroller;
 
@@ -21,44 +21,44 @@ public class ChipClusters {
     void onSuccess(String value);
     void onError(Exception error);
     {{! TODO: use SubscriptionEstablishedCallback instead, here and below. }}
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface OctetStringAttributeCallback {
     /** Indicates a successful read for an OCTET_STRING attribute. */
     void onSuccess(byte[] value);
     void onError(Exception error);
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface IntegerAttributeCallback {
     void onSuccess(int value);
     void onError(Exception error);
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface LongAttributeCallback {
     void onSuccess(long value);
     void onError(Exception error);
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface BooleanAttributeCallback {
     void onSuccess(boolean value);
     void onError(Exception error);
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface FloatAttributeCallback {
     void onSuccess(float value);
     void onError(Exception error);
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public interface DoubleAttributeCallback {
     void onSuccess(double value);
     void onError(Exception error);
-    default void onSubscriptionEstablished() {}
+    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public static abstract class BaseChipCluster {
@@ -102,7 +102,7 @@ public class ChipClusters {
     }
   }
 
-  {{#chip_client_clusters}}
+  {{#all_user_clusters side='client'}}
   public static class {{asUpperCamelCase name}}Cluster extends BaseChipCluster {
     public static final long CLUSTER_ID = {{code}}L;
 
@@ -112,38 +112,51 @@ public class ChipClusters {
 
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
-  {{#chip_cluster_commands}}
+  {{#all_user_cluster_generated_commands}}
+    {{#if_compare clusterId ../id operator='=='}}
+      {{#if (is_str_equal commandSource 'client')}}
 
     {{#unless mustUseTimedInvoke}}
     public void {{asLowerCamelCase name}}({{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback
-      {{#chip_cluster_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}) {
-      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#chip_cluster_command_arguments}}, {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}, null);
+      {{#zcl_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true clusterId=parent.parent.id}} {{asLowerCamelCase label}}{{/zcl_command_arguments}}) {
+      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#zcl_command_arguments}}, {{asLowerCamelCase label}}{{/zcl_command_arguments}}, null);
     }
     {{/unless}}
 
     public void {{asLowerCamelCase name}}({{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback
-      {{#chip_cluster_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}
+      {{#zcl_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true clusterId=parent.parent.id}} {{asLowerCamelCase label}}{{/zcl_command_arguments}}
       , int timedInvokeTimeoutMs) {
-      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#chip_cluster_command_arguments}}, {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}, timedInvokeTimeoutMs);
+      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#zcl_command_arguments}}, {{asLowerCamelCase label}}{{/zcl_command_arguments}}, timedInvokeTimeoutMs);
     }
-  {{/chip_cluster_commands}}
-  {{#chip_cluster_commands}}
+      {{/if}}
+    {{/if_compare}}
+  {{/all_user_cluster_generated_commands}}
+  {{#all_user_cluster_generated_commands}}
+    {{#if_compare clusterId ../id operator='=='}}
+      {{#if (is_str_equal commandSource 'client')}}
     private native void {{asLowerCamelCase name}}(long chipClusterPtr, {{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} Callback
-      {{#chip_cluster_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}
+      {{#zcl_command_arguments}}, {{asJavaType type chipType parent.parent.name includeAnnotations=true clusterId=parent.parent.id}} {{asLowerCamelCase label}}{{/zcl_command_arguments}}
       , @Nullable Integer timedInvokeTimeoutMs);
-  {{/chip_cluster_commands}}
-  {{#chip_cluster_responses}}
+      {{/if}}
+    {{/if_compare}}
+  {{/all_user_cluster_generated_commands}}
+    {{#all_user_cluster_generated_commands}}
+      {{#if_compare clusterId ../id operator='=='}}
+        {{#if (is_str_equal commandSource 'server')}}
     public interface {{asUpperCamelCase name}}Callback {
-      void onSuccess({{#chip_cluster_response_arguments}}{{#not_first}}, {{/not_first}}{{asJavaType type chipType parent.parent.name includeAnnotations=true}} {{asLowerCamelCase label}}{{/chip_cluster_response_arguments}});
+      void onSuccess({{#zcl_command_arguments}}{{#not_first}}, {{/not_first}}{{asJavaType type chipType parent.parent.name includeAnnotations=true clusterId=parent.parent.id}} {{asLowerCamelCase label}}{{/zcl_command_arguments}});
       
       void onError(Exception error);
     }
 
-  {{/chip_cluster_responses}}
+        {{/if}}
+    {{/if_compare}}
+  {{/all_user_cluster_generated_commands}}
 
-  {{#chip_server_cluster_attributes}}
-  {{#unless (isStrEqual chipCallback.name "Unsupported")}}
-  {{#if_basic_global_response}}
+  {{#zcl_attributes_server removeKeys='isOptional'}}
+  {{#if_unsupported_attribute_callback type isArray ../id}}
+  {{else}}
+  {{#if_basic_attribute type ../id}}
   {{else}}
     {{! NOTE: asJavaType ends up sniffing for isArray on the context. Since we want the type of our _entry_, force isArray to
           false. }}
@@ -152,28 +165,29 @@ public class ChipClusters {
       public interface {{asUpperCamelCase name}}AttributeCallback {
         void onSuccess({{#if isNullable}}@Nullable{{/if}} List<{{>asJavaTypeForEntry isArray=false}}> valueList);
         void onError(Exception ex);
-        default void onSubscriptionEstablished() {}
+        default void onSubscriptionEstablished(long subscriptionId) {}
       }
     {{else}}
       public interface {{asUpperCamelCase name}}AttributeCallback {
         void onSuccess({{#if isNullable}}@Nullable{{/if}} {{>asJavaTypeForEntry isArray=false}} value);
         void onError(Exception ex);
-        default void onSubscriptionEstablished() {}
+        default void onSubscriptionEstablished(long subscriptionId) {}
       }
     {{/if}}
-  {{/if_basic_global_response}}
-  {{/unless}}
-  {{/chip_server_cluster_attributes}}
-  {{#chip_server_cluster_attributes}}
+  {{/if_basic_attribute}}
+  {{/if_unsupported_attribute_callback}}
+  {{/zcl_attributes_server}}
+  {{#zcl_attributes_server removeKeys='isOptional'}}
   {{! TODO: Add support for struct-typed attributes }}
-  {{#unless (isStrEqual chipCallback.name "Unsupported")}}
+  {{#if_unsupported_attribute_callback type isArray ../id}}
+  {{else}}
 
     public void read{{asUpperCamelCase name}}Attribute(
-    {{#if_basic_global_response}}
-      {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
+    {{#if_basic_attribute type ../id}}
+      {{as_underlying_java_zcl_type type ../id boolean="Boolean"}}AttributeCallback callback
     {{else}}
       {{asUpperCamelCase name}}AttributeCallback callback
-    {{/if_basic_global_response}}
+    {{/if_basic_attribute}}
     ) {
       read{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback);
     }
@@ -190,27 +204,28 @@ public class ChipClusters {
   {{/if}}
   {{#if isReportableAttribute}}
     public void subscribe{{asCamelCased name false}}Attribute(
-      {{#if_basic_global_response}}
-        {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
+      {{#if_basic_attribute type ../id}}
+        {{as_underlying_java_zcl_type type ../id boolean="Boolean"}}AttributeCallback callback
       {{else}}
         {{asUpperCamelCase name}}AttributeCallback callback
-      {{/if_basic_global_response}},
+      {{/if_basic_attribute}},
       int minInterval, int maxInterval) {
       subscribe{{asCamelCased name false}}Attribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
   {{/if}}
-  {{/unless}}
-  {{/chip_server_cluster_attributes}}
-  {{#chip_server_cluster_attributes}}
+  {{/if_unsupported_attribute_callback}}
+  {{/zcl_attributes_server}}
+  {{#zcl_attributes_server removeKeys='isOptional'}}
   {{! TODO: Add support for struct-typed attributes }}
-  {{#unless (isStrEqual chipCallback.name "Unsupported")}}
+  {{#if_unsupported_attribute_callback type isArray ../id }}
+  {{else}}
 
     private native void read{{asUpperCamelCase name}}Attribute(long chipClusterPtr,
-      {{#if_basic_global_response}}
-        {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
+      {{#if_basic_attribute type ../id}}
+        {{as_underlying_java_zcl_type type ../id boolean="Boolean"}}AttributeCallback callback
       {{else}}
         {{asUpperCamelCase name}}AttributeCallback callback
-      {{/if_basic_global_response}}
+      {{/if_basic_attribute}}
     );
   {{#if isWritableAttribute}}
 
@@ -218,18 +233,18 @@ public class ChipClusters {
   {{/if}}
   {{#if isReportableAttribute}}
     private native void subscribe{{asCamelCased name false}}Attribute(long chipClusterPtr,
-      {{#if_basic_global_response}}
-        {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
+      {{#if_basic_attribute type ../id}}
+        {{as_underlying_java_zcl_type type ../id boolean="Boolean"}}AttributeCallback callback
       {{else}}
         {{asUpperCamelCase name}}AttributeCallback callback
-      {{/if_basic_global_response}}, int minInterval, int maxInterval);
+      {{/if_basic_attribute}}, int minInterval, int maxInterval);
   {{/if}}
-  {{/unless}}
-  {{/chip_server_cluster_attributes}}
+  {{/if_unsupported_attribute_callback}}
+  {{/zcl_attributes_server}}
   }
   {{#not_last}}
 
   {{/not_last}}
-  {{/chip_client_clusters}}
+  {{/all_user_clusters}}
 }
-{{/if}}
+{{/if_enabled_clusters}}

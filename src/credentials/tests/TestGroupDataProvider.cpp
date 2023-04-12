@@ -17,6 +17,7 @@
  */
 
 #include <credentials/GroupDataProviderImpl.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
@@ -77,9 +78,9 @@ constexpr ByteSpan kCompressedFabricId1(kCompressedFabricIdBuffer1);
 static const uint8_t kCompressedFabricIdBuffer2[] = { 0x3f, 0xaa, 0xe2, 0x90, 0x93, 0xd5, 0xaf, 0x45 };
 constexpr ByteSpan kCompressedFabricId2(kCompressedFabricIdBuffer2);
 
-constexpr chip::GroupId kGroup1 = kMinFabricGroupId;
+constexpr chip::GroupId kGroup1 = kMinApplicationGroupId;
 constexpr chip::GroupId kGroup2 = 0x2222;
-constexpr chip::GroupId kGroup3 = kMaxFabricGroupId;
+constexpr chip::GroupId kGroup3 = kMaxApplicationGroupId;
 constexpr chip::GroupId kGroup4 = 0x4444;
 constexpr chip::GroupId kGroup5 = 0x5555;
 
@@ -1172,13 +1173,13 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
         {
             std::pair<FabricIndex, GroupId> found(session.fabric_index, session.group_id);
             NL_TEST_ASSERT(apSuite, expected.count(found) > 0);
-            NL_TEST_ASSERT(apSuite, session.key != nullptr);
+            NL_TEST_ASSERT(apSuite, session.keyContext != nullptr);
 
             // Decrypt the ciphertext
             NL_TEST_ASSERT(apSuite,
                            CHIP_NO_ERROR ==
-                               session.key->MessageDecrypt(ciphertext, ByteSpan(aad, sizeof(aad)), ByteSpan(nonce, sizeof(nonce)),
-                                                           tag, plaintext));
+                               session.keyContext->MessageDecrypt(ciphertext, ByteSpan(aad, sizeof(aad)),
+                                                                  ByteSpan(nonce, sizeof(nonce)), tag, plaintext));
 
             // The new plaintext must match the original message
             NL_TEST_ASSERT(apSuite, 0 == memcmp(plaintext.data(), kMessage, sizeof(kMessage)));
@@ -1196,6 +1197,7 @@ void TestGroupDecryption(nlTestSuite * apSuite, void * apContext)
 namespace {
 
 static chip::TestPersistentStorageDelegate sDelegate;
+static chip::Crypto::DefaultSessionKeystore sSessionKeystore;
 static GroupDataProviderImpl sProvider(chip::app::TestGroups::kMaxGroupsPerFabric, chip::app::TestGroups::kMaxGroupKeysPerFabric);
 
 static EpochKey kEpochKeys0[] = {
@@ -1228,6 +1230,7 @@ int Test_Setup(void * inContext)
 
     // Initialize Group Data Provider
     sProvider.SetStorageDelegate(&sDelegate);
+    sProvider.SetSessionKeystore(&sSessionKeystore);
     sProvider.SetListener(&chip::app::TestGroups::sListener);
     VerifyOrReturnError(CHIP_NO_ERROR == sProvider.Init(), FAILURE);
     SetGroupDataProvider(&sProvider);

@@ -39,6 +39,10 @@
 /**********************************************************
  * Defines
  *********************************************************/
+// Button specific defines for SiWx917
+#define SL_SIMPLE_BUTTON_PRESSED 1
+#define SIWx917_BTN0 0
+#define SIWx917_BTN1 1
 
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
@@ -68,6 +72,16 @@ public:
     static void AppTaskMain(void * pvParameter);
 
     CHIP_ERROR StartAppTask();
+
+    /**
+     * @brief Event handler when a button is pressed
+     * Function posts an event for button processing
+     *
+     * @param button - btn0 or btn1
+     * @param btnAction button action - SL_SIMPLE_BUTTON_PRESSED,
+     *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
+     */
+    void ButtonEventHandler(uint8_t button, uint8_t btnAction);
 
     /**
      * @brief Callback called by the identify-server when an identify command is received

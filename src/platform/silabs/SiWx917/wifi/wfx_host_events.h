@@ -27,7 +27,6 @@
 #define SL_WFX_SCAN_COMPLETE_ID 4
 #define WFX_RSI_SSID_SIZE 64
 
-#ifndef RS911X_SOCKETS
 /* LwIP includes. */
 #include "lwip/apps/httpd.h"
 #include "lwip/ip_addr.h"
@@ -44,14 +43,18 @@
 #define SL_WFX_SCAN_COMPLETE (1 << 6)
 #define SL_WFX_RETRY_CONNECT (1 << 7)
 
-#endif /* RS911X_SOCKETS */
-
 #include "sl_status.h"
 
 #define WLAN_TASK_STACK_SIZE 1024
 #define WLAN_TASK_PRIORITY 3
 #define WLAN_DRIVER_TASK_PRIORITY 2
 #define MAX_JOIN_RETRIES_COUNT 5
+
+// WLAN retry time intervals in milli seconds
+#define WLAN_MAX_RETRY_TIMER_MS 30000
+#define WLAN_MIN_RETRY_TIMER_MS 1000
+#define WLAN_RETRY_TIMER_MS 5000
+#define CONVERT_MS_TO_SEC(TimeInMS) (TimeInMS / 1000)
 
 // WLAN related Macros
 #define ETH_FRAME 0
@@ -107,7 +110,7 @@
  * be held in the Blocked state to wait for the start command to be successfully
  * sent to the timer command queue.
  */
-#define TIMER_TICKS_TO_WAIT_0 0
+#define TIMER_TICKS_TO_WAIT_0 pdMS_TO_TICKS(0)
 
 #define CONVERT_SEC_TO_MSEC 1000
 #define CONVERT_USEC_TO_MSEC (1 / 1000)
@@ -125,7 +128,6 @@
 #define BG_SCAN_RES_SIZE 500
 
 #define SPI_CONFIG_SUCCESS 0
-#define WPA3_SECURITY 3
 
 typedef enum
 {
@@ -143,28 +145,19 @@ typedef enum
 /* Note that these are same as RSI_security */
 typedef enum
 {
-    WFX_SEC_NONE           = 0,
-    WFX_SEC_WPA            = 1,
-    WFX_SEC_WPA2           = 2,
-    WFX_SEC_WEP            = 3,
-    WFX_SEC_WPA_EAP        = 4,
-    WFX_SEC_WPA2_EAP       = 5,
-    WFX_SEC_WPA_WPA2_MIXED = 6,
-    WFX_SEC_WPA_PMK        = 7,
-    WFX_SEC_WPA2_PMK       = 8,
-    WFX_SEC_WPS_PIN        = 9,
-    WFX_SEC_GEN_WPS_PIN    = 10,
-    WFX_SEC_PUSH_BTN       = 11,
-    WFX_SEC_WPA3           = 11,
+    WFX_SEC_UNSPECIFIED = 0,
+    WFX_SEC_NONE        = 1,
+    WFX_SEC_WEP         = 2,
+    WFX_SEC_WPA         = 3,
+    WFX_SEC_WPA2        = 4,
+    WFX_SEC_WPA3        = 5
 } wfx_sec_t;
-
-#define WPA3_SECURITY 3
 
 typedef struct
 {
     char ssid[32 + 1];
     char passkey[64 + 1];
-    uint8_t security;
+    wfx_sec_t security;
 } wfx_wifi_provision_t;
 
 typedef enum
@@ -179,7 +172,7 @@ typedef enum
 typedef struct wfx_wifi_scan_result
 {
     char ssid[32 + 1];
-    uint8_t security;
+    wfx_sec_t security;
     uint8_t bssid[6];
     uint8_t chan;
     int16_t rssi; /* I suspect this is in dBm - so signed */
@@ -276,6 +269,8 @@ void * wfx_rsi_alloc_pkt(void);
 void wfx_rsi_pkt_add_data(void * p, uint8_t * buf, uint16_t len, uint16_t off);
 int32_t wfx_rsi_send_data(void * p, uint16_t len);
 #endif /* RS911X_WIFI */
+
+void wfx_retry_interval_handler(bool is_wifi_disconnection_event, uint16_t retryJoin);
 
 #ifdef __cplusplus
 }

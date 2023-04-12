@@ -123,6 +123,26 @@ CHIP_ERROR ConnectivityManagerImplWiFi::_GetAndLogWiFiStatsCounters(void)
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+CHIP_ERROR ConnectivityManagerImplWiFi::_GetSEDIntervalsConfig(ConnectivityManager::SEDIntervalsConfig & SEDIntervalsConfig)
+{
+    // For now Wi-Fi uses legacy power save mode that has fixed inactivity interval
+    SEDIntervalsConfig.ActiveIntervalMS =
+        chip::System::Clock::Milliseconds32(WiFiManager::kDefaultDTIMInterval * WiFiManager::kBeaconIntervalMs);
+    SEDIntervalsConfig.IdleIntervalMS =
+        chip::System::Clock::Milliseconds32(WiFiManager::kDefaultDTIMInterval * WiFiManager::kBeaconIntervalMs);
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR ConnectivityManagerImplWiFi::_SetSEDIntervalsConfig(const ConnectivityManager::SEDIntervalsConfig & intervalsConfig)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+CHIP_ERROR ConnectivityManagerImplWiFi::_RequestSEDActiveMode(bool onOff, bool delayIdle)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+#endif
+
 ConnectivityManager::WiFiAPMode ConnectivityManagerImplWiFi::_GetWiFiAPMode(void)
 {
     /* AP mode is unsupported */

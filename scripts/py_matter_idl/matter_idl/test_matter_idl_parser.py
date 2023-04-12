@@ -16,15 +16,20 @@
 
 try:
     from .matter_idl_parser import CreateParser
-    from .matter_idl_types import *
-except:
+    from .matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeQuality, AttributeStorage, Bitmap,
+                                   Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint,
+                                   Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, ParseMetaData,
+                                   ServerClusterInstantiation, Struct, StructQuality, StructTag)
+except ImportError:
     import os
     import sys
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
     from matter_idl_parser import CreateParser
-    from matter_idl_types import *
-
+    from matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeQuality, AttributeStorage, Bitmap,
+                                  Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint,
+                                  Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, ParseMetaData,
+                                  ServerClusterInstantiation, Struct, StructQuality, StructTag)
 import unittest
 
 
@@ -156,6 +161,33 @@ class TestParser(unittest.TestCase):
                             data_type=DataType(name="char_string", max_length=11), code=1, name="attr1")),
                         Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
                             data_type=DataType(name="octet_string", max_length=33), code=2, name="attr2", is_list=True)),
+                    ]
+                    )])
+        self.assertEqual(actual, expected)
+
+    def test_timed_attributes(self):
+        actual = parseText("""
+            server cluster MyCluster = 1 {
+                attribute int32u attr1 = 1;
+                timedwrite attribute int32u attr2 = 2;
+                attribute int32u attr3 = 3;
+                timedwrite attribute octet_string<44> attr4[] = 4;
+            }
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.SERVER,
+                    name="MyCluster",
+                    code=1,
+                    attributes=[
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
+                            data_type=DataType(name="int32u"), code=1, name="attr1")),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE | AttributeQuality.TIMED_WRITE, definition=Field(
+                            data_type=DataType(name="int32u"), code=2, name="attr2")),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
+                            data_type=DataType(name="int32u"), code=3, name="attr3")),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE | AttributeQuality.TIMED_WRITE, definition=Field(
+                            data_type=DataType(name="octet_string", max_length=44), code=4, name="attr4", is_list=True)),
                     ]
                     )])
         self.assertEqual(actual, expected)
@@ -506,6 +538,36 @@ server cluster A = 1 { /* Test comment */ }
             Endpoint(number=10),
             Endpoint(number=100),
         ])
+        self.assertEqual(actual, expected)
+
+    def test_emits_events(self):
+        actual = parseText("""
+            endpoint 1 {
+                server cluster Example {}
+            }
+            endpoint 2 {
+              server cluster Example {
+                emits event FooBar;
+                emits event SomeNewEvent;
+              }
+              server cluster AnotherExample {
+                emits event StartUp;
+                emits event ShutDown;
+              }
+            }
+        """)
+
+        expected = Idl(endpoints=[
+            Endpoint(number=1, server_clusters=[
+                     ServerClusterInstantiation(name="Example")]),
+            Endpoint(number=2, server_clusters=[
+                ServerClusterInstantiation(name="Example", events_emitted={
+                                           "FooBar", "SomeNewEvent"}),
+                ServerClusterInstantiation(name="AnotherExample", events_emitted={
+                    "StartUp", "ShutDown"}),
+            ])
+        ])
+
         self.assertEqual(actual, expected)
 
 

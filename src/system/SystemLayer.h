@@ -118,12 +118,8 @@ public:
      *   This method cancels a one-shot timer, started earlier through @p StartTimer().
      *
      *   @note
-     *       The cancellation could fail silently in two different ways. If the timer specified by the combination of the callback
-     *       function and application state object couldn't be found, cancellation could fail. If the timer has fired, then
-     *       an event is queued and will be processed later.
-     *
-     *   WARNING: Timer handlers MUST assume that they may be hit even after CancelTimer due to cancelling an
-     *            already fired timer that is queued in the event loop already.
+     *       The cancellation could fail silently if the timer specified by the combination of the callback
+     *       function and application state object couldn't be found.
      *
      *   @param[in]  aOnComplete   A pointer to the callback function used in calling @p StartTimer().
      *   @param[in]  aAppState     A pointer to the application state object used in calling @p StartTimer().

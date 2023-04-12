@@ -161,7 +161,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         /* Update Network Interface list */
         ifp->name                            = CharSpan::fromCharString(net_interface->name);
         ifp->isOperational                   = net_interface->flags & NETIF_FLAG_LINK_UP;
-        ifp->type                            = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+        ifp->type                            = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
         ifp->offPremiseServicesReachableIPv4 = mipv4_offpremise;
         ifp->offPremiseServicesReachableIPv6 = mipv6_offpremise;
         ifp->hardwareAddress                 = ByteSpan(net_interface->hwaddr, net_interface->hwaddr_len);
@@ -193,7 +193,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & value)
     if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "cy_wcm_get_associated_ap_info failed: %d", (int) result);
-        SuccessOrExit(CHIP_ERROR_INTERNAL);
+        SuccessOrExit(err = CHIP_ERROR_INTERNAL);
     }
     memcpy(mWiFiMacAddress, ap_info.BSSID, CY_WCM_MAC_ADDR_LEN);
     value = ByteSpan(mWiFiMacAddress, CY_WCM_MAC_ADDR_LEN);
@@ -202,8 +202,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityType)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
+    using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
+
     cy_wcm_associated_ap_info_t ap_info;
     cy_rslt_t result = CY_RSLT_SUCCESS;
     CHIP_ERROR err   = CHIP_NO_ERROR;
@@ -212,40 +214,41 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(uint8_t & securityTyp
     if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "cy_wcm_get_associated_ap_info failed: %d", (int) result);
-        SuccessOrExit(CHIP_ERROR_INTERNAL);
+        SuccessOrExit(err = CHIP_ERROR_INTERNAL);
     }
     if (ap_info.security == CY_WCM_SECURITY_OPEN)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
+        securityType = SecurityTypeEnum::kNone;
     }
     else if (ap_info.security & WPA3_SECURITY)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA3;
+        securityType = SecurityTypeEnum::kWpa3;
     }
     else if (ap_info.security & WPA2_SECURITY)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA2;
+        securityType = SecurityTypeEnum::kWpa2;
     }
     else if (ap_info.security & WPA_SECURITY)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_WPA;
+        securityType = SecurityTypeEnum::kWpa;
     }
     else if (ap_info.security & WEP_ENABLED)
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_WEP;
+        securityType = SecurityTypeEnum::kWep;
     }
     else
     {
-        securityType = EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED;
+        securityType = SecurityTypeEnum::kUnspecified;
     }
 
 exit:
     return err;
 }
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wiFiVersion)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    using app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum;
+
     wl_bss_info_t bss_info;
     whd_security_t security;
     cy_rslt_t result = CY_RSLT_SUCCESS;
@@ -254,27 +257,26 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(uint8_t & wiFiVersion)
     if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "whd_wifi_get_ap_info failed: %d", (int) result);
-        SuccessOrExit(CHIP_ERROR_INTERNAL);
+        return CHIP_ERROR_INTERNAL;
     }
 
     /* VHT Capable */
     if (bss_info.vht_cap)
     {
-        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_AC;
+        wiFiVersion = WiFiVersionEnum::kAc;
     }
     /* HT Capable */
     else if (bss_info.n_cap)
     {
-        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_N;
+        wiFiVersion = WiFiVersionEnum::kN;
     }
     /* 11g Capable */
     else
     {
-        wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_G;
+        wiFiVersion = WiFiVersionEnum::kG;
     }
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
@@ -287,7 +289,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNu
     if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "cy_wcm_get_associated_ap_info failed: %d", (int) result);
-        SuccessOrExit(CHIP_ERROR_INTERNAL);
+        SuccessOrExit(err = CHIP_ERROR_INTERNAL);
     }
     channelNumber = ap_info.channel;
 
@@ -305,7 +307,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
     if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "cy_wcm_get_associated_ap_info failed: %d", (int) result);
-        SuccessOrExit(CHIP_ERROR_INTERNAL);
+        SuccessOrExit(err = CHIP_ERROR_INTERNAL);
     }
     rssi = ap_info.signal_strength;
 
@@ -348,7 +350,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentM
     if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "cy_wcm_get_wlan_statistics failed: %d", (int) result);
-        SuccessOrExit(CHIP_ERROR_INTERNAL);
+        SuccessOrExit(err = CHIP_ERROR_INTERNAL);
     }
     count          = stats.tx_bitrate * PHYRATE_KPBS_BYTES_PER_SEC;
     currentMaxRate = static_cast<uint32_t>(count);
@@ -392,7 +394,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & pa
     if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "cy_wcm_get_wlan_statistics failed: %d", (int) result);
-        SuccessOrExit(CHIP_ERROR_INTERNAL);
+        SuccessOrExit(err = CHIP_ERROR_INTERNAL);
     }
     count = stats.rx_packets;
     count -= mPacketUnicastRxCount;
@@ -415,7 +417,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & pa
     if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "cy_wcm_get_wlan_statistics failed: %d", (int) result);
-        SuccessOrExit(CHIP_ERROR_INTERNAL);
+        SuccessOrExit(err = CHIP_ERROR_INTERNAL);
     }
 
     count = stats.tx_packets;

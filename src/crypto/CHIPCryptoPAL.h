@@ -32,6 +32,7 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/Optional.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafePointerCast.h>
 #include <lib/support/Span.h>
 
 #include <stddef.h>
@@ -228,68 +229,139 @@ public:
                                                      const Sig & signature) const                                              = 0;
 };
 
-template <size_t Cap>
-class CapacityBoundBuffer
+/**
+ * @brief Helper class for holding sensitive data that should be erased from memory after use.
+ *
+ * The sensitive data buffer is a variable-length, fixed-capacity buffer class that securely erases
+ * the contents of a buffer when the buffer is destroyed.
+ */
+template <size_t kCapacity>
+class SensitiveDataBuffer
 {
 public:
-    ~CapacityBoundBuffer()
+    ~SensitiveDataBuffer()
     {
         // Sanitize after use
-        ClearSecretData(&bytes[0], Cap);
+        ClearSecretData(mBytes);
     }
 
-    CapacityBoundBuffer & operator=(const CapacityBoundBuffer & other)
+    SensitiveDataBuffer & operator=(const SensitiveDataBuffer & other)
     {
         // Guard self assignment
         if (this == &other)
             return *this;
 
-        ClearSecretData(&bytes[0], Cap);
+        ClearSecretData(mBytes);
         SetLength(other.Length());
-        ::memcpy(Bytes(), other.Bytes(), other.Length());
+        ::memcpy(Bytes(), other.ConstBytes(), other.Length());
         return *this;
     }
 
-    /** @brief Set current length of the buffer that's being used
-     * @return Returns error if new length is > capacity
-     **/
-    CHIP_ERROR SetLength(size_t len)
+    /**
+     * @brief Set current length of the buffer
+     * @return Error if new length is exceeds capacity of the buffer
+     */
+    CHIP_ERROR SetLength(size_t length)
     {
-        VerifyOrReturnError(len <= sizeof(bytes), CHIP_ERROR_INVALID_ARGUMENT);
-        length = len;
+        VerifyOrReturnError(length <= kCapacity, CHIP_ERROR_INVALID_ARGUMENT);
+        mLength = length;
         return CHIP_NO_ERROR;
     }
 
-    /** @brief Returns current length of the buffer that's being used
-     * @return Returns 0 if SetLength() was never called
-     **/
-    size_t Length() const { return length; }
+    /**
+     * @brief Returns current length of the buffer
+     */
+    size_t Length() const { return mLength; }
 
-    /** @brief Returns max capacity of the buffer
-     **/
-    static constexpr size_t Capacity() { return sizeof(bytes); }
+    /**
+     * @brief Returns non-const pointer to start of the underlying buffer
+     */
+    uint8_t * Bytes() { return &mBytes[0]; }
 
-    /** @brief Returns pointer to start of underlying buffer
-     **/
-    uint8_t * Bytes() { return &bytes[0]; }
+    /**
+     * @brief Returns const pointer to start of the underlying buffer
+     */
+    const uint8_t * ConstBytes() const { return &mBytes[0]; }
 
-    /** @brief Returns const pointer to start of underlying buffer
-     **/
-    const uint8_t * ConstBytes() const { return &bytes[0]; }
+    /**
+     * @brief Constructs span from the underlying buffer
+     */
+    ByteSpan Span() const { return ByteSpan(ConstBytes(), Length()); }
 
-    /** @brief Returns buffer pointer
-     **/
-    operator uint8_t *() { return bytes; }
-    operator const uint8_t *() const { return bytes; }
+    /**
+     * @brief Returns capacity of the buffer
+     */
+    static constexpr size_t Capacity() { return kCapacity; }
 
 private:
-    uint8_t bytes[Cap];
-    size_t length = 0;
+    uint8_t mBytes[kCapacity];
+    size_t mLength = 0;
 };
 
-typedef CapacityBoundBuffer<kMax_ECDSA_Signature_Length> P256ECDSASignature;
+/**
+ * @brief Helper class for holding fixed-sized sensitive data that should be erased from memory after use.
+ *
+ * The sensitive data buffer is a fixed-length, fixed-capacity buffer class that securely erases
+ * the contents of a buffer when the buffer is destroyed.
+ */
+template <size_t kCapacity>
+class SensitiveDataFixedBuffer
+{
+public:
+    SensitiveDataFixedBuffer() = default;
 
-typedef CapacityBoundBuffer<kMax_ECDH_Secret_Length> P256ECDHDerivedSecret;
+    constexpr explicit SensitiveDataFixedBuffer(const uint8_t (&rawValue)[kCapacity])
+    {
+        memcpy(&mBytes[0], &rawValue[0], kCapacity);
+    }
+
+    constexpr explicit SensitiveDataFixedBuffer(const FixedByteSpan<kCapacity> & value)
+    {
+        memcpy(&mBytes[0], value.data(), kCapacity);
+    }
+
+    ~SensitiveDataFixedBuffer()
+    {
+        // Sanitize after use
+        ClearSecretData(mBytes);
+    }
+
+    /**
+     * @brief Returns fixed length of the buffer
+     */
+    constexpr size_t Length() const { return kCapacity; }
+
+    /**
+     * @brief Returns non-const pointer to start of the underlying buffer
+     */
+    uint8_t * Bytes() { return &mBytes[0]; }
+
+    /**
+     * @brief Returns const pointer to start of the underlying buffer
+     */
+    const uint8_t * ConstBytes() const { return &mBytes[0]; }
+
+    /**
+     * @brief Constructs fixed span from the underlying buffer
+     */
+    FixedByteSpan<kCapacity> Span() const { return FixedByteSpan<kCapacity>(mBytes); }
+
+    /**
+     * @brief Returns capacity of the buffer
+     */
+    static constexpr size_t Capacity() { return kCapacity; }
+
+private:
+    uint8_t mBytes[kCapacity];
+};
+
+using P256ECDSASignature    = SensitiveDataBuffer<kMax_ECDSA_Signature_Length>;
+using P256ECDHDerivedSecret = SensitiveDataBuffer<kMax_ECDH_Secret_Length>;
+
+using IdentityProtectionKey     = SensitiveDataFixedBuffer<CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>;
+using IdentityProtectionKeySpan = FixedByteSpan<Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>;
+
+using AttestationChallenge = SensitiveDataFixedBuffer<CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES>;
 
 class P256PublicKey : public ECPKey<P256ECDSASignature>
 {
@@ -382,7 +454,7 @@ struct alignas(size_t) P256KeypairContext
     uint8_t mBytes[kMAX_P256Keypair_Context_Size];
 };
 
-typedef CapacityBoundBuffer<kP256_PublicKey_Length + kP256_PrivateKey_Length> P256SerializedKeypair;
+using P256SerializedKeypair = SensitiveDataBuffer<kP256_PublicKey_Length + kP256_PrivateKey_Length>;
 
 class P256KeypairBase : public ECPKeypair<P256PublicKey, P256ECDHDerivedSecret, P256ECDSASignature>
 {
@@ -477,45 +549,52 @@ protected:
     bool mInitialized = false;
 };
 
-/**
- *  @brief  A data structure for holding an AES CCM128 symmetric key, without the ownership of it.
- */
-using AesCcm128KeySpan = FixedByteSpan<Crypto::kAES_CCM128_Key_Length>;
+using Aes128KeyByteArray = uint8_t[CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
 
-class AesCcm128Key
+/**
+ * @brief Platform-specific AES key
+ *
+ * The class represents AES key used by Matter stack either in the form of raw key material or key
+ * reference, depending on the platform. To achieve that, it contains an opaque context that can be
+ * cast to a concrete representation used by the given platform. Note that currently Matter uses
+ * 128-bit symmetric keys only.
+ */
+class Aes128KeyHandle
 {
 public:
-    AesCcm128Key() {}
+    Aes128KeyHandle() = default;
+    ~Aes128KeyHandle() { ClearSecretData(mContext.mOpaque); }
 
-    ~AesCcm128Key()
+    Aes128KeyHandle(const Aes128KeyHandle &) = delete;
+    Aes128KeyHandle(Aes128KeyHandle &&)      = delete;
+    void operator=(const Aes128KeyHandle &) = delete;
+    void operator=(Aes128KeyHandle &&) = delete;
+
+    /**
+     * @brief Get internal context cast to the desired key representation
+     */
+    template <class T>
+    const T & As() const
     {
-        // Sanitize after use
-        ClearSecretData(&bytes[0], Length());
+        return *SafePointerCast<const T *>(&mContext);
     }
 
-    template <size_t N>
-    constexpr AesCcm128Key(const uint8_t (&raw_value)[N])
+    /**
+     * @brief Get internal context cast to the desired, mutable key representation
+     */
+    template <class T>
+    T & AsMutable()
     {
-        static_assert(N == kAES_CCM128_Key_Length, "Can only array-initialize from proper bounds");
-        memcpy(&bytes[0], &raw_value[0], N);
+        return *SafePointerCast<T *>(&mContext);
     }
-
-    template <size_t N>
-    constexpr AesCcm128Key(const FixedByteSpan<N> & value)
-    {
-        static_assert(N == kAES_CCM128_Key_Length, "Can only initialize from proper sized byte span");
-        memcpy(&bytes[0], value.data(), N);
-    }
-
-    size_t Length() const { return sizeof(bytes); }
-    operator uint8_t *() { return bytes; }
-    operator const uint8_t *() const { return bytes; }
-    const uint8_t * ConstBytes() const { return &bytes[0]; }
-    AesCcm128KeySpan Span() const { return AesCcm128KeySpan(bytes); }
-    uint8_t * Bytes() { return &bytes[0]; }
 
 private:
-    uint8_t bytes[kAES_CCM128_Key_Length];
+    static constexpr size_t kContextSize = CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES;
+
+    struct alignas(uintptr_t) OpaqueContext
+    {
+        uint8_t mOpaque[kContextSize] = {};
+    } mContext;
 };
 
 /**
@@ -589,7 +668,6 @@ CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, Mutabl
  * @param aad Additional authentication data
  * @param aad_length Length of additional authentication data
  * @param key Encryption key
- * @param key_length Length of encryption key (in bytes)
  * @param nonce Encryption nonce
  * @param nonce_length Length of encryption nonce
  * @param ciphertext Buffer to write ciphertext into. Caller must ensure this is large enough to hold the ciphertext
@@ -598,7 +676,7 @@ CHIP_ERROR ConvertIntegerRawToDerWithoutTag(const ByteSpan & raw_integer, Mutabl
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  * */
 CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * key, size_t key_length, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
+                           const Aes128KeyHandle & key, const uint8_t * nonce, size_t nonce_length, uint8_t * ciphertext,
                            uint8_t * tag, size_t tag_length);
 
 /**
@@ -616,14 +694,13 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
  * @param tag Tag to use to decrypt
  * @param tag_length Length of tag
  * @param key Decryption key
- * @param key_length Length of Decryption key (in bytes)
  * @param nonce Encryption nonce
  * @param nonce_length Length of encryption nonce
  * @param plaintext Buffer to write plaintext into
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length, const uint8_t * aad, size_t aad_length,
-                           const uint8_t * tag, size_t tag_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
+                           const uint8_t * tag, size_t tag_length, const Aes128KeyHandle & key, const uint8_t * nonce,
                            size_t nonce_length, uint8_t * plaintext);
 
 /**
@@ -637,13 +714,12 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
  * @param input Input text to encrypt/decrypt
  * @param input_length Length of ciphertext
  * @param key Decryption key
- * @param key_length Length of Decryption key (in bytes)
  * @param nonce Encryption nonce
  * @param nonce_length Length of encryption nonce
  * @param output Buffer to write output into
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR AES_CTR_crypt(const uint8_t * input, size_t input_length, const uint8_t * key, size_t key_length, const uint8_t * nonce,
+CHIP_ERROR AES_CTR_crypt(const uint8_t * input, size_t input_length, const Aes128KeyHandle & key, const uint8_t * nonce,
                          size_t nonce_length, uint8_t * output);
 
 /**
@@ -1414,8 +1490,6 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_
  */
 CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & rootPublicKey, uint64_t fabricId,
                                       uint64_t & compressedFabricId);
-
-typedef CapacityBoundBuffer<kMax_x509_Certificate_Length> X509DerCertificate;
 
 enum class CertificateChainValidationResult
 {

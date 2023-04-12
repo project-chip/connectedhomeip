@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <lib/support/DLLUtil.h>
 #include <lib/support/logging/Constants.h>
 
 #include <os/log.h>
@@ -65,18 +64,17 @@ enum OSLogCategory
     kOSLogCategory_AUTOMATION = OS_LOG_TYPE_DEFAULT,
 };
 
-DLL_LOCAL os_log_t LoggerForModule(chip::Logging::LogModule moduleId, char const * moduleName);
-DLL_LOCAL void LogByteSpan(chip::Logging::LogModule moduleId, char const * moduleName, os_log_type_t type,
-                           const chip::ByteSpan & span);
+os_log_t LoggerForModule(chip::Logging::LogModule moduleId, char const * moduleName);
+void LogByteSpan(chip::Logging::LogModule moduleId, char const * moduleName, os_log_type_t type, const chip::ByteSpan & span);
 
 // Helper constructs for compile-time validation of format strings for C++ / ObjC++ contexts.
 // Note that ObjC++ contexts are restricted to NSString style specifiers. Supporting os_log()
 // specifiers would require these to be emulated or stripped when log redirection is used.
 #ifdef __OBJC__
-DLL_LOCAL bool ValidateLogFormat(NSString * format, ...) __attribute__((format(__NSString__, 1, 0))); // not implemented
+bool ValidateLogFormat(NSString * format, ...) __attribute__((format(__NSString__, 1, 0))); // not implemented
 #define ChipPlatformValidateLogFormat(F, ...) ((void) sizeof(chip::Logging::Platform::ValidateLogFormat(@F, ##__VA_ARGS__)))
 #else // __OBJC__
-DLL_LOCAL bool ValidateLogFormat(char const * format, ...) __attribute__((format(printf, 1, 0))); // not implemented
+bool ValidateLogFormat(char const * format, ...) __attribute__((format(printf, 1, 0))); // not implemented
 #define ChipPlatformValidateLogFormat(F, ...) ((void) sizeof(chip::Logging::Platform::ValidateLogFormat(F, ##__VA_ARGS__)))
 #endif // __OBJC__
 

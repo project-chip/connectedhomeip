@@ -39,48 +39,48 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
 
     - label: "Read the user back and verify its fields"
       command: "GetUser"
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
       response:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: 6452
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
-              - name: "credentials"
-                value: null
-              - name: "creatorFabricIndex"
+              - name: "Credentials"
+                value: []
+              - name: "CreatorFabricIndex"
                 value: 1
-              - name: "lastModifiedFabricIndex"
+              - name: "LastModifiedFabricIndex"
                 value: 1
-              - name: "nextUserIndex"
+              - name: "NextUserIndex"
                 value: null
 
     - label:
@@ -101,25 +101,25 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
-              - name: "credentialData"
+              - name: "CredentialData"
                 value: "123456"
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: null
-              - name: "userType"
+              - name: "UserType"
                 value: null
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: null
-              - name: "nextCredentialIndex"
+              - name: "NextCredentialIndex"
                 value: 2
 
     - label: "TH sends Get Credential Status Command"
@@ -127,20 +127,20 @@ tests:
       command: "GetCredentialStatus"
       arguments:
           values:
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
       response:
           values:
-              - name: "credentialExists"
+              - name: "CredentialExists"
                 constraints:
                     type: boolean
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
-              - name: "creatorFabricIndex"
+              - name: "CreatorFabricIndex"
                 value: 1
-              - name: "lastModifiedFabricIndex"
+              - name: "LastModifiedFabricIndex"
                 value: 1
-              - name: "nextCredentialIndex"
+              - name: "NextCredentialIndex"
                 value: null
 
     - label: "TH sends Set Credential Command to DUT"
@@ -149,26 +149,24 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 2 }
-              - name: "credentialData"
+              - name: "CredentialData"
                 value: "4321"
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: null
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 5
-              - name: "userType"
+              - name: "UserType"
                 value: 10
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0x85
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: null
-              - name: "nextCredentialIndex"
-                value: 3
 
     - label: "TH sends Set Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
@@ -176,27 +174,26 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 2 }
-              - name: "credentialData"
+              - name: "CredentialData"
                 value: "123456"
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: null
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: null
-              - name: "userType"
+              - name: "UserType"
                 value: null
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0x02
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: null
-              - name: "nextCredentialIndex"
-                value: 3
 
+    # Need OR condition support
     - label:
           "TH sends Set Credential Command to DUT and Verify that the DUT sends
           Set Credential Response command with status as DUPLICATE or OCCUPIED"
@@ -227,14 +224,14 @@ tests:
           Set Credential Response command with response as OCCUPIED if the
           CredentialIndex is repeated"
       verification: |
-          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1, "credentialIndex" : 1 }' 12345 1 null null 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1, "credentialIndex" : 1}' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT sends Set Credential Response command with response as DUPLICATE or OCCUPIED" on the TH(Chip-tool) Log:
 
           [1660216276.191641][71849:71854] CHIP:DMG: Received Command Response Data, Endpoint=1 Cluster=0x0000_0101 Command=0x0000_0023
           [1660216276.191673][71849:71854] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0101 Command 0x0000_0023
           [1660216276.191725][71849:71854] CHIP:TOO:   SetCredentialResponse: {
-          [1660216276.191752][71849:71854] CHIP:TOO:     status: 3
+          [1660216276.191752][71849:71854] CHIP:TOO:     status: 2
           [1660216276.191764][71849:71854] CHIP:TOO:     userIndex: null
           [1660216276.191776][71849:71854] CHIP:TOO:     nextCredentialIndex: 2
           [1660216276.191798][71849:71854] CHIP:TOO:    }
@@ -253,11 +250,11 @@ tests:
           "TH sends Set Credential Command to DUT and Verify that the DUT sends
           Set Credential Response command with response as OCCUPIED if the
           CredentialIndex is repeated"
+      PICS: PICS_USER_PROMPT && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       verification: |
           Mark as not applicable and proceed to next step
 
           ./chip-tool doorlock set-credential 2 '{ "credentialType" : 1, "credentialIndex" : 3 }' 1234567 1 null null 1 1 --timedInteractionTimeoutMs 1000
-
           Verify "DUT sends Set Credential Response command with response as OCCUPIED" on the TH(Chip-tool) Log:
 
           [1658473055.384297][2667:2672] CHIP:DMG: },
@@ -270,7 +267,6 @@ tests:
           [1658473055.384660][2667:2672] CHIP:TOO:    }
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: PICS_USER_PROMPT && DRLK.S.F08 && DRLK.S.C22.Rsp && DRLK.S.C23.Tx
       arguments:
           values:
               - name: "message"
@@ -284,7 +280,7 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
 
     - label: "TH sends Get Credential Status Command to DUT"
@@ -292,19 +288,19 @@ tests:
       command: "GetCredentialStatus"
       arguments:
           values:
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
       response:
           values:
-              - name: "credentialExists"
+              - name: "CredentialExists"
                 value: false
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: null
-              - name: "creatorFabricIndex"
+              - name: "CreatorFabricIndex"
                 value: null
-              - name: "lastModifiedFabricIndex"
+              - name: "LastModifiedFabricIndex"
                 value: null
-              - name: "nextCredentialIndex"
+              - name: "NextCredentialIndex"
                 value: null
 
     - label: "TH sends Set User Command to DUT"
@@ -313,19 +309,19 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
-              - name: "userName"
+              - name: "UserName"
                 value: "xxx"
-              - name: "userUniqueId"
+              - name: "UserUniqueID"
                 value: "6452"
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: 1
-              - name: "userType"
+              - name: "UserType"
                 value: 0
-              - name: "credentialRule"
+              - name: "CredentialRule"
                 value: 0
 
     - label: "TH sends Set Credential Command to DUT"
@@ -334,26 +330,24 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "operationType"
+              - name: "OperationType"
                 value: 0
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
-              - name: "credentialData"
+              - name: "CredentialData"
                 value: "123456"
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2
-              - name: "userStatus"
+              - name: "UserStatus"
                 value: null
-              - name: "userType"
+              - name: "UserType"
                 value: null
       response:
           values:
-              - name: "status"
+              - name: "Status"
                 value: 0
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: null
-              - name: "nextCredentialIndex"
-                value: 2
 
     - label: "TH sends Clear Credential Command to DUT"
       PICS: DRLK.S.F08 && DRLK.S.C26.Rsp
@@ -361,7 +355,7 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 65534 }
 
     - label: "TH sends Get Credential Status Command"
@@ -369,19 +363,19 @@ tests:
       command: "GetCredentialStatus"
       arguments:
           values:
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 65534 }
       response:
           values:
-              - name: "credentialExists"
+              - name: "CredentialExists"
                 value: false
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: null
-              - name: "creatorFabricIndex"
+              - name: "CreatorFabricIndex"
                 value: null
-              - name: "lastModifiedFabricIndex"
+              - name: "LastModifiedFabricIndex"
                 value: null
-              - name: "nextCredentialIndex"
+              - name: "NextCredentialIndex"
                 value: null
 
     - label: "TH sends Get Credential Status Command"
@@ -389,19 +383,19 @@ tests:
       command: "GetCredentialStatus"
       arguments:
           values:
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 1, CredentialIndex: 1 }
       response:
           values:
-              - name: "credentialExists"
+              - name: "CredentialExists"
                 value: false
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: null
-              - name: "creatorFabricIndex"
+              - name: "CreatorFabricIndex"
                 value: null
-              - name: "lastModifiedFabricIndex"
+              - name: "LastModifiedFabricIndex"
                 value: null
-              - name: "nextCredentialIndex"
+              - name: "NextCredentialIndex"
                 value: null
 
     - label: "TH sends Clear Credential Command to DUT"
@@ -410,7 +404,7 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "credential"
+              - name: "Credential"
                 value: { CredentialType: 8, CredentialIndex: 2 }
       response:
           error: INVALID_COMMAND
@@ -420,7 +414,7 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 1
 
     - label: "Cleanup the second created user"
@@ -428,5 +422,5 @@ tests:
       timedInteractionTimeoutMs: 10000
       arguments:
           values:
-              - name: "userIndex"
+              - name: "UserIndex"
                 value: 2

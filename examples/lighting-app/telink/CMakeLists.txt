@@ -21,6 +21,27 @@ get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connect
 get_filename_component(TELINK_COMMON ${CHIP_ROOT}/examples/platform/telink REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
+  set(LOCAL_DTC_OVERLAY_FILE "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
+else()
+  unset(LOCAL_DTC_OVERLAY_FILE)
+endif()
+
+if(EXISTS "${CHIP_ROOT}/src/platform/telink/${BOARD}.overlay")
+  set(GLOBAL_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}.overlay")
+else()
+  unset(GLOBAL_DTC_OVERLAY_FILE)
+endif()
+
+if(DTC_OVERLAY_FILE)
+  set(DTC_OVERLAY_FILE
+    "${DTC_OVERLAY_FILE} ${GLOBAL_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE}"
+    CACHE STRING "" FORCE
+  )
+else()
+  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE})
+endif()
+
 set(CONF_FILE ${CHIP_ROOT}/config/telink/app/zephyr.conf prj.conf)
 
 # Load NCS/Zephyr build system
@@ -47,18 +68,17 @@ add_definitions(
 
 target_sources(app PRIVATE
                src/AppTask.cpp
-               src/LightingManager.cpp
                src/main.cpp
                src/ZclCallbacks.cpp
-               ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
-               ${TELINK_COMMON}/util/src/ThreadUtil.cpp)
+               ${TELINK_COMMON}/util/src/ThreadUtil.cpp
+               ${TELINK_COMMON}/util/src/PWMDevice.cpp
+               ${TELINK_COMMON}/util/src/ColorFormat.cpp)
 
 chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lighting-common/lighting-app.zap
-    GEN_DIR ${GEN_DIR}/lighting-app/zap-generated
 )
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
@@ -77,12 +97,16 @@ set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
 include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
 
+include($ENV{PW_ROOT}/pw_assert/backend.cmake)
+include($ENV{PW_ROOT}/pw_log/backend.cmake)
+include($ENV{PW_ROOT}/pw_sys_io/backend.cmake)
+
 pw_set_module_config(pw_rpc_CONFIG pw_rpc.disable_global_mutex_config)
 pw_set_backend(pw_log pw_log_basic)
 pw_set_backend(pw_assert.check pw_assert_log.check_backend)
 pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
 pw_set_backend(pw_sys_io pw_sys_io.telink)
-pw_set_backend(pw_trace pw_trace_tokenized)
+
 set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
 add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
@@ -196,9 +220,7 @@ target_compile_options(app PRIVATE
                        "-DPW_RPC_DESCRIPTOR_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_LIGHTING_SERVICE=1"
-                       "-DPW_RPC_THREAD_SERVICE=1"
-                       "-DPW_RPC_TRACING_SERVICE=1"
-                       "-DPW_TRACE_BACKEND_SET=1")
+                       "-DPW_RPC_THREAD_SERVICE=1")
 
 target_link_libraries(app PRIVATE
   attributes_service.nanopb_rpc
@@ -209,17 +231,10 @@ target_link_libraries(app PRIVATE
   thread_service.nanopb_rpc
   pw_checksum
   pw_hdlc
+  pw_hdlc.pw_rpc
   pw_log
   pw_rpc.server
-  pw_trace_tokenized
-  pw_trace_tokenized.trace_buffer
-  pw_trace_tokenized.rpc_service
-  pw_trace_tokenized.protos.nanopb_rpc
-)
-
-target_link_options(app
-  PUBLIC
-    "-T${PIGWEED_ROOT}/pw_tokenizer/pw_tokenizer_linker_sections.ld"
+  pw_sys_io
 )
 
 endif(CONFIG_CHIP_PW_RPC)

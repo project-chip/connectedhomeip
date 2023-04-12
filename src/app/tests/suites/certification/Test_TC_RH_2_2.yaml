@@ -34,7 +34,7 @@ tests:
     - label: "Reads constraints of attribute: MinMeasuredValue"
       PICS: RH.S.A0001
       command: "readAttribute"
-      attribute: "min measured value"
+      attribute: "MinMeasuredValue"
       response:
           constraints:
               type: int16u
@@ -44,7 +44,7 @@ tests:
     - label: "Reads constraints of attribute: MaxMeasuredValue"
       PICS: RH.S.A0002
       command: "readAttribute"
-      attribute: "max measured value"
+      attribute: "MaxMeasuredValue"
       response:
           constraints:
               type: int16u
@@ -53,7 +53,7 @@ tests:
 
     - label: "Reads MeasuredValue attribute from DUT"
       command: "readAttribute"
-      attribute: "measured value"
+      attribute: "MeasuredValue"
       PICS: RH.S.A0000
       response:
           saveAs: ValueBeforeChange
@@ -75,7 +75,7 @@ tests:
 
     - label: "Read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
-      attribute: "measured value"
+      attribute: "MeasuredValue"
       PICS: RH.S.A0000 && RH.M.ManuallyControlled
       response:
           constraints:

@@ -26,12 +26,7 @@ config:
 tests:
     - label: "Commission DUT to TH (can be skipped if done in a preceding test)"
       verification: |
-          On DUT side:
-          sudo ./chip-bridge-app
 
-
-          On TH side:
-          ./chip-tool pairing ethernet 1 20202021 3840 fe80::e65f:1ff:fe0f:2753  5540
       disabled: true
 
     - label:
@@ -327,7 +322,7 @@ tests:
     - label: "compare result of step 3d to what was read in step 3b"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-          Compare step 3d and 3b and verify the name field has been chamged
+          Compare step 3d and 3b and verify the name field has been changed
 
           Step 3d
           Verify  ActionStructs in TH(chip-tool) Log:
@@ -377,7 +372,7 @@ tests:
           actions"
       PICS: ACT.S.A0000 && ACT.S.M.FillActionList
       verification: |
-          Press n in bridge-app to remove one of exposed actions
+          press n in bridge-app
       disabled: true
 
     - label: "Read ActionList attribute again"

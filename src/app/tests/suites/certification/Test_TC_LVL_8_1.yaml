@@ -25,7 +25,7 @@ config:
 
 tests:
     - label: "Note"
-      verifaction: |
+      verification: |
           For DUT as client test cases, Chip-tool command used below are an example to verify the functionality. For certification test, we expect DUT should have a capability or way to run the equivalent command.
       disabled: true
 
@@ -34,6 +34,7 @@ tests:
           commands from the Level Control cluster"
       verification: |
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner/Client)
+
 
           ./chip-tool levelcontrol move-to-level 125 10 0 0 1 1
           Verify DUT receives  move-to-level  command response on the TH(all-clusters-app) Log:

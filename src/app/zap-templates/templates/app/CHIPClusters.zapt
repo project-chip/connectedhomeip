@@ -1,6 +1,6 @@
 {{> header}}
 
-{{#if (chip_has_client_clusters)}}
+{{#if_enabled_clusters side='client'}}
 // Prevent multiple inclusion
 #pragma once
 
@@ -14,15 +14,15 @@
 namespace chip {
 namespace Controller {
 
-{{#chip_client_clusters}}
+{{#all_user_clusters side='client'}}
 class DLL_EXPORT {{asUpperCamelCase name}}Cluster : public ClusterBase
 {
 public:
-    {{asUpperCamelCase name}}Cluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, app::Clusters::{{asUpperCamelCase name}}::Id, endpoint) {}
+    {{asUpperCamelCase name}}Cluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) : ClusterBase(exchangeManager, session, endpoint) {}
     ~{{asUpperCamelCase name}}Cluster() {}
 };
 
-{{/chip_client_clusters}}
+{{/all_user_clusters}}
 } // namespace Controller
 } // namespace chip
-{{/if}}
+{{/if_enabled_clusters}}

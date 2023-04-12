@@ -22,8 +22,13 @@
 # This script expects to find a Dockerfile next to $0, so symlink
 #  in an image name directory is the expected use case.
 
+set -xe
+
 me=$(basename "$0")
-cd "$(dirname "$0")"
+SOURCE=${BASH_SOURCE[0]}
+cd "$(dirname "$SOURCE")"
+
+SOURCE_DIR=$PWD
 
 ORG=${DOCKER_BUILD_ORG:-connectedhomeip}
 
@@ -34,6 +39,13 @@ IMAGE=${DOCKER_BUILD_IMAGE:-$(basename "$(pwd)")}
 VERSION=${DOCKER_BUILD_VERSION:-$(sed 's/ .*//' version)}
 
 GITHUB_ACTION_RUN=${GITHUB_ACTION_RUN:-"0"}
+
+REPO_DIR="$SOURCE_DIR/../../../../"
+
+if [[ "$GITHUB_ACTION_RUN" = "1" ]]; then
+    # Note: This script will be invoked in docker on CI, We should ensure CHIP repo to safe directory to silent git error messages.
+    git config --global --add safe.directory /home/runner/work/connectedhomeip/connectedhomeip
+fi
 
 # The image build will clone its own ot-br-posix checkout due to limitations of git submodule.
 # Using the same ot-br-posix version as chip
@@ -85,13 +97,9 @@ else
     fi
 fi
 
-SOURCE=${BASH_SOURCE[0]}
-SOURCE_DIR=$(cd "$(dirname "$SOURCE")" >/dev/null 2>&1 && pwd)
-REPO_DIR="$SOURCE_DIR/../../../../"
-
 docker build -t "$ORG/$IMAGE" -f "$SOURCE_DIR/Dockerfile" "${BUILD_ARGS[@]}" --build-arg OT_BR_POSIX_CHECKOUT="$OT_BR_POSIX_CHECKOUT" "$SOURCE_DIR"
 
-if [[ -n GITHUB_ACTION_RUN ]]; then
+if [[ "$GITHUB_ACTION_RUN" = "1" ]]; then
     # Save cache
     mkdir -p "$CIRQUE_CACHE_PATH"
     docker save -o "$IMAGE_SAVE_PATH" "$ORG/$IMAGE"

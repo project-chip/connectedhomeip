@@ -296,7 +296,7 @@ CHIP_ERROR ChipCertificateSet::VerifySignature(const ChipCertificateData * cert,
 
     VerifyOrReturnError((cert != nullptr) && (caCert != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(signature.SetLength(cert->mSignature.size()));
-    memcpy(signature, cert->mSignature.data(), cert->mSignature.size());
+    memcpy(signature.Bytes(), cert->mSignature.data(), cert->mSignature.size());
 
     memcpy(caPublicKey, caCert->mPublicKey.data(), caCert->mPublicKey.size());
 

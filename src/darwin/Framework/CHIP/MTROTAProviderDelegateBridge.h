@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTROTAProviderDelegate.h"
+#import <Matter/MTROTAProviderDelegate.h>
 
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 
@@ -53,7 +53,7 @@ private:
     static CHIP_ERROR ConvertToQueryImageParams(
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData,
         MTROTASoftwareUpdateProviderClusterQueryImageParams * commandParams);
-    static void ConvertFromQueryImageResponseParms(
+    static void ConvertFromQueryImageResponseParams(
         const MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * responseParams,
         chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::Type & response);
     static void ConvertToApplyUpdateRequestParams(

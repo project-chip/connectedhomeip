@@ -51,7 +51,7 @@ tests:
       command: "MoveToHueAndSaturation"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 200
               - name: "Saturation"
                 value: 50
@@ -63,6 +63,7 @@ tests:
                 value: 0
 
     - label: "Wait 100ms"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -95,7 +96,7 @@ tests:
       command: "MoveToHueAndSaturation"
       arguments:
           values:
-              - name: "hue"
+              - name: "Hue"
                 value: 160
               - name: "Saturation"
                 value: 80
@@ -107,6 +108,7 @@ tests:
                 value: 0
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -133,6 +135,7 @@ tests:
               maxValue: 80
 
     - label: "Wait 10s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -160,6 +163,7 @@ tests:
               maxValue: 92
 
     - label: "Wait 5s"
+      PICS: CC.S.F00
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:

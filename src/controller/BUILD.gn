@@ -16,13 +16,6 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/python.gni")
 
-config("config") {
-  # TODO: this should be a dependency on src/controller/data_model however this is circular:
-  #    zzz_generated/controller-clusters depend on src/controller
-  #    src/controller neeeds zzz_generated/controller-cluster for includes
-  include_dirs = [ "${chip_root}/zzz_generated/" ]
-}
-
 static_library("controller") {
   output_name = "libChipController"
 
@@ -75,8 +68,6 @@ static_library("controller") {
   ]
 
   deps = [ "${chip_root}/src/lib/address_resolve" ]
-
-  public_configs = [ ":config" ]
 
   defines = []
 }

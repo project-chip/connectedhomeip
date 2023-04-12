@@ -13,30 +13,51 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Idl, ClusterSide, Field, Attribute, Cluster, FieldQuality, Command, DataType
-from matter_idl import matter_idl_types
-from matter_idl.generators.types import ParseDataType, BasicString, BasicInteger, FundamentalType, IdlType, IdlEnumType, IdlBitmapType, TypeLookupContext
-from typing import Union, List, Set
-from stringcase import capitalcase
-
+import dataclasses
 import enum
 import logging
+import os
+from typing import List, Set, Union
+
+from matter_idl.generators import CodeGenerator, GeneratorStorage
+from matter_idl.generators.types import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
+                                         ParseDataType, TypeLookupContext)
+from matter_idl.matter_idl_types import (Attribute, Cluster, ClusterSide, Command, DataType, Field, FieldQuality, Idl, Struct,
+                                         StructTag)
+from stringcase import capitalcase
 
 
-def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, None]:
-    """Global names are used for generic callbacks shared across
-    all clusters (e.g. for bool/float/uint32 and similar)
-    """
-    if field.is_list:
-        return None  # lists are always specific per cluster
+@dataclasses.dataclass
+class GenerateTarget:
+    template: str
+    output_name: str
 
-    if FieldQuality.NULLABLE & field.qualities:
-        return None
 
-    if FieldQuality.OPTIONAL & field.qualities:
-        return None
+@dataclasses.dataclass
+class GlobalType:
+    name: str       # java name
+    cpp_type: str  # underlying type
 
+
+# types that java should see globally
+_GLOBAL_TYPES = [
+    GlobalType("Boolean", "bool"),
+    GlobalType("CharString", "const chip::CharSpan"),
+    GlobalType("Double", "double"),
+    GlobalType("Float", "float"),
+    GlobalType("Int8s", "int8_t"),
+    GlobalType("Int8u", "uint8_t"),
+    GlobalType("Int16s", "int16_t"),
+    GlobalType("Int16u", "uint16_t"),
+    GlobalType("Int32s", "int32_t"),
+    GlobalType("Int32u", "uint32_t"),
+    GlobalType("Int64s", "int64_t"),
+    GlobalType("Int64u", "uint64_t"),
+    GlobalType("OctetString", "const chip::ByteSpan"),
+]
+
+
+def _UnderlyingType(field: Field, context: TypeLookupContext) -> Union[str, None]:
     actual = ParseDataType(field.data_type, context)
     if type(actual) == IdlEnumType:
         actual = actual.base_type
@@ -49,10 +70,6 @@ def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, No
         else:
             return 'CharString'
     elif type(actual) == BasicInteger:
-        # TODO: unclear why this, but tries to match zap:
-        if actual.idl_name.lower() in ['vendor_id', 'fabric_idx']:
-            return None
-
         if actual.is_signed:
             return "Int{}s".format(actual.power_of_two_bits)
         else:
@@ -70,12 +87,138 @@ def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, No
     return None
 
 
-def CallbackName(attr: Attribute, cluster: Cluster, context: TypeLookupContext) -> str:
+def FieldToGlobalName(field: Field, context: TypeLookupContext) -> Union[str, None]:
+    """Global names are used for generic callbacks shared across
+    all clusters (e.g. for bool/float/uint32 and similar)
+    """
+    if field.is_list:
+        return None  # lists are always specific per cluster
+
+    if FieldQuality.NULLABLE & field.qualities:
+        return None
+
+    return _UnderlyingType(field, context)
+
+
+# Based on atomicType in ZAP:
+#  src-electron/generator/matter/app/zap-templates/common/override.js
+_KNOWN_DECODABLE_TYPES = {
+    'action_id': 'chip::ActionId',
+    'attrib_id': 'chip::AttributeId',
+    'cluster_id': 'chip::ClusterId',
+    'command_id': 'chip::CommandId',
+    'data_ver': 'chip::DataVersion',
+    'devtype_id': 'chip::DeviceTypeId',
+    'endpoint_no': 'chip::EndpointId',
+    'eui64': 'chip::NodeId',
+    'event_id': 'chip::EventId',
+    'event_no': 'chip::EventNumber',
+    'fabric_id': 'chip::FabricId',
+    'fabric_idx': 'chip::FabricIndex',
+    'fabric_idx': 'chip::FabricIndex',
+    'field_id': 'chip::FieldId',
+    'group_id': 'chip::GroupId',
+    'node_id': 'chip::NodeId',
+    'percent': 'chip::Percent',
+    'percent100ths': 'chip::Percent100ths',
+    'transaction_id': 'chip::TransactionId',
+    'vendor_id': 'chip::VendorId',
+
+    # non-named enums
+    'enum8': 'uint8_t',
+    'enum16': 'uint16_t',
+    'enum32': 'uint32_t',
+    'enum64': 'uint64_t',
+}
+
+
+def _CppType(field: Field, context: TypeLookupContext) -> Union[str, None]:
+    if field.data_type.name.lower() in _KNOWN_DECODABLE_TYPES:
+        return _KNOWN_DECODABLE_TYPES[field.data_type.name.lower()]
+
+    actual = ParseDataType(field.data_type, context)
+    if isinstance(actual, BasicString):
+        if actual.is_binary:
+            return 'chip::ByteSpan'
+        else:
+            return 'chip::CharSpan'
+    elif isinstance(actual, BasicInteger):
+        if actual.is_signed:
+            return "int{}_t".format(actual.power_of_two_bits)
+        else:
+            return "uint{}_t".format(actual.power_of_two_bits)
+    elif isinstance(actual, FundamentalType):
+        if actual == FundamentalType.BOOL:
+            return 'bool'
+        elif actual == FundamentalType.FLOAT:
+            return 'float'
+        elif actual == FundamentalType.DOUBLE:
+            return 'double'
+        else:
+            logging.warn('Unknown fundamental type: %r' % actual)
+    elif isinstance(actual, IdlType):
+        return f"chip::app::Clusters::{context.cluster.name}::Structs::{field.data_type.name}::DecodableType"
+    elif isinstance(actual, IdlBitmapType):
+        return f"chip::BitMask<chip::app::Clusters::{context.cluster.name}::{field.data_type.name}>"
+
+    # Handles IdlEnumType
+    return f"chip::app::Clusters::{context.cluster.name}::{field.data_type.name}"
+
+
+def DecodableJniType(field: Field, context: TypeLookupContext) -> str:
+    actual = _CppType(field, context)
+
+    if field.is_list:
+        return f"const chip::app::DataModel::DecodableList<{actual}> &"
+
+    if field.is_nullable:
+        return f"const chip::app::DataModel::Nullable<{actual}> &"
+
+    return actual
+
+
+def GlobalNameToJavaName(name: str) -> str:
+    if name in {'Int8u', 'Int8s', 'Int16u', 'Int16s'}:
+        return 'Integer'
+
+    if name.startswith('Int'):
+        return 'Long'
+
+    # Double/Float/Booleans/CharString/OctetString
+    return name
+
+
+def DelegatedCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
+    """
+    Figure out what callback name to use for delegate callback construction.
+    """
+    global_name = FieldToGlobalName(attr.definition, context)
+
+    if global_name:
+        return 'Delegated{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
+
+    return 'Delegated{}Cluster{}AttributeCallback'.format(context.cluster.name, capitalcase(attr.definition.name))
+
+
+def ChipClustersCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
+    """
+    Figure out what callback name to use when building a ChipCluster.*AttributeCallback
+    in java codegen.
+    """
+    global_name = FieldToGlobalName(attr.definition, context)
+
+    if global_name:
+        return 'ChipClusters.{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
+
+    return 'ChipClusters.{}Cluster.{}AttributeCallback'.format(context.cluster.name, capitalcase(attr.definition.name))
+
+
+def CallbackName(attr: Attribute, context: TypeLookupContext) -> str:
     """
     Figure out what callback name to use when a variable requires a read callback.
 
     These are split into native types, like Boolean/Float/Double/CharString, where
-    one callback type can support anything. 
+    one callback type can support anything.
 
     For specific types (e.g. A struct) codegen will generate its own callback name
     specific to that type.
@@ -86,7 +229,7 @@ def CallbackName(attr: Attribute, cluster: Cluster, context: TypeLookupContext) 
         return 'CHIP{}AttributeCallback'.format(capitalcase(global_name))
 
     return 'CHIP{}{}AttributeCallback'.format(
-        capitalcase(cluster.name),
+        capitalcase(context.cluster.name),
         capitalcase(attr.definition.name)
     )
 
@@ -107,6 +250,51 @@ def attributesWithSupportedCallback(attrs, context: TypeLookupContext):
                 continue
 
         yield attr
+
+
+def _IsUsingGlobalCallback(field: Field, context: TypeLookupContext):
+    """Test to determine if the data type of a field can use one of
+    the global callbacks (i.e. it is a basic double/integer/bool etc.)
+    """
+    if field.is_list:
+        return False
+
+    if field.is_nullable:
+        return False
+
+    return field.data_type.name in {
+        "boolean",
+        "single",
+        "double",
+        "int8s",
+        "int8u",
+        "int16s",
+        "int16u",
+        "int24s",
+        "int24u",
+        "int32s",
+        "int32u",
+        "int40s",
+        "int40u",
+        "int48s",
+        "int48u",
+        "int56s",
+        "int56u",
+        "int64s",
+        "int64u",
+        "enum8",
+        "enum16",
+        "enum32",
+        "enum64",
+        "bitmap8",
+        "bitmap16",
+        "bitmap32",
+        "bitmap64",
+        "char_string",
+        "long_char_string",
+        "octet_string",
+        "long_octet_string",
+    }
 
 
 def NamedFilter(choices: List, name: str):
@@ -239,9 +427,10 @@ class EncodableValue:
             elif t == FundamentalType.DOUBLE:
                 return "Double"
             else:
-                raise Error("Unknown fundamental type")
+                raise Exception("Unknown fundamental type")
         elif type(t) == BasicInteger:
-            if t.byte_count >= 4:
+            # the >= 3 will include int24_t to be considered "long"
+            if t.byte_count >= 3:
                 return "Long"
             else:
                 return "Integer"
@@ -251,9 +440,15 @@ class EncodableValue:
             else:
                 return "String"
         elif type(t) == IdlEnumType:
-            return "Integer"
+            if t.base_type.byte_count >= 3:
+                return "Long"
+            else:
+                return "Integer"
         elif type(t) == IdlBitmapType:
-            return "Integer"
+            if t.base_type.byte_count >= 3:
+                return "Long"
+            else:
+                return "Integer"
         else:
             return "Object"
 
@@ -276,9 +471,9 @@ class EncodableValue:
             elif t == FundamentalType.DOUBLE:
                 return "Ljava/lang/Double;"
             else:
-                raise Error("Unknown fundamental type")
+                raise Exception("Unknown fundamental type")
         elif type(t) == BasicInteger:
-            if t.byte_count >= 4:
+            if t.byte_count >= 3:
                 return "Ljava/lang/Long;"
             else:
                 return "Ljava/lang/Integer;"
@@ -288,9 +483,15 @@ class EncodableValue:
             else:
                 return "Ljava/lang/String;"
         elif type(t) == IdlEnumType:
-            return "Ljava/lang/Integer;"
+            if t.base_type.byte_count >= 3:
+                return "Ljava/lang/Long;"
+            else:
+                return "Ljava/lang/Integer;"
         elif type(t) == IdlBitmapType:
-            return "Ljava/lang/Integer;"
+            if t.base_type.byte_count >= 3:
+                return "Ljava/lang/Long;"
+            else:
+                return "Ljava/lang/Integer;"
         else:
             return "Lchip/devicecontroller/ChipStructs${}Cluster{};".format(self.context.cluster.name, self.data_type.name)
 
@@ -300,7 +501,7 @@ def EncodableValueFrom(field: Field, context: TypeLookupContext) -> EncodableVal
     Filter to convert a standard field to an EncodableValue.
 
     This converts the AST information (field name/info + lookup context) into
-    a java-generator specific wrapper that can be manipulated and 
+    a java-generator specific wrapper that can be manipulated and
     queried for properties like java native name or JNI string signature.
     """
     attrs = set()
@@ -343,20 +544,28 @@ def CanGenerateSubscribe(attr: Attribute, lookup: TypeLookupContext) -> bool:
     return not lookup.is_struct_type(attr.definition.data_type.name)
 
 
-class JavaGenerator(CodeGenerator):
+def IsResponseStruct(s: Struct) -> bool:
+    return s.tag == StructTag.RESPONSE
+
+
+class __JavaCodeGenerator(CodeGenerator):
     """
-    Generation of java code for matter.
+    Code generation for java-specific files.
+
+    Registers filters used by all java generators.
     """
 
-    def __init__(self, storage: GeneratorStorage, idl: Idl):
+    def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
         """
         Inintialization is specific for java generation and will add
         filters as required by the java .jinja templates to function.
         """
-        super().__init__(storage, idl)
+        super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
 
         self.jinja_env.filters['attributesWithCallback'] = attributesWithSupportedCallback
         self.jinja_env.filters['callbackName'] = CallbackName
+        self.jinja_env.filters['chipClustersCallbackName'] = ChipClustersCallbackName
+        self.jinja_env.filters['delegatedCallbackName'] = DelegatedCallbackName
         self.jinja_env.filters['commandCallbackName'] = CommandCallbackName
         self.jinja_env.filters['named'] = NamedFilter
         self.jinja_env.filters['toBoxedJavaType'] = ToBoxedJavaType
@@ -364,31 +573,104 @@ class JavaGenerator(CodeGenerator):
         self.jinja_env.filters['asEncodable'] = EncodableValueFrom
         self.jinja_env.filters['createLookupContext'] = CreateLookupContext
         self.jinja_env.filters['canGenerateSubscribe'] = CanGenerateSubscribe
+        self.jinja_env.filters['decodableJniType'] = DecodableJniType
+
+        self.jinja_env.tests['is_response_struct'] = IsResponseStruct
+        self.jinja_env.tests['is_using_global_callback'] = _IsUsingGlobalCallback
+
+
+class JavaJNIGenerator(__JavaCodeGenerator):
+    """Generates JNI java files (i.e. C++ source/headers)."""
+
+    def __init__(self, *args, **kargs):
+        super().__init__(*args, **kargs)
 
     def internal_render_all(self):
         """
         Renders .CPP files required for JNI support.
         """
+
+        large_targets = [
+            GenerateTarget(template="CHIPCallbackTypes.jinja",
+                           output_name="jni/CHIPCallbackTypes.h"),
+            GenerateTarget(template="CHIPReadCallbacks_h.jinja",
+                           output_name="jni/CHIPReadCallbacks.h")
+        ]
+
+        for target in large_targets:
+            self.internal_render_one_output(
+                template_path=target.template,
+                output_file_name=target.output_name,
+                vars={
+                    'idl': self.idl,
+                    'clientClusters': [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT],
+                    'globalTypes': _GLOBAL_TYPES,
+                }
+            )
+
+        cluster_targets = [
+            GenerateTarget(template="ChipClustersRead.jinja",
+                           output_name="jni/{cluster_name}Client-ReadImpl.cpp"),
+            GenerateTarget(template="ChipClustersCpp.jinja",
+                           output_name="jni/{cluster_name}Client-InvokeSubscribeImpl.cpp"),
+        ]
+
+        self.internal_render_one_output(
+            template_path="CHIPCallbackTypes.jinja",
+            output_file_name="jni/CHIPCallbackTypes.h",
+            vars={
+                'idl': self.idl,
+                'clientClusters': [c for c in self.idl.clusters if c.side == ClusterSide.CLIENT],
+            }
+        )
+
         # Every cluster has its own impl, to avoid
         # very large compilations (running out of RAM)
         for cluster in self.idl.clusters:
             if cluster.side != ClusterSide.CLIENT:
                 continue
 
-            self.internal_render_one_output(
-                template_path="java/ChipClustersRead.jinja",
-                output_file_name="jni/%sClient-ReadImpl.cpp" % cluster.name,
-                vars={
-                    'cluster': cluster,
-                    'typeLookup': TypeLookupContext(self.idl, cluster),
-                }
-            )
+            for target in cluster_targets:
+                self.internal_render_one_output(
+                    template_path=target.template,
+                    output_file_name=target.output_name.format(
+                        cluster_name=cluster.name),
+                    vars={
+                        'cluster': cluster,
+                        'typeLookup': TypeLookupContext(self.idl, cluster),
+                        'globalTypes': _GLOBAL_TYPES,
+                    }
+                )
 
-            self.internal_render_one_output(
-                template_path="java/ChipClustersCpp.jinja",
-                output_file_name="jni/%sClient-InvokeSubscribeImpl.cpp" % cluster.name,
-                vars={
-                    'cluster': cluster,
-                    'typeLookup': TypeLookupContext(self.idl, cluster),
-                }
-            )
+
+class JavaClassGenerator(__JavaCodeGenerator):
+    """Generates .java files """
+
+    def __init__(self, *args, **kargs):
+        super().__init__(*args, **kargs)
+
+    def internal_render_all(self):
+        """
+        Renders .java files required for java matter support
+        """
+
+        clientClusters = [
+            c for c in self.idl.clusters if c.side == ClusterSide.CLIENT]
+
+        self.internal_render_one_output(
+            template_path="ClusterReadMapping.jinja",
+            output_file_name="java/chip/devicecontroller/ClusterReadMapping.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
+        self.internal_render_one_output(
+            template_path="ClusterWriteMapping.jinja",
+            output_file_name="java/chip/devicecontroller/ClusterWriteMapping.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )

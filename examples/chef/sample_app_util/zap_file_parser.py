@@ -29,13 +29,12 @@ Future work:
     available.
   - Add support for .matter files.
 """
-import base64
 import copy
-import hashlib
 import json
 import os
 import re
-from typing import Dict, List, Literal, Optional, Sequence, TypedDict, Union
+import uuid
+from typing import Dict, List, Optional, Sequence, TypedDict, Union
 
 try:
     import yaml
@@ -62,19 +61,6 @@ class ClusterType(TypedDict):
 class EndpointType(TypedDict):
     client_clusters: Dict[str, ClusterType]
     server_clusters: Dict[str, ClusterType]
-
-
-def _b64encode(input_data: bytes) -> bytes:
-    """Returns urlsafe base64 encoded with padding removed."""
-    return base64.urlsafe_b64encode(input_data).strip(b"=")
-
-
-def _b64decode(input_data: bytes) -> bytes:
-    """Returns urlsafe base64 decoded with padding added."""
-    # "=" is padding character that doesn't carry info.
-    # Adding 2x "=" will handle all edge cases where there may be
-    # incorrect number of bytes.
-    return base64.urlsafe_b64decode(input_data + b"==")
 
 
 def _convert_metadata_name(name: str, code: Union[int, str]) -> str:
@@ -154,7 +140,8 @@ def _convert_metadata_to_hashable_digest(metadata_input: Sequence[Dict[str, Endp
         for cluster_type in ["client_clusters", "server_clusters"]:
             for cluster_key in list(endpoint_obj[cluster_type].keys()):
                 cluster_id = _get_id(cluster_key)
-                endpoint_obj[cluster_type][cluster_id] = endpoint_obj[cluster_type].pop(cluster_key)
+                endpoint_obj[cluster_type][cluster_id] = endpoint_obj[cluster_type].pop(
+                    cluster_key)
                 cluster_obj = endpoint_obj[cluster_type][cluster_id]
 
                 # Replace attribute names
@@ -162,12 +149,14 @@ def _convert_metadata_to_hashable_digest(metadata_input: Sequence[Dict[str, Endp
                 attribute_keys = list(cluster_obj["attributes"])
                 for attribute_key in attribute_keys:
                     attribute_id = _get_id(attribute_key)
-                    attribute_obj[attribute_id] = attribute_obj.pop(attribute_key)
+                    attribute_obj[attribute_id] = attribute_obj.pop(
+                        attribute_key)
 
                 # Replace command names
                 if "commands" in cluster_obj:
                     command_keys = cluster_obj["commands"]
-                    cluster_obj["commands"] = [_get_id(x) for x in command_keys]
+                    cluster_obj["commands"] = [
+                        _get_id(x) for x in command_keys]
                     cluster_obj["commands"].sort()
 
     return json.dumps(metadata, sort_keys=True)
@@ -178,35 +167,13 @@ def _get_id(name):
     return name.split("/")[-1]
 
 
-def generate_hash(zap_file_path: str) -> str:
+def generate_hash() -> str:
     """Generates a hash for a zap file.
 
-    Args:
-      zap_file_path: Path to the zap file.
-
     Returns:
-      MD5 hash of the metadata generated from the zap file.
-      This is converted to base64 and then the first 10 characters are used.
+      A 10 character alphanumeric hash.
     """
-    parsed = generate_hash_metadata(zap_file_path)
-    # Use json.dumps to produce a consistent output for the object passed into it.
-    digestible_content = _convert_metadata_to_hashable_digest(parsed)
-    md5_hash = hashlib.md5(digestible_content.encode("utf-8")).digest()
-    output = str(_b64encode(md5_hash), encoding="utf-8")[:10]
-    # Replace "-" and "_" with "a" and "b".
-    # The reason for doing this is to allow the generated name to be parsed by splitting on "_".
-    # Replacing "-" makes the name easier to parse visually.
-    # This increases likelihood of hash collisions, but minimally so. See module docstring.
-    return output.replace("-", "a").replace("_", "b")
-
-
-def generate_hash_metadata(zap_file_path: str) -> List[Dict[str, EndpointType]]:
-    """Generates metadata for hash digest consumption."""
-    return generate_metadata(
-        zap_file_path=zap_file_path,
-        attribute_allow_list=_ATTRIBUTE_ALLOW_LIST,
-        include_commands=False,
-        include_platform_specific_info=False)
+    return str(uuid.uuid4())[-10:]
 
 
 def generate_metadata(
@@ -277,7 +244,8 @@ def generate_metadata(
             if not cluster["enabled"]:
                 continue
 
-            cluster_ref = _convert_metadata_name(cluster["name"], cluster["code"])
+            cluster_ref = _convert_metadata_name(
+                cluster["name"], cluster["code"])
 
             if include_commands:
                 cluster_obj: ClusterType = {"attributes": {}, "commands": []}
@@ -288,7 +256,8 @@ def generate_metadata(
                 attribute_allowed = (
                     attribute_allow_list is None or str(attribute["code"]) in attribute_allow_list)
                 if attribute["included"] and attribute_allowed:
-                    attribute_ref = _convert_metadata_name(attribute["name"], attribute["code"])
+                    attribute_ref = _convert_metadata_name(
+                        attribute["name"], attribute["code"])
                     value = _read_value(attribute["defaultValue"])
                     cluster_obj["attributes"][attribute_ref] = value
 
@@ -298,7 +267,8 @@ def generate_metadata(
 
             if include_commands:
                 for command in cluster["commands"]:
-                    command_ref = _convert_metadata_name(command["name"], command["code"])
+                    command_ref = _convert_metadata_name(
+                        command["name"], command["code"])
                     if cluster["side"] == "client" and command["outgoing"] == 1:
                         cluster_obj["commands"].append(command_ref)
                     elif cluster["side"] == "server" and command["incoming"] == 1:
@@ -314,21 +284,21 @@ def generate_metadata(
     return return_obj
 
 
-def generate_hash_metadata_file(zap_file_path: str) -> str:
-    """Generates hash metadata file for a zap file input.
+def generate_metadata_file(zap_file_path: str) -> str:
+    """Generates metadata file for a zap file.
 
     The purpose of this file is to inform the user what data was included in the hash digest.
 
     Args:
       zap_file_path: Path to the zap file to parse for generating the metadata file.
     """
-    parsed = generate_hash_metadata(zap_file_path)
+    parsed = generate_metadata(zap_file_path)
     output = yaml.dump(parsed, indent=4, sort_keys=True)
 
     dirname, filename = os.path.split(zap_file_path)
 
     filename = os.path.splitext(filename)[0]
-    output_file_path = os.path.join(dirname, f"{filename}_hashmeta.yaml")
+    output_file_path = os.path.join(dirname, f"{filename}_meta.yaml")
     with open(output_file_path, "w") as f:
         f.write(output)
     return output_file_path
@@ -348,5 +318,5 @@ def generate_name(zap_file_path: str) -> str:
     for endpoint in parsed:
         name = next(iter(endpoint))
         names.append(_convert_filename(name))
-    hash_string = generate_hash(zap_file_path)
+    hash_string = generate_hash()
     return "_".join(names) + f"_{hash_string}"

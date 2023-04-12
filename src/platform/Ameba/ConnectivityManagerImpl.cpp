@@ -83,7 +83,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     chip_connmgr_set_callback_func((chip_connmgr_callback)(conn_callback_dispatcher), this);
 
     // Register WiFi event handlers
-    wifi_reg_event_handler(WIFI_EVENT_CONNECT, ConnectivityManagerImpl::RtkWiFiStationConnectedHandler, NULL);
+    wifi_reg_event_handler(WIFI_EVENT_FOURWAY_HANDSHAKE_DONE, ConnectivityManagerImpl::RtkWiFiStationConnectedHandler, NULL);
     wifi_reg_event_handler(WIFI_EVENT_DISCONNECT, ConnectivityManagerImpl::RtkWiFiStationDisconnectedHandler, NULL);
 
     err = Internal::AmebaUtils::StartWiFi();
@@ -148,11 +148,17 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     if (event->Type == DeviceEventType::kRtkWiFiStationConnectedEvent)
     {
         ChipLogProgress(DeviceLayer, "WiFiStationConnected");
+        // Only do DHCP when connecting to wifi via matter provisioning
+        // External wifi provisioning will do DHCP on their own
         if (mWiFiStationState == kWiFiStationState_Connecting)
+        {
+            DHCPProcess();
+        }
+        // Allow external wifi provisioning methods by allowing NotConnected states to advance to Connecting_succeed
+        if ((mWiFiStationState == kWiFiStationState_Connecting) || (mWiFiStationState == kWiFiStationState_NotConnected))
         {
             ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
         }
-        DHCPProcess();
         DriveStationState();
     }
     if (event->Type == DeviceEventType::kRtkWiFiStationDisconnectedEvent)
@@ -162,6 +168,10 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         if (mWiFiStationState == kWiFiStationState_Connecting)
         {
             ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
+        }
+        if (mWiFiStationState == kWiFiStationState_Connected)
+        {
+            ChangeWiFiStationState(kWiFiStationState_Disconnecting);
         }
         DriveStationState();
     }
@@ -201,7 +211,8 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
 
     if (mWiFiStationMode != val)
     {
-        ChipLogProgress(DeviceLayer, "WiFi station mode change: %d -> %d", (mWiFiStationMode), (val));
+        ChipLogProgress(DeviceLayer, "WiFi station mode change: %s -> %s", WiFiStationModeToStr(mWiFiStationMode),
+                        WiFiStationModeToStr(val));
     }
 
     mWiFiStationMode = val;
@@ -218,9 +229,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
 void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 {
     // Clear Ameba WiFi station config
-    rtw_wifi_config_t wifiConfig;
-    memset(&wifiConfig, 0, sizeof(wifiConfig));
-    Internal::AmebaUtils::SetWiFiConfig(&wifiConfig);
+    Internal::AmebaUtils::ClearWiFiConfig();
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
@@ -493,9 +502,9 @@ void ConnectivityManagerImpl::DriveStationState()
     // If the station interface is currently connected ...
     if (stationConnected)
     {
-        // Advance the station state to Connected if it was previously NotConnected or
+        // Advance the station state to Connected if
         // a previously initiated connect attempt succeeded.
-        if (mWiFiStationState == kWiFiStationState_NotConnected || mWiFiStationState == kWiFiStationState_Connecting_Succeeded)
+        if (mWiFiStationState == kWiFiStationState_Connecting_Succeeded)
         {
             ChangeWiFiStationState(kWiFiStationState_Connected);
             ChipLogProgress(DeviceLayer, "WiFi station interface connected");
@@ -509,23 +518,23 @@ void ConnectivityManagerImpl::DriveStationState()
     {
         System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
 
-        // Advance the station state to NotConnected if it was previously Connected or Disconnecting,
+        // Advance the station state to NotConnected if it was previously Disconnecting,
         // or if a previous initiated connect attempt failed.
-        if (mWiFiStationState == kWiFiStationState_Connected || mWiFiStationState == kWiFiStationState_Disconnecting ||
-            mWiFiStationState == kWiFiStationState_Connecting_Failed)
+        if (mWiFiStationState == kWiFiStationState_Disconnecting || mWiFiStationState == kWiFiStationState_Connecting_Failed)
         {
             WiFiStationState prevState = mWiFiStationState;
             ChangeWiFiStationState(kWiFiStationState_NotConnected);
             if (prevState != kWiFiStationState_Connecting_Failed)
             {
-                ChipLogProgress(DeviceLayer, "WiFi station interface disconnected");
-                mLastStationConnectFailTime = System::Clock::kZero;
-                OnStationDisconnected();
+                ChipLogProgress(DeviceLayer, "WiFi station failed to connect");
+                // TODO: check retry count if exceeded, then clearwificonfig
             }
             else
             {
-                mLastStationConnectFailTime = now;
+                ChipLogProgress(DeviceLayer, "WiFi station disconnected");
             }
+            mLastStationConnectFailTime = now;
+            OnStationDisconnected();
         }
         // If the WiFi station interface is now enabled and provisioned (and by implication,
         // not presently under application control), AND the system is not in the process of
@@ -538,14 +547,13 @@ void ConnectivityManagerImpl::DriveStationState()
                 now >= mLastStationConnectFailTime + mWiFiStationReconnectInterval)
             {
                 ChipLogProgress(DeviceLayer, "Attempting to connect WiFi station interface");
-                err = Internal::AmebaUtils::WiFiConnect();
+                ChangeWiFiStationState(kWiFiStationState_Connecting);
+                err = Internal::AmebaUtils::WiFiConnectProvisionedNetwork();
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogError(DeviceLayer, "WiFiConnect() failed: %s", chip::ErrorStr(err));
+                    ChipLogError(DeviceLayer, "WiFiConnectProvisionedNetwork() failed: %s", chip::ErrorStr(err));
                 }
                 SuccessOrExit(err);
-
-                ChangeWiFiStationState(kWiFiStationState_Connecting);
             }
 
             // Otherwise arrange another connection attempt at a suitable point in the future.
@@ -580,7 +588,7 @@ void ConnectivityManagerImpl::OnStationConnected()
     if (delegate)
     {
         delegate->OnConnectionStatusChanged(
-            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kConnected));
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kConnected));
     }
 
     UpdateInternetConnectivityState();
@@ -596,7 +604,7 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
     uint16_t reason                    = NetworkCommissioning::AmebaWiFiDriver::GetInstance().GetLastDisconnectReason();
     uint8_t associationFailureCause =
-        chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kUnknown);
+        chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
 
     if (delegate)
     {
@@ -605,17 +613,17 @@ void ConnectivityManagerImpl::OnStationDisconnected()
         case RTW_NO_ERROR:
         case RTW_NONE_NETWORK:
             associationFailureCause =
-                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kSsidNotFound);
+                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kSsidNotFound);
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
             break;
         case RTW_CONNECT_FAIL:
             associationFailureCause =
-                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAssociationFailed);
+                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAssociationFailed);
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
             break;
         case RTW_WRONG_PASSWORD:
-            associationFailureCause =
-                chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAuthenticationFailed);
+            associationFailureCause = chip::to_underlying(
+                chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAuthenticationFailed);
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
             break;
 #if defined(CONFIG_PLATFORM_8710C)
@@ -631,7 +639,7 @@ void ConnectivityManagerImpl::OnStationDisconnected()
         }
         delegate->OnDisconnectionDetected(reason);
         delegate->OnConnectionStatusChanged(
-            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kNotConnected));
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kNotConnected));
     }
 
     UpdateInternetConnectivityState();
@@ -641,7 +649,8 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
 {
     if (mWiFiStationState != newState)
     {
-        ChipLogProgress(DeviceLayer, "WiFi station state change: %d -> %d", (mWiFiStationState), (newState));
+        ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
+                        WiFiStationStateToStr(newState));
         mWiFiStationState = newState;
         SystemLayer().ScheduleLambda([]() { NetworkCommissioning::AmebaWiFiDriver::GetInstance().OnNetworkStatusChange(); });
     }
@@ -849,13 +858,13 @@ void ConnectivityManagerImpl::RtkWiFiScanCompletedHandler(void)
 
 void ConnectivityManagerImpl::DHCPProcessThread(void * param)
 {
-    LwIP_DHCP(0, DHCP_START);
+    matter_lwip_dhcp(0, DHCP_START);
     PlatformMgr().LockChipStack();
     sInstance.OnStationIPv4AddressAvailable();
     PlatformMgr().UnlockChipStack();
 #if LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
 #if LWIP_IPV6
-    LwIP_DHCP6(0, DHCP6_START);
+    matter_lwip_dhcp(0, DHCP6_START);
     PlatformMgr().LockChipStack();
     sInstance.OnIPv6AddressAvailable();
     PlatformMgr().UnlockChipStack();

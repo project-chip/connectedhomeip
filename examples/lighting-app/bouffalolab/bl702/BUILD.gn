@@ -22,6 +22,8 @@ import("${build_root}/config/defaults.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/platform/device.gni")
 
+import("${chip_root}/src/app/chip_data_model.gni")
+
 if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
   import("$dir_pw_build/target_types.gni")
@@ -56,6 +58,7 @@ declare_args() {
 
 bl_iot_sdk("sdk") {
   include_dirs = [
+    "${chip_root}/src/platform/bouffalolab/BL702",
     "${example_dir}",
     "${example_common_dir}",
   ]
@@ -79,6 +82,10 @@ bl_iot_sdk("sdk") {
     defines += [ "CFG_USE_PSRAM=1" ]
   }
 
+  if (defined(enable_cdc_module) && enable_cdc_module) {
+    defines += [ "CFG_USB_CDC_ENABLE" ]
+  }
+
   if (chip_enable_pw_rpc) {
     include_dirs += [ "${examples_plat_common_dir}/rpc" ]
     defines += [ "PW_RPC_ENABLED=1" ]
@@ -86,6 +93,13 @@ bl_iot_sdk("sdk") {
   } else if (chip_build_libshell) {
     include_dirs += [ "${examples_plat_common_dir}/plat" ]
   }
+}
+
+chip_data_model("bouffalolab-lighting") {
+  zap_file = "${example_dir}/../data_model/lighting-app-thread.zap"
+
+  zap_pregenerated_dir = "${chip_root}/zzz_generated/lighting-app/zap-generated"
+  is_server = true
 }
 
 bouffalolab_executable("lighting_app") {
@@ -115,18 +129,24 @@ bouffalolab_executable("lighting_app") {
     defines += [ "BL706_IOT_DVK" ]
   }
 
+  if (defined(enable_cdc_module) && enable_cdc_module) {
+    defines += [ "CFG_USB_CDC_ENABLE" ]
+  }
+
   sources = [
     "${example_common_dir}/AppTask.cpp",
     "${example_common_dir}/ZclCallbacks.cpp",
     "${examples_plat_common_dir}/plat/LEDWidget.cpp",
     "${examples_plat_common_dir}/plat/demo_pwm.c",
     "${examples_plat_common_dir}/plat/main.cpp",
+    "${examples_plat_common_dir}/plat/platform.cpp",
     "${examples_plat_common_dir}/plat/uart.c",
   ]
 
   deps = [
+    ":bouffalolab-lighting",
     ":sdk",
-    "${chip_root}/examples/lighting-app/lighting-common",
+    "${chip_root}/examples/providers:device_info_provider",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",

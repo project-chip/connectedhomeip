@@ -28,11 +28,14 @@
 
 #include "AppEvent.h"
 #include "FreeRTOS.h"
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #include "sl_simple_button_instances.h"
+#endif
 #include "timers.h" // provides FreeRTOS timer support
 #include <app/clusters/identify-server/identify-server.h>
 #include <ble/BLEEndPoint.h>
 #include <lib/core/CHIPError.h>
+#include <platform/CHIPDeviceEvent.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #ifdef DISPLAY_ENABLED
@@ -42,6 +45,10 @@
 #include "qrcodegen.h"
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
+
+#ifndef SL_STATUS_LED
+#define SL_STATUS_LED 1
+#endif
 
 /**********************************************************
  * Defines
@@ -87,7 +94,7 @@ public:
      */
     static SilabsLCD & GetLCD(void);
 #endif
-
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     /**
      * @brief Event handler when a button is pressed
      * Function posts an event for button processing
@@ -97,6 +104,8 @@ public:
      *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
     virtual void ButtonEventHandler(const sl_button_t * buttonHandle, uint8_t btnAction) = 0;
+
+#endif
 
     /**
      * @brief Function called to start the LED light timer
@@ -156,7 +165,7 @@ protected:
      * @param aEvent post event being processed
      */
     static void FunctionEventHandler(AppEvent * aEvent);
-
+#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     /**
      * @brief PB0 Button event processing function
      *        Press and hold will trigger a factory reset timer start
@@ -165,7 +174,7 @@ protected:
      * @param aEvent button event being processed
      */
     static void ButtonHandler(AppEvent * aEvent);
-
+#endif
     /**
      * @brief Light Timer finished callback function
      *        Calls LED processing function
@@ -179,6 +188,16 @@ protected:
      */
     static void LightEventHandler();
 
+    /**
+     * @brief Start the factory Reset process
+     *  Almost identical to Server::ScheduleFactoryReset()
+     *  but doesn't call GetFabricTable().DeleteAllFabrics(); which deletes Key per key.
+     *  With our KVS platform implementation this is a lot slower than deleting the whole kvs section
+     *  our silabs nvm3 driver which end up being doing in ConfigurationManagerImpl::DoFactoryReset(intptr_t arg).
+     */
+    static void ScheduleFactoryReset();
+
+    static void OnPlatformEvent(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t);
     /**********************************************************
      * Protected Attributes declaration
      *********************************************************/

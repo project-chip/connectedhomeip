@@ -68,10 +68,7 @@ buildconfig_header("chip_buildconfig") {
 }
 
 source_set("chip_config_header") {
-  sources = [
-    "CHIPConfig.h",
-    "CHIPEventLoggingConfig.h",
-  ]
+  sources = [ "CHIPConfig.h" ]
 
   public_configs = [ "${chip_root}/src:includes" ]
 
@@ -93,8 +90,6 @@ static_library("core") {
     # instead.
     "${chip_root}/zzz_generated/app-common/app-common/zap-generated/cluster-enums.h",
     "CHIPCallback.h",
-    "CHIPCircularTLVBuffer.cpp",
-    "CHIPCircularTLVBuffer.h",
     "CHIPCore.h",
     "CHIPEncoding.h",
     "CHIPError.cpp",
@@ -110,6 +105,8 @@ static_library("core") {
     "PasscodeId.h",
     "PeerId.h",
     "TLV.h",
+    "TLVCircularBuffer.cpp",
+    "TLVCircularBuffer.h",
     "TLVDebug.cpp",
     "TLVReader.cpp",
     "TLVTags.h",

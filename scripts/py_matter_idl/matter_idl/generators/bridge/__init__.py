@@ -13,16 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import enum
 import logging
+import os
 import re
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Idl, Field, Attribute, Cluster, ClusterSide
-from matter_idl import matter_idl_types
-from matter_idl.generators.types import (ParseDataType, BasicString, BasicInteger, FundamentalType,
-                                         IdlType, IdlEnumType, IdlBitmapType, TypeLookupContext)
-from typing import Union, List, Set
+from matter_idl.generators.types import (BasicInteger, BasicString, FundamentalType, IdlBitmapType, IdlEnumType, IdlType,
+                                         ParseDataType, TypeLookupContext)
+from matter_idl.matter_idl_types import Attribute, Cluster, ClusterSide, Field, Idl
 
 
 def camel_to_const(s):
@@ -135,12 +133,12 @@ class BridgeGenerator(CodeGenerator):
     Generation of bridge cpp code for matter.
     """
 
-    def __init__(self, storage: GeneratorStorage, idl: Idl):
+    def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
         """
         Inintialization is specific for cpp generation and will add
         filters as required by the cpp .jinja templates to function.
         """
-        super().__init__(storage, idl)
+        super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
 
         self.jinja_env.filters['getType'] = get_attr_type
         self.jinja_env.filters['getRawSizeAndType'] = get_raw_size_and_type
@@ -166,7 +164,7 @@ class BridgeGenerator(CodeGenerator):
                 output_file_name = "bridge/%s.h" % cluster.name
 
             self.internal_render_one_output(
-                template_path="bridge/BridgeClustersCpp.jinja",
+                template_path="BridgeClustersCpp.jinja",
                 output_file_name=output_file_name,
                 vars={
                     'cluster': cluster,
@@ -175,7 +173,7 @@ class BridgeGenerator(CodeGenerator):
             )
 
         self.internal_render_one_output(
-            template_path="bridge/BridgeClustersCommon.jinja",
+            template_path="BridgeClustersCommon.jinja",
             output_file_name="bridge/BridgeClustersImpl.h",
             vars={
                 'clusters': self.idl.clusters,
@@ -184,7 +182,7 @@ class BridgeGenerator(CodeGenerator):
         )
 
         self.internal_render_one_output(
-            template_path="bridge/BridgeClustersGlobalStructs.jinja",
+            template_path="BridgeClustersGlobalStructs.jinja",
             output_file_name="bridge/BridgeGlobalStructs.h",
             vars={
                 'idl': self.idl,

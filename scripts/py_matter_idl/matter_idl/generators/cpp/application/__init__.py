@@ -12,15 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Idl, ClusterSide, Field, Attribute, Cluster, FieldQuality, Command, DataType
-from matter_idl import matter_idl_types
-from matter_idl.generators.types import ParseDataType, BasicString, BasicInteger, FundamentalType, IdlType, IdlEnumType, IdlBitmapType, TypeLookupContext
-from typing import Union, List, Set
-from stringcase import capitalcase
+import os
+from typing import List
 
-import enum
-import logging
+from matter_idl.generators import CodeGenerator, GeneratorStorage
+from matter_idl.matter_idl_types import Cluster, ClusterSide, Idl
 
 
 def serverClustersOnly(clusters: List[Cluster]) -> List[Cluster]:
@@ -32,12 +28,12 @@ class CppApplicationGenerator(CodeGenerator):
     Generation of cpp code for application implementation for matter.
     """
 
-    def __init__(self, storage: GeneratorStorage, idl: Idl):
+    def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
         """
         Inintialization is specific for java generation and will add
         filters as required by the java .jinja templates to function.
         """
-        super().__init__(storage, idl)
+        super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
 
         self.jinja_env.filters['serverClustersOnly'] = serverClustersOnly
 
@@ -48,7 +44,7 @@ class CppApplicationGenerator(CodeGenerator):
 
         # Header containing a macro to initialize all cluster plugins
         self.internal_render_one_output(
-            template_path="cpp/application/PluginApplicationCallbacksHeader.jinja",
+            template_path="PluginApplicationCallbacksHeader.jinja",
             output_file_name="app/PluginApplicationCallbacks.h",
             vars={
                 'clusters': self.idl.clusters,
@@ -58,7 +54,7 @@ class CppApplicationGenerator(CodeGenerator):
         # Source for __attribute__(weak) implementations of all cluster
         # initialization methods
         self.internal_render_one_output(
-            template_path="cpp/application/CallbackStubSource.jinja",
+            template_path="CallbackStubSource.jinja",
             output_file_name="app/callback-stub.cpp",
             vars={
                 'clusters': self.idl.clusters,

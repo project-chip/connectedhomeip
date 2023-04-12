@@ -31,6 +31,9 @@
 
 #include "sl_board_control.h"
 
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+#include "spi_multiplex.h"
+#endif
 #define LCD_SIZE 128
 #define QR_CODE_VERSION 4
 #define QR_CODE_MODULE_SIZE 3
@@ -68,6 +71,12 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
         err = CHIP_ERROR_INTERNAL;
     }
 
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    if (pr_type != LCD)
+    {
+        pr_type = LCD;
+    }
+#endif
     /* Initialize the DMD module for the DISPLAY device driver. */
     status = DMD_init(0);
     if (DMD_OK != status)
@@ -117,7 +126,18 @@ int SilabsLCD::DrawPixel(void * pContext, int32_t x, int32_t y)
 
 int SilabsLCD::Update(void)
 {
-    return DMD_updateDisplay();
+    int status;
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    pre_lcd_spi_transfer();
+#endif
+    status = DMD_updateDisplay();
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    post_lcd_spi_transfer();
+#endif
+    /*
+     * TO-DO; Above logic can be optimised by writing a common API
+     */
+    return status;
 }
 
 void SilabsLCD::WriteDemoUI(bool state)
@@ -180,8 +200,14 @@ void SilabsLCD::WriteQRCode()
             }
         }
     }
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    pre_lcd_spi_transfer();
+#endif
 
     DMD_updateDisplay();
+#if (defined(EFR32MG24) && defined(WF200_WIFI))
+    post_lcd_spi_transfer();
+#endif
 }
 
 void SilabsLCD::SetQRCode(uint8_t * str, uint32_t size)

@@ -26,33 +26,13 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Factory Reset the DUT"
+    - label: "Preconditions"
       verification: |
-
-      disabled: true
-
-    - label: "Commission TH and DUT to setup the Thread"
-      verification: |
-
-      disabled: true
-
-    - label:
-          "The cluster Identifier 49 (0x0031) is present in the ServerList
-          attribute"
-      verification: |
-
-      disabled: true
-
-    - label: "The FeatureMap attribute value is 2"
-      verification: |
-
-      disabled: true
-
-    - label:
-          "MaxNetworks attribute value is at least 1 which is saved as
-          MaxNetworksValue for future use"
-      verification: |
-
+          1. Factory Reset the DUT
+          2. Commission TH and DUT to setup the Thread
+          3. The cluster Identifier 49 (0x0031) is present in the ServerList attribute
+          4. The FeatureMap attribute value is 2
+          5. MaxNetworks attribute value is at least 1 which is saved as MaxNetworksValue for future use
       disabled: true
 
     - label: "TH sends ArmFailSafe command to the DUT"
@@ -72,10 +52,10 @@ tests:
       disabled: true
 
     - label:
-          "TH sends  RemoveNetwork  Command to the  DUT with  NetworkID
-          field  set to the extended  PAN ID
-          of  PIXIT.CNET.THRE  AD_2ND_OPERATI  ONALDATASET,  which does
-          not  match the  commissioned  network, and  Breadcrumb field  set to 1"
+          "TH sends RemoveNetwork Command to the DUT with NetworkID field set to
+          the extended PAN ID of PIXIT.CNET.THRE AD_2ND_OPERATI ONALDATASET,
+          which does not match the commissioned network, and Breadcrumb field
+          set to 1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
       verification: |
           ./chip-tool networkcommissioning remove-network hex:<your network id in hex> 1 0
@@ -96,10 +76,10 @@ tests:
       disabled: true
 
     - label:
-          "TH sends  ConnectNetwork  Command to the  DUT with  NetworkID
-          value  as the extended  PAN ID
-          of  PIXIT.CNET.THRE  AD_2ND_OPERATI  ONALDATASET,  which does
-          not  match the  commissioned  network, and  Breadcrumb field  set to 1"
+          "TH sends ConnectNetwork Command to the DUT with NetworkID value as
+          the extended PAN ID of PIXIT.CNET.THRE AD_2ND_OPERATI ONALDATASET,
+          which does not match the commissioned network, and Breadcrumb field
+          set to 1"
       PICS: CNET.S.C06.Rsp && CNET.S.C07.Tx
       verification: |
           ./chip-tool networkcommissioning connect-network hex:<your network id in hex> 1 0

@@ -41,11 +41,6 @@ lwip_debug = false
 
 chip_build_tests = false
 
-# GH #4224
-# Lifetime counter keyId not available in ConfigurationManager
-# Disabling feature awaiting path into ConfigurationManager
-chip_enable_rotating_device_id = false
-
 openthread_external_mbedtls = mbedtls_target
 openthread_project_core_config_file =
     "openthread-core-${qpg_target_ic}-config.h"

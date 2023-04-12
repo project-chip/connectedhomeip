@@ -90,7 +90,7 @@ class PartitionCreator:
         """
         Converts a list containing tuples ("key_name", "key_value") to a dictionary
 
-        If "key_value" of data entry is a string-type variable and contains a HEX_PREFIX algorithm decodes it 
+        If "key_value" of data entry is a string-type variable and contains a HEX_PREFIX algorithm decodes it
         to hex format to be sure that a cbor file will contain proper bytes.
 
         If "key_value" of data entry is a dictionary, algorithm appends it to the created dictionary.
@@ -143,7 +143,8 @@ def main():
     parser.add_argument("-i", "--input", type=str, required=True,
                         help="Path to input .json file")
     parser.add_argument("-o", "--output", type=str, required=True,
-                        help="Prefix for output file paths, e.g. setting dir/output causes creation of the following files: dir/output.hex, and dir/output.bin")
+                        help=("Prefix for output file paths, e.g. setting dir/output causes creation of the following files: "
+                              "dir/output.hex, and dir/output.bin"))
     parser.add_argument("--offset", type=allow_any_int, required=True,
                         help="Partition offset - an address in device's NVM memory, where factory data will be stored")
     parser.add_argument("--size", type=allow_any_int, required=True,
@@ -151,7 +152,8 @@ def main():
     parser.add_argument("-v", "--verbose", action="store_true",
                         help="Run this script with DEBUG logging level")
     parser.add_argument("-r", "--raw", action="store_true",
-                        help="Do not print flashing help and other logs, only generate a .hex file. It can be useful when the script is used by other script.")
+                        help=("Do not print flashing help and other logs, only generate a .hex file. "
+                              "It can be useful when the script is used by other script."))
     args = parser.parse_args()
 
     if args.verbose:

@@ -24,13 +24,13 @@
  */
 
 #include "LEDWidget.h"
-
+#if CONFIG_HAVE_DISPLAY
 #include "ScreenManager.h"
-
+#endif
 #include "esp_log.h"
 #include "esp_system.h"
 #include "esp_timer.h"
-#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM || CONFIG_DEVICE_TYPE_ESP32_C6_DEVKITC
 #include "driver/rmt.h"
 #include "led_strip.h"
 #define RMT_TX_DEFAULT_GPIO GPIO_NUM_8
@@ -51,7 +51,7 @@ void LEDWidget::Init(gpio_num_t gpioNum)
     mState            = false;
     mError            = false;
     errorTimer        = NULL;
-#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM || CONFIG_DEVICE_TYPE_ESP32_C6_DEVKITC
     if (gpioNum == RMT_TX_DEFAULT_GPIO)
     {
         rmt_config_t config = RMT_DEFAULT_CONFIG_TX(RMT_TX_DEFAULT_GPIO, RMT_TX_DEFAULT_CHANNEL);
@@ -98,7 +98,7 @@ void LEDWidget::Set(bool state)
 
 void LEDWidget::SetBrightness(uint8_t brightness)
 {
-#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM || CONFIG_DEVICE_TYPE_ESP32_C6_DEVKITC
     if (strip)
     {
         uint8_t red, green, blue;
@@ -186,7 +186,7 @@ void LEDWidget::DoSet(bool state)
 {
     bool stateChange = (mState != state);
     mState           = state;
-#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM || CONFIG_DEVICE_TYPE_ESP32_C6_DEVKITC
     if (strip)
     {
         uint8_t red, green, blue;
@@ -229,7 +229,7 @@ void LEDWidget::SetVLED(int id1, int id2)
 }
 #endif
 
-#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM
+#if CONFIG_DEVICE_TYPE_ESP32_C3_DEVKITM || CONFIG_DEVICE_TYPE_ESP32_C6_DEVKITC
 void LEDWidget::SetColor(uint8_t Hue, uint8_t Saturation)
 {
     uint8_t red, green, blue;

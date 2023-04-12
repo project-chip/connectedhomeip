@@ -13,11 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 import logging
-import jinja2
+import os
+from typing import Dict, Optional
 
-from typing import Dict
+import jinja2
 from matter_idl.matter_idl_types import Idl
 
 from .filters import RegisterCommonFilters
@@ -102,20 +102,29 @@ class CodeGenerator:
       'render' will perform a rendering of all files.
 
     As special optimizations, CodeGenerators generally will try to read
-    existing data and will not re-write content if not changed (so that 
+    existing data and will not re-write content if not changed (so that
     write time of files do not change and rebuilds are not triggered).
     """
 
-    def __init__(self, storage: GeneratorStorage, idl: Idl):
+    def __init__(self, storage: GeneratorStorage, idl: Idl, loader: Optional[jinja2.BaseLoader] = None, fs_loader_searchpath: Optional[str] = None):
         """
         A code generator will render a parsed IDL (a AST) into a given storage.
+
+        Args:
+           storage: Storage to use to read/save data
+           loader: if given, use a custom loader for templates
+           fs_loader_searchpath: if a loader is NOT given, this controls the search path
+              of a default FileSystemLoader that will be used
         """
+        if not loader:
+            if not fs_loader_searchpath:
+                fs_loader_searchpath = os.path.dirname(__file__)
+            loader = jinja2.FileSystemLoader(searchpath=fs_loader_searchpath)
+
         self.storage = storage
         self.idl = idl
         self.jinja_env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(
-                searchpath=os.path.dirname(__file__)),
-            keep_trailing_newline=True)
+            loader=loader, keep_trailing_newline=True)
         self.dry_run = False
 
         RegisterCommonFilters(self.jinja_env.filters)
@@ -146,7 +155,7 @@ class CodeGenerator:
         if dry-run was requested during `render`.
 
         NOTE: to make this method suitable for rebuilds, this file will NOT alter
-              the timestamp of the output file if the file content would not 
+              the timestamp of the output file if the file content would not
               change (i.e. no write will be invoked in that case.)
 
         Args:

@@ -68,8 +68,8 @@
 - (instancetype)initWithWorkQueue:(dispatch_queue_t)workQueue connectBlock:(NSXPCConnection * (^)(void) )connectBlock
 {
     if ([super init]) {
-        _remoteDeviceServerProtocol = [NSXPCInterface interfaceWithProtocol:@protocol(MTRDeviceControllerServerProtocol)];
-        _remoteDeviceClientProtocol = [NSXPCInterface interfaceWithProtocol:@protocol(MTRDeviceControllerClientProtocol)];
+        _remoteDeviceServerProtocol = [MTRDeviceController xpcInterfaceForServerProtocol];
+        _remoteDeviceClientProtocol = [MTRDeviceController xpcInterfaceForClientProtocol];
         _connectBlock = connectBlock;
         _workQueue = workQueue;
         _reportRegistry = [[NSMutableDictionary alloc] init];
@@ -78,7 +78,8 @@
 }
 
 // This class method is for unit testing
-+ (instancetype)connectionWithWorkQueue:(dispatch_queue_t)workQueue connectBlock:(NSXPCConnection * (^)(void) )connectBlock
++ (MTRDeviceControllerXPCConnection *)connectionWithWorkQueue:(dispatch_queue_t)workQueue
+                                                 connectBlock:(NSXPCConnection * (^)(void) )connectBlock
 {
     return [[MTRDeviceControllerXPCConnection alloc] initWithWorkQueue:workQueue connectBlock:connectBlock];
 }

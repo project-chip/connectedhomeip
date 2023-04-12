@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 133.2.3. [TC-ACL-2.7] Extension attribute
+name: 133.2.3. [TC-ACL-2.7] Extension multi-fabric
 
 PICS:
     - ACL.S
@@ -25,15 +25,18 @@ config:
     nodeId2:
         type: node_id
         defaultValue: 0xCAFE
-    TH1CommissionerNodeId:
-        type: node_id
-        defaultValue: 112233
-    TH2CommissionerNodeId:
-        type: node_id
-        defaultValue: 112233
     payload:
         type: char_string
         defaultValue: "MT:-24J0AFN00KA0648G00"
+    discriminator:
+        type: int16u
+        defaultValue: 3840
+    waitAfterCommissioning:
+        type: int16u
+        defaultValue: 5000
+    PakeVerifier:
+        type: octet_string
+        defaultValue: "hex:b96170aae803346884724fe9a3b287c30330c2a660375d17bb205a8cf1aecb350457f8ab79ee253ab6a8e46bb09e543ae422736de501e3db37d441fe344920d09548e4c18240630c4ff4913c53513839b7c07fcc0627a1b8573a149fcd1fa466cf"
     D_OK_EMPTY:
         type: octet_string
         defaultValue: "hex:1718"
@@ -50,6 +53,14 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    - label: "Read the TH1 commissioner node ID"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: TH1CommissionerNodeId
+
     - label:
           "Step 2:TH1 reads OperationalCredentials cluster CurrentFabricIndex
           attribute"
@@ -59,19 +70,65 @@ tests:
       response:
           saveAs: TH1FabricIndex
 
-    - label:
-          "Step 3:TH1 puts DUT into commissioning mode, TH2 commissions DUT
-          using admin node ID N2"
-      cluster: "AdministratorCommissioning"
-      command: "OpenBasicCommissioningWindow"
+    - label: "Step 3:TH1 puts DUT into commissioning mode"
+      cluster: "Administrator Commissioning"
+      command: "OpenCommissioningWindow"
       timedInteractionTimeoutMs: 10000
+      PICS: CADMIN.S.C00.Rsp && PICS_SDK_CI_ONLY
       arguments:
           values:
               - name: "CommissioningTimeout"
                 value: 180
+              - name: "PAKEPasscodeVerifier"
+                value: PakeVerifier
+              - name: "Discriminator"
+                value: discriminator
+              - name: "Iterations"
+                value: 1000
+              - name: "Salt"
+                value: "SPAKE2P Key Salt"
+
+    - label:
+          "Step 3 & 4: TH1 puts DUT into commissioning mode, TH2 commissions DUT
+          using admin node ID N2"
+      verification: |
+          Open a commissioning window On TH1(Chiptool)using below command
+
+          ./chip-tool  pairing open-commissioning-window 1 1 400 2000 3841
+
+          [1657186324.710951][10820:10825] CHIP:DMG: Received Command Response Status for Endpoint=0 Cluster=0x0000_003C Command=0x0000_0000 Status=0x0
+          [1657186324.710980][10820:10825] CHIP:CTL: Successfully opened pairing window On TH(Chiptool)e device
+          [1657186324.711048][10820:10825] CHIP:CTL: Manual pairing code: [36253605617]
+          [1657186324.711108][10820:10825] CHIP:CTL: SetupQRCode: [MT:-24J0IRV01A7TB7E700]
+
+
+          Commission TH2(Chiptool) to DUT using manualcode generated in TH1 using open commission window
+
+          ./chip-tool pairing code 2 36253605617 --commissioner-name beta --commissioner-nodeid 223344
+          [1657186359.584672][3509:3514] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1657186359.584743][3509:3514] CHIP:TOO: Device commissioning completed with success
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && CADMIN.S.C00.Rsp
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    - label: "Waiting after opening commissioning window"
+      PICS: CADMIN.S.C00.Rsp && PICS_SDK_CI_ONLY
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: waitAfterCommissioning
 
     - label: "Step 4:TH2 starts a commissioning process with DUT"
       identity: "beta"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "CommissionerCommands"
       command: "PairWithCode"
       arguments:
@@ -83,12 +140,22 @@ tests:
 
     - label: "DUT is commissioned by TH2 on Fabric ID2 "
       identity: "beta"
+      PICS: PICS_SDK_CI_ONLY
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
           values:
               - name: "nodeId"
                 value: nodeId2
+
+    - label: "Read the TH2 commissioner node ID"
+      identity: "beta"
+      cluster: "CommissionerCommands"
+      command: "GetCommissionerNodeId"
+      response:
+          values:
+              - name: "nodeId"
+                saveAs: TH2CommissionerNodeId
 
     - label:
           "Step 5:TH2 reads OperationalCredentials cluster CurrentFabricIndex
@@ -144,16 +211,14 @@ tests:
       event: "AccessControlExtensionChanged"
       response:
           value:
-              [
-                  {
-                      AdminNodeID: TH1CommissionerNodeId,
-                      AdminPasscodeID: null,
-                      ChangeType: 1,
-                      LatestValue:
-                          { Data: D_OK_EMPTY, FabricIndex: TH1FabricIndex },
-                  },
+              {
+                  AdminNodeID: TH1CommissionerNodeId,
+                  AdminPasscodeID: null,
+                  ChangeType: 1,
+                  LatestValue:
+                      { Data: D_OK_EMPTY, FabricIndex: TH1FabricIndex },
                   FabricIndex: TH1FabricIndex,
-              ]
+              }
 
     - label:
           "Step 11:TH2 reads DUT Endpoint 0 AccessControl cluster
@@ -164,13 +229,26 @@ tests:
       event: "AccessControlExtensionChanged"
       response:
           value:
-              [
-                  {
-                      AdminNodeID: TH2CommissionerNodeId,
-                      AdminPasscodeID: null,
-                      ChangeType: 1,
-                      LatestValue:
-                          { Data: D_OK_SINGLE, FabricIndex: TH2FabricIndex },
-                  },
+              {
+                  AdminNodeID: TH2CommissionerNodeId,
+                  AdminPasscodeID: null,
+                  ChangeType: 1,
+                  LatestValue:
+                      { Data: D_OK_SINGLE, FabricIndex: TH2FabricIndex },
                   FabricIndex: TH2FabricIndex,
-              ]
+              }
+
+    - label: "TH1 writes Extension attribute value as empty list"
+      PICS: ACL.S.A0001
+      command: "writeAttribute"
+      attribute: "Extension"
+      arguments:
+          value: []
+
+    - label: "TH2 writes Extension attribute value as empty list"
+      identity: "beta"
+      PICS: ACL.S.A0001
+      command: "writeAttribute"
+      attribute: "Extension"
+      arguments:
+          value: []

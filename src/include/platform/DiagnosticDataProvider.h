@@ -142,7 +142,7 @@ public:
     /**
      * Ethernet network diagnostics methods
      */
-    virtual CHIP_ERROR GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRate & pHYRate);
+    virtual CHIP_ERROR GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate);
     virtual CHIP_ERROR GetEthFullDuplex(bool & fullDuplex);
     virtual CHIP_ERROR GetEthCarrierDetect(bool & carrierDetect);
     virtual CHIP_ERROR GetEthTimeSinceReset(uint64_t & timeSinceReset);
@@ -157,8 +157,8 @@ public:
      * WiFi network diagnostics methods
      */
     virtual CHIP_ERROR GetWiFiBssId(ByteSpan & value);
-    virtual CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType);
-    virtual CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion);
+    virtual CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType);
+    virtual CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion);
     virtual CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber);
     virtual CHIP_ERROR GetWiFiRssi(int8_t & rssi);
     virtual CHIP_ERROR GetWiFiBeaconLostCount(uint32_t & beaconLostCount);
@@ -278,7 +278,7 @@ inline CHIP_ERROR DiagnosticDataProvider::GetNetworkInterfaces(NetworkInterface 
 
 inline void DiagnosticDataProvider::ReleaseNetworkInterfaces(NetworkInterface * netifp) {}
 
-inline CHIP_ERROR DiagnosticDataProvider::GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRate & pHYRate)
+inline CHIP_ERROR DiagnosticDataProvider::GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -333,12 +333,13 @@ inline CHIP_ERROR DiagnosticDataProvider::GetWiFiBssId(ByteSpan & value)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-inline CHIP_ERROR DiagnosticDataProvider::GetWiFiSecurityType(uint8_t & securityType)
+inline CHIP_ERROR
+DiagnosticDataProvider::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-inline CHIP_ERROR DiagnosticDataProvider::GetWiFiVersion(uint8_t & wiFiVersion)
+inline CHIP_ERROR DiagnosticDataProvider::GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

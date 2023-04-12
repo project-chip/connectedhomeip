@@ -42,9 +42,9 @@ If the LCD is enabled, the LCD on the Silabs WSTK shows a QR Code containing the
 needed commissioning information for the BLE connection and starting the
 Rendez-vous procedure.
 
-The lighting example is intended to serve both as a means to explore the
-workings of Matter as well as a template for creating real products based on the
-Silicon Labs platform.
+The lock example is intended to serve both as a means to explore the workings of
+Matter as well as a template for creating real products based on the Silicon
+Labs platform.
 
 ## Building
 
@@ -98,37 +98,11 @@ Mac OS X
     -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
-    MG12 boards:
-
-    -   BRD4161A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4163A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm,
-        868MHz@19dBm
-    -   BRD4164A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@19dBm
-    -   BRD4166A / SLTB004A / Thunderboard Sense 2 / 2.4GHz@10dBm
-    -   BRD4170A / SLWSTK6000B / Multiband Wireless Starter Kit / 2.4GHz@19dBm,
-        915MHz@19dBm
-    -   BRD4304A / SLWSTK6000B / MGM12P Module / 2.4GHz@19dBm
-
-    MG21 boards: Currently not supported due to RAM limitation.
-
-    -   BRD4180A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-
-    MG24 boards :
-
-    -   BRD4162A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4163A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm,
-        868MHz@19dBm
-    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-    -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
-
 *   Build the example application:
 
           ```
           cd ~/connectedhomeip
-          ./scripts/examples/gn_efr32_example.sh ./examples/lock-app/efr32/ ./out/lock_app BRD4161A
+          ./scripts/examples/gn_efr32_example.sh ./examples/lock-app/silabs/efr32/ ./out/lock_app BRD4161A
           ```
 
 -   To delete generated executable, libraries and object files use:
@@ -141,7 +115,7 @@ Mac OS X
     OR use GN/Ninja directly
 
           ```
-          $ cd ~/connectedhomeip/examples/lock-app/efr32
+          $ cd ~/connectedhomeip/examples/silabs/lock-app/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export EFR32_BOARD=BRD4161A
@@ -152,14 +126,14 @@ Mac OS X
 -   To delete generated executable, libraries and object files use:
 
           ```
-          $ cd ~/connectedhomeip/examples/lock-app/efr32
+          $ cd ~/connectedhomeip/examples/lock-app/silabs/efr32
           $ rm -rf out/
           ```
 
 *   Build the example as Sleepy End Device (SED)
 
           ```
-          $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32/ ./out/lighting-app_SED BRD4161A --sed
+          $ ./scripts/examples/gn_efr32_example.sh ./examples/lock-app/silabs/efr32/ ./out/lock-app_SED BRD4161A --sed
           ```
 
     or use gn as previously mentioned but adding the following arguments:
@@ -171,13 +145,13 @@ Mac OS X
 *   Build the example with pigweed RCP
 
           ```
-          $ ./scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/ out/lock_app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
+          $ ./scripts/examples/gn_efr32_example.sh examples/lock-app/silabs/efr32/ out/lock_app_rpc BRD4161A 'import("//with_pw_rpc.gni")'
           ```
 
     or use GN/Ninja Directly
 
           ```
-          $ cd ~/connectedhomeip/examples/lock-app/efr32
+          $ cd ~/connectedhomeip/examples/lock-app/silabs/efr32
           $ git submodule update --init
           $ source third_party/connectedhomeip/scripts/activate.sh
           $ export EFR32_BOARD=BRD4161A
@@ -197,11 +171,16 @@ arguments
 -   On the command line:
 
           ```
-          $ cd ~/connectedhomeip/examples/lock-app/efr32
+          $ cd ~/connectedhomeip/examples/lock-app/silabs/efr32
           $ python3 out/debug/chip-efr32-lock-example.flash.py
           ```
 
 -   Or with the Ozone debugger, just load the .out file.
+
+All EFR32 boards require a bootloader, see Silicon Labs documentation for more
+info. Pre-built bootloader binaries are available in the Assets section of the
+Releases page on
+[Silabs Matter Github](https://github.com/SiliconLabs/matter/releases) .
 
 ## Viewing Logging Output
 
@@ -394,7 +373,7 @@ To track memory usage you can set `enable_heap_monitoring = true` either in the
 BUILD.gn file or pass it as a build argument to gn. This will print on the RTT
 console the RAM usage of each individual task and the number of Memory
 allocation and Free. While this is not extensive monitoring you're welcome to
-modify `examples/platform/efr32/MemMonitoring.cpp` to add your own memory
+modify `examples/platform/silabs/efr32/MemMonitoring.cpp` to add your own memory
 tracking code inside the `trackAlloc` and `trackFree` function
 
 ## OTA Software Update
@@ -414,7 +393,7 @@ features can easily be toggled on or off. Here is a short list of options :
 `chip_progress_logging, chip_detail_logging, chip_automation_logging`
 
     ```
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lock-app/silabs/efr32 ./out/lock-app BRD4164A "chip_detail_logging=false chip_automation_logging=false chip_progress_logging=false"
     ```
 
 ### Debug build / release build
@@ -422,7 +401,7 @@ features can easily be toggled on or off. Here is a short list of options :
 `is_debug`
 
     ```
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "is_debug=false"
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lock-app/silabs/efr32 ./out/lock-app BRD4164A "is_debug=false"
     ```
 
 ### Disabling LCD
@@ -430,7 +409,7 @@ features can easily be toggled on or off. Here is a short list of options :
 `show_qr_code`
 
     ```
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A "show_qr_code=false"
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lock-app/silabs/efr32 ./out/lock-app BRD4164A "show_qr_code=false"
     ```
 
 ### KVS maximum entry count
@@ -441,5 +420,5 @@ features can easily be toggled on or off. Here is a short list of options :
     Set the maximum Kvs entries that can be stored in NVM (Default 75)
     Thresholds: 30 <= kvs_max_entries <= 255
 
-    $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/efr32 ./out/lighting-app BRD4164A kvs_max_entries=50
+    $ ./scripts/examples/gn_efr32_example.sh ./examples/lock-app/silabs/efr32 ./out/lock-app BRD4164A kvs_max_entries=50
     ```

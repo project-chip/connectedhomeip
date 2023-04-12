@@ -336,7 +336,7 @@ CHIP_ERROR ChipDeviceScanner::StopChipScan()
     ChipLogProgress(DeviceLayer, "CHIP Scanner Async Thread Quit Done..Wait for Thread Windup...!");
 
     // Report to Impl class
-    mDelegate->OnChipScanComplete();
+    mDelegate->OnScanComplete();
 
     mIsScanning = false;
 

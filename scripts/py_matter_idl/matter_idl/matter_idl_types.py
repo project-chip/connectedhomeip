@@ -1,6 +1,6 @@
 import enum
 from dataclasses import dataclass, field
-from typing import List, Optional, Set, Union
+from typing import List, Optional, Union
 
 from lark.tree import Meta
 
@@ -44,6 +44,7 @@ class AttributeQuality(enum.Flag):
     READABLE = enum.auto()
     WRITABLE = enum.auto()
     NOSUBSCRIBE = enum.auto()
+    TIMED_WRITE = enum.auto()
 
 
 class AttributeStorage(enum.Enum):
@@ -135,6 +136,10 @@ class Attribute:
     def is_subscribable(self):
         return not (AttributeQuality.NOSUBSCRIBE & self.qualities)
 
+    @property
+    def requires_timed_write(self):
+        return AttributeQuality.TIMED_WRITE & self.qualities
+
 
 @dataclass
 class Struct:
@@ -223,6 +228,7 @@ class AttributeInstantiation:
 class ServerClusterInstantiation:
     name: str
     attributes: List[AttributeInstantiation] = field(default_factory=list)
+    events_emitted: List[str] = field(default_factory=set)
 
     # Parsing meta data missing only when skip meta data is requested
     parse_meta: Optional[ParseMetaData] = field(default=None)
@@ -239,7 +245,8 @@ class DeviceType:
 class Endpoint:
     number: int
     device_types: List[DeviceType] = field(default_factory=list)
-    server_clusters: List[ServerClusterInstantiation] = field(default_factory=list)
+    server_clusters: List[ServerClusterInstantiation] = field(
+        default_factory=list)
     client_bindings: List[str] = field(default_factory=list)
 
 

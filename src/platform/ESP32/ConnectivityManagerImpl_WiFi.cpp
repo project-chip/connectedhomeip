@@ -28,6 +28,7 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
+#include <platform/ESP32/route_hook/ESP32RouteHook.h>
 #include <platform/internal/BLEManager.h>
 
 #include "esp_event.h"
@@ -519,7 +520,10 @@ void ConnectivityManagerImpl::OnWiFiPlatformEvent(const ChipDeviceEvent * event)
                 break;
             case IP_EVENT_GOT_IP6:
                 ChipLogProgress(DeviceLayer, "IP_EVENT_GOT_IP6");
-                OnIPv6AddressAvailable(event->Platform.ESPSystemEvent.Data.IpGotIp6);
+                if (strcmp(esp_netif_get_ifkey(event->Platform.ESPSystemEvent.Data.IpGotIp6.esp_netif), "WIFI_STA_DEF") == 0)
+                {
+                    OnStationIPv6AddressAvailable(event->Platform.ESPSystemEvent.Data.IpGotIp6);
+                }
                 break;
             default:
                 break;
@@ -678,7 +682,7 @@ void ConnectivityManagerImpl::OnStationConnected()
     if (delegate)
     {
         delegate->OnConnectionStatusChanged(
-            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kConnected));
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kConnected));
     }
 
     UpdateInternetConnectivityState();
@@ -696,7 +700,7 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
     uint16_t reason                    = NetworkCommissioning::ESPWiFiDriver::GetInstance().GetLastDisconnectReason();
     uint8_t associationFailureCause =
-        chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kUnknown);
+        chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kUnknown);
 
     switch (reason)
     {
@@ -710,7 +714,7 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     case WIFI_REASON_CIPHER_SUITE_REJECTED:
     case WIFI_REASON_PAIRWISE_CIPHER_INVALID:
         associationFailureCause =
-            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAssociationFailed);
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAssociationFailed);
         if (delegate)
         {
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
@@ -723,7 +727,7 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     case WIFI_REASON_INVALID_PMKID:
     case WIFI_REASON_802_1X_AUTH_FAILED:
         associationFailureCause =
-            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kAuthenticationFailed);
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kAuthenticationFailed);
         if (delegate)
         {
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
@@ -731,7 +735,7 @@ void ConnectivityManagerImpl::OnStationDisconnected()
         break;
     case WIFI_REASON_NO_AP_FOUND:
         associationFailureCause =
-            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause::kSsidNotFound);
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum::kSsidNotFound);
         if (delegate)
         {
             delegate->OnAssociationFailureDetected(associationFailureCause, reason);
@@ -755,7 +759,7 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     {
         delegate->OnDisconnectionDetected(reason);
         delegate->OnConnectionStatusChanged(
-            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus::kNotConnected));
+            chip::to_underlying(chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum::kNotConnected));
     }
 
     UpdateInternetConnectivityState();
@@ -1079,7 +1083,7 @@ void ConnectivityManagerImpl::OnStationIPv4AddressLost(void)
     PlatformMgr().PostEventOrDie(&event);
 }
 
-void ConnectivityManagerImpl::OnIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip)
+void ConnectivityManagerImpl::OnStationIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip)
 {
 #if CHIP_PROGRESS_LOGGING
     {
@@ -1094,6 +1098,8 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(const ip_event_got_ip6_t & 
     event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
     PlatformMgr().PostEventOrDie(&event);
+
+    esp_route_hook_init(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"));
 }
 
 } // namespace DeviceLayer

@@ -16,13 +16,11 @@
  */
 
 #include <app-common/zap-generated/att-storage.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
@@ -34,6 +32,7 @@ using namespace chip::app;
 using namespace chip::Credentials;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GroupKeyManagement;
+using chip::Protocols::InteractionModel::Status;
 
 //
 // Attributes
@@ -45,19 +44,19 @@ struct GroupTableCodec
 {
     static constexpr TLV::Tag TagFabric()
     {
-        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kFabricIndex));
+        return TLV::ContextTag(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kFabricIndex);
     }
     static constexpr TLV::Tag TagGroup()
     {
-        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kGroupId));
+        return TLV::ContextTag(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kGroupId);
     }
     static constexpr TLV::Tag TagEndpoints()
     {
-        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kEndpoints));
+        return TLV::ContextTag(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kEndpoints);
     }
     static constexpr TLV::Tag TagGroupName()
     {
-        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kGroupName));
+        return TLV::ContextTag(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kGroupName);
     }
 
     GroupDataProvider * mProvider = nullptr;
@@ -85,15 +84,12 @@ struct GroupTableCodec
         TLV::TLVType inner;
         ReturnErrorOnFailure(writer.StartContainer(TagEndpoints(), TLV::kTLVType_Array, inner));
         GroupDataProvider::GroupEndpoint mapping;
-        auto iter = mProvider->IterateEndpoints(mFabric);
+        auto iter = mProvider->IterateEndpoints(mFabric, MakeOptional(mInfo.group_id));
         if (nullptr != iter)
         {
             while (iter->Next(mapping))
             {
-                if (mapping.group_id == mInfo.group_id)
-                {
-                    ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), static_cast<uint16_t>(mapping.endpoint_id)));
-                }
+                ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), static_cast<uint16_t>(mapping.endpoint_id)));
             }
             iter->Release();
         }
@@ -156,25 +152,28 @@ private:
     }
     CHIP_ERROR ReadGroupKeyMap(EndpointId endpoint, AttributeValueEncoder & aEncoder)
     {
-        auto fabric_index = aEncoder.AccessingFabricIndex();
-        auto provider     = GetGroupDataProvider();
+        auto provider = GetGroupDataProvider();
         VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
 
-        CHIP_ERROR err = aEncoder.EncodeList([provider, fabric_index](const auto & encoder) -> CHIP_ERROR {
-            auto iter = provider->IterateGroupKeys(fabric_index);
-            VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
-
-            GroupDataProvider::GroupKey mapping;
-            while (iter->Next(mapping))
+        CHIP_ERROR err = aEncoder.EncodeList([provider](const auto & encoder) -> CHIP_ERROR {
+            for (auto & fabric : Server::GetInstance().GetFabricTable())
             {
-                GroupKeyManagement::Structs::GroupKeyMapStruct::Type key = {
-                    .groupId       = mapping.group_id,
-                    .groupKeySetID = mapping.keyset_id,
-                    .fabricIndex   = fabric_index,
-                };
-                encoder.Encode(key);
+                auto fabric_index = fabric.GetFabricIndex();
+                auto iter         = provider->IterateGroupKeys(fabric_index);
+                VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
+
+                GroupDataProvider::GroupKey mapping;
+                while (iter->Next(mapping))
+                {
+                    GroupKeyManagement::Structs::GroupKeyMapStruct::Type key = {
+                        .groupId       = mapping.group_id,
+                        .groupKeySetID = mapping.keyset_id,
+                        .fabricIndex   = fabric_index,
+                    };
+                    encoder.Encode(key);
+                }
+                iter->Release();
             }
-            iter->Release();
             return CHIP_NO_ERROR;
         });
         return err;
@@ -241,20 +240,23 @@ private:
 
     CHIP_ERROR ReadGroupTable(EndpointId endpoint, AttributeValueEncoder & aEncoder)
     {
-        auto fabric_index = aEncoder.AccessingFabricIndex();
-        auto provider     = GetGroupDataProvider();
+        auto provider = GetGroupDataProvider();
         VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
 
-        CHIP_ERROR err = aEncoder.EncodeList([provider, fabric_index](const auto & encoder) -> CHIP_ERROR {
-            auto iter = provider->IterateGroupInfo(fabric_index);
-            VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
-
-            GroupDataProvider::GroupInfo info;
-            while (iter->Next(info))
+        CHIP_ERROR err = aEncoder.EncodeList([provider](const auto & encoder) -> CHIP_ERROR {
+            for (auto & fabric : Server::GetInstance().GetFabricTable())
             {
-                encoder.Encode(GroupTableCodec(provider, fabric_index, info));
+                auto fabric_index = fabric.GetFabricIndex();
+                auto iter         = provider->IterateGroupInfo(fabric_index);
+                VerifyOrReturnError(nullptr != iter, CHIP_ERROR_NO_MEMORY);
+
+                GroupDataProvider::GroupInfo info;
+                while (iter->Next(info))
+                {
+                    encoder.Encode(GroupTableCodec(provider, fabric_index, info));
+                }
+                iter->Release();
             }
-            iter->Release();
             return CHIP_NO_ERROR;
         });
         return err;
@@ -299,7 +301,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
 
     if (nullptr == provider || nullptr == fabric)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 
@@ -308,7 +310,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     CHIP_ERROR err = fabric->GetCompressedFabricIdBytes(compressed_fabric_id);
     if (CHIP_NO_ERROR != err)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 
@@ -317,7 +319,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     {
         // If the EpochKey0 field is null or its associated EpochStartTime0 field is null,
         // then this command SHALL fail with an INVALID_COMMAND
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
 
@@ -336,7 +338,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
         {
             // If the EpochKey1 field is not null, its associated EpochStartTime1 field SHALL contain
             // a later epoch start time than the epoch start time found in the EpochStartTime0 field.
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+            commandObj->AddStatus(commandPath, Status::InvalidCommand);
             return true;
         }
         keyset.epoch_keys[1].start_time = commandData.groupKeySet.epochStartTime1.Value();
@@ -355,7 +357,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
             // * The EpochKey1 field SHALL NOT be null
             // * Its associated EpochStartTime1 field SHALL contain a later epoch start time
             //   than the epoch start time found in the EpochStartTime0 field.
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+            commandObj->AddStatus(commandPath, Status::InvalidCommand);
             return true;
         }
         keyset.epoch_keys[2].start_time = commandData.groupKeySet.epochStartTime2.Value();
@@ -376,11 +378,10 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
     }
 
     // Send response
-    EmberStatus status =
-        emberAfSendImmediateDefaultResponse(CHIP_NO_ERROR == err ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-    if (EMBER_SUCCESS != status)
+    err = commandObj->AddStatus(commandPath, StatusIB(err).mStatus);
+    if (CHIP_NO_ERROR != err)
     {
-        ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetWrite failed: 0x%x", status);
+        ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetWrite failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
     return true;
 }
@@ -394,7 +395,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
 
     if (nullptr == provider)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 
@@ -402,7 +403,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
     if (CHIP_NO_ERROR != provider->GetKeySet(fabric, commandData.groupKeySetID, keyset))
     {
         // KeySet ID not found
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_NOT_FOUND);
+        commandObj->AddStatus(commandPath, Status::NotFound);
         return true;
     }
 
@@ -453,9 +454,9 @@ bool emberAfGroupKeyManagementClusterKeySetRemoveCallback(
     const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::DecodableType & commandData)
 
 {
-    auto fabric          = commandObj->GetAccessingFabricIndex();
-    auto * provider      = GetGroupDataProvider();
-    EmberAfStatus status = EMBER_ZCL_STATUS_FAILURE;
+    auto fabric     = commandObj->GetAccessingFabricIndex();
+    auto * provider = GetGroupDataProvider();
+    Status status   = Status::Failure;
 
     if (nullptr != provider)
     {
@@ -463,19 +464,19 @@ bool emberAfGroupKeyManagementClusterKeySetRemoveCallback(
         CHIP_ERROR err = provider->RemoveKeySet(fabric, commandData.groupKeySetID);
         if (CHIP_ERROR_KEY_NOT_FOUND == err)
         {
-            status = EMBER_ZCL_STATUS_NOT_FOUND;
+            status = Status::NotFound;
         }
         else if (CHIP_NO_ERROR == err)
         {
-            status = EMBER_ZCL_STATUS_SUCCESS;
+            status = Status::Success;
         }
     }
 
     // Send response
-    EmberStatus send_status = emberAfSendImmediateDefaultResponse(status);
-    if (EMBER_SUCCESS != send_status)
+    CHIP_ERROR send_err = commandObj->AddStatus(commandPath, status);
+    if (CHIP_NO_ERROR != send_err)
     {
-        ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetRemove failed: 0x%x", send_status);
+        ChipLogDetail(Zcl, "GroupKeyManagementCluster: KeySetRemove failed: %" CHIP_ERROR_FORMAT, send_err.Format());
     }
     return true;
 }
@@ -496,7 +497,7 @@ struct KeySetReadAllIndicesResponse
 
         TLV::TLVType array;
         ReturnErrorOnFailure(writer.StartContainer(
-            TLV::ContextTag(to_underlying(GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Fields::kGroupKeySetIDs)),
+            TLV::ContextTag(GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::Fields::kGroupKeySetIDs),
             TLV::kTLVType_Array, array));
 
         GroupDataProvider::KeySet keyset;
@@ -520,14 +521,14 @@ bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
 
     if (nullptr == provider)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 
     auto keysIt = provider->IterateKeySets(fabric);
     if (nullptr == keysIt)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 

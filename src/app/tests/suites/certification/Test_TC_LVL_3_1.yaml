@@ -60,6 +60,14 @@ tests:
       arguments:
           value: 0
 
+    #NOTE - fix/workaround for https://github.com/CHIP-Specifications/chip-test-plans/issues/2176
+    - label: "TH writes NULL to the OnLevel attribute"
+      PICS: LVL.S.A0011
+      command: "writeAttribute"
+      attribute: "OnLevel"
+      arguments:
+          value: null
+
     - label: "TH sends Off command to DUT"
       cluster: "On/Off"
       PICS: LVL.S.C04.Rsp && OO.S.C00.Rsp
