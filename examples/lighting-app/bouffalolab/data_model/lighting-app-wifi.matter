@@ -982,21 +982,12 @@ server cluster SoftwareDiagnostics = 52 {
     kWaterMarks = 0x1;
   }
 
-  struct ThreadMetricsStruct {
-    int64u id = 0;
-    optional char_string<8> name = 1;
-    optional int32u stackFreeCurrent = 2;
-    optional int32u stackFreeMinimum = 3;
-    optional int32u stackSize = 4;
-  }
-
   info event SoftwareFault = 0 {
     INT64U id = 0;
     optional CHAR_STRING name = 1;
     optional OCTET_STRING faultRecording = 2;
   }
 
-  readonly attribute ThreadMetricsStruct threadMetrics[] = 0;
   readonly attribute int64u currentHeapFree = 1;
   readonly attribute int64u currentHeapUsed = 2;
   readonly attribute int64u currentHeapHighWatermark = 3;
@@ -1465,6 +1456,24 @@ server cluster ColorControl = 768 {
   readonly attribute enum8 colorMode = 8;
   attribute bitmap8 options = 15;
   readonly attribute nullable int8u numberOfPrimaries = 16;
+  readonly attribute int16u primary1X = 17;
+  readonly attribute int16u primary1Y = 18;
+  readonly attribute nullable int8u primary1Intensity = 19;
+  readonly attribute int16u primary2X = 21;
+  readonly attribute int16u primary2Y = 22;
+  readonly attribute nullable int8u primary2Intensity = 23;
+  readonly attribute int16u primary3X = 25;
+  readonly attribute int16u primary3Y = 26;
+  readonly attribute nullable int8u primary3Intensity = 27;
+  readonly attribute int16u primary4X = 32;
+  readonly attribute int16u primary4Y = 33;
+  readonly attribute nullable int8u primary4Intensity = 34;
+  readonly attribute int16u primary5X = 36;
+  readonly attribute int16u primary5Y = 37;
+  readonly attribute nullable int8u primary5Intensity = 38;
+  readonly attribute int16u primary6X = 40;
+  readonly attribute int16u primary6Y = 41;
+  readonly attribute nullable int8u primary6Intensity = 42;
   readonly attribute int16u enhancedCurrentHue = 16384;
   readonly attribute enum8 enhancedColorMode = 16385;
   readonly attribute int8u colorLoopActive = 16386;
@@ -1817,7 +1826,6 @@ endpoint 0 {
   }
 
   server cluster SoftwareDiagnostics {
-    callback attribute threadMetrics;
     callback attribute currentHeapFree default = 0x0000000000000000;
     callback attribute currentHeapUsed default = 0x0000000000000000;
     callback attribute currentHeapHighWatermark default = 0x0000000000000000;
@@ -1894,7 +1902,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type dimmablelight = 257, version 1;
+  device type extendedcolorlight = 269, version 1;
 
   server cluster Identify {
     ram      attribute identifyTime default = 0x0000;
@@ -1957,6 +1965,24 @@ endpoint 1 {
     ram      attribute colorMode default = 0x01;
     ram      attribute options default = 0x00;
     ram      attribute numberOfPrimaries;
+    ram      attribute primary1X;
+    ram      attribute primary1Y;
+    ram      attribute primary1Intensity;
+    ram      attribute primary2X;
+    ram      attribute primary2Y;
+    ram      attribute primary2Intensity;
+    ram      attribute primary3X;
+    ram      attribute primary3Y;
+    ram      attribute primary3Intensity;
+    ram      attribute primary4X;
+    ram      attribute primary4Y;
+    ram      attribute primary4Intensity;
+    ram      attribute primary5X;
+    ram      attribute primary5Y;
+    ram      attribute primary5Intensity;
+    ram      attribute primary6X;
+    ram      attribute primary6Y;
+    ram      attribute primary6Intensity;
     ram      attribute enhancedCurrentHue default = 0x0000;
     ram      attribute enhancedColorMode default = 0x01;
     ram      attribute colorLoopActive default = 0x00;
