@@ -322,6 +322,12 @@ private:
      */
     void DequeueConnectionCallbacks(CHIP_ERROR error);
 
+    /*
+     * Like DequeueConnectionCallbacks but does not release ourselves.  For use
+     * from our destructor.
+     */
+    void DequeueConnectionCallbacksWithoutReleasing(CHIP_ERROR error);
+
     /**
      * Triggers a DNSSD lookup to find a usable peer address.
      */

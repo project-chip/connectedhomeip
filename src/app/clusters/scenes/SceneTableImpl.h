@@ -178,18 +178,26 @@ private:
 class DefaultSceneTableImpl : public SceneTable<scenes::ExtensionFieldSetsImpl>
 {
 public:
-    DefaultSceneTableImpl() = default;
+    DefaultSceneTableImpl() {}
 
     ~DefaultSceneTableImpl() override {}
 
     CHIP_ERROR Init(PersistentStorageDelegate * storage) override;
     void Finish() override;
 
-    // Scene access by Id
+    // Global scene count
+    CHIP_ERROR GetGlobalSceneCount(uint8_t & scene_count) override;
+
+    // Data
+    CHIP_ERROR GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity) override;
     CHIP_ERROR SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry) override;
     CHIP_ERROR GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry) override;
     CHIP_ERROR RemoveSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id) override;
     CHIP_ERROR RemoveSceneTableEntryAtPosition(FabricIndex fabric_index, SceneIndex scene_idx) override;
+
+    // Groups
+    CHIP_ERROR GetAllSceneIdsInGroup(FabricIndex fabric_index, GroupId group_id, Span<SceneId> & scene_list) override;
+    CHIP_ERROR DeleteAllScenesInGroup(FabricIndex fabric_index, GroupId group_id) override;
 
     // SceneHandlers
     void RegisterHandler(SceneHandler * handler) override;
@@ -208,13 +216,25 @@ public:
     SceneEntryIterator * IterateSceneEntries(FabricIndex fabric_index) override;
 
 protected:
+    // This constructor is meant for test purposes, it allows to change the defined max for scenes per fabric and global, which
+    // allows to simulate OTA where this value was changed
+    DefaultSceneTableImpl(uint8_t maxScenesPerFabric = scenes::kMaxScenesPerFabric,
+                          uint8_t maxScenesGlobal    = scenes::kMaxScenesGlobal) :
+        mMaxScenesPerFabric(maxScenesPerFabric),
+        mMaxScenesGlobal(maxScenesGlobal)
+    {}
+
+    // Global scene count
+    CHIP_ERROR SetGlobalSceneCount(const uint8_t & scene_count);
+
     // wrapper function around emberAfGetClustersFromEndpoint to allow override when testing
     virtual uint8_t GetClustersFromEndpoint(EndpointId endpoint, ClusterId * clusterList, uint8_t listLen);
 
     class SceneEntryIteratorImpl : public SceneEntryIterator
     {
     public:
-        SceneEntryIteratorImpl(DefaultSceneTableImpl & provider, FabricIndex fabric_index);
+        SceneEntryIteratorImpl(DefaultSceneTableImpl & provider, FabricIndex fabric_index, uint8_t maxScenesPerFabric,
+                               uint8_t maxScenesGlobal);
         size_t Count() override;
         bool Next(SceneTableEntry & output) override;
         void Release() override;
@@ -225,9 +245,13 @@ protected:
         SceneIndex mNextSceneIdx;
         SceneIndex mSceneIndex = 0;
         uint8_t mTotalScenes   = 0;
+        uint8_t mMaxScenesPerFabric;
+        uint8_t mMaxScenesGlobal;
     };
     bool IsInitialized() { return (mStorage != nullptr); }
 
+    const uint8_t mMaxScenesPerFabric          = kMaxScenesPerFabric;
+    const uint8_t mMaxScenesGlobal             = kMaxScenesGlobal;
     chip::PersistentStorageDelegate * mStorage = nullptr;
     ObjectPool<SceneEntryIteratorImpl, kIteratorsMax> mSceneEntryIterators;
 }; // class DefaultSceneTableImpl
