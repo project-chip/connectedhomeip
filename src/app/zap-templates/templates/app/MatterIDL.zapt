@@ -1,10 +1,12 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-{{#chip_shared_structs}}
+{{#zcl_structs}}
+{{#if has_more_than_one_cluster}}
 {{>idl_structure_definition extraIndent=0}}
 
-{{/chip_shared_structs}}
+{{/if}}
+{{/zcl_structs}}
 {{#all_user_clusters~}}
 /** {{description}} */
 {{side}} cluster {{asUpperCamelCase name}} = {{code}} {
@@ -24,17 +26,10 @@
   }
 
   {{/zcl_bitmaps}}
-  {{#if (is_client side)~}}
-    {{#zcl_structs}}
-    {{~>idl_structure_definition extraIndent=1}}
+  {{#zcl_structs}}
+  {{~>idl_structure_definition extraIndent=1}}
 
-    {{/zcl_structs}}
-  {{~else~}}
-    {{#chip_cluster_specific_structs}}
-    {{~>idl_structure_definition extraIndent=1}}
-
-    {{/chip_cluster_specific_structs}}
-  {{/if}}
+  {{/zcl_structs}}
   {{#zcl_events}}
   {{#if isFabricSensitive}}fabric_sensitive {{/if~}} {{priority}} event {{!ensure space}}
   {{~#chip_access_elements entity="event"~}}
