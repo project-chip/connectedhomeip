@@ -229,10 +229,12 @@ static void CauseReadClientFailure(
         _readClientPtr = nullptr;
     }
     if (_pathParams) {
+        static_assert(std::is_trivially_destructible<AttributePathParams>::value, "AttributePathParams destructors won't get run");
         Platform::MemoryFree(_pathParams);
         _pathParams = nullptr;
     }
     if (_eventPathParams) {
+        static_assert(std::is_trivially_destructible<EventPathParams>::value, "EventPathParams destructors won't get run");
         Platform::MemoryFree(_eventPathParams);
         _eventPathParams = nullptr;
     }
