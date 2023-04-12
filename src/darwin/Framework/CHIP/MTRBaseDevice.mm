@@ -80,9 +80,7 @@ class MTRDataValueDictionaryCallbackBridge;
 @interface MTRReadClientContainer : NSObject
 @property (nonatomic, readwrite) app::ReadClient * readClientPtr;
 @property (nonatomic, readwrite) app::AttributePathParams * pathParams;
-@property (nonatomic, readwrite) size_t pathParamsSize;
 @property (nonatomic, readwrite) app::EventPathParams * eventPathParams;
-@property (nonatomic, readwrite) size_t eventPathParamsSize;
 @property (nonatomic, readwrite) uint64_t deviceID;
 - (void)onDone;
 @end
@@ -151,12 +149,10 @@ static void PurgeReadClientContainers(
                 if (container.pathParams) {
                     Platform::MemoryFree(container.pathParams);
                     container.pathParams = nullptr;
-                    container.pathParamsSize = 0;
                 }
                 if (container.eventPathParams) {
                     Platform::MemoryFree(container.eventPathParams);
                     container.eventPathParams = nullptr;
-                    container.eventPathParamsSize = 0;
                 }
             }
             [listToDelete removeAllObjects];
@@ -233,12 +229,10 @@ static void CauseReadClientFailure(
     if (_pathParams) {
         Platform::MemoryFree(_pathParams);
         _pathParams = nullptr;
-        _pathParamsSize = 0;
     }
     if (_eventPathParams) {
         Platform::MemoryFree(_eventPathParams);
         _eventPathParams = nullptr;
-        _eventPathParamsSize = 0;
     }
     PurgeCompletedReadClientContainers(_deviceID);
 }
@@ -252,12 +246,10 @@ static void CauseReadClientFailure(
     if (_pathParams) {
         Platform::MemoryFree(_pathParams);
         _pathParams = nullptr;
-        _pathParamsSize = 0;
     }
     if (_eventPathParams) {
         Platform::MemoryFree(_eventPathParams);
         _eventPathParams = nullptr;
-        _eventPathParamsSize = 0;
     }
 }
 @end
@@ -1173,20 +1165,20 @@ private:
                    MTRReadClientContainer * container = [[MTRReadClientContainer alloc] init];
                    container.deviceID = self.nodeID;
 
+                   size_t attributePathSize = 0;
                    if (attributes != nil) {
-                       container.pathParamsSize = 0;
                        container.pathParams = static_cast<AttributePathParams *>(
                            Platform::MemoryCalloc([attributes count], sizeof(AttributePathParams)));
                        for (MTRAttributeRequestPath * attribute in attributes) {
-                           [attribute convertToAttributePathParams:container.pathParams[container.pathParamsSize++]];
+                           [attribute convertToAttributePathParams:container.pathParams[attributePathSize++]];
                        }
                    }
+                   size_t eventPathSize = 0;
                    if (events != nil) {
-                       container.eventPathParamsSize = 0;
                        container.eventPathParams
                            = static_cast<EventPathParams *>(Platform::MemoryCalloc([events count], sizeof(EventPathParams)));
                        for (MTREventRequestPath * event in events) {
-                           [event convertToEventPathParams:container.eventPathParams[container.eventPathParamsSize++]];
+                           [event convertToEventPathParams:container.eventPathParams[eventPathSize++]];
                        }
                    }
 
@@ -1196,9 +1188,9 @@ private:
                    chip::app::ReadPrepareParams readParams(session.Value());
                    [params toReadPrepareParams:readParams];
                    readParams.mpAttributePathParamsList = container.pathParams;
-                   readParams.mAttributePathParamsListSize = container.pathParamsSize;
+                   readParams.mAttributePathParamsListSize = attributePathSize;
                    readParams.mpEventPathParamsList = container.eventPathParams;
-                   readParams.mEventPathParamsListSize = container.eventPathParamsSize;
+                   readParams.mEventPathParamsListSize = eventPathSize;
 
                    auto onDone = [container](BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
                        [container onDone];
@@ -1208,7 +1200,7 @@ private:
                    };
 
                    auto callback = chip::Platform::MakeUnique<BufferedReadClientCallback<MTRDataValueDictionaryDecodableType>>(
-                       container.pathParams, container.pathParamsSize, container.eventPathParams, container.eventPathParamsSize,
+                       container.pathParams, attributePathSize, container.eventPathParams, eventPathSize,
                        onAttributeReportCb, onEventReportCb, onFailureCb, onDone, onEstablishedCb, onResubscriptionScheduledCb);
 
                    auto readClient = Platform::New<app::ReadClient>(
@@ -1236,8 +1228,6 @@ private:
                        }
                        container.pathParams = nullptr;
                        container.eventPathParams = nullptr;
-                       container.pathParamsSize = 0;
-                       container.eventPathParamsSize = 0;
                        return;
                    }
 
@@ -1890,14 +1880,20 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 {
     if (_endpoint != nil) {
         params.mEndpointId = static_cast<chip::EndpointId>(_endpoint.unsignedShortValue);
+    } else {
+        params.SetWildcardEndpointId();
     }
 
     if (_cluster != nil) {
         params.mClusterId = static_cast<chip::ClusterId>(_cluster.unsignedLongValue);
+    } else {
+        params.SetWildcardClusterId();
     }
 
     if (_attribute != nil) {
         params.mAttributeId = static_cast<chip::AttributeId>(_attribute.unsignedLongValue);
+    } else {
+        params.SetWildcardAttributeId();
     }
 }
 @end
@@ -1956,14 +1952,20 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 {
     if (_endpoint != nil) {
         params.mEndpointId = static_cast<chip::EndpointId>(_endpoint.unsignedShortValue);
+    } else {
+        params.SetWildcardEndpointId();
     }
 
     if (_cluster != nil) {
         params.mClusterId = static_cast<chip::ClusterId>(_cluster.unsignedLongValue);
+    } else {
+        params.SetWildcardClusterId();
     }
 
     if (_event != nil) {
         params.mEventId = static_cast<chip::EventId>(_event.unsignedLongValue);
+    } else {
+        params.SetWildcardEventId();
     }
 }
 @end
