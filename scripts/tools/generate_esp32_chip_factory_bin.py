@@ -400,22 +400,17 @@ def generate_nvs_csv(out_csv_filename):
 
 
 def generate_nvs_bin(encrypt, size, csv_filename, bin_filename):
+    nvs_args = SimpleNamespace(version=2,
+                               outdir=os.getcwd(),
+                               input=csv_filename,
+                               output=bin_filename,
+                               size=hex(size))
     if encrypt:
-        nvs_args = SimpleNamespace(version=2,
-                                   keygen=True,
-                                   keyfile=NVS_KEY_PARTITION_BIN,
-                                   inputkey=None,
-                                   outdir=os.getcwd(),
-                                   input=csv_filename,
-                                   output=bin_filename,
-                                   size=hex(size))
+        nvs_args.keygen = True
+        nvs_args.keyfile = NVS_KEY_PARTITION_BIN
+        nvs_args.inputkey = None,
         nvs_partition_gen.encrypt(nvs_args)
     else:
-        nvs_args = SimpleNamespace(input=csv_filename,
-                                   output=bin_filename,
-                                   size=hex(size),
-                                   outdir=os.getcwd(),
-                                   version=2)
         nvs_partition_gen.generate(nvs_args)
 
 

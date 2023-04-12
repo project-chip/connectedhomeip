@@ -86,7 +86,7 @@ client cluster AccessControl = 31 {
   }
 
   attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
-  attribute access(read: administer, write: administer) AccessControlExtensionStruct extension[] = 1;
+  attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
   readonly attribute int16u subjectsPerAccessControlEntry = 2;
   readonly attribute int16u targetsPerAccessControlEntry = 3;
   readonly attribute int16u accessControlEntriesPerFabric = 4;

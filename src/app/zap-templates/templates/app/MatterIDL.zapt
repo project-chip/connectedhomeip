@@ -40,7 +40,7 @@
   {{~#chip_access_elements entity="event"~}}
       {{~#first~}}access({{~/first~}}
       {{~#not_first~}}, {{/not_first~}}
-        {{operation}}: {{role}} 
+        {{operation}}: {{role}}
       {{~#last}}) {{/last~}}
   {{~/chip_access_elements~}}
   {{asUpperCamelCase name}} = {{code}} {
@@ -53,7 +53,9 @@
   {{/zcl_events}}
   {{#if (is_client side)}}
     {{#zcl_attributes_server}}
+      {{#if clusterRef}}
   {{! ensure indent }}{{>idl_attribute_definition}}
+      {{/if}}
     {{/zcl_attributes_server}}
 
   {{~else}}
@@ -63,17 +65,18 @@
       {{/unless}}
     {{/enabled_attributes_for_cluster_and_side~}}
 
+  {{~/if}}
   {{~!--Global attributes: spec 7.13 describes these as mandatory --}}
+  {{~!TODO(26053): global attributes are marked as optional,
+                   hence the exclusion above and re-add here.}}
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
   readonly attribute attrib_id attributeList[] = 65531;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
-  {{~/if}}
 {{!--Open:Generating command request structs for all incoming commands into server side--~}}
   {{#if (is_server side)}}
-
     {{#all_incoming_commands_for_cluster name side}}
       {{~>idl_command_request_struct}}
     {{/all_incoming_commands_for_cluster}}

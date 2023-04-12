@@ -56,16 +56,21 @@ class ZapTarget:
 
         output_dir = os.path.join(output_root, self.idl.pregen_subdir, self.generation_type.subdir)
 
-        logging.info(f"Generating: {self.generation_type}:{self.idl.relative_path} into {output_dir}")
+        logging.info(f"Generating: {self.generation_type}:{self.idl.full_path} into {output_dir}")
 
         self.runner.ensure_directory_exists(output_dir)
+
+        if self.idl.full_path.startswith(self.sdk_root):
+            idl_path = self.idl.relative_path
+        else:
+            idl_path = self.idl.full_path
 
         cmd = [
             ZAP_GENERATE_PATH,
             '--templates', self.generation_type.generation_template,
             '--output-dir', output_dir,
             '--parallel',
-            self.idl.relative_path
+            idl_path
         ]
         logging.debug(f"Executing {cmd}")
         self.runner.run(cmd, cwd=self.sdk_root)

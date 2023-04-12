@@ -193,7 +193,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & value)
     if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "cy_wcm_get_associated_ap_info failed: %d", (int) result);
-        SuccessOrExit(CHIP_ERROR_INTERNAL);
+        SuccessOrExit(err = CHIP_ERROR_INTERNAL);
     }
     memcpy(mWiFiMacAddress, ap_info.BSSID, CY_WCM_MAC_ADDR_LEN);
     value = ByteSpan(mWiFiMacAddress, CY_WCM_MAC_ADDR_LEN);
@@ -214,7 +214,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
     if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "cy_wcm_get_associated_ap_info failed: %d", (int) result);
-        SuccessOrExit(CHIP_ERROR_INTERNAL);
+        SuccessOrExit(err = CHIP_ERROR_INTERNAL);
     }
     if (ap_info.security == CY_WCM_SECURITY_OPEN)
     {
@@ -289,7 +289,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNu
     if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "cy_wcm_get_associated_ap_info failed: %d", (int) result);
-        SuccessOrExit(CHIP_ERROR_INTERNAL);
+        SuccessOrExit(err = CHIP_ERROR_INTERNAL);
     }
     channelNumber = ap_info.channel;
 
@@ -307,7 +307,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
     if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "cy_wcm_get_associated_ap_info failed: %d", (int) result);
-        SuccessOrExit(CHIP_ERROR_INTERNAL);
+        SuccessOrExit(err = CHIP_ERROR_INTERNAL);
     }
     rssi = ap_info.signal_strength;
 
@@ -350,7 +350,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentM
     if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "cy_wcm_get_wlan_statistics failed: %d", (int) result);
-        SuccessOrExit(CHIP_ERROR_INTERNAL);
+        SuccessOrExit(err = CHIP_ERROR_INTERNAL);
     }
     count          = stats.tx_bitrate * PHYRATE_KPBS_BYTES_PER_SEC;
     currentMaxRate = static_cast<uint32_t>(count);
@@ -394,7 +394,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & pa
     if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "cy_wcm_get_wlan_statistics failed: %d", (int) result);
-        SuccessOrExit(CHIP_ERROR_INTERNAL);
+        SuccessOrExit(err = CHIP_ERROR_INTERNAL);
     }
     count = stats.rx_packets;
     count -= mPacketUnicastRxCount;
@@ -417,7 +417,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & pa
     if (result != CY_RSLT_SUCCESS)
     {
         ChipLogError(DeviceLayer, "cy_wcm_get_wlan_statistics failed: %d", (int) result);
-        SuccessOrExit(CHIP_ERROR_INTERNAL);
+        SuccessOrExit(err = CHIP_ERROR_INTERNAL);
     }
 
     count = stats.tx_packets;
