@@ -178,8 +178,8 @@ public:
             return CHIP_ERROR_INCORRECT_STATE;
         }
         WorkHelper * helper = this;
-        bool cancel = false;
-        helper->mStatus = helper->mWorkCallback(helper->mData, cancel);
+        bool cancel         = false;
+        helper->mStatus     = helper->mWorkCallback(helper->mData, cancel);
         if (!cancel)
         {
             helper->mStatus = (helper->mSession->*(helper->mAfterWorkCallback))(helper->mData, helper->mStatus);
@@ -1376,7 +1376,7 @@ CHIP_ERROR CASESession::SendSigma3b(SendSigma3Data & data, bool & cancel)
     {
         // Legacy case: delegate to fabric table fabric info
         err = data.fabricTable->SignWithOpKeypair(data.fabricIndex, ByteSpan{ data.msg_R3_Signed.Get(), data.msg_r3_signed_len },
-                                                data.tbsData3Signature);
+                                                  data.tbsData3Signature);
     }
     SuccessOrExit(err);
 
