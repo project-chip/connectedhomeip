@@ -293,7 +293,8 @@ MTR_NEWLY_AVAILABLE;
                            params:(MTRSubscribeParams * _Nullable)params
                             queue:(dispatch_queue_t)queue
                     reportHandler:(MTRDeviceResponseHandler)reportHandler
-          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished MTR_NEWLY_AVAILABLE;
+          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+          resubscriptionScheduled:(MTRDeviceResubscriptionScheduledHandler _Nullable)resubscriptionScheduled MTR_NEWLY_AVAILABLE;
 /**
  * Write to attribute in a designated attribute path
  *

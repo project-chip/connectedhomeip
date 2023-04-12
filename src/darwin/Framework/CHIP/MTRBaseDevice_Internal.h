@@ -109,11 +109,11 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 @end
 
 @interface MTRAttributeRequestPath ()
-- (void)convertToAttributePathParams:(const chip::app::AttributePathParams &)params;
+- (void)convertToAttributePathParams:(chip::app::AttributePathParams &)params;
 @end
 
 @interface MTREventRequestPath ()
-- (void)convertToEventPathParams:(const chip::app::EventPathParams &)params;
+- (void)convertToEventPathParams:(chip::app::EventPathParams &)params;
 @end
 
 // Exported utility function
