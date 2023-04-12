@@ -646,7 +646,6 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_hosal",
       ":${sdk_target_name}_config_freertos",
       ":${sdk_target_name}_config_utils",
-      ":${sdk_target_name}_config_hosal",
     ]
     public_configs = [
       ":${sdk_target_name}_config",
