@@ -280,6 +280,7 @@ MTR_NEWLY_AVAILABLE;
                     params:(MTRReadParams * _Nullable)params
                      queue:(dispatch_queue_t)queue
                 completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
+
 /**
  * Subscribes to multiple attribute or event paths.
  *
