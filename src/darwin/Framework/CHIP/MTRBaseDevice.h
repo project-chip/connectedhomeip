@@ -159,7 +159,7 @@ MTR_NEWLY_AVAILABLE
 
 + (MTREventRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
                                          clusterID:(NSNumber * _Nullable)clusterID
-                                           eventID:(NSNumber * _Nullable)eventID;
+                                           eventID:(NSNumber * _Nullable)eventID
 MTR_NEWLY_AVAILABLE;
 @end
 
