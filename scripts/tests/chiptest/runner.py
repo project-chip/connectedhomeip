@@ -123,7 +123,7 @@ class Runner:
     def __init__(self, capture_delegate=None):
         self.capture_delegate = capture_delegate
 
-    def RunSubprocess(self, cmd, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None):
+    def RunSubprocess(self, cmd, name, wait=True, dependencies=[], timeout_seconds: typing.Optional[int] = None, stdin=None):
         outpipe = LogPipe(
             logging.DEBUG, capture_delegate=self.capture_delegate,
             name=name + ' OUT')
@@ -133,12 +133,12 @@ class Runner:
 
         if sys.platform == 'darwin':
             # Try harder to avoid any stdout buffering in our tests
-            cmd = ['stdbuf', '-o0'] + cmd
+            cmd = ['stdbuf', '-o0', '-i0'] + cmd
 
         if self.capture_delegate:
             self.capture_delegate.Log(name, 'EXECUTING %r' % cmd)
 
-        s = subprocess.Popen(cmd, stdout=outpipe, stderr=errpipe)
+        s = subprocess.Popen(cmd, stdin=stdin, stdout=outpipe, stderr=errpipe)
         outpipe.close()
         errpipe.close()
 

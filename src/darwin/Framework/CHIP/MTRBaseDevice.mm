@@ -1471,7 +1471,7 @@ class OpenCommissioningWindowHelper {
 
 public:
     static CHIP_ERROR OpenCommissioningWindow(Controller::DeviceController * controller, NodeId nodeID,
-        System::Clock::Seconds16 timeout, uint16_t discriminator, uint32_t setupPIN, ResultCallback callback);
+        System::Clock::Seconds16 timeout, uint16_t discriminator, const Optional<uint32_t> & setupPIN, ResultCallback callback);
 
 private:
     OpenCommissioningWindowHelper(Controller::DeviceController * controller, ResultCallback callback);
@@ -1491,7 +1491,7 @@ OpenCommissioningWindowHelper::OpenCommissioningWindowHelper(Controller::DeviceC
 }
 
 CHIP_ERROR OpenCommissioningWindowHelper::OpenCommissioningWindow(Controller::DeviceController * controller, NodeId nodeID,
-    System::Clock::Seconds16 timeout, uint16_t discriminator, uint32_t setupPIN, ResultCallback callback)
+    System::Clock::Seconds16 timeout, uint16_t discriminator, const Optional<uint32_t> & setupPIN, ResultCallback callback)
 {
     auto * self = new (std::nothrow) OpenCommissioningWindowHelper(controller, callback);
     if (self == nullptr) {
@@ -1500,7 +1500,7 @@ CHIP_ERROR OpenCommissioningWindowHelper::OpenCommissioningWindow(Controller::De
 
     SetupPayload unused;
     CHIP_ERROR err = self->mOpener.OpenCommissioningWindow(nodeID, timeout, Crypto::kSpake2p_Min_PBKDF_Iterations, discriminator,
-        MakeOptional(setupPIN), NullOptional, &self->mOnOpenCommissioningWindowCallback, unused);
+        setupPIN, NullOptional, &self->mOnOpenCommissioningWindowCallback, unused);
     if (err != CHIP_NO_ERROR) {
         delete self;
     }
@@ -1518,11 +1518,11 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
 
 } // anonymous namespace
 
-- (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
-                                   discriminator:(NSNumber *)discriminator
-                                        duration:(NSNumber *)duration
-                                           queue:(dispatch_queue_t)queue
-                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion
+- (void)_openCommissioningWindowWithSetupPasscode:(nullable NSNumber *)setupPasscode
+                                    discriminator:(NSNumber *)discriminator
+                                         duration:(NSNumber *)duration
+                                            queue:(dispatch_queue_t)queue
+                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
 {
     if (self.isPASEDevice) {
         MTR_LOG_ERROR("Can't open a commissioning window over PASE");
@@ -1551,13 +1551,17 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
         return;
     }
 
-    unsigned long long passcodeVal = [setupPasscode unsignedLongLongValue];
-    if (!CanCastTo<uint32_t>(passcodeVal) || !SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(passcodeVal))) {
-        MTR_LOG_ERROR("Error: Setup passcode %llu is not valid", passcodeVal);
-        dispatch_async(queue, ^{
-            completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE]);
-        });
-        return;
+    Optional<uint32_t> passcode;
+    if (setupPasscode != nil) {
+        unsigned long long passcodeVal = [setupPasscode unsignedLongLongValue];
+        if (!CanCastTo<uint32_t>(passcodeVal) || !SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(passcodeVal))) {
+            MTR_LOG_ERROR("Error: Setup passcode %llu is not valid", passcodeVal);
+            dispatch_async(queue, ^{
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE]);
+            });
+            return;
+        }
+        passcode.Emplace(static_cast<uint32_t>(passcodeVal));
     }
 
     [self.deviceController
@@ -1585,7 +1589,7 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
             SetupPayload setupPayload;
             auto errorCode = OpenCommissioningWindowHelper::OpenCommissioningWindow(commissioner, self.nodeID,
                 chip::System::Clock::Seconds16(static_cast<uint16_t>(durationVal)), static_cast<uint16_t>(discriminatorVal),
-                static_cast<uint32_t>(passcodeVal), resultCallback);
+                passcode, resultCallback);
 
             if (errorCode != CHIP_NO_ERROR) {
                 dispatch_async(queue, ^{
@@ -1601,6 +1605,31 @@ void OpenCommissioningWindowHelper::OnOpenCommissioningWindowResponse(
                 completion(nil, error);
             });
         }];
+}
+
+- (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode
+                                   discriminator:(NSNumber *)discriminator
+                                        duration:(NSNumber *)duration
+                                           queue:(dispatch_queue_t)queue
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion
+{
+    [self _openCommissioningWindowWithSetupPasscode:setupPasscode
+                                      discriminator:discriminator
+                                           duration:duration
+                                              queue:queue
+                                         completion:completion];
+}
+
+- (void)openCommissioningWindowWithDiscriminator:(NSNumber *)discriminator
+                                        duration:(NSNumber *)duration
+                                           queue:(dispatch_queue_t)queue
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion
+{
+    [self _openCommissioningWindowWithSetupPasscode:nil
+                                      discriminator:discriminator
+                                           duration:duration
+                                              queue:queue
+                                         completion:completion];
 }
 
 #ifdef DEBUG

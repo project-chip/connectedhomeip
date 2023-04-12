@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-ameba:0.6.47
+            image: connectedhomeip/chip-build-ameba:0.7.0
             options: --user root
 
         steps:
@@ -49,7 +49,7 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform ameba
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform ameba
             - name: Bootstrap cache
               uses: actions/cache@v3
               timeout-minutes: 10

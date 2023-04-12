@@ -77,7 +77,7 @@ Mac OS X
 
           ```
           cd ~/connectedhomeip
-          ./scripts/examples/gn_efr32_example.sh ./examples/lock-app/silabs/SiWx917/ ./out/lock_app BRD4325B
+          ./scripts/examples/gn_efr32_example.sh ./examples/lock-app/silabs/SiWx917/ ./out/lock_app BRD4325B
           ```
 
 -   To delete generated executable, libraries and object files use:

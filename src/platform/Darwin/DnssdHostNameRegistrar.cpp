@@ -256,13 +256,30 @@ void GetInterfaceAddresses(uint32_t interfaceId, chip::Inet::IPAddressType addre
 }
 } // namespace
 
-void HostNameRegistrar::Init(const char * hostname, Inet::IPAddressType addressType, uint32_t interfaceId)
+HostNameRegistrar::~HostNameRegistrar()
+{
+    Unregister();
+    if (mLivenessTracker != nullptr)
+    {
+        *mLivenessTracker = false;
+    }
+}
+
+DNSServiceErrorType HostNameRegistrar::Init(const char * hostname, Inet::IPAddressType addressType, uint32_t interfaceId)
 {
     mHostname         = hostname;
     mInterfaceId      = interfaceId;
     mAddressType      = addressType;
     mServiceRef       = nullptr;
     mInterfaceMonitor = nullptr;
+
+    mLivenessTracker = std::make_shared<bool>(true);
+    if (mLivenessTracker == nullptr)
+    {
+        return kDNSServiceErr_NoMemory;
+    }
+
+    return kDNSServiceErr_NoError;
 }
 
 CHIP_ERROR HostNameRegistrar::Register()
@@ -303,7 +320,18 @@ CHIP_ERROR HostNameRegistrar::StartMonitorInterfaces(OnInterfaceChanges interfac
 
     nw_path_monitor_set_queue(mInterfaceMonitor, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
 
+    // Our update handler closes over "this", but can't keep us alive (because we
+    // are not refcounted).  Make sure it closes over a shared ref to our
+    // liveness tracker, which it _can_ keep alive, so it can bail out if we
+    // have been destroyed between when the task was queued and when it ran.
+    std::shared_ptr<bool> livenessTracker = mLivenessTracker;
     nw_path_monitor_set_update_handler(mInterfaceMonitor, ^(nw_path_t path) {
+        if (!*livenessTracker)
+        {
+            // The HostNameRegistrar has been destroyed; just bail out.
+            return;
+        }
+
 #if CHIP_PROGRESS_LOGGING
         LogDetails(path);
 #endif // CHIP_PROGRESS_LOGGING

@@ -58,6 +58,11 @@
 #include "Rpc.h"
 #endif
 
+#include <DeviceInfoProviderImpl.h>
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || defined(CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST)
+#include <platform/bouffalolab/common/FactoryDataProvider.h>
+#endif
+
 #if CONFIG_ENABLE_CHIP_SHELL || PW_RPC_ENABLED
 #include "uart.h"
 #endif
@@ -74,6 +79,14 @@ using namespace ::chip::DeviceLayer;
 namespace {
 chip::app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::BLWiFiDriver::GetInstance()));
+}
+#endif
+
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || defined(CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST)
+namespace {
+FactoryDataProvider sFactoryDataProvider;
 }
 #endif
 
@@ -192,19 +205,36 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
     ReturnLogErrorOnFailure(sWiFiNetworkCommissioningInstance.Init());
 #endif
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-
     // Initialize device attestation config
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || defined(CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST)
+    if (CHIP_NO_ERROR == sFactoryDataProvider.Init())
+    {
+        SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
+        SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
+        SetCommissionableDataProvider(&sFactoryDataProvider);
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "sFactoryDataProvider.Init() failed");
+    }
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXT_DISCOVERY_TIMEOUT_SECS);
 #endif
 
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
+
     static CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
 
     ReturnLogErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 

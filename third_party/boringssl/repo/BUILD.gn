@@ -20,6 +20,12 @@ import("BUILD.generated.gni")
 config("boringssl_config") {
   include_dirs = [ "src/include" ]
 
+  # We want the basic crypto impl with no asm primitives until we hook-up platform-based
+  # support to the build later.
+  defines = [ "OPENSSL_NO_ASM=1" ]
+}
+
+config("boringssl_config_disable_warnings") {
   cflags = [
     "-Wno-unused-variable",
     "-Wno-conversion",
@@ -28,11 +34,8 @@ config("boringssl_config") {
   if (is_clang) {
     cflags += [ "-Wno-shorten-64-to-32" ]
   }
-
-  # We want the basic crypto impl with no asm primitives until we hook-up platform-based
-  # support to the build later.
-  defines = [ "OPENSSL_NO_ASM=1" ]
 }
+
 all_sources = crypto_sources
 
 all_headers = crypto_headers
@@ -45,4 +48,9 @@ static_library("boringssl") {
   sources = all_sources
 
   public_configs = [ ":boringssl_config" ]
+
+  # The disable-warnings config should not be a public config, since
+  # that would make it apply to compilations of anything that depends
+  # on boringssl, not just boringssl itself.
+  configs += [ ":boringssl_config_disable_warnings" ]
 }

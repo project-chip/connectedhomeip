@@ -241,6 +241,7 @@ target_link_libraries(app PRIVATE
 target_link_options(app
   PUBLIC
     "-T${PIGWEED_ROOT}/pw_tokenizer/pw_tokenizer_linker_sections.ld"
+    "-L${PIGWEED_ROOT}/pw_tokenizer"
 )
 
 endif(CONFIG_CHIP_PW_RPC)

@@ -253,6 +253,8 @@ private:
         HasAddress,       // Have an address, CASE handshake not started yet.
         Connecting,       // CASE handshake in progress.
         SecureConnected,  // CASE session established.
+        WaitingForRetry,  // No address known, but a retry is pending.  Added at
+                          // end to make logs easier to understand.
     };
 
     CASEClientInitParams mInitParams;
@@ -283,6 +285,8 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     uint8_t mRemainingAttempts = 0;
     uint8_t mAttemptsDone      = 0;
+
+    uint8_t mResolveAttemptsAllowed = 0;
 
     Callback::CallbackDeque mConnectionRetry;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
@@ -336,6 +340,12 @@ private:
     CHIP_ERROR ScheduleSessionSetupReattempt(System::Clock::Seconds16 & timerDelay);
 
     /**
+     * Cancel a scheduled setup reattempt, if we can (i.e. if we still have
+     * access to the SystemLayer).
+     */
+    void CancelSessionSetupReattempt();
+
+    /**
      * Helper for our backoff retry timer.
      */
     static void TrySetupAgain(System::Layer * systemLayer, void * state);
@@ -346,6 +356,12 @@ private:
      */
     void NotifyRetryHandlers(CHIP_ERROR error, const ReliableMessageProtocolConfig & remoteMrpConfig,
                              System::Clock::Seconds16 retryDelay);
+
+    /**
+     * A version of NotifyRetryHandlers that passes in a retry timeout estimate
+     * directly.
+     */
+    void NotifyRetryHandlers(CHIP_ERROR error, System::Clock::Seconds16 timeoutEstimate);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 };
 
