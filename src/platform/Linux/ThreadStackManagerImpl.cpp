@@ -49,6 +49,32 @@ constexpr char ThreadStackManagerImpl::kOpenthreadDeviceRoleLeader[];
 
 constexpr char ThreadStackManagerImpl::kPropertyDeviceRole[];
 
+namespace {
+
+struct SetActiveDatasetContext
+{
+    OpenthreadIoOpenthreadBorderRouter * proxy;
+    ByteSpan netInfo;
+};
+
+CHIP_ERROR GLibMatterContextSetActiveDataset(SetActiveDatasetContext * context)
+{
+    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
+    // all D-Bus signals will be delivered to the GLib global default main context.
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+
+    std::unique_ptr<GBytes, GBytesDeleter> bytes(g_bytes_new(context->netInfo.data(), context->netInfo.size()));
+    if (!bytes)
+        return CHIP_ERROR_NO_MEMORY;
+    std::unique_ptr<GVariant, GVariantDeleter> value(g_variant_new_from_bytes(G_VARIANT_TYPE_BYTESTRING, bytes.release(), true));
+    if (!value)
+        return CHIP_ERROR_NO_MEMORY;
+    openthread_io_openthread_border_router_set_active_dataset_tlvs(context->proxy, value.release());
+    return CHIP_NO_ERROR;
+}
+
+} // namespace
+
 ThreadStackManagerImpl::ThreadStackManagerImpl() : mAttached(false) {}
 
 CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextInitThreadStack(ThreadStackManagerImpl * self)
@@ -229,16 +255,9 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(ByteSpan netInfo)
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(Thread::OperationalDataset::IsValid(netInfo), CHIP_ERROR_INVALID_ARGUMENT);
 
-    {
-        std::unique_ptr<GBytes, GBytesDeleter> bytes(g_bytes_new(netInfo.data(), netInfo.size()));
-        if (!bytes)
-            return CHIP_ERROR_NO_MEMORY;
-        std::unique_ptr<GVariant, GVariantDeleter> value(
-            g_variant_new_from_bytes(G_VARIANT_TYPE_BYTESTRING, bytes.release(), true));
-        if (!value)
-            return CHIP_ERROR_NO_MEMORY;
-        openthread_io_openthread_border_router_set_active_dataset_tlvs(mProxy.get(), value.release());
-    }
+    SetActiveDatasetContext context = { mProxy.get(), netInfo };
+    CHIP_ERROR err                  = PlatformMgrImpl().GLibMatterContextInvokeSync(GLibMatterContextSetActiveDataset, &context);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "openthread: failed to set active dataset"));
 
     // post an event alerting other subsystems about change in provisioning state
     ChipDeviceEvent event;
@@ -357,12 +376,20 @@ bool ThreadStackManagerImpl::_IsThreadAttached() const
     return mAttached;
 }
 
+CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextCallAttach(ThreadStackManagerImpl * self)
+{
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+    openthread_io_openthread_border_router_call_attach(self->mProxy.get(), nullptr, _OnThreadBrAttachFinished, self);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
 {
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
     if (val)
     {
-        openthread_io_openthread_border_router_call_attach(mProxy.get(), nullptr, _OnThreadBrAttachFinished, this);
+        CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(GLibMatterContextCallAttach, this);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "openthread: failed to attach"));
     }
     else
     {
@@ -584,12 +611,20 @@ void ThreadStackManagerImpl::_SetRouterPromotion(bool val)
     // Set Router Promotion is not supported on linux
 }
 
+CHIP_ERROR ThreadStackManagerImpl::GLibMatterContextCallScan(ThreadStackManagerImpl * self)
+{
+    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
+    openthread_io_openthread_border_router_call_scan(self->mProxy.get(), nullptr, _OnNetworkScanFinished, self);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadScan(ThreadDriver::ScanCallback * callback)
 {
     // There is another ongoing scan request, reject the new one.
     VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mpScanCallback = callback;
-    openthread_io_openthread_border_router_call_scan(mProxy.get(), nullptr, _OnNetworkScanFinished, this);
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(GLibMatterContextCallScan, this);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "openthread: failed to start scan"));
     return CHIP_NO_ERROR;
 }
 
