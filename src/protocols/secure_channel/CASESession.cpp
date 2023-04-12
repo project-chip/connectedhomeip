@@ -182,9 +182,9 @@ public:
         helper->mStatus = helper->mWorkCallback(helper->mData, cancel);
         if (!cancel)
         {
-            (helper->mSession->*(helper->mAfterWorkCallback))(helper->mData, helper->mStatus);
+            helper->mStatus = (helper->mSession->*(helper->mAfterWorkCallback))(helper->mData, helper->mStatus);
         }
-        return CHIP_NO_ERROR;
+        return helper->mStatus;
     }
 
     // Schedule the work after configuring the data.
@@ -1304,7 +1304,7 @@ CHIP_ERROR CASESession::SendSigma3a()
         data.fabricTable = mFabricsTable;
         data.fabricIndex = mFabricIndex;
 
-        // If an operational keystore is used, work will be performed in the background.
+        // If an operational keystore is used, signing will be performed in the background.
         // Otherwise, legacy signing will be performed in the foreground.
         data.keystore = nullptr;
         {
@@ -1489,10 +1489,14 @@ CHIP_ERROR CASESession::SendSigma3c(SendSigma3Data & data, CHIP_ERROR status)
 exit:
     mSendSigma3Helper.reset();
 
-    if (err != CHIP_NO_ERROR)
+    // If data.keystore is set, processing occurred in the background, so if an error occurred,
+    // need to send status report (normally occurs in SendSigma3a), and discard exchange and
+    // abort pending establish (normally occurs in OnMessageReceived).
+    if (data.keystore != nullptr && err != CHIP_NO_ERROR)
     {
         SendStatusReport(mExchangeCtxt, kProtocolCodeInvalidParam);
-        mState = State::kInitialized;
+        DiscardExchange();
+        AbortPendingEstablish(err);
     }
 
     return err;
