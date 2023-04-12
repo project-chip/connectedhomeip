@@ -88,11 +88,6 @@ void pre_bootloader_spi_transfer(void)
         return;
     }
     /*
-     * CS for Expansion header controlled within GSDK,
-     * however we need to ensure CS for Expansion header is High/disabled before use of EXT SPI Flash
-     */
-    sl_wfx_host_spi_cs_deassert();
-    /*
      * Assert CS pin for EXT SPI Flash
      */
     spi_drv_reinit(SL_BIT_RATE_SPI_FLASH);
