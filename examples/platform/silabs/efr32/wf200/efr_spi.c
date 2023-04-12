@@ -153,7 +153,7 @@ sl_status_t sl_wfx_host_spi_cs_assert()
     {
         return SL_STATUS_TIMEOUT;
     }
-    spi_drv_reinit(SL_BIT_RATE_EXP_HDR);
+    spi_drv_reinit(SL_SPIDRV_EXP_BITRATE);
     GPIO_PinOutClear(SL_SPIDRV_EXP_CS_PORT, SL_SPIDRV_EXP_CS_PIN);
     return SL_STATUS_OK;
 }
