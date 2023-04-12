@@ -290,7 +290,7 @@ MTR_NEWLY_AVAILABLE;
  * The reportHandler will be called with an error if the inputs are invalid (e.g., both attributePaths and eventPaths are
  * empty), or if the subscription fails entirely.
  *
- * The length of the Path is guaranteed up to 9.
+ * If the sum of the lengths of attributePaths and eventPaths exceeds 3, the subscribe may fail due to the device not supporting that many paths for a subscription.
  */
 - (void)subscribeToAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
                        eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
