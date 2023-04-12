@@ -533,15 +533,19 @@ WindowAppImpl::Button::Button(WindowApp::Button::Id id, const char * name) : Win
 void WindowAppImpl::OnButtonChange(uint8_t Btn, uint8_t btnAction)
 {
     WindowApp::Button * btn = static_cast<Button *>((Btn == SIWx917_BTN0) ? sInstance.mButtonUp : sInstance.mButtonDown);
-    if (Btn == SIWx917_BTN1) {
+    if (Btn == SIWx917_BTN1)
+    {
         btn->Press();
         btn->Release();
     }
-    else {
-        if (btnAction) {
+    else
+    {
+        if (btnAction)
+        {
             btn->Press();
         }
-        else {
+        else
+        {
             btn->Release();
         }
     }
@@ -551,7 +555,8 @@ void WindowAppImpl::OnButtonChange(uint8_t Btn, uint8_t btnAction)
 void sl_button_on_change(uint8_t btn, uint8_t btnAction)
 {
     WindowAppImpl * app = static_cast<WindowAppImpl *>(&WindowAppImpl::sInstance);
-    if (app->mWindowAppInit) {
+    if (app->mWindowAppInit)
+    {
         app->OnButtonChange(btn, btnAction);
     }
 }
