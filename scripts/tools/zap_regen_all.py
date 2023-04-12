@@ -494,8 +494,6 @@ def main():
 
     timings = []
     if args.parallel:
-        # Ensure each zap run is independent
-        os.environ['ZAP_TEMPSTATE'] = '1'
         with multiprocessing.Pool() as pool:
             for timing in pool.imap_unordered(_ParallelGenerateOne, targets):
                 timings.append(timing)
