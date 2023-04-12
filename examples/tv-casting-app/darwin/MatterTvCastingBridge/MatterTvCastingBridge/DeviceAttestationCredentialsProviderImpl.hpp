@@ -21,6 +21,8 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include <Security/Security.h>
+
 class DeviceAttestationCredentialsProviderImpl : public chip::Credentials::DeviceAttestationCredentialsProvider
 {
 public:
@@ -28,8 +30,7 @@ public:
                                              chip::MutableByteSpan * firmwareInformation,
                                              chip::MutableByteSpan * deviceAttestationCert,
                                              chip::MutableByteSpan * productAttestationIntermediateCert,
-                                             chip::MutableByteSpan * deviceAttestationCertPrivateKey,
-                                             chip::MutableByteSpan * deviceAttestationCertPublicKeyKey);
+                                             SecKeyRef deviceAttestationCertPrivateKeyRef);
 
     CHIP_ERROR GetCertificationDeclaration(chip::MutableByteSpan & outCertificationDeclaration) override;
     CHIP_ERROR GetFirmwareInformation(chip::MutableByteSpan & outFirmwareInformation) override;
@@ -43,15 +44,5 @@ private:
     chip::MutableByteSpan mFirmwareInformation;
     chip::MutableByteSpan mDeviceAttestationCert;
     chip::MutableByteSpan mProductAttestationIntermediateCert;
-    chip::MutableByteSpan mDeviceAttestationCertPrivateKey;
-    chip::MutableByteSpan mDeviceAttestationCertPublicKeyKey;
-
-    CHIP_ERROR LoadKeypairFromRaw(chip::ByteSpan privateKey, chip::ByteSpan publicKey, chip::Crypto::P256Keypair & keypair)
-    {
-        chip::Crypto::P256SerializedKeypair serialized_keypair;
-        ReturnErrorOnFailure(serialized_keypair.SetLength(privateKey.size() + publicKey.size()));
-        memcpy(serialized_keypair.Bytes(), publicKey.data(), publicKey.size());
-        memcpy(serialized_keypair.Bytes() + publicKey.size(), privateKey.data(), privateKey.size());
-        return keypair.Deserialize(serialized_keypair);
-    }
+    SecKeyRef mDeviceAttestationCertPrivateKeyRef;
 };

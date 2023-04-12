@@ -25,7 +25,20 @@ from .using_codegen import (CodegenBridgePregenerator, CodegenCppAppPregenerator
 from .using_zap import ZapApplicationPregenerator
 
 
-def FindAllIdls(sdk_root: str) -> Iterator[InputIdlFile]:
+def _IdlsInDirectory(top_directory_name: str, truncate_length: int):
+    for root, dirs, files in os.walk(top_directory_name):
+        for file in files:
+            if file.endswith('.zap'):
+                yield InputIdlFile(file_type=IdlFileType.ZAP,
+                                   full_path=os.path.join(root, file),
+                                   relative_path=os.path.join(root[truncate_length:], file))
+            if file.endswith('.matter'):
+                yield InputIdlFile(file_type=IdlFileType.MATTER,
+                                   full_path=os.path.join(root, file),
+                                   relative_path=os.path.join(root[truncate_length:], file))
+
+
+def _FindAllIdls(sdk_root: str, external_roots: Optional[List[str]]) -> Iterator[InputIdlFile]:
     relevant_subdirs = [
         'examples',  # all example apps
         'src',      # realistically only controller/data_model
@@ -35,17 +48,19 @@ def FindAllIdls(sdk_root: str) -> Iterator[InputIdlFile]:
         sdk_root = sdk_root[:-1]
     sdk_root_length = len(sdk_root)
 
+    # first go over SDK items
     for subdir_name in relevant_subdirs:
         top_directory_name = os.path.join(sdk_root, subdir_name)
         logging.debug(f"Searching {top_directory_name}")
-        for root, dirs, files in os.walk(top_directory_name):
-            for file in files:
-                if file.endswith('.zap'):
-                    yield InputIdlFile(file_type=IdlFileType.ZAP,
-                                       relative_path=os.path.join(root[sdk_root_length+1:], file))
-                if file.endswith('.matter'):
-                    yield InputIdlFile(file_type=IdlFileType.MATTER,
-                                       relative_path=os.path.join(root[sdk_root_length+1:], file))
+        for idl in _IdlsInDirectory(top_directory_name, sdk_root_length+1):
+            yield idl
+
+    # next external roots
+    if external_roots:
+        for root in external_roots:
+            root = os.path.normpath(root)
+            for idl in _IdlsInDirectory(root, len(root) + 1):
+                yield idl
 
 
 @dataclass
@@ -67,7 +82,7 @@ class GlobMatcher:
         return fnmatch.fnmatch(s, self.pattern)
 
 
-def FindPregenerationTargets(sdk_root: str, filter: TargetFilter, runner):
+def FindPregenerationTargets(sdk_root: str, external_roots: Optional[List[str]], filter: TargetFilter, runner):
     """Finds all relevand pre-generation targets in the given
        SDK root.
 
@@ -88,7 +103,7 @@ def FindPregenerationTargets(sdk_root: str, filter: TargetFilter, runner):
 
     path_matchers = [GlobMatcher(pattern) for pattern in filter.path_glob]
 
-    for idl in FindAllIdls(sdk_root):
+    for idl in _FindAllIdls(sdk_root, external_roots):
         if filter.file_type is not None:
             if idl.file_type != filter.file_type:
                 logging.debug(f"Will not process file of type {idl.file_type}: {idl.relative_path}")

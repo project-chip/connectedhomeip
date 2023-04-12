@@ -49,11 +49,22 @@ void ReadLine(char * buffer, size_t max)
             break;
         }
 
-        chip::WaitForShellActivity();
+#ifdef BRD4325A
+        // for 917 SoC board, we need to create a rx event before we wait for the shell activity
+        // NotifyShellProcessFromISR() is called once the buffer is filled
         if (streamer_read(streamer_get(), buffer + line_sz, 1) != 1)
         {
             continue;
         }
+#endif
+        chip::WaitForShellActivity();
+#ifndef BRD4325A
+        // for EFR32 boards
+        if (streamer_read(streamer_get(), buffer + line_sz, 1) != 1)
+        {
+            continue;
+        }
+#endif
 
         // Process character we just read.
         switch (buffer[line_sz])

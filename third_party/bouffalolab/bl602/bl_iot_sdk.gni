@@ -475,6 +475,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/aes.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/asn1parse.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/asn1write.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/base64.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/bignum.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ccm.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/cipher.c",
@@ -491,6 +492,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/hmac_drbg.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/md.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/oid.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pem.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pk.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pk_wrap.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pkcs5.c",
@@ -499,7 +501,9 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/platform_util.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/sha256.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/sha512.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509_create.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509_crt.c",
       "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509write_csr.c",
     ]
 
@@ -607,6 +611,7 @@ template("bl_iot_sdk") {
     ]
     public_configs = [
       ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_hosal",
       ":${sdk_target_name}_ble_config",
     ]
 
@@ -932,12 +937,24 @@ template("bl_iot_sdk") {
     ]
   }
 
+  config("${sdk_target_name}_config_factory_data") {
+    include_dirs = [ "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/include" ]
+  }
+
+  source_set("${sdk_target_name}_factory_data") {
+    libs = [ "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/lib/libmatter_factory_data.a" ]
+
+    configs += [ ":${sdk_target_name}_config" ]
+    public_configs = [ ":${sdk_target_name}_config_factory_data" ]
+  }
+
   group(sdk_target_name) {
     public_deps = [
       ":${sdk_target_name}_BSP_Driver",
       ":${sdk_target_name}_bl602_freertos",
       ":${sdk_target_name}_blcrypto_suite",
       ":${sdk_target_name}_ble",
+      ":${sdk_target_name}_factory_data",
       ":${sdk_target_name}_fs",
       ":${sdk_target_name}_hosal",
       ":${sdk_target_name}_libc",

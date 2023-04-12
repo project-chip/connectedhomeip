@@ -25,17 +25,17 @@ using GroupId = uint16_t;
 
 constexpr GroupId kUndefinedGroupId = 0;
 
-constexpr GroupId kMinUniversalGroupId = 0x8000;
+constexpr GroupId kMinUniversalGroupId = 0xFF00;
 constexpr GroupId kMaxUniversalGroupId = 0xFFFF;
 
-constexpr GroupId kMinFabricGroupId = 0x0001;
-constexpr GroupId kMaxFabricGroupId = 0x7FFF;
+constexpr GroupId kMinApplicationGroupId = 0x0001;
+constexpr GroupId kMaxApplicationGroupId = 0xFEFF;
 
 constexpr GroupId kAllNodes     = 0xFFFF;
 constexpr GroupId kAllNonSleepy = 0xFFFE;
 constexpr GroupId kAllProxies   = 0xFFFD;
 
-constexpr GroupId kMinUniversalGroupIdReserved = 0x8000;
+constexpr GroupId kMinUniversalGroupIdReserved = 0xFF00;
 constexpr GroupId kMaxUniversalGroupIdReserved = 0xFFFC;
 
 constexpr bool IsOperationalGroupId(GroupId aGroupId)
@@ -44,9 +44,9 @@ constexpr bool IsOperationalGroupId(GroupId aGroupId)
         ((aGroupId < kMinUniversalGroupIdReserved) || (aGroupId > kMaxUniversalGroupIdReserved));
 }
 
-constexpr bool IsFabricGroupId(GroupId aGroupId)
+constexpr bool IsApplicationGroupId(GroupId aGroupId)
 {
-    return (aGroupId >= kMinFabricGroupId) && (aGroupId <= kMaxFabricGroupId);
+    return (aGroupId >= kMinApplicationGroupId) && (aGroupId <= kMaxApplicationGroupId);
 }
 
 constexpr bool IsUniversalGroupId(GroupId aGroupId)

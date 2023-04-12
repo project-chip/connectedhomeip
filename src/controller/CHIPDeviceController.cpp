@@ -143,6 +143,8 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     mSystemState = params.systemState->Retain();
     mState       = State::Initialized;
 
+    mRemoveFromFabricTableOnShutdown = params.removeFromFabricTableOnShutdown;
+
     if (GetFabricIndex() != kUndefinedFabricIndex)
     {
         ChipLogProgress(Controller,
@@ -348,10 +350,13 @@ void DeviceController::Shutdown()
         // existing sessions too?
         mSystemState->SessionMgr()->ExpireAllSessionsForFabric(mFabricIndex);
 
-        FabricTable * fabricTable = mSystemState->Fabrics();
-        if (fabricTable != nullptr)
+        if (mRemoveFromFabricTableOnShutdown)
         {
-            fabricTable->Forget(mFabricIndex);
+            FabricTable * fabricTable = mSystemState->Fabrics();
+            if (fabricTable != nullptr)
+            {
+                fabricTable->Forget(mFabricIndex);
+            }
         }
     }
 

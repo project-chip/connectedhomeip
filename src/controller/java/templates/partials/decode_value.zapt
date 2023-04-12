@@ -60,7 +60,7 @@ if ({{source}}.IsNull()) {
         env->SetByteArrayRegion({{target}}ByteArray, 0, static_cast<jsize>({{source}}.size()), reinterpret_cast<const jbyte *>({{source}}.data()));
         {{target}} = {{target}}ByteArray;
       {{else if (isCharString type)}}
-        {{target}} = env->NewStringUTF(std::string({{source}}.data(), {{source}}.size()).c_str());
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF({{source}}, {{target}}));
       {{else}}
         std::string {{target}}ClassName = "{{asJniClassName type null cluster}}";
         std::string {{target}}CtorSignature = "({{asJniSignature type null cluster false}})V";

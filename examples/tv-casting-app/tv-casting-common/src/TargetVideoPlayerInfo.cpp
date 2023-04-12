@@ -68,6 +68,29 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
     return CHIP_NO_ERROR;
 }
 
+void TargetVideoPlayerInfo::Reset()
+{
+    ChipLogProgress(NotSpecified, "TargetVideoPlayerInfo Reset() called");
+    mInitialized = false;
+    mNodeId      = 0;
+    mFabricIndex = 0;
+    mVendorId    = 0;
+    mProductId   = 0;
+    mDeviceType  = 0;
+    memset(mDeviceName, '\0', sizeof(mDeviceName));
+    memset(mHostName, '\0', sizeof(mHostName));
+    mDeviceProxy = nullptr;
+    for (auto & endpointInfo : mEndpoints)
+    {
+        endpointInfo.Reset();
+    }
+    for (size_t i = 0; i < mNumIPs && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
+    {
+        mIpAddress[i] = chip::Inet::IPAddress();
+    }
+    mNumIPs = 0;
+}
+
 CHIP_ERROR TargetVideoPlayerInfo::FindOrEstablishCASESession(std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                                                              std::function<void(CHIP_ERROR)> onConnectionFailure)
 {

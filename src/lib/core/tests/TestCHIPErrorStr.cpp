@@ -170,6 +170,7 @@ static const CHIP_ERROR kTestElements[] =
     CHIP_ERROR_INVALID_FILE_IDENTIFIER,
     CHIP_ERROR_BUSY,
     CHIP_ERROR_HANDLER_NOT_SET,
+    CHIP_ERROR_IN_PROGRESS,
 };
 // clang-format on
 
@@ -194,6 +195,13 @@ static void CheckCoreErrorStr(nlTestSuite * inSuite, void * inContext)
         // by a presence of a colon proceeding the description.
         NL_TEST_ASSERT(inSuite, (strchr(errStr, ':') != nullptr));
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
+
+#if CHIP_CONFIG_ERROR_SOURCE
+        // GetFile() should be relative to ${chip_root}
+        char const * const file = err.GetFile();
+        NL_TEST_ASSERT(inSuite, file != nullptr);
+        NL_TEST_ASSERT(inSuite, strstr(file, "src/lib/core/") == file);
+#endif // CHIP_CONFIG_ERROR_SOURCE
     }
 }
 

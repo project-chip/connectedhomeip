@@ -20,6 +20,7 @@
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 #include <lib/support/TypeTraits.h>
 #include <string>
 
@@ -159,6 +160,15 @@ public:
     {
         return CreateBoxedObject(boxedTypeClsName, constructorSignature, chip::to_underlying(value), outObj);
     }
+
+    /**
+     * Use instead of 'NewStringUTF' function
+     * If the value is not decoded with "UTF-8", the error will be returned.
+     * (The NewStringUTF function crashes when the value can not decoded as "UTF-8".)
+     *
+     * Creates a java string type based on char array.
+     */
+    CHIP_ERROR CharToStringUTF(const chip::CharSpan & charSpan, jobject & outString);
 
 private:
     JniReferences() {}

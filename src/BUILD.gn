@@ -26,6 +26,10 @@ declare_args() {
   chip_monolithic_tests = false
 }
 
+# chip_root relative to root_build_dir for macro-prefix-map.
+# "/." avoids trailing "/" in result when chip_root is "//"
+build_relative_chip_root = rebase_path("${chip_root}/.", root_build_dir)
+
 config("includes") {
   include_dirs = [
     "include",
@@ -37,6 +41,9 @@ config("includes") {
   include_dirs += [ "${chip_root}/zzz_generated/app-common" ]
 
   defines = [ "CHIP_HAVE_CONFIG_H=1" ]
+
+  # Make __FILE__ and related macros relative to chip_root
+  cflags = [ "-fmacro-prefix-map=${build_relative_chip_root}/=" ]
 }
 
 if (chip_build_tests) {
