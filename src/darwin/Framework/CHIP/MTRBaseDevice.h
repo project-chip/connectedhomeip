@@ -273,7 +273,7 @@ MTR_NEWLY_AVAILABLE;
  * empty.) or the entire read interaction fails. Otherwise it will be called with values, which may be empty (e.g. if no paths
  * matched the wildcard paths passed in) or may include per-path errors if particular paths failed.
  *
- * The length of the path is guaranteed up to 9.
+ * If the sum of the lengths of attributePaths and eventPaths exceeds 9, the read may fail due to the device not supporting that many read paths.
  */
 - (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
                 eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
