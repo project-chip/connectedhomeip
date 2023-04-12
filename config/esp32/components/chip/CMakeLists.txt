@@ -155,12 +155,16 @@ if ((CONFIG_BT_ENABLED) AND (CONFIG_ENABLE_CHIPOBLE))
         endif()
 endif()
 
-if (CONFIG_OPENTHREAD_ENABLED)
+if (CONFIG_ENABLE_MATTER_OVER_THREAD)
     chip_gn_arg_append("chip_enable_openthread"                 "true")
+else()
+    chip_gn_arg_append("chip_enable_openthread"                 "false")
 endif()
 
 if (CONFIG_OPENTHREAD_FTD)
     chip_gn_arg_append("chip_openthread_ftd"                    "true")
+else()
+    chip_gn_arg_append("chip_openthread_ftd"                    "false")
 endif()
 
 if (CONFIG_ENABLE_OTA_REQUESTOR)

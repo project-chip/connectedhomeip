@@ -145,28 +145,9 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
 
     mOnNOCCompletionCallback = onCompletion;
 
-    TLVReader reader;
-    reader.Init(csrElements);
-
-    if (reader.GetType() == kTLVType_NotSpecified) {
-        ReturnErrorOnFailure(reader.Next());
-    }
-
-    VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
-    VerifyOrReturnError(reader.GetTag() == AnonymousTag(), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
-
-    TLVType containerType;
-    ReturnErrorOnFailure(reader.EnterContainer(containerType));
-    ReturnErrorOnFailure(reader.Next(kTLVType_ByteString, TLV::ContextTag(1)));
-
-    chip::ByteSpan csr;
-    reader.Get(csr);
-    reader.ExitContainer(containerType);
-
-    auto * csrInfo = [[MTROperationalCSRInfo alloc] initWithCSR:AsData(csr)
-                                                       csrNonce:AsData(csrNonce)
-                                                 csrElementsTLV:AsData(csrElements)
-                                           attestationSignature:AsData(csrElementsSignature)];
+    auto * csrInfo = [[MTROperationalCSRInfo alloc] initWithCSRNonce:AsData(csrNonce)
+                                                      csrElementsTLV:AsData(csrElements)
+                                                attestationSignature:AsData(csrElementsSignature)];
 
     chip::ByteSpan certificationDeclarationSpan;
     chip::ByteSpan attestationNonceSpan;

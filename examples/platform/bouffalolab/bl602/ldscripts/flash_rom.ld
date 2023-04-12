@@ -14,6 +14,9 @@ __RAM_END = 0x4200C000 + 256K - __EM_SIZE; /* leave 8K left for BLE */
 __RAM_TCM_LEN = (16K + 16K + 48K + 64K + 64K - 16K - 16K);
 __RAM_WIFI_LEN = (__RAM_END - __RAM_START - __RAM_TCM_LEN);
 
+__OCRAM_START_ADDRESS = 0x42030000 + 0x8000;
+__OCRAM_SIZE = 112K;
+
 MEMORY
 {
   rom       (rxai!w) : ORIGIN = 0x21015000, LENGTH = 44K
@@ -255,6 +258,8 @@ SECTIONS
   PROVIDE( _ld_ram_size2 = LENGTH(ram_wifi) );
   PROVIDE( _ld_ram_addr2 = ORIGIN(ram_wifi) );
 
+  PROVIDE(__ocram_start_addr = __OCRAM_START_ADDRESS);
+  PROVIDE(__ocram_size = __OCRAM_SIZE);
 
   /*BOOT2 sections*/
   PROVIDE ( __boot2_pt_addr_src = BOOT2_PT_ADDR );

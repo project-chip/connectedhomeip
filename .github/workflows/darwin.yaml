@@ -68,7 +68,7 @@ jobs:
 
             - name: Block zap-cli from being used
               # xcodebuild is NOT expected to require zap-cli
-              run: scripts/run_in_build_env.sh 'mv $PW_ENVIRONMENT_ROOT/cipd/packages/zap/zap-cli $PW_ENVIRONMENT_ROOT/cipd/packages/zap/zap-cli.moved'
+              run: scripts/run_in_build_env.sh 'D=$(dirname $(which zap-cli)) && mv $D/zap-cli $D/zap-cli.moved'
             - name: Validate zap-cli is NOT available
               # run_in_build_env.sh is used to ensure PATH is set to something that would otherwise find zap-cli
               run: scripts/run_in_build_env.sh '(zap-cli --version && exit 1) || exit 0'
@@ -112,7 +112,7 @@ jobs:
               run: xcodebuild clean
               working-directory: src/darwin/Framework
             - name: Make zap-cli work again
-              run: scripts/run_in_build_env.sh 'mv $PW_ENVIRONMENT_ROOT/cipd/packages/zap/zap-cli.moved $PW_ENVIRONMENT_ROOT/cipd/packages/zap/zap-cli'
+              run: scripts/run_in_build_env.sh 'D=$(dirname $(which zap-cli.moved)) && mv $D/zap-cli.moved $D/zap-cli'
             - name: Validate zap-cli is again available
               run: scripts/run_in_build_env.sh 'zap-cli --version'
             - name: Build example All Clusters Server

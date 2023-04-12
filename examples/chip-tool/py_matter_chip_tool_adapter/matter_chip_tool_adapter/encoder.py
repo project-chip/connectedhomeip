@@ -32,7 +32,18 @@ _ALIASES = {
             'GetCommissionerNodeId': {
                 'has_destination': False,
                 'has_endpoint': False,
-            }
+            },
+            'GetCommissionerRootCertificate': {
+                'has_destination': False,
+                'has_endpoint': False,
+            },
+            'IssueNocChain': {
+                'arguments': {
+                    'nodeId': 'node-id',
+                },
+                'has_destination': False,
+                'has_endpoint': False,
+            },
         }
     },
 

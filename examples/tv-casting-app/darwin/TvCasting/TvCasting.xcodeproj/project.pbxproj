@@ -14,6 +14,7 @@
 		3CA1CA7A28E281080023ED44 /* ClusterSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CA1CA7928E281080023ED44 /* ClusterSelectorView.swift */; };
 		3CA1CA7C28E282150023ED44 /* MediaPlaybackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CA1CA7B28E282150023ED44 /* MediaPlaybackView.swift */; };
 		3CA1CA7E28E284950023ED44 /* MediaPlaybackViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CA1CA7D28E284950023ED44 /* MediaPlaybackViewModel.swift */; };
+		3CAC955B29BA948700BEA5C3 /* ExampleDAC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CAC955A29BA948700BEA5C3 /* ExampleDAC.swift */; };
 		3CC0E8FA2841DD3400EC6A18 /* TvCastingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC0E8F92841DD3400EC6A18 /* TvCastingApp.swift */; };
 		3CC0E8FC2841DD3400EC6A18 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC0E8FB2841DD3400EC6A18 /* ContentView.swift */; };
 		3CC0E8FE2841DD3500EC6A18 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3CC0E8FD2841DD3500EC6A18 /* Assets.xcassets */; };
@@ -59,6 +60,7 @@
 		3CA1CA7928E281080023ED44 /* ClusterSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClusterSelectorView.swift; sourceTree = "<group>"; };
 		3CA1CA7B28E282150023ED44 /* MediaPlaybackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlaybackView.swift; sourceTree = "<group>"; };
 		3CA1CA7D28E284950023ED44 /* MediaPlaybackViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlaybackViewModel.swift; sourceTree = "<group>"; };
+		3CAC955A29BA948700BEA5C3 /* ExampleDAC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleDAC.swift; sourceTree = "<group>"; };
 		3CC0E8F62841DD3400EC6A18 /* TvCasting.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TvCasting.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3CC0E8F92841DD3400EC6A18 /* TvCastingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TvCastingApp.swift; sourceTree = "<group>"; };
 		3CC0E8FB2841DD3400EC6A18 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -125,6 +127,7 @@
 				3C7507B62853A3AD00D7DB3A /* CommissionerDiscoveryViewModel.swift */,
 				3C7507AE28529A5F00D7DB3A /* CommissioningView.swift */,
 				3C7507B82853EFF000D7DB3A /* CommissioningViewModel.swift */,
+				3CAC955A29BA948700BEA5C3 /* ExampleDAC.swift */,
 				3CA1CA7928E281080023ED44 /* ClusterSelectorView.swift */,
 				3CA19434285BA780004768D5 /* ContentLauncherView.swift */,
 				3CA19436285BA877004768D5 /* ContentLauncherViewModel.swift */,
@@ -235,6 +238,7 @@
 				EAF14299296D561900E17793 /* CertTestView.swift in Sources */,
 				3CCB8747286A5D0F00771BAD /* CommissioningView.swift in Sources */,
 				3CCB8748286A5D0F00771BAD /* CommissioningViewModel.swift in Sources */,
+				3CAC955B29BA948700BEA5C3 /* ExampleDAC.swift in Sources */,
 				3CA1CA7E28E284950023ED44 /* MediaPlaybackViewModel.swift in Sources */,
 				3CCB8749286A5D0F00771BAD /* ContentLauncherView.swift in Sources */,
 				3CCB874A286A5D0F00771BAD /* ContentLauncherViewModel.swift in Sources */,

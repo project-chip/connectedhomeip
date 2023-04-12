@@ -735,26 +735,39 @@ bool emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * comman
         return true;
     }
 
+    bool changeTarget = true;
+
     Delegate * delegate = GetDelegate(endpoint);
     if (delegate)
     {
-        LogErrorOnFailure(delegate->HandleStopMotion());
+        CHIP_ERROR err = delegate->HandleStopMotion();
+        if (err == CHIP_ERROR_IN_PROGRESS)
+        {
+            changeTarget = false;
+        }
+        else
+        {
+            LogErrorOnFailure(err);
+        }
     }
     else
     {
         emberAfWindowCoveringClusterPrint("WindowCovering has no delegate set for endpoint:%u", endpoint);
     }
 
-    if (HasFeaturePaLift(endpoint))
+    if (changeTarget)
     {
-        (void) Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, current);
-        (void) Attributes::TargetPositionLiftPercent100ths::Set(endpoint, current);
-    }
+        if (HasFeaturePaLift(endpoint))
+        {
+            (void) Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, current);
+            (void) Attributes::TargetPositionLiftPercent100ths::Set(endpoint, current);
+        }
 
-    if (HasFeaturePaTilt(endpoint))
-    {
-        (void) Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
-        (void) Attributes::TargetPositionTiltPercent100ths::Set(endpoint, current);
+        if (HasFeaturePaTilt(endpoint))
+        {
+            (void) Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
+            (void) Attributes::TargetPositionTiltPercent100ths::Set(endpoint, current);
+        }
     }
 
     return CHIP_NO_ERROR == commandObj->AddStatus(commandPath, Status::Success);

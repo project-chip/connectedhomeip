@@ -1,5 +1,5 @@
 {{> header}}
-{{#if (chip_has_client_clusters)}}
+{{#if_enabled_clusters side='client'}}
 #include <jni/CHIPReadCallbacks.h>
 
 #include <zap-generated/CHIPClientCallbacks.h>
@@ -175,4 +175,4 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
 {{/zcl_attributes_server}}
 {{/all_user_clusters}}
 
-{{/if}}
+{{/if_enabled_clusters}}

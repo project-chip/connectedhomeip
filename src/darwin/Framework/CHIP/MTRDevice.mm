@@ -806,6 +806,15 @@ private:
                                               completion:completion];
 }
 
+- (void)openCommissioningWindowWithDiscriminator:(NSNumber *)discriminator
+                                        duration:(NSNumber *)duration
+                                           queue:(dispatch_queue_t)queue
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion
+{
+    auto * baseDevice = [self newBaseDevice];
+    [baseDevice openCommissioningWindowWithDiscriminator:discriminator duration:duration queue:queue completion:completion];
+}
+
 #pragma mark - Cache management
 
 // assume lock is held

@@ -286,6 +286,7 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.controllerICAC                       = params.controllerICAC;
     controllerParams.controllerRCAC                       = params.controllerRCAC;
     controllerParams.permitMultiControllerFabrics         = params.permitMultiControllerFabrics;
+    controllerParams.removeFromFabricTableOnShutdown      = params.removeFromFabricTableOnShutdown;
 
     controllerParams.systemState        = mSystemState;
     controllerParams.controllerVendorId = params.controllerVendorId;

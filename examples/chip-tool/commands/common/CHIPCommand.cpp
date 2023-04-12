@@ -333,6 +333,22 @@ CHIP_ERROR CHIPCommand::GetIdentityNodeId(std::string identity, chip::NodeId * n
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CHIPCommand::GetIdentityRootCertificate(std::string identity, chip::ByteSpan & span)
+{
+    if (identity == kIdentityNull)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    chip::NodeId nodeId;
+    VerifyOrDie(GetIdentityNodeId(identity, &nodeId) == CHIP_NO_ERROR);
+    CommissionerIdentity lookupKey{ identity, nodeId };
+    auto item = mCommissioners.find(lookupKey);
+
+    span = chip::ByteSpan(item->first.mRCAC, item->first.mRCACLen);
+    return CHIP_NO_ERROR;
+}
+
 chip::FabricId CHIPCommand::CurrentCommissionerId()
 {
     chip::FabricId id;
@@ -388,20 +404,12 @@ void CHIPCommand::ShutdownCommissioner(const CommissionerIdentity & key)
     mCommissioners[key].get()->Shutdown();
 }
 
-CHIP_ERROR CHIPCommand::InitializeCommissioner(const CommissionerIdentity & identity, chip::FabricId fabricId)
+CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, chip::FabricId fabricId)
 {
-    chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
-    chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
-    chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
-
     std::unique_ptr<ChipDeviceCommissioner> commissioner = std::make_unique<ChipDeviceCommissioner>();
     chip::Controller::SetupParams commissionerParams;
 
     ReturnLogErrorOnFailure(mCredIssuerCmds->SetupDeviceAttestation(commissionerParams, sTrustStore));
-
-    VerifyOrReturnError(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
-    VerifyOrReturnError(icac.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
-    VerifyOrReturnError(rcac.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
 
     chip::Crypto::P256Keypair ephemeralKey;
 
@@ -420,15 +428,20 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(const CommissionerIdentity & iden
 
         ReturnLogErrorOnFailure(mCredIssuerCmds->InitializeCredentialsIssuer(mCommissionerStorage));
 
-        chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
-        chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
-        chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
+        chip::MutableByteSpan nocSpan(identity.mNOC);
+        chip::MutableByteSpan icacSpan(identity.mICAC);
+        chip::MutableByteSpan rcacSpan(identity.mRCAC);
 
         ReturnLogErrorOnFailure(ephemeralKey.Initialize(chip::Crypto::ECPKeyTarget::ECDSA));
 
         ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(identity.mLocalNodeId, fabricId,
                                                                             mCommissionerStorage.GetCommissionerCATs(),
                                                                             ephemeralKey, rcacSpan, icacSpan, nocSpan));
+
+        identity.mRCACLen = rcacSpan.size();
+        identity.mICACLen = icacSpan.size();
+        identity.mNOCLen  = nocSpan.size();
+
         commissionerParams.operationalKeypair           = &ephemeralKey;
         commissionerParams.controllerRCAC               = rcacSpan;
         commissionerParams.controllerICAC               = icacSpan;

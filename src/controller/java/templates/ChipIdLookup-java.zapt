@@ -1,5 +1,5 @@
 {{> header}}
-{{#if (chip_has_client_clusters)}}
+{{#if_enabled_clusters side='client'}}
 
 package chip.devicecontroller;
 
@@ -42,15 +42,15 @@ public final class ChipIdLookup {
   public static String eventIdToName(long clusterId, long eventId) {
     {{#all_user_clusters side='client'}}
     if (clusterId == {{code}}L) {
-      {{#chip_server_cluster_events}}
+      {{#zcl_events}}
       if (eventId == {{code}}L) {
         return "{{asUpperCamelCase name}}";
       }
-      {{/chip_server_cluster_events}}
+      {{/zcl_events}}
       return "";
     }
     {{/all_user_clusters}}
     return "";
   }
 }
-{{/if}}
+{{/if_enabled_clusters}}
