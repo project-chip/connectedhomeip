@@ -50,8 +50,8 @@ CHIP_ERROR StatusResponse::ProcessStatusResponse(System::PacketBufferHandle && a
     System::PacketBufferTLVReader reader;
     reader.Init(std::move(aPayload));
     ReturnErrorOnFailure(response.Init(reader));
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    ReturnErrorOnFailure(response.CheckSchemaValidity());
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    response.PrettyPrint();
 #endif
     StatusIB status;
     ReturnErrorOnFailure(response.GetStatus(status.mStatus));

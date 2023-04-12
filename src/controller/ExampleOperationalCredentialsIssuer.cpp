@@ -182,7 +182,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     {
         ChipLogProgress(Controller, "Couldn't get %s from storage: %s", kOperationalCredentialsIssuerKeypairStorage, ErrorStr(err));
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
-        ReturnErrorOnFailure(mIssuer.Initialize());
+        ReturnErrorOnFailure(mIssuer.Initialize(Crypto::ECPKeyTarget::ECDSA));
         ReturnErrorOnFailure(mIssuer.Serialize(serializedKey));
 
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIssuerKeypairStorage, key,
@@ -209,7 +209,7 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
         ChipLogProgress(Controller, "Couldn't get %s from storage: %s", kOperationalCredentialsIntermediateIssuerKeypairStorage,
                         ErrorStr(err));
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
-        ReturnErrorOnFailure(mIntermediateIssuer.Initialize());
+        ReturnErrorOnFailure(mIntermediateIssuer.Initialize(Crypto::ECPKeyTarget::ECDSA));
         ReturnErrorOnFailure(mIntermediateIssuer.Serialize(serializedKey));
 
         PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,

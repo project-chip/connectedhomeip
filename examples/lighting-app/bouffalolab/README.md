@@ -88,6 +88,13 @@ and BL706 develop board `XT-ZB6-DevKit`.
     ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-115200 build
     ```
 
+-   Build lighting app with RPC enabled and UART baudrate 115200.
+
+    ```
+    ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light-rpc build
+    ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-rpc build
+    ```
+
 ## Download image
 
 -   Using script `*.flash.py`.
@@ -303,3 +310,20 @@ ota-provider-app build and usage.
     where `<node_id_to_lighting_app>` is node id of BL602/BL702 lighting app.
 -   After OTA software upgrade gets done, BL602/BL702 will get reboot
     automatically.
+
+## Run RPC Console
+
+-   Build chip-console following this
+    [guide](../../common/pigweed/rpc_console/README.md)
+
+-   Start the console
+
+    ```
+    $ chip-console --device /dev/ttyUSB0 -b 2000000
+    ```
+
+-   Get or Set the light state
+
+    `rpcs.chip.rpc.Lighting.Get()`
+
+    `rpcs.chip.rpc.Lighting.Set(on=True, level=128)`

@@ -23,7 +23,7 @@
 
 from __future__ import absolute_import
 from datetime import datetime
-from setuptools import setup
+from setuptools import setup, Distribution
 from wheel.bdist_wheel import bdist_wheel
 
 import argparse
@@ -55,6 +55,14 @@ class InstalledScriptInfo:
     def __init__(self, name):
         self.name = name
         self.installName = os.path.splitext(name)[0]
+
+# Make sure wheel is not considered pure and avoid shared libraries in purelib
+# folder.
+
+
+class BinaryDistribution(Distribution):
+    def has_ext_modules(foo):
+        return True
 
 
 packageName = args.package_name
@@ -102,13 +110,6 @@ try:
     for script in installScripts:
         os.rename(os.path.join(tmpDir, script.name),
                   os.path.join(tmpDir, script.installName))
-
-    # Define a custom version of the bdist_wheel command that configures the
-    # resultant wheel as platform-specific (i.e. not "pure").
-    class bdist_wheel_override(bdist_wheel):
-        def finalize_options(self):
-            bdist_wheel.finalize_options(self)
-            self.root_is_pure = False
 
     requiredPackages = manifest['package_reqs']
 
@@ -164,9 +165,7 @@ try:
                 'egg_base': tmpDir
             }
         },
-        cmdclass={
-            'bdist_wheel': bdist_wheel_override
-        } if libName else {},
+        distclass=BinaryDistribution if libName else None,
         script_args=['clean', '--all', 'bdist_wheel']
     )
 

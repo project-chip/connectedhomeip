@@ -24,13 +24,10 @@
  *          key-value config calls to the correct partition.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/internal/testing/ConfigUnitTest.h>
+#include "PosixConfig.h"
 
-#include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/KeyValueStoreManager.h>
-#include <platform/Tizen/PosixConfig.h>
 
 namespace chip {
 namespace DeviceLayer {

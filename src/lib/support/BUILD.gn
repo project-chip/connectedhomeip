@@ -20,6 +20,7 @@ import("//build_overrides/nlio.gni")
 import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_version.gni")
+import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/lib/core/core.gni")
 
@@ -65,8 +66,11 @@ source_set("logging_constants") {
   sources = [ "logging/Constants.h" ]
 }
 
-source_set("enforce_format") {
-  sources = [ "EnforceFormat.h" ]
+source_set("attributes") {
+  sources = [
+    "DLLUtil.h",
+    "EnforceFormat.h",
+  ]
 }
 
 source_set("chip_version_header") {
@@ -145,8 +149,12 @@ static_library("support") {
     "verhoeff/Verhoeff36.cpp",
   ]
 
-  # added JNI helper on android
-  if (current_os == "android") {
+  if (current_os == "android" || build_java_matter_controller) {
+    if (build_java_matter_controller) {
+      include_dirs = java_matter_controller_dependent_paths
+    }
+
+    # added JNI helper on android
     sources += [
       "CHIPJNIError.h",
       "JniReferences.cpp",
@@ -160,8 +168,8 @@ static_library("support") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":attributes",
     ":chip_version_header",
-    ":enforce_format",
     ":logging_constants",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/platform:platform_buildconfig",
@@ -181,6 +189,10 @@ static_library("support") {
   # Android has no 'platform' that provides logging
   if (current_os == "android") {
     public_deps += [ "${chip_root}/src/platform/logging:android" ]
+  }
+
+  if (current_os == "mac" || current_os == "ios") {
+    public_deps += [ "${chip_root}/src/platform/Darwin:logging" ]
   }
 
   public_configs = [

@@ -26,3 +26,8 @@ CHIP_ERROR AppTask::StartAppTask()
 {
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR AppTask::Init()
+{
+    return CHIP_NO_ERROR;
+}

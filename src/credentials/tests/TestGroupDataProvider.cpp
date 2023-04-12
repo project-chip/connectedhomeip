@@ -165,16 +165,24 @@ void ResetProvider(GroupDataProvider * provider)
     provider->RemoveFabric(kFabric2);
 }
 
-bool CompareKeySets(const KeySet & keyset1, const KeySet & keyset2)
+bool CompareKeySets(const KeySet & retrievedKeySet, const KeySet & keyset2)
 {
-    VerifyOrReturnError(keyset1.policy == keyset2.policy, false);
-    VerifyOrReturnError(keyset1.num_keys_used == keyset2.num_keys_used, false);
-    VerifyOrReturnError(keyset1.epoch_keys[0].start_time == keyset2.epoch_keys[0].start_time, false);
-    VerifyOrReturnError(keyset1.epoch_keys[1].start_time == keyset2.epoch_keys[1].start_time, false);
-    VerifyOrReturnError(keyset1.epoch_keys[2].start_time == keyset2.epoch_keys[2].start_time, false);
-    VerifyOrReturnError(0 == memcmp(kZeroKey, keyset1.epoch_keys[0].key, EpochKey::kLengthBytes), false);
-    VerifyOrReturnError(0 == memcmp(kZeroKey, keyset1.epoch_keys[1].key, EpochKey::kLengthBytes), false);
-    VerifyOrReturnError(0 == memcmp(kZeroKey, keyset1.epoch_keys[2].key, EpochKey::kLengthBytes), false);
+    VerifyOrReturnError(retrievedKeySet.policy == keyset2.policy, false);
+    VerifyOrReturnError(retrievedKeySet.num_keys_used == keyset2.num_keys_used, false);
+
+    for (int i = 0; i < 3; i++)
+    {
+        if (i < retrievedKeySet.num_keys_used)
+        {
+            VerifyOrReturnError(retrievedKeySet.epoch_keys[i].start_time == keyset2.epoch_keys[i].start_time, false);
+        }
+        else
+        {
+            VerifyOrReturnError(retrievedKeySet.epoch_keys[i].start_time == 0, false);
+        }
+
+        VerifyOrReturnError(0 == memcmp(kZeroKey, retrievedKeySet.epoch_keys[i].key, EpochKey::kLengthBytes), false);
+    }
     return true;
 }
 

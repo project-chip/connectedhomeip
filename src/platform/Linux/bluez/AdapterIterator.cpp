@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ bool AdapterIterator::Advance()
 
         if (sscanf(path, BLUEZ_PATH "/hci%u", &index) != 1)
         {
-            ChipLogError(DeviceLayer, "Failed to extract HCI index from '%s'", path);
+            ChipLogError(DeviceLayer, "Failed to extract HCI index from '%s'", StringOrNullMarker(path));
             index = 0;
         }
 

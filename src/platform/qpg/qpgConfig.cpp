@@ -211,7 +211,8 @@ CHIP_ERROR QPGConfig::ClearConfigValue(Key key)
 
 bool QPGConfig::ConfigValueExists(Key key)
 {
-    return qvCHIP_Nvm_ValueExists(key, NULL);
+    uint16_t dummy = 0;
+    return qvCHIP_Nvm_ValueExists(key, &dummy);
 }
 
 CHIP_ERROR QPGConfig::FactoryResetConfig(void)

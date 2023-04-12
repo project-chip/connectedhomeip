@@ -20,6 +20,7 @@
 
 #include <fcntl.h>
 #include <lib/support/CodeUtils.h>
+#include <pthread.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>

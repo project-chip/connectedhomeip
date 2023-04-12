@@ -52,6 +52,10 @@
 #include <rtos/Mutex.h>
 #endif // CHIP_SYSTEM_CONFIG_MBED_LOCKING
 
+#if CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
+#include <cmsis_os2.h>
+#endif // CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
+
 namespace chip {
 namespace System {
 
@@ -100,6 +104,10 @@ private:
 #if CHIP_SYSTEM_CONFIG_MBED_LOCKING
     rtos::Mutex mMbedMutex;
 #endif // CHIP_SYSTEM_CONFIG_MBED_LOCKING
+
+#if CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
+    osMutexId_t mCmsisRTOSMutex;
+#endif // CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
 
     Mutex(const Mutex &) = delete;
     Mutex & operator=(const Mutex &) = delete;

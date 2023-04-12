@@ -47,8 +47,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 #endif
 
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
-
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to Tizen platforms.
@@ -57,5 +55,3 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_TELEMETRY 0
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY 0
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY_FULL 0
-
-#define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 0

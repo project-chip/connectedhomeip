@@ -37,10 +37,10 @@ static_library("CYW30739") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
+    "FactoryDataProvider.cpp",
+    "FactoryDataProvider.h",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
@@ -62,6 +62,12 @@ static_library("CYW30739") {
   }
 
   deps = [ "${chip_root}/src/crypto" ]
+
+  public = [
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+    "FactoryDataProvider.h",
+    "OTAImageProcessorImpl.h",
+  ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 

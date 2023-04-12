@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -285,12 +285,9 @@ CHIP_ERROR OnBrowseDone(BrowseContext * ctx)
             servicesIndex = 0;
             while (currentResult)
             {
-                strncpy(ctx->mServices[servicesIndex].mName, currentResult->instance_name,
-                        strnlen(currentResult->instance_name, Common::kInstanceNameMaxLength));
-                strncpy(ctx->mServices[servicesIndex].mHostName, currentResult->hostname,
-                        strnlen(currentResult->hostname, kHostNameMaxLength));
-                strncpy(ctx->mServices[servicesIndex].mType, currentResult->service_type,
-                        strnlen(currentResult->service_type, kDnssdTypeMaxSize));
+                Platform::CopyString(ctx->mServices[servicesIndex].mName, currentResult->instance_name);
+                Platform::CopyString(ctx->mServices[servicesIndex].mHostName, currentResult->hostname);
+                Platform::CopyString(ctx->mServices[servicesIndex].mType, currentResult->service_type);
                 ctx->mServices[servicesIndex].mProtocol      = ctx->mProtocol;
                 ctx->mServices[servicesIndex].mAddressType   = MapAddressType(currentResult->ip_protocol);
                 ctx->mServices[servicesIndex].mTransportType = ctx->mAddressType;
@@ -341,10 +338,9 @@ CHIP_ERROR OnResolveQuerySrvDone(ResolveContext * ctx)
     {
         ctx->mService = static_cast<DnssdService *>(chip::Platform::MemoryAlloc(sizeof(DnssdService)));
         VerifyOrExit(ctx->mService != nullptr, error = CHIP_ERROR_NO_MEMORY);
-        strncpy(ctx->mService->mName, ctx->mResult->instance_name,
-                strnlen(ctx->mResult->instance_name, Common::kInstanceNameMaxLength));
-        strncpy(ctx->mService->mHostName, ctx->mResult->hostname, strnlen(ctx->mResult->hostname, kHostNameMaxLength));
-        strncpy(ctx->mService->mType, ctx->mResult->service_type, strnlen(ctx->mResult->service_type, kDnssdTypeMaxSize));
+        Platform::CopyString(ctx->mService->mName, ctx->mResult->instance_name);
+        Platform::CopyString(ctx->mService->mHostName, ctx->mResult->hostname);
+        Platform::CopyString(ctx->mService->mType, ctx->mResult->service_type);
         ctx->mService->mProtocol      = ctx->mProtocol;
         ctx->mService->mAddressType   = MapAddressType(ctx->mResult->ip_protocol);
         ctx->mService->mTransportType = ctx->mService->mAddressType;
@@ -463,7 +459,8 @@ void MdnsQueryNotifier(mdns_search_once_t * searchHandle)
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context)
+                           chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context,
+                           intptr_t * browseIdentifier)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     mdns_search_once_t * searchHandle =
@@ -481,7 +478,16 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
     {
         chip::Platform::Delete(ctx);
     }
+    else
+    {
+        *browseIdentifier = reinterpret_cast<intptr_t>(nullptr);
+    }
     return error;
+}
+
+CHIP_ERROR ChipDnssdStopBrowse(intptr_t browseIdentifier)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
@@ -503,6 +509,13 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
         chip::Platform::Delete(ctx);
     }
     return error;
+}
+
+void ChipDnssdResolveNoLongerNeeded(const char * instanceName) {}
+
+CHIP_ERROR ChipDnssdReconfirmRecord(const char * hostname, chip::Inet::IPAddress address, chip::Inet::InterfaceId interface)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace Dnssd

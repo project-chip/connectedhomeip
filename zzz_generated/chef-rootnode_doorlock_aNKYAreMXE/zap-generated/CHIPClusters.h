@@ -30,15 +30,6 @@
 namespace chip {
 namespace Controller {
 
-class DLL_EXPORT ScenesCluster : public ClusterBase
-{
-public:
-    ScenesCluster(Messaging::ExchangeManager & exchangeManager, const SessionHandle & session, EndpointId endpoint) :
-        ClusterBase(exchangeManager, session, app::Clusters::Scenes::Id, endpoint)
-    {}
-    ~ScenesCluster() {}
-};
-
 class DLL_EXPORT BindingCluster : public ClusterBase
 {
 public:

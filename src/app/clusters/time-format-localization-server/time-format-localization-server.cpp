@@ -220,7 +220,7 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
     }
 }
 
-void MatterTimeFormatLocalizationPluginServerInitCallback(void)
+void MatterTimeFormatLocalizationPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

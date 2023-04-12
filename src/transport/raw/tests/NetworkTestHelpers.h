@@ -131,15 +131,13 @@ public:
             {
                 mDelegate->OnMessageDropped();
             }
-        }
-        else
-        {
-            System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
-            mPendingMessageQueue.push(PendingMessageItem(address, std::move(receivedMessage)));
-            mSystemLayer->ScheduleWork(OnMessageReceived, this);
+
+            return CHIP_NO_ERROR;
         }
 
-        return CHIP_NO_ERROR;
+        System::PacketBufferHandle receivedMessage = msgBuf.CloneData();
+        mPendingMessageQueue.push(PendingMessageItem(address, std::move(receivedMessage)));
+        return mSystemLayer->ScheduleWork(OnMessageReceived, this);
     }
 
     bool CanSendToPeer(const Transport::PeerAddress & address) override { return true; }
@@ -166,7 +164,6 @@ public:
 
     System::Layer * mSystemLayer = nullptr;
     std::queue<PendingMessageItem> mPendingMessageQueue;
-    Transport::PeerAddress mTxAddress;
     uint32_t mNumMessagesToDrop                = 0;
     uint32_t mDroppedMessageCount              = 0;
     uint32_t mSentMessageCount                 = 0;

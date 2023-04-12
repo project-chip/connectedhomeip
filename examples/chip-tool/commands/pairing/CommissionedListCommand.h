@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "../../config/PersistentStorage.h"
 #include "../common/Command.h"
+#include <controller/ExamplePersistentStorage.h>
 
 class CommissionedListCommand : public Command
 {

@@ -35,7 +35,16 @@
 /**
  * This file defines a base class for subscription callbacks used by
  * MTRBaseDevice and MTRDevice.  This base class handles everything except the
- * actual conversion from the incoming data to the desired data.
+ * actual conversion from the incoming data to the desired data and the dispatch
+ * of callbacks to the relevant client queues.  Its callbacks are called on the
+ * Matter queue.  This allows MTRDevice and MTRBaseDevice to do any necessary
+ * sync cleanup work before dispatching to the client callbacks on the client
+ * queue.
+ *
+ * After onDoneHandler is invoked, this object will at some point delete itself
+ * and destroy anything it owns (such as the ReadClient or the
+ * ClusterStateCache).  Consumers should drop references to all the relevant
+ * objects in that handler.  This deletion will happen on the Matter queue.
  *
  * The desired data is assumed to be NSObjects that can be stored in NSArray.
  */
@@ -46,21 +55,22 @@ typedef void (^DataReportCallback)(NSArray * value);
 typedef void (^ErrorCallback)(NSError * error);
 typedef void (^SubscriptionEstablishedHandler)(void);
 typedef void (^OnDoneHandler)(void);
+typedef void (^UnsolicitedMessageFromPublisherHandler)(void);
 
 class MTRBaseSubscriptionCallback : public chip::app::ClusterStateCache::Callback {
 public:
-    MTRBaseSubscriptionCallback(dispatch_queue_t queue, DataReportCallback attributeReportCallback,
-        DataReportCallback eventReportCallback, ErrorCallback errorCallback,
-        MTRDeviceResubscriptionScheduledHandler _Nullable resubscriptionCallback,
-        SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler, OnDoneHandler _Nullable onDoneHandler)
-        : mQueue(queue)
-        , mAttributeReportCallback(attributeReportCallback)
+    MTRBaseSubscriptionCallback(DataReportCallback attributeReportCallback, DataReportCallback eventReportCallback,
+        ErrorCallback errorCallback, MTRDeviceResubscriptionScheduledHandler _Nullable resubscriptionCallback,
+        SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler, OnDoneHandler _Nullable onDoneHandler,
+        UnsolicitedMessageFromPublisherHandler _Nullable unsolicitedMessageFromPublisherHandler = NULL)
+        : mAttributeReportCallback(attributeReportCallback)
         , mEventReportCallback(eventReportCallback)
         , mErrorCallback(errorCallback)
         , mResubscriptionCallback(resubscriptionCallback)
         , mSubscriptionEstablishedHandler(subscriptionEstablishedHandler)
         , mBufferedReadAdapter(*this)
         , mOnDoneHandler(onDoneHandler)
+        , mUnsolicitedMessageFromPublisherHandler(unsolicitedMessageFromPublisherHandler)
     {
     }
 
@@ -110,6 +120,8 @@ private:
 
     CHIP_ERROR OnResubscriptionNeeded(chip::app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
 
+    void OnUnsolicitedMessageFromPublisher(chip::app::ReadClient * apReadClient) override;
+
     void ReportData();
 
 protected:
@@ -117,14 +129,14 @@ protected:
     NSMutableArray * _Nullable mEventReports = nil;
 
 private:
-    dispatch_queue_t mQueue;
     DataReportCallback _Nullable mAttributeReportCallback = nil;
     DataReportCallback _Nullable mEventReportCallback = nil;
-    // We set mErrorCallback to nil when queueing error reports, so we
+    // We set mErrorCallback to nil before calling the error callback, so we
     // make sure to only report one error.
     ErrorCallback _Nullable mErrorCallback = nil;
     MTRDeviceResubscriptionScheduledHandler _Nullable mResubscriptionCallback = nil;
     SubscriptionEstablishedHandler _Nullable mSubscriptionEstablishedHandler = nil;
+    UnsolicitedMessageFromPublisherHandler _Nullable mUnsolicitedMessageFromPublisherHandler = nil;
     chip::app::BufferedReadCallback mBufferedReadAdapter;
 
     // Our lifetime management is a little complicated.  On errors that don't
@@ -138,9 +150,11 @@ private:
     // To handle this, enforce the following rules:
     //
     // 1) We guarantee that mErrorCallback is only invoked with an error once.
-    // 2) We ensure that we delete ourselves and the passed in ReadClient only from OnDone or a queued-up
-    //    error callback, but not both, by tracking whether we have a queued-up
-    //    deletion.
+    // 2) We guarantee that mOnDoneHandler is only invoked once, and always
+    //    invoked before we delete ourselves.
+    // 3) We ensure that we delete ourselves and the passed in ReadClient only
+    //    from OnDone or from an error callback but not both, by tracking whether
+    //    we have a queued-up deletion.
     std::unique_ptr<chip::app::ReadClient> mReadClient;
     std::unique_ptr<chip::app::ClusterStateCache> mClusterStateCache;
     bool mHaveQueuedDeletion = false;

@@ -259,7 +259,7 @@ server cluster Descriptor = 29 {
 }
 
 server cluster Binding = 30 {
-  struct TargetStruct {
+  fabric_scoped struct TargetStruct {
     optional node_id node = 1;
     optional group_id group = 2;
     optional endpoint_no endpoint = 3;
@@ -293,11 +293,11 @@ server cluster AccessControl = 31 {
     kAdminister = 5;
   }
 
-  struct AccessControlEntry {
-    Privilege privilege = 1;
-    AuthMode authMode = 2;
-    nullable int64u subjects[] = 3;
-    nullable Target targets[] = 4;
+  fabric_scoped struct AccessControlEntry {
+    fabric_sensitive Privilege privilege = 1;
+    fabric_sensitive AuthMode authMode = 2;
+    nullable fabric_sensitive int64u subjects[] = 3;
+    nullable fabric_sensitive Target targets[] = 4;
     fabric_idx fabricIndex = 254;
   }
 
@@ -307,12 +307,12 @@ server cluster AccessControl = 31 {
     nullable devtype_id deviceType = 2;
   }
 
-  struct ExtensionEntry {
-    octet_string<128> data = 1;
+  fabric_scoped struct ExtensionEntry {
+    fabric_sensitive octet_string<128> data = 1;
     fabric_idx fabricIndex = 254;
   }
 
-  info event access(read: administer) AccessControlEntryChanged = 0 {
+  fabric_sensitive info event access(read: administer) AccessControlEntryChanged = 0 {
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
@@ -320,7 +320,7 @@ server cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  info event access(read: administer) AccessControlExtensionChanged = 1 {
+  fabric_sensitive info event access(read: administer) AccessControlExtensionChanged = 1 {
     nullable node_id adminNodeID = 1;
     nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
@@ -338,7 +338,7 @@ server cluster AccessControl = 31 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-server cluster Basic = 40 {
+server cluster BasicInformation = 40 {
   struct CapabilityMinimaStruct {
     int16u caseSessionsPerFabric = 0;
     int16u subscriptionsPerFabric = 1;
@@ -476,7 +476,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
     kDelayedOnUserConsent = 8;
   }
 
-  struct ProviderLocation {
+  fabric_scoped struct ProviderLocation {
     node_id providerNodeID = 1;
     endpoint_no endpoint = 2;
     fabric_idx fabricIndex = 254;
@@ -1216,13 +1216,13 @@ server cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
-  struct NOCStruct {
-    octet_string noc = 1;
-    nullable octet_string icac = 2;
+  fabric_scoped struct NOCStruct {
+    fabric_sensitive octet_string noc = 1;
+    nullable fabric_sensitive octet_string icac = 2;
     fabric_idx fabricIndex = 254;
   }
 
-  struct FabricDescriptor {
+  fabric_scoped struct FabricDescriptor {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorId = 2;
     fabric_id fabricId = 3;
@@ -1314,23 +1314,65 @@ server cluster GroupKeyManagement = 63 {
     kCacheAndSync = 1;
   }
 
-  struct GroupKeyMapStruct {
+  fabric_scoped struct GroupKeyMapStruct {
     group_id groupId = 1;
     int16u groupKeySetID = 2;
     fabric_idx fabricIndex = 254;
   }
 
-  struct GroupInfoMapStruct {
+  fabric_scoped struct GroupInfoMapStruct {
     group_id groupId = 1;
     endpoint_no endpoints[] = 2;
     optional char_string<16> groupName = 3;
     fabric_idx fabricIndex = 254;
   }
 
+  struct GroupKeySetStruct {
+    int16u groupKeySetID = 0;
+    GroupKeySecurityPolicy groupKeySecurityPolicy = 1;
+    nullable octet_string<16> epochKey0 = 2;
+    nullable epoch_us epochStartTime0 = 3;
+    nullable octet_string<16> epochKey1 = 4;
+    nullable epoch_us epochStartTime1 = 5;
+    nullable octet_string<16> epochKey2 = 6;
+    nullable epoch_us epochStartTime2 = 7;
+  }
+
   attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
+  readonly attribute int16u maxGroupsPerFabric = 2;
+  readonly attribute int16u maxGroupKeysPerFabric = 3;
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
+
+  request struct KeySetWriteRequest {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  request struct KeySetReadRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetRemoveRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetReadAllIndicesRequest {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  response struct KeySetReadResponse = 2 {
+    GroupKeySetStruct groupKeySet = 0;
+  }
+
+  response struct KeySetReadAllIndicesResponse = 5 {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  fabric command access(invoke: administer) KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
+  fabric command access(invoke: administer) KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
+  fabric command access(invoke: administer) KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
 }
 
 server cluster FixedLabel = 64 {
@@ -1436,8 +1478,18 @@ server cluster Thermostat = 513 {
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
 }
 
+server cluster ThermostatUserInterfaceConfiguration = 516 {
+  attribute enum8 temperatureDisplayMode = 0;
+  attribute access(write: manage) enum8 keypadLockout = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 endpoint 0 {
-  device type rootdevice = 22;
+  device type rootdevice = 22, version 1;
   binding cluster OtaSoftwareUpdateProvider;
 
   server cluster Identify {
@@ -1472,7 +1524,7 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster Basic {
+  server cluster BasicInformation {
     callback attribute dataModelRevision default = 10;
     callback attribute vendorName;
     callback attribute vendorID;
@@ -1700,6 +1752,8 @@ endpoint 0 {
   server cluster GroupKeyManagement {
     callback attribute groupKeyMap;
     callback attribute groupTable;
+    callback attribute maxGroupsPerFabric;
+    callback attribute maxGroupKeysPerFabric;
     ram      attribute featureMap;
     ram      attribute clusterRevision default = 1;
   }
@@ -1717,7 +1771,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type thermostat = 769;
+  device type thermostat = 769, version 1;
   binding cluster Identify;
 
   server cluster Identify {
@@ -1743,29 +1797,13 @@ endpoint 1 {
     ram      attribute clusterRevision default = 4;
   }
 
-  server cluster Basic {
-    callback attribute dataModelRevision default = 10;
-    callback attribute vendorName;
-    callback attribute vendorID;
-    callback attribute productName;
-    callback attribute productID;
-    persist  attribute nodeLabel;
-    callback attribute location default = "XX";
-    callback attribute hardwareVersion;
-    callback attribute hardwareVersionString;
-    callback attribute softwareVersion;
-    callback attribute softwareVersionString;
-    callback attribute manufacturingDate default = "20210614123456ZZ";
-    callback attribute partNumber;
-    callback attribute productURL;
-    callback attribute productLabel;
-    callback attribute serialNumber;
-    persist  attribute localConfigDisabled;
-    ram      attribute reachable default = 1;
-    callback attribute uniqueID;
-    callback attribute capabilityMinima;
+  server cluster Descriptor {
+    callback attribute deviceTypeList;
+    callback attribute serverList;
+    callback attribute clientList;
+    callback attribute partsList;
     ram      attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster Thermostat {
@@ -1774,20 +1812,30 @@ endpoint 1 {
     ram      attribute absMaxHeatSetpointLimit default = 3000;
     ram      attribute absMinCoolSetpointLimit default = 1600;
     ram      attribute absMaxCoolSetpointLimit default = 3200;
-    ram      attribute occupiedCoolingSetpoint default = 0x0A28;
-    ram      attribute occupiedHeatingSetpoint default = 0x07D0;
+    persist  attribute occupiedCoolingSetpoint default = 0x0A28;
+    persist  attribute occupiedHeatingSetpoint default = 0x07D0;
     ram      attribute minHeatSetpointLimit default = 700;
     ram      attribute maxHeatSetpointLimit default = 3000;
     ram      attribute minCoolSetpointLimit default = 1600;
     ram      attribute maxCoolSetpointLimit default = 3200;
     ram      attribute minSetpointDeadBand default = 0x19;
     ram      attribute controlSequenceOfOperation default = 0x04;
-    ram      attribute systemMode default = 0x01;
+    persist  attribute systemMode default = 0x01;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x23;
     ram      attribute clusterRevision default = 5;
+  }
+
+  server cluster ThermostatUserInterfaceConfiguration {
+    ram      attribute temperatureDisplayMode;
+    ram      attribute keypadLockout;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap;
+    ram      attribute clusterRevision default = 1;
   }
 }
 

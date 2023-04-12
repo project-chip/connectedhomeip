@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -1152,8 +1152,24 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
                 app::DataModel::Nullable<int8_t> averageRssi;
                 app::DataModel::Nullable<int8_t> lastRssi;
 
-                averageRssi.SetNonNull(neighInfo.mAverageRssi);
-                lastRssi.SetNonNull(neighInfo.mLastRssi);
+                if (neighInfo.mAverageRssi == OT_RADIO_RSSI_INVALID)
+                {
+                    averageRssi.SetNull();
+                }
+                else
+                {
+                    // Thread average calculation already restrict mAverageRssi to be between -128 and 0
+                    averageRssi.SetNonNull(neighInfo.mAverageRssi);
+                }
+
+                if (neighInfo.mLastRssi == OT_RADIO_RSSI_INVALID)
+                {
+                    lastRssi.SetNull();
+                }
+                else
+                {
+                    lastRssi.SetNonNull(((neighInfo.mLastRssi > 0) ? 0 : neighInfo.mLastRssi));
+                }
 
                 neighborTable.averageRssi      = averageRssi;
                 neighborTable.lastRssi         = lastRssi;
@@ -1833,23 +1849,30 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::SetSEDIntervalMode(Connecti
 #else
     uint32_t curIntervalMS = otLinkGetPollPeriod(mOTInst);
 #endif
-
+    otError otErr = OT_ERROR_NONE;
     if (interval.count() != curIntervalMS)
     {
 #if CHIP_DEVICE_CONFIG_THREAD_SSED
         // Set CSL period in units of 10 symbols, convert it to microseconds and divide by 1000 to get milliseconds.
-        otError otErr = otLinkCslSetPeriod(mOTInst, interval.count() * 1000 / OT_US_PER_TEN_SYMBOLS);
+        otErr         = otLinkCslSetPeriod(mOTInst, interval.count() * 1000 / OT_US_PER_TEN_SYMBOLS);
+        curIntervalMS = otLinkCslGetPeriod(mOTInst) * OT_US_PER_TEN_SYMBOLS / 1000;
 #else
-        otError otErr = otLinkSetPollPeriod(mOTInst, interval.count());
+        otErr         = otLinkSetPollPeriod(mOTInst, interval.count());
+        curIntervalMS = otLinkGetPollPeriod(mOTInst);
 #endif
         err = MapOpenThreadError(otErr);
     }
 
     Impl()->UnlockThreadStack();
 
-    if (interval.count() != curIntervalMS)
+    if (otErr != OT_ERROR_NONE)
     {
-        ChipLogProgress(DeviceLayer, "OpenThread SED interval set to %" PRId32 "ms", interval.count());
+        ChipLogError(DeviceLayer, "Failed to set SED interval to %" PRId32 "ms. Defaulting to %" PRId32 "ms", interval.count(),
+                     curIntervalMS);
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "OpenThread SED interval is %" PRId32 "ms", curIntervalMS);
     }
 
     return err;
@@ -2427,9 +2450,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    strncpy(mdnsService.mHostName, serviceInfo.mHostNameBuffer, substringSize);
-    // Append string terminating character.
-    mdnsService.mHostName[substringSize] = '\0';
+    Platform::CopyString(mdnsService.mHostName, serviceInfo.mHostNameBuffer);
 
     if (strchr(serviceType, '.') == nullptr)
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -2440,9 +2461,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    strncpy(mdnsService.mType, serviceType, substringSize);
-    // Append string terminating character.
-    mdnsService.mType[substringSize] = '\0';
+    Platform::CopyString(mdnsService.mType, serviceType);
 
     // Extract from the <type>.<protocol>.<domain-name>. the <protocol> part.
     const char * protocolSubstringStart = serviceType + substringSize + 1;
@@ -2455,9 +2474,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    strncpy(protocol, protocolSubstringStart, substringSize);
-    // Append string terminating character.
-    protocol[substringSize] = '\0';
+    Platform::CopyString(protocol, protocolSubstringStart);
 
     if (strncmp(protocol, "_udp", chip::Dnssd::kDnssdProtocolTextMaxSize) == 0)
     {

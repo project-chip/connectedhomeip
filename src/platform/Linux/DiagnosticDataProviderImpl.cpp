@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include <app-common/zap-generated/enums.h>
 #include <app/data-model/List.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Linux/ConnectivityUtils.h>
@@ -92,7 +93,7 @@ CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
         {
             if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
             {
-                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", ifa->ifa_name);
+                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", StringOrNullMarker(ifa->ifa_name));
                 break;
             }
         }
@@ -156,7 +157,7 @@ CHIP_ERROR GetWiFiStatsCount(WiFiStatsCountType type, uint64_t & count)
         {
             if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI)
             {
-                ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", ifa->ifa_name);
+                ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", StringOrNullMarker(ifa->ifa_name));
                 break;
             }
         }
@@ -301,8 +302,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadM
 
             ThreadMetrics * thread = new ThreadMetrics();
 
-            strncpy(thread->NameBuf, entry->d_name, kMaxThreadNameLength);
-            thread->NameBuf[kMaxThreadNameLength] = '\0';
+            Platform::CopyString(thread->NameBuf, entry->d_name);
             thread->name.Emplace(CharSpan::fromCharString(thread->NameBuf));
             thread->id = atoi(entry->d_name);
 
@@ -453,8 +453,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
                 uint8_t size           = 0;
                 NetworkInterface * ifp = new NetworkInterface();
 
-                strncpy(ifp->Name, ifa->ifa_name, Inet::InterfaceId::kMaxIfNameLength);
-                ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
+                Platform::CopyString(ifp->Name, ifa->ifa_name);
 
                 ifp->name          = CharSpan::fromCharString(ifp->Name);
                 ifp->isOperational = ifa->ifa_flags & IFF_RUNNING;
@@ -616,7 +615,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetEthNetworkDiagnosticsCounts()
         {
             if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
             {
-                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", ifa->ifa_name);
+                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", StringOrNullMarker(ifa->ifa_name));
                 break;
             }
         }
@@ -781,7 +780,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
         {
             if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI)
             {
-                ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", ifa->ifa_name);
+                ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", StringOrNullMarker(ifa->ifa_name));
                 break;
             }
         }

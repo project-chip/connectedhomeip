@@ -43,6 +43,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         (current_os == "mac" || current_os == "linux") &&
         (host_cpu == "x64" || host_cpu == "arm64" || host_cpu == "arm")
     enable_pylib = false
+
+    # Build the Linux all clusters app example with default group
+    chip_build_all_clusters_app = false
   }
 
   if (enable_fuzz_test_targets) {
@@ -100,7 +103,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     "$dir_pw_watch/py",
   ]
 
-  # Matter's in-tree pw_python_package or pw_create_python_source_tree targets.
+  # Matter's in-tree pw_python_package or pw_python_distribution targets.
   _matter_python_packages = [
     "//integrations/mobly:chip_mobly",
     "//examples/chef",
@@ -116,7 +119,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     source_packages = _matter_python_packages + _pigweed_python_packages
   }
 
-  pw_internal_pip_install("pip_install_matter_packages") {
+  pw_python_pip_install("pip_install_matter_packages") {
     packages = [ "//examples/common/pigweed/rpc_console:chip_rpc_distribution" ]
   }
 
@@ -130,7 +133,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
   }
 
   # These pw_python_package targets will be installed using 'pip install --editable'
-  pw_internal_pip_install("pip_install_editable_matter_packages") {
+  pw_python_pip_install("pip_install_editable_matter_packages") {
     packages = [
       "//integrations/mobly:chip_mobly",
       "//examples/chef",
@@ -217,6 +220,16 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     if (build_tv_casting_common_a) {
       deps += [ "${chip_root}/examples/tv-casting-app/tv-casting-common:tvCastingCommon" ]
+    }
+
+    if (chip_build_all_clusters_app) {
+      if (is_libfuzzer) {
+        deps += [ "${chip_root}/examples/all-clusters-app/linux:chip-all-clusters-app-fuzzing" ]
+      } else {
+        deps += [
+          "${chip_root}/examples/all-clusters-app/linux:chip-all-clusters-app",
+        ]
+      }
     }
   }
 

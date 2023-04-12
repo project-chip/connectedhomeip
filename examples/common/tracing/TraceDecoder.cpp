@@ -130,7 +130,7 @@ CHIP_ERROR TraceDecoder::ReadString(const char * str)
 
 CHIP_ERROR TraceDecoder::LogJSON(Json::Value & json)
 {
-    uint32_t protocol   = json[kProtocolIdKey].asLargestUInt();
+    auto protocol       = json[kProtocolIdKey].asLargestUInt();
     uint16_t vendorId   = protocol >> 16;
     uint16_t protocolId = protocol & 0xFFFF;
     if (!mOptions.IsProtocolEnabled(chip::Protocols::Id(chip::VendorId(vendorId), protocolId)))
@@ -175,9 +175,9 @@ CHIP_ERROR TraceDecoder::MaybeLogAndConsumeEncryptedPayload(Json::Value & json)
         size_t size = static_cast<uint16_t>(json[kPayloadEncryptedSizeKey].asLargestUInt());
         if (size)
         {
-            auto payload       = json[kPayloadEncryptedDataKey].asString();
-            auto bufferPtr     = json[kPayloadEncryptedBufferPtrKey].asString();
-            auto scoppedIndent = ScopedLogIndentWithSize("Encrypted Payload", size);
+            auto payload      = json[kPayloadEncryptedDataKey].asString();
+            auto bufferPtr    = json[kPayloadEncryptedBufferPtrKey].asString();
+            auto scopedIndent = ScopedLogIndentWithSize("Encrypted Payload", size);
             Log("data", payload.c_str());
             Log("buffer_ptr", bufferPtr.c_str());
         }
@@ -272,6 +272,12 @@ CHIP_ERROR TraceDecoder::MaybeLogAndConsumePayload(Json::Value & json, bool isRe
     auto size = static_cast<uint16_t>(json[kPayloadSizeKey].asLargestUInt());
     if (size)
     {
+        {
+            auto payload      = json[kPayloadDataKey].asString();
+            auto scopedIndent = ScopedLogIndentWithSize("Decrypted Payload", size);
+            Log("data", payload.c_str());
+        }
+
         bool shouldDecode = !isResponse || mOptions.mEnableProtocolInteractionModelResponse;
         auto payload      = json[kPayloadDataKey].asString();
         auto protocolId   = json[kProtocolIdKey].asLargestUInt();

@@ -109,7 +109,8 @@ class NrfButton final : public Button
 public:
     pw::Status Event(const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response) override
     {
-        GetAppTask().ButtonEventHandler(request.pushed << request.idx /* button_state */, 1 << request.idx /* has_changed */);
+        AppTask::Instance().ButtonEventHandler(request.pushed << request.idx /* button_state */,
+                                               1 << request.idx /* has_changed */);
         return pw::OkStatus();
     }
 };

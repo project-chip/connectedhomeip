@@ -92,6 +92,7 @@ private:
 #endif
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
+    void OnInternetConnectivityChangeEvent(const ChipDeviceEvent * event);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     CHIP_ERROR WiFiInit(void);

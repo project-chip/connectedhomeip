@@ -61,9 +61,9 @@ static constexpr ClusterId Id = 0x0000001F;
 namespace Actions {
 static constexpr ClusterId Id = 0x00000025;
 } // namespace Actions
-namespace Basic {
+namespace BasicInformation {
 static constexpr ClusterId Id = 0x00000028;
-} // namespace Basic
+} // namespace BasicInformation
 namespace OtaSoftwareUpdateProvider {
 static constexpr ClusterId Id = 0x00000029;
 } // namespace OtaSoftwareUpdateProvider
@@ -232,9 +232,12 @@ static constexpr ClusterId Id = 0x0000050E;
 namespace ElectricalMeasurement {
 static constexpr ClusterId Id = 0x00000B04;
 } // namespace ElectricalMeasurement
-namespace TestCluster {
+namespace ClientMonitoring {
+static constexpr ClusterId Id = 0x00001046;
+} // namespace ClientMonitoring
+namespace UnitTesting {
 static constexpr ClusterId Id = 0xFFF1FC05;
-} // namespace TestCluster
+} // namespace UnitTesting
 namespace FaultInjection {
 static constexpr ClusterId Id = 0xFFF1FC06;
 } // namespace FaultInjection

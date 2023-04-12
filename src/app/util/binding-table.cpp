@@ -55,7 +55,7 @@ CHIP_ERROR BindingTable::Add(const EmberBindingTableEntry & entry)
         }
         if (error != CHIP_NO_ERROR)
         {
-            mStorage->SyncDeleteKeyValue(mKeyAllocator.BindingTableEntry(newIndex));
+            mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::BindingTableEntry(newIndex).KeyName());
         }
     }
     if (error != CHIP_NO_ERROR)
@@ -112,7 +112,7 @@ CHIP_ERROR BindingTable::SaveEntryToStorage(uint8_t index, uint8_t nextIndex)
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagNextEntry), nextIndex));
     ReturnErrorOnFailure(writer.EndContainer(container));
     ReturnErrorOnFailure(writer.Finalize());
-    return mStorage->SyncSetKeyValue(mKeyAllocator.BindingTableEntry(index), buffer,
+    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::BindingTableEntry(index).KeyName(), buffer,
                                      static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
@@ -127,7 +127,8 @@ CHIP_ERROR BindingTable::SaveListInfo(uint8_t head)
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagHead), head));
     ReturnErrorOnFailure(writer.EndContainer(container));
     ReturnErrorOnFailure(writer.Finalize());
-    return mStorage->SyncSetKeyValue(mKeyAllocator.BindingTable(), buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
+    return mStorage->SyncSetKeyValue(DefaultStorageKeyAllocator::BindingTable().KeyName(), buffer,
+                                     static_cast<uint16_t>(writer.GetLengthWritten()));
 }
 
 CHIP_ERROR BindingTable::LoadFromStorage()
@@ -137,7 +138,7 @@ CHIP_ERROR BindingTable::LoadFromStorage()
     uint16_t size                        = sizeof(buffer);
     CHIP_ERROR error;
 
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(mKeyAllocator.BindingTable(), buffer, size));
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::BindingTable().KeyName(), buffer, size));
     TLV::TLVReader reader;
     reader.Init(buffer, size);
 
@@ -183,7 +184,7 @@ CHIP_ERROR BindingTable::LoadEntryFromStorage(uint8_t index, uint8_t & nextIndex
     uint16_t size                     = sizeof(buffer);
     EmberBindingTableEntry entry;
 
-    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(mKeyAllocator.BindingTableEntry(index), buffer, size));
+    ReturnErrorOnFailure(mStorage->SyncGetKeyValue(DefaultStorageKeyAllocator::BindingTableEntry(index).KeyName(), buffer, size));
     TLV::TLVReader reader;
     reader.Init(buffer, size);
 
@@ -259,7 +260,7 @@ CHIP_ERROR BindingTable::RemoveAt(Iterator & iter)
     if (error == CHIP_NO_ERROR)
     {
         // The remove is considered "submitted" once the change on prev node takes effect
-        if (mStorage->SyncDeleteKeyValue(mKeyAllocator.BindingTableEntry(iter.mIndex)) != CHIP_NO_ERROR)
+        if (mStorage->SyncDeleteKeyValue(DefaultStorageKeyAllocator::BindingTableEntry(iter.mIndex).KeyName()) != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Failed to remove binding table entry %u from storage", iter.mIndex);
         }

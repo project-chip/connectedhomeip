@@ -383,6 +383,14 @@ private:
     void Clear();
     void SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead);
 
+    /**
+     * Get a pointer to the start of the reserved space (which comes before the
+     * payload).  The actual reserved space is the ReservedSize() bytes starting
+     * at this pointer.
+     */
+    uint8_t * ReserveStart();
+    const uint8_t * ReserveStart() const;
+
     friend class PacketBufferHandle;
     friend class ::PacketBufferTest;
 };

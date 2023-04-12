@@ -223,3 +223,15 @@ Usage of OTA:
 Once the transfer is complete, OTA requestor sends ApplyUpdateRequest command to
 OTA provider for applying the image. Device will restart on successful
 application of OTA image.
+
+### Building with Pigweed RPCs
+
+The RPCs in `lighting-common/lighting_service/lighting_service.proto` can be
+used to control various functionalities of the lighting app from a USB-connected
+host computer. To build the example with the RPC server, run the following
+command with _build-target_ replaced with the build target name of the Nordic
+Semiconductor's kit you own:
+
+    ```
+    $ west build -b tlsr9518adk80d -- -DOVERLAY_CONFIG=rpc.overlay
+    ```

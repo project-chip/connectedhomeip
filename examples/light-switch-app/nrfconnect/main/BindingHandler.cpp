@@ -22,7 +22,7 @@
 #endif
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace chip;
 using namespace chip::app;
@@ -209,7 +209,7 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & bi
             LevelControlProcessCommand(data->CommandId, binding, nullptr, context);
             break;
         default:
-            ChipLogError(NotSpecified, "Invalid binding group command data");
+            LOG_ERR("Invalid binding group command data");
             break;
         }
     }
@@ -224,7 +224,7 @@ void BindingHandler::LightSwitchChangedHandler(const EmberBindingTableEntry & bi
             LevelControlProcessCommand(data->CommandId, binding, deviceProxy, context);
             break;
         default:
-            ChipLogError(NotSpecified, "Invalid binding unicast command data");
+            LOG_ERR("Invalid binding unicast command data");
             break;
         }
     }

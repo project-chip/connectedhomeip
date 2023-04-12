@@ -152,7 +152,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: 120
+          constraints:
+              minValue: 102
+              maxValue: 138
 
     - label:
           "TH sends MoveToHue command to DUT with Hue=60, Direction=0x00
@@ -206,6 +208,7 @@ tests:
               - name: "ms"
                 value: 10000
 
+    #https://github.com/CHIP-Specifications/chip-test-scripts/issues/416#issuecomment-1228072461
     - label: "TH reads CurrentHue attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0000 && PICS_SKIP_SAMPLE_APP
       verification: |
@@ -271,7 +274,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: 135
+          constraints:
+              minValue: 115
+              maxValue: 155
 
     - label:
           "TH sends MoveToHue command to DUT with Hue=60, Direction=0x00
@@ -381,7 +386,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: 120
+          constraints:
+              minValue: 102
+              maxValue: 138
 
     - label:
           "TH sends MoveToHue command to DUT with Hue=120, Direction=0x00
@@ -475,8 +482,8 @@ tests:
       attribute: "CurrentHue"
       response:
           constraints:
-              minValue: 48
-              maxValue: 72
+              minValue: 51
+              maxValue: 69
 
     - label: "Wait 5s"
       cluster: "DelayCommands"
@@ -491,7 +498,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentHue"
       response:
-          value: 60
+          constraints:
+              minValue: 51
+              maxValue: 69
 
     - label: "TH reads ColorMode attribute from DUT"
       PICS: CC.S.F00 && CC.S.A0008

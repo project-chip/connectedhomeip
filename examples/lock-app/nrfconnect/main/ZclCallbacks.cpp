@@ -123,5 +123,5 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
     // (kUsersManagement|kAccessSchedules|kRFIDCredentials|kPINCredentials) 0x113
     logOnFailure(DoorLock::Attributes::FeatureMap::Set(endpoint, 0x101), "feature map");
 
-    GetAppTask().UpdateClusterState(BoltLockMgr().GetState(), BoltLockManager::OperationSource::kUnspecified);
+    AppTask::Instance().UpdateClusterState(BoltLockMgr().GetState(), BoltLockManager::OperationSource::kUnspecified);
 }

@@ -154,7 +154,7 @@ brightness between 0-255.
 If **Lighting LED** is available then brightness change can be observed.
 
 > For more details about Android CHIPTool please visit
-> [CHIPTool](../../src/android/CHIPTool/README.md)
+> [CHIPTool](../../examples/android/CHIPTool/README.md)
 
 # POSIX CLI CHIPTool
 

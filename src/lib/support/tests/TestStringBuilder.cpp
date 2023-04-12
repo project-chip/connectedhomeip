@@ -87,7 +87,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestStringBuilder(void)
+int TestStringBuilder()
 {
     nlTestSuite theSuite = { "StringBuilder", sTests, nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

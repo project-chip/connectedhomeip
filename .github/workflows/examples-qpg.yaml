@@ -22,6 +22,9 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     qpg:
         name: QPG
@@ -34,11 +37,11 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.99
+            image: connectedhomeip/chip-build:0.6.18
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -59,7 +62,7 @@ jobs:
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs
@@ -72,7 +75,10 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --enable-flashbundle \
-                        --target-glob 'qpg-{lock,light,shell,persistent-storage}' \
+                        --target qpg-qpg6105-lock \
+                        --target qpg-qpg6105-light \
+                        --target qpg-qpg6105-shell \
+                        --target qpg-qpg6105-persistent-storage \
                         build \
                         --copy-artifacts-to out/artifacts \
                      "
@@ -85,15 +91,15 @@ jobs:
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     qpg qpg6105+debug lighting-app \
-                    out/qpg-light/chip-qpg6105-lighting-example.out \
+                    out/qpg-qpg6105-light/chip-qpg6105-lighting-example.out \
                     /tmp/bloat_reports/
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     qpg qpg6105+debug lock-app \
-                    out/qpg-lock/chip-qpg6105-lock-example.out \
+                    out/qpg-qpg6105-lock/chip-qpg6105-lock-example.out \
                     /tmp/bloat_reports/
 
             - name: Uploading Size Reports
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ !env.ACT }}
               with:
                   name: Size,QPG-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}

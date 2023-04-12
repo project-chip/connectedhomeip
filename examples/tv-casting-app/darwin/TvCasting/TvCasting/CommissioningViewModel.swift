@@ -29,25 +29,46 @@ class CommissioningViewModel: ObservableObject {
 
     @Published var commisisoningComplete: Bool?;
 
+    @Published var connectionSuccess: Bool?;
+
+    @Published var connectionStatus: String?;
+
     func prepareForCommissioning(selectedCommissioner: DiscoveredNodeData?) {
         if let castingServerBridge = CastingServerBridge.getSharedInstance()
         {
-            castingServerBridge.openBasicCommissioningWindow(
-                { (result: Bool) -> () in
-                    // commissioning complete handler code
+            castingServerBridge.openBasicCommissioningWindow(DispatchQueue.main,
+                commissioningWindowRequestedHandler: { (result: Bool) -> () in
+                    DispatchQueue.main.async {
+                        self.commisisoningWindowOpened = result
+                    }
+                },
+                commissioningCompleteCallback: { (result: Bool) -> () in
                     self.Log.info("Commissioning status: \(result)")
                     DispatchQueue.main.async {
                         self.commisisoningComplete = result
                     }
                 },
-                clientQueue: DispatchQueue.main,
-                commissioningWindowRequestedHandler: { (result: Bool) -> () in
-                    self.commisisoningWindowOpened = result
+                onConnectionSuccessCallback: { (videoPlayer: VideoPlayer) -> () in
+                    DispatchQueue.main.async {
+                        self.connectionSuccess = true
+                        self.connectionStatus = "Connected to \(String(describing: videoPlayer))"
+                        self.Log.info("ConnectionViewModel.verifyOrEstablishConnection.onConnectionSuccessCallback called with \(videoPlayer.nodeId)")
+                    }
+                },
+                onConnectionFailureCallback: { (error: MatterError) -> () in
+                    DispatchQueue.main.async {
+                        self.connectionSuccess = false
+                        self.connectionStatus = "Failed to connect to video player!"
+                        self.Log.info("ConnectionViewModel.verifyOrEstablishConnection.onConnectionFailureCallback called with \(error)")
+                    }
+                },
+                onNewOrUpdatedEndpointCallback: { (contentApp: ContentApp) -> () in
+                    DispatchQueue.main.async {
+                        self.Log.info("CommissioningViewModel.openBasicCommissioningWindow.onNewOrUpdatedEndpointCallback called with \(contentApp.endpointId)")
+                    }
                 })
         }
-        
-        // TBD: Get Onboarding payload
-        
+                
         // Send User directed commissioning request if a commissioner with a known IP addr was selected
         if(selectedCommissioner != nil && selectedCommissioner!.numIPs > 0)
         {
@@ -55,14 +76,10 @@ class CommissioningViewModel: ObservableObject {
         }
     }
     
-    private func sendUserDirectedCommissioningRequest(selectedCommissioner: DiscoveredNodeData?) {
-        let ipAddress: String = selectedCommissioner!.ipAddresses[0] as! String
-        let port: UInt16 = selectedCommissioner!.port
-        let platformInterface: UInt32 = selectedCommissioner!.platformInterface
-        
+    private func sendUserDirectedCommissioningRequest(selectedCommissioner: DiscoveredNodeData?) {        
         if let castingServerBridge = CastingServerBridge.getSharedInstance()
         {
-            castingServerBridge.sendUserDirectedCommissioningRequest(ipAddress, commissionerPort: port, platformInterface: platformInterface, clientQueue: DispatchQueue.main, udcRequestSentHandler: { (result: Bool) -> () in
+            castingServerBridge.sendUserDirectedCommissioningRequest(selectedCommissioner!, clientQueue: DispatchQueue.main, udcRequestSentHandler: { (result: Bool) -> () in
                 self.udcRequestSent = result
             })
         }

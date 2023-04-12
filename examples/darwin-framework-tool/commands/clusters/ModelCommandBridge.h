@@ -24,8 +24,6 @@
 class ModelCommand : public CHIPCommandBridge
 {
 public:
-    using ChipDevice = ::chip::OperationalDeviceProxy;
-
     ModelCommand(const char * _Nonnull commandName) : CHIPCommandBridge(commandName) {}
 
     void AddArguments()

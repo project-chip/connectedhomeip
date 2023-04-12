@@ -29,7 +29,6 @@ template("cyw30739_executable") {
   flashable_target = "${target_name}.flashable"
   pre_build_target = "${target_name}.pre_build"
   post_build_target = "${target_name}.post_build"
-  ota_image_target = "${target_name}.ota_image"
 
   cyw30739_sdk_pre_build(pre_build_target) {
   }
@@ -38,18 +37,11 @@ template("cyw30739_executable") {
     executable_target = "${flashable_target}.executable"
   }
 
-  cyw30739_sdk_ota_image(ota_image_target) {
-    deps = [ ":${post_build_target}" ]
-  }
-
   group(target_name) {
-    deps = [ ":${flashable_target}" ]
-
-    if (chip_enable_ota_requestor) {
-      deps += [ ":${ota_image_target}" ]
-    } else {
-      deps += [ ":${post_build_target}" ]
-    }
+    deps = [
+      ":${flashable_target}",
+      ":${post_build_target}",
+    ]
   }
 
   # Copy flashing dependencies to the output directory so that the output

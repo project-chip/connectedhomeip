@@ -56,11 +56,19 @@
   {{else}}
     VerifyOrReturn(CheckValue{{#if (isString type)}}AsString{{/if}}("{{label}}", {{actual}}, 
       {{~#if (chip_tests_variables_has expected)}}{{expected}}
+      {{else if (chip_tests_config_has expected)}}
+        m{{asUpperCamelCase expected}}.HasValue() ? m{{asUpperCamelCase expected}}.Value() :
+        {{#if (isCharString type)}}
+          chip::Span<const char>("{{chip_tests_config_get_default_value expected}}", {{utf8StringLength (chip_tests_config_get_default_value expected)}})
+        {{else if (isOctetString type)}}
+          {{> octetStringValue value=(chip_tests_config_get_default_value expected)}}
+        {{else}}
+          {{asTypedExpression (chip_tests_config_get_default_value expected) type}}
+        {{/if}}
       {{else if keepAsExpected}}{{expected}}
       {{else if (isOctetString type)}}
         {{> octetStringValue value=expected}}
       {{else if (isCharString type)}}chip::CharSpan("{{expected}}", {{utf8StringLength expected}})
-      {{else if (chip_tests_config_has expected)}}m{{asUpperCamelCase expected}}.HasValue() ? m{{asUpperCamelCase expected}}.Value() : {{asTypedLiteral (chip_tests_config_get_default_value expected) (chip_tests_config_get_type expected)}}
       {{else}}{{asTypedExpression expected type}}
       {{/if}}
     ));

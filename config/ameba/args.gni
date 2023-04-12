@@ -16,7 +16,6 @@
 # options are used from examples/.
 
 import("//build_overrides/pigweed.gni")
-import("$dir_pw_span/polyfill.gni")
 
 chip_device_platform = "ameba"
 
@@ -38,5 +37,4 @@ custom_toolchain = "//third_party/connectedhomeip/config/ameba/toolchain:ameba"
 
 pw_build_PIP_CONSTRAINTS =
     [ "//third_party/connectedhomeip/scripts/constraints.txt" ]
-pw_span_ENABLE_STD_SPAN_POLYFILL = false
 cpp_standard = "c++17"

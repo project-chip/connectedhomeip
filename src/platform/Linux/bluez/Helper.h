@@ -59,20 +59,20 @@ namespace DeviceLayer {
 namespace Internal {
 
 CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, BluezEndpoint *& apEndpoint);
-bool BluezRunOnBluezThread(int (*aCallback)(void *), void * apClosure);
-bool SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf);
-bool CloseBluezConnection(BLE_CONNECTION_OBJECT apConn);
+CHIP_ERROR ShutdownBluezBleLayer(BluezEndpoint * apEndpoint);
+CHIP_ERROR SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf);
+CHIP_ERROR CloseBluezConnection(BLE_CONNECTION_OBJECT apConn);
 CHIP_ERROR StartBluezAdv(BluezEndpoint * apEndpoint);
 CHIP_ERROR StopBluezAdv(BluezEndpoint * apEndpoint);
 CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint);
 CHIP_ERROR BluezAdvertisementSetup(BluezEndpoint * apEndpoint);
 
 /// Write to the CHIP RX characteristic on the remote peripheral device
-bool BluezSendWriteRequest(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf);
+CHIP_ERROR BluezSendWriteRequest(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf);
 /// Subscribe to the CHIP TX characteristic on the remote peripheral device
-bool BluezSubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
+CHIP_ERROR BluezSubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
 /// Unsubscribe from the CHIP TX characteristic on the remote peripheral device
-bool BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
+CHIP_ERROR BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
 
 CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice, BluezEndpoint * apEndpoint);
 void CancelConnect(BluezEndpoint * apEndpoint);

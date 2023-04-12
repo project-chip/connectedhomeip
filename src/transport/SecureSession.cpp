@@ -120,9 +120,9 @@ void SecureSession::MarkAsDefunct()
 
     case State::kPendingEviction:
         //
-        // Once a session is headed for eviction, we CANNOT bring it back to either being active or defunct.
+        // Once a session is headed for eviction, we CANNOT bring it back to either being active or defunct. Let's just
+        // do nothing and return.
         //
-        VerifyOrDie(false);
         return;
     }
 }

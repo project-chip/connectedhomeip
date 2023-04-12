@@ -42,7 +42,7 @@ struct GetConnectedDeviceCallback
     jobject mJavaCallbackRef    = nullptr;
 };
 
-struct ReportCallback : public app::ReadClient::Callback
+struct ReportCallback : public app::ClusterStateCache::Callback
 {
     /** Subscription established callback can be nullptr. */
     ReportCallback(jobject wrapperCallback, jobject subscriptionEstablishedCallback, jobject reportCallback,
@@ -74,9 +74,11 @@ struct ReportCallback : public app::ReadClient::Callback
 
     CHIP_ERROR CreateChipEventPath(const app::ConcreteEventPath & aPath, jobject & outObj);
 
+    void UpdateClusterDataVersion();
+
     app::ReadClient * mReadClient = nullptr;
 
-    app::BufferedReadCallback mBufferedReadAdapter;
+    app::ClusterStateCache mClusterCacheAdapter;
     jobject mWrapperCallbackRef                 = nullptr;
     jobject mSubscriptionEstablishedCallbackRef = nullptr;
     jobject mResubscriptionAttemptCallbackRef   = nullptr;

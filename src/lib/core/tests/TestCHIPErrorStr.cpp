@@ -306,7 +306,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestCHIPErrorStr(void)
+int TestCHIPErrorStr()
 {
     // clang-format off
     nlTestSuite theSuite =

@@ -35,11 +35,10 @@ using namespace chip;
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR ReportDataMessage::Parser::PrettyPrint() const
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    int tagPresenceMask = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
     AttributeReportIBs::Parser attributeReportIBs;
     EventReportIBs::Parser eventReportIBs;
@@ -60,8 +59,6 @@ CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
         switch (tagNum)
         {
         case to_underlying(Tag::kSuppressResponse):
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kSuppressResponse))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kSuppressResponse));
             VerifyOrReturnError(TLV::kTLVType_Boolean == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
@@ -72,8 +69,6 @@ CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
 #endif // CHIP_DETAIL_LOGGING
             break;
         case to_underlying(Tag::kSubscriptionId):
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kSubscriptionId))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kSubscriptionId));
             VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
@@ -84,38 +79,30 @@ CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
 #endif // CHIP_DETAIL_LOGGING
             break;
         case to_underlying(Tag::kAttributeReportIBs):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kAttributeReportIBs))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kAttributeReportIBs));
             VerifyOrReturnError(TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
                 attributeReportIBs.Init(reader);
 
                 PRETTY_PRINT_INCDEPTH();
-                ReturnErrorOnFailure(attributeReportIBs.CheckSchemaValidity());
+                ReturnErrorOnFailure(attributeReportIBs.PrettyPrint());
                 PRETTY_PRINT_DECDEPTH();
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
         case to_underlying(Tag::kEventReports):
-            // check if this tag has appeared before
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEventReports))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kEventReports));
             VerifyOrReturnError(TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
                 eventReportIBs.Init(reader);
 
                 PRETTY_PRINT_INCDEPTH();
-                ReturnErrorOnFailure(eventReportIBs.CheckSchemaValidity());
+                ReturnErrorOnFailure(eventReportIBs.PrettyPrint());
                 PRETTY_PRINT_DECDEPTH();
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
         case to_underlying(Tag::kMoreChunkedMessages):
-            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kMoreChunkedMessages))), CHIP_ERROR_INVALID_TLV_TAG);
-            tagPresenceMask |= (1 << to_underlying(Tag::kMoreChunkedMessages));
             VerifyOrReturnError(TLV::kTLVType_Boolean == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
@@ -144,7 +131,7 @@ CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 CHIP_ERROR ReportDataMessage::Parser::GetSuppressResponse(bool * const apSuppressResponse) const
 {

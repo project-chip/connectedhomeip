@@ -27,6 +27,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
+#include <app/server/OnboardingCodesUtil.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -65,6 +66,9 @@ constexpr EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
 
 static void InitServer(intptr_t context)
 {
+    // Print QR Code URL
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
+
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 
     // We only have network commissioning on endpoint 0.

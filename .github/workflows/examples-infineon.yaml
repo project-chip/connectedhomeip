@@ -23,6 +23,9 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     infineon:
         name: Infineon examples building
@@ -32,11 +35,11 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-infineon:0.5.99
+            image: connectedhomeip/chip-build-infineon:0.6.18
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -57,7 +60,7 @@ jobs:
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs
@@ -69,7 +72,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh \
                     "scripts/build/build_examples.py \
-                        --enable-flashbundle --no-log-timestamps \
+                        --enable-flashbundle \
                         --target infineon-psoc6-lock \
                         build \
                         --copy-artifacts-to out/artifacts \
@@ -83,7 +86,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh \
                     "scripts/build/build_examples.py \
-                        --enable-flashbundle --no-log-timestamps \
+                        --enable-flashbundle \
                         --target infineon-psoc6-all-clusters \
                         build \
                         --copy-artifacts-to out/artifacts \
@@ -97,7 +100,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh \
                     "scripts/build/build_examples.py \
-                        --enable-flashbundle --no-log-timestamps \
+                        --enable-flashbundle \
                         --target infineon-psoc6-all-clusters-minimal \
                         build \
                         --copy-artifacts-to out/artifacts \
@@ -111,7 +114,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh \
                     "scripts/build/build_examples.py \
-                        --enable-flashbundle --no-log-timestamps \
+                        --enable-flashbundle \
                         --target infineon-psoc6-light \
                         build \
                         --copy-artifacts-to out/artifacts \
@@ -126,7 +129,9 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py \
-                      --target-glob 'cyw30739-cyw930739m2evb_01-{light,lock,ota-requestor-no-progress-logging}' \
+                      --target cyw30739-cyw930739m2evb_01-light \
+                      --target cyw30739-cyw930739m2evb_01-lock \
+                      --target cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging \
                       build \
                       --copy-artifacts-to out/artifacts \
                     "
@@ -152,7 +157,7 @@ jobs:
                     out/artifacts/cyw30739-cyw930739m2evb_01-ota-requestor-no-progress-logging/chip-cyw30739-ota-requestor-example.elf \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ !env.ACT }}
               with:
                   name: Size,Infineon-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}

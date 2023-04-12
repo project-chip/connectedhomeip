@@ -26,6 +26,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/util/basic-types.h>
+#include <inet/IPAddress.h>
 #include <lib/support/Span.h>
 #include <platform/NetworkCommissioning.h>
 

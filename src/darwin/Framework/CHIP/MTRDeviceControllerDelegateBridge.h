@@ -40,7 +40,7 @@ public:
     void OnCommissioningComplete(chip::NodeId deviceId, CHIP_ERROR error) override;
 
 private:
-    MTRDeviceController * _Nullable mController;
+    MTRDeviceController * __weak mController;
     _Nullable id<MTRDeviceControllerDelegate> mDelegate;
     _Nullable dispatch_queue_t mQueue;
 

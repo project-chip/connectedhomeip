@@ -13,7 +13,7 @@ class {{filename}}: public TestCommandBridge
           {{#if (isString type)}}
           AddArgument("{{name}}", &m{{asUpperCamelCase name}});
           {{else}}
-          AddArgument("{{name}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asUpperCamelCase name}});
+          AddArgument("{{name}}", {{as_type_min_value type language='c++'}}, {{as_type_max_value type language='c++'}}, &m{{asUpperCamelCase name}});
           {{/if}}
         {{/chip_tests_config}}
     }
@@ -136,7 +136,7 @@ class {{filename}}: public TestCommandBridge
         return {{command}}("{{identity}}", value);
         {{else}}
         MTRBaseDevice * device = GetDevice("{{identity}}");
-        __auto_type * cluster = [[MTRBaseCluster{{>cluster}} alloc] initWithDevice:device endpoint:@({{endpoint}}) queue:mCallbackQueue];
+        __auto_type * cluster = [[MTRBaseCluster{{>cluster}} alloc] initWithDevice:device endpointID:@({{endpoint}}) queue:mCallbackQueue];
         VerifyOrReturnError(cluster != nil, CHIP_ERROR_INCORRECT_STATE);
 
         {{#if isCommand}}
@@ -157,6 +157,8 @@ class {{filename}}: public TestCommandBridge
             {{asObjectiveCBasicType type}} {{asLowerCamelCase name}}Argument = {{asTypedLiteral definedValue type}};
           {{/chip_tests_item_parameters}}
           __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(minIntervalArgument) maxInterval:@(maxIntervalArgument)];
+          params.filterByFabric = {{#if fabricFiltered}}true{{else}}false{{/if}};
+          params.replaceExistingSubscriptions = {{#if keepSubscriptions}}false{{else}}true{{/if}};
           [cluster subscribeAttribute{{>attribute}}WithParams:params
                                       subscriptionEstablished:^{
               VerifyOrReturn(testSendCluster{{parent.filename}}_{{waitForReport.index}}_{{asUpperCamelCase waitForReport.command}}_Fulfilled, SetCommandExitStatus(CHIP_ERROR_INCORRECT_STATE));
@@ -168,7 +170,7 @@ class {{filename}}: public TestCommandBridge
         {{else if isReadAttribute}}
         {{#if_is_fabric_scoped_struct attributeObject.type}}
         __auto_type * params = [[MTRReadParams alloc] init];
-        params.fabricFiltered = {{fabricFiltered}};
+        params.filterByFabric = {{fabricFiltered}};
         {{/if_is_fabric_scoped_struct}}
         [cluster readAttribute{{>attribute}}With
         {{~#if_is_fabric_scoped_struct attributeObject.type~}}

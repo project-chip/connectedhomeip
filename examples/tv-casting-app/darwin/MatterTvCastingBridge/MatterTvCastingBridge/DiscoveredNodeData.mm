@@ -20,6 +20,12 @@
 #import "DiscoveredNodeData.h"
 #include <lib/dnssd/Resolver.h>
 
+@interface DiscoveredNodeData ()
+
+@property (nonatomic) VideoPlayer * connectableVideoPlayer;
+
+@end
+
 @implementation DiscoveredNodeData
 
 - (DiscoveredNodeData *)initWithDeviceName:(NSString *)deviceName vendorId:(uint16_t)vendorId productId:(uint16_t)productId
@@ -35,7 +41,12 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"%@ with Product ID: %d and Vendor ID: %d", _deviceName, _productId, _vendorId];
+    if ([self isPreCommissioned]) {
+        return [NSString
+            stringWithFormat:@"%@ with Product ID: %d and Vendor ID: %d [Pre-Commissioned]", _deviceName, _productId, _vendorId];
+    } else {
+        return [NSString stringWithFormat:@"%@ with Product ID: %d and Vendor ID: %d", _deviceName, _productId, _vendorId];
+    }
 }
 
 - (BOOL)isEqualToDiscoveredNodeData:(DiscoveredNodeData *)other
@@ -68,6 +79,21 @@
     result = prime * result + [self.instanceName hash];
 
     return result;
+}
+
+- (void)setConnectableVideoPlayer:(VideoPlayer * _Nonnull)videoPlayer
+{
+    _connectableVideoPlayer = videoPlayer;
+}
+
+- (bool)isPreCommissioned
+{
+    return _connectableVideoPlayer != nil;
+}
+
+- (VideoPlayer *)getConnectableVideoPlayer
+{
+    return _connectableVideoPlayer;
 }
 
 @end

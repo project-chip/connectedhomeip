@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandlerInterface.h>
 #include <lib/support/BytesCircularBuffer.h>

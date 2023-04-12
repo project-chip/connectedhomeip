@@ -78,14 +78,14 @@ static bool ParseJsonFileAndPopulateCandidates(
 
         auto vendorId = [NSNumber numberWithUnsignedInt:iter.get("vendorId", 1).asUInt()];
         auto productId = [NSNumber numberWithUnsignedInt:iter.get("productId", 1).asUInt()];
-        auto softwareVersion = [NSNumber numberWithUnsignedLong:iter.get("softwareVersion", 10).asUInt64()];
+        auto softwareVersion = [NSNumber numberWithUnsignedLongLong:iter.get("softwareVersion", 10).asUInt64()];
         auto softwareVersionString = [NSString stringWithUTF8String:iter.get("softwareVersionString", "1.0.0").asCString()];
         auto cDVersionNumber = [NSNumber numberWithUnsignedInt:iter.get("cDVersionNumber", 0).asUInt()];
         auto softwareVersionValid = iter.get("softwareVersionValid", true).asBool() ? YES : NO;
         auto minApplicableSoftwareVersion =
-            [NSNumber numberWithUnsignedLong:iter.get("minApplicableSoftwareVersion", 0).asUInt64()];
+            [NSNumber numberWithUnsignedLongLong:iter.get("minApplicableSoftwareVersion", 0).asUInt64()];
         auto maxApplicableSoftwareVersion =
-            [NSNumber numberWithUnsignedLong:iter.get("maxApplicableSoftwareVersion", 1000).asUInt64()];
+            [NSNumber numberWithUnsignedLongLong:iter.get("maxApplicableSoftwareVersion", 1000).asUInt64()];
         auto otaURL = [NSString stringWithUTF8String:iter.get("otaURL", "https://test.com").asCString()];
 
         candidate.deviceModelData.vendorId = vendorId;

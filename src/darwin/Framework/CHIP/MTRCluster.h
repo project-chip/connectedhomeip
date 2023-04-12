@@ -17,6 +17,13 @@
 
 #import <Foundation/Foundation.h>
 
+MTR_NEWLY_DEPRECATED("ResponseHandler is not used")
+typedef void (^ResponseHandler)(id _Nullable value, NSError * _Nullable error);
+MTR_NEWLY_DEPRECATED("Please use MTRStatusCompletion instead")
+typedef void (^StatusCompletion)(NSError * _Nullable error);
+MTR_NEWLY_DEPRECATED("Please use MTRSubscriptionEstablishedHandler instead")
+typedef void (^SubscriptionEstablishedHandler)(void);
+
 typedef void (^MTRStatusCompletion)(NSError * _Nullable error);
 typedef void (^MTRSubscriptionEstablishedHandler)(void);
 
@@ -85,7 +92,7 @@ NS_ASSUME_NONNULL_BEGIN
  * If NO, the read/subscribe is not fabric-filtered and will see all
  * non-fabric-sensitive data for the given attribute path.
  */
-@property (nonatomic, assign) BOOL fabricFiltered;
+@property (nonatomic, assign, getter=shouldFilterByFabric) BOOL filterByFabric MTR_NEWLY_AVAILABLE;
 
 @end
 
@@ -98,15 +105,15 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRSubscribeParams : MTRReadParams
 
 /**
- * Whether the subscribe should allow previous subscriptions to stay in
- * place. The default value is NO.
+ * Whether the subscribe should replace already-existing
+ * subscriptions.  The default value is YES.
  *
- * If NO, the subscribe will cancel any existing subscriptions to the target
+ * If YES, the subscribe will cancel any existing subscriptions to the target
  * node when it sets up the new one.
  *
- * If YES, the subscribe will allow any previous subscriptions to remain.
+ * If NO, the subscribe will allow any previous subscriptions to remain.
  */
-@property (nonatomic, assign) BOOL keepPreviousSubscriptions;
+@property (nonatomic, assign, getter=shouldReplaceExistingSubscriptions) BOOL replaceExistingSubscriptions;
 
 /**
  * Whether the subscription should automatically try to re-establish if it
@@ -120,7 +127,7 @@ NS_ASSUME_NONNULL_BEGIN
  * called again.
  *
  */
-@property (nonatomic, assign) BOOL autoResubscribe;
+@property (nonatomic, assign, getter=shouldResubscribeIfLost) BOOL resubscribeIfLost;
 
 /**
  * The minimum time, in seconds, between consecutive reports a server will send
@@ -143,8 +150,28 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (instancetype)initWithMinInterval:(NSNumber *)minInterval maxInterval:(NSNumber *)maxInterval;
 
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
+@end
+
+@interface MTRReadParams (Deprecated)
+
+@property (nonatomic, copy, nullable) NSNumber * fabricFiltered MTR_NEWLY_DEPRECATED("Please use filterByFabric");
+
+@end
+
+@interface MTRSubscribeParams (Deprecated)
+
+@property (nonatomic, copy, nullable)
+    NSNumber * keepPreviousSubscriptions MTR_NEWLY_DEPRECATED("Please use replaceExistingSubscriptions");
+@property (nonatomic, copy, nullable) NSNumber * autoResubscribe MTR_NEWLY_DEPRECATED("Please use resubscribeIfLost");
+
+/**
+ * init and new exist for now, for backwards compatibility, and initialize with
+ * minInterval set to 1 and maxInterval set to 0, which will not work on its
+ * own.  Uses of MTRSubscribeParams that rely on init must all be using
+ * (deprecated) APIs that pass in a separate minInterval and maxInterval.
+ */
+- (instancetype)init MTR_NEWLY_DEPRECATED("Please use initWithMinInterval");
++ (instancetype)new MTR_NEWLY_DEPRECATED("Please use initWithMinInterval");
 @end
 
 NS_ASSUME_NONNULL_END

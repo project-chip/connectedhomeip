@@ -1,6 +1,5 @@
 /*
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,5 +29,8 @@ void cc13xx_26xxLog(const char * aFormat, ...);
 
 #ifdef __cplusplus
 }
+
+#include <lib/core/CHIPError.h>
+void appError(CHIP_ERROR error);
 #endif
 #endif // APP_CONFIG_H

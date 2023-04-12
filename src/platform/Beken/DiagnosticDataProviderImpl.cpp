@@ -21,6 +21,7 @@
  *          for Beken platform.
  */
 
+#include <lib/support/CHIPMemString.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
@@ -131,10 +132,9 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
         return CHIP_ERROR_INTERNAL;
     }
 
-    strncpy(ifp->Name, netif->hostname, Inet::InterfaceId::kMaxIfNameLength);
-    ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
-    ifp->name                                          = CharSpan::fromCharString(ifp->Name);
-    ifp->type                                          = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+    Platform::CopyString(ifp->Name, netif->hostname);
+    ifp->name = CharSpan::fromCharString(ifp->Name);
+    ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
     ifp->offPremiseServicesReachableIPv4.SetNonNull(false);
     ifp->offPremiseServicesReachableIPv6.SetNonNull(false);
     memcpy(ifp->MacAddress, netif->hwaddr, sizeof(netif->hwaddr));

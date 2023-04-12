@@ -16,27 +16,27 @@ RUN apt-cache policy
 # TODO: Use multi stage build for smaller image size.
 RUN apt-get update \
   && apt-get install --no-install-recommends -y \
-  avahi-daemon=0.7-4ubuntu7.1 \
-  avahi-utils=0.7-4ubuntu7.1 \
-  ca-certificates=20211016~20.04.1 \
-  dhcpcd5=7.1.0-2build1 \
-  gdb=9.2-0ubuntu1~20.04.1 \
+  avahi-daemon \
+  avahi-utils \
+  ca-certificates \
+  dhcpcd5 \
+  gdb \
   git \
-  iproute2=5.5.0-1ubuntu1 \
-  libavahi-client3=0.7-4ubuntu7.1 \
-  libcairo2-dev=1.16.0-4ubuntu1 \
-  libdbus-1-dev=1.12.16-2ubuntu2.2 \
-  libgif-dev=5.1.9-1 \
-  libgirepository1.0-dev=1.64.1-1~ubuntu20.04.1 \
-  libglib2.0-dev=2.64.6-1~ubuntu20.04.4 \
-  libjpeg-dev=8c-2ubuntu8 \
-  psmisc=23.3-1 \
-  python3-dev=3.8.2-0ubuntu2 \
-  python3-pip=20.0.2-5ubuntu1.6 \
-  python3=3.8.2-0ubuntu2 \
-  sudo=1.8.31-1ubuntu1.2 \
-  wireless-tools=30~pre9-13ubuntu1 \
-  wpasupplicant=2:2.9-1ubuntu4.3 \
+  iproute2 \
+  libavahi-client3 \
+  libcairo2-dev \
+  libdbus-1-dev \
+  libgif-dev \
+  libgirepository1.0-dev \
+  libglib2.0-dev \
+  libjpeg-dev \
+  psmisc \
+  python3-dev \
+  python3-pip \
+  python3 \
+  sudo \
+  wireless-tools \
+  wpasupplicant \
   && ln -fs /usr/share/zoneinfo/UTC /etc/localtime \
   && git clone https://github.com/openthread/ot-br-posix . \
   && git checkout $OT_BR_POSIX_CHECKOUT \

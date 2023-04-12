@@ -33,14 +33,17 @@ public:
 
 private:
     OperationalState mState;
-    NPercent100ths mCurrentPosition;
-    NPercent100ths mTargetPosition;
+    NPercent100ths mCurrentLiftPosition;
+    NPercent100ths mTargetLiftPosition;
+    NPercent100ths mCurrentTiltPosition;
+    NPercent100ths mTargetTiltPosition;
 
     /**
      * @brief
      *  The callback function to be called when "movement timer" expires.
      */
-    static void HandleMovementTimer(chip::System::Layer * layer, void * aAppState);
+    static void HandleLiftMovementTimer(chip::System::Layer * layer, void * aAppState);
+    static void HandleTiltMovementTimer(chip::System::Layer * layer, void * aAppState);
 };
 
 } // namespace WindowCovering

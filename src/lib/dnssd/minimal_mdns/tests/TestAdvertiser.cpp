@@ -546,7 +546,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestAdvertiser(void)
+int TestAdvertiser()
 {
     chip::Platform::MemoryInit();
     chip::Test::IOContext context;

@@ -1,11 +1,11 @@
-# Matter CC1352 CC2652 Lighting Example Application
+# Matter Lighting Example Application
 
 An example application showing the use of [Matter][matter] on the Texas
 Instruments CC13XX_26XX family of Wireless MCUs.
 
 ---
 
--   [Matter CC1352 CC2652 Lighting Example Application](#matter-cc1352-cc2652-lighting-example-application)
+-   [Matter Lighting Example Application](#matter-lighting-example-application)
     -   [Introduction](#introduction)
         -   [Device UI](#device-ui)
     -   [Building](#building)
@@ -289,8 +289,7 @@ Additionally, we welcome any feedback.
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-launch
 [ccs_manual_method]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-method
-[cc1352r1_launchxl]: https://www.ti.com/tool/LAUNCHXL-CC1352R1
-[e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-and-thread
+[e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
 [matter-e2e-faq]:
     https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum/1082428/faq-cc2652r7-matter----getting-started-guide
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG

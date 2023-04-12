@@ -22,14 +22,18 @@
  */
 
 #include "ChipDeviceScanner.h"
-#include <platform/CHIPDeviceLayer.h>
-#include <sys/param.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <cstdint>
+#include <cstring>
+#include <utility>
+
+#include <bluetooth.h>
+
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include "MainLoop.h"
-#include <lib/support/logging/CHIPLogging.h>
-#include <system/SystemTimer.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -167,7 +171,7 @@ exit:
     return false;
 }
 
-static bool __IsScanFilterSupported(void)
+static bool __IsScanFilterSupported()
 {
     // Tizen API: bt_adapter_le_is_scan_filter_supported() is currently internal
     // Defaulting to true
@@ -221,7 +225,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceScanner::StopChipScan(void)
+CHIP_ERROR ChipDeviceScanner::StopChipScan()
 {
     int ret = BT_ERROR_NONE;
     ReturnErrorCodeIf(!mIsScanning, CHIP_ERROR_INCORRECT_STATE);
@@ -245,7 +249,7 @@ CHIP_ERROR ChipDeviceScanner::StopChipScan(void)
     return CHIP_NO_ERROR;
 }
 
-void ChipDeviceScanner::UnRegisterScanFilter(void)
+void ChipDeviceScanner::UnRegisterScanFilter()
 {
     if (mScanFilter)
     {
@@ -308,5 +312,3 @@ exit:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

@@ -102,7 +102,7 @@ class TC_RR_1_1(MatterBaseTest):
         # TODO: Shall we also verify SupportedFabrics attribute, and the CapabilityMinima attribute?
         logging.info("Pre-conditions: validate CapabilityMinima.CaseSessionsPerFabric >= 3")
 
-        capability_minima = await self.read_single_attribute(dev_ctrl, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.Basic.Attributes.CapabilityMinima)
+        capability_minima = await self.read_single_attribute(dev_ctrl, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.BasicInformation.Attributes.CapabilityMinima)
         asserts.assert_greater_equal(capability_minima.caseSessionsPerFabric, 3)
 
         # Step 1: Commission 5 fabrics with maximized NOC chains
@@ -169,9 +169,9 @@ class TC_RR_1_1(MatterBaseTest):
 
         # Before subscribing, set the NodeLabel to "Before Subscriptions"
         logging.info(f"Step 2b: Set BasicInformation.NodeLabel to {BEFORE_LABEL}")
-        await client_list[0].WriteAttribute(self.dut_node_id, [(0, Clusters.Basic.Attributes.NodeLabel(value=BEFORE_LABEL))])
+        await client_list[0].WriteAttribute(self.dut_node_id, [(0, Clusters.BasicInformation.Attributes.NodeLabel(value=BEFORE_LABEL))])
 
-        node_label = await self.read_single_attribute(client, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.Basic.Attributes.NodeLabel)
+        node_label = await self.read_single_attribute(client, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.BasicInformation.Attributes.NodeLabel)
         asserts.assert_equal(node_label, BEFORE_LABEL, "NodeLabel must match what was written")
 
         # Step 3: Add 3 Access Control entries on DUT with a list of 4 Subjects and 3 Targets with the following parameters (...)
@@ -208,7 +208,7 @@ class TC_RR_1_1(MatterBaseTest):
         resub_catchers = []
         output_queue = queue.Queue()
         subscription_contents = [
-            (0, Clusters.Basic.Attributes.NodeLabel),  # Single attribute
+            (0, Clusters.BasicInformation.Attributes.NodeLabel),  # Single attribute
             (0, Clusters.OperationalCredentials),  # Wildcard all of opcreds attributes on EP0
             Clusters.Descriptor  # All descriptors on all endpoints
         ]
@@ -222,7 +222,7 @@ class TC_RR_1_1(MatterBaseTest):
             self._subscriptions.append(sub)
 
             attribute_handler = AttributeChangeAccumulator(
-                name=client.name, expected_attribute=Clusters.Basic.Attributes.NodeLabel, output=output_queue)
+                name=client.name, expected_attribute=Clusters.BasicInformation.Attributes.NodeLabel, output=output_queue)
             sub.SetAttributeUpdateCallback(attribute_handler)
             sub_handlers.append(attribute_handler)
 
@@ -237,31 +237,31 @@ class TC_RR_1_1(MatterBaseTest):
         logging.info("Step 6: Read 9 paths (first 9 attributes of Basic Information cluster) and validate success")
 
         large_read_contents = [
-            Clusters.Basic.Attributes.DataModelRevision,
-            Clusters.Basic.Attributes.VendorName,
-            Clusters.Basic.Attributes.VendorID,
-            Clusters.Basic.Attributes.ProductName,
-            Clusters.Basic.Attributes.ProductID,
-            Clusters.Basic.Attributes.NodeLabel,
-            Clusters.Basic.Attributes.Location,
-            Clusters.Basic.Attributes.HardwareVersion,
-            Clusters.Basic.Attributes.HardwareVersionString,
+            Clusters.BasicInformation.Attributes.DataModelRevision,
+            Clusters.BasicInformation.Attributes.VendorName,
+            Clusters.BasicInformation.Attributes.VendorID,
+            Clusters.BasicInformation.Attributes.ProductName,
+            Clusters.BasicInformation.Attributes.ProductID,
+            Clusters.BasicInformation.Attributes.NodeLabel,
+            Clusters.BasicInformation.Attributes.Location,
+            Clusters.BasicInformation.Attributes.HardwareVersion,
+            Clusters.BasicInformation.Attributes.HardwareVersionString,
         ]
         large_read_paths = [(0, attrib) for attrib in large_read_contents]
         basic_info = await dev_ctrl.ReadAttribute(self.dut_node_id, large_read_paths)
 
         # Make sure everything came back from the read that we expected
         asserts.assert_true(0 in basic_info.keys(), "Must have read endpoint 0 data")
-        asserts.assert_true(Clusters.Basic in basic_info[0].keys(), "Must have read Basic Information cluster data")
+        asserts.assert_true(Clusters.BasicInformation in basic_info[0].keys(), "Must have read Basic Information cluster data")
         for attribute in large_read_contents:
-            asserts.assert_true(attribute in basic_info[0][Clusters.Basic],
+            asserts.assert_true(attribute in basic_info[0][Clusters.BasicInformation],
                                 "Must have read back attribute %s" % (attribute.__name__))
 
         # Step 7: Trigger a change on NodeLabel
         logging.info(
             "Step 7: Change attribute with one client, await all attributes changed successfully without loss of subscriptions")
         await asyncio.sleep(1)
-        await client_list[0].WriteAttribute(self.dut_node_id, [(0, Clusters.Basic.Attributes.NodeLabel(value=AFTER_LABEL))])
+        await client_list[0].WriteAttribute(self.dut_node_id, [(0, Clusters.BasicInformation.Attributes.NodeLabel(value=AFTER_LABEL))])
 
         all_changes = {client.name: False for client in client_list}
 
@@ -276,7 +276,7 @@ class TC_RR_1_1(MatterBaseTest):
                 client_name, endpoint, attribute, value = item['name'], item['endpoint'], item['attribute'], item['value']
 
                 # Record arrival of an expected subscription change when seen
-                if endpoint == 0 and attribute == Clusters.Basic.Attributes.NodeLabel and value == AFTER_LABEL:
+                if endpoint == 0 and attribute == Clusters.BasicInformation.Attributes.NodeLabel and value == AFTER_LABEL:
                     if not all_changes[client_name]:
                         logging.info("Got expected attribute change for client %s" % client_name)
                         all_changes[client_name] = True
@@ -319,7 +319,7 @@ class TC_RR_1_1(MatterBaseTest):
         for sub_idx, client in enumerate(client_list):
             logging.info("Reading NodeLabel (%d/%d) from controller node %s" % (sub_idx + 1, len(client_list), client.name))
 
-            label_readback = await self.read_single_attribute(client, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.Basic.Attributes.NodeLabel)
+            label_readback = await self.read_single_attribute(client, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.BasicInformation.Attributes.NodeLabel)
             asserts.assert_equal(label_readback, AFTER_LABEL)
 
         # On each client, read back the local session id for the CASE session to the DUT and ensure it's the same as that of the session established right at the

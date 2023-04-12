@@ -20,6 +20,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ * This protocol is used by the Matter framework to sign messages with a private
+ * key and verify signatures with a public key.
+ *
+ * The Matter framework may call keypair methods from arbitrary threads and
+ * concurrently.
+ *
+ * Implementations of the keypair methods must not call into any Matter
+ * framework APIs.
+ */
 @protocol MTRKeypair <NSObject>
 @required
 /**

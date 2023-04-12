@@ -18,6 +18,7 @@
 
 #include <lib/support/StateMachine.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <lib/support/Variant.h>
 #include <nlunit-test.h>
 
 namespace {
@@ -64,28 +65,31 @@ struct BaseState
     void LogTransition(const char * previous) { mMock.LogTransition(previous); }
     const char * GetName() { return mName; }
 
-    chip::StateMachine::Context<Event> & mCtx;
+    Context * mCtx;
     const char * mName;
     MockState & mMock;
 };
 
 struct State1 : public BaseState
 {
-    State1(Context & ctx, MockState & mock) : BaseState{ ctx, "State1", mock } {}
+    State1(Context * ctx, MockState & mock) : BaseState{ ctx, "State1", mock } {}
 };
 
 struct State2 : public BaseState
 {
-    State2(Context & ctx, MockState & mock) : BaseState{ ctx, "State2", mock } {}
+    State2(Context * ctx, MockState & mock) : BaseState{ ctx, "State2", mock } {}
 };
 
 struct State3 : public BaseState
 {
-    State3(Context & ctx, MockState & mock) : BaseState{ ctx, "State3", mock } {}
+    State3(Context * ctx, MockState & mock) : BaseState{ ctx, "State3", mock } {}
     void Enter()
     {
         BaseState::Enter();
-        this->mCtx.Dispatch(Event::Create<Event5>());
+        if (this->mCtx)
+        {
+            this->mCtx->Dispatch(Event::Create<Event5>());
+        }
     }
 };
 
@@ -95,12 +99,12 @@ using State = chip::StateMachine::VariantState<State3, State2, State1>;
 
 struct StateFactory
 {
-    Context & mCtx;
+    Context * mCtx;
     MockState ms1{ 0, 0, 0, nullptr };
     MockState ms2{ 0, 0, 0, nullptr };
     MockState ms3{ 0, 0, 0, nullptr };
 
-    StateFactory(Context & ctx) : mCtx(ctx) {}
+    StateFactory(Context * ctx) : mCtx(ctx) {}
 
     auto CreateState1() { return State::Create<State1>(mCtx, ms1); }
     auto CreateState2() { return State::Create<State2>(mCtx, ms2); }
@@ -109,9 +113,9 @@ struct StateFactory
 
 struct Transitions
 {
-    Context & mCtx;
+    Context * mCtx;
     StateFactory mFactory;
-    Transitions(Context & ctx) : mCtx(ctx), mFactory(ctx) {}
+    Transitions(Context * ctx) : mCtx(ctx), mFactory(ctx) {}
 
     using OptState = chip::StateMachine::Optional<State>;
     State GetInitState() { return mFactory.CreateState1(); }
@@ -128,7 +132,10 @@ struct Transitions
         if (state.Is<State1>() && event.Is<Event4>())
         {
             // legal - Dispatches event without transition
-            mCtx.Dispatch(Event::Create<Event2>());
+            if (mCtx)
+            {
+                mCtx->Dispatch(Event::Create<Event2>());
+            }
             return {};
         }
         if (state.Is<State2>() && event.Is<Event4>())
@@ -155,7 +162,7 @@ public:
     Transitions mTransitions;
     chip::StateMachine::StateMachine<State, Event, Transitions> mStateMachine;
 
-    SimpleStateMachine() : mTransitions(mStateMachine), mStateMachine(mTransitions) {}
+    SimpleStateMachine() : mTransitions(&mStateMachine), mStateMachine(mTransitions) {}
     ~SimpleStateMachine() {}
 };
 

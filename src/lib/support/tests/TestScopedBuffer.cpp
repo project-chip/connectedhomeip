@@ -141,7 +141,7 @@ static const nlTest sTests[] = {
     NL_TEST_SENTINEL()                    //
 };
 
-int TestScopedBuffer(void)
+int TestScopedBuffer()
 {
     nlTestSuite theSuite = { "CHIP ScopedBuffer tests", &sTests[0], Setup, Teardown };
 

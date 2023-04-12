@@ -102,15 +102,17 @@ public:
     /**
      *  Calculate the backoff timer for the retransmission.
      *
-     *  @param[in]   baseInterval   The base interval to use for the backoff calculation, either the active or idle interval.
-     *  @param[in]   sendCount      Count of how many times this message
-     *                              has been retransmitted so far (0 if it has
-     *                              been sent only once with no retransmits,
-     *                              1 if it has been sent twice, etc).
+     *  @param[in]   baseInterval         The base interval to use for the backoff calculation, either the active or idle interval.
+     *  @param[in]   sendCount            Count of how many times this message
+     *                                    has been retransmitted so far (0 if it has
+     *                                    been sent only once with no retransmits,
+     *                                    1 if it has been sent twice, etc).
+     *  @param[in]   computeMaxPossible   Disable randomness such that the maximum value is used instead.
      *
      *  @retval  The backoff time value, including jitter.
      */
-    static System::Clock::Timestamp GetBackoff(System::Clock::Timestamp baseInterval, uint8_t sendCount);
+    static System::Clock::Timestamp GetBackoff(System::Clock::Timestamp baseInterval, uint8_t sendCount,
+                                               bool computeMaxPossible = false);
 
     /**
      *  Start retranmisttion of cached encryped packet for current entry.

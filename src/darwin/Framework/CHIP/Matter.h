@@ -17,6 +17,14 @@
 
 #import <Foundation/Foundation.h>
 
+#ifndef MTR_NEWLY_DEPRECATED
+#define MTR_NEWLY_DEPRECATED(message)
+#endif
+
+#ifndef MTR_NEWLY_AVAILABLE
+#define MTR_NEWLY_AVAILABLE
+#endif
+
 #import <Matter/MTRAsyncCallbackWorkQueue.h>
 #import <Matter/MTRAttestationInfo.h>
 #import <Matter/MTRBaseClusters.h>
@@ -29,6 +37,7 @@
 #import <Matter/MTRClusters.h>
 #import <Matter/MTRCommandPayloadsObjc.h>
 #import <Matter/MTRCommissioningParameters.h>
+#import <Matter/MTRDefines.h>
 #import <Matter/MTRDevice.h>
 #import <Matter/MTRDeviceAttestationDelegate.h>
 #import <Matter/MTRDeviceController+XPC.h>
@@ -38,9 +47,13 @@
 #import <Matter/MTRDeviceControllerStartupParams.h>
 #import <Matter/MTRError.h>
 #import <Matter/MTRKeypair.h>
-#import <Matter/MTRNOCChainIssuer.h>
+#import <Matter/MTRLogging.h>
+#import <Matter/MTRManualSetupPayloadParser.h>
 #import <Matter/MTROTAHeader.h>
 #import <Matter/MTROTAProviderDelegate.h>
+#import <Matter/MTROnboardingPayloadParser.h>
+#import <Matter/MTROperationalCertificateIssuer.h>
+#import <Matter/MTRQRCodeSetupPayloadParser.h>
 #import <Matter/MTRSetupPayload.h>
 #import <Matter/MTRStorage.h>
 #import <Matter/MTRStructsObjc.h>

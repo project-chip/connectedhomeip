@@ -36,9 +36,9 @@ function(chip_ota_image TARGET_NAME)
         "--product-id"
         ${CONFIG_DEVICE_PRODUCT_ID}
         "--version"
-        ${CONFIG_DEVICE_SOFTWARE_VERSION_NUMBER}
+        ${PROJECT_VER_NUMBER}
         "--version-str"
-        ${CONFIG_DEVICE_SOFTWARE_VERSION}
+        ${PROJECT_VER}
         "--digest-algorithm"
         "sha256"
     )

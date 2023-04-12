@@ -28,7 +28,7 @@ message DeviceInfo {
 }
 
 message FabricInfo {
-  uint32 fabric_id = 1;
+  uint64 fabric_id = 1;
   uint64 node_id = 2;
 }
 

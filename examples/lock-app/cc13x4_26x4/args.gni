@@ -23,7 +23,7 @@ ti_simplelink_board = "LP_EM_CC1354P10_6"
 
 # Size Optimizations
 # use -Os instead of -Og, LWIP release build
-optimize_debug_level = "g"
+optimize_debug_level = "s"
 lwip_debug = false
 
 chip_enable_ota_requestor = false

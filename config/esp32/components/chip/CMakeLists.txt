@@ -101,6 +101,10 @@ if(CONFIG_DISABLE_IPV4)
     chip_gn_arg_append("chip_inet_config_enable_ipv4"        "false")
 endif()
 
+if(CHIP_CODEGEN_PREGEN_DIR)
+    chip_gn_arg_append("chip_code_pre_generated_directory"  "\"${CHIP_CODEGEN_PREGEN_DIR}\"")
+endif()
+
 if(CONFIG_ENABLE_PW_RPC)
     string(APPEND chip_gn_args "import(\"//build_overrides/pigweed.gni\")\n")
     chip_gn_arg_append("remove_default_configs"             "[\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:toolchain_cpp_standard\"]")
@@ -119,8 +123,8 @@ if (CONFIG_BUILD_CHIP_TESTS)
     chip_gn_arg_bool("chip_build_tests"     "true")
 endif()
 
-if (CONFIG_CHIP_ENABLE_SCHEMA_CHECK)
-    chip_gn_arg_bool("chip_enable_schema_check"	"true")
+if (CONFIG_IM_PRETTY_PRINT)
+    chip_gn_arg_bool("enable_im_pretty_print"	"true")
 endif()
 
 if (NOT CONFIG_USE_MINIMAL_MDNS)

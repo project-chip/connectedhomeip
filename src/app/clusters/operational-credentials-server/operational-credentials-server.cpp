@@ -272,11 +272,6 @@ const FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
 CHIP_ERROR DeleteFabricFromTable(FabricIndex fabricIndex)
 {
     ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().Delete(fabricIndex));
-
-    // We need to withdraw the advertisement for the now-removed fabric, so need
-    // to restart advertising altogether.
-    app::DnssdServer::Instance().StartServer();
-
     return CHIP_NO_ERROR;
 }
 
@@ -335,10 +330,10 @@ public:
     void FabricWillBeRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
-        for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
+        for (auto endpoint : EnabledEndpointsWithServerCluster(BasicInformation::Id))
         {
             // If Basic cluster is implemented on this endpoint
-            Basic::Events::Leave::Type event;
+            BasicInformation::Events::Leave::Type event;
             event.fabricIndex = fabricIndex;
             EventNumber eventNumber;
 
@@ -361,6 +356,10 @@ public:
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         ChipLogProgress(Zcl, "OpCreds: Fabric index 0x%x was removed", static_cast<unsigned>(fabricIndex));
+
+        // We need to withdraw the advertisement for the now-removed fabric, so need
+        // to restart advertising altogether.
+        app::DnssdServer::Instance().StartServer();
 
         EventManagement::GetInstance().FabricRemoved(fabricIndex);
 
@@ -396,7 +395,7 @@ private:
 
 OpCredsFabricTableDelegate gFabricDelegate;
 
-void MatterOperationalCredentialsPluginServerInitCallback(void)
+void MatterOperationalCredentialsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 

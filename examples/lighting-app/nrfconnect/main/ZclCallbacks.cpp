@@ -38,15 +38,16 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     if (clusterId == OnOff::Id && attributeId == OnOff::Attributes::OnOff::Id)
     {
         ChipLogProgress(Zcl, "Cluster OnOff: attribute OnOff set to %u", *value);
-        GetAppTask().GetLightingDevice().InitiateAction(*value ? PWMDevice::ON_ACTION : PWMDevice::OFF_ACTION,
-                                                        AppEvent::kEventType_Lighting, value);
+        AppTask::Instance().GetPWMDevice().InitiateAction(*value ? PWMDevice::ON_ACTION : PWMDevice::OFF_ACTION,
+                                                          static_cast<int32_t>(AppEventType::Lighting), value);
     }
     else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id)
     {
         ChipLogProgress(Zcl, "Cluster LevelControl: attribute CurrentLevel set to %u", *value);
-        if (GetAppTask().GetLightingDevice().IsTurnedOn())
+        if (AppTask::Instance().GetPWMDevice().IsTurnedOn())
         {
-            GetAppTask().GetLightingDevice().InitiateAction(PWMDevice::LEVEL_ACTION, AppEvent::kEventType_Lighting, value);
+            AppTask::Instance().GetPWMDevice().InitiateAction(PWMDevice::LEVEL_ACTION, static_cast<int32_t>(AppEventType::Lighting),
+                                                              value);
         }
         else
         {
@@ -80,9 +81,10 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
         // Set actual state to the cluster state that was last persisted
-        GetAppTask().GetLightingDevice().InitiateAction(storedValue ? PWMDevice::ON_ACTION : PWMDevice::OFF_ACTION,
-                                                        AppEvent::kEventType_Lighting, reinterpret_cast<uint8_t *>(&storedValue));
+        AppTask::Instance().GetPWMDevice().InitiateAction(storedValue ? PWMDevice::ON_ACTION : PWMDevice::OFF_ACTION,
+                                                          static_cast<int32_t>(AppEventType::Lighting),
+                                                          reinterpret_cast<uint8_t *>(&storedValue));
     }
 
-    GetAppTask().UpdateClusterState();
+    AppTask::Instance().UpdateClusterState();
 }

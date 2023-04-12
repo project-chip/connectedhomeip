@@ -415,6 +415,12 @@ CHIP_ERROR GlobalAttributeReader::Read(const ConcreteReadAttributePath & aPath, 
         return EncodeCommandList(aPath, aEncoder, &CommandHandlerInterface::EnumerateGeneratedCommands,
                                  mCluster->generatedCommandList);
     default:
+        // This function is only called if attributeCluster is non-null in
+        // ReadSingleClusterData, which only happens for attributes listed in
+        // GlobalAttributesNotInMetadata.  If we reach this code, someone added
+        // a global attribute to that list but not the above switch.
+        VerifyOrDieWithMsg(false, DataManagement, "Unexpected global attribute: " ChipLogFormatMEI,
+                           ChipLogValueMEI(aPath.mAttributeId));
         return CHIP_NO_ERROR;
     }
 }
@@ -531,7 +537,7 @@ bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath)
     {
         if (attr == aPath.mAttributeId)
         {
-            return (emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER) != nullptr);
+            return (emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId) != nullptr);
         }
     }
     return (emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId) != nullptr);
@@ -551,16 +557,19 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, b
     const EmberAfCluster * attributeCluster            = nullptr;
     const EmberAfAttributeMetadata * attributeMetadata = nullptr;
 
-    switch (aPath.mAttributeId)
+    bool isGlobalAttributeNotInMetadata = false;
+    for (auto & attr : GlobalAttributesNotInMetadata)
     {
-    case Clusters::Globals::Attributes::AttributeList::Id:
-        FALLTHROUGH;
-    case Clusters::Globals::Attributes::AcceptedCommandList::Id:
-        FALLTHROUGH;
-    case Clusters::Globals::Attributes::GeneratedCommandList::Id:
-        attributeCluster = emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER);
-        break;
-    default:
+        if (attr == aPath.mAttributeId)
+        {
+            isGlobalAttributeNotInMetadata = true;
+            attributeCluster               = emberAfFindServerCluster(aPath.mEndpointId, aPath.mClusterId);
+            break;
+        }
+    }
+
+    if (!isGlobalAttributeNotInMetadata)
+    {
         attributeMetadata = emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
     }
 
@@ -1097,15 +1106,6 @@ bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 
 } // namespace app
 } // namespace chip
-
-void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                                            EmberAfAttributeType type, uint8_t * data)
-{
-    IgnoreUnusedVariable(type);
-    IgnoreUnusedVariable(data);
-
-    MatterReportingAttributeChangeCallback(endpoint, clusterId, attributeId);
-}
 
 void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId)
 {

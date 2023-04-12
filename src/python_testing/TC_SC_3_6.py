@@ -115,7 +115,7 @@ class TC_SC_3_6(MatterBaseTest):
 
         logging.info("Pre-conditions: validate CapabilityMinima.CaseSessionsPerFabric >= 3")
 
-        capability_minima = await self.read_single_attribute(dev_ctrl, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.Basic.Attributes.CapabilityMinima)
+        capability_minima = await self.read_single_attribute(dev_ctrl, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.BasicInformation.Attributes.CapabilityMinima)
         asserts.assert_greater_equal(capability_minima.caseSessionsPerFabric, 3)
 
         logging.info("Pre-conditions: use existing fabric to configure new fabrics so that total is %d fabrics" %
@@ -158,7 +158,7 @@ class TC_SC_3_6(MatterBaseTest):
 
         # Before subscribing, set the NodeLabel to "Before Subscriptions"
         logging.info("Pre-conditions: writing initial value of NodeLabel, so that we can control for change of attribute detection")
-        await client_list[0].WriteAttribute(self.dut_node_id, [(0, Clusters.Basic.Attributes.NodeLabel(value=BEFORE_LABEL))])
+        await client_list[0].WriteAttribute(self.dut_node_id, [(0, Clusters.BasicInformation.Attributes.NodeLabel(value=BEFORE_LABEL))])
 
         # Subscribe with all clients to NodeLabel attribute
         sub_handlers = []
@@ -169,12 +169,12 @@ class TC_SC_3_6(MatterBaseTest):
         for sub_idx, client in enumerate(client_list):
             logging.info("Establishing subscription %d/%d from controller node %s" % (sub_idx + 1, len(client_list), client.name))
 
-            sub = await client.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.Basic.Attributes.NodeLabel)],
+            sub = await client.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.BasicInformation.Attributes.NodeLabel)],
                                              reportInterval=(min_report_interval_sec, max_report_interval_sec), keepSubscriptions=False)
             self._subscriptions.append(sub)
 
             attribute_handler = AttributeChangeAccumulator(
-                name=client.name, expected_attribute=Clusters.Basic.Attributes.NodeLabel, output=output_queue)
+                name=client.name, expected_attribute=Clusters.BasicInformation.Attributes.NodeLabel, output=output_queue)
             sub.SetAttributeUpdateCallback(attribute_handler)
             sub_handlers.append(attribute_handler)
 
@@ -189,7 +189,7 @@ class TC_SC_3_6(MatterBaseTest):
         logging.info(
             "Step 1 (second part): Change attribute with one client, await all attributes changed within time")
         await asyncio.sleep(1)
-        await client_list[0].WriteAttribute(self.dut_node_id, [(0, Clusters.Basic.Attributes.NodeLabel(value=AFTER_LABEL))])
+        await client_list[0].WriteAttribute(self.dut_node_id, [(0, Clusters.BasicInformation.Attributes.NodeLabel(value=AFTER_LABEL))])
 
         all_changes = {client.name: False for client in client_list}
 
@@ -204,7 +204,7 @@ class TC_SC_3_6(MatterBaseTest):
                 client_name, endpoint, attribute, value = item['name'], item['endpoint'], item['attribute'], item['value']
 
                 # Record arrival of an expected subscription change when seen
-                if endpoint == 0 and attribute == Clusters.Basic.Attributes.NodeLabel and value == AFTER_LABEL:
+                if endpoint == 0 and attribute == Clusters.BasicInformation.Attributes.NodeLabel and value == AFTER_LABEL:
                     if not all_changes[client_name]:
                         logging.info("Got expected attribute change for client %s" % client_name)
                         all_changes[client_name] = True

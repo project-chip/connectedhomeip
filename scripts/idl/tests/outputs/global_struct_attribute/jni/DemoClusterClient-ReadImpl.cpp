@@ -35,3 +35,4 @@ JNI_METHOD(void, DemoClusterCluster, readSomeLabelsAttribute)(JNIEnv * env, jobj
     onFailure.release();
 }
 
+

@@ -65,17 +65,29 @@ struct CommissioningView: View {
             if(viewModel.commisisoningComplete == true)
             {
                 Text("Commissioning finished!").padding()
-                NavigationLink(
-                    destination: ContentLauncherView(),
-                    label: {
-                        Text("Next")
-                            .frame(width: 100, height: 30, alignment: .center)
-                            .border(Color.black, width: 1)
+                
+                if let connectionSuccess = viewModel.connectionSuccess
+                {
+                    if let connectionStatus = viewModel.connectionStatus
+                    {
+                        Text(connectionStatus).padding()
                     }
-                ).background(Color.blue)
-                    .foregroundColor(Color.white)
-                    .frame(maxHeight: .infinity, alignment: .bottom)
-                    .padding()
+                    
+                    if(connectionSuccess)
+                    {
+                        NavigationLink(
+                            destination: ClusterSelectorView(),
+                            label: {
+                                Text("Next")
+                                    .frame(width: 100, height: 30, alignment: .center)
+                                    .border(Color.black, width: 1)
+                            }
+                        ).background(Color.blue)
+                            .foregroundColor(Color.white)
+                            .frame(maxHeight: .infinity, alignment: .bottom)
+                            .padding()
+                    }
+                }
             }
             else if(viewModel.commisisoningComplete == false)
             {

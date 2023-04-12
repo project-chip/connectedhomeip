@@ -27,6 +27,10 @@
 #include <platform/telink/FactoryDataProvider.h>
 #endif
 
+#ifdef CONFIG_CHIP_PW_RPC
+#include "Rpc.h"
+#endif
+
 #include <cstdint>
 
 struct k_timer;
@@ -40,7 +44,18 @@ public:
     void PostEvent(AppEvent * event);
     void UpdateClusterState();
 
+    enum ButtonId_t
+    {
+        kButtonId_LightingAction = 1,
+        kButtonId_FactoryReset,
+        kButtonId_StartThread,
+        kButtonId_StartBleAdv
+    } ButtonId;
+
 private:
+#ifdef CONFIG_CHIP_PW_RPC
+    friend class chip::rpc::TelinkButton;
+#endif
     friend AppTask & GetAppTask(void);
     CHIP_ERROR Init();
 
@@ -62,6 +77,7 @@ private:
     static void LightingActionEventHandler(AppEvent * aEvent);
     static void StartBleAdvHandler(AppEvent * aEvent);
 
+    static void ButtonEventHandler(ButtonId_t btnId, bool btnPressed);
     static void InitButtons(void);
 
     static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);

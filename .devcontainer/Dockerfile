@@ -72,6 +72,7 @@ RUN chown -R $USERNAME:$USERNAME /opt/android/sdk
 RUN chown -R $USERNAME:$USERNAME /opt/ameba/ambd_sdk_with_chip_non_NDA/
 
 # NXP uses a patch_sdk script to change SDK files
+RUN mkdir -p /opt/sdk/sdks/
 RUN chown -R $USERNAME:$USERNAME /opt/sdk/sdks/
 
 RUN chown -R $USERNAME:$USERNAME /opt/fsl-imx-xwayland/5.15-kirkstone/
@@ -86,3 +87,6 @@ RUN sed -i '/^TIZEN_SDK_DATA_PATH/d' $TIZEN_SDK_ROOT/sdk.info \
     && : # last line
 
 ENV TIZEN_ROOTFS /tizen_rootfs
+
+# Fast Model GDB plugins path for debugging support
+ENV FAST_MODEL_PLUGINS_PATH /opt/FastModelsPortfolio_11.16/plugins/Linux64_GCC-9.3

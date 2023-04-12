@@ -146,7 +146,8 @@ void se05x_delete_key(uint32_t keyid)
 }
 
 /* Set key in se05x */
-CHIP_ERROR se05x_set_key(uint32_t keyid, const uint8_t * key, size_t keylen, sss_key_part_t keyPart, sss_cipher_type_t cipherType)
+CHIP_ERROR se05x_set_key_for_spake(uint32_t keyid, const uint8_t * key, size_t keylen, sss_key_part_t keyPart,
+                                   sss_cipher_type_t cipherType)
 {
     sss_status_t status       = kStatus_SSS_Success;
     sss_object_t keyObject    = { 0 };
@@ -167,10 +168,10 @@ CHIP_ERROR se05x_set_key(uint32_t keyid, const uint8_t * key, size_t keylen, sss
     commonPol.policy.common.can_Write  = 1;
 
     static sss_policy_u hmac_withPol;
-    hmac_withPol.type                      = KPolicy_Asym_Key;
-    hmac_withPol.auth_obj_id               = 0;
-    hmac_withPol.policy.asymmkey.can_Write = 1;
-    hmac_withPol.policy.asymmkey.can_KA    = 1;
+    hmac_withPol.type                     = KPolicy_Sym_Key;
+    hmac_withPol.auth_obj_id              = 0;
+    hmac_withPol.policy.symmkey.can_Write = 1;
+    hmac_withPol.policy.symmkey.can_KA    = 1;
 
     sss_policy_t policy_for_hmac_key;
     policy_for_hmac_key.nPolicies   = 2;
@@ -234,6 +235,42 @@ CHIP_ERROR se05xGetCertificate(uint32_t keyId, uint8_t * buf, size_t * buflen)
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR se05xSetCertificate(uint32_t keyId, const uint8_t * buf, size_t buflen)
+{
+    sss_object_t keyObject = { 0 };
+    sss_status_t status    = kStatus_SSS_Fail;
+
+    status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+
+    status = sss_key_object_allocate_handle(&keyObject, keyId, kSSS_KeyPart_Default, kSSS_CipherType_Certificate, buflen,
+                                            kKeyObject_Mode_Transient);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+
+    status = sss_key_store_set_key(&gex_sss_chip_ctx.ks, &keyObject, buf, buflen, buflen * 8, NULL, 0);
+    VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR se05xPerformInternalSign(uint32_t keyId, uint8_t * sigBuf, size_t * sigBufLen)
+{
+#if SSS_HAVE_APPLET_SE051_H
+    smStatus_t status                                   = SM_NOT_OK;
+    sss_se05x_session_t * pSe05xCtx                     = (sss_se05x_session_t *) &gex_sss_chip_ctx.session;
+    uint8_t hashData[chip::Crypto::kSHA256_Hash_Length] = { 0 };
+    size_t hashDataLen                                  = sizeof(hashData);
+
+    status = Se05x_API_ECDSA_Internal_Sign(&(pSe05xCtx->s_ctx), keyId, kSE05x_ECSignatureAlgo_SHA_256, sigBuf, sigBufLen, hashData,
+                                           &hashDataLen);
+    VerifyOrReturnError(status == SM_OK, CHIP_ERROR_INTERNAL);
+    return CHIP_NO_ERROR;
+#else
+    /* Enable Se051H to use internal sign */
+    return CHIP_ERROR_INTERNAL;
+#endif
 }
 
 #if ENABLE_REENTRANCY

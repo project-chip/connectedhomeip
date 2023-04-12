@@ -163,7 +163,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             {
                 size_t len = env->GetArrayLength(jHardwareAddressObj);
                 len        = (len > kMaxHardwareAddrSize) ? kMaxHardwareAddrSize : len;
-                env->GetByteArrayRegion(jHardwareAddressObj, 0, len, reinterpret_cast<jbyte *>(ifp->MacAddress));
+                env->GetByteArrayRegion(jHardwareAddressObj, 0, static_cast<uint32_t>(len),
+                                        reinterpret_cast<jbyte *>(ifp->MacAddress));
                 ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
             }
 

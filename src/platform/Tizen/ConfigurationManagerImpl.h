@@ -24,9 +24,15 @@
 
 #pragma once
 
-#include <platform/internal/GenericConfigurationManagerImpl.h>
+#include <cstdint>
+#include <cstdlib>
 
-#include <platform/Tizen/PosixConfig.h>
+#include <lib/core/CHIPError.h>
+#include <platform/DeviceInstanceInfoProvider.h>
+#include <platform/PersistedStorage.h>
+
+#include "PosixConfig.h"
+#include "platform/internal/GenericConfigurationManagerImpl.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -50,8 +56,8 @@ private:
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
     bool CanFactoryReset(void) override;
     void InitiateFactoryReset(void) override;
-    CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
-    CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
+    CHIP_ERROR ReadPersistedStorageValue(Platform::PersistedStorage::Key key, uint32_t & value) override;
+    CHIP_ERROR WritePersistedStorageValue(Platform::PersistedStorage::Key key, uint32_t value) override;
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
     CHIP_ERROR WriteConfigValue(Key key, uint16_t val);

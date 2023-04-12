@@ -5,8 +5,8 @@
 #include <lib/core/CHIPError.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
-{{#structs_with_cluster_name}}
-static CHIP_ERROR Setup(const char * label, {{zapTypeToEncodableClusterObjectType name ns=clusterName}} & request, Json::Value & value);
+{{#structs_with_clusters groupByStructName=1}}
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::{{#unless (is_number_greater_than structClusterCount 1)}}{{as_camel_cased clusterName false}}{{else}}detail{{/unless}}::Structs::{{name}}::Type & request, Json::Value & value);
 
-static void Finalize({{zapTypeToEncodableClusterObjectType name ns=clusterName}} & request);
-{{/structs_with_cluster_name}}
+static void Finalize(chip::app::Clusters::{{#unless (is_number_greater_than structClusterCount 1)}}{{as_camel_cased clusterName false}}{{else}}detail{{/unless}}::Structs::{{name}}::Type & request);
+{{/structs_with_clusters}}

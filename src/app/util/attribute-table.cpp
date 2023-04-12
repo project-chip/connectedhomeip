@@ -15,40 +15,14 @@
  *    limitations under the License.
  */
 
-/**
- *
- *    Copyright (c) 2020 Silicon Labs
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-/***************************************************************************/
-/**
- * @file
- * @brief This file contains the code to manipulate
- *the Smart Energy attribute table.  This handles
- *external calls to read/write the table, as well as
- *internal ones.
- *******************************************************************************
- ******************************************************************************/
-
 // this file contains all the common includes for clusters in the zcl-util
 
 #include <app/util/attribute-storage.h>
 
 // for pulling in defines dealing with EITHER server or client
 #include "app/util/common.h"
-#include <app-common/zap-generated/callback.h>
 #include <app/util/error-mapping.h>
+#include <app/util/generic-callbacks.h>
 #include <app/util/odd-sized-integers.h>
 
 #include <app/reporting/reporting.h>
@@ -93,14 +67,6 @@ EmberAfStatus emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attr
                               false); // just test?
 }
 
-EmberAfStatus emberAfVerifyAttributeWrite(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
-                                          EmberAfAttributeType dataType)
-{
-    return emAfWriteAttribute(endpoint, cluster, attributeID, dataPtr, dataType,
-                              false, // override read-only?
-                              true); // just test?
-}
-
 EmberAfStatus emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                                    uint16_t readLength)
 {
@@ -119,7 +85,7 @@ static void emberAfAttributeDecodeAndPrintCluster(ClusterId cluster)
 #endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ATTRIBUTES)
 }
 
-void emberAfPrintAttributeTable(void)
+void emberAfPrintAttributeTable()
 {
     uint8_t data[ATTRIBUTE_LARGEST];
     decltype(emberAfEndpointCount()) endpointIndex;
@@ -250,8 +216,8 @@ static bool IsNullValue(const uint8_t * data, uint16_t dataLen, bool isAttribute
 //           device is not found in the attribute table)
 // - EMBER_ZCL_STATUS_INVALID_DATA_TYPE: if the data type passed in doesnt match the type
 //           stored in the attribute table
-// - EMBER_ZCL_STATUS_READ_ONLY: if the attribute isnt writable
-// - EMBER_ZCL_STATUS_INVALID_VALUE: if the value is set out of the allowable range for
+// - EMBER_ZCL_STATUS_UNSUPPORTED_WRITE: if the attribute isnt writable
+// - EMBER_ZCL_STATUS_CONSTRAINT_ERROR: if the value is set out of the allowable range for
 //           the attribute
 // - EMBER_ZCL_STATUS_SUCCESS: if the attribute was found and successfully written
 //
@@ -301,12 +267,12 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         {
             emberAfAttributesPrintln("%pattr not writable", "WRITE ERR: ");
             emberAfAttributesFlush();
-            return EMBER_ZCL_STATUS_READ_ONLY;
+            return EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
         }
     }
 
     // if the value the attribute is being set to is out of range
-    // return EMBER_ZCL_STATUS_INVALID_VALUE
+    // return EMBER_ZCL_STATUS_CONSTRAINT_ERROR
     if ((metadata->mask & ATTRIBUTE_MASK_MIN_MAX) != 0U)
     {
         EmberAfDefaultAttributeValue minv = metadata->defaultValue.ptrToMinMaxValue->minValue;
@@ -343,7 +309,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
             // null value is always in-range for a nullable attribute.
             (!metadata->IsNullable() || !IsNullValue(data, dataLen, isAttributeSigned)))
         {
-            return EMBER_ZCL_STATUS_INVALID_VALUE;
+            return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
         }
     }
 
@@ -393,7 +359,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         // The callee will weed out attributes that do not need to be stored.
         emAfSaveAttributeToStorageIfNeeded(data, endpoint, cluster, metadata);
 
-        MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID, dataType, data);
+        MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID);
 
         // Post write attribute callback for all attributes changes, regardless
         // of cluster.
@@ -440,7 +406,7 @@ EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attribut
     }
     else
     { // failed, print debug info
-        if (status == EMBER_ZCL_STATUS_INSUFFICIENT_SPACE)
+        if (status == EMBER_ZCL_STATUS_RESOURCE_EXHAUSTED)
         {
             emberAfAttributesPrintln("READ: attribute size too large for caller");
             emberAfAttributesFlush();

@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <init.h>
-#include <shell/shell.h>
+#include <zephyr/init.h>
+#include <zephyr/shell/shell.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/shell/Engine.h>

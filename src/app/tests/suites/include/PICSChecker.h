@@ -40,7 +40,7 @@ public:
         bool shouldSkip = !PICSBooleanExpressionParser::Eval(expression, pics);
         if (shouldSkip)
         {
-            ChipLogProgress(chipTool, " **** Skipping: %s == false\n", expression);
+            ChipLogProgress(chipTool, " **** Skipping: %s == false\n", StringOrNullMarker(expression));
         }
         return shouldSkip;
     }

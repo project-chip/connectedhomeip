@@ -34,9 +34,9 @@
     /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
-    /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     49, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -54,6 +54,7 @@
     /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
@@ -63,9 +64,9 @@
     /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
-    /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     1, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -83,6 +84,7 @@
     /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
@@ -92,9 +94,9 @@
     /* Cluster: Access Control, Attribute: SubjectsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: TargetsPerAccessControlEntry, Privilege: view */ \
     /* Cluster: Access Control, Attribute: AccessControlEntriesPerFabric, Privilege: view */ \
-    /* Cluster: Basic, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
+    /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
@@ -112,6 +114,7 @@
     /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: view */ \
     /* Cluster: Thermostat, Attribute: SystemMode, Privilege: view */ \
+    /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: view */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -120,9 +123,9 @@
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__CLUSTER { \
     31, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     31, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    40, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
-    40, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
-    40, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    40, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
+    40, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
+    40, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     48, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     49, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     63, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
@@ -134,15 +137,16 @@
     513, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     513, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
+    516, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__ATTRIBUTE { \
     0, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     1, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    5, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
-    6, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
-    16, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    5, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
+    6, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
+    16, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     0, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     4, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
@@ -154,15 +158,16 @@
     25, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
     27, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     28, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
+    1, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for write attribute
 #define GENERATED_ACCESS_WRITE_ATTRIBUTE__PRIVILEGE { \
     kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: NodeLabel, Privilege: manage */ \
-    kMatterAccessPrivilegeAdminister, /* Cluster: Basic, Attribute: Location, Privilege: administer */ \
-    kMatterAccessPrivilegeManage, /* Cluster: Basic, Attribute: LocalConfigDisabled, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: manage */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Basic Information, Attribute: Location, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
@@ -174,6 +179,7 @@
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: MinSetpointDeadBand, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: ControlSequenceOfOperation, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Thermostat, Attribute: SystemMode, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Thermostat User Interface Configuration, Attribute: keypad lockout, Privilege: manage */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -210,6 +216,10 @@
     62, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
     62, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    63, /* Cluster: Group Key Management, Command: KeySetWrite, Privilege: administer */ \
+    63, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
+    63, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
+    63, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *command*, privilege) for invoke command
@@ -244,6 +254,10 @@
     9, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
     10, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
     11, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    0, /* Cluster: Group Key Management, Command: KeySetWrite, Privilege: administer */ \
+    1, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
+    3, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
+    4, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, command, *privilege*) for invoke command
@@ -278,6 +292,10 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: UpdateFabricLabel, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: RemoveFabric, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Operational Credentials, Command: AddTrustedRootCertificate, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetWrite, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetRead, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetRemove, Privilege: administer */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Group Key Management, Command: KeySetReadAllIndices, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

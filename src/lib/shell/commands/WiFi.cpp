@@ -22,13 +22,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>
 
-// Include DeviceNetworkProvisioningDelegateImpl for WiFi provisioning.
-// TODO: Enable wifi network should be done by ConnectivityManager. (Or other platform neutral interfaces)
-#if defined(CHIP_DEVICE_LAYER_TARGET)
-#define DEVICENETWORKPROVISIONING_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/DeviceNetworkProvisioningDelegateImpl.h>
-#include DEVICENETWORKPROVISIONING_HEADER
-#endif
-
 using chip::DeviceLayer::ConnectivityManager;
 using chip::DeviceLayer::ConnectivityMgr;
 
@@ -115,8 +108,9 @@ static CHIP_ERROR WiFiConnectHandler(int argc, char ** argv)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    DeviceLayer::DeviceNetworkProvisioningDelegateImpl deviceDelegate;
-    return deviceDelegate.ProvisionWiFi(argv[0], argv[1]);
+
+    // TODO:Provision WiFi using WirelessDriver
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 static CHIP_ERROR WiFiDispatch(int argc, char ** argv)

@@ -19,6 +19,7 @@
 import os
 import sys
 import shutil
+import base64
 import logging
 import argparse
 import subprocess
@@ -27,6 +28,10 @@ from types import SimpleNamespace
 import enum
 from bitarray import bitarray
 from bitarray.util import ba2int
+
+CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('scripts', 'tools'))]
+sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'scripts', 'tools', 'spake2p'))
+from spake2p import generate_verifier  # noqa: E402
 
 if os.getenv('IDF_PATH'):
     sys.path.insert(0, os.path.join(os.getenv('IDF_PATH'),
@@ -47,7 +52,6 @@ TOOLS = {}
 FACTORY_PARTITION_CSV = 'nvs_partition.csv'
 FACTORY_PARTITION_BIN = 'factory_partition.bin'
 NVS_KEY_PARTITION_BIN = 'nvs_key_partition.bin'
-
 
 FACTORY_DATA = {
     # CommissionableDataProvider
@@ -224,13 +228,6 @@ def get_fixed_label_dict(fixed_labels):
     return fl_dict
 
 
-def check_tools_exists():
-    TOOLS['spake2p'] = shutil.which('spake2p')
-    if TOOLS['spake2p'] is None:
-        logging.error('spake2p not found, please add spake2p path to PATH environment variable')
-        sys.exit(1)
-
-
 def check_str_range(s, min_len, max_len, name):
     if s and ((len(s) < min_len) or (len(s) > max_len)):
         logging.error('%s must be between %d and %d characters', name, min_len, max_len)
@@ -268,18 +265,14 @@ def validate_args(args):
 def gen_spake2p_params(passcode):
     iter_count_max = 10000
     salt_len_max = 32
+    salt = os.urandom(salt_len_max)
+    verifier = generate_verifier(passcode, salt, iter_count_max)
 
-    cmd = [
-        TOOLS['spake2p'], 'gen-verifier',
-        '--iteration-count', str(iter_count_max),
-        '--salt-len', str(salt_len_max),
-        '--pin-code', str(passcode),
-        '--out', '-',
-    ]
-
-    output = subprocess.check_output(cmd)
-    output = output.decode('utf-8').splitlines()
-    return dict(zip(output[0].split(','), output[1].split(',')))
+    return {
+        'Iteration Count': iter_count_max,
+        'Salt': base64.b64encode(salt).decode('utf-8'),
+        'Verifier': base64.b64encode(verifier).decode('utf-8'),
+    }
 
 
 def populate_factory_data(args, spake2p_params):
@@ -478,7 +471,6 @@ def main():
 
     args = parser.parse_args()
     validate_args(args)
-    check_tools_exists()
     spake2p_params = gen_spake2p_params(args.passcode)
     populate_factory_data(args, spake2p_params)
     gen_raw_ec_keypair_from_der(args.dac_key, FACTORY_DATA['dac-pub-key']['value'], FACTORY_DATA['dac-key']['value'])

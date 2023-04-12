@@ -35,24 +35,33 @@ public:
     {
         ON_ACTION = 0,
         OFF_ACTION,
+        LEVEL_ACTION,
+        COLOR_ACTION,
+        COLOR_ACTION_XY,
+        COLOR_ACTION_HSV,
+        COLOR_ACTION_CT,
+        OCCUPANCY_PRESENT_ACTION,
+        OCCUPANCY_CLEAR_ACTION,
 
         INVALID_ACTION
     } Action;
 
     enum State_t
     {
-        kState_OffInitiated = 0,
-        kState_OffCompleted,
-        kState_OnInitiated,
+        kState_OnInitiated = 0,
         kState_OnCompleted,
+        kState_OffInitiated,
+        kState_OffCompleted,
+        kState_LevelInitiated,
+        kState_ColorInitiated
     } State;
 
     CHIP_ERROR Init();
     bool IsLightOn();
+    bool IsActionInProgress();
+    bool InitiateAction(int32_t aActor, Action_t aAction, uint8_t * aValue);
     void EnableAutoTurnOff(bool aOn);
     void SetAutoTurnOffDuration(uint32_t aDurationInSecs);
-    bool IsActionInProgress();
-    bool InitiateAction(int32_t aActor, Action_t aAction);
 
     typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
     typedef void (*Callback_fn_completed)(Action_t);

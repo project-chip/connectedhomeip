@@ -28,6 +28,8 @@ class NrfApp(Enum):
     SHELL = auto()
     PUMP = auto()
     PUMP_CONTROLLER = auto()
+    SWITCH = auto()
+    WINDOW_COVERING = auto()
     UNIT_TESTS = auto()
 
     def AppPath(self):
@@ -37,6 +39,8 @@ class NrfApp(Enum):
             return 'examples/all-clusters-minimal-app'
         elif self == NrfApp.LIGHT:
             return 'examples/lighting-app'
+        elif self == NrfApp.SWITCH:
+            return 'examples/light-switch-app'
         elif self == NrfApp.LOCK:
             return 'examples/lock-app'
         elif self == NrfApp.SHELL:
@@ -45,6 +49,8 @@ class NrfApp(Enum):
             return 'examples/pump-app'
         elif self == NrfApp.PUMP_CONTROLLER:
             return 'examples/pump-controller-app'
+        elif self == NrfApp.WINDOW_COVERING:
+            return 'examples/window-app'
         elif self == NrfApp.UNIT_TESTS:
             return 'src/test_driver'
         else:
@@ -57,6 +63,8 @@ class NrfApp(Enum):
             return 'chip-nrf-all-clusters-minimal-example'
         elif self == NrfApp.LIGHT:
             return 'chip-nrf-lighting-example'
+        elif self == NrfApp.SWITCH:
+            return 'chip-nrf-light-switch-example'
         elif self == NrfApp.LOCK:
             return 'chip-nrf-lock-example'
         elif self == NrfApp.SHELL:
@@ -65,6 +73,8 @@ class NrfApp(Enum):
             return 'chip-nrf-pump-example'
         elif self == NrfApp.PUMP_CONTROLLER:
             return 'chip-nrf-pump-controller-example'
+        elif self == NrfApp.WINDOW_COVERING:
+            return 'chip-nrf-window-example'
         elif self == NrfApp.UNIT_TESTS:
             return 'chip-nrf-unit-tests'
         else:
@@ -77,6 +87,8 @@ class NrfApp(Enum):
             return 'chip-nrfconnect-all-clusters-minimal-app-example'
         elif self == NrfApp.LIGHT:
             return 'chip-nrfconnect-lighting-example'
+        elif self == NrfApp.SWITCH:
+            return 'chip-nrfconnect-switch-example'
         elif self == NrfApp.LOCK:
             return 'chip-nrfconnect-lock-example'
         elif self == NrfApp.SHELL:
@@ -85,6 +97,8 @@ class NrfApp(Enum):
             return 'chip-nrfconnect-pump-example'
         elif self == NrfApp.PUMP_CONTROLLER:
             return 'chip-nrfconnect-pump-controller-example'
+        elif self == NrfApp.WINDOW_COVERING:
+            return 'chip-nrfconnect-window-example'
         elif self == NrfApp.UNIT_TESTS:
             raise Exception(
                 'Unit tests compile natively and do not have a flashbundle')
@@ -164,6 +178,9 @@ class NrfConnectBuilder(Builder):
 
             if self.board == NrfBoard.NRF52840DONGLE and self.app != NrfApp.ALL_CLUSTERS and self.app != NrfApp.ALL_CLUSTERS_MINIMAL:
                 flags.append("-DCONF_FILE=prj_no_dfu.conf")
+
+            if self.options.pregen_dir:
+                flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")
 
             build_flags = " -- " + " ".join(flags) if len(flags) > 0 else ""
 

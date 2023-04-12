@@ -51,7 +51,7 @@ public:
         env->DeleteGlobalRef(mContentAppEndpointManager);
     }
 
-    const char * Read(const chip::app::ConcreteReadAttributePath & aPath);
+    std::string Read(const chip::app::ConcreteReadAttributePath & aPath);
 
 private:
     void InitializeJNIObjects(jobject manager)

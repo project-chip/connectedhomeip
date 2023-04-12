@@ -119,6 +119,7 @@ public:
     {
         LOCK_ACTION = 0,
         UNLOCK_ACTION,
+        LOCK_JAMMED,
 
         INVALID_ACTION
     } Action;

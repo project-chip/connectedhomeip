@@ -21,7 +21,7 @@ limitations under the License.
     <domain>HVAC</domain>
     <description>An interface for configuring and controlling pumps.</description>
     <code>0x0200</code>
-    <define>PUMP_CONFIG_CONTROL_CLUSTER</define>
+    <define>PUMP_CONFIGURATION_AND_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" tickFrequency="half" init="false">true</server>
     <globalAttribute side="either" code="0xFFFD" value="3"/>

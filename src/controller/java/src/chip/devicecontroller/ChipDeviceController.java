@@ -19,13 +19,13 @@ package chip.devicecontroller;
 
 import android.bluetooth.BluetoothGatt;
 import android.util.Log;
-import androidx.annotation.Nullable;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
 import chip.devicecontroller.model.ChipAttributePath;
 import chip.devicecontroller.model.ChipEventPath;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
@@ -455,7 +455,7 @@ public class ChipDeviceController {
   }
 
   /** Subscribe to the given attribute path. */
-  public void subscribeToPath(
+  public void subscribeToAttributePath(
       SubscriptionEstablishedCallback subscriptionEstablishedCallback,
       ReportCallback reportCallback,
       long devicePtr,
@@ -527,7 +527,7 @@ public class ChipDeviceController {
   }
 
   /** Read the given attribute path. */
-  public void readPath(
+  public void readAttributePath(
       ReportCallback callback, long devicePtr, List<ChipAttributePath> attributePaths) {
     ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
     read(

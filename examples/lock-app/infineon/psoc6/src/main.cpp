@@ -55,7 +55,7 @@ void appError(int err)
 {
     P6_LOG("!!!!!!!!!!!! App Critical Error: %d !!!!!!!!!!!", err);
     portDISABLE_INTERRUPTS();
-    while (1)
+    while (true)
         ;
 }
 

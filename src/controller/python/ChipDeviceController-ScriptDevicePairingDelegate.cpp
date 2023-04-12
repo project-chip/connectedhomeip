@@ -19,6 +19,7 @@
 
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "lib/support/TypeTraits.h"
+#include <controller/python/chip/native/PyChipError.h>
 
 namespace chip {
 namespace Controller {
@@ -53,7 +54,7 @@ void ScriptDevicePairingDelegate::OnPairingComplete(CHIP_ERROR error)
 {
     if (mOnPairingCompleteCallback != nullptr)
     {
-        mOnPairingCompleteCallback(error.AsInteger());
+        mOnPairingCompleteCallback(ToPyChipError(error));
     }
 }
 
@@ -61,7 +62,7 @@ void ScriptDevicePairingDelegate::OnCommissioningComplete(NodeId nodeId, CHIP_ER
 {
     if (mOnCommissioningCompleteCallback != nullptr)
     {
-        mOnCommissioningCompleteCallback(nodeId, error.AsInteger());
+        mOnCommissioningCompleteCallback(nodeId, ToPyChipError(error));
     }
 }
 

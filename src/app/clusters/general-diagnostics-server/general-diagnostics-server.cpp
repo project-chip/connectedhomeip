@@ -58,9 +58,9 @@ bool IsTestEventTriggerEnabled()
 
 bool IsByteSpanAllZeros(const ByteSpan & byteSpan)
 {
-    for (auto * it = byteSpan.begin(); it != byteSpan.end(); ++it)
+    for (unsigned char it : byteSpan)
     {
-        if (*it != 0)
+        if (it != 0)
         {
             return false;
         }

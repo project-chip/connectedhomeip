@@ -35,3 +35,4 @@ JNI_METHOD(void, FirstCluster, readSomeIntegerAttribute)(JNIEnv * env, jobject s
     onFailure.release();
 }
 
+

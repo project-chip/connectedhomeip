@@ -1160,9 +1160,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 namespace Options {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions> * value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
@@ -1174,9 +1174,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions> value)
 {
-    using Traits = NumericAttributeTraits<uint8_t>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -2357,7 +2357,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 } // namespace Attributes
 } // namespace Actions
 
-namespace Basic {
+namespace BasicInformation {
 namespace Attributes {
 
 namespace DataModelRevision {
@@ -2367,7 +2367,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -2386,7 +2386,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace DataModelRevision
@@ -2396,7 +2396,7 @@ namespace VendorName {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[32 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -2416,7 +2416,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[32 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace VendorName
@@ -2428,7 +2428,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::VendorId * value)
     using Traits = NumericAttributeTraits<chip::VendorId>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -2447,7 +2447,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, writable, ZCL_VENDOR_ID_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, writable, ZCL_VENDOR_ID_ATTRIBUTE_TYPE);
 }
 
 } // namespace VendorID
@@ -2457,7 +2457,7 @@ namespace ProductName {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[32 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -2477,7 +2477,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[32 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ProductName
@@ -2489,7 +2489,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -2508,7 +2508,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ProductID
@@ -2518,7 +2518,7 @@ namespace NodeLabel {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[32 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -2538,7 +2538,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[32 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace NodeLabel
@@ -2548,7 +2548,7 @@ namespace Location {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[2 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -2568,7 +2568,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[2 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace Location
@@ -2580,7 +2580,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -2599,7 +2599,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace HardwareVersion
@@ -2609,7 +2609,7 @@ namespace HardwareVersionString {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[64 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -2629,7 +2629,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[64 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace HardwareVersionString
@@ -2641,7 +2641,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -2660,7 +2660,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace SoftwareVersion
@@ -2670,7 +2670,7 @@ namespace SoftwareVersionString {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[64 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -2690,7 +2690,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[64 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace SoftwareVersionString
@@ -2700,7 +2700,7 @@ namespace ManufacturingDate {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[16 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -2720,7 +2720,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[16 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ManufacturingDate
@@ -2730,7 +2730,7 @@ namespace PartNumber {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[32 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -2750,7 +2750,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[32 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace PartNumber
@@ -2760,7 +2760,7 @@ namespace ProductURL {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[256 + 2];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfLongStringLength(zclString);
     if (length == NumericAttributeTraits<uint16_t>::kNullValue)
@@ -2780,7 +2780,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[256 + 2];
     emberAfCopyInt16u(zclString, 0, static_cast<uint16_t>(value.size()));
     memcpy(&zclString[2], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString,
+                                       ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ProductURL
@@ -2790,7 +2791,7 @@ namespace ProductLabel {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[64 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -2810,7 +2811,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[64 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ProductLabel
@@ -2820,7 +2821,7 @@ namespace SerialNumber {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[32 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -2840,7 +2841,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[32 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace SerialNumber
@@ -2852,7 +2853,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -2871,7 +2872,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace LocalConfigDisabled
@@ -2883,7 +2884,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -2902,7 +2903,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace Reachable
@@ -2912,7 +2913,7 @@ namespace UniqueID {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[32 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -2932,7 +2933,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[32 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace UniqueID
@@ -2944,7 +2945,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -2963,7 +2964,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -2975,7 +2976,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Basic::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -2994,13 +2995,13 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::Basic::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::BasicInformation::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace Basic
+} // namespace BasicInformation
 
 namespace OtaSoftwareUpdateProvider {
 namespace Attributes {
@@ -16399,7 +16400,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_UTC_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace SetpointChangeSourceTimestamp
@@ -27727,7 +27728,168 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 } // namespace Attributes
 } // namespace ElectricalMeasurement
 
-namespace TestCluster {
+namespace ClientMonitoring {
+namespace Attributes {
+
+namespace IdleModeInterval {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::ClientMonitoring::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ClientMonitoring::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+
+} // namespace IdleModeInterval
+
+namespace ActiveModeInterval {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::ClientMonitoring::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ClientMonitoring::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+
+} // namespace ActiveModeInterval
+
+namespace ActiveModeThreshold {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::ClientMonitoring::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ClientMonitoring::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace ActiveModeThreshold
+
+namespace FeatureMap {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::ClientMonitoring::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    using Traits = NumericAttributeTraits<uint32_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ClientMonitoring::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+}
+
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    Traits::StorageType temp;
+    uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::ClientMonitoring::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = Traits::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    using Traits = NumericAttributeTraits<uint16_t>;
+    if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    Traits::StorageType storageValue;
+    Traits::WorkingToStorage(value, storageValue);
+    uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ClientMonitoring::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace ClientMonitoring
+
+namespace UnitTesting {
 namespace Attributes {
 
 namespace Boolean {
@@ -27737,7 +27899,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -27756,19 +27918,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace Boolean
 
 namespace Bitmap8 {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -27777,9 +27939,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -27787,19 +27949,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Bitmap8
 
 namespace Bitmap16 {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -27808,9 +27970,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -27818,19 +27980,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 } // namespace Bitmap16
 
 namespace Bitmap32 {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -27839,9 +28001,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -27849,19 +28011,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace Bitmap32
 
 namespace Bitmap64 {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -27870,9 +28032,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -27880,7 +28042,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP64_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP64_ATTRIBUTE_TYPE);
 }
 
 } // namespace Bitmap64
@@ -27892,7 +28054,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -27911,7 +28073,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int8u
@@ -27923,7 +28085,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -27942,7 +28104,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int16u
@@ -27954,7 +28116,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -27973,7 +28135,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int24u
@@ -27985,7 +28147,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28004,7 +28166,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int32u
@@ -28016,7 +28178,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value)
     using Traits = NumericAttributeTraits<OddSizedInteger<5, false>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28035,7 +28197,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT40U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT40U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int40u
@@ -28047,7 +28209,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value)
     using Traits = NumericAttributeTraits<OddSizedInteger<6, false>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28066,7 +28228,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT48U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT48U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int48u
@@ -28078,7 +28240,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value)
     using Traits = NumericAttributeTraits<OddSizedInteger<7, false>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28097,7 +28259,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT56U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT56U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int56u
@@ -28109,7 +28271,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value)
     using Traits = NumericAttributeTraits<uint64_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28128,7 +28290,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int64u
@@ -28140,7 +28302,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value)
     using Traits = NumericAttributeTraits<int8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28159,7 +28321,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int8s
@@ -28171,7 +28333,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     using Traits = NumericAttributeTraits<int16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28190,7 +28352,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int16s
@@ -28202,7 +28364,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, int32_t * value)
     using Traits = NumericAttributeTraits<OddSizedInteger<3, true>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28221,7 +28383,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT24S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT24S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int24s
@@ -28233,7 +28395,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, int32_t * value)
     using Traits = NumericAttributeTraits<int32_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28252,7 +28414,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int32s
@@ -28264,7 +28426,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value)
     using Traits = NumericAttributeTraits<OddSizedInteger<5, true>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28283,7 +28445,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT40S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT40S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int40s
@@ -28295,7 +28457,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value)
     using Traits = NumericAttributeTraits<OddSizedInteger<6, true>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28314,7 +28476,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT48S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT48S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int48s
@@ -28326,7 +28488,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value)
     using Traits = NumericAttributeTraits<OddSizedInteger<7, true>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28345,7 +28507,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT56S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT56S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int56s
@@ -28357,7 +28519,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, int64_t * value)
     using Traits = NumericAttributeTraits<int64_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28376,7 +28538,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT64S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT64S_ATTRIBUTE_TYPE);
 }
 
 } // namespace Int64s
@@ -28388,7 +28550,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28407,7 +28569,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace Enum8
@@ -28419,7 +28581,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28438,7 +28600,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE);
 }
 
 } // namespace Enum16
@@ -28450,7 +28612,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, float * value)
     using Traits = NumericAttributeTraits<float>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28469,7 +28631,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace FloatSingle
@@ -28481,7 +28643,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, double * value)
     using Traits = NumericAttributeTraits<double>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28500,7 +28662,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, double value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_DOUBLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_DOUBLE_ATTRIBUTE_TYPE);
 }
 
 } // namespace FloatDouble
@@ -28510,7 +28672,7 @@ namespace OctetString {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value)
 {
     uint8_t zclString[10 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -28530,7 +28692,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
     uint8_t zclString[10 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace OctetString
@@ -28540,7 +28702,7 @@ namespace LongOctetString {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value)
 {
     uint8_t zclString[1000 + 2];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfLongStringLength(zclString);
     if (length == NumericAttributeTraits<uint16_t>::kNullValue)
@@ -28560,7 +28722,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
     uint8_t zclString[1000 + 2];
     emberAfCopyInt16u(zclString, 0, static_cast<uint16_t>(value.size()));
     memcpy(&zclString[2], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace LongOctetString
@@ -28570,7 +28732,7 @@ namespace CharString {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[10 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -28590,7 +28752,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[10 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace CharString
@@ -28600,7 +28762,7 @@ namespace LongCharString {
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
     uint8_t zclString[1000 + 2];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfLongStringLength(zclString);
     if (length == NumericAttributeTraits<uint16_t>::kNullValue)
@@ -28620,7 +28782,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[1000 + 2];
     emberAfCopyInt16u(zclString, 0, static_cast<uint16_t>(value.size()));
     memcpy(&zclString[2], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace LongCharString
@@ -28632,7 +28794,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value)
     using Traits = NumericAttributeTraits<uint64_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28651,7 +28813,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE);
 }
 
 } // namespace EpochUs
@@ -28663,7 +28825,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28682,7 +28844,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_EPOCH_S_ATTRIBUTE_TYPE);
 }
 
 } // namespace EpochS
@@ -28694,7 +28856,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::VendorId * value)
     using Traits = NumericAttributeTraits<chip::VendorId>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28713,19 +28875,19 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::VendorId value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_VENDOR_ID_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_VENDOR_ID_ATTRIBUTE_TYPE);
 }
 
 } // namespace VendorId
 
 namespace EnumAttr {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TestCluster::SimpleEnum * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::UnitTesting::SimpleEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TestCluster::SimpleEnum>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::UnitTesting::SimpleEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28734,9 +28896,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::TestCluster::S
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TestCluster::SimpleEnum value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::UnitTesting::SimpleEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TestCluster::SimpleEnum>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::UnitTesting::SimpleEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -28744,7 +28906,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TestCluster::S
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 } // namespace EnumAttr
@@ -28756,7 +28918,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28775,7 +28937,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RangeRestrictedInt8u
@@ -28787,7 +28949,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, int8_t * value)
     using Traits = NumericAttributeTraits<int8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28806,7 +28968,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 } // namespace RangeRestrictedInt8s
@@ -28818,7 +28980,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28837,7 +28999,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace RangeRestrictedInt16u
@@ -28849,7 +29011,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value)
     using Traits = NumericAttributeTraits<int16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28868,7 +29030,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 } // namespace RangeRestrictedInt16s
@@ -28880,7 +29042,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28899,7 +29061,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace TimedWriteBoolean
@@ -28911,7 +29073,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28930,7 +29092,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace GeneralErrorBoolean
@@ -28942,7 +29104,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28961,7 +29123,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterErrorBoolean
@@ -28973,7 +29135,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28992,7 +29154,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 } // namespace Unsupported
@@ -29004,7 +29166,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<bool> & value)
     using Traits = NumericAttributeTraits<bool>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29026,7 +29188,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -29035,7 +29197,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<bool> & value)
@@ -29053,12 +29215,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 namespace NullableBitmap8 {
 
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value)
+                  DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> & value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29070,9 +29232,9 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     }
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -29080,20 +29242,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint,
-                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap8MaskMap>> & value)
+                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> & value)
 {
     if (value.IsNull())
     {
@@ -29108,12 +29270,12 @@ EmberAfStatus Set(chip::EndpointId endpoint,
 namespace NullableBitmap16 {
 
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value)
+                  DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> & value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29125,9 +29287,9 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     }
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -29135,20 +29297,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint,
-                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap16MaskMap>> & value)
+                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> & value)
 {
     if (value.IsNull())
     {
@@ -29163,12 +29325,12 @@ EmberAfStatus Set(chip::EndpointId endpoint,
 namespace NullableBitmap32 {
 
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value)
+                  DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> & value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29180,9 +29342,9 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     }
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -29190,20 +29352,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint,
-                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap32MaskMap>> & value)
+                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> & value)
 {
     if (value.IsNull())
     {
@@ -29218,12 +29380,12 @@ EmberAfStatus Set(chip::EndpointId endpoint,
 namespace NullableBitmap64 {
 
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value)
+                  DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> & value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29235,9 +29397,9 @@ EmberAfStatus Get(chip::EndpointId endpoint,
     }
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -29245,20 +29407,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP64_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP64_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP64_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP64_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint,
-                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::TestCluster::Bitmap64MaskMap>> & value)
+                  const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> & value)
 {
     if (value.IsNull())
     {
@@ -29277,7 +29439,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29299,7 +29461,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -29308,7 +29470,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
@@ -29330,7 +29492,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29352,7 +29514,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -29361,7 +29523,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
@@ -29383,7 +29545,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     using Traits = NumericAttributeTraits<OddSizedInteger<3, false>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29405,7 +29567,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -29414,7 +29576,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT24U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
@@ -29436,7 +29598,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & val
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29458,7 +29620,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -29467,7 +29629,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint32_t> & value)
@@ -29489,7 +29651,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     using Traits = NumericAttributeTraits<OddSizedInteger<5, false>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29511,7 +29673,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT40U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT40U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -29520,7 +29682,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT40U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT40U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
@@ -29542,7 +29704,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     using Traits = NumericAttributeTraits<OddSizedInteger<6, false>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29564,7 +29726,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT48U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT48U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -29573,7 +29735,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT48U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT48U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
@@ -29595,7 +29757,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     using Traits = NumericAttributeTraits<OddSizedInteger<7, false>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29617,7 +29779,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT56U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT56U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -29626,7 +29788,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT56U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT56U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
@@ -29648,7 +29810,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint64_t> & val
     using Traits = NumericAttributeTraits<uint64_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29670,7 +29832,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -29679,7 +29841,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint64_t> & value)
@@ -29701,7 +29863,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int8_t> & value
     using Traits = NumericAttributeTraits<int8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29723,7 +29885,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -29732,7 +29894,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int8_t> & value)
@@ -29754,7 +29916,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     using Traits = NumericAttributeTraits<int16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29776,7 +29938,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -29785,7 +29947,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
@@ -29807,7 +29969,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int32_t> & valu
     using Traits = NumericAttributeTraits<OddSizedInteger<3, true>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29829,7 +29991,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT24S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT24S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -29838,7 +30000,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT24S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT24S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int32_t> & value)
@@ -29860,7 +30022,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int32_t> & valu
     using Traits = NumericAttributeTraits<int32_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29882,7 +30044,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -29891,7 +30053,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT32S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int32_t> & value)
@@ -29913,7 +30075,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int64_t> & valu
     using Traits = NumericAttributeTraits<OddSizedInteger<5, true>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29935,7 +30097,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT40S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT40S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -29944,7 +30106,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT40S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT40S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value)
@@ -29966,7 +30128,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int64_t> & valu
     using Traits = NumericAttributeTraits<OddSizedInteger<6, true>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -29988,7 +30150,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT48S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT48S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -29997,7 +30159,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT48S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT48S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value)
@@ -30019,7 +30181,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int64_t> & valu
     using Traits = NumericAttributeTraits<OddSizedInteger<7, true>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -30041,7 +30203,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT56S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT56S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -30050,7 +30212,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT56S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT56S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value)
@@ -30072,7 +30234,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int64_t> & valu
     using Traits = NumericAttributeTraits<int64_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -30094,7 +30256,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT64S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT64S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -30103,7 +30265,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT64S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT64S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int64_t> & value)
@@ -30125,7 +30287,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -30147,7 +30309,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -30156,7 +30318,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
@@ -30178,7 +30340,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -30200,7 +30362,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -30209,7 +30371,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM16_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
@@ -30231,7 +30393,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<float> & value)
     using Traits = NumericAttributeTraits<float>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -30253,7 +30415,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, float value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -30262,7 +30424,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_SINGLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_SINGLE_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<float> & value)
@@ -30284,7 +30446,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<double> & value
     using Traits = NumericAttributeTraits<double>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -30306,7 +30468,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, double value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_DOUBLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_DOUBLE_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -30315,7 +30477,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_DOUBLE_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_DOUBLE_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<double> & value)
@@ -30335,7 +30497,7 @@ namespace NullableOctetString {
 EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableByteSpan> & value)
 {
     uint8_t zclString[10 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -30357,13 +30519,13 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
     uint8_t zclString[10 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
     uint8_t zclString[1] = { 0xFF };
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
@@ -30383,7 +30545,7 @@ namespace NullableCharString {
 EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::MutableCharSpan> & value)
 {
     uint8_t zclString[10 + 1];
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, sizeof(zclString));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
     if (length == NumericAttributeTraits<uint8_t>::kNullValue)
@@ -30405,13 +30567,13 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
     uint8_t zclString[10 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
     uint8_t zclString[1] = { 0xFF };
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::CharSpan> & value)
@@ -30428,12 +30590,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 
 namespace NullableEnumAttr {
 
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> & value)
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> & value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TestCluster::SimpleEnum>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::UnitTesting::SimpleEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -30445,9 +30607,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::app::Clus
     }
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TestCluster::SimpleEnum value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::UnitTesting::SimpleEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TestCluster::SimpleEnum>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::UnitTesting::SimpleEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -30455,20 +30617,20 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::TestCluster::S
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::TestCluster::SimpleEnum>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::UnitTesting::SimpleEnum>;
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint,
-                  const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> & value)
+                  const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> & value)
 {
     if (value.IsNull())
     {
@@ -30487,7 +30649,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & valu
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -30509,7 +30671,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -30518,7 +30680,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint8_t> & value)
@@ -30540,7 +30702,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int8_t> & value
     using Traits = NumericAttributeTraits<int8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -30562,7 +30724,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -30571,7 +30733,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int8_t> & value)
@@ -30593,7 +30755,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & val
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -30615,7 +30777,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -30624,7 +30786,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value)
@@ -30646,7 +30808,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<int16_t> & valu
     using Traits = NumericAttributeTraits<int16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (Traits::IsNullValue(temp))
     {
@@ -30668,7 +30830,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, int16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus SetNull(chip::EndpointId endpoint)
@@ -30677,7 +30839,7 @@ EmberAfStatus SetNull(chip::EndpointId endpoint)
     Traits::StorageType value;
     Traits::SetNull(value);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(value);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16S_ATTRIBUTE_TYPE);
 }
 
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<int16_t> & value)
@@ -30699,7 +30861,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     using Traits = NumericAttributeTraits<uint8_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -30718,7 +30880,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
 } // namespace WriteOnlyInt8u
@@ -30730,7 +30892,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
     using Traits = NumericAttributeTraits<uint32_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -30749,7 +30911,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -30761,7 +30923,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
     using Traits = NumericAttributeTraits<uint16_t>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TestCluster::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!Traits::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -30780,13 +30942,13 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TestCluster::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace TestCluster
+} // namespace UnitTesting
 
 namespace FaultInjection {
 namespace Attributes {

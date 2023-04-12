@@ -33,7 +33,7 @@ public:
 
 private:
     static void GpioInit(void);
-    static void lock_button_callback(void * handler_arg, cyhal_gpio_event_t event);
-    static void func_button_callback(void * handler_arg, cyhal_gpio_event_t event);
+    static void LockButtonCallback(void * handler_arg, cyhal_gpio_event_t event);
+    static void FuncButtonCallback(void * handler_arg, cyhal_gpio_event_t event);
     static void TimerCallback(TimerHandle_t xTimer);
 };

@@ -21,7 +21,6 @@
 #include <app/data-model/Nullable.h>
 #include <commands/clusters/ComplexArgument.h>
 #include <commands/clusters/CustomArgument.h>
-#include <controller/CHIPDeviceController.h>
 #include <inet/InetInterface.h>
 #include <lib/core/Optional.h>
 #include <lib/support/Span.h>

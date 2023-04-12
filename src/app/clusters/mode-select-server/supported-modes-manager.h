@@ -66,7 +66,7 @@ public:
      * @param endpointId
      * @return The mode options provider for the endpoint.
      */
-    virtual const ModeOptionsProvider getModeOptionsProvider(EndpointId endpointId) const = 0;
+    virtual ModeOptionsProvider getModeOptionsProvider(EndpointId endpointId) const = 0;
 
     /**
      * Given the endpointId and a mode value, find the ModeOptionStruct that matches the mode.

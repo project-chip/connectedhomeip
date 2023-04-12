@@ -26,8 +26,8 @@
 
 namespace chip {
 namespace app {
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR EventFilterIBs::Parser::CheckSchemaValidity() const
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+CHIP_ERROR EventFilterIBs::Parser::PrettyPrint() const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
@@ -45,7 +45,7 @@ CHIP_ERROR EventFilterIBs::Parser::CheckSchemaValidity() const
             EventFilterIB::Parser eventFilter;
             ReturnErrorOnFailure(eventFilter.Init(reader));
             PRETTY_PRINT_INCDEPTH();
-            ReturnErrorOnFailure(eventFilter.CheckSchemaValidity());
+            ReturnErrorOnFailure(eventFilter.PrettyPrint());
             PRETTY_PRINT_DECDEPTH();
         }
     }
@@ -61,7 +61,7 @@ CHIP_ERROR EventFilterIBs::Parser::CheckSchemaValidity() const
     ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#endif // CHIP_CONFIG_IM_PRETTY_PRINT
 
 EventFilterIB::Builder & EventFilterIBs::Builder::CreateEventFilter()
 {

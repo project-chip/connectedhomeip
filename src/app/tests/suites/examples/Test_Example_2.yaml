@@ -1,5 +1,5 @@
 config:
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
     testTwoVariable:
         type: INT16U

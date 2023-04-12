@@ -1,0 +1,348 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("//build_overrides/jlink.gni")
+import("//build_overrides/mbedtls.gni")
+
+import("${chip_root}/src/lib/lib.gni")
+import("silabs_board.gni")
+
+declare_args() {
+  # Location of the efr32 SDK.
+  efr32_sdk_root = "${chip_root}/third_party/silabs/gecko_sdk"
+  sdk_support_root = "${chip_root}/third_party/silabs/matter_support"
+  wiseconnect_sdk_root = "${chip_root}/third_party/silabs/wisemcu-wifi-bt-sdk"
+  examples_plat_dir = "${chip_root}/examples/platform/silabs/SiWx917"
+
+  # Build openthread with prebuilt silabs lib
+  use_silabs_thread_lib = false
+  enable_openthread_cli = true
+
+  kvs_max_entries = 75
+  use_external_flash = true
+
+  # Use Silabs factory data provider example.
+  # Users can implement their own.
+  use_efr32_factory_data_provider = true
+
+  # Enable Segger System View
+  use_system_view = false
+}
+
+# Explorer Kit and MGM240L do not have external flash
+if (silabs_board == "BRD2703A" || silabs_board == "BRD4319A") {
+  use_external_flash = false
+}
+
+# Enable LEDs by default
+use_wstk_leds = true
+
+# Board does not support LEDs and Buttons at the same time
+if (silabs_board == "BRD4317A" || silabs_board == "BRD4316A" ||
+    silabs_board == "BRD4319A") {
+  use_wstk_leds = false
+}
+
+assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
+
+# Defines an efr32 SDK build target.
+#
+# Parameters:
+#   efr32_sdk_root - The location of the erf32 SDK.
+#   sources - The sources files to build.
+template("efr32_sdk") {
+  if (defined(invoker.efr32_sdk_root)) {
+    efr32_sdk_root = invoker.efr32_sdk_root
+  }
+
+  assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
+
+  sdk_target_name = target_name
+
+  config("${sdk_target_name}_config") {
+    include_dirs = []
+    libs = []
+    if (defined(invoker.include_dirs)) {
+      include_dirs += invoker.include_dirs
+    }
+
+    # Treat these includes as system includes, so warnings in them are not fatal.
+    _include_dirs = [
+      "${sdk_support_root}/platform/emdrv/nvm3/inc",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/inc",
+      "${chip_root}/third_party/mbedtls/repo/include",
+
+      ### CCP includes ###
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/inc",
+      "${wiseconnect_sdk_root}/platforms/si91x/core/chip/inc",
+      "${wiseconnect_sdk_root}/platforms/si91x/core/config",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver/config",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/rom_driver/inc",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/inc",
+
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver/CMSIS/Driver/Include",
+      "${wiseconnect_sdk_root}/platforms/si91x/boards/brd4325a/inc",
+      "${wiseconnect_sdk_root}/platforms/si91x/core/cmsis",
+      "${wiseconnect_sdk_root}/third_party/freertos/include",
+      "${wiseconnect_sdk_root}/third_party/freertos/portable/GCC/ARM_CM4F",
+      "${examples_plat_dir}/device/inc",
+
+      "${wiseconnect_sdk_root}/sapi/include",
+
+      "${chip_root}/examples/platform/SiWx917/SiWx917",
+      "${chip_root}/examples/platform/SiWx917/SiWx917/hal",
+    ]
+
+    # Note that we're setting the mbedTLS and PSA configuration files through a
+    # define. This means the build system by default does not pick up changes in
+    # the content of these, only when changing the filename itself.
+    # To fix this, these files are also manually depended upon in the source set
+    # declared in efr32_mbedtls_config further down this file.
+    defines = [
+      "MBEDTLS_CONFIG_FILE=\"siwx917-chip-mbedtls-config.h\"",
+      "__STARTUP_CLEAR_BSS",
+      "HARD_FAULT_LOG_ENABLE",
+      "CORTEXM3_EFM32_MICRO",
+      "SILABS_LOG_ENABLED=1",
+
+      #Matter required at least 40960 but SiWx917 SoC requires an extra 20k to resolve nvm3_open() error, Need to be checked.
+      "NVM3_DEFAULT_NVM_SIZE=73728",
+      "NVM3_DEFAULT_MAX_OBJECT_SIZE=4092",
+      "KVS_MAX_ENTRIES=${kvs_max_entries}",
+      "EFR32_OPENTHREAD_API",
+      "PHY=EMBER_PHY_RAIL",
+      "CORTEXM3",
+      "MICRO=EMBER_MICRO_CORTEXM3_EFR32",
+      "PLAT=EMBER_PLATFORM_CORTEXM3",
+      "${silabs_mcu}=1",
+      "${silabs_board}=1",
+      "__HEAP_SIZE=0",
+      "SL_COMPONENT_CATALOG_PRESENT",
+      "PLATFORM_HEADER=\"platform-header.h\"",
+      "USE_NVM3=1",
+      "RSI_ARM_CM4F",
+      "RSI_BLE_ENABLE=1",
+      "BRD4325A",
+      "CHIP_9117",
+      "TINYCRYPT_PRIMITIVES",
+      "OPTIMIZE_TINYCRYPT_ASM",
+      "RS91X_BLE_ENABLE=1",
+    ]
+
+    if (use_system_view) {
+      _include_dirs += [
+        "${efr32_sdk_root}/util/third_party/segger/systemview/SEGGER",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10/Config/Cortex-M",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Sample/FreeRTOSV10",
+        "${efr32_sdk_root}/util/third_party/segger/systemview/Config/",
+      ]
+
+      defines += [ "SL_SYSTEM_VIEW=1" ]
+    }
+
+    defines += board_defines
+
+    if (defined(invoker.enable_sleepy_device)) {
+      if (invoker.enable_sleepy_device) {
+        defines += [
+          "CHIP_DEVICE_CONFIG_ENABLE_SED=1",
+          "SL_CATALOG_POWER_MANAGER_PRESENT",
+          "SL_CATALOG_SLEEPTIMER_PRESENT",
+        ]
+      }
+    }
+
+    if (chip_build_libshell) {  # matter shell
+      defines += [
+        "ENABLE_CHIP_SHELL",
+        "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE",
+        "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1",
+      ]
+    } else {
+      if (enable_openthread_cli) {  # ot-cli only
+        defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
+      }
+    }
+
+    # USART include files
+    if ((defined(invoker.chip_enable_pw_rpc) && invoker.chip_enable_pw_rpc) ||
+        chip_build_libshell || enable_openthread_cli ||
+        (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) ||
+        (defined(invoker.show_qr_code) && invoker.show_qr_code) ||
+        (defined(invoker.disable_lcd) && !invoker.disable_lcd) ||
+        (defined(invoker.use_external_flash) && use_external_flash)) {
+      defines += [ "CONFIG_ENABLE_UART" ]
+
+      if (defined(invoker.use_external_flash) && use_external_flash) {
+        defines += [ "CONFIG_USE_EXTERNAL_FLASH" ]
+
+        _include_dirs += [ "${efr32_sdk_root}/hardware/driver/mx25_flash_shutdown/inc/sl_mx25_flash_shutdown_usart" ]
+      }
+
+      _include_dirs += [
+        "${efr32_sdk_root}/platform/emdrv/uartdrv/inc",
+        "${efr32_sdk_root}/platform/emdrv/uartdrv/config",
+        "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
+        "${efr32_sdk_root}/platform/common/errno/inc",
+      ]
+    }
+
+    libs += [ "${sdk_support_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a" ]
+
+    cflags = []
+    foreach(include_dir, _include_dirs) {
+      cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
+    }
+
+    cflags += [
+      "-Wno-maybe-uninitialized",
+      "-Wno-shadow",
+    ]
+
+    if (silabs_family == "efr32mg24" || silabs_family == "mgm24") {
+      cflags += [ "-mcmse" ]
+    }
+
+    if (defined(invoker.use_rs911x)) {
+      if (invoker.use_rs911x == true) {
+        #add compilation flags for rs991x build. This will be addressed directly in wiseconnect sdk in the next version release of that sdk
+        cflags += invoker.rs911x_cflags
+      }
+    }
+
+    if (defined(invoker.defines)) {
+      defines += invoker.defines
+    }
+  }
+
+  source_set("si917_mbedtls_config") {
+    # We're setting the mbedTLS config flags here as the efr32_sdk target
+    # acts as the mbedTLS target for EFR32 builds. We need this for the build
+    # system to recompile mbedTLS (= the SDK) when the mbedTLS config gets
+    # edited.
+    sources = [
+      "${chip_root}/src/platform/silabs/SiWx917/siwx917-chip-mbedtls-config.h",
+    ]
+
+    public_deps = [ "${chip_root}/src/crypto:crypto_buildconfig" ]
+  }
+
+  source_set(sdk_target_name) {
+    sources = [
+      "${examples_plat_dir}/device/src/startup_RS1xxxx.c",
+      "${sdk_support_root}/platform/emdrv/nvm3/src/ccp_flash_dev.c",
+      "${sdk_support_root}/platform/emdrv/nvm3/src/ccp_flash_intf.c",
+      "${sdk_support_root}/platform/emdrv/nvm3/src/ccp_flash_prg.c",
+      "${sdk_support_root}/platform/emdrv/nvm3/src/nvm3_default.c",
+
+      ### nvm3 for ccp platform ###
+      "${sdk_support_root}/platform/emdrv/nvm3/src/nvm3_hal_flash_ccp.c",
+      "${sdk_support_root}/platform/emdrv/nvm3/src/nvm3_lock.c",
+
+      ######## CCP Platform #########
+      "${wiseconnect_sdk_root}/platforms/si91x/boards/brd4325a/src/rsi_board.c",
+
+      #"${wiseconnect_sdk_root}/platforms/si91x/boards/brd4325a/src/syscalls.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/core/chip/src/rsi_deepsleep_commonflash.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/core/chip/src/rsi_ps_ram_func.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/core/chip/src/rsi_system_config.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/core/chip/src/system_RS1xxxx.c",
+
+      #"${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver/UDMA.c",
+      #"${wiseconnect_sdk_root}/platforms/si91x/drivers/cmsis_driver/USART.c",
+
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/clock_update.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_comparator.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_egpio.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_udma.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_udma_wrapper.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/peripheral_drivers/src/rsi_usart.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_ipmu.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_pll.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_power_save.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_processor_sensor.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_rtc.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_temp_sensor.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_time_period.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_ulpss_clk.c",
+      "${wiseconnect_sdk_root}/platforms/si91x/drivers/systemlevel/src/rsi_wwdt.c",
+      "${wiseconnect_sdk_root}/third_party/freertos/croutine.c",
+      "${wiseconnect_sdk_root}/third_party/freertos/event_groups.c",
+      "${wiseconnect_sdk_root}/third_party/freertos/list.c",
+      "${wiseconnect_sdk_root}/third_party/freertos/portable/GCC/ARM_CM4F/port.c",
+      "${wiseconnect_sdk_root}/third_party/freertos/queue.c",
+      "${wiseconnect_sdk_root}/third_party/freertos/stream_buffer.c",
+      "${wiseconnect_sdk_root}/third_party/freertos/tasks.c",
+      "${wiseconnect_sdk_root}/third_party/freertos/timers.c",
+
+      # Bluetooth
+      "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
+      "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
+      "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
+      "${wiseconnect_sdk_root}/sapi/driver/rsi_bt_ble.c",
+
+      # mbedtls
+      "${chip_root}/third_party/mbedtls/repo/library/aes.c",
+      "${chip_root}/third_party/mbedtls/repo/library/asn1parse.c",
+      "${chip_root}/third_party/mbedtls/repo/library/asn1write.c",
+      "${chip_root}/third_party/mbedtls/repo/library/bignum.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ccm.c",
+      "${chip_root}/third_party/mbedtls/repo/library/cipher.c",
+      "${chip_root}/third_party/mbedtls/repo/library/cipher_wrap.c",
+      "${chip_root}/third_party/mbedtls/repo/library/constant_time.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ctr_drbg.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ecdh.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ecdsa.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ecp.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ecp_curves.c",
+      "${chip_root}/third_party/mbedtls/repo/library/entropy.c",
+      "${chip_root}/third_party/mbedtls/repo/library/hkdf.c",
+      "${chip_root}/third_party/mbedtls/repo/library/hmac_drbg.c",
+      "${chip_root}/third_party/mbedtls/repo/library/md.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pkcs5.c",
+      "${chip_root}/third_party/mbedtls/repo/library/platform.c",
+      "${chip_root}/third_party/mbedtls/repo/library/sha256.c",
+      "${chip_root}/third_party/mbedtls/repo/library/sha512.c",
+      "${chip_root}/third_party/mbedtls/repo/library/x509_create.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dh.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dsa.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/error.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/oid.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pk.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pk_wrap.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pkparse.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/pkwrite.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/platform_util.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509_crt.c",
+      "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509write_csr.c",
+    ]
+
+    public_deps = [
+      ":si917_mbedtls_config",
+      "${segger_rtt_root}:segger_rtt",
+      "${segger_rtt_root}:segger_rtt_printf",
+      "${segger_rtt_root}:segger_rtt_syscalls",
+    ]
+
+    if (defined(invoker.sources)) {
+      sources += invoker.sources
+    }
+
+    public_configs = [ ":${sdk_target_name}_config" ]
+  }
+}

@@ -18,8 +18,6 @@
 
 #include "AppImpl.h"
 
-#include "MyUserPrompter-JNI.h"
-
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
@@ -80,4 +78,12 @@ JNI_METHOD(jint, removeContentApp)
     chip::DeviceLayer::StackLock lock;
     EndpointId epId = RemoveContentApp(static_cast<EndpointId>(endpointId));
     return static_cast<uint16_t>(epId);
+}
+
+JNI_METHOD(void, reportAttributeChange)
+(JNIEnv *, jobject, jint endpointId, jint clusterId, jint attributeId)
+{
+    chip::DeviceLayer::StackLock lock;
+    ReportAttributeChange(static_cast<EndpointId>(endpointId), static_cast<chip::ClusterId>(clusterId),
+                          static_cast<chip::AttributeId>(attributeId));
 }

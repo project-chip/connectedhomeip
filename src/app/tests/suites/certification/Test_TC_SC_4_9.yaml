@@ -19,10 +19,11 @@ name:
 
 PICS:
     - MCORE.ROLE.COMMISSIONEE
+    - MCORE.SC.LWIP
 
 config:
     nodeId: 0x12344321
-    cluster: "Basic"
+    cluster: "Basic Information"
     endpoint: 0
 
 tests:

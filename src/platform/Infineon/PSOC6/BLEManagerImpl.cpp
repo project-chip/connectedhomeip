@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -29,6 +29,7 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
@@ -209,8 +210,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        memset(mDeviceName, 0, kMaxDeviceNameLength);
-        strncpy(mDeviceName, deviceName, strlen(deviceName));
+        Platform::CopyString(mDeviceName, deviceName);
         mFlags.Set(Flags::kFlag_DeviceNameSet, true);
         ChipLogProgress(DeviceLayer, "Setting device name to : \"%s\"", deviceName);
     }
@@ -896,7 +896,7 @@ void BLEManagerImpl::SetAdvertisingData(void)
                  deviceDiscriminator);
         localDeviceNameLen = strlen(sInstance.mDeviceName);
 
-        strncpy((char *) app_gap_device_name, sInstance.mDeviceName, sizeof(app_gap_device_name));
+        Platform::CopyString((char *) app_gap_device_name, sizeof(app_gap_device_name), sInstance.mDeviceName);
         app_gatt_db_ext_attr_tbl[0].cur_len = app_gatt_db_ext_attr_tbl[0].max_len < strlen(sInstance.mDeviceName)
             ? app_gatt_db_ext_attr_tbl[0].max_len
             : strlen(sInstance.mDeviceName);

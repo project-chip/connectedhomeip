@@ -17,7 +17,7 @@
 #import "MTRDeviceControllerStartupParams.h"
 #import "MTRCertificates.h"
 #import "MTRDeviceControllerStartupParams_Internal.h"
-#import "MTRLogging.h"
+#import "MTRLogging_Internal.h"
 #import "MTRP256KeypairBridge.h"
 #import "NSDataSpanConversion.h"
 
@@ -36,8 +36,8 @@ using namespace chip;
         return nil;
     }
 
-    if (!IsValidFabricId([fabricID unsignedLongLongValue])) {
-        MTR_LOG_ERROR("%llu is not a valid fabric id to initialize a device controller with", [fabricID unsignedLongLongValue]);
+    if (!IsValidFabricId(fabricID.unsignedLongLongValue)) {
+        MTR_LOG_ERROR("%llu is not a valid fabric id to initialize a device controller with", fabricID.unsignedLongLongValue);
         return nil;
     }
 
@@ -50,9 +50,9 @@ using namespace chip;
 
 - (instancetype)initWithIPK:(NSData *)ipk
          operationalKeypair:(id<MTRKeypair>)operationalKeypair
-     operationalCertificate:(MTRCertificateDERBytes *)operationalCertificate
-    intermediateCertificate:(MTRCertificateDERBytes * _Nullable)intermediateCertificate
-            rootCertificate:(MTRCertificateDERBytes *)rootCertificate
+     operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
+    intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
+            rootCertificate:(MTRCertificateDERBytes)rootCertificate
 {
     if (!(self = [super init])) {
         return nil;
@@ -122,6 +122,53 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
 
     return AsData(derCert);
 }
+
+@implementation MTRDeviceControllerStartupParams (Deprecated)
+
+- (uint64_t)fabricId
+{
+    return self.fabricID.unsignedLongLongValue;
+}
+
+- (nullable NSNumber *)vendorId
+{
+    return self.vendorID;
+}
+
+- (void)setVendorId:(nullable NSNumber *)vendorId
+{
+    self.vendorID = vendorId;
+}
+
+- (nullable NSNumber *)nodeId
+{
+    return self.nodeID;
+}
+
+- (void)setNodeId:(nullable NSNumber *)nodeId
+{
+    self.nodeID = nodeId;
+}
+
+- (instancetype)initWithSigningKeypair:(id<MTRKeypair>)nocSigner fabricId:(uint64_t)fabricId ipk:(NSData *)ipk
+{
+    return [self initWithIPK:ipk fabricID:@(fabricId) nocSigner:nocSigner];
+}
+
+- (instancetype)initWithOperationalKeypair:(id<MTRKeypair>)operationalKeypair
+                    operationalCertificate:(MTRCertificateDERBytes)operationalCertificate
+                   intermediateCertificate:(MTRCertificateDERBytes _Nullable)intermediateCertificate
+                           rootCertificate:(MTRCertificateDERBytes)rootCertificate
+                                       ipk:(NSData *)ipk
+{
+    return [self initWithIPK:ipk
+             operationalKeypair:operationalKeypair
+         operationalCertificate:operationalCertificate
+        intermediateCertificate:intermediateCertificate
+                rootCertificate:rootCertificate];
+}
+
+@end
 
 @implementation MTRDeviceControllerStartupParamsInternal
 

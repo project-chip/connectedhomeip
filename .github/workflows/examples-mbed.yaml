@@ -23,6 +23,9 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
     mbedos:
         name: Mbed OS examples building
@@ -37,12 +40,12 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-mbed-os:0.5.99
+            image: connectedhomeip/chip-build-mbed-os:0.6.18
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -74,7 +77,7 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
 
             - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs
@@ -150,7 +153,7 @@ jobs:
                     mbed $APP_TARGET+$APP_PROFILE shell \
                     examples/ota-requestor-app/mbed/build-CY8CPROTO_062_4343W/release/chip-mbed-ota-requestor-app-example.elf \
                     /tmp/bloat_reports/
-            
+
             - name: Build unit tests
               # Temporarily disable build due to running out of flash space
               if: false
@@ -158,7 +161,7 @@ jobs:
               run: scripts/tests/mbed/mbed_unit_tests.sh -b=$APP_TARGET -p=$APP_PROFILE
 
             - name: Uploading Size Reports
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ !env.ACT }}
               with:
                   name: Size,Mbed-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}

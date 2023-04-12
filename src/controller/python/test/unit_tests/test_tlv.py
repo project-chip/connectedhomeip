@@ -148,6 +148,18 @@ class TestTLVReader(unittest.TestCase):
         self._read_case([0b00000101, 0xab, 0xaa], tlvUint(0xaaab))
         self._read_case([0b00000100, 0xab], tlvUint(0xab))
 
+    def test_structure(self):
+        test_cases = [
+            (b'\x15\x36\x01\x15\x35\x01\x26\x00\xBF\xA2\x55\x16\x37\x01\x24\x02\x00\x24\x03\x28\x24\x04\x00\x18\x24\x02\x01\x18\x18\x18\x18',
+             {1: [{1: {0: 374710975, 1: [0, 40, 0], 2: 1}}]}),
+            (b'\x156\x01\x155\x01&\x00\xBF\xA2U\x167\x01$\x02\x00$\x03($\x04\x01\x18,\x02\x18Nordic Semiconductor ASA\x18\x18\x18\x18',
+             {1: [{1: {0: 374710975, 1: [0, 40, 1], 2: 'Nordic Semiconductor ASA'}}]}),
+            (b"\0256\001\0255\001&\000\031\346x\2077\001$\002\001$\003\006$\004\000\030(\002\030\030\030\030",
+             {1: [{1: {0: 2272847385, 1: [1, 6, 0], 2: False}}]})
+        ]
+        for tlv_bytes, answer in test_cases:
+            self._read_case(tlv_bytes, answer)
+
 
 if __name__ == '__main__':
     unittest.main()

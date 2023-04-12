@@ -101,14 +101,6 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
- *
- * Enables synchronizing the device's real time clock with a remote CHIP Time service
- * using the CHIP Time Sync protocol.
- */
-// #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
-
-/**
  * @def CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
  *
  * @brief Enable Interaction model Event support in server

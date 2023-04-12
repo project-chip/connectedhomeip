@@ -40,6 +40,9 @@ void IPv4Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, Res
         assert(addr.IsIPv4());
 
         IPResourceRecord record(GetQName(), addr);
+        // We're the only thing around with our hostname, so we should set the
+        // cache-flush bit.
+        record.SetCacheFlush(true);
         configuration.Adjust(record);
         delegate->AddResponse(record);
     }
@@ -59,6 +62,9 @@ void IPv6Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, Res
         assert(addr.IsIPv6());
 
         IPResourceRecord record(GetQName(), addr);
+        // We're the only thing around with our hostname, so we should set the
+        // cache-flush bit.
+        record.SetCacheFlush(true);
         configuration.Adjust(record);
         delegate->AddResponse(record);
     }

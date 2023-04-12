@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    Copyright 2021, Cypress Semiconductor Corporation (an Infineon company)
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,7 +27,6 @@
 #include "ClusterManager.h"
 
 #include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/CommandHandler.h>

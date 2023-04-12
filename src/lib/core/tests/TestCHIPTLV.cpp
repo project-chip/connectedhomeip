@@ -4497,7 +4497,7 @@ int TestCHIPTLV_Teardown(void * inContext)
     return SUCCESS;
 }
 
-int TestCHIPTLV(void)
+int TestCHIPTLV()
 {
     // clang-format off
     nlTestSuite theSuite =

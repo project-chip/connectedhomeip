@@ -16,12 +16,6 @@
 
 rsource "../../zephyr/Kconfig"
 
-config TELINK_BLE_LIB
-	bool "Include third party Telink BLE SDK"
-	default n
-	help
-	  Include third party Telink BLE SDK
-
 # See config/zephyr/Kconfig for full definition
 config CHIP_OTA_REQUESTOR
 	bool

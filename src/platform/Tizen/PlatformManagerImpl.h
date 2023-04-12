@@ -23,7 +23,10 @@
 
 #pragma once
 
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
+#include <lib/core/CHIPError.h>
+#include <platform/ConnectivityManager.h>
+
+#include "platform/internal/GenericPlatformManagerImpl_POSIX.h"
 
 namespace chip {
 namespace DeviceLayer {

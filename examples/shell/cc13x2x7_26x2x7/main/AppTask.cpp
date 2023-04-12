@@ -92,7 +92,7 @@ CHIP_ERROR AppTask::StartAppTask()
     if (xTaskCreate(AppTaskMain, "APP", APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, APP_TASK_PRIORITY, &sAppTaskHandle) !=
         pdPASS)
     {
-        while (1)
+        while (true)
             ;
     }
 
@@ -113,35 +113,35 @@ CHIP_ERROR AppTask::Init()
     CHIP_ERROR ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
-        while (1)
+        while (true)
             ;
     }
 
     ret = ThreadStackMgr().InitThreadStack();
     if (ret != CHIP_NO_ERROR)
     {
-        while (1)
+        while (true)
             ;
     }
 
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
     if (ret != CHIP_NO_ERROR)
     {
-        while (1)
+        while (true)
             ;
     }
 
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
     {
-        while (1)
+        while (true)
             ;
     }
 
     ret = ThreadStackMgrImpl().StartThreadTask();
     if (ret != CHIP_NO_ERROR)
     {
-        while (1)
+        while (true)
             ;
     }
 
@@ -168,7 +168,7 @@ void AppTask::AppTaskMain(void * pvParameter)
     CHIP_ERROR err = sAppTask.Init();
     if (err != CHIP_NO_ERROR)
     {
-        while (1)
+        while (true)
             ;
     }
 

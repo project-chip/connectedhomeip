@@ -245,18 +245,18 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.sessionSetupPool = Platform::New<DeviceControllerSystemStateParams::SessionSetupPool>();
     stateParams.caseClientPool   = Platform::New<DeviceControllerSystemStateParams::CASEClientPool>();
 
-    DeviceProxyInitParams deviceInitParams = {
+    CASEClientInitParams sessionInitParams = {
         .sessionManager           = stateParams.sessionMgr,
         .sessionResumptionStorage = stateParams.sessionResumptionStorage.get(),
         .exchangeMgr              = stateParams.exchangeMgr,
         .fabricTable              = stateParams.fabricTable,
-        .clientPool               = stateParams.caseClientPool,
         .groupDataProvider        = stateParams.groupDataProvider,
         .mrpLocalConfig           = GetLocalMRPConfig(),
     };
 
     CASESessionManagerConfig sessionManagerConfig = {
-        .sessionInitParams = deviceInitParams,
+        .sessionInitParams = sessionInitParams,
+        .clientPool        = stateParams.caseClientPool,
         .sessionSetupPool  = stateParams.sessionSetupPool,
     };
 
@@ -463,6 +463,7 @@ void DeviceControllerSystemState::Shutdown()
 
     if (mTempFabricTable != nullptr)
     {
+        mTempFabricTable->Shutdown();
         chip::Platform::Delete(mTempFabricTable);
         mTempFabricTable = nullptr;
         // if we created a temp fabric table, then mFabrics points to it.

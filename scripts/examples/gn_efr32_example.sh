@@ -16,7 +16,7 @@
 #    limitations under the License.
 #
 
-# Build script for GN EFT32 examples GitHub workflow.
+# Build script for GN EFR32 examples GitHub workflow.
 
 set -e
 
@@ -33,9 +33,10 @@ source "$CHIP_ROOT/scripts/activate.sh"
 set -x
 env
 USE_WIFI=false
+USE_GIT_SHA_FOR_VERSION=true
 
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
-USAGE="./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <efr32_board_name> [<Build options>]"
+USAGE="./scripts/examples/gn_efr32_example.sh <AppRootFolder> <outputFolder> <silabs_board_name> [<Build options>]"
 
 if [ "$#" == "0" ]; then
     echo "Build script for EFR32 Matter apps
@@ -48,7 +49,7 @@ if [ "$#" == "0" ]; then
     <outputFolder>
         Desired location for the output files
 
-    <efr32_board_name>
+    <silabs_board_name>
         Identifier of the board for which this app is built
         Currently Supported :
             BRD4161A
@@ -81,6 +82,10 @@ if [ "$#" == "0" ]; then
         enable_sleepy_device
             Enable Sleepy end device. (Default false)
             Must also set chip_openthread_ftd=false
+        sl_matter_version_str
+            Set a Matter sotfware version string for the Silabs examples
+            Used and formatted by default in this script.
+            To skip that formatting or use your own version string use --no-version
         use_rs911x
             Build wifi example with extension board rs911x. (Default false)
         use_wf200
@@ -94,13 +99,19 @@ if [ "$#" == "0" ]; then
         Presets
         --sed
             enable sleepy end device, set thread mtd
-            For minimum consumption, disable openthread cli and qr code
+            For minimum consumption, add --low-power
+        --low-power
+            disables all power consuming features for the most power efficient build
+            This flag is to be used with --sed
         --wifi <wf200 | rs911x>
             build wifi example variant for given exansion board
         --additional_data_advertising
             enable Addition data advertissing and rotating device ID
         --use_ot_lib
             use the silabs openthread library
+        --no-version
+            Skip the silabs formating for the Matter software version string
+            Currently : v1.0-<branchName>-<ShortCommitSha>
     "
 elif [ "$#" -lt "2" ]; then
     echo "Invalid number of arguments
@@ -111,7 +122,7 @@ else
     OUTDIR=$2
 
     if [ "$#" -gt "2" ]; then
-        EFR32_BOARD=$3
+        SILABS_BOARD=$3
         shift
     fi
 
@@ -125,9 +136,9 @@ else
                     exit 1
                 fi
                 if [ "$2" = "rs911x" ]; then
-                    optArgs+="use_rs911x=true"
+                    optArgs+="use_rs911x=true "
                 elif [ "$2" = "wf200" ]; then
-                    optArgs+="use_wf200=true"
+                    optArgs+="use_wf200=true "
                 else
                     echo "Wifi usage: --wifi rs911x|wf200"
                     exit 1
@@ -138,6 +149,10 @@ else
                 ;;
             --sed)
                 optArgs+="enable_sleepy_device=true chip_openthread_ftd=false "
+                shift
+                ;;
+            --low-power)
+                optArgs+="chip_build_libshell=false enable_openthread_cli=false show_qr_code=false disable_lcd=true "
                 shift
                 ;;
             --chip_enable_wifi_ipv4)
@@ -156,6 +171,10 @@ else
                 optArgs+="use_silabs_thread_lib=true chip_openthread_target=$SILABS_THREAD_TARGET openthread_external_platform=\"""\" use_thread_coap_lib=true "
                 shift
                 ;;
+            --no-version)
+                USE_GIT_SHA_FOR_VERSION=false
+                shift
+                ;;
             *)
                 if [ "$1" =~ *"use_rs911x=true"* ] || [ "$1" =~ *"use_wf200=true"* ]; then
                     USE_WIFI=true
@@ -167,22 +186,30 @@ else
         esac
     done
 
-    if [ -z "$EFR32_BOARD" ]; then
-        echo "EFR32_BOARD not defined"
+    if [ -z "$SILABS_BOARD" ]; then
+        echo "SILABS_BOARD not defined"
         exit 1
     fi
 
-    BUILD_DIR=$OUTDIR/$EFR32_BOARD
+    if [ "$USE_GIT_SHA_FOR_VERSION" == true ]; then
+        {
+            ShortCommitSha=$(git describe --always --dirty)
+            branchName=$(git rev-parse --abbrev-ref HEAD)
+            optArgs+="sl_matter_version_str=\"v1.0-$branchName-$ShortCommitSha\" "
+        } &>/dev/null
+    fi
+
+    BUILD_DIR=$OUTDIR/$SILABS_BOARD
     echo BUILD_DIR="$BUILD_DIR"
     if [ "$USE_WIFI" == true ]; then
-        gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="efr32_board=\"$EFR32_BOARD\" $optArgs" "$BUILD_DIR"
+        gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --dotfile="$ROOT"/build_for_wifi_gnfile.gn --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
     else
         # thread build
         #
         if [ -z "$optArgs" ]; then
-            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="efr32_board=\"$EFR32_BOARD\"" "$BUILD_DIR"
+            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\"" "$BUILD_DIR"
         else
-            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="efr32_board=\"$EFR32_BOARD\" $optArgs" "$BUILD_DIR"
+            gn gen --check --fail-on-unused-args --export-compile-commands --root="$ROOT" --args="silabs_board=\"$SILABS_BOARD\" $optArgs" "$BUILD_DIR"
         fi
     fi
     ninja -v -C "$BUILD_DIR"/

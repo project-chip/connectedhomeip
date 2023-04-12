@@ -19,7 +19,6 @@ pw_log_BACKEND = "$dir_pw_log_basic"
 pw_assert_BACKEND = "$dir_pw_assert_log"
 pw_sys_io_BACKEND =
     "${chip_root}/examples/platform/bouffalolab/common/rpc/pw_sys_io:pw_sys_io"
-pw_span_ENABLE_STD_SPAN_POLYFILL = false
 
 pw_string_CONFIG =
     "${chip_root}/config/bouffalolab/common/lib/pw_rpc:pw_string_dep"

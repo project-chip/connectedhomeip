@@ -38,7 +38,8 @@ device works as a Thread Minimal End Device.
     -   [Example build types](#example-build-types)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Testing the example](#testing-the-example)
-    -   [Testing using CHIPTool](#testing-using-chiptool)
+    -   [Testing using Linux CHIPTool](#testing-using-linux-chiptool)
+    -   [Testing using Android CHIPTool](#testing-using-android-chiptool)
 
 <hr>
 
@@ -53,14 +54,19 @@ and [Zephyr RTOS](https://zephyrproject.org/). Visit CHIP's
 [nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
 to read more about the platform structure and dependencies.
 
-The CHIP device that runs the pump application is controlled by the Matter
-controller device over the Thread protocol. By default, the Matter device has
-Thread disabled, and it should be paired with Matter controller and get
-configuration from it. Some actions required before establishing full
-communication are described below.
+The Matter device that runs the pump application is controlled by the Matter
+controller device over the Thread protocol. By default, the Matter accessory
+device has IPv6 networking disabled. You must pair it with the Matter controller
+over Bluetooth® LE to get the configuration from the controller to use the
+device within a Thread or Wi-Fi network. You have to make the device
+discoverable manually (for security reasons). See
+[Bluetooth LE advertising](#bluetooth-le-advertising) to learn how to do this.
+The controller must get the commissioning information from the Matter accessory
+device and provision the device into the network.
 
-The example can be configured to use the secure bootloader and utilize it for
-performing over-the-air Device Firmware Upgrade using Bluetooth LE.
+You can test this application remotely over the Thread or the Wi-Fi protocol,
+which in either case requires more devices, including a Matter controller that
+you can configure either on a PC or a mobile device.
 
 ### Bluetooth LE advertising
 
@@ -187,8 +193,8 @@ following states are possible:
     Bluetooth LE.
 
 -   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
-    provisioned, but does not yet have full Thread network or service
-    connectivity.
+    provisioned, but does not yet have full connectivity for Thread or Wi-Fi
+    network.
 
 -   _Solid On_ &mdash; The device is fully provisioned and has full Thread
     network and service connectivity.
@@ -494,10 +500,16 @@ directory:
 Check the [CLI tutorial](../../../docs/guides/nrfconnect_examples_cli.md) to
 learn how to use command-line interface of the application.
 
-### Testing using CHIPTool
+### Testing using Linux CHIPTool
+
+Read the [CHIP Tool user guide](../../../docs/guides/chip_tool_guide.md) to see
+how to use [CHIP Tool for Linux or mac OS](../../chip-tool/README.md) to
+commission and control the application within a Matter-enabled Thread network.
+
+### Testing using Android CHIPTool
 
 Read the
 [Android commissioning guide](../../../docs/guides/nrfconnect_android_commissioning.md)
-to see how to use [CHIPTool](../../../src/android/CHIPTool/README.md) for
+to see how to use [CHIPTool](../../../examples/android/CHIPTool/README.md) for
 Android smartphones to commission and control the application within a
 CHIP-enabled Thread network.

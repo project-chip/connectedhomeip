@@ -36,31 +36,28 @@ int main(void)
     err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("Platform::MemoryInit() failed");
+        LOG_ERR("MemoryInit fail");
         goto exit;
     }
 
-    LOG_INF("Init CHIP stack");
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("PlatformMgr().InitChipStack() failed");
+        LOG_ERR("InitChipStack fail");
         goto exit;
     }
 
-    LOG_INF("Starting CHIP task");
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
+        LOG_ERR("StartEventLoopTask fail");
         goto exit;
     }
 
-    LOG_INF("Init Thread stack");
     err = ThreadStackMgr().InitThreadStack();
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("ThreadStackMgr().InitThreadStack() failed");
+        LOG_ERR("InitThreadStack fail");
         goto exit;
     }
 
@@ -71,13 +68,13 @@ int main(void)
 #endif
     if (err != CHIP_NO_ERROR)
     {
-        LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
+        LOG_ERR("SetThreadDeviceType fail");
         goto exit;
     }
 
     err = GetAppTask().StartApp();
 
 exit:
-    LOG_ERR("Exited with code %" CHIP_ERROR_FORMAT, err.Format());
+    LOG_ERR("Exit err %" CHIP_ERROR_FORMAT, err.Format());
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

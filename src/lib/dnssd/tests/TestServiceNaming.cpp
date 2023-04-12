@@ -279,7 +279,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestCHIPServiceNaming(void)
+int TestCHIPServiceNaming()
 {
     nlTestSuite theSuite = { "ServiceNaming", &sTests[0], nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

@@ -32,29 +32,33 @@ class DeviceCommissioner;
 enum CommissioningStage : uint8_t
 {
     kError,
-    kSecurePairing,
-    kReadCommissioningInfo,
-    kArmFailsafe,
-    kConfigRegulatory,
-    kSendPAICertificateRequest,
-    kSendDACCertificateRequest,
-    kSendAttestationRequest,
-    kAttestationVerification,
-    kSendOpCertSigningRequest,
-    kValidateCSR,
-    kGenerateNOCChain,
-    kSendTrustedRootCert,
-    kSendNOC,
-    kWiFiNetworkSetup,
-    kThreadNetworkSetup,
-    kWiFiNetworkEnable,
-    kThreadNetworkEnable,
-    kFindOperational,
-    kSendComplete,
-    kCleanup,
-    // ScanNetworks can happen anytime after kArmFailsafe.
-    // However, the circ tests fail if it is earlier in the list
+    kSecurePairing,             ///< Establish a PASE session with the device
+    kReadCommissioningInfo,     ///< Query General Commissioning Attributes and Network Features
+    kArmFailsafe,               ///< Send ArmFailSafe (0x30:0) command to the device
+    kConfigRegulatory,          ///< Send SetRegulatoryConfig (0x30:2) command to the device
+    kSendPAICertificateRequest, ///< Send PAI CertificateChainRequest (0x3E:2) command to the device
+    kSendDACCertificateRequest, ///< Send DAC CertificateChainRequest (0x3E:2) command to the device
+    kSendAttestationRequest,    ///< Send AttestationRequest (0x3E:0) command to the device
+    kAttestationVerification,   ///< Verify AttestationResponse (0x3E:1) validity
+    kSendOpCertSigningRequest,  ///< Send CSRRequest (0x3E:4) command to the device
+    kValidateCSR,               ///< Verify CSRResponse (0x3E:5) validity
+    kGenerateNOCChain,          ///< TLV encode Node Operational Credentials (NOC) chain certs
+    kSendTrustedRootCert,       ///< Send AddTrustedRootCertificate (0x3E:11) command to the device
+    kSendNOC,                   ///< Send AddNOC (0x3E:6) command to the device
+    kWiFiNetworkSetup,          ///< Send AddOrUpdateWiFiNetwork (0x31:2) command to the device
+    kThreadNetworkSetup,        ///< Send AddOrUpdateThreadNetwork (0x31:3) command to the device
+    kWiFiNetworkEnable,         ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
+    kThreadNetworkEnable,       ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
+    kFindOperational,           ///< Perform operational discovery and establish a CASE session with the device
+    kSendComplete,              ///< Send CommissioningComplete (0x30:4) command to the device
+    kCleanup,                   ///< Call delegates with status, free memory, clear timers and state
+    /// Send ScanNetworks (0x31:0) command to the device.
+    /// ScanNetworks can happen anytime after kArmFailsafe.
+    /// However, the cirque tests fail if it is earlier in the list
     kScanNetworks,
+    /// Waiting for the higher layer to provide network credentials before continuing the workflow.
+    /// Call CHIPDeviceController::NetworkCredentialsReady() when CommissioningParameters is populated with
+    /// network credentials to use in kWiFiNetworkSetup or kThreadNetworkSetup steps.
     kNeedsNetworkCreds,
 };
 
@@ -103,6 +107,15 @@ public:
     // default kDefaultFailsafeTimeout.
     // This value should be set before running PerformCommissioningStep for the kArmFailsafe step.
     const Optional<uint16_t> GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
+
+    // Value to use when re-setting the commissioning failsafe timer immediately prior to operational discovery.
+    // If a CASE failsafe timer value is passed in as part of the commissioning parameters, then the failsafe timer
+    // will be reset using this value before operational discovery begins. If not supplied, then the AutoCommissioner
+    // will not automatically reset the failsafe timer before operational discovery begins. It can be useful for the
+    // commissioner to set the CASE failsafe timer to a small value (ex. 30s) when the regular failsafe timer is set
+    // to a larger value to accommodate user interaction during setup (network credential selection, user consent
+    // after device attestation).
+    const Optional<uint16_t> GetCASEFailsafeTimerSeconds() const { return mCASEFailsafeTimerSeconds; }
 
     // The location (indoor/outdoor) of the node being commissioned.
     // The node regulartory location (indoor/outdoor) should be set by the commissioner explicitly as it may be different than the
@@ -233,6 +246,12 @@ public:
     CommissioningParameters & SetFailsafeTimerSeconds(uint16_t seconds)
     {
         mFailsafeTimerSeconds.SetValue(seconds);
+        return *this;
+    }
+
+    CommissioningParameters & SetCASEFailsafeTimerSeconds(uint16_t seconds)
+    {
+        mCASEFailsafeTimerSeconds.SetValue(seconds);
         return *this;
     }
 
@@ -409,6 +428,7 @@ public:
 private:
     // Items that can be set by the commissioner
     Optional<uint16_t> mFailsafeTimerSeconds;
+    Optional<uint16_t> mCASEFailsafeTimerSeconds;
     Optional<app::Clusters::GeneralCommissioning::RegulatoryLocationType> mDeviceRegulatoryLocation;
     Optional<ByteSpan> mCSRNonce;
     Optional<ByteSpan> mAttestationNonce;

@@ -22,24 +22,27 @@ concurrency:
   group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
   cancel-in-progress: true
 
+env:
+  CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
   efr32:
     name: EFR32
-    timeout-minutes: 110 
+    timeout-minutes: 110
 
     env:
-      EFR32_BOARD: BRD4161A
+      SILABS_BOARD: BRD4161A
       BUILD_TYPE: gn_efr32
 
     runs-on: ubuntu-latest
     if: github.actor != 'restyled-io[bot]'
 
     container:
-      image: connectedhomeip/chip-build-efr32:0.5.99
+      image: connectedhomeip/chip-build-efr32:0.6.18
       volumes:
         - "/tmp/bloat_reports:/tmp/bloat_reports"
     steps:
-      - uses: Wandalen/wretry.action@v1.0.15
+      - uses: Wandalen/wretry.action@v1.0.36
         name: Checkout
         with:
           action: actions/checkout@v3
@@ -63,7 +66,7 @@ jobs:
         timeout-minutes: 25
         run: scripts/build/gn_bootstrap.sh
       - name: Uploading bootstrap logs
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: ${{ always() && !env.ACT }}
         with:
           name: bootstrap-logs
@@ -71,47 +74,60 @@ jobs:
             .environment/gn_out/.ninja_log
             .environment/pigweed-venv/*.log
 
-      - name: Build some BRD4161A variants
-        timeout-minutes: 50
+      - name: Build some BRD4187C variants
+        timeout-minutes: 90
         run: |
           ./scripts/run_in_build_env.sh \
              "./scripts/build/build_examples.py \
                 --enable-flashbundle \
-                --target-glob '*-brd4161a-{lock,light,switch,window-covering,unit-test}' \
+                --target efr32-brd4187c-window-covering \
+                --target efr32-brd4187c-switch \
+                --target efr32-brd4187c-unit-test \
+                --target efr32-brd4187c-light \
+                --target efr32-brd4187c-light-rpc \
+                --target efr32-brd4187c-lock-rpc \
                 build \
                 --copy-artifacts-to out/artifacts \
              "
       - name: Prepare some bloat report from the previous builds
         run: |
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-             efr32 BRD4161A lighting-app \
-             out/efr32-brd4161a-light/chip-efr32-lighting-example.out \
+             efr32 BRD4187C lighting-app \
+             out/efr32-brd4187c-light/chip-efr32-lighting-example.out \
              /tmp/bloat_reports/
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py  \
-             efr32 BRD4161A window-app \
-             out/efr32-brd4161a-window-covering/chip-efr32-window-example.out \
+             efr32 BRD4187C window-app \
+             out/efr32-brd4187c-window-covering/chip-efr32-window-example.out \
              /tmp/bloat_reports/
+      - name: Clean out build output
+        run: rm -rf ./out
       - name: Build example EFR32 Lighting App for BRD4161A with RPCs
         timeout-minutes: 15
         run: |
-          scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/lighting_app_debug_rpc BRD4161A "is_debug=false" \
+          scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out/lighting_app_debug_rpc BRD4161A "is_debug=false" \
             disable_lcd=true 'import("//with_pw_rpc.gni")'
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+rpc lighting-app \
             out/lighting_app_debug_rpc/BRD4161A/chip-efr32-lighting-example.out /tmp/bloat_reports/
+      - name: Clean out build output
+        run: rm -rf ./out
       - name: Build example EFR32+WF200 WiFi Lock app for BRD4161A
         timeout-minutes: 15
         run: |
-          scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/ out/lock_app_wifi_wf200 BRD4161A is_debug=false --wifi wf200
+          scripts/examples/gn_efr32_example.sh examples/lock-app/silabs/efr32/ out/lock_app_wifi_wf200 BRD4161A is_debug=false chip_logging=false --wifi wf200
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+wf200 lock-app \
             out/lock_app_wifi_wf200/BRD4161A/chip-efr32-lock-example.out /tmp/bloat_reports/
+      - name: Clean out build output
+        run: rm -rf ./out
       - name: Build example EFR32+RS911x WiFi Lighting app for BRD4161A
         timeout-minutes: 15
         run: |
-          scripts/examples/gn_efr32_example.sh examples/lighting-app/efr32/ out/lighting_app_wifi_rs911x BRD4161A --wifi rs911x
+          scripts/examples/gn_efr32_example.sh examples/lighting-app/silabs/efr32/ out/lighting_app_wifi_rs911x BRD4161A --wifi rs911x
           .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py efr32 BRD4161A+rs911x lighting-app \
             out/lighting_app_wifi_rs911x/BRD4161A/chip-efr32-lighting-example.out /tmp/bloat_reports/
+      - name: Clean out build output
+        run: rm -rf ./out
       - name: Uploading Size Reports
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: ${{ !env.ACT }}
         with:
           name: Size,EFR32-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}

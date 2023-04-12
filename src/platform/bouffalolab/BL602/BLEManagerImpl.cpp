@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include "BLEManagerImpl.h"
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
@@ -371,10 +372,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 {
-    size_t len = bufSize - 1;
-
-    strncpy(buf, bt_get_name(), len);
-    buf[len] = 0;
+    Platform::CopyString(buf, bufSize, bt_get_name());
 
     return CHIP_NO_ERROR;
 }
@@ -386,7 +384,7 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 
-    ChipLogDetail(DeviceLayer, "Device name set to: %s", deviceName);
+    ChipLogDetail(DeviceLayer, "Device name set to: %s", StringOrNullMarker(deviceName));
     return MapErrorZephyr(bt_set_name(deviceName));
 }
 

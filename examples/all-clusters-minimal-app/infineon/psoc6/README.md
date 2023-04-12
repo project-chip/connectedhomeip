@@ -12,6 +12,7 @@ An example showing the use of Matter on the Infineon CY8CKIT-062S2-43012 board.
         -   [Setting up chip-tool](#setting-up-chip-tool)
         -   [Commissioning over BLE](#commissioning-over-ble)
             -   [Notes](#notes)
+        -   [Factory Reset](#factory-reset)
     -   [OTA Software Update](#ota-software-update)
 
 <hr>
@@ -122,6 +123,16 @@ commands. These power cycle the BlueTooth hardware and disable BR/EDR mode.
           $ sudo btmgmt -i hci0 power off
           $ sudo btmgmt -i hci0 bredr off
           $ sudo btmgmt -i hci0 power on
+
+### Factory Reset
+
+-   Commissioned Wi-Fi Credentials can be cleared by pressing `USER_BTN2` button
+    on the board. All the data configured on the device during the initial
+    commissioning will be deleted and device will be ready for commissioning
+    again.
+
+-   Pressing the button again within 5 seconds will cancel the factory reset of
+    the board.
 
 ## OTA Software Update
 

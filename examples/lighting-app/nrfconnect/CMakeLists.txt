@@ -25,6 +25,7 @@ include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 # Set Kconfig root files that will be processed as a first Kconfig for used child images.
 set(mcuboot_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.mcuboot.root)
 set(multiprotocol_rpmsg_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.multiprotocol_rpmsg.root)
+set(hci_rpmsg_KCONFIG_ROOT ${CHIP_ROOT}/config/nrfconnect/chip-module/Kconfig.hci_rpmsg.root)
 
 if(NOT CONF_FILE STREQUAL "prj_no_dfu.conf" AND NOT BOARD STREQUAL "nrf52840dongle_nrf52840")
     set(PM_STATIC_YML_FILE ${CMAKE_CURRENT_SOURCE_DIR}/configuration/${BOARD}/pm_static_dfu.yml)
@@ -58,7 +59,6 @@ target_sources(app PRIVATE
                main/AppTask.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${GEN_DIR}/lighting-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/PWMDevice.cpp)
@@ -69,7 +69,7 @@ chip_configure_data_model(app
     GEN_DIR ${GEN_DIR}/lighting-app/zap-generated
 )
 
-if(CONFIG_CHIP_OTA_REQUESTOR)
+if(CONFIG_CHIP_OTA_REQUESTOR OR CONFIG_MCUMGR_SMP_BT)
     target_sources(app PRIVATE ${NRFCONNECT_COMMON}/util/OTAUtil.cpp)
 endif()
 
@@ -95,7 +95,6 @@ pw_set_backend(pw_log pw_log_basic)
 pw_set_backend(pw_assert.check pw_assert_log.check_backend)
 pw_set_backend(pw_assert.assert pw_assert.assert_compatibility_backend)
 pw_set_backend(pw_sys_io pw_sys_io.nrfconnect)
-pw_set_backend(pw_trace pw_trace_tokenized)
 set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
 add_subdirectory(third_party/connectedhomeip/examples/platform/nrfconnect/pw_sys_io)
@@ -195,7 +194,6 @@ target_sources(app PRIVATE
 )
 
 target_include_directories(app PRIVATE
-  ${PIGWEED_ROOT}/pw_sys_io/public
   ${CHIP_ROOT}/src/lib/support
   ${CHIP_ROOT}/src/system
   ${NRFCONNECT_COMMON}
@@ -210,8 +208,7 @@ target_compile_options(app PRIVATE
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_LIGHTING_SERVICE=1"
                        "-DPW_RPC_THREAD_SERVICE=1"
-                       "-DPW_RPC_TRACING_SERVICE=1"
-                       "-DPW_TRACE_BACKEND_SET=1")
+                       )
 
 target_link_libraries(app PRIVATE
   attributes_service.nanopb_rpc
@@ -222,17 +219,10 @@ target_link_libraries(app PRIVATE
   thread_service.nanopb_rpc
   pw_checksum
   pw_hdlc
+  pw_hdlc.pw_rpc
   pw_log
   pw_rpc.server
-  pw_trace_tokenized
-  pw_trace_tokenized.trace_buffer
-  pw_trace_tokenized.rpc_service
-  pw_trace_tokenized.protos.nanopb_rpc
-)
-
-target_link_options(app
-  PUBLIC
-    "-T${PIGWEED_ROOT}/pw_tokenizer/pw_tokenizer_linker_sections.ld"
+  pw_sys_io
 )
 
 endif(CONFIG_CHIP_PW_RPC)

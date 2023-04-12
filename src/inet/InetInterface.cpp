@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
@@ -423,7 +423,7 @@ CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) con
         {
             return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
-        strncpy(nameBuf, intfName, nameLength + 1);
+        Platform::CopyString(nameBuf, nameBufSize, intfName);
         return CHIP_NO_ERROR;
     }
     if (nameBufSize < 1)
@@ -698,7 +698,7 @@ CHIP_ERROR InterfaceIterator::GetInterfaceName(char * nameBuf, size_t nameBufSiz
 {
     VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(strlen(mIntfArray[mCurIntf].if_name) < nameBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    strncpy(nameBuf, mIntfArray[mCurIntf].if_name, nameBufSize);
+    Platform::CopyString(nameBuf, nameBufSize, mIntfArray[mCurIntf].if_name);
     return CHIP_NO_ERROR;
 }
 
@@ -723,8 +723,7 @@ short InterfaceIterator::GetFlags()
 
     if (!mIntfFlagsCached && HasCurrent())
     {
-        strncpy(intfData.ifr_name, mIntfArray[mCurIntf].if_name, IFNAMSIZ);
-        intfData.ifr_name[IFNAMSIZ - 1] = '\0';
+        Platform::CopyString(intfData.ifr_name, mIntfArray[mCurIntf].if_name);
 
         int res = ioctl(GetIOCTLSocket(), SIOCGIFFLAGS, &intfData);
         if (res == 0)
@@ -843,7 +842,7 @@ CHIP_ERROR InterfaceAddressIterator::GetInterfaceName(char * nameBuf, size_t nam
 {
     VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(strlen(mCurAddr->ifa_name) < nameBufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    strncpy(nameBuf, mCurAddr->ifa_name, nameBufSize);
+    Platform::CopyString(nameBuf, nameBufSize, mCurAddr->ifa_name);
     return CHIP_NO_ERROR;
 }
 
@@ -916,7 +915,7 @@ CHIP_ERROR InterfaceId::GetInterfaceName(char * nameBuf, size_t nameBufSize) con
         {
             return CHIP_ERROR_BUFFER_TOO_SMALL;
         }
-        strncpy(nameBuf, name, nameLength + 1);
+        Platform::CopyString(nameBuf, nameBufSize, name);
         return CHIP_NO_ERROR;
     }
     if (nameBufSize < 1)

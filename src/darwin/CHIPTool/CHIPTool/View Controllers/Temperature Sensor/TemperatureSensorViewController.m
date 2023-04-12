@@ -192,10 +192,10 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
             if (chipDevice) {
                 MTRBaseClusterTemperatureMeasurement * cluster =
                     [[MTRBaseClusterTemperatureMeasurement alloc] initWithDevice:chipDevice
-                                                                        endpoint:@(1)
+                                                                        endpoint:1
                                                                            queue:dispatch_get_main_queue()];
 
-                [cluster readAttributeMeasuredValueWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+                [cluster readAttributeMeasuredValueWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable error) {
                     if (error != nil)
                         return;
                     [self updateTempInUI:value.shortValue];
@@ -222,19 +222,19 @@ static TemperatureSensorViewController * _Nullable sCurrentController = nil;
     if (MTRGetConnectedDevice(^(MTRBaseDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 // Use a wildcard subscription
-                __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(minIntervalSeconds)
-                                                                           maxInterval:@(maxIntervalSeconds)];
                 [chipDevice subscribeWithQueue:dispatch_get_main_queue()
-                    params:params
-                    clusterStateCacheContainer:nil
+                    minInterval:minIntervalSeconds
+                    maxInterval:maxIntervalSeconds
+                    params:nil
+                    cacheContainer:nil
                     attributeReportHandler:^(NSArray * _Nullable reports) {
                         if (!reports)
                             return;
                         for (MTRAttributeReport * report in reports) {
                             // These should be exposed by the SDK
-                            if ([report.path.cluster isEqualToNumber:@(MTRClusterIDTypeTemperatureMeasurementID)] &&
+                            if ([report.path.cluster isEqualToNumber:@(MTRClusterTemperatureMeasurementID)] &&
                                 [report.path.attribute
-                                    isEqualToNumber:@(MTRAttributeIDTypeClusterTemperatureMeasurementAttributeMeasuredValueID)]) {
+                                    isEqualToNumber:@(MTRClusterTemperatureMeasurementAttributeMeasuredValueID)]) {
                                 if (report.error != nil) {
                                     NSLog(@"Error reading temperature: %@", report.error);
                                 } else {

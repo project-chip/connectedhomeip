@@ -25,7 +25,7 @@ namespace chip {
 class CASEClientPoolDelegate
 {
 public:
-    virtual CASEClient * Allocate(CASEClientInitParams params) = 0;
+    virtual CASEClient * Allocate() = 0;
 
     virtual void Release(CASEClient * client) = 0;
 
@@ -38,7 +38,7 @@ class CASEClientPool : public CASEClientPoolDelegate
 public:
     ~CASEClientPool() override { mClientPool.ReleaseAll(); }
 
-    CASEClient * Allocate(CASEClientInitParams params) override { return mClientPool.CreateObject(params); }
+    CASEClient * Allocate() override { return mClientPool.CreateObject(); }
 
     void Release(CASEClient * client) override { mClientPool.ReleaseObject(client); }
 

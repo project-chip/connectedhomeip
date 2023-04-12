@@ -19,7 +19,6 @@
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app/CommandHandler.h>
@@ -652,7 +651,8 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandO
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
         }
-        else if (HasFeature(endpoint, Feature::kPositionAwareTilt))
+
+        if (HasFeature(endpoint, Feature::kPositionAwareTilt))
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
         }
@@ -702,7 +702,8 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Lift));
         }
-        else if (HasFeature(endpoint, Feature::kPositionAwareTilt))
+
+        if (HasFeature(endpoint, Feature::kPositionAwareTilt))
         {
             LogErrorOnFailure(delegate->HandleMovement(WindowCoveringType::Tilt));
         }
@@ -840,7 +841,7 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
         }
         else
         {
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_VALUE);
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
         }
     }
     else
@@ -932,7 +933,7 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
         }
         else
         {
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_VALUE);
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
         }
     }
     else

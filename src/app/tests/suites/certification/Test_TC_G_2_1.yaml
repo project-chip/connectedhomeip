@@ -35,7 +35,7 @@ tests:
     - label: "TH reads NameSupport attribute from DUT"
       PICS: G.S.A0000 && G.S.F00
       command: "readAttribute"
-      attribute: "name support"
+      attribute: "NameSupport"
       response:
           value: 128
           saveAs: NameSupportFeatureSupportedValue
@@ -43,7 +43,7 @@ tests:
     - label: "TH reads NameSupport attribute from DUT"
       PICS: G.S.A0000 && !G.S.F00
       command: "readAttribute"
-      attribute: "name support"
+      attribute: "NameSupport"
       response:
           value: 0
           saveAs: NameSupportValue
@@ -53,7 +53,7 @@ tests:
           step 1"
       PICS: G.S.A0000
       command: "writeAttribute"
-      attribute: "name support"
+      attribute: "NameSupport"
       arguments:
           value: 128
       response:
@@ -62,13 +62,13 @@ tests:
     - label: "TH reads NameSupport attribute from DUT"
       PICS: G.S.A0000 && G.S.F00
       command: "readAttribute"
-      attribute: "name support"
+      attribute: "NameSupport"
       response:
           value: NameSupportFeatureSupportedValue
 
     - label: "TH reads NameSupport attribute from DUT"
       PICS: G.S.A0000 && !G.S.F00
       command: "readAttribute"
-      attribute: "name support"
+      attribute: "NameSupport"
       response:
           value: NameSupportValue

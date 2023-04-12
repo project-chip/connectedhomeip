@@ -222,6 +222,13 @@ enum class LevelControlFeature : uint32_t
     kLighting  = 0x2,
     kFrequency = 0x4,
 };
+
+// Bitmap for LevelControlOptions
+enum class LevelControlOptions : uint8_t
+{
+    kExecuteIfOff           = 0x1,
+    kCoupleColorTempToLevel = 0x2,
+};
 } // namespace LevelControl
 
 namespace BinaryInputBasic {
@@ -328,8 +335,8 @@ enum class CommandBits : uint16_t
 };
 } // namespace Actions
 
-namespace Basic {
-} // namespace Basic
+namespace BasicInformation {
+} // namespace BasicInformation
 
 namespace OtaSoftwareUpdateProvider {
 
@@ -933,6 +940,16 @@ namespace BridgedDeviceBasic {
 } // namespace BridgedDeviceBasic
 
 namespace Switch {
+
+// Bitmap for SwitchFeature
+enum class SwitchFeature : uint32_t
+{
+    kLatchingSwitch            = 0x1,
+    kMomentarySwitch           = 0x2,
+    kMomentarySwitchRelease    = 0x4,
+    kMomentarySwitchLongPress  = 0x8,
+    kMomentarySwitchMultiPress = 0x10,
+};
 } // namespace Switch
 
 namespace AdministratorCommissioning {
@@ -1994,6 +2011,13 @@ enum class PlaybackStateEnum : uint8_t
     kBuffering        = 0x03,
     kUnknownEnumValue = 4,
 };
+
+// Bitmap for MediaPlaybackFeature
+enum class MediaPlaybackFeature : uint32_t
+{
+    kAdvancedSeek  = 0x1,
+    kVariableSpeed = 0x2,
+};
 } // namespace MediaPlayback
 
 namespace MediaInput {
@@ -2249,7 +2273,10 @@ namespace AccountLogin {
 namespace ElectricalMeasurement {
 } // namespace ElectricalMeasurement
 
-namespace TestCluster {
+namespace ClientMonitoring {
+} // namespace ClientMonitoring
+
+namespace UnitTesting {
 
 // Enum for SimpleEnum
 enum class SimpleEnum : uint8_t
@@ -2304,7 +2331,7 @@ enum class SimpleBitmap : uint8_t
     kValueB = 0x2,
     kValueC = 0x4,
 };
-} // namespace TestCluster
+} // namespace UnitTesting
 
 namespace FaultInjection {
 

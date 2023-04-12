@@ -29,8 +29,6 @@
 
 #define CHIP_DEVICE_CONFIG_LWIP_WIFI_STATION_IF_NAME "infineon"
 
-#define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 0
-
 /* The VendorName attribute of the Basic cluster. */
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME "Infineon"
 

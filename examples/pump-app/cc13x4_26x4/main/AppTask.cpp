@@ -224,7 +224,12 @@ int AppTask::Init()
     chip::Server::GetInstance().Init(initParams);
 
     // Initialize device attestation config
+#ifdef CC13X4_26X4_ATTESTATION_CREDENTIALS
+    SetDeviceAttestationCredentialsProvider(CC13X4_26X4::GetCC13X4_26X4DacProvider());
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
+
 
     ConfigurationMgr().LogDeviceConfig();
 

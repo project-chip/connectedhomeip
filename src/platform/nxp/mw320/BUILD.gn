@@ -39,8 +39,6 @@ static_library("mw320") {
     "ConnectivityUtils.h",
     "DeviceInfoProviderImpl.cpp",
     "DeviceInfoProviderImpl.h",
-    "DeviceNetworkProvisioningDelegateImpl.cpp",
-    "DeviceNetworkProvisioningDelegateImpl.h",
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "KeyValueStoreManagerImpl.cpp",

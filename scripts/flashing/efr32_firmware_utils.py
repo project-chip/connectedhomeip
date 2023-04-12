@@ -77,8 +77,8 @@ EFR32_OPTIONS = {
                 """,
         },
         'device': {
-            'help': 'Device family or platform to target',
-            'default': 'EFR32',
+            'help': 'Device family or platform to target (EFR32 or MGM240)',
+            'default': None,
             'alias': ['-d'],
             'argparse': {
                 'metavar': 'DEVICE'

@@ -1,11 +1,11 @@
-# Matter CC1352 CC2652 All-clusters Example Application
+# Matter All-clusters Example Application
 
 An example application showing the use of [Matter][matter] on the Texas
 Instruments CC13XX_26XX family of Wireless MCUs.
 
 ---
 
--   [Matter CC1352 CC2652 All Clusters Example Application](#matter-cc1352-cc2652-all-clusters-example-application)
+-   [Matter All Clusters Example Application](#matter-all-clusters-example-application)
     -   [Introduction](#introduction)
         -   [Device UI](#device-ui)
     -   [Building](#building)
@@ -31,7 +31,7 @@ run commands for all currently implemented Matter clusters. This uses the
 open-source Matter implementation and the Texas Instruments SimpleLink™ CC13XX
 and CC26XX software development kit.
 
-This example is enabled to build for CC2652R7 devices.
+This example is enabled to build for CC1354P10 devices.
 
 The all-clusters example is intended to serve both as a means to explore the
 workings of Matter, as well as a template for creating real products based on
@@ -62,9 +62,9 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
     ```
     $ cd ~
-    $ wget [recommended version][sysconfig_recommended]
-    $ chmod +x sysconfig-1.1*-setup.run
-    $ ./sysconfig-1.1*-setup.run
+    $ wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.15.0.2826/sysconfig-1.15.0_2826-setup.run
+    $ chmod +x sysconfig-1.15.0_2826-setup.run
+    $ ./sysconfig-1.15.0_2826-setup.run
     ```
 
 -   Run the bootstrap script to setup the build environment.
@@ -255,7 +255,7 @@ Send commands to the all-cluster-app. Here are some example commands:
 
 Basic
 ```
-./chip-tool basic read <attribute-id> <destination-id> <endpoint-id-ignored-for-group-commands> e.g.  ./chip-tool basic read product-id 1 1
+./chip-tool basic read <attribute-id> <destination-id> <endpoint-id-ignored-for-group-commands> e.g.  ./chip-tool basic read product-id 1 0
 ```
 
 Identify
@@ -298,8 +298,7 @@ Additionally, we welcome any feedback.
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-launch
 [ccs_manual_method]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-method
-[cc1352r1_launchxl]: https://www.ti.com/tool/LAUNCHXL-CC1352R1
-[e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-and-thread
+[e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
 [matter-e2e-faq]:
     https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum/1082428/faq-cc2652r7-matter----getting-started-guide
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG

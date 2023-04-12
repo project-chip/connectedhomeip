@@ -28,6 +28,7 @@
 
 #undef BT_ENABLE_HCI_SNOOP_LOG
 
+#include <platform/CommissionableDataProvider.h>
 #include <platform/internal/BLEManager.h>
 
 #include "FreeRTOS.h"
@@ -328,8 +329,11 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
-    ChipLogProgress(DeviceLayer, "GetMTU (con %u), returning 247", conId);
-    return 247;
+    uint16_t mtu = (uint16_t) bt_gattc_get_mtu(conId);
+
+    ChipLogProgress(DeviceLayer, "GetMTU (con %u), returning %u", conId, mtu);
+
+    return mtu;
 }
 
 #define INDICATION_BUFFER_LENGTH (300)
@@ -543,8 +547,11 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     if (!mFlags.Has(Flags::kDeviceNameSet))
     {
+        uint16_t discriminator = 0;
+        err                    = GetCommissionableDataProvider()->GetSetupDiscriminator(discriminator);
+
         snprintf(gatts_device_name, sizeof(gatts_device_name), "%s%04" PRIX32, CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX,
-                 (uint32_t) 0);
+                 static_cast<uint32_t>(discriminator));
 
         gatts_device_name[kMaxDeviceNameLength] = 0;
     }

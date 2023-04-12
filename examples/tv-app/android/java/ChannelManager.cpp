@@ -411,7 +411,7 @@ void ChannelManager::InitializeWithObjects(jobject managerObject)
 
 uint32_t ChannelManager::GetFeatureMap(chip::EndpointId endpoint)
 {
-    if (endpoint >= EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= EMBER_AF_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
         return mDynamicEndpointFeatureMap;
     }

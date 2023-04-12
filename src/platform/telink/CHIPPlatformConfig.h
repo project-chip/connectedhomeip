@@ -30,24 +30,24 @@
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE const char *
 #define CHIP_CONFIG_PERSISTED_STORAGE_MAX_KEY_LENGTH 2
 
-/**
- *  @def CHIP_CONFIG_MAX_FABRICS
- *
- *  @brief
- *    Maximum number of fabrics the device can participate in.  Each fabric can
- *    provision the device with its unique operational credentials and manage
- *    its own access control lists.
- */
-#ifndef CHIP_CONFIG_MAX_FABRICS
-#define CHIP_CONFIG_MAX_FABRICS 5 // 4 fabrics + 1 for rotation slack
-#endif
+#define CHIP_CONFIG_LIFETIIME_PERSISTED_COUNTER_KEY "rc"
 
 // ==================== Security Adaptations ====================
+
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE sizeof(psa_hash_operation_t)
+#elif defined(CONFIG_CC3XX_BACKEND)
+// Size of the statically allocated context for SHA256 operations in CryptoPAL
+// determined empirically.
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE 244
+#else
+#define CHIP_CONFIG_SHA256_CONTEXT_SIZE 208
+#endif
 
 // ==================== General Configuration Overrides ====================
 
 #ifndef CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
-#define CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS 16
+#define CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS 8
 #endif // CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
 
 #ifndef CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
@@ -61,3 +61,7 @@
 #ifndef CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
 #define CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS 1
 #endif // CHIP_CONFIG_BDX_MAX_NUM_TRANSFERS
+
+#ifndef CHIP_CONFIG_MAX_FABRICS
+#define CHIP_CONFIG_MAX_FABRICS 5
+#endif

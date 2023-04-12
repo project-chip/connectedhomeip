@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -57,7 +57,7 @@ public:
     {
         if (mLoggingLevel >= LoggingLevel::kLogMutationAndReads)
         {
-            ChipLogDetail(Test, "TestPersistentStorageDelegate::SyncGetKeyValue: Get key '%s'", key);
+            ChipLogDetail(Test, "TestPersistentStorageDelegate::SyncGetKeyValue: Get key '%s'", StringOrNullMarker(key));
         }
 
         CHIP_ERROR err = SyncGetKeyValueInternal(key, buffer, size);
@@ -66,11 +66,13 @@ public:
         {
             if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {
-                ChipLogDetail(Test, "--> TestPersistentStorageDelegate::SyncGetKeyValue: Key '%s' not found", key);
+                ChipLogDetail(Test, "--> TestPersistentStorageDelegate::SyncGetKeyValue: Key '%s' not found",
+                              StringOrNullMarker(key));
             }
             else if (err == CHIP_ERROR_PERSISTED_STORAGE_FAILED)
             {
-                ChipLogDetail(Test, "--> TestPersistentStorageDelegate::SyncGetKeyValue: Key '%s' is a poison key", key);
+                ChipLogDetail(Test, "--> TestPersistentStorageDelegate::SyncGetKeyValue: Key '%s' is a poison key",
+                              StringOrNullMarker(key));
             }
         }
 
@@ -91,7 +93,8 @@ public:
         {
             if (err == CHIP_ERROR_PERSISTED_STORAGE_FAILED)
             {
-                ChipLogDetail(Test, "--> TestPersistentStorageDelegate::SyncSetKeyValue: Key '%s' is a poison key", key);
+                ChipLogDetail(Test, "--> TestPersistentStorageDelegate::SyncSetKeyValue: Key '%s' is a poison key",
+                              StringOrNullMarker(key));
             }
         }
 
@@ -102,7 +105,7 @@ public:
     {
         if (mLoggingLevel >= LoggingLevel::kLogMutation)
         {
-            ChipLogDetail(Test, "TestPersistentStorageDelegate::SyncDeleteKeyValue, Delete key '%s'", key);
+            ChipLogDetail(Test, "TestPersistentStorageDelegate::SyncDeleteKeyValue, Delete key '%s'", StringOrNullMarker(key));
         }
         CHIP_ERROR err = SyncDeleteKeyValueInternal(key);
 
@@ -110,11 +113,13 @@ public:
         {
             if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {
-                ChipLogDetail(Test, "--> TestPersistentStorageDelegate::SyncDeleteKeyValue: Key '%s' not found", key);
+                ChipLogDetail(Test, "--> TestPersistentStorageDelegate::SyncDeleteKeyValue: Key '%s' not found",
+                              StringOrNullMarker(key));
             }
             else if (err == CHIP_ERROR_PERSISTED_STORAGE_FAILED)
             {
-                ChipLogDetail(Test, "--> TestPersistentStorageDelegate::SyncDeleteKeyValue: Key '%s' is a poison key", key);
+                ChipLogDetail(Test, "--> TestPersistentStorageDelegate::SyncDeleteKeyValue: Key '%s' is a poison key",
+                              StringOrNullMarker(key));
             }
         }
 

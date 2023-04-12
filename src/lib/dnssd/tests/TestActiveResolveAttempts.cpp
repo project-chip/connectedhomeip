@@ -395,7 +395,7 @@ const nlTest sTests[] = {
 
 } // namespace
 
-int TestActiveResolveAttempts(void)
+int TestActiveResolveAttempts()
 {
     nlTestSuite theSuite = { "ActiveResolveAttempts", sTests, nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);

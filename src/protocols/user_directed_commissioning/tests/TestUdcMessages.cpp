@@ -6,6 +6,7 @@
 #include <lib/dnssd/TxtFields.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <transport/TransportMgr.h>
@@ -84,15 +85,15 @@ void TestUDCServerUserConfirmationProvider(nlTestSuite * inSuite, void * inConte
     nodeData1.resolutionData.port         = 5540;
     nodeData1.resolutionData.ipAddress[0] = address;
     nodeData1.resolutionData.numIPs       = 1;
-    strncpy((char *) nodeData1.commissionData.instanceName, instanceName1, sizeof(nodeData1.commissionData.instanceName));
+    Platform::CopyString(nodeData1.commissionData.instanceName, instanceName1);
 
     Dnssd::DiscoveredNodeData nodeData2;
     nodeData2.resolutionData.port              = 5540;
     nodeData2.resolutionData.ipAddress[0]      = address;
     nodeData2.resolutionData.numIPs            = 1;
     nodeData2.commissionData.longDiscriminator = disc2;
-    strncpy((char *) nodeData2.commissionData.instanceName, instanceName2, sizeof(nodeData2.commissionData.instanceName));
-    strncpy((char *) nodeData2.commissionData.deviceName, deviceName2, sizeof(nodeData2.commissionData.deviceName));
+    Platform::CopyString(nodeData2.commissionData.instanceName, instanceName2);
+    Platform::CopyString(nodeData2.commissionData.deviceName, deviceName2);
 
     // test empty UserConfirmationProvider
     udcServer.OnCommissionableNodeFound(nodeData2);

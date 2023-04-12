@@ -35,72 +35,115 @@ constexpr const uint16_t kDefaultMovementStep                           = 2000;
 void WindowCoveringManager::Init(EndpointId endpoint)
 {
     mState = OperationalState::Stall;
-    mCurrentPosition.SetNonNull(static_cast<uint16_t>(0));
-    mTargetPosition.SetNonNull(static_cast<uint16_t>(0));
+    mCurrentLiftPosition.SetNonNull(static_cast<uint16_t>(0));
+    mTargetLiftPosition.SetNonNull(static_cast<uint16_t>(0));
+    mCurrentTiltPosition.SetNonNull(static_cast<uint16_t>(0));
+    mTargetTiltPosition.SetNonNull(static_cast<uint16_t>(0));
     SetEndpoint(endpoint);
 }
 
-void WindowCoveringManager::HandleMovementTimer(System::Layer * layer, void * aAppState)
+void WindowCoveringManager::HandleLiftMovementTimer(System::Layer * layer, void * aAppState)
 {
     WindowCoveringManager * manager = reinterpret_cast<WindowCoveringManager *>(aAppState);
 
     VerifyOrReturn(manager->mState != OperationalState::Stall);
 
-    uint16_t currentPosition = manager->mCurrentPosition.Value();
-    uint16_t targetPosition  = manager->mTargetPosition.Value();
+    Percent100ths currentPosition = manager->mCurrentLiftPosition.Value();
+    Percent100ths targetPosition  = manager->mTargetLiftPosition.Value();
 
-    ChipLogProgress(NotSpecified, "HandleMovementTimer:currentPosition:%u, targetPosition:%u", currentPosition, targetPosition);
+    ChipLogProgress(NotSpecified, "HandleLiftMovementTimer:currentPosition:%u, targetPosition:%u", currentPosition, targetPosition);
 
     if (OperationalState::MovingUpOrOpen == manager->mState)
     {
-        if (currentPosition > targetPosition)
-        {
-            uint16_t tempPosition =
-                currentPosition > kDefaultMovementStep ? static_cast<uint16_t>(currentPosition - kDefaultMovementStep) : 0;
-            currentPosition = tempPosition > targetPosition ? tempPosition : targetPosition;
-
-            manager->mCurrentPosition.SetNonNull(currentPosition);
-        }
-        else
+        if (ComputeOperationalState(targetPosition, currentPosition) != OperationalState::MovingUpOrOpen)
         {
             ChipLogProgress(NotSpecified, "Reached the target position");
             return;
         }
+
+        Percent100ths tempPosition =
+            ComputePercent100thsStep(OperationalState::MovingUpOrOpen, currentPosition, kDefaultMovementStep);
+        currentPosition = tempPosition > targetPosition ? tempPosition : targetPosition;
+        manager->mCurrentLiftPosition.SetNonNull(currentPosition);
     }
     else
     {
-        if (currentPosition < targetPosition)
-        {
-            uint16_t tempPosition = static_cast<uint16_t>(currentPosition + kDefaultMovementStep);
-            currentPosition       = tempPosition < targetPosition ? tempPosition : targetPosition;
-            manager->mCurrentPosition.SetNonNull(currentPosition);
-        }
-        else
+        if (ComputeOperationalState(targetPosition, currentPosition) != OperationalState::MovingDownOrClose)
         {
             ChipLogProgress(NotSpecified, "Reached the target position");
             return;
         }
+
+        Percent100ths tempPosition =
+            ComputePercent100thsStep(OperationalState::MovingDownOrClose, currentPosition, kDefaultMovementStep);
+        currentPosition = tempPosition < targetPosition ? tempPosition : targetPosition;
+        manager->mCurrentLiftPosition.SetNonNull(currentPosition);
     }
 
-    if (HasFeature(manager->mEndpoint, Feature::kPositionAwareLift))
+    LiftPositionSet(manager->mEndpoint, manager->mCurrentLiftPosition);
+
+    if (manager->mCurrentLiftPosition != manager->mTargetLiftPosition)
     {
-        LiftPositionSet(manager->mEndpoint, manager->mCurrentPosition);
+        LogErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kIncrementMovementTimeout, HandleLiftMovementTimer, aAppState));
+    }
+}
+
+void WindowCoveringManager::HandleTiltMovementTimer(System::Layer * layer, void * aAppState)
+{
+    WindowCoveringManager * manager = reinterpret_cast<WindowCoveringManager *>(aAppState);
+
+    VerifyOrReturn(manager->mState != OperationalState::Stall);
+
+    Percent100ths currentPosition = manager->mCurrentTiltPosition.Value();
+    Percent100ths targetPosition  = manager->mTargetTiltPosition.Value();
+
+    ChipLogProgress(NotSpecified, "HandleTiltMovementTimer:currentPosition:%u, targetPosition:%u", currentPosition, targetPosition);
+
+    if (OperationalState::MovingUpOrOpen == manager->mState)
+    {
+        if (ComputeOperationalState(targetPosition, currentPosition) != OperationalState::MovingUpOrOpen)
+        {
+            ChipLogProgress(NotSpecified, "Reached the target position");
+            return;
+        }
+
+        Percent100ths tempPosition =
+            ComputePercent100thsStep(OperationalState::MovingUpOrOpen, currentPosition, kDefaultMovementStep);
+        currentPosition = tempPosition > targetPosition ? tempPosition : targetPosition;
+        manager->mCurrentTiltPosition.SetNonNull(currentPosition);
+    }
+    else
+    {
+        if (ComputeOperationalState(targetPosition, currentPosition) != OperationalState::MovingDownOrClose)
+        {
+            ChipLogProgress(NotSpecified, "Reached the target position");
+            return;
+        }
+
+        Percent100ths tempPosition =
+            ComputePercent100thsStep(OperationalState::MovingDownOrClose, currentPosition, kDefaultMovementStep);
+        currentPosition = tempPosition < targetPosition ? tempPosition : targetPosition;
+        manager->mCurrentTiltPosition.SetNonNull(currentPosition);
     }
 
-    if (HasFeature(manager->mEndpoint, Feature::kPositionAwareTilt))
-    {
-        TiltPositionSet(manager->mEndpoint, manager->mCurrentPosition);
-    }
+    TiltPositionSet(manager->mEndpoint, manager->mCurrentTiltPosition);
 
-    if (manager->mCurrentPosition != manager->mTargetPosition)
+    if (manager->mCurrentTiltPosition != manager->mTargetTiltPosition)
     {
-        LogErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kIncrementMovementTimeout, HandleMovementTimer, aAppState));
+        LogErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(kIncrementMovementTimeout, HandleTiltMovementTimer, aAppState));
     }
 }
 
 CHIP_ERROR WindowCoveringManager::HandleMovement(WindowCoveringType type)
 {
-    mState = OperationalStateGet(mEndpoint, OperationalStatus::kGlobal);
+    if (type == WindowCoveringType::Lift)
+    {
+        mState = OperationalStateGet(mEndpoint, OperationalStatus::kLift);
+    }
+    else
+    {
+        mState = OperationalStateGet(mEndpoint, OperationalStatus::kTilt);
+    }
 
     if (OperationalState::Stall == mState)
     {
@@ -108,31 +151,45 @@ CHIP_ERROR WindowCoveringManager::HandleMovement(WindowCoveringType type)
         return CHIP_NO_ERROR;
     }
 
-    // Cancel ongoing window covering movement timer if any.
-    DeviceLayer::SystemLayer().CancelTimer(HandleMovementTimer, this);
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // At least one of the Lift and Tilt features SHALL be supported.
     if (type == WindowCoveringType::Lift)
     {
-        Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, mCurrentPosition);
-        Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, mTargetPosition);
+        // Cancel ongoing window covering movement timer if any.
+        DeviceLayer::SystemLayer().CancelTimer(HandleLiftMovementTimer, this);
+
+        Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, mCurrentLiftPosition);
+        Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, mTargetLiftPosition);
+
+        VerifyOrReturnError(!mCurrentLiftPosition.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(!mTargetLiftPosition.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mCurrentLiftPosition != mTargetLiftPosition, CHIP_ERROR_INCORRECT_STATE);
+
+        err = DeviceLayer::SystemLayer().StartTimer(kIncrementMovementTimeout, HandleLiftMovementTimer, this);
     }
     else
     {
-        Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, mCurrentPosition);
-        Attributes::TargetPositionTiltPercent100ths::Get(mEndpoint, mTargetPosition);
+        // Cancel ongoing window covering movement timer if any.
+        DeviceLayer::SystemLayer().CancelTimer(HandleTiltMovementTimer, this);
+
+        Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, mCurrentTiltPosition);
+        Attributes::TargetPositionTiltPercent100ths::Get(mEndpoint, mTargetTiltPosition);
+
+        VerifyOrReturnError(!mCurrentTiltPosition.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(!mTargetTiltPosition.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mCurrentTiltPosition != mTargetTiltPosition, CHIP_ERROR_INCORRECT_STATE);
+
+        err = DeviceLayer::SystemLayer().StartTimer(kIncrementMovementTimeout, HandleTiltMovementTimer, this);
     }
 
-    VerifyOrReturnError(!mCurrentPosition.IsNull(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(!mTargetPosition.IsNull(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mCurrentPosition != mTargetPosition, CHIP_ERROR_INCORRECT_STATE);
-
-    return DeviceLayer::SystemLayer().StartTimer(kIncrementMovementTimeout, HandleMovementTimer, this);
+    return err;
 }
 
 CHIP_ERROR WindowCoveringManager::HandleStopMotion()
 {
 
-    DeviceLayer::SystemLayer().CancelTimer(HandleMovementTimer, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleLiftMovementTimer, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleTiltMovementTimer, this);
     return CHIP_NO_ERROR;
 }

@@ -39,10 +39,10 @@ void SecureChannelInitTest(nlTestSuite * inSuite, void * inContext)
     CryptoContext channel;
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
     P256Keypair keypair2;
-    NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair2.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
     // Test all combinations of invalid parameters
     NL_TEST_ASSERT(inSuite,
@@ -87,10 +87,10 @@ void SecureChannelEncryptTest(nlTestSuite * inSuite, void * inContext)
     CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), 0);
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
     P256Keypair keypair2;
-    NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair2.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
     // Test uninitialized channel
     NL_TEST_ASSERT(inSuite,
@@ -131,10 +131,10 @@ void SecureChannelDecryptTest(nlTestSuite * inSuite, void * inContext)
     const char * salt = "Test Salt";
 
     P256Keypair keypair;
-    NL_TEST_ASSERT(inSuite, keypair.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
     P256Keypair keypair2;
-    NL_TEST_ASSERT(inSuite, keypair2.Initialize() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, keypair2.Initialize(ECPKeyTarget::ECDH) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
                    channel.InitFromKeyPair(keypair, keypair2.Pubkey(), ByteSpan((const uint8_t *) salt, strlen(salt)),

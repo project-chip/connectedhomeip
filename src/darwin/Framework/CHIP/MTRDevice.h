@@ -44,13 +44,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * retrieved when performing actions using a combination of MTRBaseDevice
  * and MTRAsyncCallbackQueue.
  */
-+ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller;
++ (instancetype)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller MTR_NEWLY_AVAILABLE;
 
 /**
  * The current state of the device.
  *
  * The three states:
- *   MTRDeviceStateUnknkown
+ *   MTRDeviceStateUnknown
  *      Unable to determine the state of the device at the moment.
  *
  *   MTRDeviceStateReachable
@@ -87,7 +87,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  *                    MTRDeviceResponseHandler.
  *
  * @param expectedValueInterval  maximum interval in milliseconds during which reads of the attribute will return the value being
- * written. This value will be clamped to timeoutMs
+ * written. This value must be within [1, UINT32_MAX], and will be clamped to this range.
  *
  * TODO: document that -readAttribute... will return the expected value for the [endpoint,cluster,attribute] until one of the
  * following:
@@ -96,7 +96,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  *  3. We succeed at writing the attribute.
  *  4. We fail at writing the attribute and give up on the write
  *
- * @param timeout   timeout in milliseconds for timed write, or nil.
+ * @param timeout   timeout in milliseconds for timed write, or nil. This value must be within [1, UINT16_MAX], and will be clamped
+ * to this range.
  * TODO: make timeout arguments uniform
  */
 - (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
@@ -117,13 +118,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param expectedValues  array of dictionaries containing the expected values in the same format as
  *                       attribute read completion handler. Requires MTRAttributePathKey values.
  *                       See MTRDeviceResponseHandler definition for dictionary details.
+ *                       The expectedValues and expectedValueInterval arguments need to be both
+ *                       nil or both non-nil, or both will be both ignored.
+ *
  * TODO: document better the expectedValues is how this command is expected to change attributes when read, and that the next
  * readAttribute will get these values
  *
  * @param expectedValueInterval  maximum interval in milliseconds during which reads of the attribute will return the value being
- * written. This value will be clamped to timeout
+ * written. If the value is less than 1, both this value and expectedValues will be ignored.
+            If this value is greater than UINT32_MAX, it will be clamped to UINT32_MAX.
  *
- * @param timeout   timeout in milliseconds for timed invoke, or nil.
+ * @param timeout   timeout in milliseconds for timed invoke, or nil. This value must be within [1, UINT16_MAX], and will be clamped
+ * to this range.
  *
  * @param completion  response handler will receive either values or error.
  */
@@ -135,12 +141,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
                               queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion;
+                         completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
 
 /**
  * Open a commissioning window on the device.
  *
- * On success, completion will be called with the MTRSetupPayload that
+ * On success, completion will be called on queue with the MTRSetupPayload that
  * can be used to commission the device.
  *
  * @param setupPasscode The setup passcode to use for the commissioning window.
@@ -155,7 +161,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                                    discriminator:(NSNumber *)discriminator
                                         duration:(NSNumber *)duration
                                            queue:(dispatch_queue_t)queue
-                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion;
+                                      completion:(MTRDeviceOpenCommissioningWindowHandler)completion
+    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 @end
 
@@ -185,6 +192,38 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param eventReport  An array of response-value objects as described in MTRDeviceResponseHandler
  */
 - (void)device:(MTRDevice *)device receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
+
+@optional
+/**
+ * deviceStartedCommunicating:
+ *
+ * Notifies delegate the device is currently communicating
+ */
+- (void)didReceiveCommunicationFromDevice:(MTRDevice *)device;
+
+@end
+
+@interface MTRDevice (Deprecated)
+
+/**
+ * Deprecated MTRDevice APIs.
+ */
++ (instancetype)deviceWithNodeID:(uint64_t)nodeID
+                deviceController:(MTRDeviceController *)deviceController
+    MTR_NEWLY_DEPRECATED("Please use deviceWithNodeID:controller:");
+
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
+                      commandFields:(id)commandFields
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
+                        clientQueue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion
+    MTR_NEWLY_DEPRECATED("Please use "
+                         "invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:"
+                         "timedInvokeTimeout:queue:completion:");
 
 @end
 

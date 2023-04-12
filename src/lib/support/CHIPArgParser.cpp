@@ -292,6 +292,11 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
     OptionSet * curOptSet;
     OptionDef * curOpt;
     bool handlerRes;
+#if CHIP_CONFIG_NON_POSIX_LONG_OPT
+    int lastOptIndex    = 0;
+    int subOptIndex     = 0;
+    int currentOptIndex = 0;
+#endif // CHIP_CONFIG_NON_POSIX_LONG_OPT
 
     // The getopt() functions do not support recursion, so exit immediately with an
     // error if called recursively.
@@ -345,7 +350,36 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
         // Attempt to match the current option argument (argv[optind]) against the defined long and short options.
         optarg = nullptr;
         optopt = 0;
-        id     = getopt_long(argc, argv, shortOpts, longOpts, &optIndex);
+#if CHIP_CONFIG_NON_POSIX_LONG_OPT
+        // to check if index has changed
+        lastOptIndex = currentOptIndex;
+        // optind will not increment on error, this is why we need to keep track of the current option
+        // this is for use when getopt_long fails to find the option and we need to print the error
+        currentOptIndex = optind;
+        // if it's the first run, optind is not set and we need to find the first option ourselves
+        if (!currentOptIndex)
+        {
+            while (currentOptIndex < argc)
+            {
+                currentOptIndex++;
+                if (*argv[currentOptIndex] == '-')
+                {
+                    break;
+                }
+            }
+        }
+        // similarly we need to keep track of short opts index for groups like "-fba"
+        // if the index has not changed that means we are still analysing the same group
+        if (lastOptIndex != currentOptIndex)
+        {
+            subOptIndex = 0;
+        }
+        else
+        {
+            subOptIndex++;
+        }
+#endif // CHIP_CONFIG_NON_POSIX_LONG_OPT
+        id = getopt_long(argc, argv, shortOpts, longOpts, &optIndex);
 
         // Stop if there are no more options.
         if (id == -1)
@@ -356,10 +390,35 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
         {
             if (ignoreUnknown)
                 continue;
+#if CHIP_CONFIG_NON_POSIX_LONG_OPT
+            // getopt_long doesn't tell us if the option which failed to match is long or short so check
+            bool isLongOption = false;
+            if (strlen(argv[currentOptIndex]) > 2 && argv[currentOptIndex][1] == '-')
+            {
+                isLongOption = true;
+            }
+            if (optopt == 0 || isLongOption)
+            {
+                // getopt_long function incorrectly treats unknown long option as short opt group
+                if (subOptIndex == 0)
+                {
+                    PrintArgError("%s: Unknown option: %s\n", progName, argv[currentOptIndex]);
+                }
+            }
+            else if (optopt == '?')
+            {
+                PrintArgError("%s: Unknown option: -%c\n", progName, argv[currentOptIndex][subOptIndex + 1]);
+            }
+            else
+            {
+                PrintArgError("%s: Unknown option: -%c\n", progName, optopt);
+            }
+#else
             if (optopt != 0)
                 PrintArgError("%s: Unknown option: -%c\n", progName, optopt);
             else
                 PrintArgError("%s: Unknown option: %s\n", progName, argv[optind - 1]);
+#endif // CHIP_CONFIG_NON_POSIX_LONG_OPT
             goto done;
         }
 
@@ -369,7 +428,11 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
         {
             // NOTE: with the way getopt_long() works, it is impossible to tell whether the option that
             // was missing an argument was a long option or a short option.
+#if CHIP_CONFIG_NON_POSIX_LONG_OPT
+            PrintArgError("%s: Missing argument for %s option\n", progName, argv[currentOptIndex]);
+#else
             PrintArgError("%s: Missing argument for %s option\n", progName, argv[optind - 1]);
+#endif // CHIP_CONFIG_NON_POSIX_LONG_OPT
             goto done;
         }
 

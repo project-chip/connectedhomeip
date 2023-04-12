@@ -629,7 +629,7 @@ bool IsBufferContentEqualConstantTime(const void * a, const void * b, size_t n)
     return mbedtls_ct_memcmp_copy(a, b, n) == 0;
 }
 
-CHIP_ERROR P256Keypair::Initialize()
+CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int result       = UECC_FAILURE;

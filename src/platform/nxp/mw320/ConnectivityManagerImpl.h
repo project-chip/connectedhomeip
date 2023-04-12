@@ -73,7 +73,6 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     friend class ConnectivityManager;
 
 public:
-    CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, const char * key);
     void
     SetNetworkStatusChangeCallback(NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
     {

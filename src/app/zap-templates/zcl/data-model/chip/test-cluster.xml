@@ -138,9 +138,9 @@ limitations under the License.
     
   <cluster>
     <domain>CHIP</domain>
-    <name>Test Cluster</name>
+    <name>Unit Testing</name>
     <code>0xFFF1FC05</code>
-    <define>TEST_CLUSTER</define>
+    <define>UNIT_TESTING_CLUSTER</define>
     <description>The Test Cluster is meant to validate the generated code</description>
     <!-- Base data types -->
     <attribute side="server" code="0x0000" define="BOOLEAN" type="BOOLEAN" writable="true" default="false" optional="false">boolean</attribute>

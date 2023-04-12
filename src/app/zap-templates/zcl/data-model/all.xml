@@ -13,6 +13,7 @@
    <xi:include href="chip/bridged-device-basic.xml" />
    <xi:include href="chip/chip-ota.xml" />
    <xi:include href="chip/chip-types.xml" />
+   <xi:include href="chip/client-monitoring-cluster.xml" />
    <xi:include href="chip/clusters-extensions.xml" />
    <xi:include href="chip/content-launch-cluster.xml" />
    <xi:include href="chip/descriptor-cluster.xml" />

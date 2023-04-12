@@ -27,7 +27,7 @@ using namespace ::chip;
 
 int main()
 {
-    CHIP_ERROR err = GetAppTask().StartApp();
+    CHIP_ERROR err = AppTask::Instance().StartApp();
 
     LOG_ERR("Exited with code %" CHIP_ERROR_FORMAT, err.Format());
     return err == CHIP_NO_ERROR ? EXIT_SUCCESS : EXIT_FAILURE;

@@ -33,6 +33,9 @@
 // TVs need to be both commissioners and commissionees
 #define CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE 1
 
+// See issue 23625.
+#define CHIP_CONFIG_UNSAFE_SUBSCRIPTION_EXCHANGE_MANAGER_USE 1
+
 // TVs that are not commissionees,
 // or that don't automatically enter commissioning mode should set this to 0
 #define CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART 1

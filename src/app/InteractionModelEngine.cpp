@@ -426,6 +426,29 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
 
         SubscribeRequestMessage::Parser subscribeRequestParser;
         VerifyOrReturnError(subscribeRequestParser.Init(reader) == CHIP_NO_ERROR, Status::InvalidAction);
+
+        VerifyOrReturnError(subscribeRequestParser.GetKeepSubscriptions(&keepExistingSubscriptions) == CHIP_NO_ERROR,
+                            Status::InvalidAction);
+        if (!keepExistingSubscriptions)
+        {
+            //
+            // Walk through all existing subscriptions and shut down those whose subscriber matches
+            // that which just came in.
+            //
+            mReadHandlers.ForEachActiveObject([this, apExchangeContext](ReadHandler * handler) {
+                if (handler->IsFromSubscriber(*apExchangeContext))
+                {
+                    ChipLogProgress(InteractionModel,
+                                    "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
+                                    ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()),
+                                    apExchangeContext->GetSessionHandle()->GetFabricIndex());
+                    mReadHandlers.ReleaseObject(handler);
+                }
+
+                return Loop::Continue;
+            });
+        }
+
         {
             size_t requestedAttributePathCount = 0;
             size_t requestedEventPathCount     = 0;
@@ -491,28 +514,6 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnReadInitialRequest
             {
                 return Status::PathsExhausted;
             }
-        }
-
-        VerifyOrReturnError(subscribeRequestParser.GetKeepSubscriptions(&keepExistingSubscriptions) == CHIP_NO_ERROR,
-                            Status::InvalidAction);
-        if (!keepExistingSubscriptions)
-        {
-            //
-            // Walk through all existing subscriptions and shut down those whose subscriber matches
-            // that which just came in.
-            //
-            mReadHandlers.ForEachActiveObject([this, apExchangeContext](ReadHandler * handler) {
-                if (handler->IsFromSubscriber(*apExchangeContext))
-                {
-                    ChipLogProgress(InteractionModel,
-                                    "Deleting previous subscription from NodeId: " ChipLogFormatX64 ", FabricIndex: %u",
-                                    ChipLogValueX64(apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId()),
-                                    apExchangeContext->GetSessionHandle()->GetFabricIndex());
-                    mReadHandlers.ReleaseObject(handler);
-                }
-
-                return Loop::Continue;
-            });
         }
     }
     else
@@ -629,19 +630,37 @@ Status InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeContex
     VerifyOrReturnError(report.GetSubscriptionId(&subscriptionId) == CHIP_NO_ERROR, Status::InvalidAction);
     VerifyOrReturnError(report.ExitContainer() == CHIP_NO_ERROR, Status::InvalidAction);
 
+    ReadClient * foundSubscription = nullptr;
     for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
+        auto peer = apExchangeContext->GetSessionHandle()->GetPeer();
+        if (readClient->GetFabricIndex() != peer.GetFabricIndex() || readClient->GetPeerNodeId() != peer.GetNodeId())
+        {
+            continue;
+        }
+
+        // Notify Subscriptions about incoming communication from node
+        readClient->OnUnsolicitedMessageFromPublisher();
+
         if (!readClient->IsSubscriptionActive())
         {
             continue;
         }
-        auto peer = apExchangeContext->GetSessionHandle()->GetPeer();
-        if (readClient->GetFabricIndex() != peer.GetFabricIndex() || readClient->GetPeerNodeId() != peer.GetNodeId() ||
-            !readClient->IsMatchingSubscriptionId(subscriptionId))
+
+        if (!readClient->IsMatchingSubscriptionId(subscriptionId))
         {
             continue;
         }
-        readClient->OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
+
+        if (!foundSubscription)
+        {
+            foundSubscription = readClient;
+        }
+    }
+
+    if (foundSubscription)
+    {
+        foundSubscription->OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
         return Status::Success;
     }
 
@@ -790,6 +809,10 @@ bool InteractionModelEngine::TrimFabricForSubscriptions(FabricIndex aFabricIndex
          eventPathsSubscribedByCurrentFabric > perFabricPathCapacity ||
          subscriptionsEstablishedByCurrentFabric > perFabricSubscriptionCapacity))
     {
+        SubscriptionId subId;
+        candidate->GetSubscriptionId(subId);
+        ChipLogProgress(DataManagement, "Evicting Subscription ID %u:0x%" PRIx32, candidate->GetSubjectDescriptor().fabricIndex,
+                        subId);
         candidate->Close();
         return true;
     }

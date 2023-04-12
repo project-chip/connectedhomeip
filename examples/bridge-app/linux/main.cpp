@@ -23,10 +23,11 @@
 #include <app-common/zap-generated/af-structs.h>
 
 #include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
 #include <app/chip-zcl-zpro-codec.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
@@ -38,6 +39,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ZclString.h>
 #include <platform/CommissionableDataProvider.h>
+#include <platform/Linux/NetworkCommissioningDriver.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
@@ -54,6 +56,7 @@
 #include <vector>
 
 using namespace chip;
+using namespace chip::app;
 using namespace chip::Credentials;
 using namespace chip::Inet;
 using namespace chip::Transport;
@@ -71,6 +74,10 @@ EndpointId gFirstDynamicEndpointId;
 Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 std::vector<Room *> gRooms;
 std::vector<Action *> gActions;
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && defined(CHIP_DEVICE_LAYER_TARGET_LINUX)
+DeviceLayer::NetworkCommissioning::LinuxWiFiDriver sLinuxWiFiDriver;
+Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0, &sLinuxWiFiDriver);
+#endif
 
 const int16_t minMeasuredValue     = -27315;
 const int16_t maxMeasuredValue     = 32766;
@@ -142,10 +149,9 @@ constexpr CommandId onOffIncomingCommands[] = {
 };
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedLightClusters)
-DECLARE_DYNAMIC_CLUSTER(ZCL_ON_OFF_CLUSTER_ID, onOffAttrs, onOffIncomingCommands, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, bridgedDeviceBasicAttrs, nullptr,
-                            nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(OnOff::Id, onOffAttrs, onOffIncomingCommands, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasic::Id, bridgedDeviceBasicAttrs, nullptr, nullptr) DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
@@ -196,9 +202,9 @@ DECLARE_DYNAMIC_ATTRIBUTE(ZCL_POWER_SOURCE_BAT_CHARGE_LEVEL_ATTRIBUTE_ID, ENUM8,
     DECLARE_DYNAMIC_ATTRIBUTE(ZCL_POWER_SOURCE_DESCRIPTION_ATTRIBUTE_ID, CHAR_STRING, 32, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedPowerSourceClusters)
-DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, bridgedDeviceBasicAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_POWER_SOURCE_CLUSTER_ID, powerSourceAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasic::Id, bridgedDeviceBasicAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(PowerSource::Id, powerSourceAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(bridgedPowerSourceEndpoint, bridgedPowerSourceClusters);
 
@@ -216,10 +222,9 @@ DECLARE_DYNAMIC_ATTRIBUTE(ZCL_TEMP_MEASURED_VALUE_ATTRIBUTE_ID, INT16S, 2, 0),  
 //   - Descriptor
 //   - Bridged Device Basic
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedTempSensorClusters)
-DECLARE_DYNAMIC_CLUSTER(ZCL_TEMP_MEASUREMENT_CLUSTER_ID, tempSensorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, bridgedDeviceBasicAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(TemperatureMeasurement::Id, tempSensorAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasic::Id, bridgedDeviceBasicAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedTempSensorEndpoint, bridgedTempSensorClusters);
@@ -234,9 +239,8 @@ DataVersion gTempSensor2DataVersions[ArraySize(bridgedTempSensorClusters)];
 
 // Composed Device Configuration
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(bridgedComposedDeviceClusters)
-DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, bridgedDeviceBasicAttrs, nullptr, nullptr),
-    DECLARE_DYNAMIC_CLUSTER_LIST_END;
+DECLARE_DYNAMIC_CLUSTER(Descriptor::Id, descriptorAttrs, nullptr, nullptr),
+    DECLARE_DYNAMIC_CLUSTER(BridgedDeviceBasic::Id, bridgedDeviceBasicAttrs, nullptr, nullptr), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(bridgedComposedDeviceEndpoint, bridgedComposedDeviceClusters);
 DataVersion gComposedDeviceDataVersions[ArraySize(bridgedComposedDeviceClusters)];
@@ -270,7 +274,7 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const E
         {
             gDevices[index] = dev;
             EmberAfStatus ret;
-            while (1)
+            while (true)
             {
                 // Todo: Update this to schedule the work rather than use this lock
                 DeviceLayer::StackLock lock;
@@ -420,9 +424,7 @@ void HandleDevicePowerSourceStatusChanged(DevicePowerSource * dev, DevicePowerSo
 
     if (itemChangedMask & DevicePowerSource::kChanged_BatLevel)
     {
-        uint8_t batChargeLevel = dev->GetBatChargeLevel();
-        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), PowerSource::Id, PowerSource::Attributes::BatChargeLevel::Id,
-                                               ZCL_INT8U_ATTRIBUTE_TYPE, &batChargeLevel);
+        MatterReportingAttributeChangeCallback(dev->GetEndpointId(), PowerSource::Id, PowerSource::Attributes::BatChargeLevel::Id);
     }
 
     if (itemChangedMask & DevicePowerSource::kChanged_Description)
@@ -604,11 +606,11 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
     {
         Device * dev = gDevices[endpointIndex];
 
-        if (clusterId == ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID)
+        if (clusterId == BridgedDeviceBasic::Id)
         {
             ret = HandleReadBridgedDeviceBasicAttribute(dev, attributeMetadata->attributeId, buffer, maxReadLength);
         }
-        else if (clusterId == ZCL_ON_OFF_CLUSTER_ID)
+        else if (clusterId == OnOff::Id)
         {
             ret = HandleReadOnOffAttribute(static_cast<DeviceOnOff *>(dev), attributeMetadata->attributeId, buffer, maxReadLength);
         }
@@ -640,7 +642,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
     {
         Device * dev = gDevices[endpointIndex];
 
-        if ((dev->IsReachable()) && (clusterId == ZCL_ON_OFF_CLUSTER_ID))
+        if ((dev->IsReachable()) && (clusterId == OnOff::Id))
         {
             ret = HandleWriteOnOffAttribute(static_cast<DeviceOnOff *>(dev), attributeMetadata->attributeId, buffer);
         }
@@ -724,7 +726,12 @@ bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj
     return true;
 }
 
-void ApplicationInit() {}
+void ApplicationInit()
+{
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && defined(CHIP_DEVICE_LAYER_TARGET_LINUX)
+    sWiFiNetworkCommissioningInstance.Init();
+#endif
+}
 
 const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },
                                                        { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
@@ -754,7 +761,7 @@ void * bridge_polling_thread(void * context)
 {
     bool light1_added = true;
     bool light2_added = false;
-    while (1)
+    while (true)
     {
         if (kbhit())
         {
@@ -1000,6 +1007,7 @@ int main(int argc, char * argv[])
 
     // Run CHIP
 
+    ApplicationInit();
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
     return 0;

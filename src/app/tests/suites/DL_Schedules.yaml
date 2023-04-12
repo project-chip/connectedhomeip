@@ -108,7 +108,7 @@ tests:
               - name: "endMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule with out-of-bounds index"
       command: "SetWeekDaySchedule"
@@ -129,7 +129,7 @@ tests:
               - name: "endMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule with 0 user index"
       command: "SetWeekDaySchedule"
@@ -150,7 +150,7 @@ tests:
               - name: "endMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule with out-of-bounds user index"
       command: "SetWeekDaySchedule"
@@ -171,7 +171,7 @@ tests:
               - name: "endMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule for non-existing user"
       command: "SetWeekDaySchedule"
@@ -213,7 +213,7 @@ tests:
               - name: "endMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule for Sunday and Monday"
       command: "SetWeekDaySchedule"
@@ -234,7 +234,7 @@ tests:
               - name: "endMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule for Sunday Wednesday and Saturday"
       command: "SetWeekDaySchedule"
@@ -255,7 +255,7 @@ tests:
               - name: "endMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule with invalid start hour"
       command: "SetWeekDaySchedule"
@@ -276,7 +276,7 @@ tests:
               - name: "endMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule with invalid start minute"
       command: "SetWeekDaySchedule"
@@ -297,7 +297,7 @@ tests:
               - name: "endMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule with invalid end hour"
       command: "SetWeekDaySchedule"
@@ -318,7 +318,7 @@ tests:
               - name: "endMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule with invalid end minute"
       command: "SetWeekDaySchedule"
@@ -339,7 +339,7 @@ tests:
               - name: "endMinute"
                 value: 60
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Week Day schedule with start hour later that end hour"
       command: "SetWeekDaySchedule"
@@ -360,7 +360,7 @@ tests:
               - name: "endMinute"
                 value: 00
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label:
           "Create Week Day schedule with start minute later that end minute when
@@ -383,7 +383,7 @@ tests:
               - name: "endMinute"
                 value: 49
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Make sure that previous operations did not create a schedule"
       command: "GetWeekDaySchedule"
@@ -506,7 +506,7 @@ tests:
               - name: "localEndTime"
                 value: 12345689
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Year Day schedule with out-of-bounds index"
       command: "SetYearDaySchedule"
@@ -521,7 +521,7 @@ tests:
               - name: "localEndTime"
                 value: 12345689
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Year Day schedule with 0 user index"
       command: "SetYearDaySchedule"
@@ -536,7 +536,7 @@ tests:
               - name: "localEndTime"
                 value: 12345689
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Year Day schedule with out-of-bounds user index"
       command: "SetYearDaySchedule"
@@ -551,7 +551,7 @@ tests:
               - name: "localEndTime"
                 value: 12345689
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Year Day schedule for non-existing user"
       command: "SetYearDaySchedule"
@@ -704,7 +704,7 @@ tests:
               - name: "operatingMode"
                 value: 0
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Holiday schedule with out-of-bounds index"
       command: "SetHolidaySchedule"
@@ -719,7 +719,7 @@ tests:
               - name: "operatingMode"
                 value: 0
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Holiday schedule with start hour later that end hour"
       command: "SetHolidaySchedule"
@@ -734,7 +734,7 @@ tests:
               - name: "operatingMode"
                 value: 0
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Create Holiday schedule with invalid operating mode"
       command: "SetHolidaySchedule"
@@ -749,7 +749,7 @@ tests:
               - name: "operatingMode"
                 value: 5
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Make sure that previous operations did not create a schedule"
       command: "GetHolidaySchedule"
@@ -918,7 +918,7 @@ tests:
               - name: "userIndex"
                 value: 1
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Clear Week Day schedule with out-of-bounds index"
       command: "ClearWeekDaySchedule"
@@ -929,7 +929,7 @@ tests:
               - name: "userIndex"
                 value: 1
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Clear Week Day schedule with 0 user index"
       command: "ClearWeekDaySchedule"
@@ -940,7 +940,7 @@ tests:
               - name: "userIndex"
                 value: 0
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Clear Week Day schedule with out-of-bounds user index"
       command: "ClearWeekDaySchedule"
@@ -951,7 +951,7 @@ tests:
               - name: "userIndex"
                 value: NumberOfTotalUsersSupported + 1
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Clear Week Day schedule with non-existing user"
       command: "ClearWeekDaySchedule"
@@ -1043,7 +1043,7 @@ tests:
               - name: "userIndex"
                 value: 1
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Clear Year Day schedule with out-of-bounds index"
       command: "ClearYearDaySchedule"
@@ -1054,7 +1054,7 @@ tests:
               - name: "userIndex"
                 value: 1
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Clear Year Day schedule with 0 user index"
       command: "ClearYearDaySchedule"
@@ -1065,7 +1065,7 @@ tests:
               - name: "userIndex"
                 value: 0
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Clear Year Day schedule with out-of-bounds user index"
       command: "ClearYearDaySchedule"
@@ -1076,7 +1076,7 @@ tests:
               - name: "userIndex"
                 value: NumberOfTotalUsersSupported + 1
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Clear Year Day schedule with non-existing user"
       command: "ClearYearDaySchedule"
@@ -1164,7 +1164,7 @@ tests:
               - name: "holidayIndex"
                 value: 0
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Clear Holiday schedule with out-of-bounds index"
       command: "ClearHolidaySchedule"
@@ -1173,7 +1173,7 @@ tests:
               - name: "holidayIndex"
                 value: NumberOfYearDaySchedulesSupportedPerUser + 1
       response:
-          error: INVALID_FIELD
+          error: INVALID_COMMAND
 
     - label: "Make sure that week day schedule was not deleted"
       command: "GetWeekDaySchedule"

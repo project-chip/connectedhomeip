@@ -588,14 +588,13 @@ void TestCommandInteraction::ValidateCommandHandlerWithSendCommand(nlTestSuite *
     err = commandHandler.Finalize(commandPacket);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
     chip::System::PacketBufferTLVReader reader;
     InvokeResponseMessage::Parser invokeResponseMessageParser;
     reader.Init(std::move(commandPacket));
     err = invokeResponseMessageParser.Init(reader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = invokeResponseMessageParser.CheckSchemaValidity();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    invokeResponseMessageParser.PrettyPrint();
 #endif
 
     //
@@ -659,14 +658,13 @@ void TestCommandInteraction::TestCommandHandlerCommandDataEncoding(nlTestSuite *
     err = commandHandler.Finalize(commandPacket);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
     chip::System::PacketBufferTLVReader reader;
     InvokeResponseMessage::Parser invokeResponseMessageParser;
     reader.Init(std::move(commandPacket));
     err = invokeResponseMessageParser.Init(reader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = invokeResponseMessageParser.CheckSchemaValidity();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    invokeResponseMessageParser.PrettyPrint();
 #endif
 
     //
@@ -695,14 +693,13 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeFailure(nlTestSuite 
     err = commandHandler.Finalize(commandPacket);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
     chip::System::PacketBufferTLVReader reader;
     InvokeResponseMessage::Parser invokeResponseMessageParser;
     reader.Init(std::move(commandPacket));
     err = invokeResponseMessageParser.Init(reader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = invokeResponseMessageParser.CheckSchemaValidity();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    invokeResponseMessageParser.PrettyPrint();
 #endif
 
     //
@@ -1104,14 +1101,13 @@ void TestCommandInteraction::TestCommandHandlerCommandEncodeExternalFailure(nlTe
     err = commandHandler.Finalize(commandPacket);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
+#if CHIP_CONFIG_IM_PRETTY_PRINT
     chip::System::PacketBufferTLVReader reader;
     InvokeResponseMessage::Parser invokeResponseMessageParser;
     reader.Init(std::move(commandPacket));
     err = invokeResponseMessageParser.Init(reader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    err = invokeResponseMessageParser.CheckSchemaValidity();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    invokeResponseMessageParser.PrettyPrint();
 #endif
 
     //

@@ -21,6 +21,7 @@
 #include <commands/common/Command.h>
 #include <commands/common/CredentialIssuerCommands.h>
 #include <map>
+#include <set>
 #include <string>
 
 #include "../provider/OTAProviderDelegate.h"

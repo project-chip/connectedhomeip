@@ -20,7 +20,7 @@ the esp32 application.
 
 ## Supported target chips
 
-All the CHIP demo application is intended to work on: the
+All the Matter demo application is intended to work on: the
 [ESP32-DevKitC](https://www.espressif.com/en/products/hardware/esp32-devkitc/overview),
 the
 [ESP32-WROVER-KIT_V4.1](https://www.espressif.com/en/products/hardware/esp-wrover-kit/overview),
@@ -51,7 +51,7 @@ functionality can still work fine.
     $ source export.sh
     ```
 
--   CHIP
+-   Matter
 
     Before running any other build command, the scripts/activate.sh environment
     setup script should be sourced at the top level. This script set up a Python
@@ -79,10 +79,10 @@ functionality can still work fine.
     $ cd examples/<app-name>/esp32
     ```
 
--   Set the chip target to build
+-   Set the Matter target to build
 
     ```
-    $ idf.py set-target (CHIP)
+    $ idf.py set-target (Matter)
     ```
 
     All the example applications supports target chips: esp32, esp32s3, esp32c3
@@ -154,7 +154,7 @@ Below apps can be used for commissioning the application running on ESP32:
 -   [Python Based Device Controller](https://github.com/project-chip/connectedhomeip/tree/master/src/controller/python)
 -   [Standalone chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
 -   [iOS chip-tool App](https://github.com/project-chip/connectedhomeip/tree/master/src/darwin/CHIPTool)
--   [Android chip-tool App](https://github.com/project-chip/connectedhomeip/tree/master/src/android/CHIPTool)
+-   [Android chip-tool App](https://github.com/project-chip/connectedhomeip/tree/master/examples/android/CHIPTool)
 
 ### Building Standalone chip-tool
 

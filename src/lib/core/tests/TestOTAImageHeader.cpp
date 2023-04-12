@@ -207,7 +207,7 @@ int TearDownSuite(void * inContext)
 
 } // namespace
 
-int TestOTAImageHeader(void)
+int TestOTAImageHeader()
 {
     nlTestSuite theSuite = { "OTA Image header test", &sTests[0], SetupSuite, TearDownSuite };
     nlTestRunner(&theSuite, nullptr);

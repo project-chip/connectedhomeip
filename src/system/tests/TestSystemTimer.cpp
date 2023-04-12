@@ -341,18 +341,18 @@ int gCallbackProcessed[kCancelTimerCount];
 /// Validates that gCallbackProcessed has valid values (0 or 1)
 void ValidateExecutedTimerCounts(nlTestSuite * suite)
 {
-    for (unsigned i = 0; i < kCancelTimerCount; i++)
+    for (int processed : gCallbackProcessed)
     {
-        NL_TEST_ASSERT(suite, (gCallbackProcessed[i] == 0) || (gCallbackProcessed[i] == 1));
+        NL_TEST_ASSERT(suite, (processed == 0) || (processed == 1));
     }
 }
 
 unsigned ExecutedTimerCount()
 {
     unsigned count = 0;
-    for (unsigned i = 0; i < kCancelTimerCount; i++)
+    for (int processed : gCallbackProcessed)
     {
-        if (gCallbackProcessed[i] != 0)
+        if (processed != 0)
         {
             count++;
         }
@@ -625,12 +625,14 @@ static int TestSetup(void * aContext)
         return FAILURE;
     }
 
+#if !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR == 2 && LWIP_VERSION_MINOR == 0
     static sys_mbox_t * sLwIPEventQueue = NULL;
 
     sys_mbox_new(sLwIPEventQueue, 100);
     tcpip_init(NULL, NULL);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR == 2 && LWIP_VERSION_MINOR == 0
+#endif // !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
 
     sLayer.Init();
 
@@ -650,15 +652,17 @@ static int TestTeardown(void * aContext)
 
     lContext.mLayer->Shutdown();
 
+#if !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
     tcpip_finish(NULL, NULL);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP && (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
+#endif // !defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
 
     ::chip::Platform::MemoryShutdown();
     return (SUCCESS);
 }
 
-int TestSystemTimer(void)
+int TestSystemTimer()
 {
     return chip::ExecuteTestsWithContext<TestContext>(&kTheSuite);
 }

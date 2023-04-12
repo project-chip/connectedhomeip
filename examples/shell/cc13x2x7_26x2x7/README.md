@@ -1,6 +1,6 @@
-# Matter CC1352 CC2652 Shell Application
+# Matter Shell Application
 
-A [chip-shell](../README.md) project on the Texas Instruments CC13X2_26X2 family
+A [chip-shell](../README.md) project on the Texas Instruments CC13XX_26XX family
 of Wireless MCUs.
 
 ## Building
@@ -17,9 +17,9 @@ guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
     ```
     $ cd ~
-    $ wget [recommended version][sysconfig_recommended]
-    $ chmod +x sysconfig-1.1*-setup.run
-    $ ./sysconfig-1.1*-setup.run
+    $ wget https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-nsUM6f7Vvb/1.15.0.2826/sysconfig-1.15.0_2826-setup.run
+    $ chmod +x sysconfig-1.15.0_2826-setup.run
+    $ ./sysconfig-1.15.0_2826-setup.run
     ```
 
 -   Run the bootstrap script to setup the build environment.
@@ -170,8 +170,7 @@ Additionally, we welcome any feedback.
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-launch
 [ccs_manual_method]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-method
-[cc1352r1_launchxl]: https://www.ti.com/tool/LAUNCHXL-CC1352R1
-[e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-and-thread
+[e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum
 [matter-e2e-faq]:
     https://e2e.ti.com/support/wireless-connectivity/zigbee-thread-group/zigbee-and-thread/f/zigbee-thread-forum/1082428/faq-cc2652r7-matter----getting-started-guide
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG

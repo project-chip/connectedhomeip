@@ -14,6 +14,7 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("${chip_root}/build/chip/chip_codegen.gni")
 import("${chip_root}/src/platform/python.gni")
 
 import("${chip_root}/src/lib/core/core.gni")
@@ -31,10 +32,23 @@ _zap_cluster_list_script = get_path_info("zap_cluster_list.py", "abspath")
 #  zap_file
 #    Path to the ZAP input file.
 #
+#  idl
+#    Path to the .matter IDL corresponding to the zap file. This is for
+#    dependencies on build-time code generation.
+#
 # Forwards all the remaining variables to the source_set.
 #
 template("chip_data_model") {
   _data_model_name = target_name
+
+  if (defined(invoker.idl)) {
+    _idl = invoker.idl
+  } else {
+    # Assume that IDL name is the same as the zap file name, but instead of
+    # '.zap' use '.matter' as extension. This is currently the case in the
+    # sample apps, but may change in the future
+    _idl = string_replace(invoker.zap_file, ".zap", ".matter")
+  }
 
   config("${_data_model_name}_config") {
     include_dirs = []
@@ -42,6 +56,24 @@ template("chip_data_model") {
     if (defined(invoker.zap_pregenerated_dir)) {
       include_dirs += [ "${invoker.zap_pregenerated_dir}/.." ]
     }
+  }
+
+  chip_codegen("${_data_model_name}_codegen") {
+    input = _idl
+    generator = "cpp-app"
+
+    outputs = [
+      "app/PluginApplicationCallbacks.h",
+      "app/callback-stub.cpp",
+    ]
+
+    public_configs = [ ":${_data_model_name}_config" ]
+
+    if (!defined(deps)) {
+      deps = []
+    }
+
+    deps += [ "${chip_root}/src/app/common:cluster-objects" ]
   }
 
   _use_default_im_dispatch = !defined(invoker.use_default_im_dispatch) ||
@@ -60,9 +92,15 @@ template("chip_data_model") {
       sources = []
     }
 
+    if (!defined(deps)) {
+      deps = []
+    }
+    deps += [ ":${_data_model_name}_codegen" ]
+
     sources += [
       "${_app_root}/clusters/barrier-control-server/barrier-control-server.h",
-      "${_app_root}/clusters/basic/basic.h",
+      "${_app_root}/clusters/basic-information/basic-information.h",
+      "${_app_root}/clusters/client-monitoring-server/client-monitoring-server.h",
       "${_app_root}/clusters/color-control-server/color-control-server.h",
       "${_app_root}/clusters/door-lock-server/door-lock-server.h",
       "${_app_root}/clusters/groups-server/groups-server.h",
@@ -71,7 +109,6 @@ template("chip_data_model") {
       "${_app_root}/clusters/on-off-server/on-off-server.h",
       "${_app_root}/clusters/scenes/scenes-tokens.h",
       "${_app_root}/clusters/scenes/scenes.h",
-      "${_app_root}/reporting/reporting.h",
       "${_app_root}/util/DataModelHandler.cpp",
       "${_app_root}/util/af-event.cpp",
       "${_app_root}/util/attribute-size-util.cpp",
@@ -82,6 +119,7 @@ template("chip_data_model") {
       "${_app_root}/util/ember-compatibility-functions.cpp",
       "${_app_root}/util/ember-print.cpp",
       "${_app_root}/util/error-mapping.cpp",
+      "${_app_root}/util/generic-callback-stubs.cpp",
       "${_app_root}/util/message.cpp",
       "${_app_root}/util/privilege-storage.cpp",
       "${_app_root}/util/util.cpp",
@@ -146,8 +184,6 @@ template("chip_data_model") {
     }
 
     if (defined(invoker.zap_pregenerated_dir)) {
-      sources += [ "${invoker.zap_pregenerated_dir}/callback-stub.cpp" ]
-
       if (chip_controller) {
         sources += [ "${invoker.zap_pregenerated_dir}/CHIPClusters.h" ]
       }
@@ -163,6 +199,7 @@ template("chip_data_model") {
     }
 
     public_deps += [
+      ":${_data_model_name}_codegen",
       "${chip_root}/src/app",
       "${chip_root}/src/app/common:cluster-objects",
       "${chip_root}/src/controller",

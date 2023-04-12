@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 #include <platform/Zephyr/BLEManagerImpl.h>
 
 #include <ble/CHIPBleServiceData.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -234,8 +235,7 @@ struct BLEManagerImpl::ServiceData
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    int err                       = 0;
-    const bool isAdvertisingRerun = mFlags.Has(Flags::kAdvertising);
+    int err = 0;
 
     // At first run always select fast advertising, on the next attempt slow down interval.
     const uint32_t intervalMin = mFlags.Has(Flags::kFastAdvertisingEnabled) ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN
@@ -378,10 +378,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 {
-    size_t len = bufSize - 1;
-
-    strncpy(buf, bt_get_name(), len);
-    buf[len] = 0;
+    Platform::CopyString(buf, bufSize, bt_get_name());
 
     return CHIP_NO_ERROR;
 }

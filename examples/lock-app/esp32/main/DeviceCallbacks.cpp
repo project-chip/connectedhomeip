@@ -28,7 +28,7 @@
 #include "BoltLockManager.h"
 
 #include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 
 static const char * TAG = "lock-devicecallbacks";
 
@@ -45,7 +45,7 @@ void AppDeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Clus
 
     switch (clusterId)
     {
-    case ZCL_ON_OFF_CLUSTER_ID:
+    case app::Clusters::OnOff::Id:
         OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
         break;
 

@@ -54,9 +54,11 @@ class HostApp(Enum):
     OTA_PROVIDER = auto()
     OTA_REQUESTOR = auto()
     PYTHON_BINDINGS = auto()
-    NL_TEST_RUNNER = auto()
+    EFR32_TEST_RUNNER = auto()
     TV_CASTING = auto()
     BRIDGE = auto()
+    DYNAMIC_BRIDGE = auto()
+    JAVA_MATTER_CONTROLLER = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -89,12 +91,16 @@ class HostApp(Enum):
             return 'ota-requestor-app/linux'
         elif self in [HostApp.ADDRESS_RESOLVE, HostApp.TESTS, HostApp.PYTHON_BINDINGS, HostApp.CERT_TOOL]:
             return '../'
-        elif self == HostApp.NL_TEST_RUNNER:
+        elif self == HostApp.EFR32_TEST_RUNNER:
             return '../src/test_driver/efr32'
         elif self == HostApp.TV_CASTING:
             return 'tv-casting-app/linux'
         elif self == HostApp.BRIDGE:
             return 'bridge-app/linux'
+        elif self == HostApp.DYNAMIC_BRIDGE:
+            return 'dynamic-bridge-app/linux'
+        elif self == HostApp.JAVA_MATTER_CONTROLLER:
+            return 'java-matter-controller'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -154,7 +160,7 @@ class HostApp(Enum):
             yield 'chip-ota-requestor-app.map'
         elif self == HostApp.PYTHON_BINDINGS:
             yield 'controller/python'  # Directory containing WHL files
-        elif self == HostApp.NL_TEST_RUNNER:
+        elif self == HostApp.EFR32_TEST_RUNNER:
             yield 'chip_nl_test_runner_wheels'
         elif self == HostApp.TV_CASTING:
             yield 'chip-tv-casting-app'
@@ -162,6 +168,12 @@ class HostApp(Enum):
         elif self == HostApp.BRIDGE:
             yield 'chip-bridge-app'
             yield 'chip-bridge-app.map'
+        elif self == HostApp.DYNAMIC_BRIDGE:
+            yield 'dynamic-chip-bridge-app'
+            yield 'dynamic-chip-bridge-app.map'
+        elif self == HostApp.JAVA_MATTER_CONTROLLER:
+            yield 'java-matter-controller'
+            yield 'java-matter-controller.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -210,12 +222,13 @@ class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
                  enable_ipv4=True, enable_ble=True, enable_wifi=True,
-                 enable_thread=True, use_tsan=False, use_asan=False,
+                 enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
                  separate_event_loop=True, use_libfuzzer=False, use_clang=False,
                  interactive_mode=True, extra_tests=False,
                  use_platform_mdns=False, enable_rpcs=False,
                  use_coverage=False, use_dmalloc=False,
                  minmdns_address_policy=None,
+                 minmdns_high_verbosity=False,
                  crypto_library: HostCryptoLibrary = None):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -225,9 +238,6 @@ class HostBuilder(GnBuilder):
         self.board = board
         self.extra_gn_options = []
         self.build_env = {}
-
-        if board == HostBoard.ARM64:
-            self.build_env['PKG_CONFIG_PATH'] = os.path.join(self.SysRootPath('SYSROOT_AARCH64'), 'lib/aarch64-linux-gnu/pkgconfig')
 
         if enable_rpcs:
             self.extra_gn_options.append('import("//with_pw_rpc.gni")')
@@ -249,6 +259,9 @@ class HostBuilder(GnBuilder):
 
         if use_asan:
             self.extra_gn_options.append('is_asan=true')
+
+        if use_ubsan:
+            self.extra_gn_options.append('is_ubsan=true')
 
         if use_dmalloc:
             self.extra_gn_options.append('chip_config_memory_debug_checks=true')
@@ -294,12 +307,18 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append(
                 'chip_im_force_fabric_quota_check=true')
 
+        if minmdns_high_verbosity:
+            self.extra_gn_options.append('chip_minmdns_high_verbosity=true')
+
         if app == HostApp.TESTS:
             self.extra_gn_options.append('chip_build_tests=true')
             self.build_command = 'check'
 
-        if app == HostApp.NL_TEST_RUNNER:
+        if app == HostApp.EFR32_TEST_RUNNER:
             self.build_command = 'runner'
+            # board will NOT be used, but is required to be able to properly
+            # include things added by the test_runner efr32 build
+            self.extra_gn_options.append('silabs_board="BRD4161A"')
 
         # Crypto library has per-platform defaults (like openssl for linux/mac
         # and mbedtls for android/freertos/zephyr/mbed/...)
@@ -347,7 +366,20 @@ class HostBuilder(GnBuilder):
         else:
             raise Exception('Unknown host board type: %r' % self)
 
+    def createJavaExecutable(self, java_program):
+        self._Execute(
+            [
+                "chmod",
+                "+x",
+                "%s/bin/%s" % (self.output_dir, java_program),
+            ],
+            title="Make Java program executable",
+        )
+
     def GnBuildEnv(self):
+        if self.board == HostBoard.ARM64:
+            self.build_env['PKG_CONFIG_PATH'] = os.path.join(
+                self.SysRootPath('SYSROOT_AARCH64'), 'lib/aarch64-linux-gnu/pkgconfig')
         return self.build_env
 
     def SysRootPath(self, name):
@@ -357,6 +389,22 @@ class HostBuilder(GnBuilder):
 
     def generate(self):
         super(HostBuilder, self).generate()
+        if 'JAVA_PATH' in os.environ:
+            self._Execute(
+                ["third_party/java_deps/set_up_java_deps.sh"],
+                title="Setting up Java deps",
+            )
+
+            exampleName = self.app.ExamplePath()
+            if exampleName == "java-matter-controller":
+                self._Execute(
+                    [
+                        "cp",
+                        os.path.join(self.root, "Manifest.txt"),
+                        self.output_dir,
+                    ],
+                    title="Copying Manifest.txt to " + self.output_dir,
+                )
 
         if self.app == HostApp.TESTS and self.use_coverage:
             self.coverage_dir = os.path.join(self.output_dir, 'coverage')
@@ -365,19 +413,30 @@ class HostBuilder(GnBuilder):
     def PreBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
             self._Execute(['ninja', '-C', self.output_dir, 'default'], title="Build-only")
-            self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'), '--exclude', os.path.join(self.chip_dir, 'third_party/*'), '--exclude', '/usr/include/*',
-                          '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
+            self._Execute(['find', os.path.join(self.output_dir, 'obj/src/'), '-depth',
+                           '-name', 'tests', '-exec', 'rm -rf {} \\;'], title="Cleanup unit tests")
+            self._Execute(['lcov', '--initial', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
+                           '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
+                           '--exclude', os.path.join(self.chip_dir, 'third_party/*'),
+                           '--exclude', '/usr/include/*',
+                           '--output-file', os.path.join(self.coverage_dir, 'lcov_base.info')], title="Initial coverage baseline")
 
     def PostBuildCommand(self):
         if self.app == HostApp.TESTS and self.use_coverage:
-            self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'), '--exclude', os.path.join(self.chip_dir, 'third_party/*'), '--exclude', '/usr/include/*',
-                          '--output-file', os.path.join(self.coverage_dir, 'lcov_test.info')], title="Update coverage")
+            self._Execute(['lcov', '--capture', '--directory', os.path.join(self.output_dir, 'obj'),
+                           '--exclude', os.path.join(self.chip_dir, 'zzz_generated/*'),
+                           '--exclude', os.path.join(self.chip_dir, 'third_party/*'),
+                           '--exclude', '/usr/include/*',
+                           '--output-file', os.path.join(self.coverage_dir, 'lcov_test.info')], title="Update coverage")
             self._Execute(['lcov', '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_base.info'),
                            '--add-tracefile', os.path.join(self.coverage_dir, 'lcov_test.info'),
                            '--output-file', os.path.join(self.coverage_dir, 'lcov_final.info')
                            ], title="Final coverage info")
             self._Execute(['genhtml', os.path.join(self.coverage_dir, 'lcov_final.info'), '--output-directory',
-                          os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
+                           os.path.join(self.coverage_dir, 'html')], title="HTML coverage")
+
+        if self.app == HostApp.JAVA_MATTER_CONTROLLER:
+            self.createJavaExecutable("java-matter-controller")
 
     def build_outputs(self):
         outputs = {}

@@ -31,6 +31,8 @@ static_library("dnssd") {
 
   sources = [
     "Advertiser.h",
+    "IPAddressSorter.cpp",
+    "IPAddressSorter.h",
     "Resolver.h",
     "ServiceNaming.cpp",
     "ServiceNaming.h",

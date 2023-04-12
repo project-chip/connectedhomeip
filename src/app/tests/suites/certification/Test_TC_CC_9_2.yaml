@@ -168,7 +168,9 @@ tests:
               - name: "ms"
                 value: 30000
 
-    - label: "Read ColorLoopStartEnhancedHue attribute from DUT."
+    - label:
+          "Saving value for comparision read ColorLoopStartEnhancedHue attribute
+          from DUT."
       command: "readAttribute"
       attribute: "ColorLoopStartEnhancedHue"
       PICS: CC.S.F01 && CC.S.F02 && CC.S.A4005 && CC.S.C44.Rsp
@@ -241,7 +243,9 @@ tests:
               - name: "ms"
                 value: 30000
 
-    - label: "Read ColorLoopStartEnhancedHue attribute from DUT."
+    - label:
+          "Saving value for comparision read ColorLoopStartEnhancedHue attribute
+          from DUT."
       command: "readAttribute"
       attribute: "ColorLoopStartEnhancedHue"
       PICS: CC.S.F01 && CC.S.F02 && CC.S.A4005 && CC.S.C44.Rsp
@@ -305,7 +309,9 @@ tests:
       response:
           value: 0
 
-    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
+    - label:
+          "Saving value for comparision read ColorLoopStoredEnhancedHue
+          attribute from DUT."
       command: "readAttribute"
       PICS: CC.S.F01 && CC.S.F02 && CC.S.A4006 && CC.S.C44.Rsp
       attribute: "ColorLoopStoredEnhancedHue"

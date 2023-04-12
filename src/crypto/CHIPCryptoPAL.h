@@ -170,6 +170,12 @@ enum class SupportedECPKeyTypes : uint8_t
     ECP256R1 = 0,
 };
 
+enum class ECPKeyTarget : uint8_t
+{
+    ECDH  = 0,
+    ECDSA = 1,
+};
+
 /** @brief Safely clears the first `len` bytes of memory area `buf`.
  * @param buf Pointer to a memory buffer holding secret data that must be cleared.
  * @param len Specifies secret data size in bytes.
@@ -385,7 +391,7 @@ public:
      * @brief Initialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR Initialize() = 0;
+    virtual CHIP_ERROR Initialize(ECPKeyTarget key_target) = 0;
 
     /**
      * @brief Serialize the keypair.
@@ -410,7 +416,7 @@ public:
      * @brief Initialize the keypair.
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Initialize() override;
+    CHIP_ERROR Initialize(ECPKeyTarget key_target) override;
 
     /**
      * @brief Serialize the keypair.
@@ -465,7 +471,7 @@ public:
     /** Release resources associated with this key pair */
     void Clear();
 
-private:
+protected:
     P256PublicKey mPublicKey;
     mutable P256KeypairContext mKeypair;
     bool mInitialized = false;
@@ -1351,7 +1357,7 @@ public:
      *
      * @return CHIP_ERROR     The result of Spake2+ verifier generation
      */
-    CHIP_ERROR Generate(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin);
+    CHIP_ERROR Generate(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t setupPin);
 
     /**
      * @brief Compute the initiator values (w0, w1) used for PAKE input.
@@ -1364,8 +1370,7 @@ public:
      *
      * @return CHIP_ERROR     The result from running PBKDF2
      */
-    static CHIP_ERROR ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t & setupPin, uint8_t * ws,
-                                uint32_t ws_len);
+    static CHIP_ERROR ComputeWS(uint32_t pbkdf2IterCount, const ByteSpan & salt, uint32_t setupPin, uint8_t * ws, uint32_t ws_len);
 };
 
 /**

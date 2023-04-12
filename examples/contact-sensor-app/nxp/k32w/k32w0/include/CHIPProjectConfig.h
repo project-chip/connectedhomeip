@@ -152,14 +152,6 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC
- *
- * Enables synchronizing the device's real time clock with a remote CHIP Time service
- * using the CHIP Time Sync protocol.
- */
-// #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
-
-/**
  * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
  *
  * The amount of time in miliseconds after which BLE should change his advertisements

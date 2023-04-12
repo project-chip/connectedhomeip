@@ -89,23 +89,23 @@ CHIP_ERROR CryptoContext::InitFromSecret(const ByteSpan & secret, const ByteSpan
     // If enabled, override the generated session key with a known key pair
     // to allow man-in-the-middle session key recovery for testing purposes.
 
-#define TEST_SECRET_SIZE 32
-    constexpr uint8_t kTestSharedSecret[TEST_SECRET_SIZE] = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
-    static_assert(sizeof(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE) == TEST_SECRET_SIZE,
+    constexpr uint8_t kTestSharedSecret[CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH] = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
+    static_assert(sizeof(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE) == CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH,
                   "CHIP_CONFIG_TEST_SHARED_SECRET_VALUE must be 32 bytes");
     const ByteSpan & testSalt = ByteSpan(nullptr, 0);
     (void) info;
     (void) infoLen;
 
 #warning                                                                                                                           \
-    "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key, and NodeID=0 in NONCE. Node can only communicate with other nodes built with this flag set. Requires build flag 'treat_warnings_as_errors=false'."
-    ChipLogError(SecureChannel,
-                 "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key, "
-                 "and NodeID=0 in NONCE. "
-                 "Node can only communicate with other nodes built with this flag set.");
+    "Warning: CHIP_CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key, and NodeID=0 in NONCE. Node can only communicate with other nodes built with this flag set. Requires build flag 'treat_warnings_as_errors=false'."
+    ChipLogError(
+        SecureChannel,
+        "Warning: CHIP_CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key, "
+        "and NodeID=0 in NONCE. "
+        "Node can only communicate with other nodes built with this flag set.");
 
-    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(kTestSharedSecret, TEST_SECRET_SIZE, testSalt.data(), testSalt.size(), SEKeysInfo,
-                                           sizeof(SEKeysInfo), &mKeys[0][0], sizeof(mKeys)));
+    ReturnErrorOnFailure(mHKDF.HKDF_SHA256(kTestSharedSecret, CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH, testSalt.data(),
+                                           testSalt.size(), SEKeysInfo, sizeof(SEKeysInfo), &mKeys[0][0], sizeof(mKeys)));
 #else
 
     ReturnErrorOnFailure(

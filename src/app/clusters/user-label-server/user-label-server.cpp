@@ -217,7 +217,7 @@ public:
 
 UserLabelFabricTableDelegate gUserLabelFabricDelegate;
 
-void MatterUserLabelPluginServerInitCallback(void)
+void MatterUserLabelPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
     Server::GetInstance().GetFabricTable().AddFabricDelegate(&gUserLabelFabricDelegate);

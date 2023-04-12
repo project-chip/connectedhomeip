@@ -669,11 +669,7 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
 
         err = readHandler.ProcessReadRequest(std::move(readRequestbuf));
         ChipLogError(DataManagement, "The error is %s", ErrorStr(err));
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-        NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE);
-#else
         NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_END_OF_TLV);
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
         //
         // In the call above to ProcessReadRequest, the handler will not actually close out the EC since
@@ -730,9 +726,8 @@ void TestReadInteraction::TestReadClientGenerateOneEventPaths(nlTestSuite * apSu
     err = readRequestParser.Init(reader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    err = readRequestParser.CheckSchemaValidity();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    readRequestParser.PrettyPrint();
 #endif
 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -782,9 +777,8 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPaths(nlTestSuite * apSu
     err = readRequestParser.Init(reader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    err = readRequestParser.CheckSchemaValidity();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+#if CHIP_CONFIG_IM_PRETTY_PRINT
+    readRequestParser.PrettyPrint();
 #endif
 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
@@ -1227,11 +1221,11 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     chip::app::AttributePathParams attributePathParams[2];
-    for (int i = 0; i < 2; i++)
+    for (auto & attributePathParam : attributePathParams)
     {
-        attributePathParams[i].mEndpointId  = Test::kMockEndpoint3;
-        attributePathParams[i].mClusterId   = Test::MockClusterId(2);
-        attributePathParams[i].mAttributeId = Test::MockAttributeId(4);
+        attributePathParam.mEndpointId  = Test::kMockEndpoint3;
+        attributePathParam.mClusterId   = Test::MockClusterId(2);
+        attributePathParam.mAttributeId = Test::MockAttributeId(4);
     }
 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
@@ -1566,8 +1560,6 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         delegate.mGotReport            = false;
         delegate.mGotEventResponse     = false;
         delegate.mNumAttributeResponse = 0;
-
-        printf("HereHere\n");
 
         err = engine->GetReportingEngine().SetDirty(dirtyPath1);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -1920,13 +1912,16 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
             err = engine->GetReportingEngine().SetDirty(dirtyPath);
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-            ctx.DrainAndServiceIO();
-
             //
-            // Not sure why I had to add this, and didn't have cycles to figure out why.
-            // Tracked in Issue #17528.
+            // We need to DrainAndServiceIO() until attribute callback will be called.
+            // This is not correct behavior and is tracked in Issue #17528.
             //
-            ctx.DrainAndServiceIO();
+            int last;
+            do
+            {
+                last = delegate.mNumAttributeResponse;
+                ctx.DrainAndServiceIO();
+            } while (last != delegate.mNumAttributeResponse);
 
             NL_TEST_ASSERT(apSuite, delegate.mGotReport);
             // Mock endpoint3 has 13 attributes in total, and we subscribed twice.
@@ -2214,10 +2209,10 @@ void TestReadInteraction::TestReadShutdown(nlTestSuite * apSuite, void * apConte
     //
     // Allocate a number of clients
     //
-    for (int i = 0; i < 4; i++)
+    for (auto & client : pClients)
     {
-        pClients[i] = Platform::New<app::ReadClient>(engine, &ctx.GetExchangeManager(), delegate,
-                                                     chip::app::ReadClient::InteractionType::Subscribe);
+        client = Platform::New<app::ReadClient>(engine, &ctx.GetExchangeManager(), delegate,
+                                                chip::app::ReadClient::InteractionType::Subscribe);
     }
 
     //
@@ -4173,12 +4168,11 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession(nlTestSuite *
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
-    readPrepareParams.mpAttributePathParamsList    = new chip::app::AttributePathParams[1];
-    readPrepareParams.mAttributePathParamsListSize = 1;
-
     AttributePathParams subscribePath(Test::kMockEndpoint3, Test::MockClusterId(2), Test::MockAttributeId(4));
-    readPrepareParams.mpAttributePathParamsList[0] = subscribePath;
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    readPrepareParams.mpAttributePathParamsList    = &subscribePath;
+    readPrepareParams.mAttributePathParamsListSize = 1;
 
     readPrepareParams.mMinIntervalFloorSeconds   = 0;
     readPrepareParams.mMaxIntervalCeilingSeconds = 0;

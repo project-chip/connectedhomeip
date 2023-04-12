@@ -167,8 +167,7 @@ void TestBasicLifeCycle(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, opKeystore.HasOpKeypairForFabric(kFabricIndex) == true);
 
     // Committing key resets pending state and adds storage
-    DefaultStorageKeyAllocator keyAllocator;
-    std::string opKeyStorageKey = keyAllocator.FabricOpKey(kFabricIndex);
+    std::string opKeyStorageKey = DefaultStorageKeyAllocator::FabricOpKey(kFabricIndex).KeyName();
     err                         = opKeystore.CommitOpKeypairForFabric(kFabricIndex);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, opKeystore.HasPendingOpKeypair() == false);
@@ -207,7 +206,7 @@ void TestEphemeralKeys(nlTestSuite * inSuite, void * inContext)
 
     Crypto::P256Keypair * ephemeralKeypair = opKeyStore.AllocateEphemeralKeypairForCASE();
     NL_TEST_ASSERT(inSuite, ephemeralKeypair != nullptr);
-    NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize());
+    NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA));
 
     NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->ECDSA_sign_msg(message, sizeof(message), sig));
     NL_TEST_ASSERT_SUCCESS(inSuite, ephemeralKeypair->Pubkey().ECDSA_validate_msg_signature(message, sizeof(message), sig));

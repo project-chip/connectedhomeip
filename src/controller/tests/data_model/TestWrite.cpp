@@ -34,7 +34,7 @@ using TestContext = chip::Test::AppContext;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::TestCluster;
+using namespace chip::app::Clusters::UnitTesting;
 using namespace chip::Protocols;
 
 namespace {
@@ -75,7 +75,8 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
         return aWriteHandler->AddStatus(aPath, Protocols::InteractionModel::Status::DataVersionMismatch);
     }
 
-    if (aPath.mClusterId == TestCluster::Id && aPath.mAttributeId == Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
+    if (aPath.mClusterId == Clusters::UnitTesting::Id &&
+        aPath.mAttributeId == Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
     {
         if (responseDirective == kSendAttributeSuccess)
         {
@@ -119,7 +120,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
 
         return CHIP_NO_ERROR;
     }
-    if (aPath.mClusterId == TestCluster::Id && aPath.mAttributeId == Attributes::ListFabricScoped::Id)
+    if (aPath.mClusterId == Clusters::UnitTesting::Id && aPath.mAttributeId == Attributes::ListFabricScoped::Id)
     {
         // Mock a invalid SubjectDescriptor
         AttributeValueDecoder decoder(aReader, Access::SubjectDescriptor());
@@ -152,7 +153,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
         return CHIP_NO_ERROR;
     }
 
-    if (aPath.mClusterId == TestCluster::Id && aPath.mAttributeId == Attributes::Boolean::TypeInfo::GetAttributeId())
+    if (aPath.mClusterId == Clusters::UnitTesting::Id && aPath.mAttributeId == Attributes::Boolean::TypeInfo::GetAttributeId())
     {
         InteractionModel::Status status;
         if (responseDirective == kSendMultipleSuccess)
@@ -203,8 +204,8 @@ void TestWriteInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCont
     TestContext & ctx       = *static_cast<TestContext *>(apContext);
     auto sessionHandle      = ctx.GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
-    TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
-    TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
+    Clusters::UnitTesting::Structs::TestListStructOctet::Type valueBuf[4];
+    Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::Type value;
 
     value = valueBuf;
 
@@ -227,8 +228,8 @@ void TestWriteInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCont
         onFailureCbInvoked = true;
     };
 
-    chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(sessionHandle, kTestEndpointId,
-                                                                                               value, onSuccessCb, onFailureCb);
+    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
+        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -242,8 +243,8 @@ void TestWriteInteraction::TestDataResponseWithAcceptedDataVersion(nlTestSuite *
     TestContext & ctx       = *static_cast<TestContext *>(apContext);
     auto sessionHandle      = ctx.GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
-    TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
-    TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
+    Clusters::UnitTesting::Structs::TestListStructOctet::Type valueBuf[4];
+    Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::Type value;
 
     value = valueBuf;
 
@@ -268,7 +269,7 @@ void TestWriteInteraction::TestDataResponseWithAcceptedDataVersion(nlTestSuite *
 
     chip::Optional<chip::DataVersion> dataVersion;
     dataVersion.SetValue(kAcceptedDataVersion);
-    chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion);
 
     ctx.DrainAndServiceIO();
@@ -283,8 +284,8 @@ void TestWriteInteraction::TestDataResponseWithRejectedDataVersion(nlTestSuite *
     TestContext & ctx       = *static_cast<TestContext *>(apContext);
     auto sessionHandle      = ctx.GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
-    TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
-    TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
+    Clusters::UnitTesting::Structs::TestListStructOctet::Type valueBuf[4];
+    Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo::Type value;
 
     value = valueBuf;
 
@@ -308,7 +309,7 @@ void TestWriteInteraction::TestDataResponseWithRejectedDataVersion(nlTestSuite *
     };
 
     chip::Optional<chip::DataVersion> dataVersion(kRejectedDataVersion);
-    chip::Controller::WriteAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListStructOctetString::TypeInfo>(
         sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb, nullptr, dataVersion);
 
     ctx.DrainAndServiceIO();
@@ -363,8 +364,8 @@ void TestWriteInteraction::TestFabricScopedAttributeWithoutFabricIndex(nlTestSui
     TestContext & ctx       = *static_cast<TestContext *>(apContext);
     auto sessionHandle      = ctx.GetSessionBobToAlice();
     bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
-    TestCluster::Structs::TestFabricScoped::Type valueBuf[4];
-    TestCluster::Attributes::ListFabricScoped::TypeInfo::Type value;
+    Clusters::UnitTesting::Structs::TestFabricScoped::Type valueBuf[4];
+    Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo::Type value;
 
     value = valueBuf;
 
@@ -386,8 +387,8 @@ void TestWriteInteraction::TestFabricScopedAttributeWithoutFabricIndex(nlTestSui
         onFailureCbInvoked = true;
     };
 
-    chip::Controller::WriteAttribute<TestCluster::Attributes::ListFabricScoped::TypeInfo>(sessionHandle, kTestEndpointId, value,
-                                                                                          onSuccessCb, onFailureCb);
+    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::ListFabricScoped::TypeInfo>(
+        sessionHandle, kTestEndpointId, value, onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -413,8 +414,8 @@ void TestWriteInteraction::TestMultipleSuccessResponses(nlTestSuite * apSuite, v
     // not safe to do so.
     auto onFailureCb = [&failureCalls](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    chip::Controller::WriteAttribute<TestCluster::Attributes::Boolean::TypeInfo>(sessionHandle, kTestEndpointId, true, onSuccessCb,
-                                                                                 onFailureCb);
+    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(sessionHandle, kTestEndpointId, true,
+                                                                                           onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 
@@ -441,8 +442,8 @@ void TestWriteInteraction::TestMultipleFailureResponses(nlTestSuite * apSuite, v
     // not safe to do so.
     auto onFailureCb = [&failureCalls](const ConcreteAttributePath * attributePath, CHIP_ERROR aError) { ++failureCalls; };
 
-    chip::Controller::WriteAttribute<TestCluster::Attributes::Boolean::TypeInfo>(sessionHandle, kTestEndpointId, true, onSuccessCb,
-                                                                                 onFailureCb);
+    chip::Controller::WriteAttribute<Clusters::UnitTesting::Attributes::Boolean::TypeInfo>(sessionHandle, kTestEndpointId, true,
+                                                                                           onSuccessCb, onFailureCb);
 
     ctx.DrainAndServiceIO();
 

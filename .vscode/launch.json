@@ -11,6 +11,22 @@
             "pid": "${command:pickProcess}"
         },
         {
+            "name": "Run application (Darwin x64)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/${input:outAppDarwin}",
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Run application (Linux x64)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/${input:outAppLinux}",
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
             "name": "QRCode Tests",
             "type": "cppdbg",
             "request": "launch",
@@ -62,26 +78,6 @@
             "externalConsole": false,
             "MIMode": "gdb",
             "preLaunchTask": "Build openSSL crypto Tests",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ]
-        },
-        {
-            "name": "LightingApp (Linux)",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/out/lighting-app/chip-lighting-app",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "preLaunchTask": "Build Lighting App (Linux)",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
@@ -391,6 +387,14 @@
         },
 
         {
+            "name": "CHIP All Clusters App (Linux)",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/out/debug/standalone/chip-all-clusters-app",
+            "cwd": "${workspaceFolder}"
+        },
+
+        {
             "name": "OTA Requestor App (Linux)",
             "type": "lldb",
             "request": "launch",
@@ -420,9 +424,56 @@
                 "/tmp/ota-image.bin"
             ],
             "cwd": "${workspaceFolder}"
+        },
+
+        {
+            "name": "Debug Open IoT SDK example application",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/${input:openiotsdkApp}/openiotsdk",
+            "executable": "./build/chip-openiotsdk-${input:openiotsdkApp}-example.elf",
+            "armToolchainPath": "${env:ARM_GCC_TOOLCHAIN_PATH}/bin",
+            "servertype": "external",
+            "gdbTarget": "${input:openiotsdkRemoteHost}:31627", //GDBserver port on FVP
+            "overrideLaunchCommands": ["-enable-pretty-printing"],
+            "runToEntryPoint": "main",
+            "preLaunchTask": "Debug Open IoT SDK example",
+            "showDevDebugOutput": "parsed"
+        },
+        {
+            "name": "Debug Open IoT SDK unit-tests application",
+            "type": "cortex-debug",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/src/test_driver/openiotsdk/unit-tests",
+            "executable": "./build/${input:openiotsdkUnittest}.elf",
+            "armToolchainPath": "${env:ARM_GCC_TOOLCHAIN_PATH}/bin",
+            "servertype": "external",
+            "gdbTarget": ":31627", //GDBserver port on FVP
+            "overrideLaunchCommands": ["-enable-pretty-printing"],
+            "runToEntryPoint": "main",
+            "preLaunchTask": "Debug Open IoT SDK unit-tests",
+            "showDevDebugOutput": "parsed"
         }
     ],
     "inputs": [
+        {
+            "type": "command",
+            "id": "outAppDarwin",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "find ${workspaceFolder}/out/darwin-x64-* -maxdepth 2 -perm +111 -name 'chip-*' |sort |sed 's$${workspaceFolder}/out/$$'",
+                "description": "Select the application to run"
+            }
+        },
+        {
+            "type": "command",
+            "id": "outAppLinux",
+            "command": "shellCommand.execute",
+            "args": {
+                "command": "find ${workspaceFolder}/out/linux-x64-* -maxdepth 2 -executable -name 'chip-*' |sort |sed 's$${workspaceFolder}/out/$$'",
+                "description": "Select the application to run"
+            }
+        },
         {
             "type": "pickString",
             "id": "mbedDebugProfile",
@@ -457,6 +508,52 @@
             "description": "What mbed target do you want to use?",
             "options": ["CY8CPROTO_062_4343W"],
             "default": "CY8CPROTO_062_4343W"
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkApp",
+            "description": "What Open IoT SDK example do you want to use?",
+            "options": ["shell", "lock-app"],
+            "default": "shell"
+        },
+        {
+            "type": "promptString",
+            "id": "openiotsdkRemoteHost",
+            "description": "Type the hostname/IP address of external GDB target that you want to connect to. Leave blank for internal GDB server",
+            "default": ""
+        },
+        {
+            "type": "pickString",
+            "id": "openiotsdkUnittest",
+            "description": "What Open IoT SDK unit test do you want to use?",
+            "options": [
+                "accesstest",
+                "AppTests",
+                "ASN1Tests",
+                "BDXTests",
+                "ChipCryptoTests",
+                "ControllerTests",
+                "CoreTests",
+                "CredentialsTest",
+                "DataModelTests",
+                "InetLayerTests",
+                "MdnsTests",
+                "MessagingLayerTests",
+                "MinimalMdnsCoreTests",
+                "MinimalMdnsRecordsTests",
+                "MinimalMdnsRespondersTests",
+                "PlatformTests",
+                "RawTransportTests",
+                "RetransmitTests",
+                "SecureChannelTests",
+                "SetupPayloadTests",
+                "SupportTests",
+                "SystemLayerTests",
+                "TestShell",
+                "TransportLayerTests",
+                "UserDirectedCommissioningTests"
+            ],
+            "default": "accesstest"
         }
     ]
 }

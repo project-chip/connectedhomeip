@@ -16,7 +16,6 @@
  */
 
 #include <lib/support/CodeUtils.h>
-#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
@@ -257,17 +256,15 @@ void TestInPlaceSave(nlTestSuite * inSuite, void * inContext)
     for (const auto & node : nodes)
     {
         uint16_t size = 0;
-        chip::DefaultStorageKeyAllocator keyAlloc;
-        auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, node), nullptr, size);
+        auto rv       = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(node).KeyName(), nullptr, size);
         NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     }
     // Verify no link table persistent storage entries were leaked.
     for (auto & vector : vectors)
     {
         uint16_t size = 0;
-        chip::DefaultStorageKeyAllocator keyAlloc;
-        auto rv =
-            storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, vector.resumptionId), nullptr, size);
+        auto rv       = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(vector.resumptionId).KeyName(),
+                                          nullptr, size);
         NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
     }
 }
@@ -299,41 +296,37 @@ void TestDelete(nlTestSuite * inSuite, void * inContext)
     }
 
     // Fill storage.
-    for (size_t i = 0; i < sizeof(vectors) / sizeof(vectors[0]); ++i)
+    for (auto & vector : vectors)
     {
         NL_TEST_ASSERT(inSuite,
-                       sessionStorage.Save(vectors[i].node, vectors[i].resumptionId, sharedSecret, chip::CATValues{}) ==
-                           CHIP_NO_ERROR);
+                       sessionStorage.Save(vector.node, vector.resumptionId, sharedSecret, chip::CATValues{}) == CHIP_NO_ERROR);
     }
 
     // Delete values in turn from storage and verify they are removed.
-    for (size_t i = 0; i < ArraySize(vectors); ++i)
+    for (auto & vector : vectors)
     {
         chip::ScopedNodeId outNode;
         chip::SessionResumptionStorage::ResumptionIdStorage outResumptionId;
         chip::Crypto::P256ECDHDerivedSecret outSharedSecret;
         chip::CATValues outCats;
-        NL_TEST_ASSERT(inSuite, sessionStorage.Delete(vectors[i].node) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, sessionStorage.Delete(vector.node) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite,
-                       sessionStorage.FindByScopedNodeId(vectors[i].node, outResumptionId, outSharedSecret, outCats) !=
-                           CHIP_NO_ERROR);
+                       sessionStorage.FindByScopedNodeId(vector.node, outResumptionId, outSharedSecret, outCats) != CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite,
-                       sessionStorage.FindByResumptionId(vectors[i].resumptionId, outNode, outSharedSecret, outCats) !=
-                           CHIP_NO_ERROR);
+                       sessionStorage.FindByResumptionId(vector.resumptionId, outNode, outSharedSecret, outCats) != CHIP_NO_ERROR);
     }
 
     // Verify no state or link table persistent storage entries were leaked.
     for (auto & vector : vectors)
     {
         uint16_t size = 0;
-        chip::DefaultStorageKeyAllocator keyAlloc;
         {
             auto rv =
-                storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, vector.node), nullptr, size);
+                storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(vector.node).KeyName(), nullptr, size);
             NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         }
         {
-            auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, vector.resumptionId),
+            auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(vector.resumptionId).KeyName(),
                                               nullptr, size);
             NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
         }
@@ -412,14 +405,13 @@ void TestDeleteAll(nlTestSuite * inSuite, void * inContext)
         for (auto & node : vector.nodes)
         {
             uint16_t size = 0;
-            chip::DefaultStorageKeyAllocator keyAlloc;
             {
-                auto rv =
-                    storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, node.node), nullptr, size);
+                auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(node.node).KeyName(), nullptr,
+                                                  size);
                 NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
             }
             {
-                auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::StorageKey(keyAlloc, node.resumptionId),
+                auto rv = storage.SyncGetKeyValue(chip::SimpleSessionResumptionStorage::GetStorageKey(node.resumptionId).KeyName(),
                                                   nullptr, size);
                 NL_TEST_ASSERT(inSuite, rv == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
             }

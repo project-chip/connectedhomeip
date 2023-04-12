@@ -33,9 +33,22 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 - (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
     expectedValueInterval:(NSNumber *)expectedValueIntervalMs;
 
-@property (nonatomic, readonly, strong, nonnull) MTRDeviceController * deviceController;
-@property (nonatomic, readonly) uint64_t nodeID;
+// called by controller to clean up and shutdown
+- (void)invalidate;
+
+@property (nonatomic, readonly) MTRDeviceController * deviceController;
+@property (nonatomic, readonly, copy) NSNumber * nodeID;
+// Queue used for various internal bookkeeping work.  In general endWork calls
+// on work items should happen on this queue, so we don't block progress of the
+// asyncCallbackWorkQueue on any client code.
+@property (nonatomic) dispatch_queue_t queue;
+@property (nonatomic, readonly) MTRAsyncCallbackWorkQueue * asyncCallbackWorkQueue;
 
 @end
+
+#pragma mark - Utility for clamping numbers
+// Returns a NSNumber object that is aNumber if it falls within the range [min, max].
+// Returns min or max, if it is below or above, respectively.
+NSNumber * MTRClampedNumber(NSNumber * aNumber, NSNumber * min, NSNumber * max);
 
 NS_ASSUME_NONNULL_END

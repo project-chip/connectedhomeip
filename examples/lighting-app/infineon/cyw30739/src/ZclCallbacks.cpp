@@ -26,7 +26,7 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 
-void emberAfBasicClusterInitCallback(EndpointId endpoint)
+void emberAfBasicInformationClusterInitCallback(EndpointId endpoint)
 {
     uint16_t year;
     uint8_t month;
@@ -37,7 +37,7 @@ void emberAfBasicClusterInitCallback(EndpointId endpoint)
     {
         snprintf(cString, sizeof(cString), "%04u%02u%02u", year, month, dayOfMonth);
     }
-    Basic::Attributes::ManufacturingDate::Set(endpoint, CharSpan(cString));
+    BasicInformation::Attributes::ManufacturingDate::Set(endpoint, CharSpan(cString));
 }
 
 void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,

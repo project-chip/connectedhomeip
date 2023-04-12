@@ -64,7 +64,7 @@ chip_test_suite("tests") {
     "-Wconversion",
 
     # TODO(#21255): work-around for SimpleStateMachine constructor issue.
-    "-Wno-error=uninitialized",
+    "-Wno-uninitialized",
   ]
 
   public_deps = [

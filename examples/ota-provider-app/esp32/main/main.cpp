@@ -20,6 +20,7 @@
 #include "esp_spi_flash.h"
 #include "esp_spiffs.h"
 #include "nvs_flash.h"
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
@@ -75,6 +76,9 @@ chip::Callback::Callback<OnBdxTransferFailed> onTransferFailedCallback(OnTransfe
 
 static void InitServer(intptr_t context)
 {
+    // Print QR Code URL
+    PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
+
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
 
     BdxOtaSender * bdxOtaSender = otaProvider.GetBdxOtaSender();

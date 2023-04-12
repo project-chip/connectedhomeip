@@ -960,7 +960,7 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
  *******************************************************************************/
 void BLEManagerImpl::bleAppTask(void * p_arg)
 {
-    while (1)
+    while (true)
     {
         xEventGroupWaitBits(bleAppTaskLoopEvent, LOOP_EV_BLE, true, false, portMAX_DELAY);
 

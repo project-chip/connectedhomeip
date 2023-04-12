@@ -154,7 +154,7 @@ leveraged through toolchain-compatibility preprocessor macros.
 CHIP strives to use the latest C++ functionality as long as existing compilers
 support such standards.
 
-C{plusplus}14 is considered pervasive enough to be used. As compilers start 
+C{plusplus}14 is considered pervasive enough to be used. As compilers start
 supporting standards such as C{plusplus}17, C{plusplus}20 and beyond,
 CHIP may follow suit.
 
@@ -354,7 +354,7 @@ static chipDEFINE_ALIGNED_VAR(sThreadAttributes, sizeof (pthread_attr_t), uint64
 
 #endif // USE_STRUCT_STORAGE
 
-int foobar(void)
+int foobar()
 {
     int              retval;
     int              status;
@@ -427,10 +427,10 @@ destructed after deinitialization.
 class ThreadAttributes
 {
 public:
-    ThreadAttributes(void) {};
-    ~ThreadAttributes(void) {};
+    ThreadAttributes() {};
+    ~ThreadAttributes() {};
 
-    operator pthread_attr_t *(void) { return &mAttributes; }
+    operator pthread_attr_t *() { return &mAttributes; }
 
 private:
     pthread_attr_t mAttributes;
@@ -444,7 +444,7 @@ extern void * foobar_entry(void *aArgument);
 
 static chipDEFINE_ALIGNED_VAR(sThreadAttributes, sizeof (ThreadAttributes), uint64_t);
 
-int foobar(void)
+int foobar()
 {
     int                retval = -1;
     int                status;
@@ -530,9 +530,9 @@ storage of objects from a static array of storage.
 class Foo
 {
 public:
-    Foo(void);
+    Foo();
     Foo(const Foo &inFoo);
-    ~Foo(void);
+    ~Foo();
 };
 
 // Global Variables
@@ -554,7 +554,7 @@ static void CreateFooAllocator(void *inStorage,
                               inDestroy);
 }
 
-static StaticAllocatorBitmap &GetFooAllocator(void)
+static StaticAllocatorBitmap &GetFooAllocator()
 {
     return *sFooAllocator;
 }
@@ -571,7 +571,7 @@ static void FooDestroy(AllocatorBase &inAllocator, void *inObject)
     return;
 }
 
-int Init(void)
+int Init()
 {
     static const size_t sFooCount = CHIP_FOO_COUNT;
     static chipAllocatorStaticBitmapStorageDefine(sFooStorage, Foo, sFooCount, uint32_t, sizeof (void *));
@@ -586,7 +586,7 @@ int Init(void)
     return retval;
 }
 
-Foo * FooAllocate(void)
+Foo * FooAllocate()
 {
     Foo *foo;
 

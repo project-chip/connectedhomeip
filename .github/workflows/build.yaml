@@ -23,7 +23,11 @@ concurrency:
     group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
+env:
+    CHIP_NO_LOG_TIMESTAMPS: true
+
 jobs:
+
     build_linux_gcc_debug:
         name: Build on Linux (gcc_debug)
         timeout-minutes: 85
@@ -32,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.99
+            image: connectedhomeip/chip-build:0.6.18
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -47,7 +51,7 @@ jobs:
               env:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -66,7 +70,7 @@ jobs:
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs
@@ -74,7 +78,7 @@ jobs:
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
             - name: Setup Build
-              run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=true"
+              run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
             - name: Run Build
               timeout-minutes: 20
               run: scripts/run_in_build_env.sh "ninja -C ./out"
@@ -105,7 +109,7 @@ jobs:
               timeout-minutes: 20
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Uploading core files
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux-gcc-debug
@@ -118,13 +122,14 @@ jobs:
             # If re-enabling, some subset of this should be picked
             #
             # - name: Uploading objdir for debugging
-            #   uses: actions/upload-artifact@v2
+            #   uses: actions/upload-artifact@v3
             #   if: ${{ failure() && !env.ACT }}
             #   with:
             #       name: crash-objdir-linux-gcc-debug
             #       path: out/
             #       # objdirs are big; don't hold on to them too long.
             #       retention-days: 5
+
     build_linux:
         name: Build on Linux (fake, gcc_release, clang, simulated)
         timeout-minutes: 150
@@ -133,7 +138,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.99
+            image: connectedhomeip/chip-build:0.6.18
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -148,7 +153,7 @@ jobs:
               env:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -172,7 +177,7 @@ jobs:
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs
@@ -210,12 +215,15 @@ jobs:
                         BUILD_TYPE=sanitizers scripts/build/gn_gen.sh --args="$GN_ARGS" --export-compile-commands
                         BUILD_TYPE=sanitizers scripts/tests/gn_tests.sh
                     done
+            - name: Ensure codegen is done for sanitize
+              timeout-minutes: 45
+              run: |
+                  ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/sanitizers"
             - name: Clang-tidy validation
               timeout-minutes: 45
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
-                       --no-log-timestamps \
                        --compile-database out/sanitizers/compile_commands.json \
                        --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/' \
                        check \
@@ -224,20 +232,36 @@ jobs:
               timeout-minutes: 60
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps \
-                       --target linux-x64-all-clusters-ipv6only-clang \
-                       --target linux-x64-chip-tool-ipv6only-clang \
+                    "./scripts/build/build_examples.py \
                        --target linux-x64-minmdns-ipv6only-clang \
                        --target linux-x64-rpc-console \
                        build \
                     "
+            - name: Create a pre-generate directory and ensure compile-time codegen would fail
+              run: |
+                  ./scripts/run_in_build_env.sh "./scripts/codepregen.py ./zzz_pregenerated"
+                  mv scripts/codegen.py scripts/codegen.py.renamed
+            - name: Build using build_examples.py (pregen)
+              timeout-minutes: 60
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py \
+                       --target linux-x64-all-clusters-ipv6only-clang \
+                       --target linux-x64-chip-tool-ipv6only-clang \
+                       --pregen-dir ./zzz_pregenerated \
+                       build \
+                    "
+            - name: Undo code pre-generation changes (make compile time codegen work again)
+              run: |
+                  rm -rf ./zzz_pregenerated
+                  mv scripts/codegen.py.renamed scripts/codegen.py
             - name: Run fake linux tests with build_examples
               timeout-minutes: 15
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --no-log-timestamps --target linux-fake-tests build"
+                    "./scripts/build/build_examples.py --target linux-fake-tests build"
             - name: Uploading core files
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-core-linux
@@ -250,7 +274,7 @@ jobs:
             # If re-enabling, some subset of this should be picked
             #
             # - name: Uploading objdir for debugging
-            #   uses: actions/upload-artifact@v2
+            #   uses: actions/upload-artifact@v3
             #   if: ${{ failure() && !env.ACT }}
             #   with:
             #       name: crash-objdir-linux
@@ -275,6 +299,7 @@ jobs:
             # - name: Perform CodeQL Analysis
             #   if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
             #   uses: github/codeql-action/analyze@v1
+
     build_linux_python_lib:
         name: Build on Linux (python_lib)
         timeout-minutes: 60
@@ -283,7 +308,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.99
+            image: connectedhomeip/chip-build:0.6.18
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -298,7 +323,7 @@ jobs:
               env:
                   CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
               run: echo "$CONCURRENCY_CONTEXT"
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -332,7 +357,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         steps:
-            - uses: Wandalen/wretry.action@v1.0.15
+            - uses: Wandalen/wretry.action@v1.0.36
               name: Checkout
               with:
                   action: actions/checkout@v3
@@ -364,7 +389,7 @@ jobs:
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ always() && !env.ACT }}
               with:
                   name: bootstrap-logs
@@ -401,17 +426,20 @@ jobs:
                       scripts/run_in_build_env.sh "ninja -C ./out/$BUILD_TYPE"
                       BUILD_TYPE=$BUILD_TYPE scripts/tests/gn_tests.sh
                   done
+            - name: Ensure codegen is done for sanitize
+              timeout-minutes: 45
+              run: |
+                  ./scripts/run_in_build_env.sh "./scripts/run_codegen_targets.sh out/default"
             - name: Clang-tidy validation
               timeout-minutes: 45
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
-                       --no-log-timestamps \
                        --compile-database out/default/compile_commands.json \
                        check \
                     "
             - name: Uploading diagnostic logs
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               if: ${{ failure() && !env.ACT }}
               with:
                   name: crash-log-darwin

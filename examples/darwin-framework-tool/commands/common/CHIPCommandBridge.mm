@@ -26,7 +26,6 @@
 
 #include "MTRError_Utils.h"
 
-const uint16_t kListenPort = 5541;
 static CHIPToolPersistentStorageDelegate * storage = nil;
 std::set<CHIPCommandBridge *> CHIPCommandBridge::sDeferredCleanups;
 std::map<std::string, MTRDeviceController *> CHIPCommandBridge::mControllers;
@@ -42,7 +41,8 @@ CHIP_ERROR CHIPCommandBridge::Run()
     ReturnErrorOnFailure(MaybeSetUpStack());
     SetIdentity(mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha);
     ReturnLogErrorOnFailure(RunCommand());
-    ReturnLogErrorOnFailure(StartWaiting(GetWaitDuration()));
+
+    auto err = StartWaiting(GetWaitDuration());
 
     bool deferCleanup = (IsInteractive() && DeferInteractiveCleanup());
 
@@ -55,7 +55,7 @@ CHIP_ERROR CHIPCommandBridge::Run()
     }
     MaybeTearDownStack();
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR CHIPCommandBridge::GetPAACertsFromFolder(NSArray<NSData *> * __autoreleasing * paaCertsResult)
@@ -118,13 +118,12 @@ CHIP_ERROR CHIPCommandBridge::MaybeSetUpStack()
     }
 
     auto params = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:storage];
-    params.port = @(kListenPort);
     params.shouldStartServer = YES;
     params.otaProviderDelegate = mOTADelegate;
     NSArray<NSData *> * paaCertResults;
     ReturnLogErrorOnFailure(GetPAACertsFromFolder(&paaCertResults));
     if ([paaCertResults count] > 0) {
-        params.paaCerts = paaCertResults;
+        params.productAttestationAuthorityCertificates = paaCertResults;
     }
 
     NSError * error;

@@ -37,6 +37,10 @@
 
 #include <zephyr/sys/reboot.h>
 
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+#include <psa/crypto.h>
+#endif
+
 #define DEFAULT_MIN_SLEEP_PERIOD (60 * 60 * 24 * 30) // Month [sec]
 
 namespace chip {
@@ -68,6 +72,10 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_InitChipStack(void)
                 CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE);
 
     mShouldRunEventLoop = false;
+
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    VerifyOrReturnError(psa_crypto_init() == PSA_SUCCESS, CHIP_ERROR_INTERNAL);
+#endif
 
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();

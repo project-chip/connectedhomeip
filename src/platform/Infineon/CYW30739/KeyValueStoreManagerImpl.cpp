@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2022 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,6 +46,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::Init(void)
     {
         KeyStorage keyStorage;
         size_t keyStorageLength;
+        memset(keyStorage.mKey, 0, sizeof(keyStorage.mKey));
         err = CYW30739Config::ReadConfigValueBin(CYW30739ConfigKey(Config::kChipKvsKey_KeyBase, configID), &keyStorage,
                                                  sizeof(keyStorage), keyStorageLength);
         if (err != CHIP_NO_ERROR)
@@ -176,15 +177,19 @@ CHIP_ERROR KeyValueStoreManagerImpl::EraseAll(void)
 
 KeyValueStoreManagerImpl::KeyStorage::KeyStorage(const char * key) : mValueSize(0)
 {
-    memset(mKey, 0, sizeof(mKey));
-
     if (key != NULL)
-        strncpy(mKey, key, sizeof(mKey));
+    {
+        Platform::CopyString(mKey, key);
+    }
+    else
+    {
+        mKey[0] = 0;
+    }
 }
 
 bool KeyValueStoreManagerImpl::KeyStorage::IsMatchKey(const char * key) const
 {
-    return strncmp(mKey, key, sizeof(mKey)) == 0;
+    return strcmp(mKey, key) == 0;
 }
 
 KeyValueStoreManagerImpl::KeyConfigIdEntry * KeyValueStoreManagerImpl::AllocateEntry(const char * key)

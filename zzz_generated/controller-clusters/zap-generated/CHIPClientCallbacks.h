@@ -121,12 +121,12 @@ typedef void (*ActionsAcceptedCommandListListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ActionsAttributeListListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*BasicGeneratedCommandListListAttributeCallback)(void * context,
-                                                               const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BasicAcceptedCommandListListAttributeCallback)(void * context,
-                                                              const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*BasicAttributeListListAttributeCallback)(void * context,
-                                                        const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*BasicInformationGeneratedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BasicInformationAcceptedCommandListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+typedef void (*BasicInformationAttributeListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*OtaSoftwareUpdateProviderAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
 typedef void (*OtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback)(
@@ -496,26 +496,26 @@ typedef void (*ElectricalMeasurementAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*ElectricalMeasurementAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*TestClusterListInt8uListAttributeCallback)(void * context,
+typedef void (*UnitTestingListInt8uListAttributeCallback)(void * context,
                                                           const chip::app::DataModel::DecodableList<uint8_t> & data);
-typedef void (*TestClusterListOctetStringListAttributeCallback)(void * context,
+typedef void (*UnitTestingListOctetStringListAttributeCallback)(void * context,
                                                                 const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
-typedef void (*TestClusterListStructOctetStringListAttributeCallback)(
+typedef void (*UnitTestingListStructOctetStringListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestListStructOctet::DecodableType> &
         data);
-typedef void (*TestClusterListNullablesAndOptionalsStructListAttributeCallback)(
+typedef void (*UnitTestingListNullablesAndOptionalsStructListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & data);
-typedef void (*TestClusterListLongOctetStringListAttributeCallback)(
+        chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType> & data);
+typedef void (*UnitTestingListLongOctetStringListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
-typedef void (*TestClusterListFabricScopedListAttributeCallback)(
+typedef void (*UnitTestingListFabricScopedListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestFabricScoped::DecodableType> & data);
-typedef void (*TestClusterGeneratedCommandListListAttributeCallback)(
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::DecodableType> & data);
+typedef void (*UnitTestingGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*TestClusterAcceptedCommandListListAttributeCallback)(
+typedef void (*UnitTestingAcceptedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-typedef void (*TestClusterAttributeListListAttributeCallback)(void * context,
+typedef void (*UnitTestingAttributeListListAttributeCallback)(void * context,
                                                               const chip::app::DataModel::DecodableList<chip::AttributeId> & data);

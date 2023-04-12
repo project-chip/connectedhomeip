@@ -78,7 +78,7 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
-int TestTimeSource(void)
+int TestTimeSource()
 {
     nlTestSuite theSuite = {
         "chip-timesource", &sTests[0], nullptr /* setup */, nullptr /* teardown */

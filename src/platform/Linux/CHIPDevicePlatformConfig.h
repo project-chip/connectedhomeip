@@ -41,7 +41,13 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0
 #endif
 
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 0
+// Start GLib main event loop if BLE or WiFi is enabled. This is needed to handle
+// D-Bus communication with BlueZ or wpa_supplicant.
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#define CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP 1
+#else
+#define CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP 0
+#endif
 
 // ========== Platform-specific Configuration =========
 
@@ -81,6 +87,3 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFI_TELEMETRY 0
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY 0
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_TELEMETRY_FULL 0
-
-// TODO: CHIP has redesigned the crypto interface, pending on the final version of CHIP HASH APIs
-#define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 0

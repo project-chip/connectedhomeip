@@ -1,6 +1,6 @@
 {{> header excludeZapComment=true}}
 
-#import "MTRCallbackBridge_internal.h"
+#import "MTRCallbackBridge.h"
 #import "MTRStructsObjc.h"
 #import "MTRCommandPayloadsObjc.h"
 

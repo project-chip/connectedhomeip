@@ -90,6 +90,7 @@ private:
     jmethodID mGetPositionMethod        = nullptr;
 
     uint64_t HandleMediaRequestGetAttribute(MediaPlaybackRequestAttribute attribute);
+    long HandleMediaRequestGetLongAttribute(MediaPlaybackRequestAttribute attribute);
     chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type
     HandleMediaRequest(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds);
 

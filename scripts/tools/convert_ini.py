@@ -17,12 +17,13 @@
 #    limitations under the License.
 #
 import json
-from configparser import ConfigParser
-import click
-import typing
-import re
-from os.path import exists
 import logging
+import re
+import typing
+from configparser import ConfigParser
+from os.path import exists
+
+import click
 
 
 def convert_ini_to_json(ini_dir: str, json_path: str):
@@ -106,4 +107,4 @@ def main(ini_dir: str, json_path: str):
 
 
 if __name__ == '__main__':
-    main()
+    main(auto_envvar_prefix='CHIP')

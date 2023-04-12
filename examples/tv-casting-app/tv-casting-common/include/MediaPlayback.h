@@ -17,10 +17,12 @@
  */
 
 #include "MediaCommandBase.h"
+#include "MediaSubscriptionBase.h"
 
 #include <functional>
 #include <zap-generated/CHIPClusters.h>
 
+// COMMAND CLASSES
 class PlayCommand : public MediaCommandBase<chip::app::Clusters::MediaPlayback::Commands::Play::Type,
                                             chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType>
 {
@@ -82,4 +84,50 @@ public:
     SkipBackwardCommand() : MediaCommandBase(chip::app::Clusters::MediaPlayback::Id) {}
 
     CHIP_ERROR Invoke(uint64_t deltaPositionMilliseconds, std::function<void(CHIP_ERROR)> responseCallback);
+};
+
+// SUBSCRIBER CLASSES
+class CurrentStateSubscriber : public MediaSubscriptionBase<chip::app::Clusters::MediaPlayback::Attributes::CurrentState::TypeInfo>
+{
+public:
+    CurrentStateSubscriber() : MediaSubscriptionBase(chip::app::Clusters::MediaPlayback::Id) {}
+};
+
+class StartTimeSubscriber : public MediaSubscriptionBase<chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo>
+{
+public:
+    StartTimeSubscriber() : MediaSubscriptionBase(chip::app::Clusters::MediaPlayback::Id) {}
+};
+
+class DurationSubscriber : public MediaSubscriptionBase<chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo>
+{
+public:
+    DurationSubscriber() : MediaSubscriptionBase(chip::app::Clusters::MediaPlayback::Id) {}
+};
+
+class SampledPositionSubscriber
+    : public MediaSubscriptionBase<chip::app::Clusters::MediaPlayback::Attributes::SampledPosition::TypeInfo>
+{
+public:
+    SampledPositionSubscriber() : MediaSubscriptionBase(chip::app::Clusters::MediaPlayback::Id) {}
+};
+
+class PlaybackSpeedSubscriber
+    : public MediaSubscriptionBase<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo>
+{
+public:
+    PlaybackSpeedSubscriber() : MediaSubscriptionBase(chip::app::Clusters::MediaPlayback::Id) {}
+};
+
+class SeekRangeEndSubscriber : public MediaSubscriptionBase<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo>
+{
+public:
+    SeekRangeEndSubscriber() : MediaSubscriptionBase(chip::app::Clusters::MediaPlayback::Id) {}
+};
+
+class SeekRangeStartSubscriber
+    : public MediaSubscriptionBase<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo>
+{
+public:
+    SeekRangeStartSubscriber() : MediaSubscriptionBase(chip::app::Clusters::MediaPlayback::Id) {}
 };

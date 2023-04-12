@@ -116,7 +116,7 @@ void Start(void (*RegisterServices)(pw::rpc::Server &), ::chip::rpc::Mutex * uar
     std::array<std::byte, kMaxTransmissionUnit> input_buffer;
 
     Logging::Log(Logging::kLogModule_NotSpecified, Logging::kLogCategory_Detail, "Starting pw_rpc server");
-    pw::hdlc::ReadAndProcessPackets(server, hdlc_channel_output, input_buffer);
+    pw::hdlc::ReadAndProcessPackets(server, input_buffer);
 }
 
 } // namespace rpc

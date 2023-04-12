@@ -15,40 +15,33 @@
 
 import click
 import logging
-import coloredlogs
 import enum
+import sys
+
+try:
+    import coloredlogs
+    _has_coloredlogs = True
+except:
+    _has_coloredlogs = False
 
 try:
     from idl.matter_idl_parser import CreateParser
 except:
     import os
-    import sys
     sys.path.append(os.path.abspath(os.path.dirname(__file__)))
     from idl.matter_idl_parser import CreateParser
 
 from idl.generators import FileSystemGeneratorStorage, GeneratorStorage
-from idl.generators.java import JavaGenerator
-
-
-class CodeGeneratorTypes(enum.Enum):
-    """
-    Represents every generator type supported by codegen and maps
-    the simple enum value (user friendly and can be a command line input)
-    into underlying generators.
-    """
-    JAVA = enum.auto()
-
-    def CreateGenerator(self, *args, **kargs):
-        if self == CodeGeneratorTypes.JAVA:
-            return JavaGenerator(*args, **kargs)
-        else:
-            raise Error("Unknown code generator type")
+from idl.generators.registry import CodeGenerator, GENERATORS
 
 
 class ListGeneratedFilesStorage(GeneratorStorage):
     """
     A storage that prints out file names that would have content in them.
     """
+
+    def __init__(self):
+        super().__init__()
 
     def get_existing_data(self, relative_path: str):
         return None  # stdout has no pre-existing data
@@ -66,10 +59,6 @@ __LOG_LEVELS__ = {
     'fatal': logging.FATAL,
 }
 
-__GENERATORS__ = {
-    'java': CodeGeneratorTypes.JAVA,
-}
-
 
 @click.command()
 @click.option(
@@ -80,7 +69,7 @@ __GENERATORS__ = {
 @click.option(
     '--generator',
     default='JAVA',
-    type=click.Choice(__GENERATORS__.keys(), case_sensitive=False),
+    type=click.Choice(GENERATORS.keys(), case_sensitive=False),
     help='What code generator to run')
 @click.option(
     '--output-dir',
@@ -97,16 +86,29 @@ __GENERATORS__ = {
     default=False,
     is_flag=True,
     help='Output just a list of file names that would be generated')
+@click.option(
+    '--expected-outputs',
+    type=click.Path(exists=True),
+    default=None,
+    help='A file containing all expected outputs. Script will fail if outputs do not match')
 @click.argument(
     'idl_path',
     type=click.Path(exists=True))
-def main(log_level, generator, output_dir, dry_run, name_only, idl_path):
+def main(log_level, generator, output_dir, dry_run, name_only, expected_outputs, idl_path):
     """
     Parses MATTER IDL files (.matter) and performs SDK code generation
     as set up by the program arguments.
     """
-    coloredlogs.install(level=__LOG_LEVELS__[
-                        log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
+    if _has_coloredlogs:
+        coloredlogs.install(level=__LOG_LEVELS__[
+                            log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
+    else:
+        logging.basicConfig(
+            level=__LOG_LEVELS__[log_level],
+            format='%(asctime)s %(levelname)-7s %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S'
+        )
+
     logging.info("Parsing idl from %s" % idl_path)
     idl_tree = CreateParser().parse(open(idl_path, "rt").read())
 
@@ -116,11 +118,33 @@ def main(log_level, generator, output_dir, dry_run, name_only, idl_path):
         storage = FileSystemGeneratorStorage(output_dir)
 
     logging.info("Running code generator %s" % generator)
-    generator = __GENERATORS__[
-        generator].CreateGenerator(storage, idl=idl_tree)
+    generator = CodeGenerator.FromString(generator).Create(storage, idl=idl_tree)
     generator.render(dry_run)
+
+    if expected_outputs:
+        with open(expected_outputs, 'rt') as fin:
+            expected = set()
+            for l in fin.readlines():
+                l = l.strip()
+                if l:
+                    expected.add(l)
+
+            if expected != storage.generated_paths:
+                logging.fatal("expected and generated files do not match.")
+
+                extra = storage.generated_paths - expected
+                missing = expected - storage.generated_paths
+
+                for name in extra:
+                    logging.fatal("   '%s' was generated but not expected" % name)
+
+                for name in missing:
+                    logging.fatal("   '%s' was expected but not generated" % name)
+
+                sys.exit(1)
+
     logging.info("Done")
 
 
 if __name__ == '__main__':
-    main()
+    main(auto_envvar_prefix='CHIP')

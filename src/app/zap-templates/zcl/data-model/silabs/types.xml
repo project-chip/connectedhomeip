@@ -661,10 +661,11 @@ limitations under the License.
     <item name="SetToToggle" value="0x02"/>
     <!-- 0x03-0xFF reserved -->
   </enum>
-  <enum name="LevelControlOptions" type="BITMAP8">
-    <item name="ExecuteIfOff" value="0x1"/>
-    <item name="CoupleColorTempToLevel" value="0x02"/>
-  </enum>
+  <bitmap name="LevelControlOptions" type="BITMAP8">
+    <cluster code="0x0008"/>
+    <field name="ExecuteIfOff" mask="0x1"/>
+    <field name="CoupleColorTempToLevel" mask="0x02"/>
+  </bitmap>
   <!-- Barrier Control Cluster -->
   <bitmap name="BarrierControlCapabilities" type="BITMAP8">
     <field name="partialBarrier" mask="0x01"/>

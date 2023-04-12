@@ -26,7 +26,7 @@
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
 
-#if CHIP_WITH_GIO
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
 #include <gio/gio.h>
 #endif
 
@@ -50,9 +50,6 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
-#if CHIP_WITH_GIO
-    GDBusConnection * GetGDBusConnection();
-#endif
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
@@ -72,17 +69,15 @@ private:
 
     static PlatformManagerImpl sInstance;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
-    // This should be removed or find a better place once we depercate the rendezvous session.
-    static void WiFIIPChangeListener();
+    // This should be removed or find a better place once we deprecate the rendezvous session.
+    static void WiFiIPChangeListener();
+#endif
 
-#if CHIP_WITH_GIO
-    struct GDBusConnectionDeleter
-    {
-        void operator()(GDBusConnection * conn) { g_object_unref(conn); }
-    };
-    using UniqueGDBusConnection = std::unique_ptr<GDBusConnection, GDBusConnectionDeleter>;
-    UniqueGDBusConnection mpGDBusConnection;
+#if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+    GMainLoop * mGLibMainLoop;
+    GThread * mGLibMainLoopThread;
 #endif
 };
 
