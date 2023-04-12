@@ -45,16 +45,20 @@ template("chip_fuzz_target") {
     executable(target_name) {
       forward_variables_from(invoker, "*")
 
-      if (defined(public_configs)) {
-        public_configs += [
-          "//build/config/compiler:libfuzzer_fuzzing",
-          "//build/config/compiler:sanitize_address",
-        ]
+      fuzz_configs = []
+      if (oss_fuzz) {
+        fuzz_configs += [ "//build/config/compiler:oss_fuzz" ]
       } else {
-        public_configs = [
+        fuzz_configs += [
           "//build/config/compiler:libfuzzer_fuzzing",
           "//build/config/compiler:sanitize_address",
         ]
+      }
+
+      if (defined(public_configs)) {
+        public_configs += fuzz_configs
+      } else {
+        public_configs = fuzz_configs
       }
       if (!defined(oubput_dir)) {
         output_dir = "${root_out_dir}/tests"
