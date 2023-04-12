@@ -1,11 +1,11 @@
-# Matter CC1352 CC2652 Persistent Storage Example Application
+# Matter Persistent Storage Example Application
 
 An example test application showing the persistent storage system for
 [Matter][matter] on the Texas Instruments CC13X2_26X2 family of Wireless MCUs.
 
 ---
 
--   [Matter CC1352 CC2652 Persistent Storage Application](#matter-cc1352-cc2652-persistent-storage-example-application)
+-   [Matter Persistent Storage Application](#matter-persistent-storage-example-application)
     -   [Introduction](#introduction)
         -   [Device UI](#device-ui)
     -   [Building](#building)

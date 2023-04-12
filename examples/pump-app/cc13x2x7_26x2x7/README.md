@@ -1,11 +1,11 @@
-# Matter CC1352 CC2652 Pump Example Application
+# Matter Pump Example Application
 
 An example application showing the use of [Matter][matter] on the Texas
 Instruments CC13XX_26XX family of Wireless MCUs.
 
 ---
 
--   [Matter CC1352 CC2652 Pump Example Application](#matter-cc1352-cc2652-pump-example-application)
+-   [Matter Pump Example Application](#matter-pump-example-application)
     -   [Introduction](#introduction)
         -   [Device UI](#device-ui)
     -   [Building](#building)

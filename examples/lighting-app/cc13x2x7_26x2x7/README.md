@@ -1,11 +1,11 @@
-# Matter CC1352 CC2652 Lighting Example Application
+# Matter Lighting Example Application
 
 An example application showing the use of [Matter][matter] on the Texas
 Instruments CC13XX_26XX family of Wireless MCUs.
 
 ---
 
--   [Matter CC1352 CC2652 Lighting Example Application](#matter-cc1352-cc2652-lighting-example-application)
+-   [Matter Lighting Example Application](#matter-lighting-example-application)
     -   [Introduction](#introduction)
         -   [Device UI](#device-ui)
     -   [Building](#building)

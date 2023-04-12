@@ -1,6 +1,6 @@
-# Matter CC1352 CC2652 Shell Application
+# Matter Shell Application
 
-A [chip-shell](../README.md) project on the Texas Instruments CC13X2_26X2 family
+A [chip-shell](../README.md) project on the Texas Instruments CC13XX_26XX family
 of Wireless MCUs.
 
 ## Building

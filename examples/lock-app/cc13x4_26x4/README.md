@@ -1,11 +1,11 @@
-# Matter CC1352 CC2652 Lock Example Application
+# Matter Lock Example Application
 
 An example application showing the use of [Matter][matter] on the Texas
 Instruments CC13XX_26XX family of Wireless MCUs.
 
 ---
 
--   [Matter CC1352 CC2652 Lock Example Application](#matter-cc1352-cc2652-lock-example-application)
+-   [Matter Lock Example Application](#matter-lock-example-application)
     -   [Introduction](#introduction)
         -   [Device UI](#device-ui)
     -   [Building](#building)
@@ -30,7 +30,7 @@ The CC13XX_26XX lock example application provides a working demonstration of a
 connected door lock device. This uses the open-source Matter implementation and
 the Texas Instruments SimpleLink™ CC13XX and CC26XX software development kit.
 
-This example is enabled to build for CC2652R7 devices.
+This example is enabled to build for CC1354P10 devices.
 
 The lock example is intended to serve both as a means to explore the workings of
 Matter, as well as a template for creating real products based on the Texas

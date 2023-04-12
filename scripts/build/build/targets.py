@@ -383,7 +383,7 @@ def BuildK32WTarget():
 
     return target
 
-def TITargets():
+def BuildTITargets():
     target = BuildTarget('ti', TIBuilder)
 
     # board
@@ -553,7 +553,7 @@ BUILD_TARGETS = [
     BuildAmebaTarget(),
     BuildAndroidTarget(),
     BuildBouffalolabTarget(),
-    TITargets(),
+    BuildTITargets(),
     BuildCyw30739Target(),
     BuildEfr32Target(),
     BuildEsp32Target(),

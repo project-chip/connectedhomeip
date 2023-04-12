@@ -1,11 +1,11 @@
-# Matter CC1352 CC2652 All-clusters Example Application
+# Matter All-clusters Example Application
 
 An example application showing the use of [Matter][matter] on the Texas
 Instruments CC13XX_26XX family of Wireless MCUs.
 
 ---
 
--   [Matter CC1352 CC2652 All Clusters Example Application](#matter-cc1352-cc2652-all-clusters-example-application)
+-   [Matter All Clusters Example Application](#matter-all-clusters-example-application)
     -   [Introduction](#introduction)
         -   [Device UI](#device-ui)
     -   [Building](#building)
@@ -31,7 +31,7 @@ run commands for all currently implemented Matter clusters. This uses the
 open-source Matter implementation and the Texas Instruments SimpleLink™ CC13XX
 and CC26XX software development kit.
 
-This example is enabled to build for CC2652R7 devices.
+This example is enabled to build for CC1354P10 devices.
 
 The all-clusters example is intended to serve both as a means to explore the
 workings of Matter, as well as a template for creating real products based on
