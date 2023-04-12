@@ -147,7 +147,7 @@ static void PurgeReadClientContainers(
                     container.readClientPtr = nullptr;
                 }
                 if (container.pathParams) {
-                    static_assert(std::is_trivially_destructible<AttributePathParams>::value, "AttributePathPArams destructors won't get run");
+                    static_assert(std::is_trivially_destructible<AttributePathParams>::value, "AttributePathParams destructors won't get run");
                     Platform::MemoryFree(container.pathParams);
                     container.pathParams = nullptr;
                 }
@@ -246,7 +246,7 @@ static void CauseReadClientFailure(
         _readClientPtr = nullptr;
     }
     if (_pathParams) {
-        static_assert(std::is_trivially_destructible<AttributePathParams>::value, "AttributePathPArams destructors won't get run");
+        static_assert(std::is_trivially_destructible<AttributePathParams>::value, "AttributePathParams destructors won't get run");
         Platform::MemoryFree(_pathParams);
         _pathParams = nullptr;
     }
