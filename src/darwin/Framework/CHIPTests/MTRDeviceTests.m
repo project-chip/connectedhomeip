@@ -1593,9 +1593,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                  [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@29 attributeID:@4],
                  [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@40 attributeID:@5],
                  [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@40 attributeID:@6],
-                 [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@40 attributeID:@7],
-                 [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@40 attributeID:@8],
-                 [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@40 attributeID:@9], nil];
+                 [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@40 attributeID:@7], nil];
 
     NSArray<MTREventRequestPath *> * eventPaths =
         [NSArray arrayWithObjects:[MTREventRequestPath requestPathWithEndpointID:nil clusterID:@40 eventID:@0], nil];
@@ -1665,8 +1663,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                  ,
                  [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@40 attributeID:@5],
                  [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@40 attributeID:@6],
-                 [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@40 attributeID:@7],
-                 [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@40 attributeID:@8], nil];
+                 [MTRAttributeRequestPath requestPathWithEndpointID:nil clusterID:@40 attributeID:@7], nil];
 
     [device readAttributePaths:attributePaths
                     eventPaths:nil
