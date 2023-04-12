@@ -29,12 +29,19 @@ from tests_logger import TestColoredLogPrinter, WebSocketRunnerLogger
 
 
 @click.pass_context
-def send_yaml_command(ctx, test_name: str, server_path: str, server_arguments: str, pics: str):
-    parser_builder_config = ctx.invoke(runner_base, test_name=test_name, pics=pics)
+def send_yaml_command(ctx, test_name: str, server_path: str, server_arguments: str, pics: str, commands: list[str]):
+    kwargs = {'test_name': test_name, 'pics': pics}
+
+    index = 0
+    while len(commands) - index > 1:
+        kwargs[commands[index].replace('--', '')] = commands[index+1]
+        index += 2
+    ctx.invoke(runner_base, **kwargs)
 
     del ctx.params['commands']
     del ctx.params['pics']
-    return ctx.forward(chiptool, parser_builder_config)
+
+    return ctx.forward(chiptool)
 
 
 def send_raw_command(command: str, server_path: str, server_arguments: str):
@@ -88,7 +95,7 @@ def chiptool_py(ctx, commands: list[str], server_path: str, server_name: str, se
     success = False
 
     if len(commands) > 1 and commands[0] == 'tests':
-        success = send_yaml_command(commands[1], server_path, server_arguments, pics)
+        success = send_yaml_command(commands[1], server_path, server_arguments, pics, commands[2:])
     else:
         if server_path is None and server_name:
             paths_finder = PathsFinder()

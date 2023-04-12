@@ -179,7 +179,7 @@ void ReadHandler::OnInitialRequest(System::PacketBufferHandle && aPayload)
         StatusResponse::Send(status, mExchangeCtx.Get(), /* aExpectResponse = */ false);
         // At this point we can't have a persisted subscription, since that
         // happens only when ProcessSubscribeRequest returns success. And our
-        // subscription id is almost certianly not actually useful at this
+        // subscription id is almost certainly not actually useful at this
         // point, either.  So don't try to mess with persisted subscriptions in
         // Close().
         Close(CloseOptions::kKeepPersistedSubscription);
