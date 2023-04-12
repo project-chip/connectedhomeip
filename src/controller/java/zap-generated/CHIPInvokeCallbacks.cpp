@@ -157,7 +157,7 @@ void CHIPGroupsClusterViewGroupResponseCallback::CallbackFn(
     chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(GroupIDClassName.c_str(), GroupIDCtorSignature.c_str(),
                                                                    dataResponse.groupID, GroupID);
     jobject GroupName;
-    chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.groupName, GroupName);
+    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.groupName, GroupName));
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, Status, GroupID, GroupName);
 }
@@ -470,7 +470,8 @@ void CHIPScenesClusterViewSceneResponseCallback::CallbackFn(
     else
     {
         jobject SceneNameInsideOptional;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.sceneName.Value(), SceneNameInsideOptional);
+        LogErrorOnFailure(
+            chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.sceneName.Value(), SceneNameInsideOptional));
         chip::JniReferences::GetInstance().CreateOptional(SceneNameInsideOptional, SceneName);
     }
     jobject ExtensionFieldSets;
@@ -1051,7 +1052,8 @@ void CHIPScenesClusterEnhancedViewSceneResponseCallback::CallbackFn(
     else
     {
         jobject SceneNameInsideOptional;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.sceneName.Value(), SceneNameInsideOptional);
+        LogErrorOnFailure(
+            chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.sceneName.Value(), SceneNameInsideOptional));
         chip::JniReferences::GetInstance().CreateOptional(SceneNameInsideOptional, SceneName);
     }
     jobject ExtensionFieldSets;
@@ -1319,7 +1321,8 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback::CallbackFn(
     else
     {
         jobject ImageURIInsideOptional;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.imageURI.Value(), ImageURIInsideOptional);
+        LogErrorOnFailure(
+            chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.imageURI.Value(), ImageURIInsideOptional));
         chip::JniReferences::GetInstance().CreateOptional(ImageURIInsideOptional, ImageURI);
     }
     jobject SoftwareVersion;
@@ -1345,8 +1348,8 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback::CallbackFn(
     else
     {
         jobject SoftwareVersionStringInsideOptional;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.softwareVersionString.Value(),
-                                                           SoftwareVersionStringInsideOptional);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.softwareVersionString.Value(),
+                                                                             SoftwareVersionStringInsideOptional));
         chip::JniReferences::GetInstance().CreateOptional(SoftwareVersionStringInsideOptional, SoftwareVersionString);
     }
     jobject UpdateToken;
@@ -1528,7 +1531,7 @@ void CHIPGeneralCommissioningClusterArmFailSafeResponseCallback::CallbackFn(
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(ErrorCodeClassName.c_str(), ErrorCodeCtorSignature.c_str(),
                                                                   static_cast<uint8_t>(dataResponse.errorCode), ErrorCode);
     jobject DebugText;
-    chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.debugText, DebugText);
+    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.debugText, DebugText));
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, ErrorCode, DebugText);
 }
@@ -1594,7 +1597,7 @@ void CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback::Callbac
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(ErrorCodeClassName.c_str(), ErrorCodeCtorSignature.c_str(),
                                                                   static_cast<uint8_t>(dataResponse.errorCode), ErrorCode);
     jobject DebugText;
-    chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.debugText, DebugText);
+    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.debugText, DebugText));
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, ErrorCode, DebugText);
 }
@@ -1660,7 +1663,7 @@ void CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback::Callb
     chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(ErrorCodeClassName.c_str(), ErrorCodeCtorSignature.c_str(),
                                                                   static_cast<uint8_t>(dataResponse.errorCode), ErrorCode);
     jobject DebugText;
-    chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.debugText, DebugText);
+    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.debugText, DebugText));
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, ErrorCode, DebugText);
 }
@@ -1733,7 +1736,8 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallback::CallbackFn(
     else
     {
         jobject DebugTextInsideOptional;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.debugText.Value(), DebugTextInsideOptional);
+        LogErrorOnFailure(
+            chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.debugText.Value(), DebugTextInsideOptional));
         chip::JniReferences::GetInstance().CreateOptional(DebugTextInsideOptional, DebugText);
     }
     jobject WiFiScanResults;
@@ -1837,7 +1841,7 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallback::CallbackFn(
                                                                            newElement_1_extendedPanIdCtorSignature.c_str(),
                                                                            entry_1.extendedPanId, newElement_1_extendedPanId);
             jobject newElement_1_networkName;
-            chip::JniReferences::GetInstance().CharToStringUTF(entry_1.networkName, newElement_1_networkName);
+            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_1.networkName, newElement_1_networkName));
             jobject newElement_1_channel;
             std::string newElement_1_channelClassName     = "java/lang/Integer";
             std::string newElement_1_channelCtorSignature = "(I)V";
@@ -1965,7 +1969,8 @@ void CHIPNetworkCommissioningClusterNetworkConfigResponseCallback::CallbackFn(
     else
     {
         jobject DebugTextInsideOptional;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.debugText.Value(), DebugTextInsideOptional);
+        LogErrorOnFailure(
+            chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.debugText.Value(), DebugTextInsideOptional));
         chip::JniReferences::GetInstance().CreateOptional(DebugTextInsideOptional, DebugText);
     }
     jobject NetworkIndex;
@@ -2054,7 +2059,8 @@ void CHIPNetworkCommissioningClusterConnectNetworkResponseCallback::CallbackFn(
     else
     {
         jobject DebugTextInsideOptional;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.debugText.Value(), DebugTextInsideOptional);
+        LogErrorOnFailure(
+            chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.debugText.Value(), DebugTextInsideOptional));
         chip::JniReferences::GetInstance().CreateOptional(DebugTextInsideOptional, DebugText);
     }
     jobject ErrorValue;
@@ -2443,7 +2449,8 @@ void CHIPOperationalCredentialsClusterNOCResponseCallback::CallbackFn(
     else
     {
         jobject DebugTextInsideOptional;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.debugText.Value(), DebugTextInsideOptional);
+        LogErrorOnFailure(
+            chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.debugText.Value(), DebugTextInsideOptional));
         chip::JniReferences::GetInstance().CreateOptional(DebugTextInsideOptional, DebugText);
     }
 
@@ -3126,7 +3133,7 @@ void CHIPDoorLockClusterGetUserResponseCallback::CallbackFn(
     }
     else
     {
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.userName.Value(), UserName);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.userName.Value(), UserName));
     }
     jobject UserUniqueID;
     if (dataResponse.userUniqueID.IsNull())
@@ -3673,7 +3680,7 @@ void CHIPChannelClusterChangeChannelResponseCallback::CallbackFn(
     else
     {
         jobject DataInsideOptional;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.data.Value(), DataInsideOptional);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.data.Value(), DataInsideOptional));
         chip::JniReferences::GetInstance().CreateOptional(DataInsideOptional, Data);
     }
 
@@ -3746,7 +3753,7 @@ void CHIPTargetNavigatorClusterNavigateTargetResponseCallback::CallbackFn(
     else
     {
         jobject DataInsideOptional;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.data.Value(), DataInsideOptional);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.data.Value(), DataInsideOptional));
         chip::JniReferences::GetInstance().CreateOptional(DataInsideOptional, Data);
     }
 
@@ -3817,7 +3824,7 @@ void CHIPMediaPlaybackClusterPlaybackResponseCallback::CallbackFn(
     else
     {
         jobject DataInsideOptional;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.data.Value(), DataInsideOptional);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.data.Value(), DataInsideOptional));
         chip::JniReferences::GetInstance().CreateOptional(DataInsideOptional, Data);
     }
 
@@ -3948,7 +3955,7 @@ void CHIPContentLauncherClusterLauncherResponseCallback::CallbackFn(
     else
     {
         jobject DataInsideOptional;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.data.Value(), DataInsideOptional);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.data.Value(), DataInsideOptional));
         chip::JniReferences::GetInstance().CreateOptional(DataInsideOptional, Data);
     }
 
@@ -4083,7 +4090,7 @@ void CHIPAccountLoginClusterGetSetupPINResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject SetupPIN;
-    chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.setupPIN, SetupPIN);
+    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.setupPIN, SetupPIN));
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, SetupPIN);
 }
@@ -4560,7 +4567,7 @@ void CHIPUnitTestingClusterTestStructArrayArgumentResponseCallback::CallbackFn(
                                 reinterpret_cast<const jbyte *>(entry_0.c.d.data()));
         newElement_0_c_d = newElement_0_c_dByteArray;
         jobject newElement_0_c_e;
-        chip::JniReferences::GetInstance().CharToStringUTF(entry_0.c.e, newElement_0_c_e);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.c.e, newElement_0_c_e));
         jobject newElement_0_c_f;
         std::string newElement_0_c_fClassName     = "java/lang/Integer";
         std::string newElement_0_c_fCtorSignature = "(I)V";
@@ -4628,7 +4635,7 @@ void CHIPUnitTestingClusterTestStructArrayArgumentResponseCallback::CallbackFn(
                                     reinterpret_cast<const jbyte *>(entry_2.d.data()));
             newElement_2_d = newElement_2_dByteArray;
             jobject newElement_2_e;
-            chip::JniReferences::GetInstance().CharToStringUTF(entry_2.e, newElement_2_e);
+            LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_2.e, newElement_2_e));
             jobject newElement_2_f;
             std::string newElement_2_fClassName     = "java/lang/Integer";
             std::string newElement_2_fCtorSignature = "(I)V";
@@ -4762,7 +4769,7 @@ void CHIPUnitTestingClusterTestStructArrayArgumentResponseCallback::CallbackFn(
                                 reinterpret_cast<const jbyte *>(entry_0.d.data()));
         newElement_0_d = newElement_0_dByteArray;
         jobject newElement_0_e;
-        chip::JniReferences::GetInstance().CharToStringUTF(entry_0.e, newElement_0_e);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.e, newElement_0_e));
         jobject newElement_0_f;
         std::string newElement_0_fClassName     = "java/lang/Integer";
         std::string newElement_0_fCtorSignature = "(I)V";
@@ -5248,8 +5255,8 @@ void CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallback::Callback
     else
     {
         jobject NullableStringValueInsideOptional;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.nullableStringValue.Value(),
-                                                           NullableStringValueInsideOptional);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.nullableStringValue.Value(),
+                                                                             NullableStringValueInsideOptional));
         chip::JniReferences::GetInstance().CreateOptional(NullableStringValueInsideOptional, NullableStringValue);
     }
     jobject OptionalStringWasPresent;
@@ -5266,8 +5273,8 @@ void CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallback::Callback
     else
     {
         jobject OptionalStringValueInsideOptional;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.optionalStringValue.Value(),
-                                                           OptionalStringValueInsideOptional);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.optionalStringValue.Value(),
+                                                                             OptionalStringValueInsideOptional));
         chip::JniReferences::GetInstance().CreateOptional(OptionalStringValueInsideOptional, OptionalStringValue);
     }
     jobject NullableOptionalStringWasPresent;
@@ -5301,8 +5308,8 @@ void CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallback::Callback
     else
     {
         jobject NullableOptionalStringValueInsideOptional;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.nullableOptionalStringValue.Value(),
-                                                           NullableOptionalStringValueInsideOptional);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.nullableOptionalStringValue.Value(),
+                                                                             NullableOptionalStringValueInsideOptional));
         chip::JniReferences::GetInstance().CreateOptional(NullableOptionalStringValueInsideOptional, NullableOptionalStringValue);
     }
     jobject NullableStructWasNull;
@@ -5345,8 +5352,8 @@ void CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallback::Callback
                                 reinterpret_cast<const jbyte *>(dataResponse.nullableStructValue.Value().d.data()));
         NullableStructValueInsideOptional_d = NullableStructValueInsideOptional_dByteArray;
         jobject NullableStructValueInsideOptional_e;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.nullableStructValue.Value().e,
-                                                           NullableStructValueInsideOptional_e);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.nullableStructValue.Value().e,
+                                                                             NullableStructValueInsideOptional_e));
         jobject NullableStructValueInsideOptional_f;
         std::string NullableStructValueInsideOptional_fClassName     = "java/lang/Integer";
         std::string NullableStructValueInsideOptional_fCtorSignature = "(I)V";
@@ -5431,8 +5438,8 @@ void CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallback::Callback
                                 reinterpret_cast<const jbyte *>(dataResponse.optionalStructValue.Value().d.data()));
         OptionalStructValueInsideOptional_d = OptionalStructValueInsideOptional_dByteArray;
         jobject OptionalStructValueInsideOptional_e;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.optionalStructValue.Value().e,
-                                                           OptionalStructValueInsideOptional_e);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.optionalStructValue.Value().e,
+                                                                             OptionalStructValueInsideOptional_e));
         jobject OptionalStructValueInsideOptional_f;
         std::string OptionalStructValueInsideOptional_fClassName     = "java/lang/Integer";
         std::string OptionalStructValueInsideOptional_fCtorSignature = "(I)V";
@@ -5537,8 +5544,8 @@ void CHIPUnitTestingClusterTestComplexNullableOptionalResponseCallback::Callback
                                 reinterpret_cast<const jbyte *>(dataResponse.nullableOptionalStructValue.Value().d.data()));
         NullableOptionalStructValueInsideOptional_d = NullableOptionalStructValueInsideOptional_dByteArray;
         jobject NullableOptionalStructValueInsideOptional_e;
-        chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.nullableOptionalStructValue.Value().e,
-                                                           NullableOptionalStructValueInsideOptional_e);
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.nullableOptionalStructValue.Value().e,
+                                                                             NullableOptionalStructValueInsideOptional_e));
         jobject NullableOptionalStructValueInsideOptional_f;
         std::string NullableOptionalStructValueInsideOptional_fClassName     = "java/lang/Integer";
         std::string NullableOptionalStructValueInsideOptional_fCtorSignature = "(I)V";
@@ -5834,7 +5841,7 @@ void CHIPUnitTestingClusterSimpleStructResponseCallback::CallbackFn(
                             reinterpret_cast<const jbyte *>(dataResponse.arg1.d.data()));
     arg1_d = arg1_dByteArray;
     jobject arg1_e;
-    chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.arg1.e, arg1_e);
+    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.arg1.e, arg1_e));
     jobject arg1_f;
     std::string arg1_fClassName     = "java/lang/Integer";
     std::string arg1_fCtorSignature = "(I)V";
