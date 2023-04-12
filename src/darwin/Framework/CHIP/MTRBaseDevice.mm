@@ -147,6 +147,7 @@ static void PurgeReadClientContainers(
                     container.readClientPtr = nullptr;
                 }
                 if (container.pathParams) {
+                    static_assert(std::is_trivially_destructible<AttributePathParams>::value, "AttributePathPArams destructors won't get run");
                     Platform::MemoryFree(container.pathParams);
                     container.pathParams = nullptr;
                 }
