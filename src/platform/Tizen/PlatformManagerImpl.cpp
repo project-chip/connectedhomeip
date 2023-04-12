@@ -117,6 +117,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // earlier, because the generic implementation sets a generic one.
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
     return CHIP_NO_ERROR;
 }
 
