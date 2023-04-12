@@ -147,12 +147,14 @@ static void PurgeReadClientContainers(
                     container.readClientPtr = nullptr;
                 }
                 if (container.pathParams) {
-                    static_assert(std::is_trivially_destructible<AttributePathParams>::value, "AttributePathParams destructors won't get run");
+                    static_assert(std::is_trivially_destructible<AttributePathParams>::value,
+                        "AttributePathParams destructors won't get run");
                     Platform::MemoryFree(container.pathParams);
                     container.pathParams = nullptr;
                 }
                 if (container.eventPathParams) {
-                    static_assert(std::is_trivially_destructible<EventPathParams>::value, "EventPathParams destructors won't get run");
+                    static_assert(
+                        std::is_trivially_destructible<EventPathParams>::value, "EventPathParams destructors won't get run");
                     Platform::MemoryFree(container.eventPathParams);
                     container.eventPathParams = nullptr;
                 }

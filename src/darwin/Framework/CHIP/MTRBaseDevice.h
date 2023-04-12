@@ -159,8 +159,7 @@ MTR_NEWLY_AVAILABLE
 
 + (MTREventRequestPath *)requestPathWithEndpointID:(NSNumber * _Nullable)endpointID
                                          clusterID:(NSNumber * _Nullable)clusterID
-                                           eventID:(NSNumber * _Nullable)eventID
-MTR_NEWLY_AVAILABLE;
+                                           eventID:(NSNumber * _Nullable)eventID MTR_NEWLY_AVAILABLE;
 @end
 
 @interface MTRBaseDevice : NSObject
@@ -273,7 +272,8 @@ MTR_NEWLY_AVAILABLE;
  * empty.) or the entire read interaction fails. Otherwise it will be called with values, which may be empty (e.g. if no paths
  * matched the wildcard paths passed in) or may include per-path errors if particular paths failed.
  *
- * If the sum of the lengths of attributePaths and eventPaths exceeds 9, the read may fail due to the device not supporting that many read paths.
+ * If the sum of the lengths of attributePaths and eventPaths exceeds 9, the read may fail due to the device not supporting that
+ * many read paths.
  */
 - (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
                 eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
@@ -367,7 +367,8 @@ MTR_NEWLY_AVAILABLE;
  * The reportHandler will be called with an error if the inputs are invalid (e.g., both attributePaths and eventPaths are
  * empty), or if the subscription fails entirely.
  *
- * If the sum of the lengths of attributePaths and eventPaths exceeds 3, the subscribe may fail due to the device not supporting that many paths for a subscription.
+ * If the sum of the lengths of attributePaths and eventPaths exceeds 3, the subscribe may fail due to the device not supporting
+ * that many paths for a subscription.
  */
 - (void)subscribeToAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
                        eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
