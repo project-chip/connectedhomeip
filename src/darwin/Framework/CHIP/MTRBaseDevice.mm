@@ -1395,6 +1395,14 @@ exit:
                    if (attributes != nil) {
                        container.pathParams = static_cast<AttributePathParams *>(
                            Platform::MemoryCalloc([attributes count], sizeof(AttributePathParams)));
+                       if (container.pathParams == nullptr) {
+                           if (reportHandler) {
+                               dispatch_async(queue, ^{
+                                   reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY]);
+                               });
+                           }
+                           return;
+                       }
                        for (MTRAttributeRequestPath * attribute in attributes) {
                            [attribute convertToAttributePathParams:container.pathParams[attributePathSize++]];
                        }
@@ -1403,6 +1411,14 @@ exit:
                    if (events != nil) {
                        container.eventPathParams
                            = static_cast<EventPathParams *>(Platform::MemoryCalloc([events count], sizeof(EventPathParams)));
+                       if (container.eventPathParams == nullptr) {
+                           if (reportHandler) {
+                               dispatch_async(queue, ^{
+                                   reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY]);
+                               });
+                           }
+                           return;
+                       }
                        for (MTREventRequestPath * event in events) {
                            [event convertToEventPathParams:container.eventPathParams[eventPathSize++]];
                        }
