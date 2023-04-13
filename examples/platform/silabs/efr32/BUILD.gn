@@ -227,6 +227,9 @@ config("efr32-common-config") {
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]
   }
+
+  # Do not warn for LOAD segment with RWX permissions
+  ldflags = [ "-Wl,--no-warn-rwx-segment" ]
 }
 
 config("silabs-wifi-config") {
@@ -279,6 +282,7 @@ source_set("efr32-common") {
 
   sources = [
     "${silabs_common_plat_dir}/heap_4_silabs.c",
+    "${silabs_common_plat_dir}/syscall_stubs.cpp",
     "efr32_utils.cpp",
     "init_efrPlatform.cpp",
     "matter_config.cpp",
