@@ -90,6 +90,15 @@ public:
     bool IsOnResponseTimeoutCalled = false;
 };
 
+class ExpireSessionFromTimeoutDelegate : public WaitForTimeoutDelegate
+{
+    void OnResponseTimeout(ExchangeContext * ec) override
+    {
+        ec->GetSessionHandle()->AsSecureSession()->MarkForEviction();
+        WaitForTimeoutDelegate::OnResponseTimeout(ec);
+    }
+};
+
 void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
@@ -156,6 +165,32 @@ void CheckSessionExpirationTimeout(nlTestSuite * inSuite, void * inContext)
 
     // Expire the session this exchange is supposedly on.  This should close the exchange.
     ec1->GetSessionHandle()->AsSecureSession()->MarkForEviction();
+    NL_TEST_ASSERT(inSuite, sendDelegate.IsOnResponseTimeoutCalled);
+
+    // recreate closed session.
+    NL_TEST_ASSERT(inSuite, ctx.CreateSessionAliceToBob() == CHIP_NO_ERROR);
+}
+
+void CheckSessionExpirationDuringTimeout(nlTestSuite * inSuite, void * inContext)
+{
+    using namespace chip::System::Clock::Literals;
+
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    ExpireSessionFromTimeoutDelegate sendDelegate;
+    ExchangeContext * ec1 = ctx.NewExchangeToBob(&sendDelegate);
+
+    ec1->SetResponseTimeout(System::Clock::Timeout(100));
+
+    ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
+                     SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
+
+    ctx.DrainAndServiceIO();
+    NL_TEST_ASSERT(inSuite, !sendDelegate.IsOnResponseTimeoutCalled);
+
+    // Wait for our timeout to elapse. Give it an extra 100ms.
+    ctx.GetIOContext().DriveIOUntil(200_ms32, [&sendDelegate] { return sendDelegate.IsOnResponseTimeoutCalled; });
+
     NL_TEST_ASSERT(inSuite, sendDelegate.IsOnResponseTimeoutCalled);
 
     // recreate closed session.
@@ -237,6 +272,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test ExchangeMgr::CheckExchangeMessages",    CheckExchangeMessages),
     NL_TEST_DEF("Test OnConnectionExpired basics",            CheckSessionExpirationBasics),
     NL_TEST_DEF("Test OnConnectionExpired timeout handling",  CheckSessionExpirationTimeout),
+    NL_TEST_DEF("Test session eviction in timeout handling",  CheckSessionExpirationDuringTimeout),
 
     NL_TEST_SENTINEL()
 };

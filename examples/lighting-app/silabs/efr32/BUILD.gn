@@ -46,6 +46,20 @@ declare_args() {
   chip_print_memory_usage = false
 }
 
+if (slc_generate) {
+  # Generate Project Specific config (Board, hardware used etc..)
+  print(exec_script("${chip_root}/third_party/silabs/slc_gen/run_slc.py",
+                    [
+                      rebase_path(chip_root),
+                      "${silabs_board}",
+                      "${disable_lcd}",
+                      "${use_wstk_buttons}",
+                      "${use_wstk_leds}",
+                      "${use_external_flash}",
+                    ],
+                    "list lines"))
+}
+
 efr32_sdk("sdk") {
   sources = [
     "${efr32_project_dir}/include/CHIPProjectConfig.h",

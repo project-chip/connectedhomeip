@@ -30,7 +30,12 @@ class Commands;
 class InteractiveStartCommand : public CHIPCommandBridge
 {
 public:
-    InteractiveStartCommand(Commands * commandsHandler) : CHIPCommandBridge("start"), mHandler(commandsHandler) {}
+    InteractiveStartCommand(Commands * commandsHandler) : CHIPCommandBridge("start"), mHandler(commandsHandler)
+    {
+        AddArgument(
+            "additional-prompt", &mAdditionalPrompt,
+            "Force printing of an additional prompt that can then be detected by something trying to script interactive mode");
+    }
 
     CHIP_ERROR RunCommand() override;
 
@@ -39,4 +44,5 @@ public:
 private:
     bool ParseCommand(char * command);
     Commands * mHandler = nullptr;
+    chip::Optional<char *> mAdditionalPrompt;
 };

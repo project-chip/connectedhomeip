@@ -545,18 +545,6 @@ public:
 private:
     std::vector<std::string> options;
 };
-class CustomScreen : public Screen
-{
-public:
-    virtual void Display()
-    {
-        TFT_drawCircle(0.3 * DisplayWidth, 0.3 * DisplayHeight, 8, TFT_BLUE);
-        TFT_drawCircle(0.7 * DisplayWidth, 0.3 * DisplayHeight, 8, TFT_BLUE);
-        TFT_drawLine(0.2 * DisplayWidth, 0.6 * DisplayHeight, 0.3 * DisplayWidth, 0.7 * DisplayHeight, TFT_BLUE);
-        TFT_drawLine(0.3 * DisplayWidth, 0.7 * DisplayHeight, 0.7 * DisplayWidth, 0.7 * DisplayHeight, TFT_BLUE);
-        TFT_drawLine(0.7 * DisplayWidth, 0.7 * DisplayHeight, 0.8 * DisplayWidth, 0.6 * DisplayHeight, TFT_BLUE);
-    }
-};
 
 void SetupPretendDevices()
 {
@@ -729,20 +717,10 @@ esp_err_t InitM5Stack(std::string qrCodeText)
                        ESP_LOGI(TAG, "Opening Setup list");
                        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<SetupListModel>()));
                    })
-            ->Item("Status",
-                   [=]() {
-                       ESP_LOGI(TAG, "Opening Status screen");
-                       ScreenManager::PushScreen(chip::Platform::New<StatusScreen>());
-                   })
-            ->Item("Custom",
-                   []() {
-                       ESP_LOGI(TAG, "Opening custom screen");
-                       ScreenManager::PushScreen(chip::Platform::New<CustomScreen>());
-                   })
-            ->Item("More")
-            ->Item("Items")
-            ->Item("For")
-            ->Item("Demo")));
+            ->Item("Status", [=]() {
+                ESP_LOGI(TAG, "Opening Status screen");
+                ScreenManager::PushScreen(chip::Platform::New<StatusScreen>());
+            })));
     return ESP_OK;
 }
 #endif

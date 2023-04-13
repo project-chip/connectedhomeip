@@ -98,8 +98,8 @@ static IdentifyIdentifyType __attribute__((unused)) kIdentifyIdentifyTypekUnknow
 
 namespace Groups {
 
-// Bitmap for GroupClusterFeature
-enum class GroupClusterFeature : uint32_t
+// Bitmap for GroupsFeature
+enum class GroupsFeature : uint32_t
 {
     kGroupNames = 0x1,
 };
@@ -107,16 +107,16 @@ enum class GroupClusterFeature : uint32_t
 
 namespace Scenes {
 
-// Bitmap for SceneFeatures
-enum class SceneFeatures : uint32_t
-{
-    kSceneNames = 0x1,
-};
-
 // Bitmap for ScenesCopyMode
 enum class ScenesCopyMode : uint8_t
 {
     kCopyAllScenes = 0x1,
+};
+
+// Bitmap for ScenesFeature
+enum class ScenesFeature : uint32_t
+{
+    kSceneNames = 0x1,
 };
 } // namespace Scenes
 
@@ -1940,16 +1940,6 @@ enum class ConfigStatus : uint8_t
     kTiltEncoderControlled = 0x40,
 };
 
-// Bitmap for Feature
-enum class Feature : uint32_t
-{
-    kLift              = 0x1,
-    kTilt              = 0x2,
-    kPositionAwareLift = 0x4,
-    kAbsolutePosition  = 0x8,
-    kPositionAwareTilt = 0x10,
-};
-
 // Bitmap for Mode
 enum class Mode : uint8_t
 {
@@ -1982,6 +1972,16 @@ enum class SafetyStatus : uint16_t
     kHardwareFailure     = 0x200,
     kManualOperation     = 0x400,
     kProtection          = 0x800,
+};
+
+// Bitmap for WindowCoveringFeature
+enum class WindowCoveringFeature : uint32_t
+{
+    kLift              = 0x1,
+    kTilt              = 0x2,
+    kPositionAwareLift = 0x4,
+    kAbsolutePosition  = 0x8,
+    kPositionAwareTilt = 0x10,
 };
 } // namespace WindowCovering
 
@@ -2019,8 +2019,8 @@ enum class OperationModeEnum : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Bitmap for PumpFeature
-enum class PumpFeature : uint32_t
+// Bitmap for PumpConfigurationAndControlFeature
+enum class PumpConfigurationAndControlFeature : uint32_t
 {
     kConstantPressure    = 0x1,
     kCompensatedPressure = 0x2,
@@ -2372,8 +2372,8 @@ namespace TemperatureMeasurement {} // namespace TemperatureMeasurement
 
 namespace PressureMeasurement {
 
-// Bitmap for PressureFeature
-enum class PressureFeature : uint32_t
+// Bitmap for PressureMeasurementFeature
+enum class PressureMeasurementFeature : uint32_t
 {
     kExtended = 0x1,
 };

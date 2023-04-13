@@ -224,7 +224,7 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION_STRING
+ * CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING
  *
  * Human readable string identifying version of the product assigned by the device vendor.
  */

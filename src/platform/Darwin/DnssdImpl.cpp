@@ -195,11 +195,12 @@ CHIP_ERROR Register(void * context, DnssdPublishCallback callback, uint32_t inte
     sdCtx = chip::Platform::New<RegisterContext>(type, name, callback, context);
     VerifyOrReturnError(nullptr != sdCtx, CHIP_ERROR_NO_MEMORY);
 
-    sdCtx->mHostNameRegistrar.Init(hostname, addressType, interfaceId);
+    auto err = sdCtx->mHostNameRegistrar.Init(hostname, addressType, interfaceId);
+    VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
     DNSServiceRef sdRef;
-    auto err = DNSServiceRegister(&sdRef, kRegisterFlags, interfaceId, name, type, kLocalDot, hostname, htons(port), record.size(),
-                                  record.data(), OnRegister, sdCtx);
+    err = DNSServiceRegister(&sdRef, kRegisterFlags, interfaceId, name, type, kLocalDot, hostname, htons(port), record.size(),
+                             record.data(), OnRegister, sdCtx);
     VerifyOrReturnError(kDNSServiceErr_NoError == err, sdCtx->Finalize(err));
 
     return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
@@ -394,7 +395,12 @@ CHIP_ERROR ChipDnssdInit(DnssdAsyncReturnCallback successCallback, DnssdAsyncRet
     return CHIP_NO_ERROR;
 }
 
-void ChipDnssdShutdown() {}
+void ChipDnssdShutdown()
+{
+    // Drop our existing advertisements now, so they don't stick around while we
+    // are not actually in a responsive state.
+    ChipDnssdRemoveServices();
+}
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCallback callback, void * context)
 {
@@ -416,6 +422,8 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service, DnssdPublishCal
 
 CHIP_ERROR ChipDnssdRemoveServices()
 {
+    assertChipStackLockedByCurrentThread();
+
     auto err = MdnsContexts::GetInstance().RemoveAllOfType(ContextType::Register);
     if (CHIP_ERROR_KEY_NOT_FOUND == err)
     {

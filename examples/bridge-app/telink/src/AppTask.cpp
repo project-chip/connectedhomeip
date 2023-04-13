@@ -17,23 +17,11 @@
  */
 
 #include "AppTask.h"
-
 #include "Device.h"
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/reporting/reporting.h>
-#include <app/util/af-types.h>
-#include <lib/support/ZclString.h>
 
-#include <DeviceInfoProviderImpl.h>
+#include <app/reporting/reporting.h>
+#include <lib/support/ZclString.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/identify-server/identify-server.h>
-#include <app/server/OnboardingCodesUtil.h>
-#include <app/server/Server.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <lib/support/ErrorStr.h>
-#include <system/SystemClock.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -81,6 +69,17 @@ static DeviceTempSensor TempSensor1("TempSensor 1", "Office", minMeasuredValue, 
 // Device Version for dynamic endpoints:
 #define DEVICE_VERSION_DEFAULT 1
 
+/* REVISION definitions:
+ */
+
+#define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
+#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (1u)
+#define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
+#define ZCL_ON_OFF_CLUSTER_REVISION (4u)
+#define ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION (4u)
+#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP (0u)
+#define ZCL_TEMPERATURE_SENSOR_FEATURE_MAP (0u)
+
 /* BRIDGED DEVICE ENDPOINT: contains the following clusters:
    - On/Off
    - Descriptor
@@ -90,6 +89,7 @@ static DeviceTempSensor TempSensor1("TempSensor 1", "Office", minMeasuredValue, 
 // Declare On/Off cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(onOffAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(Clusters::OnOff::Attributes::OnOff::Id, BOOLEAN, 1, 0), /* on/off */
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::OnOff::Attributes::ClusterRevision::Id, INT16U, ZCL_ON_OFF_CLUSTER_REVISION, 0),
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Descriptor cluster attributes
@@ -102,6 +102,8 @@ DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Descriptor::Attributes::DeviceTypeList::Id, 
                               0), /* client list */
     DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Descriptor::Attributes::PartsList::Id, ARRAY, kDescriptorAttributeArraySize,
                               0), /* parts list */
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::Descriptor::Attributes::ClusterRevision::Id, INT16U, ZCL_DESCRIPTOR_CLUSTER_REVISION,
+                              0), /* cluster revision */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Bridged Device Basic Information cluster attributes
@@ -110,6 +112,8 @@ DECLARE_DYNAMIC_ATTRIBUTE(chip::app::Clusters::BridgedDeviceBasicInformation::At
                           kNodeLabelSize, 0), /* NodeLabel */
     DECLARE_DYNAMIC_ATTRIBUTE(chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::Reachable::Id, BOOLEAN, 1,
                               0), /* Reachable */
+    DECLARE_DYNAMIC_ATTRIBUTE(chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ClusterRevision::Id, INT16U,
+                              ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION, 0), /* cluster revision */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Cluster List for Bridged Light endpoint
@@ -139,6 +143,8 @@ DECLARE_DYNAMIC_ATTRIBUTE(Clusters::TemperatureMeasurement::Attributes::Measured
     DECLARE_DYNAMIC_ATTRIBUTE(Clusters::TemperatureMeasurement::Attributes::MaxMeasuredValue::Id, INT16S, 2,
                               0), /* Max Measured Value */
     DECLARE_DYNAMIC_ATTRIBUTE(Clusters::TemperatureMeasurement::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* FeatureMap */
+    DECLARE_DYNAMIC_ATTRIBUTE(Clusters::TemperatureMeasurement::Attributes::ClusterRevision::Id, INT16U,
+                              ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION, 0), /* cluster revision */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // TEMPERATURE SENSOR ENDPOINT: contains the following clusters:
@@ -172,15 +178,6 @@ const EmberAfDeviceType gBridgedOnOffDeviceTypes[] = { { DEVICE_TYPE_LO_ON_OFF_L
 
 const EmberAfDeviceType gBridgedTempSensorDeviceTypes[] = { { DEVICE_TYPE_TEMP_SENSOR, DEVICE_VERSION_DEFAULT },
                                                             { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT } };
-/* REVISION definitions:
- */
-
-#define ZCL_DESCRIPTOR_CLUSTER_REVISION (1u)
-#define ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION (1u)
-#define ZCL_FIXED_LABEL_CLUSTER_REVISION (1u)
-#define ZCL_ON_OFF_CLUSTER_REVISION (4u)
-#define ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION (1u)
-#define ZCL_TEMPERATURE_SENSOR_FEATURE_MAP (0u)
 
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, const Span<const EmberAfDeviceType> & deviceTypeList,
                       const Span<DataVersion> & dataVersionStorage, chip::EndpointId parentEndpointId)
@@ -254,6 +251,16 @@ EmberAfStatus HandleReadBridgedDeviceBasicAttribute(Device * dev, chip::Attribut
         MutableByteSpan zclNameSpan(buffer, maxReadLength);
         MakeZclCharString(zclNameSpan, dev->GetName());
     }
+    else if ((attributeId == FeatureMap::Id) && (maxReadLength == 4))
+    {
+        uint32_t featureMap = ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_FEATURE_MAP;
+        memcpy(buffer, &featureMap, sizeof(featureMap));
+    }
+    else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 4))
+    {
+        uint16_t clusterRevision = ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_REVISION;
+        memcpy(buffer, &clusterRevision, sizeof(clusterRevision));
+    }
     else
     {
         return EMBER_ZCL_STATUS_FAILURE;
@@ -269,6 +276,11 @@ EmberAfStatus HandleReadOnOffAttribute(Device * dev, chip::AttributeId attribute
     if ((attributeId == Clusters::OnOff::Attributes::OnOff::Id) && (maxReadLength == 1))
     {
         *buffer = dev->IsOn() ? 1 : 0;
+    }
+    else if ((attributeId == Clusters::OnOff::Attributes::ClusterRevision::Id) && (maxReadLength == 4))
+    {
+        uint16_t clusterRevision = ZCL_ON_OFF_CLUSTER_REVISION;
+        memcpy(buffer, &clusterRevision, sizeof(clusterRevision));
     }
     else
     {
@@ -430,7 +442,6 @@ CHIP_ERROR AppTask::Init(void)
 
 void AppTask::InitServer(intptr_t context)
 {
-
     // Set starting endpoint id where dynamic endpoints will be assigned, which
     // will be the next consecutive endpoint id after the last fixed endpoint.
     gFirstDynamicEndpointId = static_cast<chip::EndpointId>(
@@ -508,7 +519,7 @@ EmberAfStatus HandleReadTempMeasurementAttribute(DeviceTempSensor * dev, chip::A
         uint32_t featureMap = ZCL_TEMPERATURE_SENSOR_FEATURE_MAP;
         memcpy(buffer, &featureMap, sizeof(featureMap));
     }
-    else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 2))
+    else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 4))
     {
         uint16_t clusterRevision = ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION;
         memcpy(buffer, &clusterRevision, sizeof(clusterRevision));

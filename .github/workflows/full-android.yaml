@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-android:0.6.47
+            image: connectedhomeip/chip-build-android:0.7.0
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -61,7 +61,7 @@ jobs:
               if: ${{ env.ACT }}
               name: Checkout (ACT for local build)
             - name: Checkout submodules
-              run: scripts/checkout_submodules.py --shallow --platform android
+              run: scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform android
 
             - name: Bootstrap cache
               uses: actions/cache@v3

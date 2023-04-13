@@ -234,8 +234,47 @@ scripts/codepregen.py ${OUTPUT_DIRECTORY:-./zzz_pregenerated/}
 
 # To generate a single output you can use `--input-glob`:
 
-scripts/codepregen.py --input-glob "*all-clusters*" ${OUTPUT_DIRECTORY:-./zzz_pregenerated/}
+scripts/codepregen.py --input-glob "*all-clusters*" --input-glob "*controller*" ${OUTPUT_DIRECTORY:-./zzz_pregenerated/}
 ```
+
+### External applications/zap files
+
+#### Ensure you have a `.matter` file
+
+Code generation generally will use both `.zap` or `.matter` files. If you only
+have a `.zap` file, you can create the corresponding `.matter` file via:
+
+```bash
+scripts/tools/zap/generate.py ${ZAP_FILE_PATH}
+```
+
+The above will use the template `src/app/zap-templates/matter-idl.json` to
+generate a `.matter` file corresponding to the input `.zap` file.
+
+`.matter` files are designed to be human readable. It is recommended to take a
+look at the generated file and see if it contains what is expected and also lint
+it. If anything seems wrong, the `.zap` file should be fixed (`.matter`
+represents the content of `.zap`). To lint use:
+
+```bash
+scripts/idl_lint.py ${MATTER_FILE_PATH}
+```
+
+#### Running pre-generation
+
+If you have zap files outside the CHIP repository (i.e. not in `src` or
+`examples`) you should provide the root of your application source.
+
+```bash
+scripts/codepregen.py --external-root ${PATH_TO_SOURCE_ROOT} ${OUTPUT_DIRECTORY:-./zzz_pregenerated/}
+```
+
+NOTE: `$PATH_TO_SOURCE_ROOT` should be a top-level directory containing
+zap/matter files as the code pre-generation will generate files based on the
+path inside the root:
+
+-   if files are `$PATH_TO_SOURCE_ROOT/some/path/foo.zap` this will generate
+    files into `$OUTPUT_DIRECTORY/some/path/foo/...`
 
 ### Using pre-generated code
 

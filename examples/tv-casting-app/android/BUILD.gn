@@ -68,7 +68,6 @@ android_library("java") {
     "App/app/src/main/jni/com/chip/casting/ContentApp.java",
     "App/app/src/main/jni/com/chip/casting/ContentLauncherTypes.java",
     "App/app/src/main/jni/com/chip/casting/DACProvider.java",
-    "App/app/src/main/jni/com/chip/casting/DACProviderStub.java",
     "App/app/src/main/jni/com/chip/casting/DiscoveredNodeData.java",
     "App/app/src/main/jni/com/chip/casting/FailureCallback.java",
     "App/app/src/main/jni/com/chip/casting/MatterCallbackHandler.java",
@@ -86,11 +85,11 @@ android_library("java") {
   javac_flags = [ "-Xlint:deprecation" ]
 
   # TODO: add classpath support (we likely need to add something like
-  #  ..../platforms/android-21/android.jar to access BLE items)
+  #  ..../platforms/android-26/android.jar to access BLE items)
 }
 
 java_prebuilt("android") {
-  jar_path = "${android_sdk_root}/platforms/android-21/android.jar"
+  jar_path = "${android_sdk_root}/platforms/android-26/android.jar"
 }
 
 group("default") {

@@ -26,6 +26,7 @@ class IdlFileType(Enum):
 class InputIdlFile:
     file_type: IdlFileType
     relative_path: str
+    full_path: str
 
     @property
     def pregen_subdir(self):

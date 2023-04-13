@@ -1,30 +1,23 @@
-/*******************************************************************************
- * @file  wfx_sl_ble_init.h
- * @brief
- *******************************************************************************
- * # License
- * <b>Copyright 2021 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
+/*
  *
- * The licensor of this software is Silicon Laboratories Inc. Your use of this
- * software is governed by the terms of Silicon Labs Master Software License
- * Agreement (MSLA) available at
- * www.silabs.com/about-us/legal/master-software-license-agreement. This
- * software is distributed to you in Source Code format and is governed by the
- * sections of the MSLA applicable to Source Code.
+ *    Copyright (c) 2022 Project CHIP Authors
  *
- ******************************************************************************/
-/*************************************************************************
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
-
-/**
- * Include files
- * */
 
 #ifndef WFX_SL_BLE_INIT
 #define WFX_SL_BLE_INIT
-#define RSI_BLE_ENABLE 1
+#define RSI_BLE_ENABLE (1)
 
 // BLE include file to refer BLE APIs
 #include "FreeRTOS.h"
@@ -74,38 +67,38 @@ typedef struct sl_wfx_msg_s
 
 } sl_wfx_msg_t;
 
-#define ATT_REC_IN_HOST 0
+#define ATT_REC_IN_HOST (0)
 
-#define RSI_BT_CTRL_REMOTE_USER_TERMINATED 0x4E13
-#define RSI_BT_CTRL_REMOTE_DEVICE_TERMINATED_CONNECTION_DUE_TO_LOW_RESOURCES 0x4E14
-#define RSI_BT_CTRL_REMOTE_POWERING_OFF 0x4E15
-#define RSI_BT_CTRL_TERMINATED_MIC_FAILURE 0x4E3D
-#define RSI_BT_FAILED_TO_ESTABLISH_CONN 0x4E3E
-#define RSI_BT_INVALID_RANGE 0x4E60
+#define RSI_BT_CTRL_REMOTE_USER_TERMINATED (0x4E13)
+#define RSI_BT_CTRL_REMOTE_DEVICE_TERMINATED_CONNECTION_DUE_TO_LOW_RESOURCES (0x4E14)
+#define RSI_BT_CTRL_REMOTE_POWERING_OFF (0x4E15)
+#define RSI_BT_CTRL_TERMINATED_MIC_FAILURE (0x4E3D)
+#define RSI_BT_FAILED_TO_ESTABLISH_CONN (0x4E3E)
+#define RSI_BT_INVALID_RANGE (0x4E60)
 
-#define RSI_BLE_MATTER_CUSTOM_SERVICE_UUID 0
-#define RSI_BLE_MATTER_CUSTOM_SERVICE_SIZE 2
-#define RSI_BLE_MATTER_CUSTOM_SERVICE_VALUE_16 0xFFF6
-#define RSI_BLE_MATTER_CUSTOM_SERVICE_DATA 0x00
+#define RSI_BLE_MATTER_CUSTOM_SERVICE_UUID (0)
+#define RSI_BLE_MATTER_CUSTOM_SERVICE_SIZE (2)
+#define RSI_BLE_MATTER_CUSTOM_SERVICE_VALUE_16 (0xFFF6)
+#define RSI_BLE_MATTER_CUSTOM_SERVICE_DATA (0x00)
 
-#define RSI_BLE_CUSTOM_CHARACTERISTIC_RX_SIZE 16
+#define RSI_BLE_CUSTOM_CHARACTERISTIC_RX_SIZE (16)
 #define RSI_BLE_CUSTOM_CHARACTERISTIC_RX_RESERVED 0x00, 0x00, 0x00
 #define RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_1 0x18EE2EF5
 #define RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_2 0x263D
 #define RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_3 0x4559
 #define RSI_BLE_CUSTOM_CHARACTERISTIC_RX_VALUE_128_DATA_4 0x9F, 0x95, 0x9C, 0x4F, 0x11, 0x9D, 0x9F, 0x42
-#define RSI_BLE_CHARACTERISTIC_RX_ATTRIBUTE_HANDLE_LOCATION 1
-#define RSI_BLE_CHARACTERISTIC_RX_VALUE_HANDLE_LOCATION 2
+#define RSI_BLE_CHARACTERISTIC_RX_ATTRIBUTE_HANDLE_LOCATION (1)
+#define RSI_BLE_CHARACTERISTIC_RX_VALUE_HANDLE_LOCATION (2)
 
-#define RSI_BLE_CUSTOM_CHARACTERISTIC_TX_SIZE 16
+#define RSI_BLE_CUSTOM_CHARACTERISTIC_TX_SIZE (16)
 #define RSI_BLE_CUSTOM_CHARACTERISTIC_TX_RESERVED 0x00, 0x00, 0x00
 #define RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_1 0x18EE2EF5
 #define RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_2 0x263D
 #define RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_3 0x4559
 #define RSI_BLE_CUSTOM_CHARACTERISTIC_TX_VALUE_128_DATA_4 0x9F, 0x95, 0x9C, 0x4F, 0x12, 0x9D, 0x9F, 0x42
-#define RSI_BLE_CHARACTERISTIC_TX_ATTRIBUTE_HANDLE_LOCATION 3
-#define RSI_BLE_CHARACTERISTIC_TX_MEASUREMENT_HANDLE_LOCATION 4
-#define RSI_BLE_CHARACTERISTIC_TX_GATT_SERVER_CLIENT_HANDLE_LOCATION 5
+#define RSI_BLE_CHARACTERISTIC_TX_ATTRIBUTE_HANDLE_LOCATION (3)
+#define RSI_BLE_CHARACTERISTIC_TX_MEASUREMENT_HANDLE_LOCATION (4)
+#define RSI_BLE_CHARACTERISTIC_TX_GATT_SERVER_CLIENT_HANDLE_LOCATION (5)
 
 // ALL Ble functions
 void rsi_ble_on_connect_event(rsi_ble_event_conn_status_t * resp_conn);
