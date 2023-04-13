@@ -30,6 +30,7 @@ project_dir = "${chip_root}/examples/lighting-app/cc13x4_26x4"
 
 ti_simplelink_sdk("sdk") {
   include_dirs = [ "${project_dir}/include" ]
+  public_configs = [ ":lighting_app_config" ]
 }
 
 ti_sysconfig("sysconfig") {
