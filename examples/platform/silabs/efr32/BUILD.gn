@@ -161,7 +161,7 @@ config("attestation-credentials-config") {
 
   defines = [
     # Set to 1 to enable EFR32 attestation credentials
-    "EFR32_ATTESTATION_CREDENTIALS",
+    "SILABS_ATTESTATION_CREDENTIALS",
   ]
 }
 

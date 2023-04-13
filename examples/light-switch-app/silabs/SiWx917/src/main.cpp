@@ -25,7 +25,7 @@
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <matter_config.h>
-#ifdef SI917_ATTESTATION_CREDENTIALS
+#ifdef SILABS_ATTESTATION_CREDENTIALS
 #include <examples/platform/silabs/SilabsDeviceAttestationCreds.h>
 #else
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -61,7 +61,7 @@ int main(void)
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
-#ifdef SI917_ATTESTATION_CREDENTIALS
+#ifdef SILABS_ATTESTATION_CREDENTIALS
     SetDeviceAttestationCredentialsProvider(SIWx917::GetSIWx917DacProvider());
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

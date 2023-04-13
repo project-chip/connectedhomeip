@@ -129,7 +129,7 @@ config("attestation-credentials-config") {
 
   defines = [
     # Set to 1 to enable SI917 attestation credentials
-    "SI917_ATTESTATION_CREDENTIALS",
+    "SILABS_ATTESTATION_CREDENTIALS",
   ]
 }
 

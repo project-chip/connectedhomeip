@@ -133,7 +133,7 @@ Silicon Labs platform.
 
 *   Build the example as Sleepy End Device (SED)
 
-          $ ./scripts/examples/gn_efr32_example.sh ./examples/light-switch-app/silabs/efr32/ ./out/light-switch-app_SED BRD4161A --sed
+          $ ./scripts/examples/gn_efr32_example.sh ./examples/light-switch-app/silabs/efr32/ ./out/light-switch-app_SED BRD4161A --sed
 
     or use gn as previously mentioned but adding the following arguments:
 
