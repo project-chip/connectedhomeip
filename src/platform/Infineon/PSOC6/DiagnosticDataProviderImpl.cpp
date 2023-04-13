@@ -185,7 +185,7 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & value)
 {
-    VerifyOrReturnError(BssId.size() >= CY_WCM_MAC_ADDR_LEN, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(value.size() >= CY_WCM_MAC_ADDR_LEN, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     cy_wcm_associated_ap_info_t ap_info;
     cy_rslt_t result = CY_RSLT_SUCCESS;
