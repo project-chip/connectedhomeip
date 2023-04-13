@@ -1022,7 +1022,7 @@ private:
                     successCb(bridge, resultArray);
                 }
                 if (attributePathParamsList != nullptr) {
-                    chip::Platform::MemoryFree(attributePathParamsList);
+                    Platform::MemoryFree(attributePathParamsList);
                 }
                 if (eventPathParamsList != nullptr) {
                     Platform::MemoryFree(eventPathParamsList);
