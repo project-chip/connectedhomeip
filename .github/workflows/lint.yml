@@ -82,7 +82,6 @@ jobs:
                       if [ "$idl_file" = './examples/chef/devices/noip_rootnode_dimmablelight_bCwGYSDpoe.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/chef/devices/rootnode_contactsensor_lFAGG1bfRO' ]; then continue; fi
                       if [ "$idl_file" = './examples/chef/devices/rootnode_contactsensor_lFAGG1bfRO.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_dimmablelight_bCwGYSDpoe.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/chef/devices/rootnode_doorlock_aNKYAreMXE.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/chef/devices/rootnode_extendedcolorlight_8lcaaYJVAa.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/chef/devices/rootnode_flowsensor_1zVxHedlaV.matter' ]; then continue; fi
