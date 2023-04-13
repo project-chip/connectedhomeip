@@ -1025,7 +1025,7 @@ private:
                     chip::Platform::MemoryFree(attributePathParamsList);
                 }
                 if (eventPathParamsList != nullptr) {
-                    chip::Platform::MemoryFree(eventPathParamsList);
+                    Platform::MemoryFree(eventPathParamsList);
                 }
                 chip::Platform::Delete(callback);
             };
