@@ -1405,7 +1405,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Before resubscribe, first test write failure and expected value effects
     NSNumber * testEndpointID = @(1);
     NSNumber * testClusterID = @(8);
-    NSNumber * testAttributeID = @(10000);
+    NSNumber * testAttributeID = @(10000); // choose a nonexistent attribute to cause a failure
     XCTestExpectation * expectedValueReportedExpectation = [self expectationWithDescription:@"Expected value reported"];
     XCTestExpectation * expectedValueRemovedExpectation = [self expectationWithDescription:@"Expected value removed"];
     delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
@@ -1430,10 +1430,11 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                clusterID:testClusterID
                              attributeID:testAttributeID
                                    value:writeValue
-                   expectedValueInterval:@(20)
+                   expectedValueInterval:@(20000)
                        timedWriteTimeout:nil];
 
-    // expected value interval is 20 but expect it get reverted immediately as the write fails
+    // expected value interval is 20s but expect it get reverted immediately as the write fails because it's writing to a
+    // nonexistent attribute
     [self waitForExpectations:@[ expectedValueReportedExpectation, expectedValueRemovedExpectation ] timeout:5 enforceOrder:YES];
 
     // reset the onAttributeDataReceived to validate the following resubscribe test
