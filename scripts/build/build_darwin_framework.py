@@ -13,9 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import argparse
+import glob
 import os
 import platform
 from subprocess import PIPE, Popen
+
+
+def get_file_from_pigweed(name):
+    CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+    PIGWEED = os.path.join(CHIP_ROOT, ".environment/cipd/packages/pigweed")
+
+    pattern = os.path.join(PIGWEED, '**', name)
+    for filename in glob.glob(pattern, recursive=True):
+        if os.path.isfile(filename):
+            return filename
 
 
 def run_command(command):
@@ -53,11 +64,6 @@ def build_darwin_framework(args):
         '-derivedDataPath',
         abs_path,
         "ARCHS={}".format(args.target_arch),
-        # For now disable unguarded-availability-new warnings because we
-        # internally use APIs that we are annotating as only available on
-        # new enough versions.  Maybe we should change out deployment
-        # target versions instead?
-        "OTHER_CFLAGS=${inherited} -Wno-unguarded-availability-new",
     ]
 
     if args.target_sdk != "macosx":
@@ -71,12 +77,47 @@ def build_darwin_framework(args):
             "GCC_SYMBOLS_PRIVATE_EXTERN=NO",
         ]
 
-    if not args.ipv4:
-        command += [
-            "CHIP_INET_CONFIG_ENABLE_IPV4=NO",
-        ]
-    command_result = run_command(command)
+    options = {
+        'CHIP_INET_CONFIG_ENABLE_IPV4': args.ipv4,
+        'CHIP_IS_ASAN': args.asan,
+        'CHIP_IS_BLE': args.ble,
+        'CHIP_IS_CLANG': args.clang,
+    }
+    for option in options:
+        command += ["{}={}".format(option, "YES" if options[option] else "NO")]
 
+    # For now disable unguarded-availability-new warnings because we
+    # internally use APIs that we are annotating as only available on
+    # new enough versions.  Maybe we should change out deployment
+    # target versions instead?
+    cflags = ["${inherited}", "-Wno-unguarded-availability-new"]
+    ldflags = ["${inherited}"]
+
+    if args.clang:
+        command += [
+            "CC={}".format(get_file_from_pigweed("clang")),
+            "CXX={}".format(get_file_from_pigweed("clang++")),
+            "COMPILER_INDEX_STORE_ENABLE=NO",
+            "CLANG_ENABLE_MODULES=NO",
+        ]
+
+        ldflags += [
+            "-nostdlib++",
+            get_file_from_pigweed("libc++.a"),
+        ]
+
+    if args.asan:
+        flags = ["-fsanitize=address", "-fno-omit-frame-pointer"]
+        cflags += flags
+        ldflags += flags
+
+        if args.clang:
+            ldflags += [
+                get_file_from_pigweed("libclang_rt.asan_osx_dynamic.dylib")
+            ]
+
+    command += ["OTHER_CFLAGS=" + ' '.join(cflags), "OTHER_LDFLAGS=" + ' '.join(ldflags)]
+    command_result = run_command(command)
     print("Build Framework Result: {}".format(command_result))
     exit(command_result)
 
@@ -114,6 +155,9 @@ if __name__ == "__main__":
                         help="Output log file destination",
                         required=True)
     parser.add_argument('--ipv4', action=argparse.BooleanOptionalAction)
+    parser.add_argument('--asan', action=argparse.BooleanOptionalAction)
+    parser.add_argument('--ble', action=argparse.BooleanOptionalAction)
+    parser.add_argument('--clang', action=argparse.BooleanOptionalAction)
 
     args = parser.parse_args()
     build_darwin_framework(args)

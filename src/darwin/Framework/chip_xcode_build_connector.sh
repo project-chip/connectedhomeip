@@ -95,6 +95,7 @@ declare -a args=(
     'chip_enable_wifi=false'
     'chip_log_message_max_size=4096' # might as well allow nice long log messages
     'chip_disable_platform_kvs=true'
+    'enable_fuzz_test_targets=false'
     "target_cpu=\"$target_cpu\""
     "target_defines=$target_defines"
     "target_cflags=[$target_cflags]"
@@ -120,6 +121,24 @@ declare -a args=(
 [[ $CHIP_INET_CONFIG_ENABLE_IPV4 == NO ]] && {
     args+=(
         'chip_inet_config_enable_ipv4=false'
+    )
+}
+
+[[ $CHIP_IS_ASAN == YES ]] && {
+    args+=(
+        'is_asan=true'
+    )
+}
+
+[[ $CHIP_IS_CLANG == YES ]] && {
+    args+=(
+        'is_clang=true'
+    )
+}
+
+[[ $CHIP_IS_BLE == NO ]] && {
+    args+=(
+        'chip_config_network_layer_ble=false'
     )
 }
 
