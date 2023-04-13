@@ -190,6 +190,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
 //   - See MTRDeviceExpectedValueFieldIndex for the definitions of indices into this array.
 // See MTRDeviceResponseHandler definition for value dictionary details.
 @property (nonatomic) NSMutableDictionary<MTRAttributePath *, NSArray *> * expectedValueCache;
+
+// This is a monotonically increasing value used when adding entries to expectedValueCache
+// Currently used/updated only in _getAttributesToReportWithNewExpectedValues:expirationTime:expectedValueID:
 @property (nonatomic) uint64_t expectedValueNextID;
 
 @property (nonatomic) BOOL expirationCheckScheduled;
@@ -1020,12 +1023,18 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
             // Case where new expected value overrides previous expected value - report new expected value
             *shouldReportValue = YES;
             *attributeValueToReport = expectedAttributeValue;
-        } else if (!expectedAttributeValue
-            && ![self _attributeDataValue:previousExpectedValue[MTRDeviceExpectedValueFieldValueIndex]
-                       isEqualToDataValue:_readCache[attributePath]]) {
-            // Case of removing expected value that is different than read cache - report read cache value
-            *shouldReportValue = YES;
-            *attributeValueToReport = _readCache[attributePath];
+        } else if (!expectedAttributeValue) {
+            // Remove previous expected value only if it's from the same setExpectedValues operation
+            NSNumber * previousExpectedValueID = previousExpectedValue[MTRDeviceExpectedValueFieldIDIndex];
+            if (previousExpectedValueID.unsignedLongLongValue == expectedValueID) {
+                if (![self _attributeDataValue:previousExpectedValue[MTRDeviceExpectedValueFieldValueIndex]
+                            isEqualToDataValue:_readCache[attributePath]]) {
+                    // Case of removing expected value that is different than read cache - report read cache value
+                    *shouldReportValue = YES;
+                    *attributeValueToReport = _readCache[attributePath];
+                    _expectedValueCache[attributePath] = nil;
+                }
+            }
         }
     } else {
         if (expectedAttributeValue
@@ -1040,12 +1049,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
 
     if (expectedAttributeValue) {
         _expectedValueCache[attributePath] = @[ expirationTime, expectedAttributeValue, @(expectedValueID) ];
-    } else if (previousExpectedValue) {
-        // Remove previous expected value only if it's from the same setExpectedValues operation
-        NSNumber * previousExpectedValueID = previousExpectedValue[MTRDeviceExpectedValueFieldIDIndex];
-        if (previousExpectedValueID.unsignedLongLongValue == expectedValueID) {
-            _expectedValueCache[attributePath] = nil;
-        }
     }
 }
 
@@ -1091,7 +1094,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
     [self setExpectedValues:values expectedValueInterval:expectedValueInterval expectedValueID:nil];
 }
 
-// expectedValueID is an out-argument that returns
+// expectedValueID is an out-argument that returns an identifier to be used when removing expected values
 - (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
     expectedValueInterval:(NSNumber *)expectedValueInterval
           expectedValueID:(uint64_t *)expectedValueID
