@@ -999,14 +999,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
     return attributesToReport;
 }
 
-// If value is non-nil, return new expected value ID in the expectedValueID.
-// If value is nil, use the expectedValueID pointed
+// If value is non-nil, associate with expectedValueID
+// If value is nil, remove only if expectedValueID matches
 - (void)_setExpectedValue:(NSDictionary<NSString *, id> *)expectedAttributeValue
              attributePath:(MTRAttributePath *)attributePath
             expirationTime:(NSDate *)expirationTime
          shouldReportValue:(BOOL *)shouldReportValue
     attributeValueToReport:(NSDictionary<NSString *, id> **)attributeValueToReport
-           expectedValueID:(uint64_t *)expectedValueID
+           expectedValueID:(uint64_t)expectedValueID
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -1039,15 +1039,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
     }
 
     if (expectedAttributeValue) {
-        uint64_t expectedValueIDToReturn = _expectedValueNextID++;
-        _expectedValueCache[attributePath] = @[ expirationTime, expectedAttributeValue, @(expectedValueIDToReturn) ];
-        if (expectedValueID) {
-            *expectedValueID = expectedValueIDToReturn;
-        }
+        _expectedValueCache[attributePath] = @[ expirationTime, expectedAttributeValue, @(expectedValueID) ];
     } else if (previousExpectedValue) {
         // Remove previous expected value only if it's from the same setExpectedValues operation
         NSNumber * previousExpectedValueID = previousExpectedValue[MTRDeviceExpectedValueFieldIDIndex];
-        if (previousExpectedValueID.unsignedLongLongValue == *expectedValueID) {
+        if (previousExpectedValueID.unsignedLongLongValue == expectedValueID) {
             _expectedValueCache[attributePath] = nil;
         }
     }
@@ -1059,6 +1055,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
                                          expectedValueID:(uint64_t *)expectedValueID
 {
     os_unfair_lock_assert_owner(&self->_lock);
+    uint64_t expectedValueIDToReturn = _expectedValueNextID++;
 
     NSMutableArray * attributesToReport = [NSMutableArray array];
     NSMutableArray * attributePathsToReport = [NSMutableArray array];
@@ -1073,12 +1070,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
                     expirationTime:expirationTime
                  shouldReportValue:&shouldReportValue
             attributeValueToReport:&attributeValueToReport
-                   expectedValueID:expectedValueID];
+                   expectedValueID:expectedValueIDToReturn];
 
         if (shouldReportValue) {
             [attributesToReport addObject:@{ MTRAttributePathKey : attributePath, MTRDataKey : attributeValueToReport }];
             [attributePathsToReport addObject:attributePath];
         }
+    }
+    if (expectedValueID) {
+        *expectedValueID = expectedValueIDToReturn;
     }
 
     MTR_LOG_INFO("%@ report from new expected values %@", self, attributePathsToReport);
@@ -1091,6 +1091,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
     [self setExpectedValues:values expectedValueInterval:expectedValueInterval expectedValueID:nil];
 }
 
+// expectedValueID is an out-argument that returns
 - (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
     expectedValueInterval:(NSNumber *)expectedValueInterval
           expectedValueID:(uint64_t *)expectedValueID
@@ -1141,7 +1142,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
                 expirationTime:nil
              shouldReportValue:&shouldReportValue
         attributeValueToReport:&attributeValueToReport
-               expectedValueID:&expectedValueID];
+               expectedValueID:expectedValueID];
 
     MTR_LOG_INFO("%@ remove expected value for path %@ should report %@", self, attributePath, shouldReportValue ? @"YES" : @"NO");
 
