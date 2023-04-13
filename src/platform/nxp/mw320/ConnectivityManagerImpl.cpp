@@ -193,7 +193,7 @@ CHIP_ERROR ConnectivityManagerImpl::CommitConfig()
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(MutableByteSpan & value)
 {
     constexpr size_t bssIdSize = 6;
-    VerifyOrReturnError(BssId.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(value.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     int ret = wlan_get_current_network(&sta_network);
 
