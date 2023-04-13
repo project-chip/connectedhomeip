@@ -49,7 +49,7 @@
 #include "sl_power_manager.h"
 #endif
 
-#if defined(EFR32MG24)
+#if SL_WIFI
 #include "spi_multiplex.h"
 StaticSemaphore_t spi_sem_peripharal;
 SemaphoreHandle_t spi_sem_sync_hdl;
