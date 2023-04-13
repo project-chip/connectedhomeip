@@ -156,7 +156,13 @@ public:
     /**
      * WiFi network diagnostics methods
      */
-    virtual CHIP_ERROR GetWiFiBssId(ByteSpan & value);
+
+    /**
+     * The MutableByteSpan provided to GetWiFiBssId must have size at least
+     * kMaxHardwareAddrSize. Its size will be set to the actual size of the
+     * BSSID.
+     */
+    virtual CHIP_ERROR GetWiFiBssId(MutableByteSpan & value);
     virtual CHIP_ERROR GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType);
     virtual CHIP_ERROR GetWiFiVersion(app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum & wiFiVersion);
     virtual CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber);
@@ -328,7 +334,7 @@ inline CHIP_ERROR DiagnosticDataProvider::ResetEthNetworkDiagnosticsCounts()
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-inline CHIP_ERROR DiagnosticDataProvider::GetWiFiBssId(ByteSpan & value)
+inline CHIP_ERROR DiagnosticDataProvider::GetWiFiBssId(MutableByteSpan & value)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

@@ -110,7 +110,6 @@ public:
     uint32_t mPacketUnicastRxCount   = 0;
     uint32_t mPacketUnicastTxCount   = 0;
     uint64_t mOverrunCount           = 0;
-    uint8_t mWiFiMacAddress[CY_WCM_MAC_ADDR_LEN];
     app::DataModel::Nullable<bool> mipv4_offpremise;
     app::DataModel::Nullable<bool> mipv6_offpremise;
 };
