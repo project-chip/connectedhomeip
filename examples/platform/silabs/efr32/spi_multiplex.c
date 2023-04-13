@@ -40,7 +40,7 @@ void spi_drv_reinit(uint32_t baudrate)
 {
     if (USART_BaudrateGet(USART0) == baudrate)
     {
-        // USART synced to buadrate already
+        // USART synced to baudrate already
         return;
     }
     // USART is used in MG24 + WF200 combination
