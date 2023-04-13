@@ -38,6 +38,11 @@
  *****************************************************************************/
 void spi_drv_reinit(uint32_t baudrate)
 {
+    if (USART_BaudrateGet(MY_USART) == baudrate)
+    {
+        // USART synced to buadrate already
+        return;
+    }
     // USART is used in MG24 + WF200 combination
     USART_InitSync_TypeDef usartInit = USART_INITSYNC_DEFAULT;
     usartInit.msbf                   = true;
