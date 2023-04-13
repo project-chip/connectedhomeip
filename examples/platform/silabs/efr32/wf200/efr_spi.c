@@ -381,10 +381,6 @@ sl_status_t sl_wfx_host_enable_spi(void)
 {
     if (spi_enabled == false)
     {
-#ifdef SLEEP_ENABLED
-        // Prevent the host to use lower EM than EM1
-        sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
-#endif
         spi_enabled = true;
     }
     return SL_STATUS_OK;
@@ -403,10 +399,6 @@ sl_status_t sl_wfx_host_disable_spi(void)
     if (spi_enabled == true)
     {
         spi_enabled = false;
-#ifdef SLEEP_ENABLED
-        // Allow the host to use the lowest allowed EM
-        sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
-#endif
     }
     return SL_STATUS_OK;
 }
