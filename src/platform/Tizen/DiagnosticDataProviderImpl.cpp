@@ -205,14 +205,12 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
-    struct mallinfo mallocInfo = mallinfo();
-    currentHeapHighWatermark   = mallocInfo.uordblks;
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
 {
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)

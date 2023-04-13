@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include "ConnectivityUtils.h"
+
 #include <app-common/zap-generated/enums.h>
 #include <platform/Tizen/ConnectivityUtils.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -111,26 +113,28 @@ CHIP_ERROR ConnectivityUtils::GetInterfaceHardwareAddrs(const char * ifname, uin
     CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
     int skfd;
 
+    if (ifname[0] == '\0')
+    {
+        ChipLogError(DeviceLayer, "Invalid argument for interface name");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
         ChipLogError(DeviceLayer, "Failed to create a channel to the NET kernel.");
         return CHIP_ERROR_OPEN_FAILED;
     }
 
-    if (ifname[0] != '\0')
+    struct ifreq req;
+    Platform::CopyString(req.ifr_name, ifname);
+    if (ioctl(skfd, SIOCGIFHWADDR, &req) != -1)
     {
-        struct ifreq req;
+        // Copy 48-bit IEEE MAC Address
+        VerifyOrReturnError(bufSize >= 6, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-        strcpy(req.ifr_name, ifname);
-        if (ioctl(skfd, SIOCGIFHWADDR, &req) != -1)
-        {
-            // Copy 48-bit IEEE MAC Address
-            VerifyOrReturnError(bufSize >= 6, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-            memset(buf, 0, bufSize);
-            memcpy(buf, req.ifr_ifru.ifru_hwaddr.sa_data, 6);
-            err = CHIP_NO_ERROR;
-        }
+        memset(buf, 0, bufSize);
+        memcpy(buf, req.ifr_ifru.ifru_hwaddr.sa_data, 6);
+        err = CHIP_NO_ERROR;
     }
 
     close(skfd);
@@ -250,7 +254,6 @@ CHIP_ERROR ConnectivityUtils::GetWiFiInterfaceName(char * ifname, size_t bufSize
 CHIP_ERROR ConnectivityUtils::GetWiFiChannelNumber(const char * ifname, uint16_t & channelNumber)
 {
     CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
-
     struct iwreq wrq;
     int skfd;
 
@@ -260,13 +263,17 @@ CHIP_ERROR ConnectivityUtils::GetWiFiChannelNumber(const char * ifname, uint16_t
         return CHIP_ERROR_OPEN_FAILED;
     }
 
-    if (GetWiFiParameter(skfd, ifname, SIOCGIWFREQ, &wrq) == CHIP_NO_ERROR)
+    if ((err = GetWiFiParameter(skfd, ifname, SIOCGIWFREQ, &wrq)) == CHIP_NO_ERROR)
     {
         double freq = ConvertFrequenceToFloat(&(wrq.u.freq));
         VerifyOrReturnError((freq / 1000000) <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
         channelNumber = MapFrequencyToChannel(static_cast<uint16_t>(freq / 1000000));
 
         err = CHIP_NO_ERROR;
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get channel/frequency (Hz).")
     }
 
     close(skfd);
@@ -285,7 +292,7 @@ CHIP_ERROR ConnectivityUtils::GetWiFiRssi(const char * ifname, int8_t & rssi)
         return CHIP_ERROR_OPEN_FAILED;
     }
 
-    if (GetWiFiStats(skfd, ifname, &stats) == CHIP_NO_ERROR)
+    if ((err = GetWiFiStats(skfd, ifname, &stats)) == CHIP_NO_ERROR)
     {
         struct iw_quality * qual = &stats.qual;
 
@@ -327,6 +334,10 @@ CHIP_ERROR ConnectivityUtils::GetWiFiRssi(const char * ifname, int8_t & rssi)
             }
         }
     }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get /proc/net/wireless stats.")
+    }
 
     close(skfd);
     return err;
@@ -366,10 +377,14 @@ CHIP_ERROR ConnectivityUtils::GetWiFiCurrentMaxRate(const char * ifname, uint64_
         return CHIP_ERROR_OPEN_FAILED;
     }
 
-    if (GetWiFiParameter(skfd, ifname, SIOCGIWRATE, &wrq) == CHIP_NO_ERROR)
+    if ((err = GetWiFiParameter(skfd, ifname, SIOCGIWRATE, &wrq)) == CHIP_NO_ERROR)
     {
         currentMaxRate = wrq.u.bitrate.value;
         err            = CHIP_NO_ERROR;
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get channel/frequency (Hz).")
     }
 
     close(skfd);

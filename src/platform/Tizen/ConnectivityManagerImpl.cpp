@@ -257,7 +257,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(ByteSpan & value)
 {
     uint8_t bssId[kMaxHardwareAddrSize];
     CHIP_ERROR err = Internal::WiFiMgr().GetBssId(bssId);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    ReturnErrorOnFailure(err);
 
     value = ByteSpan(bssId, 6);
 
@@ -268,7 +268,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & secur
 {
     wifi_manager_security_type_e secType;
     CHIP_ERROR err = Internal::WiFiMgr().GetSecurityType(&secType);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    ReturnErrorOnFailure(err);
 
     switch (secType)
     {
@@ -299,8 +299,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(SecurityTypeEnum & secur
 
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(WiFiVersionEnum & wiFiVersion)
 {
-    wiFiVersion = WiFiVersionEnum::kN;
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI

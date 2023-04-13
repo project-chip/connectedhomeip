@@ -23,7 +23,7 @@
  *          for Tizen platforms.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
+#include "ConfigurationManagerImpl.h"
 
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceBuildConfig.h>
