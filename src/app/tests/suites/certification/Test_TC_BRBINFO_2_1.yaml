@@ -35,7 +35,7 @@ tests:
           [1656495199.434300][2158:2163] CHIP:TOO:   VendorName: TEST_VENDOR
       disabled: true
 
-    - label: "TH writes VendorName as sample"
+    - label: "TH writes VendorName as 'sample'"
       PICS: BRBINFO.S.A0001
       verification: |
           ./chip-tool bridgeddevicebasicinformation write-by-id 1 '"vendor-name sample"' 1 3
@@ -67,7 +67,7 @@ tests:
           [1656495322.252171][2177:2182] CHIP:TOO:   VendorID: 65521
       disabled: true
 
-    - label: "TH writes VendorID as 0x0011"
+    - label: "TH writes VendorID as '0x0011'"
       PICS: BRBINFO.S.A0002
       verification: |
           ./chip-tool bridgeddevicebasicinformation write-by-id 2 5  1 3
@@ -99,7 +99,7 @@ tests:
           [1656495708.412745][2200:2205] CHIP:TOO:   ProductName: TEST_PRODUCT
       disabled: true
 
-    - label: "TH writes ProductName as newproduct"
+    - label: "TH writes ProductName as 'newproduct'"
       PICS: BRBINFO.S.A0003
       verification: |
           ./chip-tool bridgeddevicebasicinformation write-by-id 3 '"newproduct"' 1 3
@@ -133,7 +133,7 @@ tests:
           [1657696463.081791][15476:15481] CHIP:TOO:   NodeLabel: Light 1
       disabled: true
 
-    - label: "TH writes newnode to NodeLabel"
+    - label: "TH writes 'newnode' to NodeLabel"
       PICS: BRBINFO.S.A0005
       verification: |
           ./chip-tool bridgeddevicebasicinformation write node-label '"newnode"' 1 3
@@ -176,7 +176,7 @@ tests:
           [1656496175.564718][2302:2307] CHIP:TOO:   HardwareVersion: 0
       disabled: true
 
-    - label: "TH writes HardwareVersion as 0x4531"
+    - label: "TH writes HardwareVersion as '0x4531'"
       PICS: BRBINFO.S.A0007
       verification: |
           ./chip-tool bridgeddevicebasicinformation write-by-id 7 '"hardware-version 0x4531"'  1 3
@@ -208,7 +208,7 @@ tests:
           [1656496257.298675][2315:2320] CHIP:TOO:   HardwareVersionString: TEST_VERSION
       disabled: true
 
-    - label: "TH writes HardwareVersionString as newhardwareversion"
+    - label: "TH writes HardwareVersionString as 'newhardwareversion'"
       PICS: BRBINFO.S.A0008
       verification: |
           ./chip-tool bridgeddevicebasicinformation write-by-id 8 '"hardware-version-string newhardwareversion"'  1 3
@@ -240,7 +240,7 @@ tests:
           [1656496411.609866][2348:2353] CHIP:TOO:   SoftwareVersion: 1
       disabled: true
 
-    - label: "TH writes SoftwareVersion as 0x8213"
+    - label: "TH writes SoftwareVersion as '0x8213'"
       PICS: BRBINFO.S.A0009
       verification: |
           ./chip-tool bridgeddevicebasicinformation write-by-id 9 '"software-version 0x8213"' 1 3
@@ -272,7 +272,7 @@ tests:
           [1656496498.568951][2362:2367] CHIP:TOO:   SoftwareVersionString: 1.0
       disabled: true
 
-    - label: "TH writes SoftwareVersionString as 1.0"
+    - label: "TH writes SoftwareVersionString as '1.0'"
       PICS: BRBINFO.S.A000a
       verification: |
           ./chip-tool bridgeddevicebasicinformation write-by-id 10 '"software-version-string 1.0"'  1 3
@@ -305,7 +305,7 @@ tests:
           [1656496661.777852][2388:2393] CHIP:TOO:   ManufacturingDate: 20200101
       disabled: true
 
-    - label: "TH writes ManufacturingDate as 20210814789452IN"
+    - label: "TH writes ManufacturingDate as '20210814789452IN'"
       PICS: BRBINFO.S.A000b
       verification: |
           ./chip-tool bridgeddevicebasicinformation write-by-id 11 '"manufacturing-date  20210814789452IN"' 1 3
@@ -338,7 +338,7 @@ tests:
           [1656496800.941788][2405:2410] CHIP:TOO:   PartNumber: 1234
       disabled: true
 
-    - label: "TH writes PartNumber as newpart"
+    - label: "TH writes PartNumber as 'newpart'"
       PICS: BRBINFO.S.A000c
       verification: |
           ./chip-tool bridgeddevicebasicinformation write-by-id 12 '"part-number newpart"'  1 3
@@ -371,7 +371,7 @@ tests:
           [1656497181.118653][2436:2441] CHIP:TOO:   ProductURL: https://example.com/myproduct
       disabled: true
 
-    - label: "TH writes ProductURL as https://www.example.com"
+    - label: "TH writes ProductURL as 'https://www.example.com'"
       PICS: BRBINFO.S.A000d
       verification: |
           ./chip-tool bridgeddevicebasicinformation write-by-id 13 '"product-url  https://www.example.com"' 1 3
@@ -404,7 +404,7 @@ tests:
           [1656501313.811305][2602:2607] CHIP:TOO:   ProductLabel: ABCD
       disabled: true
 
-    - label: "TH writes ProductLabel as newproductlabel"
+    - label: "TH writes ProductLabel as 'newproductlabel'"
       PICS: BRBINFO.S.A000e
       verification: |
           ./chip-tool bridgeddevicebasicinformation write-by-id 14 '"product-label newproductlabel"'  1 3
@@ -438,7 +438,7 @@ tests:
           [1656501452.183890][2624:2630] CHIP:TOO:   SerialNumber: 5678
       disabled: true
 
-    - label: "TH writes SerialNumber_test as newserialnumber"
+    - label: "TH writes SerialNumber_test as 'newserialnumber'"
       PICS: BRBINFO.S.A000f
       verification: |
           ./chip-tool bridgeddevicebasicinformation write-by-id 15 '"serial-number newserialnumber"'  1 3
@@ -473,7 +473,7 @@ tests:
 
     - label:
           "TH sends Write request message to DUT to change value of Reachable to
-          false."
+          'false'."
       PICS: BRBINFO.S.A0011
       verification: |
           ./chip-tool bridgeddevicebasicinformation write-by-id 17  false 1 3
@@ -508,7 +508,7 @@ tests:
           [1656501734.253827][2673:2679] CHIP:TOO:   UniqueID: 30789FE4FCF832C9
       disabled: true
 
-    - label: "TH writes UniqueID as newid"
+    - label: "TH writes UniqueID as 'newid'"
       PICS: BRBINFO.S.A0012
       verification: |
           ./chip-tool bridgeddevicebasicinformation write-by-id 18 '"unique-id newid"'  1 3

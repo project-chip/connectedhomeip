@@ -359,6 +359,7 @@ tests:
 
     - label: "TH removes the GroupKeySet"
       cluster: "Group Key Management"
+      PICS: PICS_SDK_CI_ONLY
       endpoint: 0
       command: "KeySetRemove"
       arguments:

@@ -67,7 +67,7 @@ tests:
           Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) and TH as lock-app.
 
           To generate the event give below command
-          echo "{"Cmd": "SendDoorLockAlarm", "Params": { "EndpointId": 1, "AlarmCode": 0 } }" > /tmp/chip_lock_app_fifo-<PID>   (PID of lock app)
+          echo '{"Cmd": "SendDoorLockAlarm", "Params": { "EndpointId": 1, "AlarmCode": 0 } }' > /tmp/chip_lock_app_fifo-<PID>   (PID of lock app)
 
           ./chip-tool doorlock read-event door-lock-alarm 1 1
 
@@ -251,7 +251,7 @@ tests:
           [1667212365.336681][14571:14571] CHIP:DMG:                 },
 
 
-          ./chip-tool doorlock set-credential 0 "{ "credentialType" : 1 , "credentialIndex" : 1 }" 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-credential 0 '{ "credentialType" : 1 , "credentialIndex" : 1 }' 123456 1 null null 1 1 --timedInteractionTimeoutMs 1000
 
           Verify "DUT receives the set-credential response " on the TH(Lock-app) Log:
 
@@ -498,7 +498,7 @@ tests:
       PICS: DRLK.C.F05 && DRLK.C.E01
       verification: |
           To trigger the event give below command in another terminal of DUT
-           echo "{"Cmd": "SetDoorState", "Params": { "EndpointId": 1, "DoorState": 1 } }" > /tmp/chip_lock_app_fifo-<PID> (PID of lock-app)
+           echo '{"Cmd": "SetDoorState", "Params": { "EndpointId": 1, "DoorState": 1 } }' > /tmp/chip_lock_app_fifo-<PID> (PID of lock-app)
 
           ./chip-tool doorlock read-event door-state-change 1 1
 

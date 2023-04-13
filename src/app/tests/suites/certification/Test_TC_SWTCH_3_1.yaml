@@ -144,7 +144,7 @@ tests:
           the TH one at a time in a manufacturer specific order."
       PICS: SWTCH.C.AM-WRITE
       verification: |
-          This cluster doesn"t have any writable attributes
+          This cluster doesn't have any writable attributes
       disabled: true
 
     - label:
@@ -152,7 +152,7 @@ tests:
           the TH one at a time in a manufacturer specific order."
       PICS: SWTCH.C.AO-WRITE
       verification: |
-          This cluster doesn"t have any writable attributes
+          This cluster doesn't have any writable attributes
       disabled: true
 
     - label:
@@ -453,5 +453,5 @@ tests:
           the TH one at a time in a manufacturer specific order."
       PICS: SWTCH.C.AO-WRITE
       verification: |
-          This cluster doesn"t have any writable attributes
+          This cluster doesn't have any writable attributes
       disabled: true
