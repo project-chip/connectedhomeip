@@ -187,7 +187,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
 @property (nonatomic) NSMutableDictionary<MTRAttributePath *, NSDictionary *> * readCache;
 
 // Expected value cache is attributePath => NSArray of [NSDate of expiration time, NSDictionary of value, expected value ID]
-//   - MTRDeviceExpectedValueFieldIndex
+//   - See MTRDeviceExpectedValueFieldIndex for the definitions of indices into this array.
 // See MTRDeviceResponseHandler definition for value dictionary details.
 @property (nonatomic) NSMutableDictionary<MTRAttributePath *, NSArray *> * expectedValueCache;
 @property (nonatomic) uint64_t expectedValueNextID;
