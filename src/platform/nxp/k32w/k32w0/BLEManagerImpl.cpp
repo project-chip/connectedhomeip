@@ -125,20 +125,6 @@ CHIP_ERROR BLEManagerImpl::blekw_controller_init(void)
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    /* Setup Interrupt priorities of Interrupt handlers that are used
-     * in application to meet requirements of FreeRTOS */
-
-    // BLE_DP_IRQHandler
-    NVIC_SetPriority(BLE_DP_IRQn, configMAX_PRIORITIES - 1);
-    // BLE_DP0_IRQHandler
-    NVIC_SetPriority(BLE_DP0_IRQn, configMAX_PRIORITIES - 1);
-    // BLE_DP1_IRQHandler
-    NVIC_SetPriority(BLE_DP1_IRQn, configMAX_PRIORITIES - 1);
-    // BLE_DP2_IRQHandler
-    NVIC_SetPriority(BLE_DP2_IRQn, configMAX_PRIORITIES - 1);
-    // BLE_LL_ALL_IRQHandler
-    NVIC_SetPriority(BLE_LL_ALL_IRQn, configMAX_PRIORITIES - 1);
-
     /* BLE Controller Init */
     if (osaStatus_Success != Controller_Init(Ble_HciRecv))
     {
