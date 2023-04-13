@@ -38,7 +38,7 @@
  *****************************************************************************/
 void spi_drv_reinit(uint32_t baudrate)
 {
-    if (USART_BaudrateGet(MY_USART) == baudrate)
+    if (USART_BaudrateGet(USART0) == baudrate)
     {
         // USART synced to buadrate already
         return;
@@ -52,7 +52,7 @@ void spi_drv_reinit(uint32_t baudrate)
     usartInit.databits               = (USART_Databits_TypeDef) databits;
     usartInit.autoCsEnable           = true;
 
-    USART_InitSync(MY_USART, &usartInit);
+    USART_InitSync(USART0, &usartInit);
 }
 
 /****************************************************************************
