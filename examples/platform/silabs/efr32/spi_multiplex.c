@@ -47,7 +47,7 @@ void spi_drv_reinit(uint32_t baudrate)
     usartInit.databits               = (USART_Databits_TypeDef) databits;
     usartInit.autoCsEnable           = true;
 
-    USART_InitSync(USART0, &usartInit);
+    USART_InitSync(MY_USART, &usartInit);
 }
 
 /****************************************************************************
