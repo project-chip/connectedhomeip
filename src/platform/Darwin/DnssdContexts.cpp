@@ -112,17 +112,17 @@ DNSServiceProtocol GetProtocol(const chip::Inet::IPAddressType & addressType)
 namespace chip {
 namespace Dnssd {
 
-CHIP_ERROR GenericContext::Finalize(DNSServiceErrorType err)
+CHIP_ERROR GenericContext::FinalizeInternal(const char * errorStr, CHIP_ERROR err)
 {
     if (MdnsContexts::GetInstance().Has(this) == CHIP_NO_ERROR)
     {
-        if (kDNSServiceErr_NoError == err)
+        if (CHIP_NO_ERROR == err)
         {
             DispatchSuccess();
         }
         else
         {
-            DispatchFailure(err);
+            DispatchFailure(errorStr, err);
         }
     }
     else
@@ -130,7 +130,17 @@ CHIP_ERROR GenericContext::Finalize(DNSServiceErrorType err)
         chip::Platform::Delete(this);
     }
 
-    return Error::ToChipError(err);
+    return err;
+}
+
+CHIP_ERROR GenericContext::Finalize(CHIP_ERROR err)
+{
+    return FinalizeInternal(err.AsString(), err);
+}
+
+CHIP_ERROR GenericContext::Finalize(DNSServiceErrorType err)
+{
+    return FinalizeInternal(Error::ToString(err), Error::ToChipError(err));
 }
 
 MdnsContexts::~MdnsContexts()
@@ -289,10 +299,10 @@ RegisterContext::RegisterContext(const char * sType, const char * instanceName, 
     mInstanceName = instanceName;
 }
 
-void RegisterContext::DispatchFailure(DNSServiceErrorType err)
+void RegisterContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 {
-    ChipLogError(Discovery, "Mdns: Register failure (%s)", Error::ToString(err));
-    callback(context, nullptr, nullptr, Error::ToChipError(err));
+    ChipLogError(Discovery, "Mdns: Register failure (%s)", errorStr);
+    callback(context, nullptr, nullptr, err);
     MdnsContexts::GetInstance().Remove(this);
 }
 
@@ -316,10 +326,10 @@ BrowseContext::BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServ
     protocol = cbContextProtocol;
 }
 
-void BrowseContext::DispatchFailure(DNSServiceErrorType err)
+void BrowseContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 {
-    ChipLogError(Discovery, "Mdns: Browse failure (%s)", Error::ToString(err));
-    callback(context, nullptr, 0, true, Error::ToChipError(err));
+    ChipLogError(Discovery, "Mdns: Browse failure (%s)", errorStr);
+    callback(context, nullptr, 0, true, err);
     MdnsContexts::GetInstance().Remove(this);
 }
 
@@ -353,14 +363,14 @@ ResolveContext::ResolveContext(void * cbContext, DnssdResolveCallback cb, chip::
 
 ResolveContext::~ResolveContext() {}
 
-void ResolveContext::DispatchFailure(DNSServiceErrorType err)
+void ResolveContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 {
-    ChipLogError(Discovery, "Mdns: Resolve failure (%s)", Error::ToString(err));
+    ChipLogError(Discovery, "Mdns: Resolve failure (%s)", errorStr);
     // Remove before dispatching, so calls back into
     // ChipDnssdResolveNoLongerNeeded don't find us and try to also remove us.
     bool needDelete = MdnsContexts::GetInstance().RemoveWithoutDeleting(this);
 
-    callback(context, nullptr, Span<Inet::IPAddress>(), Error::ToChipError(err));
+    callback(context, nullptr, Span<Inet::IPAddress>(), err);
 
     if (needDelete)
     {
