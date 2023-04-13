@@ -121,7 +121,7 @@ CHIP_ERROR ExtensionFieldSetsImpl::InsertFieldSet(const ExtensionFieldSet & fiel
 
 CHIP_ERROR ExtensionFieldSetsImpl::GetFieldSetAtPosition(ExtensionFieldSet & fieldSet, uint8_t position) const
 {
-    VerifyOrReturnError(position < mFieldSetsCount, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(position < mFieldSetsCount, CHIP_ERROR_INVALID_ARGUMENT);
 
     fieldSet = mFieldSets[position];
 

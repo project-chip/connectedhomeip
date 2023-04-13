@@ -262,7 +262,7 @@ void OperationalSessionSetup::EnqueueConnectionCallbacks(Callback::Callback<OnDe
     }
 }
 
-void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error)
+void OperationalSessionSetup::DequeueConnectionCallbacksWithoutReleasing(CHIP_ERROR error)
 {
     Cancelable failureReady, successReady;
 
@@ -318,6 +318,11 @@ void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error)
             cb->mCall(cb->mContext, *exchangeMgr, optionalSessionHandle.Value());
         }
     }
+}
+
+void OperationalSessionSetup::DequeueConnectionCallbacks(CHIP_ERROR error)
+{
+    DequeueConnectionCallbacksWithoutReleasing(error);
     VerifyOrDie(mReleaseDelegate != nullptr);
     mReleaseDelegate->ReleaseSession(this);
 }
@@ -429,6 +434,8 @@ OperationalSessionSetup::~OperationalSessionSetup()
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
     CancelSessionSetupReattempt();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
+    DequeueConnectionCallbacksWithoutReleasing(CHIP_ERROR_CANCELLED);
 }
 
 CHIP_ERROR OperationalSessionSetup::LookupPeerAddress()
