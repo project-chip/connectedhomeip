@@ -255,7 +255,7 @@ bool ConnectivityManagerImpl::IsWiFiManagementStarted()
 
 CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(ByteSpan & value)
 {
-    uint8_t bssId[kMaxHardwareAddrSize];
+    uint8_t * bssId = nullptr;
     CHIP_ERROR err = Internal::WiFiMgr().GetBssId(bssId);
     ReturnErrorOnFailure(err);
 

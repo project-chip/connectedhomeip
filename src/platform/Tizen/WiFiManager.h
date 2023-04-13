@@ -96,6 +96,7 @@ private:
     wifi_manager_module_state_e mModuleState;
     wifi_manager_connection_state_e mConnectionState;
 
+    uint8_t mWiFiBSSID[kWiFiBSSIDLength];
     char mWiFiSSID[kMaxWiFiSSIDLength + 1];
     char mWiFiKey[kMaxWiFiKeyLength + 1];
 
