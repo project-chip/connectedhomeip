@@ -227,6 +227,10 @@ config("efr32-common-config") {
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]
   }
+
+  # Do not warn for LOAD segment with RWX permissions
+  # Uncomment this cflag when pigweed update is done and GCC 12.2 is used.
+  #ldflags = [ "-Wl,--no-warn-rwx-segment" ]
 }
 
 config("silabs-wifi-config") {
@@ -279,6 +283,7 @@ source_set("efr32-common") {
 
   sources = [
     "${silabs_common_plat_dir}/heap_4_silabs.c",
+    "${silabs_common_plat_dir}/syscalls_stubs.cpp",
     "efr32_utils.cpp",
     "init_efrPlatform.cpp",
     "matter_config.cpp",
