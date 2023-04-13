@@ -79,10 +79,7 @@ jobs:
                       #       https://github.com/project-chip/connectedhomeip/issues/19169
                       #       https://github.com/project-chip/connectedhomeip/issues/22640
                       if [ "$idl_file" = './examples/all-clusters-app/all-clusters-common/all-clusters-app.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/noip_rootnode_dimmablelight_bCwGYSDpoe.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_contactsensor_lFAGG1bfRO' ]; then continue; fi
                       if [ "$idl_file" = './examples/chef/devices/rootnode_contactsensor_lFAGG1bfRO.matter' ]; then continue; fi
-                      if [ "$idl_file" = './examples/chef/devices/rootnode_dimmablelight_bCwGYSDpoe.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/chef/devices/rootnode_doorlock_aNKYAreMXE.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/chef/devices/rootnode_extendedcolorlight_8lcaaYJVAa.matter' ]; then continue; fi
                       if [ "$idl_file" = './examples/chef/devices/rootnode_flowsensor_1zVxHedlaV.matter' ]; then continue; fi
