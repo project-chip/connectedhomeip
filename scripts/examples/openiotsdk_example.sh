@@ -153,7 +153,7 @@ function run_fvp() {
 
     # Check if FVP GDB plugin file exists
     if "$DEBUG" && ! [ -f "$GDB_PLUGIN" ]; then
-        echo "Error: $GDB_PLUGIN does not exist. Ensure Fast Model extensions are mounted." >&2
+        echo "Error: $GDB_PLUGIN does not exist." >&2
         exit 1
     fi
 

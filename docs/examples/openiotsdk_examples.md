@@ -87,58 +87,79 @@ network from host settings.
 
 ### Debugging setup
 
-Debugging Matter application running on `FVP` model requires GDB Remote
+Debugging the Matter application running on `FVP` model requires GDB Remote
 Connection Plugin for Fast Model. More details
 [GDBRemoteConnection](https://developer.arm.com/documentation/100964/1116/Plug-ins-for-Fast-Models/GDBRemoteConnection).
 
-The Third-Party IP add-on package can be downloaded from ARM developer website
-[Fast models](https://developer.arm.com/downloads/-/fast-models). Currently
-required version is `11.16`.
+The `Fast Models FVP` add-on package can be downloaded from the ARM developer
+website [Fast models](https://developer.arm.com/downloads/-/fast-models). After
+login in to the `ARM developer` platform search for `Fast Models`, choose
+`Fast Models (FM000A)` on the list of results, then choose the revision
+`r11p16-16rel0` and download the
+`Third Party Add-ons for Fast Models 11.16 (Linux)` package. Then unpack the
+package in the selected location on the host machine.
 
-To install Fast Model Third-Party IP package:
+Now you should add the GDB Remote Connection Plugin to your development
+environment:
 
--   unpack the installation package in a temporary location
--   execute the command `./setup.bin` (Linux) or `Setup.exe` (Windows), and
-    follow the installation instructions.
+-   Linux host environment:
 
-After installation the GDB Remote Connection Plugin should be visible in
-`FastModelsPortfolio_11.16/plugins` directory.
+    -   install Fast Model Extension package by executing the command
+        `./setup.bin`, and follow the installation instructions. After
+        installation, the GDB Remote Connection Plugin should be visible in
+        `<installation directory>/FastModelsPortfolio_11.16/plugins/Linux64_GCC-9.3`
+        directory.
+    -   add GDB plugin path to environment variable as
+        `FAST_MODEL_PLUGINS_PATH`.
 
-Then add the GDB plugin to your development environment:
+        Example:
 
--   host environment - add GDB plugin path to environment variable as
-    FAST_MODEL_PLUGINS_PATH.
+        ```
+        export FAST_MODEL_PLUGINS_PATH=<installation directory>/FastModelsPortfolio_11.16/plugins/Linux64_GCC-9.3
+        ```
 
-    Example
+-   Docker container environment:
 
-    ```
-    export FAST_MODEL_PLUGINS_PATH=/opt/FastModelsPortfolio_11.16/plugins/Linux64_GCC-9.3
-    ```
+    -   pass the Fast Model Extension package to Docker container development
+        environment by mounting it into the
+        `/opt/FastModels_ThirdParty_IP_11-16_b16_Linux64` directory in the
+        container. Add a volume bound to this directory
+        [Add local file mount](https://code.visualstudio.com/remote/advancedcontainers/add-local-file-mount).
 
--   Docker container environment - mount the Fast Model Third-Party IP directory
-    into the `/opt/FastModelsPortfolio_11.16` directory in container.
+        You can edit the `.devcontainer/devcontainer.json` file, for example:
 
-    The Vscode devcontainer users should add a volume bound to this directory
-    [Add local file mount](https://code.visualstudio.com/remote/advancedcontainers/add-local-file-mount).
-
-    You can edit the `.devcontainer/devcontainer.json` file, for example:
-
-    ```
-    ...
-    "mounts": [
+        ```
         ...
-        "source=/opt/FastModelsPortfolio_11.16,target=/opt/FastModelsPortfolio_11.16,type=bind,consistency=cached"
+        "mounts": [ ...
+        "source=/opt/FastModels_ThirdParty_IP_11-16_b16_Linux64,target=/opt/FastModels_ThirdParty_IP_11-16_b16_Linux64,type=bind,consistency=cached"
+        ... ],
         ...
-    ],
-    ...
-    ```
+        ```
 
-    In this case, the FAST MODEL PLUGINS PATH environment variable is already
-    created.
+        Or if you launch the Docker container directly from CLI, use the above
+        arguments with `docker run` command:
 
-    If you launch the Docker container directly from CLI, use the above
-    arguments with `docker run` command. Remember add GDB plugin path to
-    environment variable as FAST_MODEL_PLUGINS_PATH inside container.
+        ```
+        docker run ... --mount type=bind,source=/opt/FastModels_ThirdParty_IP_11-16_b16_Linux64,target=/opt/FastModels_ThirdParty_IP_11-16_b16_Linux64 ...
+        ```
+
+    -   install the Fast Model Extension package via setup script inside Docker
+        container:
+
+        ```
+        ${MATTER_ROOT}/scripts/setup/openiotsdk/debugging_setup.sh
+        ```
+
+    -   the GDB Remote Connection Plugin should be visible in
+        `/opt/FastModelsPortfolio_11.16/plugins/Linux64_GCC-9.3` directory.
+        -   For `VScode devcontainer` use the environment variable
+            `FAST_MODEL_PLUGINS_PATH` to point to the correct directory.
+        -   If the Docker container is directly launched remember to add the GDB
+            Remote Connection Plugin path to the environment variable
+            `FAST_MODEL_PLUGINS_PATH` inside the container:
+            ```
+            export FAST_MODEL_PLUGINS_PATH=/opt/FastModelsPortfolio_11.16/plugins/Linux64_GCC-9.3
+            ```
 
 ## Configuration
 
