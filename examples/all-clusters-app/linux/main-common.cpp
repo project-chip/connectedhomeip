@@ -25,6 +25,9 @@
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/clusters/mode-select-server/mode-select-server.h>
+#include <app/clusters/mode-select-server/mode-select-delegate.h>
+#include "../all-clusters-common/include/mode-select-1-delegate.h"
 #include <app/server/Server.h>
 #include <app/util/af.h>
 #include <lib/support/CHIPMem.h>
@@ -140,6 +143,12 @@ Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(kNetw
 Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(kNetworkCommissioningEndpointMain, &sEthernetDriver);
 } // namespace
 
+// Mode select
+namespace {
+    Clusters::ModeSelect::ModeSelectDelegate1 aliasDelegate1;
+    Clusters::ModeSelect::Instance modeSelectAliasA(0x1, 0x50, &aliasDelegate1);
+}
+
 void ApplicationInit()
 {
     (void) kNetworkCommissioningEndpointMain;
@@ -193,6 +202,8 @@ void ApplicationInit()
     {
         sEthernetNetworkCommissioningInstance.Init();
     }
+
+    modeSelectAliasA.Init();
 
     std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
 

@@ -23,7 +23,7 @@ source_set("chip-all-clusters-common") {
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
-    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
+    "${chip_root}/examples/all-clusters-app/all-clusters-common/src/mode-select-1-delegate.cpp",
     "AppOptions.cpp",
     "include/tv-callbacks.cpp",
     "include/tv-callbacks.h",

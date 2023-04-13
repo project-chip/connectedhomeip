@@ -45,7 +45,6 @@ ClustersWithInitFunctions:
     - Scenes
     - Time Format Localization
     - Thermostat
-    - Mode Select
 
 ClustersWithAttributeChangedFunctions:
     - Bridged Device Basic
@@ -68,6 +67,5 @@ ClustersWithPreAttributeChangeFunctions:
     - Thermostat User Interface Configuration
     - Time Format Localization
     - Localization Configuration
-    - Mode Select
     - Fan Control
     - Thermostat
