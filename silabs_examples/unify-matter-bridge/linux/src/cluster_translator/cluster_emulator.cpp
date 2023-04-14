@@ -16,9 +16,9 @@
 #include "sl_log.h"
 #include <attribute_state_cache.hpp>
 
+#include "emulate_groups.hpp"
 #include "emulate_identify.hpp"
 #include "emulate_level.hpp"
-#include "emulate_groups.hpp"
 #include <app/clusters/identify-server/identify-server.h>
 
 #define LOG_TAG "cluster_emulator"
@@ -27,22 +27,25 @@
 
 /**
  * @brief Use default values for external attribute storage, this functions overrides a _weak_ symbol on the ember framework.
- * 
- * All attributes which has meta data with ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) and is not overridden by an attribute access interface,
- * will be read though this function. Right now this only applies to the attriutes in the Group cluster
- * 
- * @param endpoint 
- * @param clusterId 
- * @param attributeMetadata 
- * @param buffer 
- * @param maxReadLength 
- * @return EmberAfStatus 
+ *
+ * All attributes which has meta data with ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) and is not overridden by an attribute access
+ * interface, will be read though this function. Right now this only applies to the attriutes in the Group cluster
+ *
+ * @param endpoint
+ * @param clusterId
+ * @param attributeMetadata
+ * @param buffer
+ * @param maxReadLength
+ * @return EmberAfStatus
  */
-EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata,
-                                     uint8_t * buffer, uint16_t maxReadLength) {
-  sl_log_debug(LOG_TAG, "emberAfExternalAttributeReadCallback: endpoint: %d cluster: %d attribute: %d\n", endpoint, clusterId, attributeMetadata->attributeId); 
-  memcpy(buffer, &attributeMetadata->defaultValue, attributeMetadata->size);
-  return EMBER_ZCL_STATUS_SUCCESS;
+EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                   const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                   uint16_t maxReadLength)
+{
+    sl_log_debug(LOG_TAG, "emberAfExternalAttributeReadCallback: endpoint: %d cluster: %d attribute: %d\n", endpoint, clusterId,
+                 attributeMetadata->attributeId);
+    memcpy(buffer, &attributeMetadata->defaultValue, attributeMetadata->size);
+    return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 void OnIdentifyStart(::Identify *)
@@ -119,8 +122,8 @@ uint32_t ClusterEmulator::read_cluster_revision(const ConcreteReadAttributePath 
     switch (aPath.mClusterId)
     {
     case TemperatureMeasurement::Id: {
-                                       return 4;
-                                     }
+        return 4;
+    }
     }
     if (zap_cluster_revisions.count(aPath.mClusterId))
     {
@@ -134,12 +137,13 @@ uint32_t ClusterEmulator::read_cluster_revision(const ConcreteReadAttributePath 
 
 uint32_t ClusterEmulator::read_feature_map_revision(const ConcreteReadAttributePath & aPath) const
 {
+    attribute_state_cache & cache = attribute_state_cache::get_instance();
+
     sl_log_debug(LOG_TAG, "Reading feature map for cluster %d", aPath.mClusterId);
     switch (aPath.mClusterId)
     {
     case ColorControl::Id: {
         ColorControl::Attributes::ColorCapabilities::TypeInfo::Type colorControlCapabilities;
-        attribute_state_cache & cache = attribute_state_cache::get_instance();
         if (cache.get<ColorControl::Attributes::ColorCapabilities::TypeInfo::Type>(aPath, colorControlCapabilities))
         {
             return static_cast<uint32_t>(colorControlCapabilities);
@@ -152,8 +156,11 @@ uint32_t ClusterEmulator::read_feature_map_revision(const ConcreteReadAttributeP
     }
     break;
     case OnOff::Id:
-        sl_log_debug(LOG_TAG, "Returning feature map for OnOff %d", ON_OFF_LIGHTING_FEATURE_MAP_MASK);
-        return ON_OFF_LIGHTING_FEATURE_MAP_MASK;
+        if (emberAfFindServerCluster(aPath.mEndpointId, LevelControl::Id))
+        {
+            return ON_OFF_LIGHTING_FEATURE_MAP_MASK;
+        }
+        break;
     case LevelControl::Id:
         /// Check if OnOff is supported
         if (emberAfFindServerCluster(aPath.mEndpointId, OnOff::Id))
@@ -169,16 +176,12 @@ void ClusterEmulator::add_emulated_commands_and_attributes(const node_state_moni
                                                            matter_cluster_builder & cluster_builder)
 {
     // We always need to add the feature map and cluster
-    cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
-                                                                     chip::app::Clusters::Globals::Attributes::FeatureMap::Id,
-                                                                     4,
-                                                                     ZAP_TYPE(BITMAP32),
-                                                                     ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)});
-    cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ZAP_EMPTY_DEFAULT(),
-                                                                     chip::app::Clusters::Globals::Attributes::ClusterRevision::Id,
-                                                                     2,
-                                                                     ZAP_TYPE(INT16U),
-                                                                     ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)});
+    cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(),
+                                                                      chip::app::Clusters::Globals::Attributes::FeatureMap::Id, 4,
+                                                                      ZAP_TYPE(BITMAP32), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) });
+    cluster_builder.attributes.emplace_back(EmberAfAttributeMetadata{ ZAP_EMPTY_DEFAULT(),
+                                                                      chip::app::Clusters::Globals::Attributes::ClusterRevision::Id,
+                                                                      2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) });
 
     // Add emulation for commands and attributes for the cluster
     auto it = cluster_emulators_string_map.find(unify_cluster.cluster_name);
