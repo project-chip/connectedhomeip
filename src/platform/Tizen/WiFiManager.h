@@ -69,11 +69,11 @@ private:
     static void _ConnectedCb(wifi_manager_error_e wifiErr, void * userData);
     static bool _ConfigListCb(const wifi_manager_config_h config, void * userData);
 
-    static gboolean _WiFiInitialize(gpointer userData);
-    static gboolean _WiFiActivate(GMainLoop * mainLoop, gpointer userData);
-    static gboolean _WiFiDeactivate(GMainLoop * mainLoop, gpointer userData);
-    static gboolean _WiFiScan(GMainLoop * mainLoop, gpointer userData);
-    static gboolean _WiFiConnect(GMainLoop * mainLoop, gpointer userData);
+    static CHIP_ERROR _WiFiInitialize(gpointer userData);
+    static CHIP_ERROR _WiFiActivate(gpointer userData);
+    static CHIP_ERROR _WiFiDeactivate(gpointer userData);
+    static CHIP_ERROR _WiFiScan(gpointer userData);
+    static CHIP_ERROR _WiFiConnect(wifi_manager_ap_h ap);
 
     void _WiFiDeinitialize();
     void _WiFiSetStates();
