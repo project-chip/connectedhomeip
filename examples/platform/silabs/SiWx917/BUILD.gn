@@ -168,7 +168,7 @@ config("siwx917-common-config") {
   defines = [ "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_sec}" ]
 
   if (!disable_lcd) {
-    include_dirs = [ "display" ]
+    include_dirs = [ "${silabs_common_plat_dir}/display" ]
 
     defines += [ "DISPLAY_ENABLED" ]
   }
@@ -264,11 +264,11 @@ source_set("siwx917-common") {
 
   if (!disable_lcd) {
     sources += [
-      "display/demo-ui.c",
-      "display/lcd.cpp",
+      "${silabs_common_plat_dir}/display/demo-ui.c",
+      "${silabs_common_plat_dir}/display/lcd.cpp",
     ]
 
-    include_dirs += [ "display" ]
+    include_dirs += [ "${silabs_common_plat_dir}/display" ]
     public_deps += [ "${chip_root}/examples/common/QRCode" ]
   }
 
