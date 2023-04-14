@@ -132,4 +132,3 @@ void AppTask::PostStartActionRequest(int32_t actor, PumpManager::Action_t action
 }
 
 void AppTask::UpdateClusterState() {}
-

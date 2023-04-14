@@ -24,7 +24,7 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init()
-{ 
+{
     InitCommonParts();
 
     // Configure Bindings
