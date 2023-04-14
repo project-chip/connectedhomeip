@@ -29,4 +29,4 @@ cpp_standard = "gnu++17"
 # it seems riscv gcc (version > 10) can fixes this issue.
 # let's disable strict warnings for RPC enabled for now.
 remove_default_configs = [ "$dir_pw_build:strict_warnings" ]
-treat_warnings_as_errors=false
+treat_warnings_as_errors = false
