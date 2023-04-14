@@ -221,10 +221,7 @@ DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
-    BssId = ByteSpan(wifiMgmr.wifi_mgmr_stat_info.bssid, sizeof(wifiMgmr.wifi_mgmr_stat_info.bssid));
-
-    // TODO: This does not actually put the data in the out param.
-    return CHIP_ERROR_READ_FAILED;
+    return CopySpanToMutableSpan(ByteSpan(wifiMgmr.wifi_mgmr_stat_info.bssid), BssId);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
