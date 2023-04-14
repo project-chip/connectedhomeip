@@ -7,7 +7,7 @@ The commissioning process supports two potential starting points:
 1. The device is already on the network
 2. The device needs network credentials for Wi-Fi or Thread (requires Bluetooth LE (BLE) support)
 
-The current Matter revision supports Ethernet, Wi-Fi, and Thread devices. 
+The current Matter revision supports Ethernet, Wi-Fi, and Thread devices. 
 
 - Ethernet devices get into the operational network when their Ethernet cable is connected. Therefore the devices are normally already on the network before commissioning.
 - Wi-Fi and Thread devices must have credentials configured before the devices can be joined into the operational network. This is normally done over BLE. 
@@ -34,7 +34,7 @@ Usually, a mobile phone serves as the administrator. Step 2 is to use the mobile
 
 Step 3 is to set up the BLE beaconing and connection between the mobile phone and the Matter device, so that the commissioning information can be exchanged through the BLE connection channel. 
 
-As the connection should be secure, step 4 is to secure the connection in a process known as password-authenticated session establishment (**PACE**). The passcode derived from the QR code is used as an input for this process. The output is the security key used by the connection.
+As the connection should be secure, step 4 is to secure the connection in a process known as password-authenticated session establishment (**PACE**). The passcode derived from the QR code is used as an input for this process. The output is the security key used by the connection.
 
 ![Steps 5-7](./images/CommissioningSteps5-7.png)
 
@@ -50,7 +50,7 @@ In step 8, the device starts to join the operational network with the configured
 
 Once the device is attached to the network (step 9), it can be discovered through Service Registration Protocol (**SRP**). To control that device, you must establish a secured connection through the Certification Authorized Session Establishment (**CASE**) process. 
 
-After the CASE session is established, the Matter device is commissioned successfully and can communicate with other devices in the Matter network (step 10).
+After the CASE session is established, the Matter device is commissioned successfully and can communicate with other devices in the Matter network (step 10).
 
 ----
 [Table of Contents](../README.md) | [Thread Demo](../thread/DEMO_OVERVIEW.md) | [Wi-Fi Demo](../wifi/DEMO_OVERVIEW.md)

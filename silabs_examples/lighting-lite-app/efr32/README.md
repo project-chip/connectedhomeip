@@ -95,7 +95,7 @@ featuring the lowest memory requirements possible based on the Silicon Labs plat
 *   Build the example application for your specific board:
 
           cd ~/matter
-          ./scripts/examples/gn_efr32_example.sh ./silabs_examples/lighting-lite-app/efr32/ ./out/lighting-lite-app BRD4161A
+          ./scripts/examples/gn_efr32_example.sh ./silabs_examples/lighting-lite-app/efr32/ ./out/lighting-lite-app BRD4161A
 
 -   To delete generated executable, libraries and object files use:
 
@@ -118,7 +118,7 @@ featuring the lowest memory requirements possible based on the Silicon Labs plat
 
 *   Build the example as Sleepy End Device (SED)
 
-          $ ./scripts/examples/gn_efr32_example.sh ./silabs_examples/lighting-lite-app/efr32/ ./out/lighting-lite-app_SED BRD4161A --sed
+          $ ./scripts/examples/gn_efr32_example.sh ./silabs_examples/lighting-lite-app/efr32/ ./out/lighting-lite-app_SED BRD4161A --sed
 
     or use gn as previously mentioned but adding the following arguments:
 

@@ -55,10 +55,9 @@ it belongs to. Utility clusters are required to be on the endpoint with ID 0.
 Application clusters are assigned to endpoints with IDs 1 and higher.
 
 Some applications have callbacks that are left to be implemented by the device
-manufacturer. For example, the storage and mangement of users and credentials in
+manufacturer. For example, the storage and management of users and credentials in
 the lock-app is left up to the application developer.
 
-<br>
 
 ## ZAP Tool
 
@@ -68,11 +67,25 @@ Library, which was the starting point for the Matter data model. ZAP is used for
 generating code for Matter applications based on the Zigbee Cluster Library and
 associated Matter code templates.
 
-The ZAP tool can be cloned using the following git command. This will create a
-root level matter folder in your current directory. All following commands
-should be run from the matter folder.
+The ZAP tool is no longer present as a submodule in the Matter repo. The ZAP tool 
+can be downloaded as a binary from GitHub or optionally you can clone the entire ZAP 
+repo and build the ZAP binary from scratch.
 
-> `$ git clone https://github.com/SiliconLabs/matter.git`
+ZAP binaries can be downloaded from the latest ZAP release here:
+
+> `https://github.com/project-chip/zap/releases/latest`
+
+Optionally, the ZAP tool can be cloned using the following git command. This will create a
+root level zap folder in your current directory. 
+
+> `$ git clone https://github.com/project-chip/zap.git`
+
+The ZAP tool can be invoked using the `run_zaptool.sh` script located in the Matter repo at 
+`./scripts/tools/zap/run_zaptool.sh`. Before you run this script you have to provide the location of the ZAP instance to be run. This is either the binary that you downloaded or 
+the binary that you built from scratch in the ZAP repo. You can do this by setting the `ZAP_INSTALL_PATH` environment variable
+like this:
+
+> `$ export ZAP_INSTALL_PATH=(path to your instance of the ZAP binary)`
 
 The `run_zaptool.sh` script can be invoked without arguments, or, you can
 provide the path to a ZAP file to be opened upon launch.
@@ -80,6 +93,10 @@ provide the path to a ZAP file to be opened upon launch.
 In the following examples, the ZAP file for the lock-app has been chosen.
 
 > `$ ./scripts/tools/zap/run_zaptool.sh ($PATH_TO_ZAP_FILE)`
+
+ZAP files for the various sample applications are included in the sample applications `data_model` directory such as
+
+`./examples/lighting-app/silabs/efr32/data_model/lighting-thread-app.zap`.
 
 This shows the output of the run_zaptool script with no arguments. To load a new
 zap file, click the application menu for Electron (Upper left corner of the
@@ -156,11 +173,9 @@ store these differently.
 
 ## Generation of Code
 
-Once desirable cluster options are chosen for an application, one must save the
-current zap configuration using the application menu in the upper left corner.
-Then click generate in the top menu bar. The user will be prompted to choose a
-save location for the generated ZAP code. In the Silicon Labs Matter repository,
-the lock-app generated files belong in
+Once you have chosen the cluster options, save the current ZAP configuration using the application menu in the upper left corner. 
+
+Before v1.1.0-1.1 you needed to click the Generate button to generate code. Now, code is generated automatically in the save function. You will be prompted to choose a save location for the generated ZAP code. In the Silicon Labs Matter repository, the lock-app generated files belong in 
 matter/zzz_generated/lock-app/zap-generated .
 
 ---

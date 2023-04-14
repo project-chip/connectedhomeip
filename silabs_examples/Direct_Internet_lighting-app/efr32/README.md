@@ -4,23 +4,23 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12 and MG24.
 
 <hr>
 
--   [Matter EFR32 Lighting Example](#matter-efr32-lighting-example)
-    -   [Introduction](#introduction)
-    -   [Building](#building)
-    -   [Flashing the Application](#flashing-the-application)
-    -   [Viewing Logging Output](#viewing-logging-output)
-    -   [Running the Complete Example](#running-the-complete-example)
-        -   [Notes](#notes)
-    -   [Running RPC console](#running-rpc-console)
-    -   [Device Tracing](#device-tracing)
-    -   [Memory settings](#memory-settings)
-    -   [OTA Software Update](#ota-software-update)
-    -   [Group Communication (Multicast)](#group-communication-multicast)
-    -   [Building options](#building-options)
-        -   [Disabling logging](#disabling-logging)
-        -   [Debug build / release build](#debug-build--release-build)
-        -   [Disabling LCD](#disabling-lcd)
-        -   [KVS maximum entry count](#kvs-maximum-entry-count)
+- [Matter EFR32 Lighting Example](#matter-efr32-lighting-example)
+  - [Introduction](#introduction)
+  - [Building](#building)
+  - [Flashing the Application](#flashing-the-application)
+  - [Viewing Logging Output](#viewing-logging-output)
+  - [Running the Complete Example](#running-the-complete-example)
+    - [Notes](#notes)
+  - [Running RPC console](#running-rpc-console)
+  - [Device Tracing](#device-tracing)
+  - [Memory settings](#memory-settings)
+  - [OTA Software Update](#ota-software-update)
+  - [Group Communication (Multicast)](#group-communication-multicast)
+  - [Building options](#building-options)
+    - [Disabling logging](#disabling-logging)
+    - [Debug build / release build](#debug-build--release-build)
+    - [Disabling LCD](#disabling-lcd)
+    - [KVS maximum entry count](#kvs-maximum-entry-count)
 
 <hr>
 
@@ -100,7 +100,7 @@ Silicon Labs platform.
 *   Build the example application:
 
           cd ~/connectedhomeip
-          ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/efr32/ ./out/lighting-app BRD4161A
+          ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/efr32/ ./out/lighting-app BRD4161A
 
 -   To delete generated executable, libraries and object files use:
 
@@ -123,7 +123,7 @@ Silicon Labs platform.
 
 *   Build the example as Sleepy End Device (SED)
 
-          $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/efr32/ ./out/lighting-app_SED BRD4161A --sed
+          $ ./scripts/examples/gn_efr32_example.sh ./examples/lighting-app/silabs/efr32/ ./out/lighting-app_SED BRD4161A --sed
 
     or use gn as previously mentioned but adding the following arguments:
 

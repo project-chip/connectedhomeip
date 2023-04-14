@@ -94,7 +94,7 @@ Silicon Labs platform.
 
 *   Build the example as Sleepy End Device (SED)
 
-          $ ./scripts/examples/gn_efr32_example.sh ./silabs_examples/onoff-plug-app/SiWx917/ ./out/onoff-plug-app_SED BRD4325B --sed
+          $ ./scripts/examples/gn_efr32_example.sh ./silabs_examples/onoff-plug-app/SiWx917/ ./out/onoff-plug-app_SED BRD4325B --sed
 
     or use gn as previously mentioned but adding the following arguments:
 

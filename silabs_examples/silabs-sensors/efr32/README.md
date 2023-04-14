@@ -74,7 +74,7 @@ to change the sensor type just use one of the following arguments :
 
 example :
 
-    - ./scripts/examples/gn_efr32_example.sh ./examples/silabs-sensor/efr32/ ./out/temperature-sensor BRD4187C "is_temperature_sensor=true"
+    - ./scripts/examples/gn_efr32_example.sh ./examples/silabs-sensor/efr32/ ./out/temperature-sensor BRD4187C "is_temperature_sensor=true"
 ___
 
 
@@ -127,7 +127,7 @@ ___
 *   Build the example application:
 
           cd ~/connectedhomeip
-          ./scripts/examples/gn_efr32_example.sh ./examples/silabs-sensors/efr32/ ./out/occupancy-app BRD4187C
+          ./scripts/examples/gn_efr32_example.sh ./examples/silabs-sensors/efr32/ ./out/occupancy-app BRD4187C
 
 -   To delete generated executable, libraries and object files use:
 
@@ -150,7 +150,7 @@ ___
 
 *   Build the example as Sleepy End Device (SED)
 
-          $ ./scripts/examples/gn_efr32_example.sh ./examples/silabs-sensors/efr32/ ./out/occupancy-sensor_SED BRD4187C --sed
+          $ ./scripts/examples/gn_efr32_example.sh ./examples/silabs-sensors/efr32/ ./out/occupancy-sensor_SED BRD4187C --sed
 
     or use gn as previously mentioned but adding the following arguments:
 

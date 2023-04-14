@@ -120,7 +120,7 @@ This script:
 -   Calculate offsets for DAC, PAI, and DC files
 -   Writes DAC, PAI, and DC into the target device's flash using Simplicity
     Commander
--   Generates a efr32_creds.h  header file with the correct offsets and sizes
+-   Generates a efr32_creds.h  header file with the correct offsets and sizes
 
 The parameters are as follows:
 
@@ -213,7 +213,7 @@ of 463 octets:
     0817e1c0: 5E DB E7 C2 2F 9F EA 71 22 0E 7E A7 03 F8 91
 
 This should match the contents of the DER-formatted PAI certificate, which is
-stored by the setup script as ./temp/pai_cert.der :
+stored by the setup script as ./temp/pai_cert.der :
 
 ```shell
 $ xxd ./temp/pai_cert.der
@@ -235,7 +235,7 @@ a size of 488 octets:
     0817e3c0: FA 3E 07 CF 0C 25 92 D1
 
 This should match the contents of the DER-formatted DAC certificate, which is
-stored by the setup script as ./temp/dac_cert.der :
+stored by the setup script as ./temp/dac_cert.der :
 
 ```shell
 $ xxd ./temp/dac_cert.der
