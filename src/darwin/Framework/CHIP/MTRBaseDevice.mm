@@ -996,7 +996,13 @@ private:
                 size_t count = 0;
                 eventPathParamsList
                     = static_cast<EventPathParams *>(Platform::MemoryCalloc([events count], sizeof(EventPathParams)));
-                VerifyOrReturnError(eventPathParamsList != nullptr, CHIP_ERROR_NO_MEMORY);
+                if (eventPathParamsList == nullptr) {
+                    if (attributePathParamsList != nullptr) {
+                        Platform::MemoryFree(attributePathParamsList);
+                        attributePathParamsList = nullptr;
+                    }
+                    return CHIP_ERROR_NO_MEMORY;
+                }
                 for (MTREventRequestPath * event in events) {
                     [event convertToEventPathParams:eventPathParamsList[count++]];
                 }
@@ -1396,11 +1402,9 @@ exit:
                        container.pathParams = static_cast<AttributePathParams *>(
                            Platform::MemoryCalloc([attributes count], sizeof(AttributePathParams)));
                        if (container.pathParams == nullptr) {
-                           if (reportHandler) {
-                               dispatch_async(queue, ^{
-                                   reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY]);
-                               });
-                           }
+                           dispatch_async(queue, ^{
+                               reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY]);
+                           });
                            return;
                        }
                        for (MTRAttributeRequestPath * attribute in attributes) {
@@ -1412,11 +1416,9 @@ exit:
                        container.eventPathParams
                            = static_cast<EventPathParams *>(Platform::MemoryCalloc([events count], sizeof(EventPathParams)));
                        if (container.eventPathParams == nullptr) {
-                           if (reportHandler) {
-                               dispatch_async(queue, ^{
-                                   reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY]);
-                               });
-                           }
+                           dispatch_async(queue, ^{
+                               reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY]);
+                           });
                            return;
                        }
                        for (MTREventRequestPath * event in events) {
