@@ -183,8 +183,10 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
 
 /* Wi-Fi Diagnostics Cluster Support */
 
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & value)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & value)
 {
+    VerifyOrReturnError(value.size() >= CY_WCM_MAC_ADDR_LEN, CHIP_ERROR_BUFFER_TOO_SMALL);
+
     cy_wcm_associated_ap_info_t ap_info;
     cy_rslt_t result = CY_RSLT_SUCCESS;
     CHIP_ERROR err   = CHIP_NO_ERROR;
@@ -195,8 +197,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & value)
         ChipLogError(DeviceLayer, "cy_wcm_get_associated_ap_info failed: %d", (int) result);
         SuccessOrExit(err = CHIP_ERROR_INTERNAL);
     }
-    memcpy(mWiFiMacAddress, ap_info.BSSID, CY_WCM_MAC_ADDR_LEN);
-    value = ByteSpan(mWiFiMacAddress, CY_WCM_MAC_ADDR_LEN);
+    memcpy(value.data(), ap_info.BSSID, CY_WCM_MAC_ADDR_LEN);
+    value.reduce_size(CY_WCM_MAC_ADDR_LEN);
 
 exit:
     return err;
