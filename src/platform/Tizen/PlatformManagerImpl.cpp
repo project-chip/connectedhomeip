@@ -83,6 +83,32 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     mGLibMainLoopThread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop);
     g_main_context_unref(context);
 
+    {
+        // Wait for the GLib main loop to start. It is required that the GLib Matter
+        // context is acquired by the g_main_loop_run() before any other GLib function
+        // is called. Otherwise, the GLibMatterContextInvokeSync() might run callback
+        // functions on the wrong thread.
+
+        GLibMatterContextInvokeData invokeData{};
+
+        auto * idleSource = g_idle_source_new();
+        g_source_set_callback(
+            idleSource,
+            [](void * userData_) {
+                auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
+                std::unique_lock<std::mutex> lock(data->mDoneMutex);
+                data->mDone = true;
+                data->mDoneCond.notify_one();
+                return G_SOURCE_REMOVE;
+            },
+            &invokeData, nullptr);
+        g_source_attach(idleSource, g_main_loop_get_context(mGLibMainLoop));
+        g_source_unref(idleSource);
+
+        std::unique_lock<std::mutex> lock(invokeData.mDoneMutex);
+        invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
+    }
+
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
 
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack());
