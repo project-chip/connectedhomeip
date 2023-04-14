@@ -57,7 +57,7 @@ using namespace ::chip::DeviceLayer;
 #include "SiWx917DeviceDataProvider.h"
 
 #if EFR32_OTA_ENABLED
-void SI917MatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
+void SilabsMatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
 {
 #if 0 // TODO : OTA is not planned now for CCP
     OTAConfig::Init();
@@ -65,7 +65,7 @@ void SI917MatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, voi
 }
 #endif
 
-void SI917MatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg){
+void SilabsMatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg){
     // Initialize OTA only when Thread or WiFi connectivity is established
     /*if (((event->Type == DeviceEventType::kThreadConnectivityChange) &&
          (event->ThreadConnectivityChange.Result == kConnectivity_Established)) ||
@@ -79,7 +79,7 @@ void SI917MatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event,
     SILABS_LOG("Scheduling OTA Requestor initialization")
 }
 
-CHIP_ERROR SI917MatterConfig::InitMatter(const char * appName)
+CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 {
     CHIP_ERROR err;
 
@@ -159,7 +159,7 @@ CHIP_ERROR SI917MatterConfig::InitMatter(const char * appName)
 }
 
 #ifdef SL_WIFI
-void SI917MatterConfig::InitWiFi(void)
+void SilabsMatterConfig::InitWiFi(void)
 {
 #ifdef RS911X_WIFI
     /*
