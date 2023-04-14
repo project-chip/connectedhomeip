@@ -37,11 +37,11 @@ __attribute__((section(".co_stack"))) unsigned long pulStack[STACK_SIZE];
 #define WEAK __attribute__((weak))
 
 /*----------Declaration of the default fault handlers-------------------------*/
-// #ifndef __START
-// extern void  _start(void) __attribute__((noreturn));    /* Pre Main (C library entry point) */
-// #else
-// extern int  __START(void) __attribute__((noreturn));    /* main entry point */
-// #endif
+#ifndef __START
+extern void _start(void) __attribute__((noreturn)); /* Pre Main (C library entry point) */
+#else
+extern int __START(void) __attribute__((noreturn)); /* main entry point */
+#endif
 
 /* System exception vector handler */
 __attribute__((used)) void WEAK Reset_Handler(void);
