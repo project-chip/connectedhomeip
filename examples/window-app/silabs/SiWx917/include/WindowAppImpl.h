@@ -44,6 +44,7 @@ class WindowAppImpl : public WindowApp
 {
 public:
     static WindowAppImpl sInstance;
+    bool mWindowAppInit = false;
 
     WindowAppImpl();
     CHIP_ERROR Init() override;
