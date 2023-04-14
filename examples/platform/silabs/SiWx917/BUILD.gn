@@ -273,7 +273,7 @@ source_set("siwx917-common") {
   }
 
   if (enable_heap_monitoring) {
-    sources += [ "MemMonitoring.cpp" ]
+    sources += [ "${silabs_common_plat_dir}/MemMonitoring.cpp" ]
   }
 
   if (chip_enable_wifi) {
