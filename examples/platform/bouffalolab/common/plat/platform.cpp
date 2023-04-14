@@ -121,6 +121,10 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
         {
             GetAppTask().PostEvent(AppTask::APP_EVENT_SYS_PROVISIONED);
             GetAppTask().mIsConnected = true;
+#ifdef OTA_ENABLED
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
+                                                        OTAConfig::InitOTARequestorHandler, nullptr);
+#endif
         }
         break;
 #endif
@@ -155,11 +159,14 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
         {
             ChipLogProgress(NotSpecified, "Initializing route hook...");
             bl_route_hook_init();
+
+#ifdef OTA_ENABLED
+            chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
+                                                        OTAConfig::InitOTARequestorHandler, nullptr);
+#endif
         }
         break;
 #endif
-
-        break;
     default:
         break;
     }
@@ -248,12 +255,6 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 
     PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
-
-#ifdef OTA_ENABLED
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    OTAConfig::Init();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-#endif // OTA_ENABLED
 
 #if PW_RPC_ENABLED
     chip::rpc::Init();
