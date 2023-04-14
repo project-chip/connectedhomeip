@@ -221,9 +221,7 @@ DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
-    static uint8_t macAddress[kMaxHardwareAddrSize];
-
-    memcpy(macAddress, wifiMgmr.wifi_mgmr_stat_info.bssid, kMaxHardwareAddrSize);
+    BssId = ByteSpan(wifiMgmr.wifi_mgmr_stat_info.bssid, sizeof(wifiMgmr.wifi_mgmr_stat_info.bssid));
 
     // TODO: This does not actually put the data in the out param.
     return CHIP_ERROR_READ_FAILED;
