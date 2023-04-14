@@ -22,8 +22,8 @@
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
-constexpr EndpointId kPccClusterEndpoint        = 1;
-constexpr EndpointId kOnOffClusterEndpoint      = 1;
+constexpr EndpointId kPccClusterEndpoint   = 1;
+constexpr EndpointId kOnOffClusterEndpoint = 1;
 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
 LEDWidget sPumpStateLED;

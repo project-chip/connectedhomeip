@@ -17,8 +17,8 @@
  */
 
 #include "AppTask.h"
-#include "WindowCovering.h"
 #include "ButtonManager.h"
+#include "WindowCovering.h"
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 

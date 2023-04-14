@@ -19,9 +19,9 @@
 #include "AppTask.h"
 #include "Device.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/reporting/reporting.h>
 #include <lib/support/ZclString.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 

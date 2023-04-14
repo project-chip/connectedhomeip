@@ -18,8 +18,8 @@
 
 #include "AppTask.h"
 
-#include "PWMDevice.h"
 #include "ColorFormat.h"
+#include "PWMDevice.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 
@@ -196,7 +196,7 @@ void AppTask::UpdateClusterState(void)
     bool isTurnedOn =
         sAppTask.mPwmRgbRedLed.IsTurnedOn() || sAppTask.mPwmRgbGreenLed.IsTurnedOn() || sAppTask.mPwmRgbBlueLed.IsTurnedOn();
 #else
-    bool isTurnedOn  = sAppTask.mPwmRgbBlueLed.IsTurnedOn();
+    bool isTurnedOn = sAppTask.mPwmRgbBlueLed.IsTurnedOn();
 #endif
     // write the new on/off value
     EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(kExampleEndpointId, isTurnedOn);

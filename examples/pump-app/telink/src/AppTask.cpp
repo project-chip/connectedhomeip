@@ -24,8 +24,8 @@
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
-constexpr EndpointId kPccClusterEndpoint        = 1;
-constexpr EndpointId kOnOffClusterEndpoint      = 1;
+constexpr EndpointId kPccClusterEndpoint   = 1;
+constexpr EndpointId kOnOffClusterEndpoint = 1;
 
 #if CONFIG_CHIP_ENABLE_APPLICATION_STATUS_LED
 LEDWidget sPumpStateLED;
@@ -144,23 +144,23 @@ void AppTask::UpdateClusterState()
         LOG_ERR("ERR: Updating On/Off state  %x", status);
     }
 
-    int16_t  maxPressure   = PumpMgr().GetMaxPressure();
+    int16_t maxPressure    = PumpMgr().GetMaxPressure();
     uint16_t maxSpeed      = PumpMgr().GetMaxSpeed();
     uint16_t maxFlow       = PumpMgr().GetMaxFlow();
-    int16_t  minConstPress = PumpMgr().GetMinConstPressure();
-    int16_t  maxConstPress = PumpMgr().GetMaxConstPressure();
-    int16_t  minCompPress  = PumpMgr().GetMinCompPressure();
-    int16_t  maxCompPress  = PumpMgr().GetMaxCompPressure();
+    int16_t minConstPress  = PumpMgr().GetMinConstPressure();
+    int16_t maxConstPress  = PumpMgr().GetMaxConstPressure();
+    int16_t minCompPress   = PumpMgr().GetMinCompPressure();
+    int16_t maxCompPress   = PumpMgr().GetMaxCompPressure();
     uint16_t minConstSpeed = PumpMgr().GetMinConstSpeed();
     uint16_t maxConstSpeed = PumpMgr().GetMaxConstSpeed();
     uint16_t minConstFlow  = PumpMgr().GetMinConstFlow();
     uint16_t maxConstFlow  = PumpMgr().GetMaxConstFlow();
-    int16_t  minConstTemp  = PumpMgr().GetMinConstTemp();
-    int16_t  maxConstTemp  = PumpMgr().GetMaxConstTemp();
+    int16_t minConstTemp   = PumpMgr().GetMinConstTemp();
+    int16_t maxConstTemp   = PumpMgr().GetMaxConstTemp();
 
     LOG_INF("UpdateClusterState:\n maxPressure = %d,\t maxSpeed = %d,\t maxFlow = %d\n minConstPress = %d,\t "
             "maxConstPress = %d\n minCompPress = %d,\t maxCompPress = %d\n minConstSpeed = %d,\t maxConstSpeed = %d\n"
-            "minConstFlow = %d,\t maxConstFlow = %d\n minConstTemp = %d,\t maxConstTemp = %d", maxPressure, maxSpeed,
-            maxFlow, minConstPress, maxConstPress, minCompPress, maxCompPress, minConstSpeed, maxConstSpeed,
+            "minConstFlow = %d,\t maxConstFlow = %d\n minConstTemp = %d,\t maxConstTemp = %d",
+            maxPressure, maxSpeed, maxFlow, minConstPress, maxConstPress, minCompPress, maxCompPress, minConstSpeed, maxConstSpeed,
             minConstFlow, maxConstFlow, minConstTemp, maxConstTemp);
 }

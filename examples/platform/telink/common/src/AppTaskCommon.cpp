@@ -24,10 +24,10 @@
 #include "ThreadUtil.h"
 
 #include <DeviceInfoProviderImpl.h>
+#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-#include <app/clusters/identify-server/identify-server.h>
 
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include "OTAUtil.h"
@@ -36,9 +36,9 @@
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 namespace {
-constexpr int kFactoryResetCalcTimeout          = 3000;
-constexpr int kFactoryResetTriggerCntr          = 3;
-constexpr int kAppEventQueueSize                = 10;
+constexpr int kFactoryResetCalcTimeout = 3000;
+constexpr int kFactoryResetTriggerCntr = 3;
+constexpr int kAppEventQueueSize       = 10;
 
 #if APP_USE_IDENTIFY_PWM
 constexpr uint32_t kIdentifyBlinkRateMs         = 200;
@@ -80,7 +80,7 @@ bool sIsThreadAttached    = false;
 bool sHaveBLEConnections  = false;
 
 #if APP_SET_DEVICE_INFO_PROVIDER
-    chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
 
 #if APP_USE_IDENTIFY_PWM
@@ -247,25 +247,27 @@ void AppTaskCommon::InitButtons(void)
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
     sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_1, FactoryResetButtonEventHandler);
     sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, StartBleAdvButtonEventHandler);
-    #if APP_USE_THREAD_START_BUTTON
+#if APP_USE_THREAD_START_BUTTON
     sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, StartThreadButtonEventHandler);
-    #endif
-    #if APP_USE_EXAMPLE_START_BUTTON
-    if (ExampleActionEventHandler) {
+#endif
+#if APP_USE_EXAMPLE_START_BUTTON
+    if (ExampleActionEventHandler)
+    {
         sExampleActionButton.Configure(BUTTON_PORT, BUTTON_PIN_2, ExampleActionButtonEventHandler);
     }
-    #endif
+#endif
 #else
     sFactoryResetButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_1, FactoryResetButtonEventHandler);
     sBleAdvStartButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_2, StartBleAdvButtonEventHandler);
-    #if APP_USE_THREAD_START_BUTTON
+#if APP_USE_THREAD_START_BUTTON
     sThreadStartButton.Configure(BUTTON_PORT, BUTTON_PIN_3, BUTTON_PIN_2, StartThreadButtonEventHandler);
-    #endif
-    #if APP_USE_EXAMPLE_START_BUTTON
-    if (ExampleActionEventHandler) {
+#endif
+#if APP_USE_EXAMPLE_START_BUTTON
+    if (ExampleActionEventHandler)
+    {
         sExampleActionButton.Configure(BUTTON_PORT, BUTTON_PIN_4, BUTTON_PIN_1, ExampleActionButtonEventHandler);
     }
-    #endif
+#endif
 #endif
 
     ButtonManagerInst().AddButton(sFactoryResetButton);
@@ -274,7 +276,8 @@ void AppTaskCommon::InitButtons(void)
     ButtonManagerInst().AddButton(sThreadStartButton);
 #endif
 #if APP_USE_EXAMPLE_START_BUTTON
-    if (ExampleActionEventHandler) {
+    if (ExampleActionEventHandler)
+    {
         ButtonManagerInst().AddButton(sExampleActionButton);
     }
 #endif
@@ -502,7 +505,8 @@ void AppTaskCommon::ExampleActionButtonEventHandler(void)
 {
     AppEvent event;
 
-    if (!GetAppTask().ExampleActionEventHandler) {
+    if (!GetAppTask().ExampleActionEventHandler)
+    {
         return;
     }
 

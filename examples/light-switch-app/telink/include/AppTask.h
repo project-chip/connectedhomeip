@@ -24,6 +24,7 @@ class AppTask : public AppTaskCommon
 {
 public:
     void UpdateClusterState();
+
 private:
     friend AppTask & GetAppTask(void);
     friend class AppTaskCommon;
