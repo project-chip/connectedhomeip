@@ -21,28 +21,24 @@
 
 namespace chip {
 namespace DeviceLayer {
-namespace SIWx917 {
+namespace Silabs {
 
 /**
  * @brief This class provides Commissionable data, Device Attestation Credentials,
  *        and Device Instance Info.
  */
 
-class SIWx917DeviceDataProvider : public CommissionableDataProvider,
-                                  public Internal::GenericDeviceInstanceInfoProvider<Internal::SilabsConfig>
+class SilabsDeviceDataProvider : public CommissionableDataProvider,
+                                 public Internal::GenericDeviceInstanceInfoProvider<Internal::SilabsConfig>
 {
 public:
-    SIWx917DeviceDataProvider() :
+    SilabsDeviceDataProvider() :
         CommissionableDataProvider(), Internal::GenericDeviceInstanceInfoProvider<Internal::SilabsConfig>(
                                           ConfigurationManagerImpl::GetDefaultInstance())
     {}
 
-    static SIWx917DeviceDataProvider & GetDeviceDataProvider();
+    static SilabsDeviceDataProvider & GetDeviceDataProvider();
     CHIP_ERROR GetSetupPayload(MutableCharSpan & payloadBuf);
-#ifdef SIWX917_USE_COMISSIONABLE_DATA
-    void setupPayload(uint8_t * outBuf);
-    CHIP_ERROR FlashFactoryData();
-#endif /* SIWX917_USE_COMISSIONABLE_DATA */
     // ===== Members functions that implement the CommissionableDataProvider
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
     CHIP_ERROR SetSetupDiscriminator(uint16_t setupDiscriminator) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -63,8 +59,11 @@ public:
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day) override;
     CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVersion) override;
+    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetProductURL(char * buf, size_t bufSzie) override;
+    CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override;
 };
 
-} // namespace SIWx917
+} // namespace Silabs
 } // namespace DeviceLayer
 } // namespace chip
