@@ -486,8 +486,6 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
                                                  Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
                                                  DnssdServiceProtocol protocol, PeerId peerId)
 {
-    VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
-
     DnssdService service;
     ReturnErrorOnFailure(MakeHostName(service.mHostName, sizeof(service.mHostName), mac));
     ReturnErrorOnFailure(protocol == DnssdServiceProtocol::kDnssdProtocolTcp
@@ -525,6 +523,7 @@ CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextE
 }
 
 #define PREPARE_RECORDS(Type)                                                                                                      \
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);                                                              \
     TextEntry textEntries[Type##AdvertisingParameters::kTxtMaxNumber];                                                             \
     size_t textEntrySize = 0;                                                                                                      \
     const char * subTypes[Type::kSubTypeMaxNumber];                                                                                \
@@ -593,6 +592,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
 
 CHIP_ERROR DiscoveryImplPlatform::RemoveServices()
 {
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(ChipDnssdRemoveServices());
 
     return CHIP_NO_ERROR;
@@ -600,6 +600,7 @@ CHIP_ERROR DiscoveryImplPlatform::RemoveServices()
 
 CHIP_ERROR DiscoveryImplPlatform::FinalizeServiceUpdate()
 {
+    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return ChipDnssdFinalizeServiceUpdate();
 }
 
