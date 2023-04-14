@@ -42,8 +42,7 @@ include(linker)
 
 add_subdirectory(${OPEN_IOT_SDK_EXAMPLE_COMMON}/app ./app_build)
 
-file(STRINGS testnames.txt TEST_NAMES_FROM_FILE)
-STRING(REGEX REPLACE "\n" ";" TEST_NAMES_FROM_FILE "${TEST_NAMES_FROM_FILE}")
+file(STRINGS test_components.txt TEST_NAMES_FROM_FILE)
 
 target_compile_definitions(openiotsdk-startup
     PRIVATE
