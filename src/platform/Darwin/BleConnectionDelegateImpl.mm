@@ -91,9 +91,11 @@ namespace DeviceLayer {
         dispatch_queue_t bleWorkQueue;
 
         void BleConnectionDelegateImpl::NewConnection(
-            Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & deviceDiscriminator)
+            Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & inDeviceDiscriminator)
         {
             assertChipStackLockedByCurrentThread();
+
+            SetupDiscriminator deviceDiscriminator = inDeviceDiscriminator;
 
             ChipLogProgress(Ble, "%s", __FUNCTION__);
             if (!bleWorkQueue) {
