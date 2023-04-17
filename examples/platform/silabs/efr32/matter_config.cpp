@@ -53,7 +53,7 @@ using namespace ::chip::DeviceLayer;
 static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeystore;
 #endif
 
-#include "EFR32DeviceDataProvider.h"
+#include "SilabsDeviceDataProvider.h"
 #include <app/InteractionModelEngine.h>
 
 #ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
@@ -159,8 +159,8 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
-    SetDeviceInstanceInfoProvider(&EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider());
-    SetCommissionableDataProvider(&EFR32::EFR32DeviceDataProvider::GetDeviceDataProvider());
+    SetDeviceInstanceInfoProvider(&Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
+    SetCommissionableDataProvider(&Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
 

@@ -54,7 +54,7 @@ using namespace ::chip::DeviceLayer;
 #include <crypto/CHIPCryptoPAL.h>
 // If building with the SiWx917-provided crypto backend, we can use the
 
-#include "SiWx917DeviceDataProvider.h"
+#include "SilabsDeviceDataProvider.h"
 
 #if EFR32_OTA_ENABLED
 void SilabsMatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
@@ -112,11 +112,11 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     }
     ReturnErrorOnFailure(PlatformMgr().InitChipStack());
 
-    SetDeviceInstanceInfoProvider(&SIWx917::SIWx917DeviceDataProvider::GetDeviceDataProvider());
-    SetCommissionableDataProvider(&SIWx917::SIWx917DeviceDataProvider::GetDeviceDataProvider());
+    SetDeviceInstanceInfoProvider(&Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
+    SetCommissionableDataProvider(&Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider());
 
 #ifdef SIWX917_USE_COMISSIONABLE_DATA
-    err = SIWx917::SIWx917DeviceDataProvider::GetDeviceDataProvider().FlashFactoryData();
+    err = Silabs::SilabsDeviceDataProvider::GetDeviceDataProvider().FlashFactoryData();
     if (err != CHIP_NO_ERROR)
     {
         SILABS_LOG("Flashing to the device failed");
