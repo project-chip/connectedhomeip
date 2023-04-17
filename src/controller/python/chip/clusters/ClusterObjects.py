@@ -242,7 +242,9 @@ class Cluster(ClusterObject):
         try:
             ALL_CLUSTERS[cls.id] = cls
         except NotImplementedError:
-            pass # we can safely ignore this
+            # handle case where the Cluster class is not (fully) subclassed
+            # and accessing the id property throws a NotImplementedError.
+            pass
 
     @property
     def data_version(self) -> int:
