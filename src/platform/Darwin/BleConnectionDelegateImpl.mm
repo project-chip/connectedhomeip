@@ -95,6 +95,7 @@ namespace DeviceLayer {
         {
             assertChipStackLockedByCurrentThread();
 
+            // Make a copy of the device discriminator for the block to capture.
             SetupDiscriminator deviceDiscriminator = inDeviceDiscriminator;
 
             ChipLogProgress(Ble, "%s", __FUNCTION__);
