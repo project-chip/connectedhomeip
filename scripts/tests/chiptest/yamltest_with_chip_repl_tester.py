@@ -16,7 +16,6 @@
 
 import asyncio
 import atexit
-import builtins
 import logging
 import os
 import tempfile
@@ -77,7 +76,7 @@ async def execute_test(yaml, runner):
         post_processing_result = test_step.post_process_response(
             decoded_response)
         if not post_processing_result.is_success():
-            logging.warning(f"Test step failure in 'test_step.label'")
+            logging.warning(f"Test step failure in {test_step.label}")
             for entry in post_processing_result.entries:
                 if entry.state == PostProcessCheckStatus.SUCCESS:
                     continue
