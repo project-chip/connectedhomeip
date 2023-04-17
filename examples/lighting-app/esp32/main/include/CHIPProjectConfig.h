@@ -43,7 +43,5 @@
  * @brief Defines the maximum number of ReadHandler for subscriptions, limits the number of active subscription transactions on
  * server.
  *
- * The default value comes from 3sub per fabric * max number of fabrics.
- *
  */
 #define CHIP_IM_MAX_NUM_SUBSCRIPTIONS 45
