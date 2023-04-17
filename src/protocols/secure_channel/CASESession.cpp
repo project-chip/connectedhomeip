@@ -261,9 +261,10 @@ public:
 
 struct CASESession::SendSigma3Data
 {
-    FabricTable * fabricTable;
     std::atomic<FabricIndex> fabricIndex;
 
+    // Use one or the other
+    FabricTable * fabricTable;
     Crypto::OperationalKeystore * keystore;
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R3_Signed;
@@ -1301,17 +1302,21 @@ CHIP_ERROR CASESession::SendSigma3a()
         auto & data = helper->mData;
 
         VerifyOrExit(mFabricsTable != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        data.fabricTable = mFabricsTable;
         data.fabricIndex = mFabricIndex;
+        data.fabricTable = nullptr;
+        data.keystore    = nullptr;
 
-        // If an operational keystore is used, signing will be performed in the background.
-        // Otherwise, legacy signing will be performed in the foreground.
-        data.keystore = nullptr;
         {
             const FabricInfo * fabricInfo = mFabricsTable->FindFabricWithIndex(mFabricIndex);
             VerifyOrExit(fabricInfo != nullptr, err = CHIP_ERROR_KEY_NOT_FOUND);
-            if (!fabricInfo->HasOperationalKey())
+            if (fabricInfo->HasOperationalKey())
             {
+                // NOTE: used to sign in foreground.
+                data.fabricTable = mFabricsTable;
+            }
+            else
+            {
+                // NOTE: used to sign in background.
                 data.keystore = mFabricsTable->GetOperationalKeystore();
                 VerifyOrExit(data.keystore != nullptr, err = CHIP_ERROR_KEY_NOT_FOUND);
             }
