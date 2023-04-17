@@ -63,7 +63,6 @@ If building `-with-ui` variant, also install SDL2:
 sudo apt-get install libsdl2-dev
 ```
 
-
 ### Installing prerequisites on macOS
 
 On macOS, install Xcode from the Mac App Store.
