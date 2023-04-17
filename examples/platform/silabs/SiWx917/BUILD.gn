@@ -148,10 +148,6 @@ source_set("siwx917-attestation-credentials") {
 }
 
 source_set("silabs-factory-data-provider") {
-  if (siwx917_commissionable_data) {
-    defines = [ "SIWX917_USE_COMISSIONABLE_DATA=1" ]
-  }
-
   sources = [
     "${silabs_common_plat_dir}/SilabsDeviceDataProvider.cpp",
     "${silabs_common_plat_dir}/SilabsDeviceDataProvider.h",
@@ -162,6 +158,8 @@ source_set("silabs-factory-data-provider") {
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/src/setup_payload",
   ]
+
+  public_configs = [ ":siwx917-common-config" ]
 }
 
 config("siwx917-common-config") {
@@ -183,6 +181,10 @@ config("siwx917-common-config") {
 
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]
+  }
+
+  if (siwx917_commissionable_data) {
+    defines += [ "SIWX917_USE_COMISSIONABLE_DATA=1" ]
   }
 }
 

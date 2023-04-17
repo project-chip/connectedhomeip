@@ -161,6 +161,7 @@ CHIP_ERROR SIWx917DeviceDataProvider::FlashFactoryData()
             return err;
         }
     }
+    return CHIP_NO_ERROR;
 }
 #endif
 
