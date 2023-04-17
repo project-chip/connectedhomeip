@@ -789,11 +789,13 @@ public:
         , mBufferedReadAdapter(*this)
     {
         if (aAttributePathParamsList != nullptr) {
-            mAttributePathParamsList = Platform::MakeMemoryUnique<app::AttributePathParams>(aAttributePathParamsSize, sizeof(AttributePathParams));
-            memcpy(mAttributePathParamsList.get(), aAttributePathParamsList, aAttributePathParamsSize * sizeof(AttributePathParams));
+            mAttributePathParamsList
+                = Platform::MakeMemoryUnique<app::AttributePathParams>(aAttributePathParamsSize, sizeof(AttributePathParams));
+            memcpy(
+                mAttributePathParamsList.get(), aAttributePathParamsList, aAttributePathParamsSize * sizeof(AttributePathParams));
             mAttributePathParamsSize = aAttributePathParamsSize;
         }
-        
+
         if (aEventPathParamsList != nullptr) {
             mEventPathParamsList = Platform::MakeMemoryUnique<app::EventPathParams>(aEventPathParamsSize, sizeof(EventPathParams));
             memcpy(mEventPathParamsList.get(), aEventPathParamsList, aEventPathParamsSize * sizeof(EventPathParams));
@@ -1003,13 +1005,13 @@ private:
                 }
             };
 
-        Platform::MemoryUniquePtr<AttributePathParams> attributePathParamsList = nullptr;
-        Platform::MemoryUniquePtr<EventPathParams> eventPathParamsList = nullptr;
+            Platform::MemoryUniquePtr<AttributePathParams> attributePathParamsList = nullptr;
+            Platform::MemoryUniquePtr<EventPathParams> eventPathParamsList = nullptr;
 
             if (attributes != nil) {
                 size_t count = 0;
                 attributePathParamsList
-                = Platform::MakeMemoryUnique<AttributePathParams>([attributes count], sizeof(AttributePathParams));
+                    = Platform::MakeMemoryUnique<AttributePathParams>([attributes count], sizeof(AttributePathParams));
                 VerifyOrReturnError(attributePathParamsList != nullptr, CHIP_ERROR_NO_MEMORY);
                 for (MTRAttributeRequestPath * attribute in attributes) {
                     [attribute convertToAttributePathParams:attributePathParamsList.get()[count++]];
@@ -1018,8 +1020,7 @@ private:
 
             if (events != nil) {
                 size_t count = 0;
-                eventPathParamsList
-                = Platform::MakeMemoryUnique<EventPathParams>([events count], sizeof(EventPathParams));
+                eventPathParamsList = Platform::MakeMemoryUnique<EventPathParams>([events count], sizeof(EventPathParams));
                 VerifyOrReturnError(eventPathParamsList != nullptr, CHIP_ERROR_NO_MEMORY);
                 for (MTREventRequestPath * event in events) {
                     [event convertToEventPathParams:eventPathParamsList.get()[count++]];
@@ -1036,7 +1037,8 @@ private:
             readParams.mpEventPathParamsList = eventPathParamsList.get();
             readParams.mEventPathParamsListSize = [eventPaths count];
 
-        auto onDone = [resultArray, interactionStatus, bridge, successCb, failureCb](BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
+            auto onDone = [resultArray, interactionStatus, bridge, successCb, failureCb](
+                              BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
                 if (*interactionStatus != CHIP_NO_ERROR) {
                     // Failure
                     failureCb(bridge, *interactionStatus);
