@@ -34,7 +34,8 @@ class ModeSelectDelegate1 : public Delegate
 {
     CHIP_ERROR Init() override;
 public:
-    ModeSelectDelegate1()
+    ModeSelectDelegate1(std::vector<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type> modes) : 
+    Delegate(modes)
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "ModeSelectDelegate1: Contsucted");
     }

@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/util/af.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/clusters/mode-select-server/mode-select-delegate.h>
 
 
@@ -44,16 +45,29 @@ public:
     // CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     // CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
+    EmberAfStatus SetCurrentMode(uint8_t);
+
 private:
+    EndpointId endpointId{};
+    ClusterId clusterId{};
     Delegate * msDelegate;
+
+    void GenericHandleChangeToMode(uint8_t newMode);
+    void ModeSelectHandleChangeToMode(HandlerContext & ctx, const Commands::ChangeToMode::DecodableType & req);
 
 public:
     Instance(EndpointId aEndpointId, ClusterId aClusterId, Delegate * aDelegate) :
         CommandHandlerInterface(Optional<EndpointId>(aEndpointId), aClusterId),
         AttributeAccessInterface(Optional<EndpointId>(aEndpointId), aClusterId)
     {
+        endpointId = aEndpointId;
+        clusterId = aClusterId;
         msDelegate = aDelegate;
+
     }
+
+    template <typename RequestT, typename FuncT>
+    void HandleCommand(HandlerContext & handlerContext, FuncT func);
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;

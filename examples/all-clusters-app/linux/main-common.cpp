@@ -145,7 +145,21 @@ Clusters::NetworkCommissioning::Instance sEthernetNetworkCommissioningInstance(k
 
 // Mode select
 namespace {
-    Clusters::ModeSelect::ModeSelectDelegate1 aliasDelegate1;
+    template <typename T>
+    using List               = chip::app::DataModel::List<T>;
+    using SemanticTagStructType = chip::app::Clusters::ModeSelect::Structs::SemanticTagStruct::Type;
+    using ModeOptionStructType = chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type;
+
+    constexpr SemanticTagStructType semanticTagsBlack[]     = { { .value = 0 } };
+    constexpr SemanticTagStructType semanticTagsCappucino[] = { { .value = 0 } };
+    constexpr SemanticTagStructType semanticTagsEspresso[]  = { { .value = 0 } };
+
+    std::vector<ModeOptionStructType> coffeeOptions = {
+        chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Black", 0, List<const SemanticTagStructType>(semanticTagsBlack)),
+        chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Cappuccino", 4, List<const SemanticTagStructType>(semanticTagsCappucino)),
+        chip::app::Clusters::ModeSelect::Delegate::BuildModeOptionStruct("Espresso", 7, List<const SemanticTagStructType>(semanticTagsEspresso))
+    };
+    Clusters::ModeSelect::ModeSelectDelegate1 aliasDelegate1(coffeeOptions);
     Clusters::ModeSelect::Instance modeSelectAliasA(0x1, 0x50, &aliasDelegate1);
 }
 
