@@ -595,7 +595,7 @@ def main() -> int:
     #
 
     if options.do_build:
-        sw_ver_string = "v1.0"
+        sw_ver_string = ""
 
         if options.do_automated_test_stamp:
             branch = ""
