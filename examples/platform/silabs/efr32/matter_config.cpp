@@ -110,7 +110,7 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 }
 #endif // CHIP_ENABLE_OPENTHREAD
 
-#if EFR32_OTA_ENABLED
+#if SILABS_OTA_ENABLED
 void SilabsMatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
 {
     OTAConfig::Init();
@@ -125,7 +125,7 @@ void SilabsMatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event
         ((event->Type == DeviceEventType::kInternetConnectivityChange) &&
          (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)))
     {
-#if EFR32_OTA_ENABLED
+#if SILABS_OTA_ENABLED
         SILABS_LOG("Scheduling OTA Requestor initialization")
         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
                                                     InitOTARequestorHandler, nullptr);

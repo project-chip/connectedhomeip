@@ -56,7 +56,7 @@ using namespace ::chip::DeviceLayer;
 
 #include "SilabsDeviceDataProvider.h"
 
-#if EFR32_OTA_ENABLED
+#if SILABS_OTA_ENABLED
 void SilabsMatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
 {
 #if 0 // TODO : OTA is not planned now for CCP
