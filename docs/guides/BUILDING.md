@@ -55,9 +55,25 @@ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev \
      python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
 ```
 
+#### UI builds
+
+If building `-with-ui` variant, also install SDL2:
+
+```
+sudo apt-get install libsdl2-dev
+```
+
 ### Installing prerequisites on macOS
 
 On macOS, install Xcode from the Mac App Store.
+
+#### UI builds
+
+If building `-with-ui` variant, also install SDL2:
+
+```
+brew install sdl2
+```
 
 ### Installing prerequisites on Raspberry Pi 4
 
