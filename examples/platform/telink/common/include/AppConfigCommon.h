@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,39 +18,17 @@
 
 #pragma once
 
-#include <cstdint>
+// Buttons config
+#define BUTTON_PORT DEVICE_DT_GET(DT_NODELABEL(gpioc))
 
-struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
+#define BUTTON_PIN_1 2
+#define BUTTON_PIN_3 3
+#define BUTTON_PIN_4 1
+#define BUTTON_PIN_2 0
 
-class LEDWidget;
-
-struct AppEvent
-{
-    enum AppEventTypes
-    {
-        kEventType_Button = 0,
-        kEventType_Timer,
-        kEventType_UpdateLedState,
-    };
-
-    uint16_t Type;
-
-    union
-    {
-        struct
-        {
-            uint8_t Action;
-        } ButtonEvent;
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-        struct
-        {
-            LEDWidget * LedWidget;
-        } UpdateLedStateEvent;
-    };
-
-    EventHandler Handler;
-};
+// LEDs config
+#define LEDS_PORT DEVICE_DT_GET(DT_NODELABEL(gpiob))
+#define SYSTEM_STATE_LED 7
+#if APP_USE_IDENTIFY_PWM
+#define LIGHTING_PWM_SPEC_IDENTIFY_GREEN PWM_DT_SPEC_GET(DT_ALIAS(pwm_led3))
+#endif
