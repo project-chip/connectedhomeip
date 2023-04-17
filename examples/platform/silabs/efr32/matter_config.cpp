@@ -57,7 +57,7 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include <app/InteractionModelEngine.h>
 
 #ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
-ICDSubscriptionCallback EFR32MatterConfig::mICDSubscriptionHandler;
+ICDSubscriptionCallback SilabsMatterConfig::mICDSubscriptionHandler;
 #endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -87,10 +87,10 @@ void UnlockOpenThreadTask(void)
 }
 
 // ================================================================================
-// EFR32MatterConfig Methods
+// SilabsMatterConfig Methods
 // ================================================================================
 
-CHIP_ERROR EFR32MatterConfig::InitOpenThread(void)
+CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 {
     SILABS_LOG("Initializing OpenThread stack");
     ReturnErrorOnFailure(ThreadStackMgr().InitThreadStack());
@@ -111,13 +111,13 @@ CHIP_ERROR EFR32MatterConfig::InitOpenThread(void)
 #endif // CHIP_ENABLE_OPENTHREAD
 
 #if EFR32_OTA_ENABLED
-void EFR32MatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
+void SilabsMatterConfig::InitOTARequestorHandler(System::Layer * systemLayer, void * appState)
 {
     OTAConfig::Init();
 }
 #endif
 
-void EFR32MatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg)
+void SilabsMatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
     // Initialize OTA only when Thread or WiFi connectivity is established
     if (((event->Type == DeviceEventType::kThreadConnectivityChange) &&
@@ -133,7 +133,7 @@ void EFR32MatterConfig::ConnectivityEventCallback(const ChipDeviceEvent * event,
     }
 }
 
-CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
+CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 {
     CHIP_ERROR err;
 
@@ -223,7 +223,7 @@ CHIP_ERROR EFR32MatterConfig::InitMatter(const char * appName)
 }
 
 #ifdef SL_WIFI
-void EFR32MatterConfig::InitWiFi(void)
+void SilabsMatterConfig::InitWiFi(void)
 {
 #ifdef WF200_WIFI
     // Start wfx bus communication task.
