@@ -37,6 +37,10 @@
                             clientQueue:(dispatch_queue_t _Nonnull)clientQueue
                    initAppStatusHandler:(nullable void (^)(bool))initAppStatusHandler;
 
+- (void)setDacHolder:(DeviceAttestationCredentialsHolder * _Nonnull)deviceAttestationCredentials
+           clientQueue:(dispatch_queue_t _Nonnull)clientQueue
+    setDacHolderStatus:(void (^_Nonnull)(MatterError * _Nonnull))setDacHolderStatus;
+
 /*!
  @brief Browse for on-network commissioner TVs
 
@@ -192,7 +196,7 @@
 
  @param responseHandler Called when purgeCache completes
  */
-- (void)purgeCache:(dispatch_queue_t _Nonnull)clientQueue responseHandler:(void (^)(MatterError * _Nonnull))responseHandler;
+- (void)purgeCache:(dispatch_queue_t _Nonnull)clientQueue responseHandler:(void (^_Nonnull)(MatterError * _Nonnull))responseHandler;
 
 /*!
  @brief Start the Matter server and reconnect to a previously connected Video Player (if any). This API is async

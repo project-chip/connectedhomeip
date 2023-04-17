@@ -161,7 +161,7 @@ config("attestation-credentials-config") {
 
   defines = [
     # Set to 1 to enable EFR32 attestation credentials
-    "EFR32_ATTESTATION_CREDENTIALS",
+    "SILABS_ATTESTATION_CREDENTIALS",
   ]
 }
 
@@ -211,7 +211,7 @@ config("efr32-common-config") {
   defines = [ "OTA_PERIODIC_TIMEOUT=${ota_periodic_query_timeout_sec}" ]
 
   if (!disable_lcd) {
-    include_dirs = [ "display" ]
+    include_dirs = [ "${silabs_common_plat_dir}/display" ]
 
     defines += [ "DISPLAY_ENABLED" ]
   }
@@ -227,6 +227,10 @@ config("efr32-common-config") {
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]
   }
+
+  # Do not warn for LOAD segment with RWX permissions
+  # Uncomment this cflag when pigweed update is done and GCC 12.2 is used.
+  #ldflags = [ "-Wl,--no-warn-rwx-segment" ]
 }
 
 config("silabs-wifi-config") {
@@ -279,6 +283,7 @@ source_set("efr32-common") {
 
   sources = [
     "${silabs_common_plat_dir}/heap_4_silabs.c",
+    "${silabs_common_plat_dir}/syscalls_stubs.cpp",
     "efr32_utils.cpp",
     "init_efrPlatform.cpp",
     "matter_config.cpp",
@@ -302,16 +307,16 @@ source_set("efr32-common") {
 
   if (!disable_lcd) {
     sources += [
-      "display/demo-ui.c",
-      "display/lcd.cpp",
+      "${silabs_common_plat_dir}/display/demo-ui.c",
+      "${silabs_common_plat_dir}/display/lcd.cpp",
     ]
 
-    include_dirs += [ "display" ]
+    include_dirs += [ "${silabs_common_plat_dir}/display" ]
     public_deps += [ "${chip_root}/examples/common/QRCode" ]
   }
 
   if (enable_heap_monitoring) {
-    sources += [ "MemMonitoring.cpp" ]
+    sources += [ "${silabs_common_plat_dir}/MemMonitoring.cpp" ]
   }
 
   # OpenThread Settings

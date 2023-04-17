@@ -44,9 +44,14 @@ struct GenericContext
 
     virtual ~GenericContext() {}
 
+    CHIP_ERROR Finalize(CHIP_ERROR err);
     CHIP_ERROR Finalize(DNSServiceErrorType err = kDNSServiceErr_NoError);
-    virtual void DispatchFailure(DNSServiceErrorType err) = 0;
-    virtual void DispatchSuccess()                        = 0;
+
+    virtual void DispatchFailure(const char * errorStr, CHIP_ERROR err) = 0;
+    virtual void DispatchSuccess()                                      = 0;
+
+private:
+    CHIP_ERROR FinalizeInternal(const char * errorStr, CHIP_ERROR err);
 };
 
 struct RegisterContext;
@@ -130,7 +135,7 @@ struct RegisterContext : public GenericContext
     RegisterContext(const char * sType, const char * instanceName, DnssdPublishCallback cb, void * cbContext);
     virtual ~RegisterContext() { mHostNameRegistrar.Unregister(); }
 
-    void DispatchFailure(DNSServiceErrorType err) override;
+    void DispatchFailure(const char * errorStr, CHIP_ERROR err) override;
     void DispatchSuccess() override;
 
     bool matches(const char * sType) { return mType.compare(sType) == 0; }
@@ -145,7 +150,7 @@ struct BrowseContext : public GenericContext
     BrowseContext(void * cbContext, DnssdBrowseCallback cb, DnssdServiceProtocol cbContextProtocol);
     virtual ~BrowseContext() {}
 
-    void DispatchFailure(DNSServiceErrorType err) override;
+    void DispatchFailure(const char * errorStr, CHIP_ERROR err) override;
     void DispatchSuccess() override;
 
     // Dispatch what we have found so far, but don't stop browsing.
@@ -195,7 +200,7 @@ struct ResolveContext : public GenericContext
                    std::shared_ptr<uint32_t> && consumerCounterToUse);
     virtual ~ResolveContext();
 
-    void DispatchFailure(DNSServiceErrorType err) override;
+    void DispatchFailure(const char * errorStr, CHIP_ERROR err) override;
     void DispatchSuccess() override;
 
     CHIP_ERROR OnNewAddress(uint32_t interfaceId, const struct sockaddr * address);

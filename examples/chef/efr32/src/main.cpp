@@ -27,7 +27,7 @@
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <matter_config.h>
-#ifdef EFR32_ATTESTATION_CREDENTIALS
+#ifdef SILABS_ATTESTATION_CREDENTIALS
 #include <examples/platform/efr32/EFR32DeviceAttestationCreds.h>
 #else
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -58,7 +58,7 @@ int main(void)
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     // Initialize device attestation config
-#ifdef EFR32_ATTESTATION_CREDENTIALS
+#ifdef SILABS_ATTESTATION_CREDENTIALS
     SetDeviceAttestationCredentialsProvider(EFR32::GetEFR32DacProvider());
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

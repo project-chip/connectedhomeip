@@ -65,7 +65,6 @@
 
 #include "CHIPDevicePlatformEvent.h"
 #include "ChipDeviceScanner.h"
-#include "MainLoop.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -118,14 +117,14 @@ void BLEManagerImpl::GattConnectionStateChangedCb(int result, bool connected, co
     }
 }
 
-gboolean BLEManagerImpl::_BleInitialize(void * userData)
+CHIP_ERROR BLEManagerImpl::_BleInitialize(void * userData)
 {
     int ret;
 
     if (sInstance.mFlags.Has(Flags::kTizenBLELayerInitialized))
     {
         ChipLogProgress(DeviceLayer, "BLE Already Initialized");
-        return true;
+        return CHIP_NO_ERROR;
     }
 
     ret = bt_initialize();
@@ -144,11 +143,10 @@ gboolean BLEManagerImpl::_BleInitialize(void * userData)
 
     sInstance.mFlags.Set(Flags::kTizenBLELayerInitialized);
     ChipLogProgress(DeviceLayer, "BLE Initialized");
-    sInstance.mMainContext = g_main_context_get_thread_default();
-    return true;
+    return CHIP_NO_ERROR;
 
 exit:
-    return false;
+    return CHIP_ERROR_INTERNAL;
 }
 
 static int __GetAttInfo(bt_gatt_h gattHandle, char ** uuid, bt_gatt_type_e * type)
@@ -447,37 +445,27 @@ void BLEManagerImpl::HandleConnectionTimeout(System::Layer * layer, void * data)
     sInstance.NotifyHandleConnectFailed(CHIP_ERROR_TIMEOUT);
 }
 
-gboolean BLEManagerImpl::ConnectChipThing(gpointer userData)
+CHIP_ERROR BLEManagerImpl::ConnectChipThing(const char * address)
 {
-    int ret = BT_ERROR_NONE;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    int ret;
 
-    char * address = reinterpret_cast<char *>(userData);
     ChipLogProgress(DeviceLayer, "ConnectRequest: Addr [%s]", StringOrNullMarker(address));
 
     ret = bt_gatt_client_create(address, &sInstance.mGattClient);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Failed to create GATT client. ret [%d]", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Failed to create GATT client. ret [%d]", ret);
+                 err = CHIP_ERROR_INTERNAL);
 
     ret = bt_gatt_connect(address, false);
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Failed to issue GATT connect request. ret [%d]", ret));
+    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Failed to issue GATT connect request. ret [%d]", ret);
+                 err = CHIP_ERROR_INTERNAL);
 
     ChipLogProgress(DeviceLayer, "GATT Connect Issued");
+
 exit:
-    if (ret != BT_ERROR_NONE)
-        sInstance.NotifyHandleConnectFailed(CHIP_ERROR_INTERNAL);
-
-    g_free(address);
-    return G_SOURCE_REMOVE;
-}
-
-void BLEManagerImpl::ConnectHandler(const char * address)
-{
-    GSource * idleSource;
-
-    idleSource = g_idle_source_new();
-    g_source_set_callback(idleSource, ConnectChipThing, g_strdup(address), nullptr);
-    g_source_set_priority(idleSource, G_PRIORITY_HIGH_IDLE);
-    g_source_attach(idleSource, sInstance.mMainContext);
-    g_source_unref(idleSource);
+    if (err != CHIP_NO_ERROR)
+        sInstance.NotifyHandleConnectFailed(err);
+    return err;
 }
 
 void BLEManagerImpl::OnChipDeviceScanned(void * device, const Ble::ChipBLEDeviceIdentificationInfo & info)
@@ -515,7 +503,7 @@ void BLEManagerImpl::OnChipDeviceScanned(void * device, const Ble::ChipBLEDevice
     mDeviceScanner->StopChipScan();
 
     /* Initiate Connect */
-    ConnectHandler(deviceInfo->remote_address);
+    PlatformMgrImpl().GLibMatterContextInvokeSync(ConnectChipThing, const_cast<const char *>(deviceInfo->remote_address));
 }
 
 void BLEManagerImpl::OnScanComplete()
@@ -960,7 +948,6 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
 CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
-    bool ret;
 
     err = BleLayer::Init(this, this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
@@ -968,8 +955,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
 
     ChipLogProgress(DeviceLayer, "Initialize BLE");
-    ret = MainLoop::Instance().Init(_BleInitialize);
-    VerifyOrExit(ret != false, err = CHIP_ERROR_INTERNAL);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(_BleInitialize, static_cast<void *>(nullptr));
+    SuccessOrExit(err);
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 

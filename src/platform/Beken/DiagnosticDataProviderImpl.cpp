@@ -153,14 +153,18 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
     LinkStatusTypeDef linkStatus;
+
+    constexpr size_t bssIdSize = 6;
+    VerifyOrReturnError(BssId.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
     memset(&linkStatus, 0x0, sizeof(LinkStatusTypeDef));
     if (0 == bk_wlan_get_link_status(&linkStatus))
     {
-        BssId = ByteSpan(linkStatus.bssid, 6);
+        memcpy(BssId.data(), linkStatus.bssid, bssIdSize);
+        BssId.reduce_size(bssIdSize);
     }
     else
     {

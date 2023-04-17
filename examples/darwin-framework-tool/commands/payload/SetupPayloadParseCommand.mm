@@ -24,8 +24,6 @@ using namespace ::chip;
 
 namespace {
 
-#if CHIP_PROGRESS_LOGGING
-
 NSString * CustomFlowString(MTRCommissioningFlow flow)
 {
     switch (flow) {
@@ -41,8 +39,6 @@ NSString * CustomFlowString(MTRCommissioningFlow flow)
 
     return @"???";
 }
-
-#endif // CHIP_PROGRESS_LOGGING
 
 } // namespace
 

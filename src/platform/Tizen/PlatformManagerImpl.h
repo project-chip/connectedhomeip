@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <glib.h>
+
 #include <lib/core/CHIPError.h>
 #include <platform/ConnectivityManager.h>
 
@@ -49,18 +51,46 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
+    /**
+     * @brief Invoke a function on the Matter GLib context.
+     *
+     * If execution of the function will have to be scheduled on other thread,
+     * this call will block the current thread until the function is executed.
+     *
+     * @param[in] function The function to call.
+     * @param[in] userData User data to pass to the function.
+     * @returns The result of the function.
+     */
+    template <typename T>
+    CHIP_ERROR GLibMatterContextInvokeSync(CHIP_ERROR (*func)(T *), T * userData)
+    {
+        return _GLibMatterContextInvokeSync((CHIP_ERROR(*)(void *)) func, (void *) userData);
+    }
+
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
-    CHIP_ERROR _InitChipStack(void);
+    CHIP_ERROR _InitChipStack();
+    void _Shutdown();
 
     // ===== Members for internal use by the following friends.
 
-    friend PlatformManager & PlatformMgr(void);
-    friend PlatformManagerImpl & PlatformMgrImpl(void);
+    friend PlatformManager & PlatformMgr();
+    friend PlatformManagerImpl & PlatformMgrImpl();
     friend class Internal::BLEManagerImpl;
 
     static PlatformManagerImpl sInstance;
+
+    /**
+     * @brief Invoke a function on the Matter GLib context.
+     *
+     * @note This function does not provide type safety for the user data. Please,
+     *       use the GLibMatterContextInvokeSync() template function instead.
+     */
+    CHIP_ERROR _GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData);
+
+    GMainLoop * mGLibMainLoop;
+    GThread * mGLibMainLoopThread;
 };
 
 /**
@@ -69,7 +99,7 @@ private:
  * Chip applications should use this to access features of the PlatformManager object
  * that are common to all platforms.
  */
-inline PlatformManager & PlatformMgr(void)
+inline PlatformManager & PlatformMgr()
 {
     return PlatformManagerImpl::sInstance;
 }
@@ -80,7 +110,7 @@ inline PlatformManager & PlatformMgr(void)
  * Chip applications can use this to gain access to features of the PlatformManager
  * that are specific to Tizen platform.
  */
-inline PlatformManagerImpl & PlatformMgrImpl(void)
+inline PlatformManagerImpl & PlatformMgrImpl()
 {
     return PlatformManagerImpl::sInstance;
 }

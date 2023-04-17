@@ -35,8 +35,6 @@
 
 @property NSData * spake2pVerifierBase64;
 
-@property DeviceAttestationCredentialsHolder * deviceAttestationCredentials;
-
 @end
 
 #endif /* AppParameters_h */

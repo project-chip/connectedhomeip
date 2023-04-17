@@ -1402,6 +1402,46 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         [subscriptionDroppedExpectation fulfill];
     };
 
+    // Before resubscribe, first test write failure and expected value effects
+    NSNumber * testEndpointID = @(1);
+    NSNumber * testClusterID = @(8);
+    NSNumber * testAttributeID = @(10000); // choose a nonexistent attribute to cause a failure
+    XCTestExpectation * expectedValueReportedExpectation = [self expectationWithDescription:@"Expected value reported"];
+    XCTestExpectation * expectedValueRemovedExpectation = [self expectationWithDescription:@"Expected value removed"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
+        for (NSDictionary<NSString *, id> * attributeDict in attributeReport) {
+            MTRAttributePath * attributePath = attributeDict[MTRAttributePathKey];
+            XCTAssertNotNil(attributePath);
+            if ([attributePath.endpoint isEqualToNumber:testEndpointID] && [attributePath.cluster isEqualToNumber:testClusterID] &&
+                [attributePath.attribute isEqualToNumber:testAttributeID]) {
+                id data = attributeDict[MTRDataKey];
+                if (data) {
+                    [expectedValueReportedExpectation fulfill];
+                } else {
+                    [expectedValueRemovedExpectation fulfill];
+                }
+            }
+        }
+    };
+
+    NSDictionary * writeValue = [NSDictionary
+        dictionaryWithObjectsAndKeys:@"UnsignedInteger", @"type", [NSNumber numberWithUnsignedInteger:200], @"value", nil];
+    [device writeAttributeWithEndpointID:testEndpointID
+                               clusterID:testClusterID
+                             attributeID:testAttributeID
+                                   value:writeValue
+                   expectedValueInterval:@(20000)
+                       timedWriteTimeout:nil];
+
+    // expected value interval is 20s but expect it get reverted immediately as the write fails because it's writing to a
+    // nonexistent attribute
+    [self waitForExpectations:@[ expectedValueReportedExpectation, expectedValueRemovedExpectation ] timeout:5 enforceOrder:YES];
+
+    // reset the onAttributeDataReceived to validate the following resubscribe test
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        attributeReportsReceived += data.count;
+    };
+
     // Now trigger another subscription which will cause ours to drop; we should re-subscribe after that.
     MTRBaseDevice * baseDevice = GetConnectedDevice();
     __auto_type params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];

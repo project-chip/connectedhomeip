@@ -227,6 +227,8 @@ CHIP_ERROR WindowAppImpl::Init()
     }
 #endif // QR_CODE_ENABLED
 
+    mWindowAppInit = true;
+
     return CHIP_NO_ERROR;
 }
 
@@ -531,14 +533,30 @@ WindowAppImpl::Button::Button(WindowApp::Button::Id id, const char * name) : Win
 void WindowAppImpl::OnButtonChange(uint8_t Btn, uint8_t btnAction)
 {
     WindowApp::Button * btn = static_cast<Button *>((Btn == SIWx917_BTN0) ? sInstance.mButtonUp : sInstance.mButtonDown);
-    btn->Press();
-    // since sl_button_on_change is being called only with button press, calling Release() without condition
-    btn->Release();
+    if (Btn == SIWx917_BTN1)
+    {
+        btn->Press();
+        btn->Release();
+    }
+    else
+    {
+        if (btnAction)
+        {
+            btn->Press();
+        }
+        else
+        {
+            btn->Release();
+        }
+    }
 }
 
 // Silabs button callback from button event ISR
 void sl_button_on_change(uint8_t btn, uint8_t btnAction)
 {
     WindowAppImpl * app = static_cast<WindowAppImpl *>(&WindowAppImpl::sInstance);
-    app->OnButtonChange(btn, btnAction);
+    if (app->mWindowAppInit)
+    {
+        app->OnButtonChange(btn, btnAction);
+    }
 }

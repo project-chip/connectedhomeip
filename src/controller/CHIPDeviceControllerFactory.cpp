@@ -286,6 +286,7 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.controllerICAC                       = params.controllerICAC;
     controllerParams.controllerRCAC                       = params.controllerRCAC;
     controllerParams.permitMultiControllerFabrics         = params.permitMultiControllerFabrics;
+    controllerParams.removeFromFabricTableOnShutdown      = params.removeFromFabricTableOnShutdown;
 
     controllerParams.systemState        = mSystemState;
     controllerParams.controllerVendorId = params.controllerVendorId;
@@ -337,6 +338,21 @@ CHIP_ERROR DeviceControllerFactory::ServiceEvents()
 #endif // CONFIG_DEVICE_LAYER
 
     return CHIP_NO_ERROR;
+}
+
+void DeviceControllerFactory::RetainSystemState()
+{
+    (void) mSystemState->Retain();
+}
+
+void DeviceControllerFactory::ReleaseSystemState()
+{
+    mSystemState->Release();
+
+    if (!mSystemState->IsInitialized() && mEnableServerInteractions)
+    {
+        app::DnssdServer::Instance().StopServer();
+    }
 }
 
 DeviceControllerFactory::~DeviceControllerFactory()

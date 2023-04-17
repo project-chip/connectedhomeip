@@ -155,6 +155,7 @@ protected:
 
     std::string GetIdentity();
     CHIP_ERROR GetIdentityNodeId(std::string identity, chip::NodeId * nodeId);
+    CHIP_ERROR GetIdentityRootCertificate(std::string identity, chip::ByteSpan & span);
     void SetIdentity(const char * name);
 
     // This method returns the commissioner instance to be used for running the command.
@@ -179,12 +180,19 @@ private:
         }
         std::string mName;
         chip::NodeId mLocalNodeId;
+        uint8_t mRCAC[chip::Controller::kMaxCHIPDERCertLength] = {};
+        uint8_t mICAC[chip::Controller::kMaxCHIPDERCertLength] = {};
+        uint8_t mNOC[chip::Controller::kMaxCHIPDERCertLength]  = {};
+
+        size_t mRCACLen;
+        size_t mICACLen;
+        size_t mNOCLen;
     };
 
     // InitializeCommissioner uses various members, so can't be static.  This is
     // obviously a little odd, since the commissioners are then shared across
     // multiple commands in interactive mode...
-    CHIP_ERROR InitializeCommissioner(const CommissionerIdentity & identity, chip::FabricId fabricId);
+    CHIP_ERROR InitializeCommissioner(CommissionerIdentity & identity, chip::FabricId fabricId);
     void ShutdownCommissioner(const CommissionerIdentity & key);
     chip::FabricId CurrentCommissionerId();
 

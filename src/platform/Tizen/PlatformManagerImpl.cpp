@@ -29,6 +29,11 @@
  *       class. */
 #include <platform/PlatformManager.h>
 
+#include <condition_variable>
+#include <mutex>
+
+#include <glib.h>
+
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -45,8 +50,65 @@ namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
+namespace {
+
+struct GLibMatterContextInvokeData
+{
+    CHIP_ERROR (*mFunc)(void *);
+    void * mFuncUserData;
+    CHIP_ERROR mFuncResult;
+    // Sync primitives to wait for the function to be executed
+    std::mutex mDoneMutex;
+    std::condition_variable mDoneCond;
+    bool mDone = false;
+};
+
+void * GLibMainLoopThread(void * userData)
+{
+    GMainLoop * loop       = static_cast<GMainLoop *>(userData);
+    GMainContext * context = g_main_loop_get_context(loop);
+
+    g_main_context_push_thread_default(context);
+    g_main_loop_run(loop);
+
+    return nullptr;
+}
+
+} // namespace
+
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
+    auto * context      = g_main_context_new();
+    mGLibMainLoop       = g_main_loop_new(context, FALSE);
+    mGLibMainLoopThread = g_thread_new("gmain-matter", GLibMainLoopThread, mGLibMainLoop);
+    g_main_context_unref(context);
+
+    {
+        // Wait for the GLib main loop to start. It is required that the GLib Matter
+        // context is acquired by the g_main_loop_run() before any other GLib function
+        // is called. Otherwise, the GLibMatterContextInvokeSync() might run callback
+        // functions on the wrong thread.
+
+        GLibMatterContextInvokeData invokeData{};
+
+        auto * idleSource = g_idle_source_new();
+        g_source_set_callback(
+            idleSource,
+            [](void * userData_) {
+                auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
+                std::unique_lock<std::mutex> lock(data->mDoneMutex);
+                data->mDone = true;
+                data->mDoneCond.notify_one();
+                return G_SOURCE_REMOVE;
+            },
+            &invokeData, nullptr);
+        g_source_attach(idleSource, g_main_loop_get_context(mGLibMainLoop));
+        g_source_unref(idleSource);
+
+        std::unique_lock<std::mutex> lock(invokeData.mDoneMutex);
+        invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
+    }
+
     ReturnErrorOnFailure(Internal::PosixConfig::Init());
 
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack());
@@ -56,6 +118,42 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
     return CHIP_NO_ERROR;
+}
+
+void PlatformManagerImpl::_Shutdown()
+{
+    Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
+
+    g_main_loop_quit(mGLibMainLoop);
+    g_main_loop_unref(mGLibMainLoop);
+    g_thread_join(mGLibMainLoopThread);
+}
+
+CHIP_ERROR PlatformManagerImpl::_GLibMatterContextInvokeSync(CHIP_ERROR (*func)(void *), void * userData)
+{
+    GLibMatterContextInvokeData invokeData{ func, userData };
+
+    g_main_context_invoke_full(
+        g_main_loop_get_context(mGLibMainLoop), G_PRIORITY_HIGH_IDLE,
+        [](void * userData_) {
+            auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
+            VerifyOrExit(g_main_context_get_thread_default() != nullptr,
+                         ChipLogError(DeviceLayer, "GLib thread default main context is not set");
+                         data->mFuncResult = CHIP_ERROR_INCORRECT_STATE);
+            data->mFuncResult = data->mFunc(data->mFuncUserData);
+        exit:
+            data->mDoneMutex.lock();
+            data->mDone = true;
+            data->mDoneMutex.unlock();
+            data->mDoneCond.notify_one();
+            return G_SOURCE_REMOVE;
+        },
+        &invokeData, nullptr);
+
+    std::unique_lock<std::mutex> lock(invokeData.mDoneMutex);
+    invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
+
+    return invokeData.mFuncResult;
 }
 
 } // namespace DeviceLayer

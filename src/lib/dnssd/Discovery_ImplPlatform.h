@@ -38,6 +38,7 @@ class DiscoveryImplPlatform : public ServiceAdvertiser, public Resolver
 public:
     // Members that implement both ServiceAdveriser and Resolver interfaces.
     CHIP_ERROR Init(Inet::EndPointManager<Inet::UDPEndPoint> *) override { return InitImpl(); }
+    bool IsInitialized() override;
     void Shutdown() override;
 
     // Members that implement ServiceAdvertiser interface.
@@ -49,7 +50,6 @@ public:
     CHIP_ERROR UpdateCommissionableInstanceName() override;
 
     // Members that implement Resolver interface.
-    bool IsInitialized() override;
     void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mResolverProxy.SetOperationalDelegate(delegate); }
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override
     {

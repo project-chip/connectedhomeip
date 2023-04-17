@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2021 Project CHIP Authors
+ *   Copyright (c) 2023 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,18 +18,8 @@
 
 #pragma once
 
-#include "../common/Command.h"
-#include <controller/ExamplePersistentStorage.h>
+#include <lib/support/Span.h>
+#include <string>
 
-class CommissionedListCommand : public Command
-{
-public:
-    CommissionedListCommand() : Command("list") {}
-    CHIP_ERROR Run() override;
-
-private:
-    CHIP_ERROR PrintInformation();
-    CHIP_ERROR PrintDeviceInformation(chip::NodeId deviceId);
-
-    PersistentStorage mStorage;
-};
+CHIP_ERROR ToBase64(const chip::ByteSpan & input, std::string & outputAsPrefixedBase64);
+CHIP_ERROR ToTLVCert(const chip::ByteSpan & derEncodedCertificate, std::string & tlvCertAsPrefixedBase64);
