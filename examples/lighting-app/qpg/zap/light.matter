@@ -153,7 +153,7 @@ server cluster OnOff = 6 {
     kLighting = 0x1;
   }
 
-  readonly nosubscribe attribute boolean onOff = 0;
+  readonly attribute boolean onOff = 0;
   readonly attribute boolean globalSceneControl = 16384;
   attribute int16u onTime = 16385;
   attribute int16u offWaitTime = 16386;
@@ -1452,12 +1452,12 @@ server cluster ColorControl = 768 {
     kUpdateStartHue = 0x8;
   }
 
-  readonly nosubscribe attribute int8u currentHue = 0;
-  readonly nosubscribe attribute int8u currentSaturation = 1;
+  readonly attribute int8u currentHue = 0;
+  readonly attribute int8u currentSaturation = 1;
   readonly attribute int16u remainingTime = 2;
-  readonly nosubscribe attribute int16u currentX = 3;
-  readonly nosubscribe attribute int16u currentY = 4;
-  readonly nosubscribe attribute int16u colorTemperatureMireds = 7;
+  readonly attribute int16u currentX = 3;
+  readonly attribute int16u currentY = 4;
+  readonly attribute int16u colorTemperatureMireds = 7;
   readonly attribute enum8 colorMode = 8;
   attribute bitmap8 options = 15;
   readonly attribute nullable int8u numberOfPrimaries = 16;

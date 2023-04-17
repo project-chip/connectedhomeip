@@ -275,18 +275,22 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(ByteSpan & BssId)
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
+    constexpr size_t bssIdSize = 6;
+    VerifyOrReturnError(BssId.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+
     wifi_ap_record_t ap_info;
     esp_err_t err;
-    static uint8_t macAddress[kMaxHardwareAddrSize];
 
     err = esp_wifi_sta_get_ap_info(&ap_info);
-    if (err == ESP_OK)
+    if (err != ESP_OK)
     {
-        memcpy(macAddress, ap_info.bssid, 6);
+        return CHIP_ERROR_READ_FAILED;
     }
-    BssId = ByteSpan(macAddress, 6);
+
+    memcpy(BssId.data(), ap_info.bssid, bssIdSize);
+    BssId.reduce_size(bssIdSize);
     return CHIP_NO_ERROR;
 }
 

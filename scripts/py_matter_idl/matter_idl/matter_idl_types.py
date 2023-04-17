@@ -9,16 +9,19 @@ from lark.tree import Meta
 # Helpful when referencing data items in logs when processing
 @dataclass
 class ParseMetaData:
-    line: int
-    column: int
+    line: Optional[int]
+    column: Optional[int]
+    start_pos: Optional[int]
 
-    def __init__(self, meta: Meta = None, line: int = None, column: int = None):
+    def __init__(self, meta: Meta = None, line: int = None, column: int = None, start_pos: int = None):
         if meta:
             self.line = meta.line
             self.column = meta.column
+            self.start_pos = meta.start_pos
         else:
             self.line = line
             self.column = column
+            self.start_pos = start_pos
 
 
 class StructQuality(enum.Flag):
@@ -192,6 +195,10 @@ class Command:
     output_param: str
     qualities: CommandQuality = CommandQuality.NONE
     invokeacl: AccessPrivilege = AccessPrivilege.OPERATE
+    description: Optional[str] = None
+
+    # Parsing meta data missing only when skip meta data is requested
+    parse_meta: Optional[ParseMetaData] = field(default=None)
 
     @property
     def is_timed_invoke(self):
@@ -209,6 +216,7 @@ class Cluster:
     attributes: List[Attribute] = field(default_factory=list)
     structs: List[Struct] = field(default_factory=list)
     commands: List[Command] = field(default_factory=list)
+    description: Optional[str] = None
 
     # Parsing meta data missing only when skip meta data is requested
     parse_meta: Optional[ParseMetaData] = field(default=None)

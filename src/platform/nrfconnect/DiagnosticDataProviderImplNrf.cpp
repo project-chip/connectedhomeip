@@ -42,12 +42,12 @@ DiagnosticDataProviderImplNrf & DiagnosticDataProviderImplNrf::GetDefaultInstanc
 }
 
 #ifdef CONFIG_WIFI_NRF700X
-CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiBssId(ByteSpan & value)
+CHIP_ERROR DiagnosticDataProviderImplNrf::GetWiFiBssId(MutableByteSpan & value)
 {
     WiFiManager::WiFiInfo info;
-    CHIP_ERROR err = WiFiManager::Instance().GetWiFiInfo(info);
-    value          = info.mBssId;
-    return err;
+    ReturnErrorOnFailure(WiFiManager::Instance().GetWiFiInfo(info));
+
+    return CopySpanToMutableSpan(info.mBssId, value);
 }
 
 CHIP_ERROR

@@ -140,13 +140,13 @@ void rsi_hal_board_init(void)
     xSemaphoreGive(spiTransferLock);
 
     /* GPIO INIT of MG12 & MG24 : Reset, Wakeup, Interrupt */
-    WFX_RSI_LOG("RSI_HAL: init GPIO");
+    SILABS_LOG("RSI_HAL: init GPIO");
     sl_wfx_host_gpio_init();
 
     /* Reset of Wifi chip */
-    WFX_RSI_LOG("RSI_HAL: Reset Wifi");
+    SILABS_LOG("RSI_HAL: Reset Wifi");
     sl_wfx_host_reset_chip();
-    WFX_RSI_LOG("RSI_HAL: Init done");
+    SILABS_LOG("RSI_HAL: Init done");
 }
 
 /*****************************************************************************
@@ -223,8 +223,8 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
             int itemsTransferred = 0;
             int itemsRemaining   = 0;
             SPIDRV_GetTransferStatus(SPI_HANDLE, &itemsTransferred, &itemsRemaining);
-            WFX_RSI_LOG("SPI transfert timed out %d/%d (rx%x rx%x)", itemsTransferred, itemsRemaining, (uint32_t) tx_buf,
-                        (uint32_t) rx_buf);
+            SILABS_LOG("SPI transfert timed out %d/%d (rx%x rx%x)", itemsTransferred, itemsRemaining, (uint32_t) tx_buf,
+                       (uint32_t) rx_buf);
 
             SPIDRV_AbortTransfer(SPI_HANDLE);
             rsiError = RSI_ERROR_SPI_TIMEOUT;
@@ -232,7 +232,7 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     }
     else
     {
-        WFX_RSI_LOG("SPI transfert failed with err:%x (tx%x rx%x)", spiError, (uint32_t) tx_buf, (uint32_t) rx_buf);
+        SILABS_LOG("SPI transfert failed with err:%x (tx%x rx%x)", spiError, (uint32_t) tx_buf, (uint32_t) rx_buf);
         rsiError               = RSI_ERROR_SPI_FAIL;
         spiInitiatorTaskHandle = NULL; // SPI operation failed. No notification to received.
     }

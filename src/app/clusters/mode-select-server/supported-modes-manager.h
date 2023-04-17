@@ -20,9 +20,6 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af-enums.h>
-#include <app/util/af.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/basic-types.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -55,6 +52,8 @@ public:
          * Returns the ModeOptionStructIterator to an element after the last option.
          */
         inline pointer end() const { return mEnd; }
+
+        ModeOptionsProvider() : mBegin(nullptr), mEnd(nullptr) {}
 
         ModeOptionsProvider(const pointer aBegin, const pointer aEnd) : mBegin(aBegin), mEnd(aEnd) {}
 

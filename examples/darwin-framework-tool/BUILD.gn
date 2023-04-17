@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/build/config/compiler/compiler.gni")
 import("${chip_root}/build/config/mac/mac_sdk.gni")
 import("${chip_root}/examples//chip-tool/chip-tool.gni")
 
@@ -31,6 +32,8 @@ declare_args() {
   # When config_enable_yaml_tests is false, the Matter SDK options are not available.
   if (!config_enable_yaml_tests) {
     chip_inet_config_enable_ipv4 = true
+    chip_config_network_layer_ble = true
+    is_clang = false
   }
 }
 
@@ -73,8 +76,28 @@ action("build-darwin-framework") {
     ]
   }
 
-  if (defined(chip_inet_config_enable_ipv4) && !chip_inet_config_enable_ipv4) {
+  if (defined(chip_inet_config_enable_ipv4) && chip_inet_config_enable_ipv4) {
+    args += [ "--ipv4" ]
+  } else {
     args += [ "--no-ipv4" ]
+  }
+
+  if (defined(is_asan) && is_asan) {
+    args += [ "--asan" ]
+  } else {
+    args += [ "--no-asan" ]
+  }
+
+  if (defined(chip_config_network_layer_ble) && chip_config_network_layer_ble) {
+    args += [ "--ble" ]
+  } else {
+    args += [ "--no-ble" ]
+  }
+
+  if (defined(is_clang) && is_clang) {
+    args += [ "--clang" ]
+  } else {
+    args += [ "--no-clang" ]
   }
 
   output_name = "Matter.framework"

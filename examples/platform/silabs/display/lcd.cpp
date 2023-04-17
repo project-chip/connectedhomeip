@@ -71,12 +71,6 @@ CHIP_ERROR SilabsLCD::Init(uint8_t * name, bool initialState)
         err = CHIP_ERROR_INTERNAL;
     }
 
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
-    if (pr_type != LCD)
-    {
-        pr_type = LCD;
-    }
-#endif
     /* Initialize the DMD module for the DISPLAY device driver. */
     status = DMD_init(0);
     if (DMD_OK != status)

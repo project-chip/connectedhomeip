@@ -15,24 +15,21 @@
  *    limitations under the License.
  */
 
-#include "SiWx917DeviceDataProvider.h"
-#include "DeviceConfig.h"
-#include "siwx917_utils.h"
+#include "SilabsDeviceDataProvider.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/Base64.h>
 #include <platform/silabs/SilabsConfig.h>
-#include <setup_payload/Base38Decode.h>
 #include <setup_payload/Base38Encode.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
 namespace chip {
 namespace DeviceLayer {
-namespace SIWx917 {
-#include <string>
+namespace Silabs {
+
 // using namespace chip::Credentials;
 using namespace chip::DeviceLayer::Internal;
 
+// TODO Remove once Commander supports (doesn't erase) NVM3 for 917
 #ifdef SIWX917_USE_COMISSIONABLE_DATA
 void SIWx917DeviceDataProvider::setupPayload(uint8_t * outBuf)
 {
@@ -167,7 +164,7 @@ CHIP_ERROR SIWx917DeviceDataProvider::FlashFactoryData()
 }
 #endif
 
-CHIP_ERROR SIWx917DeviceDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
+CHIP_ERROR SilabsDeviceDataProvider::GetSetupDiscriminator(uint16_t & setupDiscriminator)
 {
     CHIP_ERROR err;
     uint32_t setupDiscriminator32;
@@ -186,9 +183,10 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetSetupDiscriminator(uint16_t & setupDisc
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SIWx917DeviceDataProvider::GetSpake2pIterationCount(uint32_t & iterationCount)
+CHIP_ERROR SilabsDeviceDataProvider::GetSpake2pIterationCount(uint32_t & iterationCount)
 {
     CHIP_ERROR err = SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_Spake2pIterationCount, iterationCount);
+
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT) && CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_ITERATION_COUNT
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -199,7 +197,7 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetSpake2pIterationCount(uint32_t & iterat
     return err;
 }
 
-CHIP_ERROR SIWx917DeviceDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
+CHIP_ERROR SilabsDeviceDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
 {
     static constexpr size_t kSpake2pSalt_MaxBase64Len = BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_Max_PBKDF_Salt_Length) + 1;
 
@@ -208,6 +206,7 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
     size_t saltB64Len                       = 0;
 
     err = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_Spake2pSalt, saltB64, sizeof(saltB64), saltB64Len);
+
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_SALT)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -230,7 +229,7 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetSpake2pSalt(MutableByteSpan & saltBuf)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SIWx917DeviceDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & verifierLen)
+CHIP_ERROR SilabsDeviceDataProvider::GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & verifierLen)
 {
     static constexpr size_t kSpake2pSerializedVerifier_MaxBase64Len =
         BASE64_ENCODED_LEN(chip::Crypto::kSpake2p_VerifierSerialized_Length) + 1;
@@ -241,6 +240,7 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetSpake2pVerifier(MutableByteSpan & verif
 
     err = SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_Spake2pVerifier, verifierB64, sizeof(verifierB64),
                                            verifierB64Len);
+
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SPAKE2P_VERIFIER)
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -262,13 +262,15 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetSpake2pVerifier(MutableByteSpan & verif
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SIWx917DeviceDataProvider::GetSetupPayload(MutableCharSpan & payloadBuf)
+CHIP_ERROR SilabsDeviceDataProvider::GetSetupPayload(MutableCharSpan & payloadBuf)
 {
     CHIP_ERROR err                                      = CHIP_NO_ERROR;
     uint8_t payloadBitSet[kTotalPayloadDataSizeInBytes] = { 0 };
     size_t bitSetLen                                    = 0;
+
     err = SilabsConfig::ReadConfigValueBin(SilabsConfig::kConfigKey_SetupPayloadBitSet, payloadBitSet, kTotalPayloadDataSizeInBytes,
                                            bitSetLen);
+
 #if defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -300,18 +302,19 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetSetupPayload(MutableCharSpan & payloadB
     return err;
 }
 
-CHIP_ERROR SIWx917DeviceDataProvider::GetVendorName(char * buf, size_t bufSize)
+CHIP_ERROR SilabsDeviceDataProvider::GetVendorName(char * buf, size_t bufSize)
 {
     size_t vendorNameLen = 0; // without counting null-terminator
     return SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_VendorName, buf, bufSize, vendorNameLen);
 }
 
-CHIP_ERROR SIWx917DeviceDataProvider::GetVendorId(uint16_t & vendorId)
+CHIP_ERROR SilabsDeviceDataProvider::GetVendorId(uint16_t & vendorId)
 {
     ChipError err       = CHIP_NO_ERROR;
     uint32_t vendorId32 = 0;
 
     err = SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_VendorId, vendorId32);
+
 #if defined(CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID) && CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -325,18 +328,19 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetVendorId(uint16_t & vendorId)
     return err;
 }
 
-CHIP_ERROR SIWx917DeviceDataProvider::GetProductName(char * buf, size_t bufSize)
+CHIP_ERROR SilabsDeviceDataProvider::GetProductName(char * buf, size_t bufSize)
 {
     size_t productNameLen = 0; // without counting null-terminator
     return SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_ProductName, buf, bufSize, productNameLen);
 }
 
-CHIP_ERROR SIWx917DeviceDataProvider::GetProductId(uint16_t & productId)
+CHIP_ERROR SilabsDeviceDataProvider::GetProductId(uint16_t & productId)
 {
     ChipError err        = CHIP_NO_ERROR;
     uint32_t productId32 = 0;
 
     err = SilabsConfig::ReadConfigValue(SilabsConfig::kConfigKey_ProductId, productId32);
+
 #if defined(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID) && CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -350,7 +354,7 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetProductId(uint16_t & productId)
     return err;
 }
 
-CHIP_ERROR SIWx917DeviceDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
+CHIP_ERROR SilabsDeviceDataProvider::GetHardwareVersionString(char * buf, size_t bufSize)
 {
     size_t hardwareVersionStringLen = 0; // without counting null-terminator
     CHIP_ERROR err =
@@ -365,7 +369,7 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetHardwareVersionString(char * buf, size_
     return err;
 }
 
-CHIP_ERROR SIWx917DeviceDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
+CHIP_ERROR SilabsDeviceDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
 {
     CHIP_ERROR err;
     uint32_t hardwareVersion32;
@@ -383,7 +387,7 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetHardwareVersion(uint16_t & hardwareVers
     return err;
 }
 
-CHIP_ERROR SIWx917DeviceDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
+CHIP_ERROR SilabsDeviceDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan)
 {
     ChipError err = CHIP_ERROR_WRONG_KEY_TYPE;
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
@@ -411,13 +415,13 @@ CHIP_ERROR SIWx917DeviceDataProvider::GetRotatingDeviceIdUniqueId(MutableByteSpa
     return err;
 }
 
-CHIP_ERROR SIWx917DeviceDataProvider::GetSerialNumber(char * buf, size_t bufSize)
+CHIP_ERROR SilabsDeviceDataProvider::GetSerialNumber(char * buf, size_t bufSize)
 {
     size_t serialNumberLen = 0; // without counting null-terminator
     return SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_SerialNum, buf, bufSize, serialNumberLen);
 }
 
-CHIP_ERROR SIWx917DeviceDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
+CHIP_ERROR SilabsDeviceDataProvider::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & day)
 {
     CHIP_ERROR err;
     constexpr uint8_t kDateStringLength = 10; // YYYY-MM-DD
@@ -452,15 +456,32 @@ exit:
         ChipLogError(DeviceLayer, "Invalid manufacturing date: %s", dateStr);
     }
     return err;
-    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-SIWx917DeviceDataProvider & SIWx917DeviceDataProvider::GetDeviceDataProvider()
+CHIP_ERROR SilabsDeviceDataProvider::GetPartNumber(char * buf, size_t bufSize)
 {
-    static SIWx917DeviceDataProvider sDataProvider;
+    size_t partNumberLen = 0; // without counting null-terminator
+    return SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_PartNumber, buf, bufSize, partNumberLen);
+}
+
+CHIP_ERROR SilabsDeviceDataProvider::GetProductURL(char * buf, size_t bufSize)
+{
+    size_t productUrlLen = 0; // without counting null-terminator
+    return SilabsConfig::ReadConfigValueStr(SilabsConfig::kConfigKey_ProductURL, buf, bufSize, productUrlLen);
+}
+
+CHIP_ERROR SilabsDeviceDataProvider::GetProductLabel(char * buf, size_t bufSize)
+{
+    size_t productLabelLen = 0; // without counting null-terminator
+    return SilabsConfig::ReadConfigValueStr(SilabsConfig::KConfigKey_ProductLabel, buf, bufSize, productLabelLen);
+}
+
+SilabsDeviceDataProvider & SilabsDeviceDataProvider::GetDeviceDataProvider()
+{
+    static SilabsDeviceDataProvider sDataProvider;
     return sDataProvider;
 }
 
-} // namespace SIWx917
+} // namespace Silabs
 } // namespace DeviceLayer
 } // namespace chip

@@ -1113,8 +1113,12 @@ CHIP_ERROR ConnectivityManagerImpl::CommitConfig()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(ByteSpan & value)
+CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(MutableByteSpan & value)
 {
+    constexpr size_t bssIdSize = 6;
+    static_assert(kMaxHardwareAddrSize >= bssIdSize, "We are assuming we can fit a BSSID in a buffer of size kMaxHardwareAddrSize");
+    VerifyOrReturnError(value.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
@@ -1126,23 +1130,22 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(ByteSpan & value)
     }
     else
     {
-        uint8_t macAddress[kMaxHardwareAddrSize];
-
         // Walk through linked list, maintaining head pointer so we can free list later.
         for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
             if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) ==
                 InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI)
             {
-                if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, macAddress, kMaxHardwareAddrSize) != CHIP_NO_ERROR)
+                if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, value.data(), kMaxHardwareAddrSize) !=
+                    CHIP_NO_ERROR)
                 {
                     ChipLogError(DeviceLayer, "Failed to get WiFi network hardware address");
                 }
                 else
                 {
                     // Set 48-bit IEEE MAC Address
-                    value = ByteSpan(macAddress, 6);
-                    err   = CHIP_NO_ERROR;
+                    value.reduce_size(bssIdSize);
+                    err = CHIP_NO_ERROR;
                     break;
                 }
             }

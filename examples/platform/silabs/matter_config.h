@@ -22,7 +22,11 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 
-class SI917MatterConfig
+#ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
+#include "ICDSubscriptionCallback.h"
+#endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
+
+class SilabsMatterConfig
 {
 public:
     static CHIP_ERROR InitMatter(const char * appName);
@@ -32,4 +36,8 @@ private:
     static void InitWiFi(void);
     static void ConnectivityEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
     static void InitOTARequestorHandler(chip::System::Layer * systemLayer, void * appState);
+
+#ifdef CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
+    static ICDSubscriptionCallback mICDSubscriptionHandler;
+#endif // CHIP_CONFIG_USE_ICD_SUBSCRIPTION_CALLBACKS
 };
