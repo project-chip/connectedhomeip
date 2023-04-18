@@ -432,11 +432,10 @@ def BuildCyw30739Target():
     # apps
     target.AppendFixedTargets([
         TargetPart('light', app=Cyw30739App.LIGHT),
-        TargetPart('lock',  app=Cyw30739App.LOCK),
-        TargetPart('ota-requestor',  app=Cyw30739App.OTA_REQUESTOR),
+        TargetPart('lock', app=Cyw30739App.LOCK),
+        TargetPart('ota-requestor', app=Cyw30739App.OTA_REQUESTOR),
+        TargetPart('switch', app=Cyw30739App.SWITCH),
     ])
-
-    target.AppendModifier(name="no-progress-logging", progress_logging=False)
 
     return target
 
