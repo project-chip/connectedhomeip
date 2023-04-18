@@ -16,7 +16,6 @@
  */
 package chip.devicecontroller;
 
-
 public class ClusterIDMapping {
   public interface BaseCluster {
     long getID();
