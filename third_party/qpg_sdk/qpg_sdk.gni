@@ -102,7 +102,6 @@ template("qpg_sdk") {
     cflags += [
       "-Wno-maybe-uninitialized",
       "-Wno-shadow",
-      "-Wno-error=array-parameter",
     ]
 
     # Inherit defines from invoker (i.e. examples app)
