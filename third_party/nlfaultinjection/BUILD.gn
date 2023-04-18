@@ -34,7 +34,7 @@ static_library("nlfaultinjection") {
   deps = [ "${nlassert_root}:nlassert" ]
 
   public_configs = [ ":nlfaultinjection_config" ]
-  configs = [ ":nlfaultinjection_config_private" ]
+  configs += [ ":nlfaultinjection_config_private" ]
 
   output_name = "libnlfaultinjection"
   output_dir = "${root_out_dir}/lib"
