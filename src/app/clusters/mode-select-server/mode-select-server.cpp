@@ -76,8 +76,6 @@ void Instance::HandleCommand(HandlerContext & handlerContext, FuncT func)
     }
 }
 
-
-
 EmberAfStatus Instance::SetCurrentMode(uint8_t newMode)
 {
     switch (clusterId)
@@ -120,13 +118,30 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::SupportedModes::Id:
+        if (msDelegate->modeOptions.empty())
+        {
+            aEncoder.EncodeEmptyList();
+            return CHIP_NO_ERROR;
+        }
+
+        CHIP_ERROR err;
+        const auto mo = msDelegate->modeOptions;
+        err = aEncoder.EncodeList([mo](const auto & encoder) -> CHIP_ERROR {
+            for (ModeOptionStructType mode : mo)
+            {
+                ReturnErrorOnFailure(encoder.Encode(mode));
+            }
+            return CHIP_NO_ERROR;
+        });
+        ReturnErrorOnFailure(err);
+    }
+
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    return CHIP_NO_ERROR;
-}
 
 } // namespace ModeSelect
 } // namespace Clusters

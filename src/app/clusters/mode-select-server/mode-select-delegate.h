@@ -40,11 +40,9 @@ namespace Clusters {
 namespace ModeSelect {
 
 class Delegate {
-private:
-    const std::vector<ModeOptionStructType> modeOptions;
-
 public:
-    /** 
+    const std::vector<ModeOptionStructType> modeOptions;
+    /**
      * This is a helper function to build a mode option struture. It takes the label/name of the mode,
      * the value of the mode and a list of semantic tags that apply to this mode.
      */
