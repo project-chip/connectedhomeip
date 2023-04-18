@@ -1384,11 +1384,14 @@ exit:
                        }
                    };
 
-                   auto onResubscriptionScheduledCb = [resubscriptionScheduled](NSError * error, NSNumber * resubscriptionDelay) {
-                       if (resubscriptionScheduled) {
-                           resubscriptionScheduled(error, resubscriptionDelay);
-                       }
-                   };
+                   auto onResubscriptionScheduledCb
+                       = [queue, resubscriptionScheduled](NSError * error, NSNumber * resubscriptionDelay) {
+                             if (resubscriptionScheduled) {
+                                 dispatch_async(queue, ^{
+                                     resubscriptionScheduled(error, resubscriptionDelay);
+                                 });
+                             }
+                         };
 
                    MTRReadClientContainer * container = [[MTRReadClientContainer alloc] init];
                    container.deviceID = self.nodeID;
