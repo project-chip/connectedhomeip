@@ -285,7 +285,6 @@ class ClusterAttributeDescriptor:
             # handle case where the ClusterAttribute class is not (fully) subclassed
             # and accessing the id property throws a NotImplementedError.
             pass
-        
     @classmethod
     def ToTLV(cls, tag: Union[int, None], value):
         writer = tlv.TLVWriter()
