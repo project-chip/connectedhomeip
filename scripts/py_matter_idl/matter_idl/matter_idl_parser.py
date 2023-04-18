@@ -287,6 +287,7 @@ class MatterIdlTransformer(Transformer):
     def command(self, meta, *args):
         # The command takes 4 arguments if no input argument, 5 if input
         # argument is provided
+        args = list(args) # convert from tuple
         if len(args) != 5:
             args.insert(2, None)
 
