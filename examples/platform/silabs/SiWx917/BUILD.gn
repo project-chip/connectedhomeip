@@ -176,7 +176,7 @@ config("siwx917-common-config") {
   }
 
   if (chip_enable_ota_requestor) {
-    defines += [ "EFR32_OTA_ENABLED" ]
+    defines += [ "SILABS_OTA_ENABLED" ]
   }
 
   if (enable_heap_monitoring) {

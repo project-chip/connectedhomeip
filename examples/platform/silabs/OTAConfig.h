@@ -22,7 +22,7 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <platform/silabs/efr32/OTAImageProcessorImpl.h>
+#include <platform/silabs/OTAImageProcessorImpl.h>
 
 class OTAConfig
 {
