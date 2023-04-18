@@ -1011,23 +1011,24 @@ private:
             AttributePathParams * attributePathParamsListToFree = attributePathParamsList.Get();
             EventPathParams * eventPathParamsListToFree = eventPathParamsList.Get();
 
-            auto onDone = [resultArray, interactionStatus, bridge, successCb, failureCb, attributePathParamsListToFree,
-                           eventPathParamsListToFree](BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
-                if (*interactionStatus != CHIP_NO_ERROR) {
-                    // Failure
-                    failureCb(bridge, *interactionStatus);
-                } else {
-                    // Success
-                    successCb(bridge, resultArray);
-                }
-                if (attributePathParamsListToFree != nullptr) {
-                    Platform::MemoryFree(attributePathParamsListToFree);
-                }
-                if (eventPathParamsListToFree != nullptr) {
-                    Platform::MemoryFree(eventPathParamsListToFree);
-                }
-                chip::Platform::Delete(callback);
-            };
+            auto onDone
+                = [resultArray, interactionStatus, bridge, successCb, failureCb, attributePathParamsListToFree,
+                      eventPathParamsListToFree](BufferedReadClientCallback<MTRDataValueDictionaryDecodableType> * callback) {
+                      if (*interactionStatus != CHIP_NO_ERROR) {
+                          // Failure
+                          failureCb(bridge, *interactionStatus);
+                      } else {
+                          // Success
+                          successCb(bridge, resultArray);
+                      }
+                      if (attributePathParamsListToFree != nullptr) {
+                          Platform::MemoryFree(attributePathParamsListToFree);
+                      }
+                      if (eventPathParamsListToFree != nullptr) {
+                          Platform::MemoryFree(eventPathParamsListToFree);
+                      }
+                      chip::Platform::Delete(callback);
+                  };
 
             auto callback = chip::Platform::MakeUnique<BufferedReadClientCallback<MTRDataValueDictionaryDecodableType>>(
                 attributePathParamsList.Get(), readParams.mAttributePathParamsListSize, eventPathParamsList.Get(),
