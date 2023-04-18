@@ -22,6 +22,13 @@
 #include <setup_payload/Base38Encode.h>
 #include <setup_payload/SetupPayload.h>
 
+#ifdef SIWX917_USE_COMISSIONABLE_DATA
+#include "DeviceConfig.h"
+#include "siwx917_utils.h"
+#include <setup_payload/Base38Decode.h>
+#include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#endif // SIWX917_USE_COMISSIONABLE_DATA
+
 namespace chip {
 namespace DeviceLayer {
 namespace Silabs {
@@ -31,7 +38,7 @@ using namespace chip::DeviceLayer::Internal;
 
 // TODO Remove once Commander supports (doesn't erase) NVM3 for 917
 #ifdef SIWX917_USE_COMISSIONABLE_DATA
-void SIWx917DeviceDataProvider::setupPayload(uint8_t * outBuf)
+void SilabsDeviceDataProvider::setupPayload(uint8_t * outBuf)
 {
     SetupPayload payload;
     std::string result;
@@ -64,7 +71,7 @@ void SIWx917DeviceDataProvider::setupPayload(uint8_t * outBuf)
 }
 
 // writing to the flash based on the value given in the DeviceConfig.h
-CHIP_ERROR SIWx917DeviceDataProvider::FlashFactoryData()
+CHIP_ERROR SilabsDeviceDataProvider::FlashFactoryData()
 {
     // flashing the value to the nvm3 section of the flash
     // TODO: remove this once it is removed SiWx917 have the nvm3 simiplicity commander support
@@ -161,6 +168,7 @@ CHIP_ERROR SIWx917DeviceDataProvider::FlashFactoryData()
             return err;
         }
     }
+    return CHIP_NO_ERROR;
 }
 #endif
 
